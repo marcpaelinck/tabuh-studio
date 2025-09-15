@@ -6,7 +6,7 @@ export type Instrument = {
 
 export type SectionData = {
   label: string
-  value: string
+  value: string[]
 }
 
 export type Section = {

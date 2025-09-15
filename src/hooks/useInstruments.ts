@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import * as Tone from 'tone'
 
 const SOUNDS_FOLDER = 'sounds/'
-const NOTES = ['D4', 'E4', 'G#4', 'A4', 'C#4', 'D5', 'E5', 'G#5', 'A5', 'C#6']
+const NOTES = ['D2', 'E2', 'G#2', 'A2', 'C#2', 'D3', 'E3', 'G#3', 'A3', 'C#3', 'D4', 'E4', 'G#4', 'A4', 'C#4', 'D5', 'E5', 'G#5', 'A5', 'C#6', 'D6', 'E6', 'G#6', 'A6']
 
 type InstrumentConfig = {
   alphabet: string[]
@@ -11,136 +11,87 @@ type InstrumentConfig = {
 }
 
 const instrumentConfigs: Record<string, InstrumentConfig> = {
-  r1: {
-    alphabet: ['E', 'U', 'A', 'I', 'O', 'e'],
-    samples: ['r_e.mp3', 'r_u.mp3', 'r_a.mp3', 'r_i.mp3', 'r_o.mp3', 'r_e-h.mp3'],
-    volume: -24,
-  },
-  r2: {
-    alphabet: ['A', 'I', 'O', 'e', 'u', 'a'],
-    samples: ['r_a.mp3', 'r_i.mp3', 'r_o.mp3', 'r_e-h.mp3', 'r_u-h.mp3', 'r_a-h.mp3'],
-    volume: -24,
-  },
-  r3: {
-    alphabet: ['e', 'u', 'a', 'i', 'o'],
-    samples: ['r_e-h.mp3', 'r_u-h.mp3', 'r_a-h.mp3', 'r_i-h.mp3', 'r_o-h.mp3'],
-    volume: -24,
-  },
-  r4: {
-    alphabet: ['U', 'a', 'i', 'o', 'e', 'u'],
-    samples: ['r_u-h.mp3', 'r_a-h.mp3', 'r_i-h.mp3', 'r_o-h.mp3', 'r_e-hh.mp3', 'r_u-hh.mp3'],
-    volume: -24,
-  },
-  rs2: {
-    alphabet: ['a', 'i', 'o', 'e', 'u'],
-    samples: ['r_a.mp3', 'r_i.mp3', 'r_o.mp3', 'r_e-h.mp3', 'r_u-h.mp3'],
-    volume: -24,
-  },
-  rs4: {
-    alphabet: ['a', 'i', 'o', 'e', 'u'],
-    samples: ['r_a-h.mp3', 'r_i-h.mp3', 'r_o-h.mp3', 'r_e-hh.mp3', 'r_u-hh.mp3'],
-    volume: -24,
-  },
-  rp1: {
-    alphabet: ['e', 'u', 'a', 'i', 'o'],
-    samples: ['r_e.mp3', 'r_u.mp3', 'r_a.mp3', 'r_i.mp3', 'r_o.mp3'],
-    volume: -24,
-  },
-  rp3: {
-    alphabet: ['e', 'u', 'a', 'i', 'o'],
-    samples: ['r_e-h.mp3', 'r_u-h.mp3', 'r_a-h.mp3', 'r_i-h.mp3', 'r_o-h.mp3'],
-    volume: -24,
-  },
-  ks: {
-    alphabet: ['O', 'E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gk_o.mp3','gk_e.mp3','gk_u.mp3','gk_a.mp3','gk_i.mp3','gk_o-h.mp3','gk_e-h.mp3','gk_u-h.mp3','gk_a-h.mp3','gk_i-h.mp3'], // prettier-ignore
-    volume: -28,
-  },
-  kp: {
-    alphabet: ['O', 'E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gk_o.mp3','gk_e.mp3','gk_u.mp3','gk_a.mp3','gk_i.mp3','gk_o-h.mp3','gk_e-h.mp3','gk_u-h.mp3','gk_a-h.mp3','gk_i-h.mp3'], // prettier-ignore
-    volume: -28,
-  },
-  ps: {
-    alphabet: ['O', 'E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gp_o.mp3','gp_e.mp3','gp_u.mp3','gp_a.mp3','gp_i.mp3','gp_o-h.mp3','gp_e-h.mp3','gp_u-h.mp3','gp_a-h.mp3','gp_i-h.mp3'], // prettier-ignore
-    volume: -28,
-  },
-  pp: {
-    alphabet: ['O', 'E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gp_o.mp3','gp_e.mp3','gp_u.mp3','gp_a.mp3','gp_i.mp3','gp_o-h.mp3','gp_e-h.mp3','gp_u-h.mp3','gp_a-h.mp3','gp_i-h.mp3'], // prettier-ignore
-    volume: -28,
-  },
-  gr1: {
-    alphabet: ['E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gr_e.mp3','gr_u.mp3','gr_a.mp3','gr_i.mp3','gr_o.mp3','gr_e-h.mp3','gr_u-h.mp3','gr_a-h.mp3','gr_i-h.mp3'], // prettier-ignore
-    volume: -26,
-  },
-  gr2: {
-    alphabet: ['E', 'U', 'A', 'I', 'o', 'e', 'u', 'a', 'i'],
-    samples: ['gr_e-h.mp3','gr_u-h.mp3','gr_a-h.mp3','gr_i-h.mp3','gr_o-h.mp3','gr_e-hh.mp3','gr_u-hh.mp3','gr_a-hh.mp3','gr_i-hh.mp3'], // prettier-ignore
-    volume: -26,
-  },
-  u: { alphabet: [], samples: [], volume: -24 },
-  t: { alphabet: [], samples: [], volume: -24 },
-  p: {
-    alphabet: ['U', 'A', 'i', 'o', 'e', 'u', 'a'],
-    samples: ['pp_u.mp3', 'pp_a.mp3', 'pp_i.mp3', 'pp_o.mp3', 'pp_e.mp3', 'pp_u-h.mp3', 'pp_a-h.mp3'],
-    volume: -22,
-  },
-  c: {
-    alphabet: ['I', 'O', 'E', 'U', 'A'],
-    samples: ['pc_i.mp3', 'pc_o.mp3', 'pc_e.mp3', 'pc_u.mp3', 'pc_a.mp3'],
-    volume: -22,
-  },
-  j: {
-    alphabet: ['I', 'O', 'E', 'U', 'A'],
-    samples: ['pj_i.mp3', 'pj_o.mp3', 'pj_e.mp3', 'pj_u.mp3', 'pj_a.mp3'],
-    volume: -22,
-  },
-  g: {
-    alphabet: ['G', 'L', 'P', 't'],
-    samples: ['g_g.mp3', 'g_l.mp3', 'g_p.mp3', 'g_t.mp3'],
-    volume: -20,
-  },
-  km: { alphabet: ['x'], samples: ['km.mp3'], volume: -20 },
-  kn: { alphabet: ['n'], samples: ['kn.mp3'], volume: -24 },
-  cc: {
-    alphabet: ['x', 'c', 'C'],
-    samples: ['c_x-l.mp3', 'c_c.mp3', 'c_c-o.mp3'],
-    volume: -28,
-  },
-  kkr: {
-    alphabet: ['o', 'e', 'n', 'u', 'D', 'T', 'k', 'p', 'ḱ', 'ṕ'],
-    samples: ['kkr_o.mp3','kkr_e.mp3','kkr_n.mp3','kkr_u.mp3','kkr_d.mp3','kkr_t.mp3','kkr_k.mp3','kkr_p.mp3','kkr_k-h.mp3','kkr_pak.mp3'], // prettier-ignore
-    volume: -17,
-  },
-  krw: {
-    alphabet: ['o', 'e', 'n', 'u', 'D', 'T', 'k', 'p', 'ḱ', 'ṕ'],
-    samples: ['kkr_o.mp3','kkr_e.mp3','kkr_n.mp3','kkr_u.mp3','kkr_d.mp3','kkr_t.mp3','kkr_k.mp3','kkr_p.mp3','kkr_k-h.mp3','kkr_pak.mp3'], // prettier-ignore
-    volume: -17,
-  },
-  krl: {
-    alphabet: ['o', 'e', 'n', 'u', 'D', 'T', 'k', 'p', 'ḱ', 'ṕ'],
-    samples: ['kkr_o.mp3','kkr_e.mp3','kkr_n.mp3','kkr_u.mp3','kkr_d.mp3','kkr_t.mp3','kkr_k.mp3','kkr_p.mp3','kkr_k-h.mp3','kkr_pak.mp3'], // prettier-ignore
-    volume: -17,
-  },
-  tr: {
-    alphabet: ['o', 'p', 'x'],
-    samples: ['tr_o.mp3', 'tr_p.mp3', 'tr_x.mp3'],
-    volume: -18,
-  },
+GONG: {
+	alphabet: ['G', 'P', 'T'],
+	samples: ['Gong.mp3', 'Kempur.mp3', 'Kemong.mp3'],
+	volume: -24,
+	},
+KEMPLI: {
+	alphabet: ['x?'],
+	samples: ['Kempli_MUTED.mp3'],
+	volume: -20,
+	},
+CENGCENG: {
+	alphabet: ['x', 'x?'],
+	samples: ['Cengceng.mp3', 'Cengceng_MUTED.mp3'],
+	volume: -24,
+	},
+JEGOGAN: {
+	alphabet: ['i', 'o', 'e', 'u', 'a'],
+	samples: ['Jegogan_DING1.mp3', 'Jegogan_DONG1.mp3', 'Jegogan_DENG1.mp3', 'Jegogan_DUNG1.mp3', 'Jegogan_DANG1.mp3'],
+	volume: -24,
+	},
+CALUNG: {
+	alphabet: ['i', 'o', 'e', 'u', 'a'],
+	samples: ['Calung_DING1.mp3', 'Calung_DONG1.mp3', 'Calung_DENG1.mp3', 'Calung_DUNG1.mp3', 'Calung_DANG1.mp3'],
+	volume: -24,
+	},
+KANTILAN_POLOS: {
+	alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</'],
+	samples: ['Kantilan_DONG0.mp3', 'Kantilan_DENG0.mp3', 'Kantilan_DUNG0.mp3', 'Kantilan_DANG0.mp3', 'Kantilan_DING1.mp3', 'Kantilan_DONG1.mp3', 'Kantilan_DENG1.mp3', 'Kantilan_DUNG1.mp3', 'Kantilan_DANG1.mp3', 'Kantilan_DING2.mp3', 'Kantilan_DONG0_MUTED.mp3', 'Kantilan_DENG0_MUTED.mp3', 'Kantilan_DUNG0_MUTED.mp3', 'Kantilan_DANG0_MUTED.mp3', 'Kantilan_DING1_MUTED.mp3', 'Kantilan_DONG1_MUTED.mp3', 'Kantilan_DENG1_MUTED.mp3', 'Kantilan_DUNG1_MUTED.mp3', 'Kantilan_DANG1_MUTED.mp3', 'Kantilan_DING2_MUTED.mp3'],
+	volume: -24,
+	},
+KANTILAN_SANGSIH: {
+	alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</'],
+	samples: ['Kantilan_DONG0.mp3', 'Kantilan_DENG0.mp3', 'Kantilan_DUNG0.mp3', 'Kantilan_DANG0.mp3', 'Kantilan_DING1.mp3', 'Kantilan_DONG1.mp3', 'Kantilan_DENG1.mp3', 'Kantilan_DUNG1.mp3', 'Kantilan_DANG1.mp3', 'Kantilan_DING2.mp3', 'Kantilan_DONG0_MUTED.mp3', 'Kantilan_DENG0_MUTED.mp3', 'Kantilan_DUNG0_MUTED.mp3', 'Kantilan_DANG0_MUTED.mp3', 'Kantilan_DING1_MUTED.mp3', 'Kantilan_DONG1_MUTED.mp3', 'Kantilan_DENG1_MUTED.mp3', 'Kantilan_DUNG1_MUTED.mp3', 'Kantilan_DANG1_MUTED.mp3', 'Kantilan_DING2_MUTED.mp3'],
+	volume: -24,
+	},
+PEMADE_POLOS: {
+	alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</'],
+	samples: ['Pemade_DONG0.mp3', 'Pemade_DENG0.mp3', 'Pemade_DUNG0.mp3', 'Pemade_DANG0.mp3', 'Pemade_DING1.mp3', 'Pemade_DONG1.mp3', 'Pemade_DENG1.mp3', 'Pemade_DUNG1.mp3', 'Pemade_DANG1.mp3', 'Pemade_DING2.mp3', 'Pemade_DONG0_MUTED.mp3', 'Pemade_DENG0_MUTED.mp3', 'Pemade_DUNG0_MUTED.mp3', 'Pemade_DANG0_MUTED.mp3', 'Pemade_DING1_MUTED.mp3', 'Pemade_DONG1_MUTED.mp3', 'Pemade_DENG1_MUTED.mp3', 'Pemade_DUNG1_MUTED.mp3', 'Pemade_DANG1_MUTED.mp3', 'Pemade_DING2_MUTED.mp3'],
+	volume: -24,
+	},
+PEMADE_SANGSIH: {
+	alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</'],
+	samples: ['Pemade_DONG0.mp3', 'Pemade_DENG0.mp3', 'Pemade_DUNG0.mp3', 'Pemade_DANG0.mp3', 'Pemade_DING1.mp3', 'Pemade_DONG1.mp3', 'Pemade_DENG1.mp3', 'Pemade_DUNG1.mp3', 'Pemade_DANG1.mp3', 'Pemade_DING2.mp3', 'Pemade_DONG0_MUTED.mp3', 'Pemade_DENG0_MUTED.mp3', 'Pemade_DUNG0_MUTED.mp3', 'Pemade_DANG0_MUTED.mp3', 'Pemade_DING1_MUTED.mp3', 'Pemade_DONG1_MUTED.mp3', 'Pemade_DENG1_MUTED.mp3', 'Pemade_DUNG1_MUTED.mp3', 'Pemade_DANG1_MUTED.mp3', 'Pemade_DING2_MUTED.mp3'],
+	volume: -24,
+	},
+UGAL: {
+	alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<'],
+  samples: ['Ugal_DONG0.mp3', 'Ugal_DENG0.mp3', 'Ugal_DUNG0.mp3', 'Ugal_DANG0.mp3', 'Ugal_DING1.mp3', 'Ugal_DONG1.mp3', 'Ugal_DENG1.mp3', 'Ugal_DUNG1.mp3', 'Ugal_DANG1.mp3', 'Ugal_DING2.mp3'],
+	volume: -24,
+	},
+REYONG_1: {
+	alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 'r', 'b', 'b/', 'b?', 'x', 'y'],
+	samples: ['Reyong_DENG0.mp3', 'Reyong_DUNG0.mp3', 'Reyong_DANG0.mp3', 'Reyong_DING1.mp3', 'Reyong_DONG1.mp3', 'Reyong_DENG1.mp3', 'Reyong_DENG0-DING1.mp3', 'Reyong_DENG0-DANG0.mp3', 'Reyong_DENG0-DANG0_ABBREVIATED.mp3', 'Reyong_DENG0-DANG0_MUTED.mp3',  'Reyong_DUNG0_TICK_1_PANGGUL.mp3', 'Reyong_DUNG0_TICK_2_PANGGUL.mp3'],
+	volume: -30,
+	},
+REYONG_2: {
+	alphabet: ['u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'b', 'b/', 'b?', 'x', 'y'],
+	samples: ['Reyong_DUNG0.mp3', 'Reyong_DANG0.mp3', 'Reyong_DING1.mp3', 'Reyong_DONG1.mp3', 'Reyong_DENG1.mp3', 'Reyong_DUNG1.mp3', 'Reyong_DANG1.mp3', 'Reyong_DING1-DENG1.mp3', 'Reyong_DING1-DENG1_ABBREVIATED.mp3', 'Reyong_DING1-DENG1_MUTED.mp3', 'Reyong_DONG1_TICK_1_PANGGUL.mp3', 'Reyong_DONG1_TICK_2_PANGGUL.mp3'],
+	volume: -30,
+	},
+REYONG_3: {
+	alphabet: ['o', 'e', 'u', 'a', 'i<', 'o<', 'e<', 'b', 'b/', 'b?', 'x', 'y'],
+	samples: ['Reyong_DONG1.mp3', 'Reyong_DENG1.mp3', 'Reyong_DUNG1.mp3', 'Reyong_DANG1.mp3', 'Reyong_DING2.mp3', 'Reyong_DONG2.mp3', 'Reyong_DENG2.mp3', 'Reyong_DUNG1-DING2.mp3', 'Reyong_DUNG1-DING2_ABBREVIATED.mp3', 'Reyong_DUNG1-DING2_MUTED.mp3', 'Reyong_DANG1_TICK_1_PANGGUL.mp3', 'Reyong_DANG1_TICK_2_PANGGUL.mp3'],
+	volume: -30,
+	},
+REYONG_4: {
+	alphabet: ['u', 'a,', 'i<', 'o<', 'e<', 'u<', 'b', 'b/', 'b?', 'x', 'y'],
+	samples: ['Reyong_DUNG1.mp3', 'Reyong_DANG1.mp3', 'Reyong_DING2.mp3', 'Reyong_DONG2.mp3', 'Reyong_DENG2.mp3', 'Reyong_DUNG2.mp3', 'Reyong_DONG2-DUNG2.mp3', 'Reyong_DONG2-DUNG2_ABBREVIATED.mp3', 'Reyong_DONG2-DUNG2_MUTED.mp3', 'Reyong_DENG2_TICK_1_PANGGUL.mp3', 'Reyong_DENG2_TICK_2_PANGGUL.mp3'],
+	volume: -30,
+	},
 }
 
 const cInstrumentConfigs: Record<string, string[]> = {
-  rs: ['rs2', 'rs4'],
-  rp: ['rp1', 'rp3'],
-  kt: ['ks', 'kp'],
-  pd: ['ps', 'pp'],
-  gs: ['ks', 'ps'],
-  gp: ['kp', 'pp'],
-  gr: ['gr1', 'gr2'],
-  ggs: ['ks', 'kp', 'ps', 'pp'],
+  REYONG_13: ['REYONG_1', 'REYONG_3'],
+  REYONG_24: ['REYONG_2', 'REYONG_4'],
+  REYONG: ['REYONG_13', 'REYONG_24'],
+  KANTILAN: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'],
+  PEMADE: ['PEMADE_POLOS', 'PEMADE_SANGSIH'],
+  GANGSA: ['KANTILAN', 'PEMADE'],
+  GANGSA_POLOS: ['KANTILAN_POLOS', 'PEMADE_POLOS'],
+  GANGSA_SANGSIH: ['KANTILAN_SANGSIH', 'PEMADE_SANGSIH'],
 }
 
 export type LarasInstrument = {
