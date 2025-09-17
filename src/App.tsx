@@ -31,7 +31,10 @@ export default function App() {
 
   return (
     <div className="flex h-screen min-h-0">
-      <div className="h-full w-full overflow-scroll">
+      <div className="float-left">
+        <p>spacing</p>
+      </div>
+      <div className="float-left">
         <ScorePlayer
           initialContent={templateContent}
         />

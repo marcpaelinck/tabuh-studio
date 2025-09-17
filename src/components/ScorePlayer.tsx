@@ -1,5 +1,4 @@
 import { useInstruments } from '../hooks/useInstruments'
-import { useMaxSteps } from '../hooks/useMaxSteps'
 import { type Score} from '../models/types'
 import { createScoreTimeline, parseScore} from '../utils/score'
 import { useState, type JSX, memo, useCallback, useMemo } from 'react'
@@ -212,6 +211,7 @@ export default function ScorePlayer({ initialContent }: { initialContent: string
             playInstrument(action.label, notes, triggerTime)
           })
           if (timelinePoint.tempo !== Tone.getTransport().bpm.value) Tone.getTransport().bpm.value = timelinePoint.tempo
+          // if (timelinePoint.tempo !== Tone.getTransport().bpm.value) Tone.getTransport().bpm.rampTo(timelinePoint.tempo, 5)
           if (pC >= timeline.length - 1) {
             stopLoop()
             return 0
