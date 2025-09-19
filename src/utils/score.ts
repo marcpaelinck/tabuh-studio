@@ -1,77 +1,67 @@
-import { type SectionData, type Score } from '../models/types'
+import {type Score } from '../models/types'
+import * as Tone from 'tone'
 
 export function parseScore(input: string): Score {
   return JSON.parse(input)
 }
 
-export function splitSectionData(data: SectionData[], steps: number): SectionData[][] {
-  if (steps <= 0 || data.length === 0) return []
-
-  const labels = data.map(({ label }) => label)
-  const values = data.map(({ value }) => value)
-
-  if (values.length === 0) return []
-
-  const dataLength = values[0].length
-  const chunks: SectionData[][] = []
-
-  for (let i = 0; i < dataLength; i += steps) {
-    const chunk: SectionData[] = labels.map((label, j) => {
-      const end = Math.min(i + steps, values[j].length)
-      const value = values[j].slice(i, end)
-
-      return { label, value }
-    })
-    chunks.push(chunk)
-  }
-
-  return chunks
-}
-
-type InstrumentAction = {
+export interface InstrumentAction  {
+  target: string
   label: string
-  value: string
+  symbol: string
+  velocity: Tone.Unit.NormalRange[]
+  time: Tone.Unit.TimeObject
+  duration: Tone.Unit.TimeObject
 }
 
-export type ScoreTimelinePoint = {
-  timelineStep: number
+export type TransportAction ={
+  target: string
+  bpm: (Tone.Unit.NormalRange | null)[]
+  time: Tone.Unit.TimeObject
+  duration: Tone.Unit.TimeObject
+}
+
+export type TimelineBeat = {
   sectionId: number
-  sectionStep: number
-  time: number
-  tempo: number
-  instrumentActions: InstrumentAction[]
+  actions: (InstrumentAction | TransportAction)[]
 }
 
-export type ScoreTimeline = ScoreTimelinePoint[]
+export type ScoreTimeline = TimelineBeat[]
 
-export function createScoreTimeline(score: Score): ScoreTimelinePoint[] {
-  const timeline: ScoreTimelinePoint[] = []
-  let currentTime = 0
-  let timelineStep = 0
+const n2TO = (notevalue: number) => {
+  return {"16n": notevalue}
+}
+
+export function createFlattenedScore(score: Score): TimelineBeat[] {
+  const timeline: TimelineBeat[] = []
+  var currBpm: Tone.Unit.NormalRange = 0
+  var currTime: Tone.Unit.TimeObject = n2TO(0)
 
   score.sections.forEach((section) => {
-    const sectionBpm = section.tempo || 120
-    const secondsPerStep = 60 / sectionBpm
-    const maxSteps = section.data.reduce((max, data) => Math.max(max, data.value.length), 0)
+    var actionList: (InstrumentAction | TransportAction)[] = []
 
-    for (let step = 0; step < maxSteps; step++) {
-      const instrumentActions: InstrumentAction[] = section.data
-        .filter((data) => data.value[step] && data.value[step] !== ' ')
-        .map((data) => ({ label: data.label, value: data.value[step] }))
+    currTime = n2TO(section.starttime)
 
-      timeline.push({
-        timelineStep: timelineStep,
-        sectionId: section.id,
-        sectionStep: step,
-        time: currentTime,
-        tempo: sectionBpm,
-        instrumentActions,
+    if (section.tempo[0] != currBpm || section.tempo[1] != currBpm) {
+      actionList.push({target: "transport", bpm: [section.tempo[0]!=currBpm ? section.tempo[0] : null, section.tempo[1]!=section.tempo[0] ? section.tempo[1] : null], time: currTime, duration: n2TO(section.duration)})
+      currBpm = section.tempo[1]
+    }
+
+    section.data.forEach((stave) => {
+      stave.value.forEach((note) => {
+        actionList.push({target: "instrument", label: stave.label, symbol: note.s, velocity: stave.velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
       })
-
-      currentTime += secondsPerStep
-      timelineStep++
+      
+      // actionList.push(...stave.value
+      //   .map((note) =>({target: "instrument", label: stave.label, symbol: note.s, velocity: stave.velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })))
+    })
+    if (actionList.length > 0) {
+      timeline.push({
+        sectionId: section.id,
+        actions: actionList,
+      })
     }
   })
-
+  console.log(timeline.length + " events pushed")
   return timeline
 }

@@ -4,15 +4,24 @@ export type Instrument = {
   alphabet: string[]
 }
 
-export type SectionData = {
-  label: string
-  value: string[]
+export type Note = {
+  s: string
+  t: number
+  d?: number
+  v?: number
 }
 
+export type SectionData = {
+  label: string
+  velocity: number[]
+  value: Note[]
+}
 export type Section = {
   id: number
   title: string
-  tempo: number
+  starttime: number
+  duration: number
+  tempo: number[]
   data: SectionData[]
 }
 

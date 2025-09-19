@@ -12,7 +12,7 @@ export default function App() {
 
   useEffect(() => {
     const loadTemplate = async () => {
-      const templateContent = await readFile('scores/gilak penutup [full].json')
+      const templateContent = await readFile('scores/teruna jaya [full].json')
       setTemplateContent(templateContent)
       const templateScore = parseScore(templateContent)
       setScore(templateScore)

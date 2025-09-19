@@ -1,6 +1,6 @@
 import { useInstruments } from '../hooks/useInstruments'
 import { type Score} from '../models/types'
-import { createScoreTimeline, parseScore} from '../utils/score'
+import { createFlattenedScore, parseScore, type InstrumentAction, type TransportAction} from '../utils/score'
 import { useState, type JSX, memo, useCallback, useMemo } from 'react'
 import * as Tone from 'tone'
 
@@ -39,122 +39,6 @@ function ScoreSectionHeader({
   )
 }
 
-// function ScoreSectionData({
-//   sectionData,
-//   fullDisplay,
-//   isFirst = false,
-//   isLast = false,
-//   cursorStep,
-//   setCursorStep,
-// }: {
-//   sectionData: SectionData[]
-//   fullDisplay: boolean
-//   isFirst?: boolean
-//   isLast?: boolean
-//   cursorStep?: number
-//   setCursorStep: (step: number) => void
-// }): JSX.Element {
-//   return (
-//     <div className="flex flex-col">
-//       {sectionData.map((data, i) => (
-//         <div key={`${i}-${data.label}-${i}`} className="flex items-center text-xs select-none">
-//           <div className="sticky left-0 flex h-4 w-8 flex-shrink-0 items-center bg-amber-100 font-bold">
-//             {data.label}
-//           </div>
-
-//           <div className="flex">
-//             {data.value.split('').map((char, j) => {
-//               return (
-//                 <span
-//                   key={j}
-//                   onClick={() => setCursorStep(j)}
-//                   className={cn(
-//                     'flex h-4 w-4 cursor-pointer items-center justify-center font-mono',
-//                     j === 0 && (!fullDisplay || isFirst)
-//                       ? 'border-l'
-//                       : j % 4 === 0 && 'border-l border-dashed border-black/20',
-//                     cursorStep === j && 'bg-yellow-300',
-//                   )}
-//                 >
-//                   {char}
-//                 </span>
-//               )
-//             })}
-//             <span
-//               className={cn(
-//                 'flex h-4 w-4 items-center justify-center border-l',
-//                 fullDisplay && !isLast && 'border-dashed border-black/20',
-//               )}
-//             ></span>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-//   )
-// }
-
-// const ScoreSection = memo(function ScoreSection({
-//   section,
-//   maxSteps,
-//   cursorStep,
-//   setCursorStep,
-// }: {
-//   section: Section
-//   maxSteps: number
-//   cursorStep?: number
-//   setCursorStep: (step: number) => void
-// }): JSX.Element {
-//   const [fullDisplay, setFullDisplay] = useState(true)
-//   const dataChunks = splitSectionData(section.data, maxSteps)
-
-//   return (
-//     <div className="overflow-hidden text-sm">
-//       {dataChunks.length === 0 ? null : (
-//         <div className="flex flex-col">
-//           <ScoreSectionHeader
-//             fullDisplay={fullDisplay}
-//             onToggleDisplay={() => setFullDisplay((prev) => !prev)}
-//             name={section.title}
-//           />
-//           {fullDisplay ? (
-//             dataChunks.map((data, i) => {
-//               const chunkStart = i * maxSteps
-//               const chunkEnd = chunkStart + maxSteps
-//               const chunkCursorStep =
-//                 cursorStep !== undefined && cursorStep >= chunkStart && cursorStep < chunkEnd
-//                   ? cursorStep - chunkStart
-//                   : undefined
-//               const setChunkCursorStep = (chunkStep: number) => setCursorStep(chunkStart + chunkStep)
-//               return (
-//                 <div key={i} className="flex flex-col">
-//                   <ScoreSectionData
-//                     sectionData={data}
-//                     fullDisplay={fullDisplay}
-//                     isFirst={i === 0}
-//                     isLast={i === dataChunks.length - 1}
-//                     cursorStep={chunkCursorStep}
-//                     setCursorStep={setChunkCursorStep}
-//                   />
-//                   {i < dataChunks.length - 1 && <hr className="border-black/20" />}
-//                 </div>
-//               )
-//             })
-//           ) : (
-//             <div className="custom-scrollbar overflow-scroll">
-//               <ScoreSectionData
-//                 sectionData={section.data}
-//                 fullDisplay={fullDisplay}
-//                 cursorStep={cursorStep}
-//                 setCursorStep={setCursorStep}
-//               />
-//             </div>
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   )
-// })
-
 type AudioState = 'false' | 'true' | 'wait'
 
 export default function ScorePlayer({ initialContent }: { initialContent: string }): JSX.Element {
@@ -176,7 +60,7 @@ export default function ScorePlayer({ initialContent }: { initialContent: string
     return callbacks
   }, [score.sections, updateCursor])
 
-  const timeline = useMemo(() => createScoreTimeline(score), [score])
+  const timeline = useMemo(() => createFlattenedScore(score), [score])
   const { playInstrument, muteAll } = useInstruments()
 
   async function playStop() {
@@ -195,39 +79,37 @@ export default function ScorePlayer({ initialContent }: { initialContent: string
   const startLoop = () => {
     // const accentedChars = new Set(['Í', 'Ó', 'É', 'Ú', 'Á', 'í', 'ó', 'é', 'ú', 'á', 'ć'])
     // const delayOffset = Tone.Time('32n')
-    muteAll()
+    muteAll(0)
+    // Tone.getContext().lookAhead = 0
     Tone.getTransport().cancel()
-    Tone.getTransport().scheduleRepeat(
-      (t) => {
-        setCursor((pC) => {
-          const timelinePoint = timeline[pC]
-          timelinePoint.instrumentActions.forEach((action) => {
-            let triggerTime = t
-            let notes = action.value
-            // if (!['kkr', 'krw', 'krl'].includes(action.label) && accentedChars.has(action.value)) {
-            //   triggerTime += delayOffset.toSeconds()
-            //   char = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-            // }
-            playInstrument(action.label, notes, triggerTime)
-          })
-          if (timelinePoint.tempo !== Tone.getTransport().bpm.value) Tone.getTransport().bpm.value = timelinePoint.tempo
-          // if (timelinePoint.tempo !== Tone.getTransport().bpm.value) Tone.getTransport().bpm.rampTo(timelinePoint.tempo, 5)
-          if (pC >= timeline.length - 1) {
-            stopLoop()
-            return 0
+
+    timeline.forEach((beat) => {beat.actions.forEach((action) => {
+      Tone.getTransport().schedule(
+        (time)=>{
+          // Check if action is an InstrumentAction object by checking for expected properties
+          // if (typeof action == 'TransportAction' && action && 'bpm' in action && 'label' in action) {
+          if (action.target == "transport") {
+            var tAction = action as TransportAction
+            if (tAction.bpm != undefined) {
+              if (tAction.bpm[0] !== Tone.getTransport().bpm.value || tAction.bpm[1] !== Tone.getTransport().bpm.value) {
+                if (tAction.bpm[0]) Tone.getTransport().bpm.setValueAtTime(tAction.bpm[0], time)
+                if (tAction.bpm[1]) Tone.getTransport().bpm.rampTo(tAction.bpm[1], tAction.duration, time)
+              }
+            }
+          } else {
+            var iAction = action as InstrumentAction
+            playInstrument(time, iAction.label, iAction)
           }
-          return pC + 1
-        })
-      },
-      '16n',
-      0,
-    )
+        }, action.time)
+      })
+    })
+
     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
     setPlaying(true)
   }
 
   const stopLoop = () => {
-    muteAll()
+    muteAll(Tone.getTransport().seconds)
     Tone.getTransport().cancel()
     setPlaying(false)
   }

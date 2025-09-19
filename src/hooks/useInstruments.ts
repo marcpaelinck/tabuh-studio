@@ -1,5 +1,7 @@
 import { useCallback, useMemo, useState } from 'react'
 import * as Tone from 'tone'
+import type { Note } from '../models/types'
+import type { InstrumentAction } from '../utils/score'
 
 const SOUNDS_FOLDER = 'sounds/'
 const NOTES = ['D2', 'E2', 'G#2', 'A2', 'C#2', 'D3', 'E3', 'G#3', 'A3', 'C#3', 'D4', 'E4', 'G#4', 'A4', 'C#4', 'D5', 'E5', 'G#5', 'A5', 'C#6', 'D6', 'E6', 'G#6', 'A6']
@@ -110,7 +112,7 @@ const cInstrumentConfigs: Record<string, string[]> = {
 }
 
 export type LarasInstrument = {
-  play: (note: string, time: number) => void
+  play: (time: number, action: InstrumentAction) => void
   mute: (time: number) => void
 }
 
@@ -120,7 +122,7 @@ const generateMappings = (alphabet: string[]) => Object.fromEntries(alphabet.map
 
 
 const pitchShift: Tone.PitchShift = new Tone.PitchShift( {
-      pitch : 0.5 ,
+      pitch : 0.0 ,
       windowSize : 0.07 ,
       delayTime : 0 ,
       feedback : 0
@@ -129,7 +131,7 @@ const pitchShift: Tone.PitchShift = new Tone.PitchShift( {
 
 const createSampler = (instr_type: string, samples: { [key: string]: string }, volume: number) => {
   if (instr_type=='melodic')
-    return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).connect(pitchShift)
+    return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() // .connect(pitchShift)
   else
     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
@@ -137,10 +139,10 @@ const createSampler = (instr_type: string, samples: { [key: string]: string }, v
 const createInstrument = (key: string, samplers: Record<string, Tone.Sampler>): LarasInstrument => {
   const mapping = generateMappings(instrumentConfigs[key].alphabet)
   return {
-    play: (note: string, time: number) => {
-      if (mapping[note]) {
-        samplers[key].releaseAll(time)
-        samplers[key].triggerAttack([mapping[note]], time)
+    play: (time: number, action: InstrumentAction) => {
+      if (mapping[action.symbol]) {
+        // samplers[key].releaseAll(),
+        samplers[key].triggerAttackRelease([mapping[action.symbol]], action.duration, time , action.velocity[0])
       }
     },
     mute: (time: number) => samplers[key].releaseAll(time),
@@ -157,11 +159,12 @@ const createCInstrument = (components: string[], samplers: Record<string, Tone.S
   })
 
   return {
-    play: (note: string, time: number) => {
+    play: (time: number, action: InstrumentAction) => {
       components.forEach((component) => {
-        if (allMappings[component]?.[note]) {
-          samplers[component].releaseAll(time)
-          samplers[component].triggerAttack([allMappings[component][note]], time)
+        if (allMappings[component]?.[action.symbol]) {
+          // samplers[component].triggerRelease([allMappings[component][action.symbol]])
+          // samplers[component].releaseAll(),
+          samplers[component].triggerAttackRelease([allMappings[component][action.symbol]], action.duration, time , action.velocity[0])
         }
       })
     },
@@ -193,10 +196,10 @@ export const useInstruments = () => {
   )
 
   const playInstrument = useCallback(
-    (label: string, note: string, time: number) => {
+    (time: number, label: string, action: InstrumentAction) => {
       if (!mutedInstruments[label] && instruments[label]) {
-        if (note === '.') instruments[label].mute(time)
-        else instruments[label].play(note, time)
+        if (action.symbol === '.') instruments[label].mute(time)
+        else instruments[label].play(time, action)
       }
     },
     [mutedInstruments, instruments],
@@ -208,14 +211,14 @@ export const useInstruments = () => {
   )
 
   const muteAll = useCallback(
-    (time: number = Tone.now()) => Object.keys(instruments).forEach((label) => instruments[label].mute(time)),
+    (time: number) => Object.keys(instruments).forEach((label) => instruments[label].mute(time)),
     [instruments],
   )
 
   return {
     playInstrument,
-    muteInstrument,
+  /*  muteInstrument, */
     muteAll,
-    mutedInstruments,
+/*    mutedInstruments, */
   }
 }
