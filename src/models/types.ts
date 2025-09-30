@@ -7,10 +7,8 @@ export type Instrument = {
 export type Note = {
   s: string
   t: number
-  d?: number
-  v?: number
+  d: number
 }
-
 export type SectionData = {
   label: string
   velocity: number[]
@@ -29,4 +27,9 @@ export type Score = {
   title: string
   composer: string
   sections: Section[]
+}
+
+export type ScoreInfo = {
+  title: string
+  file: string
 }

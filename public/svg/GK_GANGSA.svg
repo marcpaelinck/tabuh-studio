@@ -1,0 +1,131 @@
+<svg id="GK_GANGSA" viewBox="0 0 400 180" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" overflow="hidden">
+    <defs>
+        <linearGradient x1="35" y1="140" x2="35" y2="25" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="fill1">
+            <stop offset="0" stop-color="#966F00"/>
+            <stop offset="0.5" stop-color="#CC9900"/>
+            <stop offset="1" stop-color="#FEBB00"/>
+        </linearGradient>
+        <linearGradient x1="41" y1="830" x2="54" y2="82" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="fill2">
+            <stop offset="0" stop-color="#966F00"/>
+            <stop offset="0.5" stop-color="#CC9900"/>
+            <stop offset="1" stop-color="#FEBB00"/>
+        </linearGradient>
+        <linearGradient x1="42" y1="-24" x2="74" y2="30" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="fill3">
+            <stop offset="0" stop-color="#966F00"/>
+            <stop offset="0.72" stop-color="#CC9900"/>
+            <stop offset="1" stop-color="#FEBB00"/>
+        </linearGradient>
+        <linearGradient x1="-60.8792" y1="949.281" x2="326.397" y2="250.616" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="panggulfill0">
+            <stop offset="0" stop-color="#D6C9A6"/>
+            <stop offset="1" stop-color="#E7E0CB"/>
+        </linearGradient>
+        <linearGradient x1="-72.9636" y1="943.189" x2="313.124" y2="246.668" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="panggulfill1">
+            <stop offset="0" stop-color="#B1A46B"/>
+            <stop offset="1" stop-color="#BFB88F"/>
+        </linearGradient>
+        <linearGradient x1="-14.1707" y1="373.82" x2="444.384" y2="98.2927" gradientUnits="userSpaceOnUse" spreadMethod="reflect" id="panggulfill2">
+            <stop offset="0" stop-color="#928F00"/>
+            <stop offset="0.29" stop-color="#928F00"/>
+            <stop offset="0.64" stop-color="#DAD500"/>
+            <stop offset="1" stop-color="#FFFC79"/>
+        </linearGradient>
+        <rect x="0" y="0" rx="12" ry="12" width="30" height="90" fill="#CC9900" fill-rule="evenodd" id="separator"/>
+        <symbol id="daun" width="30" height="128" viewBox="0 0 33 128">
+            <rect class="highlight-target-bg" x="5" y="4" width="20" height="120" fill="url(#fill1)" fill-opacity="1"/>
+            <path class="fixed-item" id="rechts" d="M30 0 30 128 25 124 25 4Z" fill="url(#fill2)" fill-rule="evenodd" fill-opacity="1"/>
+            <path class="fixed-item" id="links" d="M0 0 0 128 5 124 5 4Z" fill="url(#fill3)" fill-rule="evenodd" fill-opacity="1"/>
+            <path class="fixed-item" id="boven" d="M0 0 30 0 25 4 5 4Z" fill="#CC9900" fill-rule="evenodd" fill-opacity="1"/>
+            <path class="fixed-item" id="onder" d="M0 128 30 128 25 124 5 124Z" fill="#966F00" fill-rule="evenodd" fill-opacity="1"/>
+        </symbol>
+        <symbol id="highlight-target" width="30" height="128" viewBox="0 0 33 128">
+            <rect class="highlight-target" x="5" y="4" width="20" height="120"/>
+        </symbol>
+        <symbol id="suspenders" width="6" height="128" viewBox="0 0 6 128">
+            <rect class="fixed-item" x="1" y="32" rx="2" ry="2" width="3" height="9" fill="#CC9900" fill-rule="evenodd"/>
+            <rect class="fixed-item" x="1" y="87" rx="2" ry="2" width="3" height="9" fill="#CC9900" fill-rule="evenodd"/>
+        </symbol>
+        <symbol id="panggul" width="50" height="140">
+            <g transform="scale(0.1 0.1) translate(100 300)">
+                <path d="M103.259 1014.3C123.526 977.041 140.213 840.342 160.031 719.883 179.849 599.425 219.833 370.977 222.168 291.55 236.672 214.748 180.22 118.668 152.009 209.327 131.015 255.913 106.873 502.907 96.2059 571.067 119.285 590.04 86.9766 706.273 79.7593 750.345 59.7184 819.689 70.6175 784.794 52.9026 835.5 36.501 888.112 28.5076 913.872 26.095 931.862 23.6824 949.853 25.5664 929.705 38.4271 943.445 16.1625 990.631 82.9917 1051.56 103.259 1014.3Z" fill="url(#panggulfill0)" fill-rule="evenodd"/>
+                <path d="M87.6421 1014.5C110.089 978.95 125.102 839.631 145.263 718.555 165.423 597.479 206.06 367.854 208.605 288.048 223.33 210.847 167.046 114.463 138.559 205.621 117.413 252.48 92.593 500.698 81.7331 569.206 104.796 588.208 72.1383 705.071 64.7959 749.369 44.5454 819.091 55.5511 784.003 37.6787 834.994 21.1164 887.896 2.83009 901.627 10.5815 931.879 18.3328 962.13 65.1952 1050.06 87.6421 1014.5Z" fill="url(#panggulfill1)" fill-rule="evenodd"/>
+                <path d="M114.368-0.538122C80.631-2.53367 49.6899 25.3848 35.9192 53.1298 22.1485 80.8747 11.8077 140.648 31.7435 165.932 51.6793 191.217 101.127 205.98 127.249 223.696 153.371 241.412 167.459 251.886 188.478 272.23 209.498 292.574 232.696 316.695 253.365 345.76 274.034 374.824 299.109 422.764 312.494 446.617 325.879 470.47 328.215 480.374 333.674 488.877 339.133 497.381 341.626 497.589 345.249 497.641 348.873 497.693 353.334 493.645 355.413 489.189 357.491 484.733 357.309 490.162 357.722 470.905 358.135 451.648 360.98 425.366 357.893 373.646 354.807 321.925 338.375 226.004 314.749 163.019 291.644 117.797 295.835 125.289 281.866 107.99 267.897 90.6903 252.488 76.989 238.339 65.103 201.044 37.876 148.104 1.45742 114.368-0.538122Z" fill="url(#panggulfill2)" fill-rule="evenodd"/>
+                <path d="M189.779 29.588 189.67 29.9347 187.477 28.9512C140.179 14.0721 87.8062 46.6121 70.4981 101.631 61.8441 129.14 63.5949 157.061 73.421 179.964L87.6221 200.68 57.6285 187.178 51.4458 168.019C46.4416 145.783 47.1957 121.112 54.8707 96.7151 65.104 64.1857 85.7028 38.3017 110.735 22.7493 132.49 14.5998 128.989 17.2991 150.72 12.2822 165.776 18.8161 174.723 23.0541 189.779 29.588Z" fill="#C00000" fill-rule="evenodd"/>
+            </g>
+	    </symbol>
+    </defs>
+    <style>
+         <!-- 
+            The styling enables animation. See file GK_REYONG.svg for an explanation.
+         -->
+       .target *{
+            fill: inherit;
+        }
+         <!-- The next setting defines the default color for the highlight-target of a daun (key) -->
+        .target {
+            fill: url(#fill1);
+        }
+         <!-- The following sections will give control of the highlighting from the javascript application.
+              Variables color1 and color2 are used when both polos and sangsih are animated on the same instrument.
+              Otherwise variable color is used.
+         -->
+        :root {
+          --alpha: 1;
+          --color:orange;
+          --color1:orange;
+          --color2:orange;
+        }
+        .highlight.--color {
+          fill: var(--color);
+          opacity: var(--alpha);
+        }
+        .highlight.--color1 {
+          fill: var(--color1);
+          opacity: var(--alpha);
+        }
+        .highlight.--color2 {
+          fill: var(--color2);
+          opacity: var(--alpha);
+        }
+
+    </style>
+    <!-- without dummy, Firefox sets the fill of the first daun to white when the highlight of another key is removed -->
+    <use id="dummy" href="#suspenders" x="0" y="0" transform="scale(1 .98)"/>
+    <use id="DONG0-daun" class="daun" href="#daun" x="0" y="0.0%" transform="scale(1 1.00)"/>
+    <use id="DONG0" class="target" href="#highlight-target" x="0" y="0.0%" transform="scale(1 1.00)"/>
+    <use id="DENG0-daun" class="daun" href="#daun" x="32" y="1.8%" transform="scale(1 0.98)"/>
+    <use id="DENG0" class="target" href="#highlight-target" x="32" y="1.8%" transform="scale(1 0.98)"/>
+    <use id="" href="#suspenders" x="62"/>"""0.0%"" 0.00"
+    <use id="DUNG0-daun" class="daun" href="#daun" x="68" y="1.8%" transform="scale(1 0.96)"/>
+    <use id="DUNG0" class="target" href="#highlight-target" x="68" y="1.8%" transform="scale(1 0.96)"/>
+    <use id="DANG0-daun" class="daun" href="#daun" x="100" y="2.6%" transform="scale(1 0.95)"/>
+    <use id="DANG0" class="target" href="#highlight-target" x="100" y="2.6%" transform="scale(1 0.95)"/>
+    <use id="" href="#suspenders" x="130"/>"""0.0%"" 0.00"
+    <use id="DING1-daun" class="daun" href="#daun" x="136" y="3.5%" transform="scale(1 0.93)"/>
+    <use id="DING1" class="target" href="#highlight-target" x="136" y="3.5%" transform="scale(1 0.93)"/>
+    <use id="DONG1-daun" class="daun" href="#daun" x="168" y="4.3%" transform="scale(1 0.91)"/>
+    <use id="DONG1" class="target" href="#highlight-target" x="168" y="4.3%" transform="scale(1 0.91)"/>
+    <use id="" href="#suspenders" x="198"/>"""0.0%"" 0.00"
+    <use id="DENG1-daun" class="daun" href="#daun" x="204" y="5.1%" transform="scale(1 0.90)"/>
+    <use id="DENG1" class="target" href="#highlight-target" x="204" y="5.1%" transform="scale(1 0.90)"/>
+    <use id="DUNG1-daun" class="daun" href="#daun" x="236" y="5.9%" transform="scale(1 0.88)"/>
+    <use id="DUNG1" class="target" href="#highlight-target" x="236" y="5.9%" transform="scale(1 0.88)"/>
+    <use id="" href="#suspenders" x="266"/>"""0.0%"" 0.00"
+    <use id="DANG1-daun" class="daun" href="#daun" x="272" y="6.7%" transform="scale(1 0.87)"/>
+    <use id="DANG1" class="target" href="#highlight-target" x="272" y="6.7%" transform="scale(1 0.87)"/>
+    <use id="DING2-daun" class="daun" href="#daun" x="304" y="7.5%" transform="scale(1 0.85)"/>
+    <use id="DING2" class="target" href="#highlight-target" x="304" y="7.5%" transform="scale(1 0.85)"/>
+    <g id="helpinghand">
+        <!-- The "helpinghand" group should contain three data elements, each having a JSON dictionary as value parameter.
+             The class="x" element contains the X coordinates for the helping hand symbol, for each key of the instrument.
+             Format: {<note1>: x-value, ...})
+             The class="y" element contains the default Y coordinate for the helping hand symbol.
+             The class="animation" element contains additional animation values. All values are relative.
+             hoverx, hovery: distance over which the mallet should move during the idle/waiting step of the animation
+              (see code). stroke_x, _y, _rotation, _scale: transformation values for the stroke.
+         -->
+        <use class="helpinghand" href="#panggul" x="0" y="0"/>
+        <data class="x" value='{"DONG0": 0, "DENG0": 32, "DUNG0": 68, "DANG0": 100, "DING1": 136, "DONG1": 168, "DENG1": 204, "DUNG1": 236, "DANG1": 272, "DING2": 304}'/>
+        <data class="y" value='{"y": 0}'/>
+        <data class="animation" value='{"hover_x": 3, "hover_y": 0, "stroke_x": -25, "stroke_y": 40, "stroke_rotation": -25, "stroke_scale": [0.8, 1]}'/>
+    </g>
+</svg>
