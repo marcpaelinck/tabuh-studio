@@ -12,7 +12,7 @@ function positionToSvg(position: string): string  {
         PEMADE_SANGSIH: "GK_GANGSA.svg",
         KANTILAN_POLOS: "GK_GANGSA.svg",
         KANTILAN_SANGSIH: "GK_GANGSA.svg",
-        UGAL: "GK_GANGSA.svg",
+        UGAL: "GK_UGAL.svg",
         REYONG_1: "GK_REYONG.svg",
         REYONG_3: "GK_REYONG.svg",
         REYONG_2: "GK_REYONG.svg",
@@ -53,7 +53,7 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SvgIn
 
 
 
-export default function AnimationDiv({focusRef, svgInfoUpdater}: {focusRef: React.RefObject<string>, svgInfoUpdater: Function}) : JSX.Element {
+export default function AnimationDiv({focusRef, focus, svgInfoUpdater}: {focusRef: React.RefObject<string>, focus: string, svgInfoUpdater: Function}) : JSX.Element {
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
@@ -96,7 +96,7 @@ export default function AnimationDiv({focusRef, svgInfoUpdater}: {focusRef: Reac
                     <label>show panggul</label>
                 </form>  )}
                 <div id="svg-embed">
-                    <ReactSVG src={positionToSvg(focusRef.current)} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
+                    <ReactSVG src={positionToSvg(focus)} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
                 </div>
             </div>) : <div/>)
 }

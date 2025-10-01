@@ -22,7 +22,7 @@ const pitchShift: Tone.PitchShift = new Tone.PitchShift({
 }
 ).toDestination();
 
-const createSampler = (instr_type: string, samples: { [key: string]: string }, volume: number) => {
+const createSampler = ({ instr_type, samples, volume }: { instr_type: string, samples: { [key: string]: string }, volume: number }) => {
   if (instr_type == 'melodic')
     // PitchShift currently disabled because it causes a slight time lag
     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
@@ -86,7 +86,8 @@ export const useInstruments = () => {
   const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(instrumentConfigs).map((position, index) => [position, useRef(null)]))
   useEffect(() => {
     for (const [position, config] of Object.entries(instrumentConfigs)) {
-      samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER/*, onload: () => samplerOnLoaded(position) */ }).toDestination()
+      // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
+      samplers[position].current = createSampler({ instr_type: config.type, samples: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), volume: config.volume }).toDestination()
     }
   }, [])
 

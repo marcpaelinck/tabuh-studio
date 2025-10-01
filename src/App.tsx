@@ -30,7 +30,6 @@ export default function App() {
   
   useEffect(() => {
     const loadScore = async () => {
-      console.log("scorefile=" + scorefile)
       let jsonScore
       if (! scorefile) 
         jsonScore = await readFile('scores/gilak penutup [full].json')
@@ -58,7 +57,7 @@ export default function App() {
       </div>
       <div className="w-8/10 rounded-xl p-6 shadow-lg">
         <Selectors score={score} scoreUpdater={updateScorefile} focusUpdater={updateFocus} />
-        <AnimationDiv focusRef={focusReference} svgInfoUpdater={updateSvgInfo}/>
+        <AnimationDiv focusRef={focusReference} focus={focus} svgInfoUpdater={updateSvgInfo}/>
         <ScorePlayer score={score} focusRef={focusReference} svgInfoRef={svgInfoInfoReference}/>
       </div>
     </div>

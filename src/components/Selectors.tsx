@@ -1,5 +1,5 @@
-import type { JSX } from "react";
-import { useState, useEffect } from "react";
+import type { ChangeEvent, JSX, RefObject } from "react";
+import { useState, useEffect, useRef } from "react";
 import { readFile } from "../utils/filesystem";
 import type { Score, ScoreInfo, Section, SectionData } from "../models/types";
 
@@ -11,6 +11,8 @@ export default function Selectors(
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
+    const [currentFocus, setCurrentFocus] = useState<string>("");
+    const focusSelector: RefObject<HTMLSelectElement | null> = useRef(null)
 
     // Populate the score selector
     useEffect(() => {
@@ -27,6 +29,15 @@ export default function Selectors(
         fetchScores();
     }, []);
 
+    const onChangeSongSelector = (value: string) => {
+        score_updater(value)
+        onChangeFocusSelector("")
+    }
+
+    const onChangeFocusSelector = (value: string) => {
+        setCurrentFocus(value)
+        focus_updater(value)
+    }
 
     // Populate the focus selector with the instruments in the selected score
     useEffect(() => {
@@ -45,11 +56,11 @@ export default function Selectors(
     return (<div className="">
 				<div className="label">
                     <span className="font-semibold italic pe-2">Song:</span>
-                    <select id="songselector" title="Song" onChange={e => score_updater(e.target.value)} className="bg-amber-100">
+                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className="bg-amber-100">
                         { scoreListItems }
                     </select>
                     <span className="font-semibold italic ps-5 pe-2">Focus:</span>
-                    <select id="focusselector" title="Focus" onChange={e => focus_updater(e.target.value)} className=" bg-amber-100">
+                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className=" bg-amber-100">
                         { focusListItems }
                     </select>
 				</div>

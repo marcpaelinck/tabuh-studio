@@ -122,8 +122,8 @@ export function createTimeline(score: Score): Timeline {
     })
   })
 
-  console.log(timeline.sampleractions.length + " sampler actions," + timeline.tempoactions.length + " tempo actions," + timeline.animationactions.length + " animation actions,")
-  console.log(timeline.animationactions)
+  // console.log(timeline.sampleractions.length + " sampler actions," + timeline.tempoactions.length + " tempo actions," + timeline.animationactions.length + " animation actions,")
+  // console.log(timeline.animationactions)
 
   return timeline
 }
