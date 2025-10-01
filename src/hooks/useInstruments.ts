@@ -129,7 +129,4 @@ export const useInstruments = () => {
     muteAll,
   }
 }
-function UseRef(arg0: null) {
-  throw new Error('Function not implemented.')
-}
 

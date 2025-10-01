@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import type { AnimationAction } from "../utils/score";
-import { Time } from "tone"
+import * as Tone from 'tone'
 import type { SvgInfo } from "../components/Animation";
 
 const moveToDuration = 500; // duration of the movement to the next key
@@ -9,8 +9,8 @@ const bezier = "cubic-bezier(0,.25,1,.71)"; // default timing curve
 const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke (accelerates toward stroke)
 const selectedSpeed = 1 //TODO replace with value of speed selector
 
-
-function highlightNote(keyElement: Element): void {
+function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
+    const durationMillis = Tone.Time(duration).toMilliseconds()
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
         [
@@ -18,19 +18,16 @@ function highlightNote(keyElement: Element): void {
             { fill: "rgba(0,255,255,1)", offset: 0, easing: bezier },
             { fill: "rgba(0,255,255,0)", offset: 1, easing: bezier },
         ],
-        { duration: 1000 }
+        { duration: durationMillis }
     );
-    // if (animation) {
-    //     animation.cancel()
-    // }
-    var animation = new Animation(highlightKeyframes, document.timeline);
+    const animation = new Animation(highlightKeyframes, document.timeline);
     animation.play()
 }
 
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-function animateInstrument(action: AnimationAction, svgInfo: SvgInfo): void {
+function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null) return
 
@@ -63,7 +60,7 @@ function animateInstrument(action: AnimationAction, svgInfo: SvgInfo): void {
             console.log("ERROR in panggul animation: next note not defined but current note is not last.")
             return
         }
-        var millisToNextNote = Math.round(Time(action.timeuntil).toMilliseconds() / selectedSpeed)
+        var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
         // Convert time durations to fractions (keyframe time indicators run from 0 to 1)
         var move_to_fraction = moveToDuration / millisToNextNote
         var stroke_fraction = strikeDuration / millisToNextNote
@@ -111,11 +108,9 @@ function animateInstrument(action: AnimationAction, svgInfo: SvgInfo): void {
         options = { duration: millisToNextNote, fill: "forwards", easing: bezier, composite: "replace" };
     }
 
-    // logConsole(`animation id started ${noteinfo.id}: ${JSON.stringify(noteinfo)}`, "helpinghand");
     // @ts-expect-error
     svgInfo.panggul.animate(keyframes, options).finished.then((a) => {
         try {
-            // logConsole(`animation id finished ${noteinfo.id}: ${JSON.stringify(noteinfo)}`, "helpinghand");
             a.commitStyles(); // Persist the final position of the animation
         } catch (exception) {
             // Happens when user switches intrument during animation: animation's target does not exist any more
@@ -128,7 +123,7 @@ function animateInstrument(action: AnimationAction, svgInfo: SvgInfo): void {
 export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRef: React.RefObject<string>) => {
 
 
-    function animateNote(time: number, action: AnimationAction) {
+    function executeAnimation(time: number, action: AnimationAction) {
         if (action.position === focusRef.current) {
             const svgInfo = svgInfoRef.current
             if (svgInfo.svg && action.currnote) {
@@ -136,16 +131,16 @@ export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRe
                 // Hightighting animation
                 var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname} .${action.currnote.stroke}`) ||
                     svgInfo.svg.querySelector(`#${action.currnote.keyname}`))
-                if (keyElement) highlightNote(keyElement)
+                if (keyElement) highlightNote(keyElement, action.currnote.duration)
 
                 // Panggul animation
                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-                    animateInstrument(action, svgInfo)
+                    animatePanggul(action, svgInfo)
                 }
             }
 
         }
     }/*, [svgInfo, focus])*/
 
-    return { animateNote }
+    return { executeAnimation }
 }

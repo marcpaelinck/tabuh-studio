@@ -12,10 +12,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [scorefile, setScorefile] = useState<string>("")
   const [score, setScore] = useState<Score>({ title: '', composer: '', sections: [] })
-  // const [timeLine, setTimeLine] = useState<Timeline>({tempoactions: [], sampleractions: [], animationactions:[], cursoractions: []})
   const [focus, setFocus] = useState<string>('')
   const focusReference: React.RefObject<string>  = useRef('')
-  // const svgReference: React.RefObject<SVGSVGElement | null>  = useRef(null)
   const svgInfoInfoReference: React.RefObject<SvgInfo> = useRef<SvgInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
 
 
@@ -29,15 +27,6 @@ export default function App() {
     // setSvgInfo(svgInfo)
 
   }
-
-  // const { larasInstruments, playInstrument, muteInstrument } = useInstruments()
-  // const { changeTempo, changeDynamics } = useInterpretations()
-  // const { animateNote } = useAnimationEngine(svgInfoInfoReference.current)
-
-  // const playInstrument = () => {}
-  // const changeTempo = () => {}
-  // const animateNote = () => {}
-
   
   useEffect(() => {
     const loadScore = async () => {
@@ -63,12 +52,6 @@ export default function App() {
     )
   }
 
-  // function setSvgRef(svg: SVGSVGElement) {
-  //   if (svg!==svgReference.current) {
-  //     svgReference.current=svg
-  //   }
-  // }
-  
   return (
     <div className="flex w-screen min-h-0 ">
       <div className="w-1/10">
@@ -76,7 +59,7 @@ export default function App() {
       <div className="w-8/10 rounded-xl p-6 shadow-lg">
         <Selectors score={score} scoreUpdater={updateScorefile} focusUpdater={updateFocus} />
         <AnimationDiv focusRef={focusReference} svgInfoUpdater={updateSvgInfo}/>
-        <ScorePlayer score={score} focus={focus} focusRef={focusReference} svgInfoRef={svgInfoInfoReference}/>
+        <ScorePlayer score={score} focusRef={focusReference} svgInfoRef={svgInfoInfoReference}/>
       </div>
     </div>
   )

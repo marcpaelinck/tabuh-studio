@@ -12,14 +12,6 @@ export default function Selectors(
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
 
-
-    // function Selector({id, title, onChange, listItems}: 
-    //                 {id: string, title: string, onChange: Function, listItems: JSX.Element[]}) {
-    //     return  <select id={id} title={title} onChange={e => onChange(e.target.value)}>
-    //                 { listItems }
-    //         </select>
-    // }
-    
     // Populate the score selector
     useEffect(() => {
         async function fetchScores() {

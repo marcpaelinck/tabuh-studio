@@ -1,9 +1,8 @@
-import { instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { useAnimationEngine } from '../hooks/useAnimation'
-import { useInstruments, type LarasInstruments } from '../hooks/useInstruments'
+import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score} from '../models/types'
-import { useState, type JSX, memo, useCallback, useMemo, useEffect, useRef } from 'react'
+import { useState, type JSX, memo, useMemo, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import { type SvgInfo } from './Animation'
 import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
@@ -45,7 +44,7 @@ function ScoreSectionHeader({
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { score: Score, focus: string, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
   // const score: Score = parseScore(initialContent)
   // const score: Score = {title: "", composer: "", sections: []}
 
@@ -67,7 +66,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
 
   const { larasInstruments, playInstrument, muteInstrument, muteAll} = useInstruments()
   const {changeTempo, changeDynamics} = useInterpretations()
-  const { animateNote } = useAnimationEngine(svgInfoRef, focusRef)
+  const { executeAnimation } = useAnimationEngine(svgInfoRef, focusRef)
   // const focusReference: React.RefObject<string>  = useRef("")
 
   // useEffect(() => {focusReference.current = focus}, [focus])
@@ -90,9 +89,9 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     timeline.sampleractions.forEach((iAction: SamplerAction) => {
       Tone.getTransport().schedule((time) => playInstrument(time, iAction.label, iAction), iAction.time)
     })
-    // TODO: Schedule animation actions
+    // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => animateNote(time, aAction), aAction.time)
+      Tone.getTransport().schedule((time) => executeAnimation(time, aAction), aAction.time)
       })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {

@@ -1,4 +1,4 @@
-import { cInstrumentConfigs, instrumentConfigs, type KeyGroup, type KeyPOS as KeyInfo } from '../config/config'
+import { BaseNote, cInstrumentConfigs, instrumentConfigs, type KeyGroup, type KeyPOS as KeyInfo } from '../config/config'
 import { type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 
@@ -62,9 +62,7 @@ export type ScheduleFunctions = {
   animateNote: CallableFunction,
 }
 
-const n2TO = (notevalue: number) => {
-  return { "16n": notevalue }
-}
+const n2TO = (notevalue: number): Tone.Unit.TimeObject => new Object({ [BaseNote]: notevalue })
 
 export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
@@ -129,38 +127,3 @@ export function createTimeline(score: Score): Timeline {
 
   return timeline
 }
-
-// export function createSchedule(score: Score, focusRef: React.RefObject<string>, schedFunctions: ScheduleFunctions) {
-//   // Creates the schedule for the Transport object.
-//   Tone.getTransport().stop()
-//   Tone.getTransport().cancel()
-//   Tone.getTransport().position = 0
-
-//   const timeline: Timeline = createTimeline(score)
-
-//   // const { playInstrument, muteInstrument, muteAll, mutedInstruments } = useInstruments(setInstruments)
-//   // const { changeTempo, changeDynamics } = useInterpretations()
-//   // const { animateNote } = useAnimationEngine(svgInfo)
-
-//   // tempo actions
-//   timeline.tempoactions.forEach((tAction: TempoAction) => {
-//     Tone.getTransport().schedule((time) => schedFunctions.changeTempo(time, tAction), tAction.time)
-//   })
-//   // instrument actions (notes)
-//   timeline.sampleractions.forEach((iAction: SamplerAction) => {
-//     Tone.getTransport().schedule((time) => schedFunctions.playInstrument(time, iAction.label, iAction), iAction.time)
-//   })
-//   // TODO: Schedule animation actions
-//   timeline.animationactions.forEach((aAction: AnimationAction) => {
-//     Tone.getTransport().schedule((time) => schedFunctions.animateNote(time, aAction, focusRef.current), aAction.time)
-//   })
-//   // cursor actions
-//   // beat.cursorActions.forEach((cAction: CursorAction) => {
-//   //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)
-//   // })
-//   // // TODO: gradual dynamics actions
-//   // beat.dynamicsActions.forEach((dAction: DynamicsAction) => {
-//   //   Tone.getTransport().schedule((time) => changeDynamics(time, dAction), dAction.time)
-//   // })
-// }
-
