@@ -3,6 +3,7 @@ import * as Tone from 'tone'
 import type { SamplerAction, TempoAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../models/constants'
 import { cInstrumentConfigs, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { soundFile, soundFiles } from '../utils/config'
 
 export type LarasInstrument = {
   play: (time: number, action: SamplerAction) => void
@@ -30,19 +31,31 @@ const createSampler = ({ instr_type, samples, volume }: { instr_type: string, sa
     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
 
+const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([position, config]) => {
+  const noteList = [...new Set(config.notes.flat())]
+  const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, instrumentConfigs[position].sampletemplate)]))
+  const notestrList = noteList.map(([tone, stroke]) => `${tone}|${stroke}`)
+  const noteToIndex = Object.fromEntries(notestrList.map((notestr, index) => [notestr, NOTES[index]]))
+  const symbolToIndices = Object.fromEntries(config.alphabet.map((symbol, index) => [symbol, config.notes[index].map(([tone, stroke]) => noteToIndex[`${tone}|${stroke}`])]))
+  return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
+}))
+console.log(lookup)
 
-
-
-const createInstrument = (key: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
-  const mapping = generateInstrumenMappings(instrumentConfigs[key].alphabet)
+const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
+  // const mapping = generateInstrumenMappings(instrumentConfigs[key].alphabet)
   return {
     play: (time: number, action: SamplerAction) => {
-      if (mapping[action.symbol] && samplers[key].current) {
+      const indices = lookup[position].symbol2idxs[action.symbol]
+      if (indices && samplers[position].current) {
         // samplers[key].releaseAll(),
-        samplers[key].current.triggerAttackRelease([mapping[action.symbol]], action.duration, time, action.velocity[0])
+        try {
+          samplers[position].current.triggerAttackRelease(indices, action.duration, time, action.velocity[0])
+        } catch {
+          console.log(`ERROR: could not play sound ${action.label}-${action.symbol} `)
+        }
       }
     },
-    mute: (time: number) => samplers[key].current ? samplers[key].current.releaseAll(time) : null,
+    mute: (time: number) => samplers[position].current ? samplers[position].current.releaseAll(time) : null,
   }
 }
 
@@ -75,19 +88,12 @@ const createCInstrument = (components: string[], samplers: Record<string, React.
 export const useInstruments = () => {
   const [mutedInstruments, setMutedInstruments] = useState<Record<string, boolean>>({})
 
-  const samplersLoaded: { [key: string]: any } = {}
-  const SetSamplersLoaded: { [key: string]: any } = {}
-  Object.keys(instrumentConfigs).forEach((position, index) => { [samplersLoaded[position], SetSamplersLoaded[position]] = useState<boolean>(false) })
-
-  // const samplerOnLoaded = (position: string) => {
-  //   SetSamplersLoaded[position](true)
-  // }
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
   const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(instrumentConfigs).map((position, index) => [position, useRef(null)]))
   useEffect(() => {
     for (const [position, config] of Object.entries(instrumentConfigs)) {
       // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
-      samplers[position].current = createSampler({ instr_type: config.type, samples: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), volume: config.volume }).toDestination()
+      samplers[position].current = createSampler({ instr_type: config.type, samples: lookup[position].idx2sample, volume: config.volume }).toDestination()
     }
   }, [])
 

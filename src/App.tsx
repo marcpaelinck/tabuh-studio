@@ -7,6 +7,7 @@ import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
 import { useEffect, useRef, useState } from 'react'
 import { type SvgInfo } from './components/Animation'
+import { sanityCheck } from './utils/config'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)

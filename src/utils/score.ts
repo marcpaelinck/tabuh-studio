@@ -1,4 +1,4 @@
-import { BaseNote, cInstrumentConfigs, instrumentConfigs, type KeyGroup, type KeyPOS as KeyInfo } from '../config/config'
+import { BaseNote, cInstrumentConfigs, instrumentConfigs, type Notes, type Note as KeyInfo } from '../config/config'
 import { type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 
@@ -77,9 +77,9 @@ export function createTimeline(score: Score): Timeline {
   var positionScore: { [position: string]: Note[] } = {}
 
   // Create a mapping for notes to Pitch, Octave, 
-  var note_to_keygroup: { [position: string]: { [symbol: string]: KeyGroup } } = {}
+  var note_to_keygroup: { [position: string]: { [symbol: string]: Notes } } = {}
   for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
-    note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.noteGroups[index]]))
+    note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
   }
 
   function note2noteAction(position: string, note: Note, isLast: boolean): AnimationNote | null {
