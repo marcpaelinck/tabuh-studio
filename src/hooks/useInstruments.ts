@@ -8,6 +8,9 @@ import { soundFile, soundFiles } from '../utils/config'
 export type LarasInstrument = {
   play: (time: number, action: SamplerAction) => void
   mute: (time: number) => void
+  dim: () => void
+  undim: () => void
+  params: { [param: string]: any }
 }
 
 export type LarasInstruments = Record<string, LarasInstrument>
@@ -43,6 +46,7 @@ console.log(lookup)
 
 const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
   // const mapping = generateInstrumenMappings(instrumentConfigs[key].alphabet)
+  var params = { dimmed: false, alwaysFocus: ["KEMPLI", "GONGS"] }
   return {
     play: (time: number, action: SamplerAction) => {
       const indices = lookup[position].symbol2idxs[action.symbol]
@@ -56,6 +60,21 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
       }
     },
     mute: (time: number) => samplers[position].current ? samplers[position].current.releaseAll(time) : null,
+    dim: () => {
+      if (samplers[position].current && !params.dimmed) {
+        samplers[position].current.volume.value -= 15
+        params.dimmed = true
+      }
+    }
+    ,
+    undim: () => {
+      if (samplers[position].current && params.dimmed) {
+        samplers[position].current.volume.value += 15
+        params.dimmed = false
+      }
+    },
+    params: params
+
   }
 }
 
@@ -82,6 +101,9 @@ const createCInstrument = (components: string[], samplers: Record<string, React.
         if (samplers[component].current) samplers[component].current.releaseAll(time)
       })
     },
+    dim: () => { },
+    undim: () => { },
+    params: { "dimmed": false }
   }
 }
 
@@ -129,11 +151,21 @@ export const useInstruments = () => {
     [larasInstruments],
   )
 
+  const focusInstrument = (position: string): void => {
+    Object.keys(larasInstruments).forEach((position) => larasInstruments[position].undim())
+    if (position == "" || !(position in larasInstruments)) return
+    Object.keys(larasInstruments).forEach((pos) => {
+      if (![position, ...larasInstruments[pos].params.alwaysFocus].includes(pos))
+        larasInstruments[position].dim()
+    })
+  }
+
   return {
     larasInstruments,
     playInstrument,
     muteInstrument,
     muteAll,
+    focusInstrument
   }
 }
 

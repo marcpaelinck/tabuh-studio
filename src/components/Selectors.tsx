@@ -7,7 +7,7 @@ import type { Score, ScoreInfo, Section, SectionData } from "../models/types";
 
 
 export default function Selectors(
-    {score, scoreUpdater: score_updater, focusUpdater: focus_updater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
+    {score, scoreUpdater: score_updater, focusUpdater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
@@ -36,7 +36,7 @@ export default function Selectors(
 
     const onChangeFocusSelector = (value: string) => {
         setCurrentFocus(value)
-        focus_updater(value)
+        focusUpdater(value)
     }
 
     // Populate the focus selector with the instruments in the selected score

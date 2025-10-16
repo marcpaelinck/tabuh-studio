@@ -2,10 +2,14 @@ import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score} from '../models/types'
-import { useState, type JSX, memo, useMemo, useEffect, useRef } from 'react'
+import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
 import * as Tone from 'tone'
 import { type SvgInfo } from './Animation'
 import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
+  //-------------------------CONTROLS--------------------------------------
+import {FaPlay, FaPause} from "react-icons/fa"
+import {FaBackwardFast} from "react-icons/fa6"
+
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
   return (
@@ -21,28 +25,10 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
   )
 })
 
-function ScoreSectionHeader({
-  name,
-  fullDisplay,
-  onToggleDisplay,
-}: {
-  name: string
-  fullDisplay: boolean
-  onToggleDisplay: () => void
-}): JSX.Element {
-  return (
-    <div className="flex justify-between border-b font-bold">
-      <span className="cursor-pointer select-none">{name}</span>
-      <div className="flex items-center gap-2">
-        <span onClick={onToggleDisplay} className="cursor-pointer font-mono select-none">
-          {fullDisplay ? '-' : '+'}
-        </span>
-      </div>
-    </div>
-  )
-}
+
 
 type AudioState = 'false' | 'true' | 'wait'
+var maxDurationSeconds = 0
 
 export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
   // const score: Score = parseScore(initialContent)
@@ -52,28 +38,22 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
-  // const [cursor, setCursor] = useState<number>(0)
-  // const updateCursor = useCallback(
-  //   (sectionID: number, step: number) => setCursor(timeline.findIndex((p) => p.sectionId === sectionID) + step),
-  //   [],
-  // )
-  // const updateCursorCallbacks = useMemo(() => {
-  //   const callbacks: Record<number, (step: number) => void> = {}
-  //   score.sections.forEach((section) => (callbacks[section.id] = (step: number) => updateCursor(section.id, step)))
-  //   return callbacks
-  // }, [score.sections, updateCursor])
+  const [progress, setProgress] = useState<number>(0)
 
-
-  const { larasInstruments, playInstrument, muteInstrument, muteAll} = useInstruments()
+  const { larasInstruments, playInstrument, muteInstrument, muteAll, focusInstrument} = useInstruments()
   const {changeTempo, changeDynamics} = useInterpretations()
   const { executeAnimation } = useAnimationEngine(svgInfoRef, focusRef)
-  // const focusReference: React.RefObject<string>  = useRef("")
-
-  // useEffect(() => {focusReference.current = focus}, [focus])
 
   // recreate the Transport schedule when a new score is selected
   const timeline = useMemo(() => createTimeline(score), [score])
   useEffect(() => createSchedule(timeline), [score]);
+
+  useEffect(() => focusInstrument(focusRef.current), [focusRef.current])
+
+
+  function updateProgress(time: number){
+    setProgress(Tone.getTransport().seconds)
+  }
 
   function createSchedule(timeline: Timeline) {
     // Creates the schedule for the Transport object.
@@ -101,6 +81,10 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     // beat.dynamicsActions.forEach((dAction: DynamicsAction) => {
     //   Tone.getTransport().schedule((time) => changeDynamics(time, dAction), dAction.time)
     // })
+    const maxtime = timeline.sampleractions.reduce((aggr: Tone.Unit.TimeObject, curr: SamplerAction) => {return (Tone.Time(curr.time).toSeconds() > Tone.Time(aggr).toSeconds()) ? curr.time : aggr}, {"16n":0}, )
+    maxDurationSeconds = Tone.Time(maxtime).toSeconds()
+    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0)
+
   }
 
   const play = () => {
@@ -114,8 +98,6 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     muteAll(Tone.getTransport().seconds)
     setPlaying(false)
   }
-
-  const playPauseButton: React.RefObject<HTMLImageElement | null>  = useRef(null)
 
   async function playPause() {
     if (audioStarted === 'false') {
@@ -131,7 +113,22 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     }
   }
 
-  return (
+  async function rewind() {
+    Tone.getTransport().position=0
+    setProgress(0)
+    pause()
+  }
+
+  //-------------------------CONTROLS--------------------------------------
+  const toMmSs = (time: number): string => {
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`
+  }
+
+  //-----------------------------------------------------------------------
+
+return (
     <div className="flex flex-col justify-between">
       <div className="custom-scrollbar flex h-full flex-col overflow-scroll">
         <div className="my-4">
@@ -141,25 +138,19 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
 
       <div className="max-width-200 gap-1 border-t px-4 pt-3 pb-4 text-xs">
         <div className="flex justify-center">
-          {/* <span className="italic">{score.title}</span> */}
-          {/* <span className="mx-1 text-black/40">–</span> */}
-          {/* <span>{score.composer}</span> */}
         </div>
         <div className="flex w-full">
-          <div className="flex w-full items-center justify-center gap-2 select-none">
+          <div className="flex w-full items-center gap-5 justify-center select-none">
             <div className="h-4 w-4 flex-shrink-0">
-              <img
-                onClick={() => playPause()}
-                src={`icons/${playing ? 'pause' : 'play'}_icon.svg`}
-                className="h-full w-full cursor-pointer select-none"
-                alt="Play/Stop"
-                ref={playPauseButton}
-              />
+              <button onClick={() => rewind()}><FaBackwardFast/></button>
             </div>
-            <span className="flex w-12 flex-shrink-0 justify-center">00:00</span>
-            <div className="flex w-full cursor-pointer items-center py-1">
-              <hr className="w-full border-1" />
+            <div className="h-4 w-4 flex-shrink-0">
+              <button onClick={() => playPause()}>{playing? <FaPause/> : <FaPlay/>}</button>
             </div>
+            <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
+              <div className="flex w-full cursor-pointer items-center py-1">
+                <hr className="w-full border-1" />
+              </div>
             <span className="flex w-12 flex-shrink-0 justify-center">00:00</span>
           </div>
         </div>
