@@ -46,7 +46,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     KENDANG: {
         type: 'percussion',
         alphabet: ['(', ')', '*', '0', '8', '9'],
-        notes: [[['TUT', 'DETUT']], [['KUNG', 'CUNGKUNG']], [['PAK', 'KAPAK']], [['CUNG', 'CUNGKUNG']], [['KA', 'KAPAK']], [['DE', 'DETUT']]],
+        notes: [[['TUT', 'OPEN']], [['KUNG', 'OPEN']], [['PAK', 'OPEN']], [['CUNG', 'OPEN']], [['KA', 'OPEN']], [['DE', 'OPEN']]],
         volume: -10,
         svg_file: "GK_KENDANG.svg",
         sampletemplate: "GK_KENDANG_{tone}_{muting}.wav",
