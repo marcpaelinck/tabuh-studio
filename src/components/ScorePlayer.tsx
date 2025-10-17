@@ -1,3 +1,4 @@
+import { BaseNote } from '../config/config'
 import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
@@ -9,6 +10,10 @@ import { createTimeline, type AnimationAction, type SamplerAction, type TempoAct
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
+import { AVERAGE_ATTACK_DELAY } from '../models/constants'
+import { n2TO } from '../utils/timeunits'
 
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
@@ -28,7 +33,6 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 
 type AudioState = 'false' | 'true' | 'wait'
-var maxDurationSeconds = 0
 
 export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
   // const score: Score = parseScore(initialContent)
@@ -39,6 +43,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
+  const [totalDuration, setTotalDuration] = useState<number>(0)
 
   const { larasInstruments, playInstrument, muteInstrument, muteAll, focusInstrument} = useInstruments()
   const {changeTempo, changeDynamics} = useInterpretations()
@@ -46,17 +51,19 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
 
   // recreate the Transport schedule when a new score is selected
   const timeline = useMemo(() => createTimeline(score), [score])
+  
   useEffect(() => createSchedule(timeline), [score]);
 
   useEffect(() => focusInstrument(focusRef.current), [focusRef.current])
 
-
   function updateProgress(time: number){
     setProgress(Tone.getTransport().seconds)
+    Tone.getTransport()
   }
 
   function createSchedule(timeline: Timeline) {
     // Creates the schedule for the Transport object.
+    if (audioStarted) pause()
     Tone.getTransport().stop()
     Tone.getTransport().cancel()
     Tone.getTransport().position = 0
@@ -81,10 +88,17 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     // beat.dynamicsActions.forEach((dAction: DynamicsAction) => {
     //   Tone.getTransport().schedule((time) => changeDynamics(time, dAction), dAction.time)
     // })
-    const maxtime = timeline.sampleractions.reduce((aggr: Tone.Unit.TimeObject, curr: SamplerAction) => {return (Tone.Time(curr.time).toSeconds() > Tone.Time(aggr).toSeconds()) ? curr.time : aggr}, {"16n":0}, )
-    maxDurationSeconds = Tone.Time(maxtime).toSeconds()
-    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0)
+    setTotalDuration(timeline.totalDurationSec)
+    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0, timeline.totalDurationTO)
 
+  }
+
+  function jumpToProgressTime(time: number | number[]) {
+    const newTime = typeof time === 'number' ? time : time[1]
+    Tone.getTransport().stop()
+    Tone.getTransport().position = newTime
+    Tone.getTransport().start()
+    setProgress(newTime)
   }
 
   const play = () => {
@@ -114,6 +128,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   }
 
   async function rewind() {
+    Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)
     pause()
@@ -148,10 +163,11 @@ return (
               <button onClick={() => playPause()}>{playing? <FaPause/> : <FaPlay/>}</button>
             </div>
             <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
-              <div className="flex w-full cursor-pointer items-center py-1">
-                <hr className="w-full border-1" />
+              <div className="flex w-full items-center ">
+                {/* <hr className="w-full border-1" /> */}
+                <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)}/>
               </div>
-            <span className="flex w-12 flex-shrink-0 justify-center">00:00</span>
+            <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
           </div>
         </div>
       </div>

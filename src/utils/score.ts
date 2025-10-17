@@ -1,6 +1,7 @@
 import { BaseNote, cInstrumentConfigs, instrumentConfigs, type Notes, type Note as KeyInfo } from '../config/config'
 import { type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
+import { n2TO } from './timeunits'
 
 export function parseScore(input: string): Score {
   return JSON.parse(input)
@@ -48,6 +49,8 @@ export type AnimationAction = {
 }
 
 export type Timeline = {
+  totalDurationSec: number
+  totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
   tempoactions: TempoAction[]
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
@@ -62,15 +65,13 @@ export type ScheduleFunctions = {
   animateNote: CallableFunction,
 }
 
-const n2TO = (notevalue: number): Tone.Unit.TimeObject => new Object({ [BaseNote]: notevalue })
-
 export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
 
   const timeline: Timeline = {
-    tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
   }
-  if (!score) return { tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [] }
+  if (!score) return { totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [] }
 
   var currBpm: Tone.Unit.NormalRange = 0
   var currTime: Tone.Unit.TimeObject = n2TO(0)
@@ -89,7 +90,10 @@ export function createTimeline(score: Score): Timeline {
   }
 
   // Populate the action lists
+  var totalDurationBaseNote = 0
   score.sections.forEach((section) => {
+    totalDurationBaseNote += section.duration
+    timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
 
     // Create tempo actions
     currTime = n2TO(section.starttime)
@@ -97,6 +101,7 @@ export function createTimeline(score: Score): Timeline {
       timeline.tempoactions.push({ bpm: [section.tempo[0] != currBpm ? section.tempo[0] : null, section.tempo[1] != section.tempo[0] ? section.tempo[1] : null], time: currTime, duration: n2TO(section.duration) })
       currBpm = section.tempo[1]
     }
+    timeline.totalDurationTO = n2TO(totalDurationBaseNote)
 
     // Create sampler actions
     section.data.forEach((stave) => {
