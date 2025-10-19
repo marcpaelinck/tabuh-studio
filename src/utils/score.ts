@@ -84,7 +84,7 @@ export function createTimeline(score: Score): Timeline {
   // Create a mapping for notes to Pitch, Octave, 
   var note_to_keygroup: { [position: string]: { [symbol: string]: Notes } } = {}
   for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
-    note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
+    note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index].map((str, index) => str.split("_"))]))
   }
 
   function note2noteAction(position: string, note: Note, isLast: boolean): AnimationNote | null {

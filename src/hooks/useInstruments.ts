@@ -3,7 +3,7 @@ import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../models/constants'
 import { dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
-import { soundFile, soundFiles } from '../utils/config'
+import { soundFile } from '../utils/config'
 
 export type LarasInstrument = {
   play: (time: number, action: SamplerAction, focus: string) => void
@@ -34,9 +34,8 @@ const createSampler = ({ instr_type, samples, volume }: { instr_type: string, sa
 const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([position, config]) => {
   const noteList = [...new Set(config.notes.flat())]
   const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, instrumentConfigs[position].sampletemplate)]))
-  const notestrList = noteList.map(([tone, stroke]) => `${tone}|${stroke}`)
-  const noteToIndex = Object.fromEntries(notestrList.map((notestr, index) => [notestr, NOTES[index]]))
-  const symbolToIndices = Object.fromEntries(config.alphabet.map((symbol, index) => [symbol, config.notes[index].map(([tone, stroke]) => noteToIndex[`${tone}|${stroke}`])]))
+  const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
+  const symbolToIndices = Object.fromEntries(config.alphabet.map((symbol, index) => [symbol, config.notes[index].map((repr) => noteToIndex[repr])]))
   return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
 }))
 console.log(lookup)
