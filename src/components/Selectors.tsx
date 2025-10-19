@@ -42,7 +42,7 @@ export default function Selectors(
     // Populate the focus selector with the instruments in the selected score
     useEffect(() => {
         async function fetchFocusInstruments(score: Score) {
-            const instr_lists: string[][] = score.sections.map((section: Section) => section.data.map((data: SectionData) => data.label))
+            const instr_lists: string[][] = score.sections.map((section: Section) => section.data.map((data: SectionData) => data.position))
             const instruments: string[] = [...new Set(instr_lists.flat())]
             const instr_options: JSX.Element[] = [<option value={""} key={""}>No focus</option>].concat(
                 instruments.map((instrument: string) => (

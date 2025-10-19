@@ -1,16 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import * as Tone from 'tone'
-import type { SamplerAction, TempoAction } from '../utils/score'
+import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../models/constants'
-import { cInstrumentConfigs, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile, soundFiles } from '../utils/config'
 
 export type LarasInstrument = {
-  play: (time: number, action: SamplerAction) => void
+  play: (time: number, action: SamplerAction, focus: string) => void
   mute: (time: number) => void
-  dim: () => void
-  undim: () => void
-  params: { [param: string]: any }
 }
 
 export type LarasInstruments = Record<string, LarasInstrument>
@@ -45,65 +42,22 @@ const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([positi
 console.log(lookup)
 
 const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
-  // const mapping = generateInstrumenMappings(instrumentConfigs[key].alphabet)
-  var params = { dimmed: false, alwaysFocus: ["KEMPLI", "GONGS"] }
+  const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
+  const focusPositions = ["KEMPLI", "GONGS"].concat([position])
+
   return {
-    play: (time: number, action: SamplerAction) => {
+    play: (time: number, action: SamplerAction, focus: string) => {
+      const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
       const indices = lookup[position].symbol2idxs[action.symbol]
       if (indices && samplers[position].current) {
-        // samplers[key].releaseAll(),
         try {
-          samplers[position].current.triggerAttackRelease(indices, action.duration, time, action.velocity[0])
+          sampler.current?.triggerAttackRelease(indices, action.duration, time, action.velocity * dimValue)
         } catch {
-          console.log(`ERROR: could not play sound ${action.label}-${action.symbol} `)
+          console.log(`ERROR: could not play sound ${action.position}-${action.symbol} `)
         }
       }
     },
-    mute: (time: number) => samplers[position].current ? samplers[position].current.releaseAll(time) : null,
-    dim: () => {
-      if (samplers[position].current && !params.dimmed) {
-        samplers[position].current.volume.value -= 15
-        params.dimmed = true
-      }
-    }
-    ,
-    undim: () => {
-      if (samplers[position].current && params.dimmed) {
-        samplers[position].current.volume.value += 15
-        params.dimmed = false
-      }
-    },
-    params: params
-
-  }
-}
-
-const createCInstrument = (components: string[], samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
-  const allMappings: Record<string, Record<string, string>> = {}
-
-  components.forEach((component) => {
-    if (instrumentConfigs[component]?.alphabet.length) {
-      allMappings[component] = generateInstrumenMappings(instrumentConfigs[component].alphabet)
-    }
-  })
-  return {
-    play: (time: number, action: SamplerAction) => {
-      components.forEach((component) => {
-        if (allMappings[component]?.[action.symbol] && samplers[component].current) {
-          // samplers[component].triggerRelease([allMappings[component][action.symbol]])
-          // samplers[component].releaseAll(),
-          samplers[component].current.triggerAttackRelease([allMappings[component][action.symbol]], action.duration, time, action.velocity[0])
-        }
-      })
-    },
-    mute: (time: number) => {
-      components.forEach((component) => {
-        if (samplers[component].current) samplers[component].current.releaseAll(time)
-      })
-    },
-    dim: () => { },
-    undim: () => { },
-    params: { "dimmed": false }
+    mute: (time: number) => sampler.current?.releaseAll(time),
   }
 }
 
@@ -123,19 +77,15 @@ export const useInstruments = () => {
   const larasInstruments: LarasInstruments = {}
 
   Object.keys(instrumentConfigs).forEach((key) => (larasInstruments[key] = createInstrument(key, samplers)))
-  // Object.entries(cInstrumentConfigs).forEach(
-  //   ([key, components]) => (instruments[key] = createCInstrument(components, samplers)),
-  // )
-  // setInstruments(instruments)
 
   // Adds a small random deviation to the note attack time for a more realistic execution
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
   const playInstrument = useCallback(
-    (time: number, label: string, action: SamplerAction) => {
+    (time: number, label: string, action: SamplerAction, focus: string) => {
       if (!mutedInstruments[label] /*&& larasInstruments[label]*/) {
         if (action.symbol === '.') larasInstruments[label].mute(time)
-        else { larasInstruments[label].play(random_attack_deviation(time), action) }
+        else { larasInstruments[label].play(random_attack_deviation(time), action, focus) }
       }
     },
     [mutedInstruments],
@@ -151,21 +101,11 @@ export const useInstruments = () => {
     [larasInstruments],
   )
 
-  const focusInstrument = (position: string): void => {
-    Object.keys(larasInstruments).forEach((position) => larasInstruments[position].undim())
-    if (position == "" || !(position in larasInstruments)) return
-    Object.keys(larasInstruments).forEach((pos) => {
-      if (![position, ...larasInstruments[pos].params.alwaysFocus].includes(pos))
-        larasInstruments[position].dim()
-    })
-  }
-
   return {
     larasInstruments,
     playInstrument,
     muteInstrument,
     muteAll,
-    focusInstrument
   }
 }
 

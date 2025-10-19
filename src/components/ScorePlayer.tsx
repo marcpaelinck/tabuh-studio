@@ -1,4 +1,3 @@
-import { BaseNote } from '../config/config'
 import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
@@ -12,8 +11,6 @@ import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { AVERAGE_ATTACK_DELAY } from '../models/constants'
-import { n2TO } from '../utils/timeunits'
 
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
@@ -45,7 +42,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
 
-  const { larasInstruments, playInstrument, muteInstrument, muteAll, focusInstrument} = useInstruments()
+  const { larasInstruments, playInstrument, muteInstrument, muteAll} = useInstruments()
   const {changeTempo, changeDynamics} = useInterpretations()
   const { executeAnimation } = useAnimationEngine(svgInfoRef, focusRef)
 
@@ -54,7 +51,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   
   useEffect(() => createSchedule(timeline), [score]);
 
-  useEffect(() => focusInstrument(focusRef.current), [focusRef.current])
+  // useEffect(() => focusInstrument(focusRef.current), [focusRef.current])
 
   function updateProgress(time: number){
     setProgress(Tone.getTransport().seconds)
@@ -74,7 +71,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     })
     // instrument actions (notes)
     timeline.sampleractions.forEach((iAction: SamplerAction) => {
-      Tone.getTransport().schedule((time) => playInstrument(time, iAction.label, iAction), iAction.time)
+      Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {

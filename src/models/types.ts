@@ -10,7 +10,7 @@ export type Note = {
   d: number
 }
 export type SectionData = {
-  label: string
+  position: string
   velocity: number[]
   value: Note[]
 }

@@ -1,4 +1,4 @@
-import { BaseNote, cInstrumentConfigs, instrumentConfigs, type Notes, type Note as KeyInfo } from '../config/config'
+import { cInstrumentConfigs, instrumentConfigs, type Notes, type Note as KeyInfo } from '../config/config'
 import { type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
@@ -9,19 +9,20 @@ export function parseScore(input: string): Score {
 
 export interface SamplerAction {
   time: Tone.Unit.TimeObject
-  label: string
+  position: string
   symbol: string
-  velocity: Tone.Unit.NormalRange[]
+  velocity: Tone.Unit.NormalRange
   duration: Tone.Unit.TimeObject
 }
 
 export type TempoAction = {
   time: Tone.Unit.TimeObject
-  bpm: (Tone.Unit.NormalRange | null)[]
+  bpm: (Tone.Unit.NormalRange)[]
   duration: Tone.Unit.TimeObject
 }
 
 export type DynamicsAction = {
+  position: string
   time: Tone.Unit.TimeObject
   velocity: (Tone.Unit.NormalRange | null)[]
   duration: Tone.Unit.TimeObject
@@ -52,6 +53,7 @@ export type Timeline = {
   totalDurationSec: number
   totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
   tempoactions: TempoAction[]
+  dynamicsactions: DynamicsAction[]
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
   cursoractions: CursorAction[]
@@ -69,13 +71,15 @@ export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], dynamicsactions: [], sampleractions: [], animationactions: [], cursoractions: []
   }
-  if (!score) return { totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [] }
+  if (!score) return timeline
 
   var currBpm: Tone.Unit.NormalRange = 0
+  // currVelocity will keep track of the velocity of each separate instrument position
+  const currVelocity: { [position: string]: number } = Object.fromEntries(Object.keys(instrumentConfigs).map((pos) => [pos, 0]))
   var currTime: Tone.Unit.TimeObject = n2TO(0)
-  var positionScore: { [position: string]: Note[] } = {}
+  const positionScore: { [position: string]: Note[] } = {}
 
   // Create a mapping for notes to Pitch, Octave, 
   var note_to_keygroup: { [position: string]: { [symbol: string]: Notes } } = {}
@@ -89,27 +93,45 @@ export function createTimeline(score: Score): Timeline {
     return keyInfo ? { keyname: keyInfo[0], stroke: keyInfo[1], duration: n2TO(note.d), islast: isLast } : null
   }
 
+  // Used for tempo and dynamics actions. Checks for a value change and returns null if no change is detected.
+  function changedValues(values: number[], reference: number): number[] | null {
+    return values
+    // return (values[0] != reference || values[1] != reference) ? values : null
+  }
+
   // Populate the action lists
   var totalDurationBaseNote = 0
   score.sections.forEach((section) => {
     totalDurationBaseNote += section.duration
     timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
-
-    // Create tempo actions
     currTime = n2TO(section.starttime)
-    if (section.tempo[0] != currBpm || section.tempo[1] != currBpm) {
-      timeline.tempoactions.push({ bpm: [section.tempo[0] != currBpm ? section.tempo[0] : null, section.tempo[1] != section.tempo[0] ? section.tempo[1] : null], time: currTime, duration: n2TO(section.duration) })
+
+    // Create tempo actions for each tempo change.
+    var newValues: number[] | null
+    if (newValues = changedValues(section.tempo, currBpm)) {
+      timeline.tempoactions.push({ bpm: newValues, time: currTime, duration: n2TO(section.duration) })
       currBpm = section.tempo[1]
     }
     timeline.totalDurationTO = n2TO(totalDurationBaseNote)
 
+    // Create dynamics actionsfor each velocity change. Velocity is given for each instrument position.
+    section.data.forEach((data) => {
+      if (newValues = changedValues(data.velocity, currVelocity[data.position])) {
+        timeline.dynamicsactions.push({ position: data.position, velocity: newValues, time: currTime, duration: n2TO(section.duration) })
+        currVelocity[data.position] = data.velocity[1]
+      }
+    })
+
     // Create sampler actions
     section.data.forEach((stave) => {
-      if (!(stave.label in positionScore)) positionScore[stave.label] = []
+      if (!(stave.position in positionScore)) positionScore[stave.position] = []
+      var sectionProgress: number = 0
       stave.value.forEach((note) => {
         // create separate scores for each position, which will be used to create the animation actions 
-        positionScore[stave.label].push(note)
-        timeline.sampleractions.push({ label: stave.label, symbol: note.s, velocity: stave.velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
+        var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+        positionScore[stave.position].push(note)
+        timeline.sampleractions.push({ position: stave.position, symbol: note.s, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
+        sectionProgress += (note.d || 1)
       })
     })
   })
