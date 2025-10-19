@@ -1,4 +1,3 @@
-import { useCallback, useState } from "react";
 import type { AnimationAction } from "../utils/score";
 import * as Tone from 'tone'
 import type { SvgInfo } from "../components/Animation";
@@ -8,6 +7,9 @@ const strikeDuration = 600; // duration of the stroke
 const bezier = "cubic-bezier(0,.25,1,.71)"; // default timing curve
 const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke (accelerates toward stroke)
 const selectedSpeed = 1 //TODO replace with value of speed selector
+// See the last remark in https://github.com/tonejs/tone.js/wiki/TransportTime
+const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
+console.log(`lookAhead=${lookAheadMillis}`)
 
 function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
     const durationMillis = Tone.Time(duration).toMilliseconds()
@@ -123,23 +125,26 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
 export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRef: React.RefObject<string>) => {
 
 
-    function executeAnimation(time: number, action: AnimationAction) {
-        if (action.position === focusRef.current) {
-            const svgInfo = svgInfoRef.current
-            if (svgInfo.svg && action.currnote) {
+    async function executeAnimation(time: number, action: AnimationAction) {
+        setTimeout(function () {
+            if (action.position === focusRef.current) {
+                const svgInfo = svgInfoRef.current
+                if (svgInfo.svg && action.currnote) {
 
-                // Hightighting animation
-                var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname} .${action.currnote.stroke}`) ||
-                    svgInfo.svg.querySelector(`#${action.currnote.keyname}`))
-                if (keyElement) highlightNote(keyElement, action.currnote.duration)
 
-                // Panggul animation
-                if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-                    animatePanggul(action, svgInfo)
+                    // Hightighting animation
+                    var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname} .${action.currnote.stroke}`) ||
+                        svgInfo.svg.querySelector(`#${action.currnote.keyname}`))
+                    if (keyElement) highlightNote(keyElement, action.currnote.duration)
+
+                    // Panggul animation
+                    if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
+                        animatePanggul(action, svgInfo)
+                    }
                 }
-            }
 
-        }
+            }
+        }, lookAheadMillis);
     }/*, [svgInfo, focus])*/
 
     return { executeAnimation }
