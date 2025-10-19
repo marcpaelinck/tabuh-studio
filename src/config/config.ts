@@ -22,7 +22,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         type: 'percussion',
         alphabet: ['G', 'P', 'T'],
         notes: [['GIR_OPEN'], ['PUR_OPEN'], ['TONG_OPEN']],
-        volume: 0,
+        volume: -5,
         svg_file: "GK_GONGS.svg",
         sampletemplate: "GK_GONGS_{note}.mp3",
     },

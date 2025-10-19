@@ -46,7 +46,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
   return {
     play: (time: number, action: SamplerAction, focus: string) => {
       // const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
-      const dimValue = (focus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
+      const dimValue = (focus == "" || focus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
       const indices = lookup[position].symbol2idxs[action.symbol]
       if (indices && samplers[position].current) {
         try {

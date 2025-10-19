@@ -56,11 +56,11 @@ export default function Selectors(
     return (<div className="">
 				<div className="label">
                     <span className="font-semibold italic pe-2">Song:</span>
-                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className="bg-amber-100">
+                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className="bg-blue-300">
                         { scoreListItems }
                     </select>
                     <span className="font-semibold italic ps-5 pe-2">Focus:</span>
-                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className=" bg-amber-100">
+                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className=" bg-blue-300">
                         { focusListItems }
                     </select>
 				</div>

@@ -162,7 +162,7 @@ return (
             <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
               <div className="flex w-full items-center ">
                 {/* <hr className="w-full border-1" /> */}
-                <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)}/>
+                <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
               </div>
             <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
           </div>
