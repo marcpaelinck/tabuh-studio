@@ -1,7 +1,7 @@
-import { instrumentConfigs, SOUNDS_FOLDER, type Note } from "../config/config";
+import { instrumentConfigs, SOUNDS_FOLDER } from "../config/config";
 import { fileExists } from "./filesystem";
 
-export function soundFiles(notes: Note[], fileTemplate: string): string[] {
+export function soundFiles(notes: string[], fileTemplate: string): string[] {
     return notes.map(([tone, muting]) =>
         fileTemplate.replace('{tone}', `${tone}`).replace('{muting}', `${muting}`))
 }
@@ -26,3 +26,4 @@ export async function sanityCheck() {
     }
     if (logMessage) console.log(logMessage)
 }
+sanityCheck()

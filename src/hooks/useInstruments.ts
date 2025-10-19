@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../models/constants'
-import { dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
 export type LarasInstrument = {
@@ -42,11 +42,11 @@ console.log(lookup)
 
 const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
-  const focusPositions = ["KEMPLI", "GONGS"].concat([position])
 
   return {
     play: (time: number, action: SamplerAction, focus: string) => {
-      const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
+      // const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
+      const dimValue = (focus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
       const indices = lookup[position].symbol2idxs[action.symbol]
       if (indices && samplers[position].current) {
         try {

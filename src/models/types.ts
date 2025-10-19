@@ -5,6 +5,11 @@ export type Instrument = {
 }
 
 export type Note = {
+  tone: string
+  muting: string
+}
+
+export type NotationNote = {
   s: string
   t: number
   d: number
@@ -12,7 +17,7 @@ export type Note = {
 export type SectionData = {
   position: string
   velocity: number[]
-  value: Note[]
+  value: NotationNote[]
 }
 export type Section = {
   id: number
