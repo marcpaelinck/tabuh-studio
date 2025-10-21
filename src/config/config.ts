@@ -13,7 +13,7 @@ export type InstrumentConfig = {
     type: string
     alphabet: string[]
     notes: string[][] //list of single notes or multiple notes that are played simultaneously
-    svg_file: string | null,
+    svg_file: string,
     sampletemplate: string
     volume: number
 }
@@ -23,7 +23,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['G', 'P', 'T'],
         notes: [['GIR_OPEN'], ['PUR_OPEN'], ['TONG_OPEN']],
         volume: -5,
-        svg_file: "GK_GONGS.svg",
+        svg_file: "/svg/GK_GONGS.svg",
         sampletemplate: "GK_GONGS_{note}.mp3",
     },
     KEMPLI: {
@@ -31,7 +31,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['x?'],
         notes: [['X_MUTED']],
         volume: -5,
-        svg_file: null,
+        svg_file: "",
         sampletemplate: "GK_KEMPLI_{note}.mp3",
     },
     CENGCENG: {
@@ -39,7 +39,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['x', 'x?'],
         notes: [['X_OPEN'], ['X_MUTED']],
         volume: -14,
-        svg_file: null,
+        svg_file: "",
         sampletemplate: "GK_CENGCENG_{note}.mp3",
     },
     KENDANG: {
@@ -47,7 +47,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['(', ')', '*', '0', '8', '9'],
         notes: [['TUT_OPEN'], ['KUNG_OPEN'], ['PAK_OPEN'], ['CUNG_OPEN'], ['KA_OPEN'], ['DE_OPEN']],
         volume: 0,
-        svg_file: "GK_KENDANG.svg",
+        svg_file: "/svg/GK_KENDANG.svg",
         sampletemplate: "GK_KENDANG_{note}.wav",
     },
     JEGOGAN: {
@@ -55,7 +55,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN']],
         volume: -14,
-        svg_file: "GK_JEGOGAN.svg",
+        svg_file: "/svg/GK_JEGOGAN.svg",
         sampletemplate: "GK_JEGOGAN_{note}.mp3",
     },
     CALUNG: {
@@ -63,7 +63,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN']],
         volume: -14,
-        svg_file: "GK_CALUNG.svg",
+        svg_file: "/svg/GK_CALUNG.svg",
         sampletemplate: "GK_CALUNG_{note}.mp3",
     },
     PENYACAH: {
@@ -71,7 +71,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN']],
         volume: -14,
-        svg_file: "GK_PENYACAH.svg",
+        svg_file: "/svg/GK_PENYACAH.svg",
         sampletemplate: "GK_PENYACAH_{note}.mp3",
     },
     KANTILAN_POLOS: {
@@ -79,7 +79,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0_OPEN'], ['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG0_ABBREVIATED'], ['DENG0_ABBREVIATED'], ['DUNG0_ABBREVIATED'], ['DANG0_ABBREVIATED'], ['DING1_ABBREVIATED'], ['DONG1_ABBREVIATED'], ['DENG1_ABBREVIATED'], ['DUNG1_ABBREVIATED'], ['DANG1_ABBREVIATED'], ['DING2_ABBREVIATED'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
-        svg_file: "GK_GANGSA.svg",
+        svg_file: "/svg/GK_GANGSA.svg",
         sampletemplate: "GK_KANTILAN_{note}.mp3",
     },
     KANTILAN_SANGSIH: {
@@ -87,7 +87,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0_OPEN'], ['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG0_ABBREVIATED'], ['DENG0_ABBREVIATED'], ['DUNG0_ABBREVIATED'], ['DANG0_ABBREVIATED'], ['DING1_ABBREVIATED'], ['DONG1_ABBREVIATED'], ['DENG1_ABBREVIATED'], ['DUNG1_ABBREVIATED'], ['DANG1_ABBREVIATED'], ['DING2_ABBREVIATED'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
-        svg_file: "GK_GANGSA.svg",
+        svg_file: "/svg/GK_GANGSA.svg",
         sampletemplate: "GK_KANTILAN_{note}.mp3",
     },
     PEMADE_POLOS: {
@@ -95,7 +95,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0_OPEN'], ['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG0_ABBREVIATED'], ['DENG0_ABBREVIATED'], ['DUNG0_ABBREVIATED'], ['DANG0_ABBREVIATED'], ['DING1_ABBREVIATED'], ['DONG1_ABBREVIATED'], ['DENG1_ABBREVIATED'], ['DUNG1_ABBREVIATED'], ['DANG1_ABBREVIATED'], ['DING2_ABBREVIATED'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
-        svg_file: "GK_GANGSA.svg",
+        svg_file: "/svg/GK_GANGSA.svg",
         sampletemplate: "GK_PEMADE_{note}.mp3",
     },
     PEMADE_SANGSIH: {
@@ -103,7 +103,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0_OPEN'], ['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG0_ABBREVIATED'], ['DENG0_ABBREVIATED'], ['DUNG0_ABBREVIATED'], ['DANG0_ABBREVIATED'], ['DING1_ABBREVIATED'], ['DONG1_ABBREVIATED'], ['DENG1_ABBREVIATED'], ['DUNG1_ABBREVIATED'], ['DANG1_ABBREVIATED'], ['DING2_ABBREVIATED'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
-        svg_file: "GK_GANGSA.svg",
+        svg_file: "/svg/GK_GANGSA.svg",
         sampletemplate: "GK_PEMADE_{note}.mp3",
     },
     UGAL: {
@@ -111,7 +111,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0_OPEN'], ['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG0_ABBREVIATED'], ['DENG0_ABBREVIATED'], ['DUNG0_ABBREVIATED'], ['DANG0_ABBREVIATED'], ['DING1_ABBREVIATED'], ['DONG1_ABBREVIATED'], ['DENG1_ABBREVIATED'], ['DUNG1_ABBREVIATED'], ['DANG1_ABBREVIATED'], ['DING2_ABBREVIATED'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
-        svg_file: "GK_UGAL.svg",
+        svg_file: "/svg/GK_UGAL.svg",
         sampletemplate: "GK_UGAL_{note}.mp3",
     },
     REYONG_1: {
@@ -119,7 +119,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 'r', 'r?', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DENG0_OPEN'], ['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DENG0_OPEN', 'DING1_OPEN'], ['DENG0_MUTED', 'DING1_MUTED'], ['DENG0_OPEN', 'DANG0_OPEN'], ['DENG0_ABBREVIATED', 'DANG0_ABBREVIATED'], ['DENG0_MUTED', 'DANG0_MUTED'], ['XDUNG0_OPEN'], ['XDUNG0_MUTED']],
         volume: -14,
-        svg_file: "GK_REYONG.svg",
+        svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_2: {
@@ -127,7 +127,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DUNG0_OPEN'], ['DANG0_OPEN'], ['DING1_OPEN'], ['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING1_OPEN', 'DENG1_OPEN'], ['DING1_ABBREVIATED', 'DENG1_ABBREVIATED'], ['DING1_MUTED', 'DENG1_MUTED'], ['XDONG1_OPEN'], ['XDONG1_MUTED']],
         volume: -14,
-        svg_file: "GK_REYONG.svg",
+        svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_3: {
@@ -135,7 +135,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['o', 'e', 'u', 'a', 'i<', 'o<', 'e<', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DONG1_OPEN'], ['DENG1_OPEN'], ['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG2_OPEN'], ['DENG2_OPEN'], ['DUNG1_OPEN', 'DING2_OPEN'], ['DUNG1_ABBREVIATED', 'DING2_ABBREVIATED'], ['DUNG1_MUTED', 'DING2_MUTED'], ['XDANG1_OPEN'], ['XDANG1_MUTED']],
         volume: -14,
-        svg_file: "GK_REYONG.svg",
+        svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_4: {
@@ -143,7 +143,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         alphabet: ['u', 'a,', 'i<', 'o<', 'e<', 'u<', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DUNG1_OPEN'], ['DANG1_OPEN'], ['DING2_OPEN'], ['DONG2_OPEN'], ['DENG2_OPEN'], ['DUNG2_OPEN'], ['DING2_OPEN', 'DENG2_OPEN'], ['DING2_ABBREVIATED', 'DENG2_ABBREVIATED'], ['DING2_MUTED', 'DENG2_MUTED'], ['XDENG2_OPEN'], ['XDENG2_MUTED']],
         volume: -14,
-        svg_file: "GK_REYONG.svg",
+        svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
 }

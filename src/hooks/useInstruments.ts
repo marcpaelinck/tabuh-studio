@@ -101,7 +101,6 @@ export const useInstruments = () => {
   )
 
   return {
-    larasInstruments,
     playInstrument,
     muteInstrument,
     muteAll,

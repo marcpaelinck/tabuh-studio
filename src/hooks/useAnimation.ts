@@ -1,6 +1,7 @@
 import type { AnimationAction } from "../utils/score";
 import * as Tone from 'tone'
 import type { SvgInfo } from "../components/Animation";
+import { useCallback, useState } from "react";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -123,7 +124,6 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
 }
 
 export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRef: React.RefObject<string>) => {
-
 
     async function executeAnimation(time: number, action: AnimationAction) {
         setTimeout(function () {

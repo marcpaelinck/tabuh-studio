@@ -12,7 +12,6 @@ import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
   return (
     <div className="flex flex-col items-center">
@@ -27,23 +26,17 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
   )
 })
 
-
-
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
-  // const score: Score = parseScore(initialContent)
-  // const score: Score = {title: "", composer: "", sections: []}
+export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { score: Score, focus: string, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
 
-  // const { ref: scoreSectionRef, maxSteps } = useMaxSteps()
-  
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
 
-  const { larasInstruments, playInstrument, muteInstrument, muteAll} = useInstruments()
-  const {changeTempo, changeDynamics} = useInterpretations()
+  const { playInstrument, muteInstrument, muteAll} = useInstruments()
+  const {changeTempo} = useInterpretations()
   const { executeAnimation } = useAnimationEngine(svgInfoRef, focusRef)
 
   // recreate the Transport schedule when a new score is selected
@@ -51,7 +44,6 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
   
   useEffect(() => createSchedule(timeline), [score]);
 
-  // useEffect(() => focusInstrument(focusRef.current), [focusRef.current])
 
   function updateProgress(time: number){
     setProgress(Tone.getTransport().seconds)
@@ -80,10 +72,6 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
     //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)
-    // })
-    // // TODO: gradual dynamics actions
-    // beat.dynamicsActions.forEach((dAction: DynamicsAction) => {
-    //   Tone.getTransport().schedule((time) => changeDynamics(time, dAction), dAction.time)
     // })
     setTotalDuration(timeline.totalDurationSec)
     Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0, timeline.totalDurationTO)
@@ -124,7 +112,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     }
   }
 
-  async function rewind() {
+  function rewind() {
     Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)

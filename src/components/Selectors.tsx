@@ -29,16 +29,6 @@ export default function Selectors(
         fetchScores();
     }, []);
 
-    const onChangeSongSelector = (value: string) => {
-        score_updater(value)
-        onChangeFocusSelector("")
-    }
-
-    const onChangeFocusSelector = (value: string) => {
-        setCurrentFocus(value)
-        focusUpdater(value)
-    }
-
     // Populate the focus selector with the instruments in the selected score
     useEffect(() => {
         async function fetchFocusInstruments(score: Score) {
@@ -52,6 +42,16 @@ export default function Selectors(
         }
         fetchFocusInstruments(score);
     }, [score]);
+
+    const onChangeSongSelector = (value: string) => {
+        score_updater(value)
+        onChangeFocusSelector("")
+    }
+
+    const onChangeFocusSelector = (value: string) => {
+        setCurrentFocus(value)
+        focusUpdater(value)
+    }
 
     return (<div className="">
 				<div className="label">

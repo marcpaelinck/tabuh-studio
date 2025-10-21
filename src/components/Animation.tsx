@@ -3,26 +3,10 @@ import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
+import { instrumentConfigs } from '../config/config';
 
-interface InstrumentDict {[key: string]: string | null; }
 function positionToSvg(position: string): string  {
-    // TODO: move to JSON file in public/config
-    const dict: InstrumentDict = {
-        PEMADE_POLOS: "GK_GANGSA.svg",
-        PEMADE_SANGSIH: "GK_GANGSA.svg",
-        KANTILAN_POLOS: "GK_GANGSA.svg",
-        KANTILAN_SANGSIH: "GK_GANGSA.svg",
-        UGAL: "GK_UGAL.svg",
-        REYONG_1: "GK_REYONG.svg",
-        REYONG_3: "GK_REYONG.svg",
-        REYONG_2: "GK_REYONG.svg",
-        REYONG_4: "GK_REYONG.svg",
-        CALUNG: "GK_CALUNG.svg",
-        JEGOGAN: "GK_JEGOGAN.svg",
-        GONGS: "GK_GONGS.svg",
-        KEMPLI: null,
-    }
-    return position in dict? `/svg/${dict[position]}` : ""
+    return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
 }
 
 export type XCoordRecord = { [note: string]: number } | null
@@ -36,6 +20,7 @@ export type SvgInfo = {
     animation: AnimationData
 }
 
+// Returns the content of the data section of the SVG file
 const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SvgInfo => {
     if (!svgRef.current) return { svg: null, panggul: null, x: null, y: null, animation: null }
     const panggul: SVGUseElement | null = svgRef.current?.querySelector("#helpinghand")
@@ -43,17 +28,16 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SvgIn
     const data_y: HTMLDataElement | null = svgRef.current.querySelector("data.y");
     var data_animation: HTMLDataElement | null = svgRef.current.querySelector("data.animation");
     //@ts-expect-error
-    const xValues: XCoordRecord = data_x ? JSON.parse(data_x?.attributes.value.value) : null;
+    const xValues: XCoordRecord = data_x ? JSON.parse(data_x.attributes.value.value) : null;
     //@ts-expect-error
-    const yValues: YCoordRecord = data_y ? JSON.parse(data_y?.attributes.value.value) : null;
+    const yValues: YCoordRecord = data_y ? JSON.parse(data_y.attributes.value.value) : null;
     //@ts-expect-error
     const animationValues: AnimationData = data_animation ? JSON.parse(data_animation?.attributes.value.value) : null;
     return { svg: svgRef.current, panggul: panggul, x: xValues, y: (yValues ? yValues.y : 0), animation: animationValues }
 }
 
 
-
-export default function AnimationDiv({focusRef, focus, svgInfoUpdater}: {focusRef: React.RefObject<string>, focus: string, svgInfoUpdater: Function}) : JSX.Element {
+export default function Animation({focus, svgInfoUpdater}: {focus: string, svgInfoUpdater: Function}) : JSX.Element {
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
@@ -89,7 +73,7 @@ export default function AnimationDiv({focusRef, focus, svgInfoUpdater}: {focusRe
         }
     }
 
-    return(	focusRef.current ? (<div id="Animations" color="blue" className={"border-t px-4 pt-3 pb-4 "}>
+    return(	focus ? (<div id="Animations" color="blue" className={"border-t px-4 pt-3 pb-4 "}>
                 {// The panggul checkbox is only visible if the embedded SVG code has an element with id "helpinghand"
                 hasPanggul && (<form id="panggul-selector" >
                     <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>

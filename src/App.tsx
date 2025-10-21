@@ -1,47 +1,49 @@
 // import ScoreEditor from './components/ScoreEditor'
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
-import AnimationDiv from './components/Animation'
+import Animation from './components/Animation'
 import { type Score } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
 import { useEffect, useRef, useState } from 'react'
 import { type SvgInfo } from './components/Animation'
-import { sanityCheck } from './utils/config'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
-  const [scorefile, setScorefile] = useState<string>("")
+  const [scoreTitle, setScoreTitle] = useState<string>("")
   const [score, setScore] = useState<Score>({ title: '', composer: '', sections: [] })
   const [focus, setFocus] = useState<string>('')
   const focusReference: React.RefObject<string>  = useRef('')
-  const svgInfoInfoReference: React.RefObject<SvgInfo> = useRef<SvgInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
+  const svgInfoReference: React.RefObject<SvgInfo> = useRef<SvgInfo>({ svg: null, panggul: null, x: null, y: 2, animation: null })
 
 
-  function updateScorefile(filename: string): void {setScorefile(filename)}
-  function updateFocus(position: string): void {
-    focusReference.current=position
-    setFocus(position)
+  const updateScoreTitle = (newScorefile: string): void => {
+      if (newScorefile !== scoreTitle) setScoreTitle(newScorefile)
+    }
+  const updateFocus = (position: string): void => {
+    if  (position !== focusReference.current) {
+      focusReference.current=position
+      setFocus(position)
+    }
   }
-  function updateSvgInfo(svgInfo: SvgInfo) {
-    svgInfoInfoReference.current = svgInfo
-    // setSvgInfo(svgInfo)
-
+  const updateSvgInfo = (svgInfo: SvgInfo): void => {
+    svgInfoReference.current = svgInfo
   }
   
+  // Load and parse the score when a new score title is selected
   useEffect(() => {
     const loadScore = async () => {
       let jsonScore
-      if (! scorefile) 
+      if (! scoreTitle) 
         jsonScore = await readFile('scores/gilak penutup [full].json')
       else
-        jsonScore = await readFile('scores/' + scorefile)
+        jsonScore = await readFile('scores/' + scoreTitle)
       const score = parseScore(jsonScore)
       setScore(score)
       setIsLoading(false)
     }
     loadScore()
-  }, [scorefile])
+  }, [scoreTitle])
   
 
   if (isLoading) {
@@ -57,9 +59,9 @@ export default function App() {
       <div className="w-1/10">
       </div>
       <div className="w-8/10 rounded-xl p-6 shadow-lg">
-        <Selectors score={score} scoreUpdater={updateScorefile} focusUpdater={updateFocus} />
-        <AnimationDiv focusRef={focusReference} focus={focus} svgInfoUpdater={updateSvgInfo}/>
-        <ScorePlayer score={score} focusRef={focusReference} svgInfoRef={svgInfoInfoReference}/>
+        <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
+        <Animation focus={focus} svgInfoUpdater={updateSvgInfo}/>
+        <ScorePlayer score={score} focus={focus} focusRef={focusReference} svgInfoRef={svgInfoReference}/>
       </div>
     </div>
   )
