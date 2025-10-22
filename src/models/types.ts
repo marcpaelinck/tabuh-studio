@@ -5,8 +5,10 @@ export type Instrument = {
 }
 
 export type Note = {
-  tone: string
-  muting: string
+  tone: string,
+  octave: number | null,
+  stroke: string | null,
+  muting: string,
 }
 
 export type NotationNote = {

@@ -133,8 +133,7 @@ export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRe
 
 
                     // Hightighting animation
-                    var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname} .${action.currnote.stroke}`) ||
-                        svgInfo.svg.querySelector(`#${action.currnote.keyname}`))
+                    var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname}${action.currnote.stroke ? " ." + action.currnote.stroke : ""}`))
                     if (keyElement) highlightNote(keyElement, action.currnote.duration)
 
                     // Panggul animation

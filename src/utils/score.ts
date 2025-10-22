@@ -1,5 +1,5 @@
-import { instrumentConfigs } from '../config/config'
-import { type NotationNote, type Score } from '../models/types'
+import { instrumentConfigs, noteConfigs } from '../config/config'
+import { type NotationNote, type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
 
@@ -29,7 +29,8 @@ export type CursorAction = {
 
 export type AnimationNote = {
   keyname: string
-  stroke: string
+  stroke: string | null
+  muting: string
   duration: Tone.Unit.TimeObject
   islast: boolean
 }
@@ -74,17 +75,35 @@ export function createTimeline(score: Score): Timeline {
   var currTime: Tone.Unit.TimeObject = n2TO(0)
   const positionScore: { [position: string]: NotationNote[] } = {}
 
-  // Create a mapping for notes to Pitch, Octave, 
-  var note_to_keygroup: { [position: string]: { [symbol: string]: string[][] } } = {}
+  // // Create a mapping for notes to Pitch, Octave, 
+  // var note_to_keygroup: { [position: string]: { [symbol: string]: string[][] } } = {}
+  // for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
+  //   note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index].map((str, index) => str.split("_"))]))
+  // }
+
+  // Create a mapping for notes to shorthand code
+  const note_to_shCode: { [position: string]: { [symbol: string]: string[] } } = {}
   for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
-    note_to_keygroup[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index].map((str, index) => str.split("_"))]))
+    note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
   }
 
-  function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {
+  const note2noteAction = (position: string, notationNote: NotationNote, isLast: boolean): AnimationNote | null => {
     // TODO currently only animating first note of group
-    const keyInfo: string[] | null = note.s in note_to_keygroup[position] ? note_to_keygroup[position][note.s][0] : null
-    return keyInfo ? { keyname: keyInfo[0], stroke: keyInfo[1], duration: n2TO(note.d), islast: isLast } : null
+    if (!(position in note_to_shCode)) return null
+    const symbol = notationNote.s
+    const shCode: string | null = symbol in note_to_shCode[position] ? note_to_shCode[position][symbol][0] : null
+    const instrType: string = instrumentConfigs[position].type
+    if (!shCode) return null
+    const note: Note = noteConfigs[instrType][shCode]
+    const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
+    return shCode ? { keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
   }
+
+  // function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {
+  //   // TODO currently only animating first note of group
+  //   const keyInfo: string[] | null = note.s in note_to_keygroup[position] ? note_to_keygroup[position][note.s][0] : null
+  //   return keyInfo ? { tone: keyInfo[0], stroke: keyInfo[1], duration: n2TO(note.d), islast: isLast } : null
+  // }
 
   // Used for tempo and dynamics actions. Checks for a value change and returns null if no change is detected.
   function changedValues(values: number[], reference: number): number[] | null {

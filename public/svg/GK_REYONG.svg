@@ -105,62 +105,62 @@
 </style>
     <g id="DENG0" transform="translate(0 0) scale(1.00 1.00)">
         <use class="chime" href="#chime" x="0" y="0"/>
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DUNG0" transform="translate(623 14) scale(0.95 0.95)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DANG0"  transform="translate(1220 27) scale(0.91 0.91)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DING1"  transform="translate(1792 39) scale(0.87 0.87)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DONG1"  transform="translate(2340 51) scale(0.83 0.83)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DENG1" transform="translate(2865 62) scale(0.79 0.79)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DUNG1"  transform="translate(3370 73) scale(0.76 0.76)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DANG1"  transform="translate(3853 83) scale(0.72 0.72)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DING2"  transform="translate(4317 93) scale(0.69 0.69)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DONG2"  transform="translate(4762 102) scale(0.66 0.66)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DENG2"  transform="translate(5189 111) scale(0.63 0.63)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob  OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
     <g id="DUNG2" transform="translate(5599, 120) scale(0.60 0.60)">
         <use class="chime" href="#chime" x="0" y="0" />
-        <use class="rim TICK1 TICK2 target" href="#highlight-rim" x="0" y="0" />
-        <use class="knob OPEN ABBREVIATED MUTED target" href="#highlight-knob" x="0" y="0"/>
+        <use class="rim RIM target" href="#highlight-rim" x="0" y="0" />
+        <use class="knob KNOB target" href="#highlight-knob" x="0" y="0"/>
     </g>
 </svg>
