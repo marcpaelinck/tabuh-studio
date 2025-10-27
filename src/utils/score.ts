@@ -28,6 +28,7 @@ export type CursorAction = {
 }
 
 export type AnimationNote = {
+  time: Tone.Unit.TimeObject
   keyname: string
   stroke: string | null
   muting: string
@@ -96,7 +97,7 @@ export function createTimeline(score: Score): Timeline {
     if (!shCode) return null
     const note: Note = noteConfigs[instrType][shCode]
     const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
-    return shCode ? { keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
+    return shCode ? { time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
   }
 
   // function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {

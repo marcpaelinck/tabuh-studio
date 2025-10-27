@@ -13,7 +13,7 @@ const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
 console.log(`lookAhead=${lookAheadMillis}`)
 
 function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
-    const durationMillis = Tone.Time(duration).toMilliseconds()
+    const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
         [
@@ -32,7 +32,7 @@ const logConsole = (msg: string, caller: string) => { }
 
 function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
     var keyframes, options;
-    if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null) return
+    if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
 
     var currKey = action.currnote ? action.currnote.keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
     var nextKey = action.nextnote ? action.nextnote.keyname : currKey
@@ -123,12 +123,12 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
     });
 }
 
-export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRef: React.RefObject<string>) => {
+export const useAnimationEngine = () => {
 
-    async function executeAnimation(time: number, action: AnimationAction) {
-        setTimeout(function () {
-            if (action.position === focusRef.current) {
-                const svgInfo = svgInfoRef.current
+    const executeAnimation = (time: number, action: AnimationAction, currentFocus: string, svgInfo: SvgInfo) => {
+        setTimeout(function () { // The callback is called slightly before (lookAheadMillis) the target time.
+            if (action.position === currentFocus) {
+                // const svgInfo = svgInfoRef.current
                 if (svgInfo.svg && action.currnote) {
 
 
@@ -144,7 +144,7 @@ export const useAnimationEngine = (svgInfoRef: React.RefObject<SvgInfo>, focusRe
 
             }
         }, lookAheadMillis);
-    }/*, [svgInfo, focus])*/
+    }
 
     return { executeAnimation }
 }

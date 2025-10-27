@@ -7,10 +7,6 @@ export const alwaysFocusPositions = ["KEMPLI", "GONGS"]
 
 export const NOTES = ['C1', 'C#1', 'D1', 'D#1', 'E1', 'F1', 'F#1', 'G1', 'G#1', 'A1', 'A#1', 'B1', 'C2', 'C#2', 'D2', 'D#2', 'E2', 'F2', 'F#2', 'G2', 'G#2', 'A2', 'A#2', 'B2', 'C3', 'C#3', 'D3', 'D#3', 'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3']
 
-// A note is represented as {tone}_{muting}, e.g. O1_O, in case of a gangsa, stands for DONG1 OPEN.
-// A tone corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
-// Muting denotes whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
-
 export type InstrumentConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.
     // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
@@ -159,7 +155,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         type: 'melodic',
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
-        volume: -14,
+        volume: -5,
         svg_file: "/svg/GK_JEGOGAN.svg",
         sampletemplate: "GK_JEGOGAN_{note}.mp3",
     },
@@ -167,7 +163,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         type: 'melodic',
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
-        volume: -14,
+        volume: -5,
         svg_file: "/svg/GK_CALUNG.svg",
         sampletemplate: "GK_CALUNG_{note}.mp3",
     },
@@ -175,7 +171,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         type: 'melodic',
         alphabet: ['i', 'o', 'e', 'u', 'a'],
         notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
-        volume: -14,
+        volume: -5,
         svg_file: "/svg/GK_PENYACAH.svg",
         sampletemplate: "GK_PENYACAH_{note}.mp3",
     },

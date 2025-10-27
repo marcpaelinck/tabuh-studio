@@ -5,10 +5,10 @@ export type Instrument = {
 }
 
 export type Note = {
-  tone: string,
-  octave: number | null,
-  stroke: string | null,
-  muting: string,
+  tone: string, // corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
+  octave: number | null, // Scale always start with DING.
+  stroke: string | null, // Striking location or method in case multiple ways exist to strike a key, chime or gong.
+  muting: string, // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 
 export type NotationNote = {

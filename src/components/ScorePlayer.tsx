@@ -37,7 +37,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
 
   const { playInstrument, muteInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
-  const { executeAnimation } = useAnimationEngine(svgInfoRef, focusRef)
+  const { executeAnimation } = useAnimationEngine()
 
   // recreate the Transport schedule when a new score is selected
   const timeline = useMemo(() => createTimeline(score), [score])
@@ -67,7 +67,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => executeAnimation(time, aAction), aAction.time)
+      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current), aAction.time)
       })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
