@@ -2,14 +2,13 @@ import { instrumentConfigs, noteConfigs } from '../config/config'
 import { type NotationNote, type Note, type Score, type Section, type SectionData } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
-import { setTempo } from '../hooks/useInterpretations'
 
 export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
   // This function also calculates times in ms for each note, to be used by the animation.
   // The reason is that Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
   var sectionTimeMs = 0
-  score.sections.forEach((section) => {
+  score.sections.forEach((section, idx, sectionArray) => {
     section.starttimeMs = Math.round(sectionTimeMs)
     section.data.forEach((posData: SectionData) => {
       var dataTimeMs = sectionTimeMs
@@ -21,7 +20,9 @@ export function parseScore(input: string): Score {
       })
     })
     sectionTimeMs += 1000 * (section.duration / 4) * (60 / (0.5 * (section.tempo[0] + section.tempo[1])))
-
+    if (idx === sectionArray.length - 1) {
+      score.durationMs = sectionTimeMs
+    }
   })
   return score
 }

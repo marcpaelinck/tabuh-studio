@@ -56,7 +56,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     Tone.getTransport().stop()
     Tone.getTransport().cancel()
     Tone.getTransport().position = 0
-
+    
     // tempo actions
     timeline.tempoactions.forEach((tAction: TempoAction) => {
       Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
@@ -73,7 +73,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     // beat.cursorActions.forEach((cAction: CursorAction) => {
     //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)
     // })
-    setTotalDuration(timeline.totalDurationSec)
+    setTotalDuration(Math.round(score.durationMs/1000))
     Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0, timeline.totalDurationTO)
 
   }

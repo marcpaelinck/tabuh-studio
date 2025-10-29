@@ -35,6 +35,7 @@ export type Section = {
 export type Score = {
   title: string
   composer: string
+  durationMs: number
   sections: Section[]
 }
 
