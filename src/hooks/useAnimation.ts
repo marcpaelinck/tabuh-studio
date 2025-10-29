@@ -63,7 +63,8 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
             console.log("ERROR in panggul animation: next note not defined but current note is not last.")
             return
         }
-        var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
+        // var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
+        var millisToNextNote = Math.round(action.timeuntilMs / selectedSpeed)
         // Convert time durations to fractions (keyframe time indicators run from 0 to 1)
         var move_to_fraction = moveToDuration / millisToNextNote
         var stroke_fraction = strikeDuration / millisToNextNote

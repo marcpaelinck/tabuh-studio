@@ -1,10 +1,29 @@
 import { instrumentConfigs, noteConfigs } from '../config/config'
-import { type NotationNote, type Note, type Score } from '../models/types'
+import { type NotationNote, type Note, type Score, type Section, type SectionData } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
+import { setTempo } from '../hooks/useInterpretations'
 
 export function parseScore(input: string): Score {
-  return JSON.parse(input)
+  const score: Score = JSON.parse(input)
+  // This function also calculates times in ms for each note, to be used by the animation.
+  // The reason is that Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
+  var sectionTimeMs = 0
+  score.sections.forEach((section) => {
+    section.starttimeMs = Math.round(sectionTimeMs)
+    section.data.forEach((posData: SectionData) => {
+      var dataTimeMs = sectionTimeMs
+      posData.value.forEach((note: NotationNote) => {
+        // Use the average tempo to determine the time in ms.
+        const currTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * (note.t - section.starttime) / section.duration
+        dataTimeMs = section.starttimeMs + 1000 * ((note.t - section.starttime) / 4) * (60 / (0.5 * (section.tempo[0] + currTempo)))
+        note.ms = dataTimeMs
+      })
+    })
+    sectionTimeMs += 1000 * (section.duration / 4) * (60 / (0.5 * (section.tempo[0] + section.tempo[1])))
+
+  })
+  return score
 }
 
 export interface SamplerAction {
@@ -42,6 +61,7 @@ export type AnimationAction = {
   currnote: AnimationNote | null
   nextnote: AnimationNote | null
   timeuntil: Tone.Unit.TimeObject
+  timeuntilMs: number
 }
 
 export type Timeline = {
@@ -54,13 +74,6 @@ export type Timeline = {
   cursoractions: CursorAction[]
 }
 
-export type ScoreTimeline = Timeline[]
-
-export type ScheduleFunctions = {
-  playInstrument: CallableFunction,
-  changeTempo: CallableFunction,
-  animateNote: CallableFunction,
-}
 
 export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
@@ -108,8 +121,8 @@ export function createTimeline(score: Score): Timeline {
 
   // Used for tempo and dynamics actions. Checks for a value change and returns null if no change is detected.
   function changedValues(values: number[], reference: number): number[] | null {
-    return values
-    // return (values[0] != reference || values[1] != reference) ? values : null
+    // return values
+    return (values[0] != reference || values[1] != reference) ? values : null
   }
 
   var totalDurationInBaseNotes = 0
@@ -160,7 +173,8 @@ export function createTimeline(score: Score): Timeline {
       const nextIsLast = (index == notes.length - 2)
       const nextANote: AnimationNote | null = currIsLast ? null : note2noteAction(position, notes[index + 1], nextIsLast)
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
-      timeline.animationactions.push({ time: n2TO(note.t), position: position, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil })
+      const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
+      timeline.animationactions.push({ time: n2TO(note.t), position: position, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
 

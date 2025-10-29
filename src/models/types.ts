@@ -13,7 +13,8 @@ export type Note = {
 
 export type NotationNote = {
   s: string
-  t: number
+  t: number  // attack time in base notes
+  ms: number // attack time in ms
   d: number
 }
 export type SectionData = {
@@ -24,7 +25,8 @@ export type SectionData = {
 export type Section = {
   id: number
   title: string
-  starttime: number
+  starttime: number   // start time in base notes
+  starttimeMs: number // start time in ms
   duration: number
   tempo: number[]
   data: SectionData[]
