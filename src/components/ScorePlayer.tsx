@@ -5,12 +5,13 @@ import { type Score} from '../models/types'
 import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
 import * as Tone from 'tone'
 import { type SvgInfo } from './Animation'
-import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
+import { createTimeline, type AnimationAction, type SamplerAction, type SamplerAnimationAction, type TempoAction, type Timeline } from '../utils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import { NotationArea } from './NotationArea'
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
   return (
@@ -34,15 +35,24 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
+  const textAreaContent: React.RefObject<string> = useRef("")
+  const  notationArea:React.RefObject<NotationArea|null> = useRef(null)
 
-  const { playInstrument, muteInstrument, muteAll} = useInstruments()
+  const { playInstrument, playInstrumentWithAnimation, muteInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
   const { executeAnimation } = useAnimationEngine()
 
   // recreate the Transport schedule when a new score is selected
   const timeline = useMemo(() => createTimeline(score), [score])
   
-  useEffect(() => createSchedule(timeline), [score]);
+  useEffect(() => {
+    createSchedule(timeline)
+    rewind()
+  }, [score]);
+
+  function updateTextAreaContent(value: string, append: boolean = false): void {
+      textAreaContent.current = append? textAreaContent.current + " " + value : value
+  }
 
 
   function updateProgress(time: number){
@@ -61,14 +71,21 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     timeline.tempoactions.forEach((tAction: TempoAction) => {
       Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
     })
-    // instrument actions (notes)
-    timeline.sampleractions.forEach((iAction: SamplerAction) => {
-      Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
+    // // instrument actions (notes)
+    // timeline.sampleractions.forEach((iAction: SamplerAction) => {
+    //   Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
+    // })
+    // // Schedule animation actions
+    // timeline.animationactions.forEach((aAction: AnimationAction) => {
+    //   Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current), aAction.time)
+    //   })
+    // instrument actions (both sampler and animation)
+    //TODO For better sync of animation, consider using Tone.getDraw().schedule. See https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
+    //     The following call does this. However this causes both the audio and animation to stutter from time to time. Need to dive into this before activating.
+    //     The call should replace the above two calls (instrument actions and animation actions)
+    timeline.sampleranimationactions.forEach((iAction: SamplerAnimationAction) => {
+      Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, iAction.position, iAction, focusRef.current, svgInfoRef.current, notationArea), iAction.time)
     })
-    // Schedule animation actions
-    timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current), aAction.time)
-      })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
     //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)
@@ -116,6 +133,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)
+    textAreaContent.current = ""
     pause()
   }
 
@@ -148,12 +166,19 @@ return (
               <button onClick={() => playPause()}>{playing? <FaPause/> : <FaPlay/>}</button>
             </div>
             <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
-              <div className="flex w-full items-center ">
-                {/* <hr className="w-full border-1" /> */}
-                <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
-              </div>
+            <div className="flex w-full items-center ">
+              {/* <hr className="w-full border-1" /> */}
+              <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
+            </div>
             <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
           </div>
+        </div>
+      </div>
+      <div className="max-width-200 gap-1 border-t px-4 pt-3 pb-4 text-xs">
+        <div className="flex w-full items-center">
+          {/* 
+          //@ts-ignore */}
+          <NotationArea ref={notationArea} rows={8} cols={120}/>
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ import { type SvgInfo } from './components/Animation'
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [scoreTitle, setScoreTitle] = useState<string>("")
-  const [score, setScore] = useState<Score>({ title: '', composer: '', sections: [] })
+  const [score, setScore] = useState<Score>({ title: '', composer: '', durationMs: 0, sections: [] })
   const [focus, setFocus] = useState<string>('')
   const focusReference: React.RefObject<string>  = useRef('')
   const svgInfoReference: React.RefObject<SvgInfo> = useRef<SvgInfo>({ svg: null, panggul: null, x: null, y: 2, animation: null })

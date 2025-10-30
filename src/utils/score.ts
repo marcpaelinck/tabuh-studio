@@ -48,6 +48,7 @@ export type CursorAction = {
 }
 
 export type AnimationNote = {
+  section: string
   time: Tone.Unit.TimeObject
   keyname: string
   stroke: string | null
@@ -65,6 +66,19 @@ export type AnimationAction = {
   timeuntilMs: number
 }
 
+export type SamplerAnimationAction = {
+  section: string
+  time: Tone.Unit.TimeObject
+  position: string
+  symbol: string
+  velocity: Tone.Unit.NormalRange
+  duration: Tone.Unit.TimeObject
+  currnote: AnimationNote | null
+  nextnote: AnimationNote | null
+  timeuntil: Tone.Unit.TimeObject
+  timeuntilMs: number
+}
+
 export type Timeline = {
   totalDurationSec: number
   totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
@@ -72,6 +86,7 @@ export type Timeline = {
   // dynamicsactions: DynamicsAction[]
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
+  sampleranimationactions: SamplerAnimationAction[]
   cursoractions: CursorAction[]
 }
 
@@ -80,7 +95,7 @@ export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], sampleranimationactions: [], cursoractions: []
   }
   if (!score) return timeline
 
@@ -111,7 +126,7 @@ export function createTimeline(score: Score): Timeline {
     if (!shCode) return null
     const note: Note = noteConfigs[instrType][shCode]
     const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
-    return shCode ? { time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
+    return shCode ? { section: notationNote.section, time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
   }
 
   // function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {
@@ -157,7 +172,9 @@ export function createTimeline(score: Score): Timeline {
       var sectionProgress: number = 0
       stave.value.forEach((note) => {
         // create separate scores for each position, which will be used to create the animation actions 
+        note.section = section.title
         var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+        note.v = velocity
         positionScore[stave.position].push(note)
         timeline.sampleractions.push({ position: stave.position, symbol: note.s, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
         sectionProgress += (note.d || 1)
@@ -176,8 +193,11 @@ export function createTimeline(score: Score): Timeline {
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
       timeline.animationactions.push({ time: n2TO(note.t), position: position, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      timeline.sampleranimationactions.push({ section: note.section, time: n2TO(note.t), position: position, symbol: note.s, velocity: note.v, duration: n2TO(note.d || 1), currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
+
+  // Create combined sampler and animation actions
 
   // console.log(timeline.sampleractions.length + " sampler actions," + timeline.tempoactions.length + " tempo actions," + timeline.animationactions.length + " animation actions,")
   // console.log(timeline.animationactions)

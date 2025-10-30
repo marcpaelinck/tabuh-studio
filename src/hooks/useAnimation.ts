@@ -1,7 +1,8 @@
-import type { AnimationAction } from "../utils/score";
+import type { AnimationAction, SamplerAnimationAction } from "../utils/score";
 import * as Tone from 'tone'
 import type { SvgInfo } from "../components/Animation";
 import { useCallback, useState } from "react";
+import type { NotationArea } from "../components/NotationArea";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -12,7 +13,7 @@ const selectedSpeed = 1 //TODO replace with value of speed selector
 const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
 console.log(`lookAhead=${lookAheadMillis}`)
 
-function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
+export function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
     const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
@@ -30,7 +31,7 @@ function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
+export async function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
 
@@ -122,6 +123,23 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo): void {
         }
         a.cancel();
     });
+}
+
+export async function animateNotation(saAction: SamplerAnimationAction, notationArea: React.RefObject<NotationArea | null>) {
+    var text = saAction.symbol
+    const [gongan, beat] = saAction.currnote ? saAction.currnote.section.split("-") : [null, null]
+    const [nextgongan, nextbeat] = saAction.nextnote ? saAction.nextnote.section.split("-") : [null, null]
+    if (nextgongan) {
+        if (nextgongan != gongan) {
+            text = text + "\n" + saAction.nextnote?.section + ": "
+        }
+        else if (nextbeat != beat) {
+            text = text + "  |  " + saAction.nextnote?.section + ": "
+        }
+    }
+    // const textarea: HTMLTextAreaElement = document.getElementById("notationArea") as HTMLTextAreaElement
+    notationArea.current?.update(text)
+    // textarea.value = textarea.value + text
 }
 
 export const useAnimationEngine = () => {

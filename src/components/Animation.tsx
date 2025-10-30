@@ -80,7 +80,7 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
                     <label>show panggul</label>
                 </form>  )}
                 <div id="svg-embed">
-                    <ReactSVG src={positionToSvg(focus)} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
+                    <ReactSVG style={{ width: "40%", height: "40%" }} src={positionToSvg(focus)} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
                 </div>
             </div>) : <div/>)
 }

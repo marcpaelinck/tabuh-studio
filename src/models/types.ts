@@ -12,10 +12,12 @@ export type Note = {
 }
 
 export type NotationNote = {
+  section: string
   s: string
   t: number  // attack time in base notes
   ms: number // attack time in ms
   d: number
+  v: number // velocity
 }
 export type SectionData = {
   position: string
