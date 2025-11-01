@@ -46,7 +46,6 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
     // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
 
     function panggulElement()  {return (svgElement.current && svgLoaded) ? svgElement.current.querySelector("#helpinghand") : null}
-
     function setSvgLoadedFalse(svg: SVGSVGElement) {setSvgLoaded(false)}
 
     function setSvgStates(svg: SVGSVGElement) {

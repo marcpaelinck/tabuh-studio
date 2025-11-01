@@ -5,7 +5,7 @@ import { type Score} from '../models/types'
 import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
 import * as Tone from 'tone'
 import { type SvgInfo } from './Animation'
-import { createTimeline, type AnimationAction, type SamplerAction, type SamplerAnimationAction, type TempoAction, type Timeline } from '../utils/score'
+import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
@@ -37,7 +37,7 @@ export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInf
   const [totalDuration, setTotalDuration] = useState<number>(0)
   const  notationArea:React.RefObject<NotationArea|null> = useRef(null)
 
-  const { playInstrument, muteInstrument, muteAll} = useInstruments()
+  const { playInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
   const { executeAnimation } = useAnimationEngine()
 

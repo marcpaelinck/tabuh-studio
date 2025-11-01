@@ -68,19 +68,6 @@ export type AnimationAction = {
   timeuntilMs: number
 }
 
-export type SamplerAnimationAction = {
-  prevsection: string
-  time: Tone.Unit.TimeObject
-  position: string
-  symbol: string
-  velocity: Tone.Unit.NormalRange
-  duration: Tone.Unit.TimeObject
-  currnote: AnimationNote | null
-  nextnote: AnimationNote | null
-  timeuntil: Tone.Unit.TimeObject
-  timeuntilMs: number
-}
-
 export type Timeline = {
   totalDurationSec: number
   totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
@@ -88,7 +75,6 @@ export type Timeline = {
   // dynamicsactions: DynamicsAction[]
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
-  sampleranimationactions: SamplerAnimationAction[]
   cursoractions: CursorAction[]
 }
 
@@ -100,7 +86,7 @@ export function createTimeline(score: Score): Timeline {
   console.log(`starting with ${score.sections[0].data[0].position} ${score.sections[0].data[0].value[0].s}`)
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], sampleranimationactions: [], cursoractions: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
   }
   if (!score) return timeline
 
@@ -163,14 +149,6 @@ export function createTimeline(score: Score): Timeline {
     }
     timeline.totalDurationTO = n2TO(totalDurationInBaseNotes)
 
-    // Create dynamics actionsfor each velocity change. Velocity is given for each instrument position.
-    // section.data.forEach((data) => {
-    //   if (newValues = changedValues(data.velocity, currVelocity[data.position])) {
-    //     timeline.dynamicsactions.push({ position: data.position, velocity: newValues, time: currTime, duration: n2TO(section.duration) })
-    //     currVelocity[data.position] = data.velocity[1]
-    //   }
-    // })
-
     // Create sampler actions
     section.data.forEach((stave) => {
       if (!(stave.position in positionScore)) positionScore[stave.position] = []
@@ -199,14 +177,8 @@ export function createTimeline(score: Score): Timeline {
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
       const prevSection = index == 0 ? "-" : notes[index - 1].section
       timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
-      timeline.sampleranimationactions.push({ prevsection: prevSection, time: n2TO(note.t), position: position, symbol: note.s, velocity: note.v, duration: n2TO(note.d || 1), currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
-
-  // Create combined sampler and animation actions
-
-  // console.log(timeline.sampleractions.length + " sampler actions," + timeline.tempoactions.length + " tempo actions," + timeline.animationactions.length + " animation actions,")
-  // console.log(timeline.animationactions)
 
   return timeline
 }

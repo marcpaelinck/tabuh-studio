@@ -1,7 +1,7 @@
-import type { AnimationAction, SamplerAnimationAction } from "../utils/score";
+import type { AnimationAction } from "../utils/score";
 import * as Tone from 'tone'
 import type { SvgInfo } from "../components/Animation";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import type { NotationArea } from "../components/NotationArea";
 
 const moveToDuration = 500; // duration of the movement to the next key
@@ -9,8 +9,6 @@ const strikeDuration = 600; // duration of the stroke
 const bezier = "cubic-bezier(0,.25,1,.71)"; // default timing curve
 const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke (accelerates toward stroke)
 const selectedSpeed = 1 //TODO replace with value of speed selector
-// See the last remark in https://github.com/tonejs/tone.js/wiki/TransportTime
-const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
 
 export async function highlightNote(keyElement: Element, duration: Tone.Unit.Time) {
     const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
@@ -124,7 +122,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
     });
 }
 
-function animateNotation(aAction: AnimationAction, notationArea: React.RefObject<NotationArea | null>) {
+async function animateNotation(aAction: AnimationAction, notationArea: React.RefObject<NotationArea | null>) {
     var text = ""
     const [gongan, beat] = aAction.currnote ? aAction.currnote.section.split("-") : [null, null]
     const [prevgongan, prevbeat] = aAction.prevsection.split("-")
@@ -135,54 +133,29 @@ function animateNotation(aAction: AnimationAction, notationArea: React.RefObject
         text += "  |  "
     }
     text += aAction.symbol
-    // const textarea: HTMLTextAreaElement = document.getElementById("notationArea") as HTMLTextAreaElement
     notationArea.current?.update(text)
-    // textarea.value = textarea.value + text
 }
 
 export const useAnimationEngine = () => {
 
-    // const executeAnimation = async (time: number, action: AnimationAction, currentFocus: string, svgInfo: SvgInfo) => {
-    //     setTimeout(function () { // The callback is called slightly before (lookAheadMillis) the target time.
-    //         if (action.position === currentFocus) {
-    //             // const svgInfo = svgInfoRef.current
-    //             if (svgInfo.svg && action.currnote) {
-
-
-    //                 // Hightighting animation
-    //                 var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname}${action.currnote.stroke ? " ." + action.currnote.stroke : ""}`))
-    //                 if (keyElement) highlightNote(keyElement, action.currnote.duration)
-
-    //                 // Panggul animation
-    //                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-    //                     animatePanggul(action, svgInfo)
-    //                 }
-    //             }
-
-    //         }
-    //     }, lookAheadMillis);
-    // }
-
-    const executeAnimation = (time: number, aAction: AnimationAction, currentFocus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
+    // For the use of Draw.schedule, see 
+    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
             if (svgInfo.svg && aAction.currnote) {
                 // Display notation
-                Tone.getDraw().schedule(() => animateNotation(aAction, notationArea), aAction.time)
-
-
+                Tone.getDraw().schedule(() => animateNotation(aAction, notationArea), time)
                 // Hightighting animation
                 var keyElement = (svgInfo.svg.querySelector(`#${aAction.currnote.keyname}${aAction.currnote.stroke ? " ." + aAction.currnote.stroke : ""}`))
-                //@ts-expect-error
+                //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
                 if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, aAction.currnote.duration), time) }
-
                 // Panggul animation
                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
                     Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo), time)
                 }
             }
         }
-    }
+    }, [])
 
     return { executeAnimation }
 }

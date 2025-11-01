@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import * as Tone from 'tone'
-import type { AnimationAction, SamplerAction, SamplerAnimationAction } from '../utils/score'
-import { AVERAGE_ATTACK_DELAY } from '../models/constants'
+import type { SamplerAction } from '../utils/score'
+import { AVERAGE_ATTACK_DELAY } from '../config/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
@@ -11,9 +11,6 @@ export type LarasInstrument = {
 }
 
 export type LarasInstruments = Record<string, LarasInstrument>
-
-const generateInstrumenMappings = (alphabet: string[]) => Object.fromEntries(alphabet.map((char, index) => [char, NOTES[index]]))
-
 
 const pitchShift: Tone.PitchShift = new Tone.PitchShift({
   pitch: 0.0, // 1 unit equals 100 cents
@@ -89,11 +86,6 @@ export const useInstruments = () => {
     [mutedInstruments],
   )
 
-  const muteInstrument = useCallback(
-    (label: string) => setMutedInstruments((prev) => ({ ...prev, [label]: !prev[label] })),
-    [],
-  )
-
   const muteAll = useCallback(
     (time: number) => Object.keys(larasInstruments).forEach((label) => larasInstruments[label].mute(time)),
     [larasInstruments],
@@ -101,7 +93,6 @@ export const useInstruments = () => {
 
   return {
     playInstrument,
-    muteInstrument,
     muteAll,
   }
 }

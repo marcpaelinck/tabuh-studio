@@ -2,7 +2,7 @@
 // E.g. notation can be written in the textarea element or a cursor could scroll through the 
 // notation while the corresponding notes are being played.
 
-import { Component, createRef, useRef, type JSX, type Ref, type RefObject } from "react";
+import { Component, createRef, type RefObject } from "react";
 
 export class NotationArea extends Component<React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement> | {notationAreaRef:RefObject<NotationArea>}, { text: string, textarea: RefObject<HTMLTextAreaElement | null>}> {
     constructor({props, notationAreaRef: notationAreaRef}:{props: React.DetailedHTMLProps<React.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>, notationAreaRef: RefObject<NotationArea>}) {
