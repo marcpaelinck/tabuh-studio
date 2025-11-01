@@ -4,6 +4,8 @@ import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
 import { instrumentConfigs } from '../config/config';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 function positionToSvg(position: string): string  {
     return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
@@ -38,12 +40,19 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SvgIn
 
 
 export default function Animation({focus, svgInfoUpdater}: {focus: string, svgInfoUpdater: Function}) : JSX.Element {
+    const defaultSvgSize = 40 // percent
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const panggulRef = useRef<Element | null>(null)
+    const [svgSizeStyle, setSvgSize] = useState<Object>({"width": `${defaultSvgSize}%`, "height": `${defaultSvgSize}%`})
     // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
+
+    const updateSvgSize = (val: number | number[]) => {
+        const size: number = Math.round(typeof val=="number" ? val : val[0])
+        setSvgSize({"width": `${size}%`, "height": `${size}%`})
+    }
 
     function panggulElement()  {return (svgElement.current && svgLoaded) ? svgElement.current.querySelector("#helpinghand") : null}
     function setSvgLoadedFalse(svg: SVGSVGElement) {setSvgLoaded(false)}
@@ -73,13 +82,15 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
     }
 
     return(	focus ? (<div id="Animations" color="blue" className={"border-t px-4 pt-3 pb-4 "}>
-                {// The panggul checkbox is only visible if the embedded SVG code has an element with id "helpinghand"
+                {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
                 hasPanggul && (<form id="panggul-selector" >
                     <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
                     <label>show panggul</label>
-                </form>  )}
-                <div id="svg-embed">
-                    <ReactSVG style={{ width: "40%", height: "40%" }} src={positionToSvg(focus)} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
+                </form>  )
+                }
+                <div id="svg-embed" className="border-t-4 border-l-4 border-r-4 border-green-300 rounded-sm p-4">
+                    <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
                 </div>
+                <Slider min={0} max={100} defaultValue={defaultSvgSize} onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
             </div>) : <div/>)
 }
