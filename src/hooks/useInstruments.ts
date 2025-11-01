@@ -4,9 +4,6 @@ import type { AnimationAction, SamplerAction, SamplerAnimationAction } from '../
 import { AVERAGE_ATTACK_DELAY } from '../models/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
-import { animateNotation, animatePanggul, highlightNote } from './useAnimation'
-import type { SvgInfo } from '../components/Animation'
-import type { NotationArea } from '../components/NotationArea'
 
 export type LarasInstrument = {
   play: (time: number, action: SamplerAction, focus: string) => void
@@ -92,39 +89,6 @@ export const useInstruments = () => {
     [mutedInstruments],
   )
 
-  // The following two functions are currently not being used. See commented code in ScorePlayer where playInstrumentWithAnimation is called.
-  const executeAnimation = (saAction: SamplerAnimationAction, currentFocus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
-    if (saAction.position === currentFocus) {
-      // const svgInfo = svgInfoRef.current
-      if (svgInfo.svg && saAction.currnote) {
-        // Display notation
-        animateNotation(saAction, notationArea)
-        // Hightighting animation
-        var keyElement = (svgInfo.svg.querySelector(`#${saAction.currnote.keyname}${saAction.currnote.stroke ? " ." + saAction.currnote.stroke : ""}`))
-        if (keyElement) highlightNote(keyElement, saAction.currnote.duration)
-
-        // Panggul animation
-        if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-          animatePanggul(saAction, svgInfo)
-        }
-      }
-    }
-  }
-
-
-  const playInstrumentWithAnimation = useCallback(
-    (time: number, label: string, saAction: SamplerAnimationAction, focus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
-      if (!mutedInstruments[label] /*&& larasInstruments[label]*/) {
-        if (saAction.symbol === '.') larasInstruments[label].mute(time)
-        else {
-          larasInstruments[label].play(random_attack_deviation(time), saAction, focus)
-          Tone.getDraw().schedule(() => executeAnimation(saAction, focus, svgInfo, notationArea), time)
-        }
-      }
-    },
-    [],
-  )
-
   const muteInstrument = useCallback(
     (label: string) => setMutedInstruments((prev) => ({ ...prev, [label]: !prev[label] })),
     [],
@@ -137,7 +101,6 @@ export const useInstruments = () => {
 
   return {
     playInstrument,
-    playInstrumentWithAnimation,
     muteInstrument,
     muteAll,
   }

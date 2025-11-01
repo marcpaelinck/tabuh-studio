@@ -12,7 +12,7 @@ const selectedSpeed = 1 //TODO replace with value of speed selector
 // See the last remark in https://github.com/tonejs/tone.js/wiki/TransportTime
 const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
 
-export function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
+export async function highlightNote(keyElement: Element, duration: Tone.Unit.Time) {
     const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
@@ -30,7 +30,7 @@ export function highlightNote(keyElement: Element, duration: Tone.Unit.Time): vo
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-export async function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
+function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
 
@@ -124,17 +124,17 @@ export async function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) 
     });
 }
 
-export async function animateNotation(saAction: SamplerAnimationAction, notationArea: React.RefObject<NotationArea | null>) {
+function animateNotation(aAction: AnimationAction, notationArea: React.RefObject<NotationArea | null>) {
     var text = ""
-    const [gongan, beat] = saAction.currnote ? saAction.currnote.section.split("-") : [null, null]
-    const [prevgongan, prevbeat] = saAction.prevsection.split("-")
+    const [gongan, beat] = aAction.currnote ? aAction.currnote.section.split("-") : [null, null]
+    const [prevgongan, prevbeat] = aAction.prevsection.split("-")
     if (prevgongan != gongan) {
         text = (prevgongan ? "\n" : "")
     }
     if (prevbeat != beat) {
         text += "  |  "
     }
-    text += saAction.symbol
+    text += aAction.symbol
     // const textarea: HTMLTextAreaElement = document.getElementById("notationArea") as HTMLTextAreaElement
     notationArea.current?.update(text)
     // textarea.value = textarea.value + text
@@ -142,25 +142,46 @@ export async function animateNotation(saAction: SamplerAnimationAction, notation
 
 export const useAnimationEngine = () => {
 
-    const executeAnimation = (time: number, action: AnimationAction, currentFocus: string, svgInfo: SvgInfo) => {
-        setTimeout(function () { // The callback is called slightly before (lookAheadMillis) the target time.
-            if (action.position === currentFocus) {
-                // const svgInfo = svgInfoRef.current
-                if (svgInfo.svg && action.currnote) {
+    // const executeAnimation = async (time: number, action: AnimationAction, currentFocus: string, svgInfo: SvgInfo) => {
+    //     setTimeout(function () { // The callback is called slightly before (lookAheadMillis) the target time.
+    //         if (action.position === currentFocus) {
+    //             // const svgInfo = svgInfoRef.current
+    //             if (svgInfo.svg && action.currnote) {
 
 
-                    // Hightighting animation
-                    var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname}${action.currnote.stroke ? " ." + action.currnote.stroke : ""}`))
-                    if (keyElement) highlightNote(keyElement, action.currnote.duration)
+    //                 // Hightighting animation
+    //                 var keyElement = (svgInfo.svg.querySelector(`#${action.currnote.keyname}${action.currnote.stroke ? " ." + action.currnote.stroke : ""}`))
+    //                 if (keyElement) highlightNote(keyElement, action.currnote.duration)
 
-                    // Panggul animation
-                    if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-                        animatePanggul(action, svgInfo)
-                    }
+    //                 // Panggul animation
+    //                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
+    //                     animatePanggul(action, svgInfo)
+    //                 }
+    //             }
+
+    //         }
+    //     }, lookAheadMillis);
+    // }
+
+    const executeAnimation = (time: number, aAction: AnimationAction, currentFocus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
+        if (aAction.position === currentFocus) {
+            // const svgInfo = svgInfoRef.current
+            if (svgInfo.svg && aAction.currnote) {
+                // Display notation
+                Tone.getDraw().schedule(() => animateNotation(aAction, notationArea), aAction.time)
+
+
+                // Hightighting animation
+                var keyElement = (svgInfo.svg.querySelector(`#${aAction.currnote.keyname}${aAction.currnote.stroke ? " ." + aAction.currnote.stroke : ""}`))
+                //@ts-expect-error
+                if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, aAction.currnote.duration), time) }
+
+                // Panggul animation
+                if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
+                    Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo), time)
                 }
-
             }
-        }, lookAheadMillis);
+        }
     }
 
     return { executeAnimation }

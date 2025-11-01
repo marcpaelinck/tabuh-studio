@@ -37,7 +37,7 @@ export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInf
   const [totalDuration, setTotalDuration] = useState<number>(0)
   const  notationArea:React.RefObject<NotationArea|null> = useRef(null)
 
-  const { playInstrument, playInstrumentWithAnimation, muteInstrument, muteAll} = useInstruments()
+  const { playInstrument, muteInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
   const { executeAnimation } = useAnimationEngine()
 
@@ -67,21 +67,21 @@ export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInf
     timeline.tempoactions.forEach((tAction: TempoAction) => {
       Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
     })
-    // // instrument actions (notes)
-    // timeline.sampleractions.forEach((iAction: SamplerAction) => {
-    //   Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
-    // })
-    // // Schedule animation actions
-    // timeline.animationactions.forEach((aAction: AnimationAction) => {
-    //   Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current), aAction.time)
-    //   })
+    // instrument actions (notes)
+    timeline.sampleractions.forEach((iAction: SamplerAction) => {
+      Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
+    })
+    // Schedule animation actions
+    timeline.animationactions.forEach((aAction: AnimationAction) => {
+      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current, notationArea), aAction.time)
+      })
     // instrument actions (both sampler and animation)
     //TODO For better sync of animation, consider using Tone.getDraw().schedule. See https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
     //     The following call does this. However this causes both the audio and animation to stutter from time to time. Need to dive into this before activating.
     //     The call should replace the above two calls (instrument actions and animation actions)
-    timeline.sampleranimationactions.forEach((saAction: SamplerAnimationAction) => {
-      Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, saAction.position, saAction, focusRef.current, svgInfoRef.current, notationArea), saAction.time)
-    })
+    // timeline.sampleranimationactions.forEach((saAction: SamplerAnimationAction) => {
+    //   Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, saAction.position, saAction, focusRef.current, svgInfoRef.current, notationArea), saAction.time)
+    // })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
     //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)

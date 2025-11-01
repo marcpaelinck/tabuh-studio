@@ -60,6 +60,8 @@ export type AnimationNote = {
 export type AnimationAction = {
   time: Tone.Unit.TimeObject
   position: string
+  symbol: string
+  prevsection: string
   currnote: AnimationNote | null
   nextnote: AnimationNote | null
   timeuntil: Tone.Unit.TimeObject
@@ -196,7 +198,7 @@ export function createTimeline(score: Score): Timeline {
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
       const prevSection = index == 0 ? "-" : notes[index - 1].section
-      timeline.animationactions.push({ time: n2TO(note.t), position: position, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
       timeline.sampleranimationactions.push({ prevsection: prevSection, time: n2TO(note.t), position: position, symbol: note.s, velocity: note.v, duration: n2TO(note.d || 1), currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
