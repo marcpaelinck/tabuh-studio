@@ -7,7 +7,7 @@ export function useInterpretations() {
             // if (action.bpm[0] !== Tone.getTransport().bpm.getValueAtTime(action.time) || action.bpm[1] !== Tone.getTransport().bpm.getValueAtTime(action.time)) {
             if (action.bpm[0]) Tone.getTransport().bpm.setValueAtTime(action.bpm[0], time)
             if (action.bpm[1] != action.bpm[0]) {
-                Tone.getTransport().bpm.linearRampTo(action.bpm[1], action.duration)
+                Tone.getTransport().bpm.rampTo(action.bpm[1], action.duration)
             }
             // }
         }

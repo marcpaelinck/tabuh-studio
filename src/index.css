@@ -68,3 +68,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@font-face {
+    font-family: 'BaliMusic5';
+    src: url('/fonts/BaliMusic5.woff2') format('woff2'),
+        url('/fonts/BaliMusic5.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.balifont {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+}

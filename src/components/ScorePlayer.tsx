@@ -11,7 +11,7 @@ import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { NotationArea } from './NotationArea'
+import  {NotationArea}  from './NotationArea'
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
   return (
@@ -29,13 +29,12 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { score: Score, focus: string, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
+export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInfoRef}: { score: Score, scoretitle: string, focus: string, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
-  const textAreaContent: React.RefObject<string> = useRef("")
   const  notationArea:React.RefObject<NotationArea|null> = useRef(null)
 
   const { playInstrument, playInstrumentWithAnimation, muteInstrument, muteAll} = useInstruments()
@@ -48,12 +47,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
   useEffect(() => {
     createSchedule(timeline)
     rewind()
-  }, [score]);
-
-  function updateTextAreaContent(value: string, append: boolean = false): void {
-      textAreaContent.current = append? textAreaContent.current + " " + value : value
-  }
-
+  }, [timeline]);
 
   function updateProgress(time: number){
     setProgress(Tone.getTransport().seconds)
@@ -66,6 +60,8 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     Tone.getTransport().stop()
     Tone.getTransport().cancel()
     Tone.getTransport().position = 0
+
+    console.log(`Creating schedule for ${score.title}`)
     
     // tempo actions
     timeline.tempoactions.forEach((tAction: TempoAction) => {
@@ -83,8 +79,8 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     //TODO For better sync of animation, consider using Tone.getDraw().schedule. See https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
     //     The following call does this. However this causes both the audio and animation to stutter from time to time. Need to dive into this before activating.
     //     The call should replace the above two calls (instrument actions and animation actions)
-    timeline.sampleranimationactions.forEach((iAction: SamplerAnimationAction) => {
-      Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, iAction.position, iAction, focusRef.current, svgInfoRef.current, notationArea), iAction.time)
+    timeline.sampleranimationactions.forEach((saAction: SamplerAnimationAction) => {
+      Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, saAction.position, saAction, focusRef.current, svgInfoRef.current, notationArea), saAction.time)
     })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
@@ -133,7 +129,7 @@ export default function ScorePlayer({ score, focus, focusRef, svgInfoRef}: { sco
     Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)
-    textAreaContent.current = ""
+    notationArea.current?.clear()
     pause()
   }
 
@@ -174,11 +170,11 @@ return (
           </div>
         </div>
       </div>
-      <div className="max-width-200 gap-1 border-t px-4 pt-3 pb-4 text-xs">
+      <div >
         <div className="flex w-full items-center">
           {/* 
           //@ts-ignore */}
-          <NotationArea ref={notationArea} rows={8} cols={120}/>
+          <NotationArea notationAreaRef={notationArea} rows={8} cols={800}/>
         </div>
       </div>
     </div>

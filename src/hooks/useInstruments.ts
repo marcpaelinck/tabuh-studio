@@ -41,7 +41,6 @@ const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([positi
   const symbolToIndices = Object.fromEntries(config.alphabet.map((symbol, index) => [symbol, config.notes[index].map((repr) => noteToIndex[repr])]))
   return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
 }))
-console.log(lookup)
 
 const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]

@@ -5,7 +5,7 @@ import Animation from './components/Animation'
 import { type Score } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { type SvgInfo } from './components/Animation'
 
 export default function App() {
@@ -61,7 +61,7 @@ export default function App() {
       <div className="w-8/10 rounded-xl p-6 shadow-lg">
         <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
         <Animation focus={focus} svgInfoUpdater={updateSvgInfo}/>
-        <ScorePlayer score={score} focus={focus} focusRef={focusReference} svgInfoRef={svgInfoReference}/>
+        <ScorePlayer score={score} scoretitle={scoreTitle} focus={focus} focusRef={focusReference} svgInfoRef={svgInfoReference}/>
       </div>
     </div>
   )

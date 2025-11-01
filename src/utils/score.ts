@@ -67,7 +67,7 @@ export type AnimationAction = {
 }
 
 export type SamplerAnimationAction = {
-  section: string
+  prevsection: string
   time: Tone.Unit.TimeObject
   position: string
   symbol: string
@@ -93,6 +93,9 @@ export type Timeline = {
 
 export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
+
+  console.log(`creating score for ${score.title}`)
+  console.log(`starting with ${score.sections[0].data[0].position} ${score.sections[0].data[0].value[0].s}`)
 
   const timeline: Timeline = {
     totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], sampleranimationactions: [], cursoractions: []
@@ -192,8 +195,9 @@ export function createTimeline(score: Score): Timeline {
       const nextANote: AnimationNote | null = currIsLast ? null : note2noteAction(position, notes[index + 1], nextIsLast)
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
+      const prevSection = index == 0 ? "-" : notes[index - 1].section
       timeline.animationactions.push({ time: n2TO(note.t), position: position, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
-      timeline.sampleranimationactions.push({ section: note.section, time: n2TO(note.t), position: position, symbol: note.s, velocity: note.v, duration: n2TO(note.d || 1), currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      timeline.sampleranimationactions.push({ prevsection: prevSection, time: n2TO(note.t), position: position, symbol: note.s, velocity: note.v, duration: n2TO(note.d || 1), currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
 

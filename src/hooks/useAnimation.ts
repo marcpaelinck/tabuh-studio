@@ -11,7 +11,6 @@ const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke
 const selectedSpeed = 1 //TODO replace with value of speed selector
 // See the last remark in https://github.com/tonejs/tone.js/wiki/TransportTime
 const lookAheadMillis = Tone.Context.getDefaults().lookAhead * 1000
-console.log(`lookAhead=${lookAheadMillis}`)
 
 export function highlightNote(keyElement: Element, duration: Tone.Unit.Time): void {
     const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
@@ -126,17 +125,16 @@ export async function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) 
 }
 
 export async function animateNotation(saAction: SamplerAnimationAction, notationArea: React.RefObject<NotationArea | null>) {
-    var text = saAction.symbol
+    var text = ""
     const [gongan, beat] = saAction.currnote ? saAction.currnote.section.split("-") : [null, null]
-    const [nextgongan, nextbeat] = saAction.nextnote ? saAction.nextnote.section.split("-") : [null, null]
-    if (nextgongan) {
-        if (nextgongan != gongan) {
-            text = text + "\n" + saAction.nextnote?.section + ": "
-        }
-        else if (nextbeat != beat) {
-            text = text + "  |  " + saAction.nextnote?.section + ": "
-        }
+    const [prevgongan, prevbeat] = saAction.prevsection.split("-")
+    if (prevgongan != gongan) {
+        text = (prevgongan ? "\n" : "")
     }
+    if (prevbeat != beat) {
+        text += "  |  "
+    }
+    text += saAction.symbol
     // const textarea: HTMLTextAreaElement = document.getElementById("notationArea") as HTMLTextAreaElement
     notationArea.current?.update(text)
     // textarea.value = textarea.value + text
