@@ -1,5 +1,5 @@
 import { instrumentConfigs, noteConfigs } from '../config/config'
-import { type NotationNote, type Note, type Score, type Section, type SectionData } from '../models/types'
+import { type JsonNote, type Note, type Score, type Section, type SectionData } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
 
@@ -12,7 +12,7 @@ export function parseScore(input: string): Score {
     section.starttimeMs = Math.round(sectionTimeMs)
     section.data.forEach((posData: SectionData) => {
       var dataTimeMs = sectionTimeMs
-      posData.value.forEach((note: NotationNote) => {
+      posData.notes.forEach((note: JsonNote) => {
         // Use the average tempo to determine the time in ms.
         const currTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * (note.t - section.starttime) / section.duration
         dataTimeMs = section.starttimeMs + 1000 * ((note.t - section.starttime) / 4) * (60 / (0.5 * (section.tempo[0] + currTempo)))
@@ -91,7 +91,7 @@ export function createTimeline(score: Score): Timeline {
   // currVelocity will keep track of the velocity of each separate instrument position
   // const currVelocity: { [position: string]: number } = Object.fromEntries(Object.keys(instrumentConfigs).map((pos) => [pos, 0]))
   var currTime: Tone.Unit.TimeObject = n2TO(0)
-  const positionScore: { [position: string]: NotationNote[] } = {}
+  const positionScore: { [position: string]: JsonNote[] } = {}
 
   // // Create a mapping for notes to Pitch, Octave, 
   // var note_to_keygroup: { [position: string]: { [symbol: string]: string[][] } } = {}
@@ -105,7 +105,7 @@ export function createTimeline(score: Score): Timeline {
     note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
   }
 
-  const note2noteAction = (position: string, notationNote: NotationNote, isLast: boolean): AnimationNote | null => {
+  const note2noteAction = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote | null => {
     // TODO currently only animating first note of group
     if (!(position in note_to_shCode)) return null
     const symbol = notationNote.s
@@ -150,7 +150,7 @@ export function createTimeline(score: Score): Timeline {
     section.data.forEach((stave) => {
       if (!(stave.position in positionScore)) positionScore[stave.position] = []
       var sectionProgress: number = 0
-      stave.value.forEach((note) => {
+      stave.notes.forEach((note) => {
         // create separate scores for each position, which will be used to create the animation actions 
         note.section = section.title
         var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
@@ -164,7 +164,7 @@ export function createTimeline(score: Score): Timeline {
 
   // Create animation actions
   Object.keys(positionScore).forEach((position) => {
-    const notes: NotationNote[] = positionScore[position]
+    const notes: JsonNote[] = positionScore[position]
     notes.forEach((note, index) => {
       const currIsLast = (index == notes.length - 1)
       const aNote: AnimationNote | null = note2noteAction(position, notes[index], currIsLast)

@@ -4,17 +4,26 @@ import { readFile } from "../utils/filesystem";
 import type { Score, ScoreInfo, Section, SectionData } from "../models/types";
 
 
-
+// Width is a fraction, e.g. 3/10
+function Selector({id, title, items, onChange} : {id: string, title: string, width: string, items: JSX.Element[], onChange: CallableFunction}) {
+    return (
+        <div className={`flex-auto gap-3`}>
+            <div className="">
+            <span className={"font-semibold italic pe-2"}>{title}:</span>
+            <select id={id}  title={title} onChange={e => onChange(e.target.value)} className="bg-blue-300 border-blue-500 border rounded-md">
+                { items }
+            </select>
+            </div>
+        </div>
+    )
+}
 
 export default function Selectors(
     {score, scoreUpdater, focusUpdater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
-    const [currentFocus, setCurrentFocus] = useState<string>("");
-    const focusSelector: RefObject<HTMLSelectElement | null> = useRef(null)
 
-    const selectorStyle = "bg-blue-300 border-blue-500 border rounded-md"
 
     // Populate the score selector
     useEffect(() => {
@@ -51,21 +60,13 @@ export default function Selectors(
     }
 
     const onChangeFocusSelector = (value: string) => {
-        setCurrentFocus(value)
         focusUpdater(value)
     }
 
-    return (<div className="">
-				<div className="label">
-                    <span className="font-semibold italic pe-2">Song:</span>
-                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className={selectorStyle}>
-                        { scoreListItems }
-                    </select>
-                    <span className="font-semibold italic ps-5 pe-2">Focus:</span>
-                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className={selectorStyle}>
-                        { focusListItems }
-                    </select>
-				</div>
-			</div>
+    return (
+            <div className="selectors flex flex-wrap">
+                <Selector id="songselector" title="Song" width="3/10" items={scoreListItems} onChange={onChangeSongSelector}/>
+                <Selector id="focusselector" title="Focus"  width="3/10" items={focusListItems} onChange={onChangeFocusSelector}/>
+            </div>
         )
 }

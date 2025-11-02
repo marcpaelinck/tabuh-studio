@@ -17,7 +17,7 @@ export type Note = {
   muting: string, // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 
-export type NotationNote = {
+export type JsonNote = {
   section: string
   s: string
   t: number  // attack time in base notes
@@ -25,11 +25,21 @@ export type NotationNote = {
   d: number
   v: number // velocity
 }
+
+export type JsonSymbol = {
+  section: string
+  s: string
+  t: number  // attack time in base notes
+  d: number
+}
+
 export type SectionData = {
   position: string
   velocity: number[]
-  value: NotationNote[]
+  notes: JsonNote[]
+  notation: JsonSymbol[]
 }
+
 export type Section = {
   id: number
   title: string
