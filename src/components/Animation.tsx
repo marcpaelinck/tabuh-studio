@@ -8,7 +8,8 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import colors from 'tailwindcss/colors'
 import { FRAMESTYLE } from '../config/constants';
-import type { AnimationInfo } from '../models/types';
+import type { AnimationInfo, SVGInfo } from '../models/types';
+import  {NotationArea}  from './NotationArea'
 
 const svgBdrColorClass = `border-gray-300`
 const svgBdrColorHex = colors.gray["300"]
@@ -18,7 +19,7 @@ function positionToSvg(position: string): string  {
 }
 
 // Returns the content of the data section of the SVG file
-const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): AnimationInfo => {
+const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGInfo => {
     if (!svgRef.current) return { svg: null, panggul: null, x: null, y: null, animation: null }
     const panggul: SVGUseElement | null = svgRef.current?.querySelector("#helpinghand")
     const data_x: HTMLDataElement | null = svgRef.current.querySelector("data.x");
@@ -34,7 +35,7 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): Anima
 }
 
 
-export default function Animation({focus, svgInfoUpdater}: {focus: string, svgInfoUpdater: Function}) : JSX.Element {
+export default function Animation({focus, animationInfoUpdater}: {focus: string, animationInfoUpdater: Function}) : JSX.Element {
     const defaultSvgSize = 40 // percent
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
@@ -42,6 +43,7 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const panggulRef = useRef<Element | null>(null)
     const [svgSizeStyle, setSvgSize] = useState<Object>({"width": `${defaultSvgSize}%`, "height": `${defaultSvgSize}%`})
+    const  notationAreaRef: React.RefObject<NotationArea|null> = useRef(null)
     // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
 
     const updateSvgSize = (val: number | number[]) => {
@@ -55,8 +57,9 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
     function setSvgStates(svg: SVGSVGElement) {
         if (svg) {
                 svgElement.current = svg
-                // if (! svgLoaded)
-                    svgInfoUpdater(retrieve_svg_data(svgElement))
+                const svgInfo: SVGInfo = retrieve_svg_data(svgElement)
+                const animationInfo: AnimationInfo = {svgInfo: svgInfo, notationAreaRef: notationAreaRef}
+                animationInfoUpdater(animationInfo) // pass animationInfo to App component
                 setSvgLoaded(true)
                 panggulRef.current = panggulElement()
                 setHasPanggul(panggulElement() ? true : false)
@@ -85,6 +88,9 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
                     </form>  )
                     }
                     <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
+                    {/* 
+                    //@ts-ignore */}
+                    <NotationArea notationAreaRef={notationAreaRef} rows={8} cols={800}/>
                 </div>
                 <div className="pl-4 pr-4">
                     <Slider min={0} max={100} defaultValue={defaultSvgSize} onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: svgBdrColorHex}, handle: {borderColor: svgBdrColorHex}}}/>

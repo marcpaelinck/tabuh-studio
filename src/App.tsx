@@ -5,16 +5,17 @@ import Animation from './components/Animation'
 import { type Score, type AnimationInfo } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
-import { memo, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
+import type { NotationArea } from './components/NotationArea'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [scoreTitle, setScoreTitle] = useState<string>("")
   const [score, setScore] = useState<Score>({ title: '', composer: '', durationMs: 0, sections: [] })
   const [focus, setFocus] = useState<string>('')
-  const focusReference: React.RefObject<string>  = useRef('')
-  const animationInfoReference: React.RefObject<AnimationInfo> = useRef<AnimationInfo>({ svg: null, panggul: null, x: null, y: 2, animation: null })
+  const focusReference: RefObject<string>  = useRef('')
+  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null) })
 
 
   const updateScoreTitle = (newScorefile: string): void => {
@@ -26,8 +27,8 @@ export default function App() {
       setFocus(position)
     }
   }
-  const updateSvgInfo = (svgInfo: AnimationInfo): void => {
-    animationInfoReference.current = svgInfo
+  const updateAnimationInfo = (animationInfo: AnimationInfo): void => {
+    animationInfoRef.current = animationInfo
   }
   
   // Load and parse the score when a new score title is selected
@@ -61,8 +62,8 @@ export default function App() {
       </div>
       <div className={"w-8/10" + FRAMESTYLE}>
         <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
-        <Animation focus={focus} svgInfoUpdater={updateSvgInfo}/>
-        <ScorePlayer score={score} focusRef={focusReference} svgInfoRef={animationInfoReference}/>
+        {focus && <Animation focus={focus} animationInfoUpdater={updateAnimationInfo}/>}
+        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef}/>
       </div>
     </div>
   )

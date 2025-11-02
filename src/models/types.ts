@@ -1,5 +1,7 @@
 // INSTRUMENTS
 
+import type { NotationArea } from "../components/NotationArea"
+
 export type Instrument = {
   id: string
   name: string
@@ -53,13 +55,17 @@ export type ScoreInfo = {
 // ANIMATION
 
 export type XCoordRecord = { [note: string]: number } | null
-export type YCoordRecord = { y: number } | null
 export type AnimationData = { hover_x: number, hover_y: number, stroke_x: number, stroke_y: number, stroke_rotation: number, stroke_scale: number[] } | null
 
-export type AnimationInfo = {
+export type SVGInfo = {
   svg: SVGSVGElement | null
   panggul: SVGUseElement | null
   x: XCoordRecord
   y: number | null
   animation: AnimationData
+}
+
+export type AnimationInfo = {
+  svgInfo: SVGInfo
+  notationAreaRef: React.RefObject<NotationArea | null>
 }

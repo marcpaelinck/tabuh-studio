@@ -10,7 +10,6 @@ import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import  {NotationArea}  from './NotationArea'
 
 const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
   return (
@@ -28,13 +27,12 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, animationInfoRef}: { score: Score, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
-  const  notationArea:React.RefObject<NotationArea|null> = useRef(null)
 
   const { playInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
@@ -72,7 +70,7 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current, notationArea), aAction.time)
+      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, animationInfoRef.current), aAction.time)
       })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
@@ -121,7 +119,8 @@ export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Sco
     Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)
-    notationArea.current?.clear()
+    // TODO: use `resetAnimation` callback that is passed as prop
+    animationInfoRef.current?.notationAreaRef.current?.clear()
     pause()
   }
 
@@ -163,11 +162,6 @@ return (
         </div>
       </div>
       <div >
-        <div className="flex w-full items-center">
-          {/* 
-          //@ts-ignore */}
-          <NotationArea notationAreaRef={notationArea} rows={8} cols={800}/>
-        </div>
       </div>
     </div>
   )

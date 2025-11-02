@@ -2,7 +2,7 @@ import type { AnimationAction } from "../utils/score";
 import * as Tone from 'tone'
 import { useCallback } from "react";
 import type { NotationArea } from "../components/NotationArea";
-import type { AnimationInfo } from "../models/types";
+import type { AnimationInfo, SVGInfo } from "../models/types";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -28,7 +28,7 @@ export async function highlightNote(keyElement: Element, duration: Tone.Unit.Tim
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-function animatePanggul(action: AnimationAction, svgInfo: AnimationInfo) {
+function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
 
@@ -138,12 +138,14 @@ async function animateNotation(aAction: AnimationAction, notationArea: React.Ref
 export const useAnimationEngine = () => {
 
     // For the use of Draw.schedule, see 
-    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, svgInfo: AnimationInfo, notationArea: React.RefObject<NotationArea | null>) => {
+    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo) => {
+        const svgInfo = animationInfo.svgInfo
+        const notationAreaRef = animationInfo.notationAreaRef
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
             if (svgInfo.svg && aAction.currnote) {
                 // Display notation
-                Tone.getDraw().schedule(() => animateNotation(aAction, notationArea), time)
+                Tone.getDraw().schedule(() => animateNotation(aAction, notationAreaRef), time)
                 // Hightighting animation
                 var keyElement = (svgInfo.svg.querySelector(`#${aAction.currnote.keyname}${aAction.currnote.stroke ? " ." + aAction.currnote.stroke : ""}`))
                 //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
