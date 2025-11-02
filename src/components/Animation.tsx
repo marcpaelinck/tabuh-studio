@@ -11,8 +11,7 @@ import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, SVGInfo } from '../models/types';
 import  {NotationArea}  from './NotationArea'
 
-const svgBdrColorClass = `border-gray-300`
-const svgBdrColorHex = colors.gray["300"]
+const svgBdrColorHex = colors.blue["300"]
 
 function positionToSvg(position: string): string  {
     return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
@@ -79,21 +78,27 @@ export default function Animation({focus, animationInfoUpdater}: {focus: string,
         }
     }
 //border-t-4 border-l-4 border-r-4 rounded-md p-4
-    return(	focus ? (<div id="Animations" color="blue" className={"px-4 pt-3 pb-4 "}>
+    return(	focus ? (<div id="Animations" color="blue" className={"px-4 pt-3 pb-4"}>
                 <div id="svg-embed" className={FRAMESTYLE}>
-                    {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
-                    hasPanggul && (<form id="panggul-selector" >
-                        <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
-                        <label>show panggul</label>
-                    </form>  )
-                    }
-                    <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
-                    {/* 
-                    //@ts-ignore */}
-                    <NotationArea notationAreaRef={notationAreaRef} rows={8} cols={800}/>
-                </div>
-                <div className="pl-4 pr-4">
-                    <Slider min={0} max={100} defaultValue={defaultSvgSize} onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: svgBdrColorHex}, handle: {borderColor: svgBdrColorHex}}}/>
+                    <div id="checkbox-and-slider" className="flex items-center">
+                        {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
+                        hasPanggul && (
+                        <div className="w-3/10 align-bottom">
+                            <form id="panggul-selector" >
+                                <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
+                                <label>show panggul</label>
+                            </form>  
+                        </div>
+                        )
+                        }
+                        <div className="w-6/10 pl-4 pr-4">
+                            <Slider min={0} max={100} defaultValue={defaultSvgSize} 
+                                onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: svgBdrColorHex}, handle: {borderColor: svgBdrColorHex}}}/>
+                        </div>
+                    </div>
+                    <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} 
+                        useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
+                    <NotationArea rows={2} cols={800} ref={notationAreaRef}/>
                 </div>
             </div>) : <div/>)
 }
