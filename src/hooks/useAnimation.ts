@@ -1,8 +1,8 @@
 import type { AnimationAction } from "../utils/score";
 import * as Tone from 'tone'
-import type { SvgInfo } from "../components/Animation";
 import { useCallback } from "react";
 import type { NotationArea } from "../components/NotationArea";
+import type { AnimationInfo } from "../models/types";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -28,7 +28,7 @@ export async function highlightNote(keyElement: Element, duration: Tone.Unit.Tim
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
+function animatePanggul(action: AnimationAction, svgInfo: AnimationInfo) {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
 
@@ -102,8 +102,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SvgInfo) {
             // Step 3: strike down (combination of rotation, movement and scaling)
             {
                 transform: `translate(${svgInfo.x[nextKey] + svgInfo.animation.stroke_x}px, ${svgInfo.y + svgInfo.animation.stroke_y
-                    }px) rotate(${svgInfo.animation.stroke_rotation
-                    }deg) scale(${svgInfo.animation.stroke_scale.toString()})`,
+                    }px) rotate(${svgInfo.animation.stroke_rotation}deg) scale(${svgInfo.animation.stroke_scale.toString()})`,
                 offset: 1,
             },
         ];
@@ -139,7 +138,7 @@ async function animateNotation(aAction: AnimationAction, notationArea: React.Ref
 export const useAnimationEngine = () => {
 
     // For the use of Draw.schedule, see 
-    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, svgInfo: SvgInfo, notationArea: React.RefObject<NotationArea | null>) => {
+    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, svgInfo: AnimationInfo, notationArea: React.RefObject<NotationArea | null>) => {
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
             if (svgInfo.svg && aAction.currnote) {

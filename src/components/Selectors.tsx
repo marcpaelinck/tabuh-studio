@@ -7,12 +7,14 @@ import type { Score, ScoreInfo, Section, SectionData } from "../models/types";
 
 
 export default function Selectors(
-    {score, scoreUpdater: score_updater, focusUpdater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
+    {score, scoreUpdater, focusUpdater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
     const [currentFocus, setCurrentFocus] = useState<string>("");
     const focusSelector: RefObject<HTMLSelectElement | null> = useRef(null)
+
+    const selectorStyle = "bg-blue-300 border-blue-500 border rounded-md"
 
     // Populate the score selector
     useEffect(() => {
@@ -44,7 +46,7 @@ export default function Selectors(
     }, [score]);
 
     const onChangeSongSelector = (value: string) => {
-        score_updater(value)
+        scoreUpdater(value)
         onChangeFocusSelector("")
     }
 
@@ -56,11 +58,11 @@ export default function Selectors(
     return (<div className="">
 				<div className="label">
                     <span className="font-semibold italic pe-2">Song:</span>
-                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className="bg-blue-300">
+                    <select id="songselector"  title="Song" onChange={e => onChangeSongSelector(e.target.value)} className={selectorStyle}>
                         { scoreListItems }
                     </select>
                     <span className="font-semibold italic ps-5 pe-2">Focus:</span>
-                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className=" bg-blue-300">
+                    <select id="focusselector" ref={focusSelector} value={currentFocus} title="Focus" onChange={e => onChangeFocusSelector(e.target.value)} className={selectorStyle}>
                         { focusListItems }
                     </select>
 				</div>

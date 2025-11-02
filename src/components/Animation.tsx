@@ -6,24 +6,19 @@ import React from 'react';
 import { instrumentConfigs } from '../config/config';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
+import colors from 'tailwindcss/colors'
+import { FRAMESTYLE } from '../config/constants';
+import type { AnimationInfo } from '../models/types';
+
+const svgBdrColorClass = `border-gray-300`
+const svgBdrColorHex = colors.gray["300"]
 
 function positionToSvg(position: string): string  {
     return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
 }
 
-export type XCoordRecord = { [note: string]: number } | null
-export type YCoordRecord = { y: number } | null
-export type AnimationData = { hover_x: number, hover_y: number, stroke_x: number, stroke_y: number, stroke_rotation: number, stroke_scale: number[] } | null
-export type SvgInfo = {
-    svg: SVGSVGElement | null
-    panggul: SVGUseElement | null
-    x: XCoordRecord
-    y: number | null
-    animation: AnimationData
-}
-
 // Returns the content of the data section of the SVG file
-const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SvgInfo => {
+const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): AnimationInfo => {
     if (!svgRef.current) return { svg: null, panggul: null, x: null, y: null, animation: null }
     const panggul: SVGUseElement | null = svgRef.current?.querySelector("#helpinghand")
     const data_x: HTMLDataElement | null = svgRef.current.querySelector("data.x");
@@ -80,17 +75,19 @@ export default function Animation({focus, svgInfoUpdater}: {focus: string, svgIn
             }
         }
     }
-
-    return(	focus ? (<div id="Animations" color="blue" className={"border-t px-4 pt-3 pb-4 "}>
-                {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
-                hasPanggul && (<form id="panggul-selector" >
-                    <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
-                    <label>show panggul</label>
-                </form>  )
-                }
-                <div id="svg-embed" className="border-t-4 border-l-4 border-r-4 border-green-300 rounded-sm p-4">
+//border-t-4 border-l-4 border-r-4 rounded-md p-4
+    return(	focus ? (<div id="Animations" color="blue" className={"px-4 pt-3 pb-4 "}>
+                <div id="svg-embed" className={FRAMESTYLE}>
+                    {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
+                    hasPanggul && (<form id="panggul-selector" >
+                        <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
+                        <label>show panggul</label>
+                    </form>  )
+                    }
                     <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
                 </div>
-                <Slider min={0} max={100} defaultValue={defaultSvgSize} onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
+                <div className="pl-4 pr-4">
+                    <Slider min={0} max={100} defaultValue={defaultSvgSize} onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: svgBdrColorHex}, handle: {borderColor: svgBdrColorHex}}}/>
+                </div>
             </div>) : <div/>)
 }

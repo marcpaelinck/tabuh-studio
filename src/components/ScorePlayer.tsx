@@ -1,10 +1,9 @@
 import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
-import { type Score} from '../models/types'
+import { type Score, type AnimationInfo} from '../models/types'
 import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
 import * as Tone from 'tone'
-import { type SvgInfo } from './Animation'
 import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
@@ -29,7 +28,7 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInfoRef}: { score: Score, scoretitle: string, focus: string, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<SvgInfo> }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, svgInfoRef}: { score: Score, focusRef: React.RefObject<string>, svgInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
@@ -75,13 +74,6 @@ export default function ScorePlayer({ score, scoretitle, focus, focusRef, svgInf
     timeline.animationactions.forEach((aAction: AnimationAction) => {
       Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, svgInfoRef.current, notationArea), aAction.time)
       })
-    // instrument actions (both sampler and animation)
-    //TODO For better sync of animation, consider using Tone.getDraw().schedule. See https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
-    //     The following call does this. However this causes both the audio and animation to stutter from time to time. Need to dive into this before activating.
-    //     The call should replace the above two calls (instrument actions and animation actions)
-    // timeline.sampleranimationactions.forEach((saAction: SamplerAnimationAction) => {
-    //   Tone.getTransport().schedule((time) => playInstrumentWithAnimation(time, saAction.position, saAction, focusRef.current, svgInfoRef.current, notationArea), saAction.time)
-    // })
     // cursor actions
     // beat.cursorActions.forEach((cAction: CursorAction) => {
     //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)

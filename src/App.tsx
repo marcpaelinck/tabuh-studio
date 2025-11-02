@@ -2,11 +2,11 @@
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
 import Animation from './components/Animation'
-import { type Score } from './models/types'
+import { type Score, type AnimationInfo } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { type SvgInfo } from './components/Animation'
+import { memo, useEffect, useRef, useState } from 'react'
+import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
@@ -14,7 +14,7 @@ export default function App() {
   const [score, setScore] = useState<Score>({ title: '', composer: '', durationMs: 0, sections: [] })
   const [focus, setFocus] = useState<string>('')
   const focusReference: React.RefObject<string>  = useRef('')
-  const svgInfoReference: React.RefObject<SvgInfo> = useRef<SvgInfo>({ svg: null, panggul: null, x: null, y: 2, animation: null })
+  const animationInfoReference: React.RefObject<AnimationInfo> = useRef<AnimationInfo>({ svg: null, panggul: null, x: null, y: 2, animation: null })
 
 
   const updateScoreTitle = (newScorefile: string): void => {
@@ -26,8 +26,8 @@ export default function App() {
       setFocus(position)
     }
   }
-  const updateSvgInfo = (svgInfo: SvgInfo): void => {
-    svgInfoReference.current = svgInfo
+  const updateSvgInfo = (svgInfo: AnimationInfo): void => {
+    animationInfoReference.current = svgInfo
   }
   
   // Load and parse the score when a new score title is selected
@@ -35,7 +35,7 @@ export default function App() {
     const loadScore = async () => {
       let jsonScore
       if (! scoreTitle) 
-        jsonScore = await readFile('scores/gilak penutup [full].json')
+        jsonScore = '{"title": "", "composer": "", "sections": []}'
       else
         jsonScore = await readFile('scores/' + scoreTitle)
       const score = parseScore(jsonScore)
@@ -56,12 +56,13 @@ export default function App() {
 
   return (
     <div className="flex w-screen min-h-0 ">
+      {/*App frame is 8/10 of screen width and centered*/}
       <div className="w-1/10">
       </div>
-      <div className="w-8/10 rounded-xl p-6 shadow-lg">
+      <div className={"w-8/10" + FRAMESTYLE}>
         <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
         <Animation focus={focus} svgInfoUpdater={updateSvgInfo}/>
-        <ScorePlayer score={score} scoretitle={scoreTitle} focus={focus} focusRef={focusReference} svgInfoRef={svgInfoReference}/>
+        <ScorePlayer score={score} focusRef={focusReference} svgInfoRef={animationInfoReference}/>
       </div>
     </div>
   )

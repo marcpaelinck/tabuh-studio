@@ -82,9 +82,6 @@ export type Timeline = {
 export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
 
-  console.log(`creating score for ${score.title}`)
-  console.log(`starting with ${score.sections[0].data[0].position} ${score.sections[0].data[0].value[0].s}`)
-
   const timeline: Timeline = {
     totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
   }
