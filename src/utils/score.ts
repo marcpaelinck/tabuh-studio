@@ -1,5 +1,5 @@
 import { instrumentConfigs, noteConfigs } from '../config/config'
-import { type JsonNote, type Note, type Score, type Section, type SectionData } from '../models/types'
+import { type JsonNote, type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
 
@@ -7,22 +7,26 @@ export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
   // This function also calculates times in ms for each note, to be used by the animation.
   // The reason is that Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
-  var sectionTimeMs = 0
-  score.sections.forEach((section, idx, sectionArray) => {
-    section.starttimeMs = Math.round(sectionTimeMs)
-    section.data.forEach((posData: SectionData) => {
-      var dataTimeMs = sectionTimeMs
-      posData.notes.forEach((note: JsonNote) => {
-        // Use the average tempo to determine the time in ms.
-        const currTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * (note.t - section.starttime) / section.duration
-        dataTimeMs = section.starttimeMs + 1000 * ((note.t - section.starttime) / 4) * (60 / (0.5 * (section.tempo[0] + currTempo)))
-        note.ms = dataTimeMs
-      })
+  var currentTimeMs = 0
+  score.systems.forEach((system, sysidx, systemArray) => {
+    system.sections.forEach((section, sectidx, sectionArray) => {
+      section.starttimeMs = Math.round(currentTimeMs)
+      for (const [position, stave] of Object.entries(section.staves)) {
+        var dataTimeMs = currentTimeMs
+        stave.notes.forEach((note: JsonNote) => {
+          // Use the average tempo to determine the time in ms.
+          const currTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * (note.t - section.starttime) / section.duration
+          dataTimeMs = section.starttimeMs + 1000 * ((note.t - section.starttime) / 4) * (60 / (0.5 * (section.tempo[0] + currTempo)))
+          note.ms = dataTimeMs
+          note.section = section.id
+          note.system = system.id
+        })
+      }
+      currentTimeMs += 1000 * (section.duration / 4) * (60 / (0.5 * (section.tempo[0] + section.tempo[1])))
+      if (sysidx === systemArray.length - 1 && sectidx === sectionArray.length - 1) {
+        score.durationMs = currentTimeMs
+      }
     })
-    sectionTimeMs += 1000 * (section.duration / 4) * (60 / (0.5 * (section.tempo[0] + section.tempo[1])))
-    if (idx === sectionArray.length - 1) {
-      score.durationMs = sectionTimeMs
-    }
   })
   return score
 }
@@ -48,7 +52,8 @@ export type CursorAction = {
 }
 
 export type AnimationNote = {
-  section: string
+  system: number
+  section: number
   time: Tone.Unit.TimeObject
   keyname: string
   stroke: string | null
@@ -61,7 +66,8 @@ export type AnimationAction = {
   time: Tone.Unit.TimeObject
   position: string
   symbol: string
-  prevsection: string
+  prevsystem: number | null
+  prevsection: number | null
   currnote: AnimationNote | null
   nextnote: AnimationNote | null
   timeuntil: Tone.Unit.TimeObject
@@ -79,8 +85,10 @@ export type Timeline = {
 }
 
 
-export function createTimeline(score: Score): Timeline {
+export function createTimeline(score: Score | null): Timeline | null {
   // Timeline will be used to create the Transport schedule
+
+  if (!score) return null
 
   const timeline: Timeline = {
     totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
@@ -114,7 +122,7 @@ export function createTimeline(score: Score): Timeline {
     if (!shCode) return null
     const note: Note = noteConfigs[instrType][shCode]
     const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
-    return shCode ? { section: notationNote.section, time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
+    return shCode ? { system: notationNote.system, section: notationNote.section, time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
   }
 
   // function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {
@@ -132,33 +140,41 @@ export function createTimeline(score: Score): Timeline {
   var totalDurationInBaseNotes = 0
 
   // populate the action lists
-  score.sections.forEach((section) => {
-    // Update the total duration time
-    totalDurationInBaseNotes += section.duration
-    timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
-    currTime = n2TO(section.starttime)
+  // score.systems.forEach((system, sysidx, systemArray) => {
+  //   system.sections.forEach((section, sectidx, sectionArray) => {
+  //     section.starttimeMs = Math.round(currentTimeMs)
+  //     for (const [position, staveData] of Object.entries(section.staves)) {
 
-    // Create tempo actions for each tempo change.
-    var newValues: number[] | null
-    if (newValues = changedValues(section.tempo, currBpm)) {
-      timeline.tempoactions.push({ bpm: newValues, time: currTime, duration: n2TO(section.duration) })
-      currBpm = section.tempo[1]
-    }
-    timeline.totalDurationTO = n2TO(totalDurationInBaseNotes)
 
-    // Create sampler actions
-    section.data.forEach((stave) => {
-      if (!(stave.position in positionScore)) positionScore[stave.position] = []
-      var sectionProgress: number = 0
-      stave.notes.forEach((note) => {
-        // create separate scores for each position, which will be used to create the animation actions 
-        note.section = section.title
-        var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
-        note.v = velocity
-        positionScore[stave.position].push(note)
-        timeline.sampleractions.push({ position: stave.position, symbol: note.s, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
-        sectionProgress += (note.d || 1)
-      })
+
+  score.systems.forEach((system, sysidx, systemArray) => {
+    system.sections.forEach((section) => {
+      // Update the total duration time
+      totalDurationInBaseNotes += section.duration
+      timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
+      currTime = n2TO(section.starttime)
+
+      // Create tempo actions for each tempo change.
+      var newValues: number[] | null
+      if (newValues = changedValues(section.tempo, currBpm)) {
+        timeline.tempoactions.push({ bpm: newValues, time: currTime, duration: n2TO(section.duration) })
+        currBpm = section.tempo[1]
+      }
+      timeline.totalDurationTO = n2TO(totalDurationInBaseNotes)
+
+      // Create sampler actions
+      for (const [position, stave] of Object.entries(section.staves)) {
+        if (!(stave.position in positionScore)) positionScore[position] = []
+        var sectionProgress: number = 0
+        stave.notes.forEach((note) => {
+          // create separate scores for each position, which will be used to create the animation actions 
+          var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+          note.v = velocity
+          positionScore[position].push(note)
+          timeline.sampleractions.push({ position: position, symbol: note.s, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
+          sectionProgress += (note.d || 1)
+        })
+      }
     })
   })
 
@@ -172,8 +188,9 @@ export function createTimeline(score: Score): Timeline {
       const nextANote: AnimationNote | null = currIsLast ? null : note2noteAction(position, notes[index + 1], nextIsLast)
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
-      const prevSection = index == 0 ? "-" : notes[index - 1].section
-      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      const prevSystem = index > 0 ? notes[index - 1].system : null
+      const prevSection = index > 0 ? notes[index - 1].section : null
+      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsystem: prevSystem, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
 

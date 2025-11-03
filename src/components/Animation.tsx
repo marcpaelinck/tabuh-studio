@@ -80,6 +80,7 @@ export default function Animation({focus, animationInfoUpdater}: {focus: string,
 //border-t-4 border-l-4 border-r-4 rounded-md p-4
     return(focus ? (
             <div id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
+                <NotationArea rows={2} cols={80} ref={notationAreaRef}/>
                 <div id="svg-embed" >
                     <div id="checkbox-and-slider" className="flex items-center">
                         {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
@@ -100,7 +101,6 @@ export default function Animation({focus, animationInfoUpdater}: {focus: string,
                     <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} 
                         useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
                 </div>
-                <NotationArea rows={2} cols={80} ref={notationAreaRef}/>
             </div>) 
         : <div/>)
 }

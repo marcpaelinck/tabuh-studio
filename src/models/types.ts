@@ -18,7 +18,8 @@ export type Note = {
 }
 
 export type JsonNote = {
-  section: string
+  system: number
+  section: number
   s: string
   t: number  // attack time in base notes
   ms: number // attack time in ms
@@ -26,20 +27,24 @@ export type JsonNote = {
   v: number // velocity
 }
 
+// Used as 
 export type JsonSymbol = {
-  section: string
+  system: number
+  section: number
   s: string
   t: number  // attack time in base notes
   d: number
 }
 
-export type SectionData = {
+// Notation of one section for one instrument position
+export type Stave = {
   position: string
   velocity: number[]
   notes: JsonNote[]
   notation: JsonSymbol[]
 }
 
+// Subdivision of a system, typically spans one kempli beat
 export type Section = {
   id: number
   title: string
@@ -47,14 +52,22 @@ export type Section = {
   starttimeMs: number // start time in ms
   duration: number
   tempo: number[]
-  data: SectionData[]
+  staves: { [position: string]: Stave }
+}
+
+// Subdivision of a score, typically spans one gongan
+export type System = {
+  id: number
+  starttime: number // start time of first section
+  duration: number // sum of section durations
+  sections: Section[]
 }
 
 export type Score = {
   title: string
   composer: string
   durationMs: number
-  sections: Section[]
+  systems: System[]
 }
 
 export type ScoreInfo = {

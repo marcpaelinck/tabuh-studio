@@ -27,7 +27,7 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, animationInfoRef}: { score: Score, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, animationInfoRef}: { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
@@ -51,14 +51,16 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef}: { scor
     Tone.getTransport()
   }
 
-  function createSchedule(timeline: Timeline) {
+  function createSchedule(timeline: Timeline | null) {
     // Creates the schedule for the Transport object.
+    if (! timeline || !score) return
+
     if (audioStarted) pause()
     Tone.getTransport().stop()
     Tone.getTransport().cancel()
     Tone.getTransport().position = 0
 
-    console.log(`Creating schedule for ${score.title}`)
+    console.log(`Creating schedule for ${score?.title}`)
     
     // tempo actions
     timeline.tempoactions.forEach((tAction: TempoAction) => {
@@ -102,6 +104,8 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef}: { scor
   }
 
   async function playPause() {
+    if (! timeline) return
+
     if (audioStarted === 'false') {
       Tone.start()
       setAudioStarted('wait')
@@ -116,6 +120,8 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef}: { scor
   }
 
   function rewind() {
+    if (! timeline) return
+
     Tone.getTransport().stop()
     Tone.getTransport().position=0
     setProgress(0)

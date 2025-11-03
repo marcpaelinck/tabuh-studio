@@ -1,7 +1,7 @@
 import type { ChangeEvent, JSX, RefObject } from "react";
 import { useState, useEffect, useRef } from "react";
 import { readFile } from "../utils/filesystem";
-import type { Score, ScoreInfo, Section, SectionData } from "../models/types";
+import type { Score, ScoreInfo, Section, Stave, System } from "../models/types";
 
 
 // Width is a fraction, e.g. 3/10
@@ -19,7 +19,7 @@ function Selector({id, title, items, onChange} : {id: string, title: string, wid
 }
 
 export default function Selectors(
-    {score, scoreUpdater, focusUpdater}: {score: Score, scoreUpdater: Function, focusUpdater: Function}, 
+    {score, scoreUpdater, focusUpdater}: {score: Score | null, scoreUpdater: Function, focusUpdater: Function}, 
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
@@ -42,9 +42,12 @@ export default function Selectors(
 
     // Populate the focus selector with the instruments in the selected score
     useEffect(() => {
-        async function fetchFocusInstruments(score: Score) {
-            const instr_lists: string[][] = score.sections.map((section: Section) => section.data.map((data: SectionData) => data.position))
-            const instruments: string[] = [...new Set(instr_lists.flat())]
+        async function fetchFocusInstruments(score: Score | null) {
+            let instruments: string[] = []
+            if (score) {
+                const instr_lists: string[] = score.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
+                instruments = [...new Set(instr_lists)]
+            }
             const instr_options: JSX.Element[] = [<option value={""} key={""}>No focus</option>].concat(
                 instruments.map((instrument: string) => (
                 <option value={instrument} key={instrument}>{instrument}</option>

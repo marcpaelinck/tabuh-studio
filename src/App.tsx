@@ -7,12 +7,11 @@ import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
-import type { NotationArea } from './components/NotationArea'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [scoreTitle, setScoreTitle] = useState<string>("")
-  const [score, setScore] = useState<Score>({ title: '', composer: '', durationMs: 0, sections: [] })
+  const [score, setScore] = useState<Score | null>(null)
   const [focus, setFocus] = useState<string>('')
   const focusReference: RefObject<string>  = useRef('')
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null) })
@@ -34,13 +33,11 @@ export default function App() {
   // Load and parse the score when a new score title is selected
   useEffect(() => {
     const loadScore = async () => {
-      let jsonScore
-      if (! scoreTitle) 
-        jsonScore = '{"title": "", "composer": "", "sections": []}'
-      else
-        jsonScore = await readFile('scores/' + scoreTitle)
-      const score = parseScore(jsonScore)
-      setScore(score)
+      if (scoreTitle) {
+        let jsonScore = await readFile('scores/' + scoreTitle)
+        const score = parseScore(jsonScore)
+        setScore(score)
+      }
       setIsLoading(false)
     }
     loadScore()

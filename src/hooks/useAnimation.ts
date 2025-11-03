@@ -122,16 +122,9 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
 }
 
 async function animateNotation(aAction: AnimationAction, notationArea: React.RefObject<NotationArea | null>) {
-    var text = ""
-    const [gongan, beat] = aAction.currnote ? aAction.currnote.section.split("-") : [null, null]
-    const [prevgongan, prevbeat] = aAction.prevsection.split("-")
-    if (prevgongan != gongan) {
-        text = (prevgongan ? "\n" : "")
-    }
-    if (prevbeat != beat) {
-        text += "  |  "
-    }
-    text += aAction.symbol
+    var text = ((aAction.prevsystem && aAction.prevsystem != aAction.currnote?.system) ? "\n" : "") +
+        ((aAction.prevsection != aAction.currnote?.section) ? " " : "") +
+        aAction.symbol
     notationArea.current?.update(text)
 }
 
