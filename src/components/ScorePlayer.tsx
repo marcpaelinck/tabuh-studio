@@ -27,8 +27,8 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, animationInfoRef, notationUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, notationUpdater: CallableFunction }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, animationInfoRef, timelineUpdater}: 
+  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, timelineUpdater: CallableFunction }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
@@ -43,7 +43,7 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, notatio
   const timeline = useMemo(() => createTimeline(score), [score])
   
   useEffect(() => {
-    notationUpdater(timeline?.notation)
+    timelineUpdater(timeline)
     createSchedule(timeline)
     rewind()
   }, [timeline]);

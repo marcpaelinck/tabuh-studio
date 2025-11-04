@@ -1,7 +1,7 @@
 import type { AnimationAction, CursorAction } from "../utils/score";
 import * as Tone from 'tone'
 import { useCallback, type Ref } from "react";
-import type { AnimationInfo, NotationType, SVGInfo } from "../models/types";
+import type { AnimationInfo, SVGInfo } from "../models/types";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke

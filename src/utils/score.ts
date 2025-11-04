@@ -1,5 +1,5 @@
 import { instrumentConfigs, noteConfigs } from '../config/config'
-import { type JsonNote, type JsonSymbol, type Note, type Score } from '../models/types'
+import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
 import { createElement, type DetailedReactHTMLElement } from 'react'
@@ -88,7 +88,7 @@ export type Timeline = {
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
   cursoractions: CursorAction[]
-  notation: DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
+  notation: { [position: string]: NotationType }
 }
 
 
@@ -98,7 +98,7 @@ export function createTimeline(score: Score | null): Timeline | null {
   if (!score) return null
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [], notation: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [], notation: {}
   }
   if (!score) return timeline
 
@@ -196,6 +196,7 @@ export function createTimeline(score: Score | null): Timeline | null {
 
   // Create cursor actions
   Object.keys(positionNotation).forEach((position) => {
+    timeline.notation[position] = []
     const symbols: JsonSymbol[] = positionNotation[position]
     let currentline: string = ""
     let line = 0
@@ -204,7 +205,7 @@ export function createTimeline(score: Score | null): Timeline | null {
       const newSection = index > 0 ? newSystem || symbol.section !== symbols[index - 1].section : false
       const isLast = (index == symbols.length - 1)
       if (newSystem) {
-        timeline.notation.push(createElement('p', { id: `${line}` }, currentline))
+        timeline.notation[position].push(createElement('p', { id: `${line}` }, currentline))
         currentline = ""
         line++
       }

@@ -4,7 +4,7 @@ import Selectors from './components/Selectors'
 import Animation from './components/Animation'
 import { type Score, type AnimationInfo, type NotationType } from './models/types'
 import { readFile } from './utils/filesystem'
-import { parseScore } from './utils/score'
+import { parseScore, type Timeline } from './utils/score'
 import { useEffect, useRef, useState, type Ref, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
 
@@ -15,6 +15,7 @@ export default function App() {
   const [focus, setFocus] = useState<string>('')
   const focusReference: RefObject<string>  = useRef('')
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null)})
+  const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
 
 
@@ -25,12 +26,14 @@ export default function App() {
     const updateFocus = (position: string): void => {
     if  (position !== focusReference.current) {
       focusReference.current=position
+      if (timelineRef.current?.notation && position in timelineRef.current?.notation)
+        notationRef.current = timelineRef.current.notation[position]
       setFocus(position)
     }
   }
 
-const updateNotation = (notation: NotationType): void => {
-  notationRef.current = notation
+const updateTimeline = (timeline: Timeline): void => {
+  timelineRef.current = timeline
 }
 
   const updateAnimationInfo = (animationInfo: AnimationInfo): void => {
@@ -67,7 +70,7 @@ const updateNotation = (notation: NotationType): void => {
       <div className={"w-8/10" + FRAMESTYLE}>
         <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
         {focus && <Animation focus={focus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
-        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} notationUpdater={updateNotation}/>
+        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} timelineUpdater={updateTimeline}/>
       </div>
     </div>
   )
