@@ -1,6 +1,7 @@
 // INSTRUMENTS
 
-import type { NotationArea } from "../components/NotationArea"
+import type { DetailedReactHTMLElement, FunctionComponent, JSX } from "react"
+import { NotationArea } from "../components/NotationArea"
 
 export type Instrument = {
   id: string
@@ -38,7 +39,6 @@ export type JsonSymbol = {
 
 // Notation of one section for one instrument position
 export type Stave = {
-  position: string
   velocity: number[]
   notes: JsonNote[]
   notation: JsonSymbol[]
@@ -87,6 +87,9 @@ export type SVGInfo = {
   y: number | null
   animation: AnimationData
 }
+
+// export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
+export type NotationType = JSX.Element[]
 
 export type AnimationInfo = {
   svgInfo: SVGInfo

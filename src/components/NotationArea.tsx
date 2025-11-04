@@ -2,13 +2,17 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the 
 // notation while the corresponding notes are being played.
 
-import { Component, createRef, type RefObject } from "react"
+import { Component, createRef, type Ref, type RefObject } from "react"
+import type { NotationType } from "../models/types";
+import ReactDOM from "react-dom";
 
-interface NotationAreaAttributes extends React.TextareaHTMLAttributes<HTMLTextAreaElement>, React.RefAttributes<NotationArea> {}
+interface NotationAreaAttributes extends React.TextareaHTMLAttributes<HTMLDivElement>, React.RefAttributes<NotationArea> {
+    notation: NotationType | null
+}
 
 interface NotationAreaStates { 
     text: string, 
-    textarea: RefObject<HTMLTextAreaElement | null>
+    textarea: RefObject<HTMLDivElement | null>
 }
 
 export class NotationArea extends Component<NotationAreaAttributes, NotationAreaStates> {
@@ -21,13 +25,35 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
         this.setState({text: this.state.text + newText})
         if (this.state.textarea.current)
             this.state.textarea.current.scrollTop = this.state.textarea.current.scrollHeight;
-    };
+    }
+
+    highlight = (line: number, range: number[], scroll: boolean) => {
+        const para = this.state.textarea.current?.children[line]
+        const para1 = this.state.textarea.current?.childNodes[line]
+        para?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        const range1 = new Range();
+        if (para1) {
+            const text = para1.firstChild
+            if (text){
+                range1.setStart(text, range[0]);
+                range1.setEnd(text, range[1]);
+                const highlight = new Highlight(range1);       
+                CSS.highlights.set("notation-highlight", highlight)
+            }
+        }
+
+    }
 
     clear = () => this.setState({text: ""})
 
     render() {
         return (
-            <textarea value={this.state.text} ref={this.state.textarea} readOnly={true} rows={this.props.rows} cols={this.props.cols} className="balifont"/>
+            <>
+                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-15 text-base/5 overflow-hidden bg-blue-200">
+                { this.props.notation }
+                </div>
+            </>
         );
     }
 }

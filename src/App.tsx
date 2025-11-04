@@ -2,10 +2,10 @@
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
 import Animation from './components/Animation'
-import { type Score, type AnimationInfo } from './models/types'
+import { type Score, type AnimationInfo, type NotationType } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore } from './utils/score'
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type Ref, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
@@ -14,18 +14,25 @@ export default function App() {
   const [score, setScore] = useState<Score | null>(null)
   const [focus, setFocus] = useState<string>('')
   const focusReference: RefObject<string>  = useRef('')
-  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null) })
+  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null)})
+  const notationRef: RefObject<NotationType | null> = useRef(null)
 
 
   const updateScoreTitle = (newScorefile: string): void => {
       if (newScorefile !== scoreTitle) setScoreTitle(newScorefile)
     }
-  const updateFocus = (position: string): void => {
+ 
+    const updateFocus = (position: string): void => {
     if  (position !== focusReference.current) {
       focusReference.current=position
       setFocus(position)
     }
   }
+
+const updateNotation = (notation: NotationType): void => {
+  notationRef.current = notation
+}
+
   const updateAnimationInfo = (animationInfo: AnimationInfo): void => {
     animationInfoRef.current = animationInfo
   }
@@ -59,8 +66,8 @@ export default function App() {
       </div>
       <div className={"w-8/10" + FRAMESTYLE}>
         <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
-        {focus && <Animation focus={focus} animationInfoUpdater={updateAnimationInfo}/>}
-        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef}/>
+        {focus && <Animation focus={focus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
+        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} notationUpdater={updateNotation}/>
       </div>
     </div>
   )

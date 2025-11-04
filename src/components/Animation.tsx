@@ -8,8 +8,8 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import colors from 'tailwindcss/colors'
 import { FRAMESTYLE } from '../config/constants';
-import type { AnimationInfo, SVGInfo } from '../models/types';
-import  {NotationArea}  from './NotationArea'
+import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
+import { NotationArea } from './NotationArea';
 
 const svgBdrColorHex = colors.blue["300"]
 
@@ -33,8 +33,8 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGIn
     return { svg: svgRef.current, panggul: panggul, x: xValues, y: (yValues ? yValues.y : 0), animation: animationValues }
 }
 
-
-export default function Animation({focus, animationInfoUpdater}: {focus: string, animationInfoUpdater: Function}) : JSX.Element {
+export default function Animation({focus, notationRef, animationInfoUpdater}: 
+    {focus: string, notationRef: React.RefObject<NotationType | null>, animationInfoUpdater: Function}) : JSX.Element {
     const defaultSvgSize = 40 // percent
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
@@ -80,7 +80,7 @@ export default function Animation({focus, animationInfoUpdater}: {focus: string,
 //border-t-4 border-l-4 border-r-4 rounded-md p-4
     return(focus ? (
             <div id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
-                <NotationArea rows={2} cols={80} ref={notationAreaRef}/>
+                <NotationArea ref={notationAreaRef} notation={notationRef.current}/>
                 <div id="svg-embed" >
                     <div id="checkbox-and-slider" className="flex items-center">
                         {// The panggul checkbox is only visible if the embedded SVG code has a panggul element

@@ -4,7 +4,7 @@ import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score, type AnimationInfo} from '../models/types'
 import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
 import * as Tone from 'tone'
-import { createTimeline, type AnimationAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
+import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
@@ -27,7 +27,8 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, animationInfoRef}: { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo> }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, animationInfoRef, notationUpdater}: 
+  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, notationUpdater: CallableFunction }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
@@ -36,12 +37,13 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef}: { scor
 
   const { playInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
-  const { executeAnimation } = useAnimationEngine()
+  const { animateInstrument, animateNotation } = useAnimationEngine()
 
   // recreate the Transport schedule when a new score is selected
   const timeline = useMemo(() => createTimeline(score), [score])
   
   useEffect(() => {
+    notationUpdater(timeline?.notation)
     createSchedule(timeline)
     rewind()
   }, [timeline]);
@@ -72,12 +74,13 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef}: { scor
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => executeAnimation(time, aAction, focusRef.current, animationInfoRef.current), aAction.time)
+      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef.current), aAction.time)
       })
-    // cursor actions
-    // beat.cursorActions.forEach((cAction: CursorAction) => {
-    //   Tone.getTransport().schedule((time) => moveCursor(time, cAction.step), cAction.time)
-    // })
+    // Schedule cursor actions
+    timeline.cursoractions.forEach((cAction: CursorAction) => {
+      Tone.getTransport().schedule((time) => animateNotation(time, cAction, focusRef.current, animationInfoRef.current), cAction.time)
+      })
+
     setTotalDuration(Math.round(score.durationMs/1000))
     Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0, timeline.totalDurationTO)
 

@@ -1,7 +1,7 @@
-import type { ChangeEvent, JSX, RefObject } from "react";
-import { useState, useEffect, useRef } from "react";
+import type { JSX } from "react";
+import { useState, useEffect } from "react";
 import { readFile } from "../utils/filesystem";
-import type { Score, ScoreInfo, Section, Stave, System } from "../models/types";
+import type { Score, ScoreInfo, Section, System } from "../models/types";
 
 
 // Width is a fraction, e.g. 3/10

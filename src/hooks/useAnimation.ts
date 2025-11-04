@@ -1,8 +1,7 @@
-import type { AnimationAction } from "../utils/score";
+import type { AnimationAction, CursorAction } from "../utils/score";
 import * as Tone from 'tone'
-import { useCallback } from "react";
-import type { NotationArea } from "../components/NotationArea";
-import type { AnimationInfo, SVGInfo } from "../models/types";
+import { useCallback, type Ref } from "react";
+import type { AnimationInfo, NotationType, SVGInfo } from "../models/types";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -121,24 +120,19 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
     });
 }
 
-async function animateNotation(aAction: AnimationAction, notationArea: React.RefObject<NotationArea | null>) {
-    var text = ((aAction.prevsystem && aAction.prevsystem != aAction.currnote?.system) ? "\n" : "") +
-        ((aAction.prevsection != aAction.currnote?.section) ? " " : "") +
-        aAction.symbol
-    notationArea.current?.update(text)
+async function highlightCurrentNote(cAction: CursorAction, animationInfo: AnimationInfo) {
+    animationInfo.notationAreaRef.current?.highlight(cAction.line, cAction.range, cAction.newsystem)
 }
 
 export const useAnimationEngine = () => {
 
+
     // For the use of Draw.schedule, see 
-    const executeAnimation = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo) => {
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo) => {
         const svgInfo = animationInfo.svgInfo
-        const notationAreaRef = animationInfo.notationAreaRef
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
             if (svgInfo.svg && aAction.currnote) {
-                // Display notation
-                Tone.getDraw().schedule(() => animateNotation(aAction, notationAreaRef), time)
                 // Hightighting animation
                 var keyElement = (svgInfo.svg.querySelector(`#${aAction.currnote.keyname}${aAction.currnote.stroke ? " ." + aAction.currnote.stroke : ""}`))
                 //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
@@ -151,5 +145,11 @@ export const useAnimationEngine = () => {
         }
     }, [])
 
-    return { executeAnimation }
+    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string, animationInfo: AnimationInfo) => {
+        if (cAction.position === currentFocus) {
+            Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfo), time)
+        }
+    }, [])
+
+    return { animateInstrument, animateNotation }
 }

@@ -1,7 +1,8 @@
 import { instrumentConfigs, noteConfigs } from '../config/config'
-import { type JsonNote, type Note, type Score } from '../models/types'
+import { type JsonNote, type JsonSymbol, type Note, type Score } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
+import { createElement, type DetailedReactHTMLElement } from 'react'
 
 export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
@@ -45,12 +46,6 @@ export type TempoAction = {
   duration: Tone.Unit.TimeObject
 }
 
-export type CursorAction = {
-  system: number
-  time: Tone.Unit.TimeObject
-  step: number
-}
-
 export type AnimationNote = {
   system: number
   section: number
@@ -74,6 +69,17 @@ export type AnimationAction = {
   timeuntilMs: number
 }
 
+export type CursorAction = {
+  time: Tone.Unit.TimeObject
+  position: string
+  symbol: string
+  newsystem: boolean
+  newsection: boolean
+  islast: boolean
+  line: number
+  range: number[]
+}
+
 export type Timeline = {
   totalDurationSec: number
   totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
@@ -82,6 +88,7 @@ export type Timeline = {
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
   cursoractions: CursorAction[]
+  notation: DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
 }
 
 
@@ -91,7 +98,7 @@ export function createTimeline(score: Score | null): Timeline | null {
   if (!score) return null
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: []
+    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [], notation: []
   }
   if (!score) return timeline
 
@@ -99,7 +106,6 @@ export function createTimeline(score: Score | null): Timeline | null {
   // currVelocity will keep track of the velocity of each separate instrument position
   // const currVelocity: { [position: string]: number } = Object.fromEntries(Object.keys(instrumentConfigs).map((pos) => [pos, 0]))
   var currTime: Tone.Unit.TimeObject = n2TO(0)
-  const positionScore: { [position: string]: JsonNote[] } = {}
 
   // // Create a mapping for notes to Pitch, Octave, 
   // var note_to_keygroup: { [position: string]: { [symbol: string]: string[][] } } = {}
@@ -125,12 +131,6 @@ export function createTimeline(score: Score | null): Timeline | null {
     return shCode ? { system: notationNote.system, section: notationNote.section, time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
   }
 
-  // function note2noteAction(position: string, note: NotationNote, isLast: boolean): AnimationNote | null {
-  //   // TODO currently only animating first note of group
-  //   const keyInfo: string[] | null = note.s in note_to_keygroup[position] ? note_to_keygroup[position][note.s][0] : null
-  //   return keyInfo ? { tone: keyInfo[0], stroke: keyInfo[1], duration: n2TO(note.d), islast: isLast } : null
-  // }
-
   // Used for tempo and dynamics actions. Checks for a value change and returns null if no change is detected.
   function changedValues(values: number[], reference: number): number[] | null {
     // return values
@@ -138,16 +138,10 @@ export function createTimeline(score: Score | null): Timeline | null {
   }
 
   var totalDurationInBaseNotes = 0
+  const positionScore: { [position: string]: JsonNote[] } = {}
+  const positionNotation: { [position: string]: JsonSymbol[] } = {}
 
-  // populate the action lists
-  // score.systems.forEach((system, sysidx, systemArray) => {
-  //   system.sections.forEach((section, sectidx, sectionArray) => {
-  //     section.starttimeMs = Math.round(currentTimeMs)
-  //     for (const [position, staveData] of Object.entries(section.staves)) {
-
-
-
-  score.systems.forEach((system, sysidx, systemArray) => {
+  score.systems.forEach((system) => {
     system.sections.forEach((section) => {
       // Update the total duration time
       totalDurationInBaseNotes += section.duration
@@ -164,7 +158,8 @@ export function createTimeline(score: Score | null): Timeline | null {
 
       // Create sampler actions
       for (const [position, stave] of Object.entries(section.staves)) {
-        if (!(stave.position in positionScore)) positionScore[position] = []
+        if (!(position in positionScore)) positionScore[position] = []
+        if (!(position in positionNotation)) positionNotation[position] = []
         var sectionProgress: number = 0
         stave.notes.forEach((note) => {
           // create separate scores for each position, which will be used to create the animation actions 
@@ -173,6 +168,11 @@ export function createTimeline(score: Score | null): Timeline | null {
           positionScore[position].push(note)
           timeline.sampleractions.push({ position: position, symbol: note.s, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
           sectionProgress += (note.d || 1)
+        })
+        stave.notation.forEach((symbol: JsonSymbol) => {
+          symbol.system = system.id
+          symbol.section = section.id
+          positionNotation[position].push(symbol)
         })
       }
     })
@@ -191,6 +191,27 @@ export function createTimeline(score: Score | null): Timeline | null {
       const prevSystem = index > 0 ? notes[index - 1].system : null
       const prevSection = index > 0 ? notes[index - 1].section : null
       timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsystem: prevSystem, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+    })
+  })
+
+  // Create cursor actions
+  Object.keys(positionNotation).forEach((position) => {
+    const symbols: JsonSymbol[] = positionNotation[position]
+    let currentline: string = ""
+    let line = 0
+    symbols.forEach((symbol, index) => {
+      const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
+      const newSection = index > 0 ? newSystem || symbol.section !== symbols[index - 1].section : false
+      const isLast = (index == symbols.length - 1)
+      if (newSystem) {
+        timeline.notation.push(createElement('p', { id: `${line}` }, currentline))
+        currentline = ""
+        line++
+      }
+      if (newSection) currentline += " "
+      const range = [currentline.length, currentline.length + symbol.s.length]
+      currentline += symbol.s
+      timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, islast: isLast, line: line, range: range })
     })
   })
 
