@@ -1,14 +1,15 @@
 import * as Tone from 'tone'
-import type { TempoAction } from '../utils/score'
+import type { SamplerAction } from '../utils/score'
+import { BaseNote } from '../config/config'
 
 export function useInterpretations() {
-    const changeTempo = (time: number, action: TempoAction) => {
+    const changeTempo = (time: number, action: SamplerAction) => {
         if (action.bpm != undefined) {
             // if (action.bpm[0] !== Tone.getTransport().bpm.getValueAtTime(action.time) || action.bpm[1] !== Tone.getTransport().bpm.getValueAtTime(action.time)) {
-            if (action.bpm[0]) Tone.getTransport().bpm.setValueAtTime(action.bpm[0], time)
-            if (action.bpm[1] != action.bpm[0]) {
-                Tone.getTransport().bpm.rampTo(action.bpm[1], action.duration)
-            }
+            Tone.getTransport().bpm.setValueAtTime(action.bpm, time)
+            // if (action.bpm[1] != action.bpm[0] && action.duration[BaseNote]) {
+            // Tone.getTransport().bpm.rampTo(action.bpm[1], action.duration, "+0.001")
+            // }
             // }
         }
     }

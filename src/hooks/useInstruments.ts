@@ -48,7 +48,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
         try {
           sampler.current?.triggerAttackRelease(indices, action.duration, time, action.velocity * dimValue)
         } catch {
-          console.log(`ERROR: could not play sound ${action.position}-${action.symbol} `)
+          console.log(`ERROR: could not play sound ${action.position} ${action.symbol} `)
         }
       }
     },

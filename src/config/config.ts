@@ -1,7 +1,7 @@
 import type { Note } from "../models/types"
 
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
-export const BaseNote: string = "16n"
+export const BaseNote: "1n" | "2n" | "4n" | "8n" | "16n" | "32n" = "16n"
 export const SOUNDS_FOLDER = 'sounds/'
 export const alwaysFocusPositions = ["KEMPLI", "GONGS"]
 

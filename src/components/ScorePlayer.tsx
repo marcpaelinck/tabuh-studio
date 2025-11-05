@@ -54,22 +54,23 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, timelin
   }
 
   function createSchedule(timeline: Timeline | null) {
-    // Creates the schedule for the Transport object.
+    // Creates the schedule for the Transport object.f
     if (! timeline || !score) return
 
     if (audioStarted) pause()
     Tone.getTransport().stop()
     Tone.getTransport().cancel()
-    Tone.getTransport().position = 0
+    Tone.getTransport().seconds = 0
 
     console.log(`Creating schedule for ${score?.title}`)
     
-    // tempo actions
-    timeline.tempoactions.forEach((tAction: TempoAction) => {
-      Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
-    })
+    // tempo actions ==> moved to sampleractions
+    // timeline.tempoactions.forEach((tAction: TempoAction) => {
+    //   Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
+    // })
     // instrument actions (notes)
     timeline.sampleractions.forEach((iAction: SamplerAction) => {
+      Tone.getTransport().schedule((time) => changeTempo(time, iAction), iAction.time)      
       Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
     })
     // Schedule animation actions
@@ -82,14 +83,14 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, timelin
       })
 
     setTotalDuration(Math.round(score.durationMs/1000))
-    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0, timeline.totalDurationTO)
+    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0)//, timeline.totalDurationTO)
 
   }
 
   function jumpToProgressTime(time: number | number[]) {
     const newTime = typeof time === 'number' ? time : time[1]
     Tone.getTransport().stop()
-    Tone.getTransport().position = newTime
+    Tone.getTransport().seconds = newTime
     Tone.getTransport().start()
     setProgress(newTime)
   }
@@ -126,7 +127,7 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, timelin
     if (! timeline) return
 
     Tone.getTransport().stop()
-    Tone.getTransport().position=0
+    Tone.getTransport().seconds=0
     setProgress(0)
     // TODO: use `resetAnimation` callback that is passed as prop
     animationInfoRef.current?.notationAreaRef.current?.clear()

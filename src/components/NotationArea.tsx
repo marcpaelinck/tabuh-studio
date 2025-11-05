@@ -50,7 +50,7 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
     render() {
         return (
             <>
-                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-15 text-base/5 overflow-hidden bg-blue-200">
+                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-25 text-sm/5 overflow-hidden border rounded-md p-2">
                 { this.props.notation }
                 </div>
             </>
