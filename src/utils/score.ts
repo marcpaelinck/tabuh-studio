@@ -65,8 +65,8 @@ export type AnimationAction = {
   symbol: string
   prevsystem: number | null
   prevsection: number | null
-  currnote: AnimationNote | null
-  nextnote: AnimationNote | null
+  currnotes: AnimationNote[]
+  nextnotes: AnimationNote[]
   timeuntil: Tone.Unit.TimeObject
   timeuntilMs: number
 }
@@ -99,16 +99,28 @@ for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
   note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
 }
 
-const note2AnimationNote = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote | null => {
-  // TODO currently only animating first note of group
-  if (!(position in note_to_shCode)) return null
+const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote[] => {
+  if (!(position in note_to_shCode)) return []
   const symbol = notationNote.s
-  const shCode: string | null = symbol in note_to_shCode[position] ? note_to_shCode[position][symbol][0] : null
-  const instrType: string = instrumentConfigs[position].type
-  if (!shCode) return null
-  const note: Note = noteConfigs[instrType][shCode]
-  const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
-  return shCode ? { system: notationNote.system, section: notationNote.section, time: n2TO(notationNote.t), keyname: keyname, stroke: note.stroke, muting: note.muting, duration: n2TO(notationNote.d), islast: isLast } : null
+  const shorthandCodes = note_to_shCode[position][symbol] || []
+  const result: AnimationNote[] = []
+  shorthandCodes.forEach((shCode) => {
+    const instrType: string = instrumentConfigs[position].type
+    if (!shCode) return null
+    const note: Note = noteConfigs[instrType][shCode]
+    const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
+    result.push({
+      system: notationNote.system,
+      section: notationNote.section,
+      time: n2TO(notationNote.t),
+      keyname: keyname,
+      stroke: note.stroke,
+      muting: note.muting,
+      duration: n2TO(notationNote.d),
+      islast: isLast
+    })
+  })
+  return result
 }
 
 // Returns the tempo at the given time in BaseNote units relative to the start of the section.
@@ -191,14 +203,14 @@ export function createTimeline(score: Score | null): Timeline | null {
     const notes: JsonNote[] = positionScore[position]
     notes.forEach((note, index) => {
       const currIsLast = (index == notes.length - 1)
-      const aNote: AnimationNote | null = note2AnimationNote(position, notes[index], currIsLast)
+      const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
       const nextIsLast = (index == notes.length - 2)
-      const nextANote: AnimationNote | null = currIsLast ? null : note2AnimationNote(position, notes[index + 1], nextIsLast)
+      const nextANotes: AnimationNote[] = currIsLast ? [] : note2AnimationNotes(position, notes[index + 1], nextIsLast)
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
       const prevSystem = index > 0 ? notes[index - 1].system : null
       const prevSection = index > 0 ? notes[index - 1].section : null
-      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsystem: prevSystem, prevsection: prevSection, currnote: aNote, nextnote: nextANote, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsystem: prevSystem, prevsection: prevSection, currnotes: aNotes, nextnotes: nextANotes, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
     })
   })
 

@@ -29,12 +29,13 @@ const logConsole = (msg: string, caller: string) => { }
 
 function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
     var keyframes, options;
-    if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnote) return
+    if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnotes) return
 
-    var currKey = action.currnote ? action.currnote.keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
-    var nextKey = action.nextnote ? action.nextnote.keyname : currKey
+    // Currently only one panggul can be animated
+    var currKey = action.currnotes ? action.currnotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
+    var nextKey = action.nextnotes ? action.nextnotes[0].keyname : currKey
 
-    if (action.currnote?.islast /*&& !this.dom.loopCheckbox.checked*/) {
+    if (action.currnotes[0].islast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
         logConsole("last note", "helpinghand");
         keyframes = [
@@ -56,7 +57,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
             composite: "replace",
         };
     } else {
-        if (!action.nextnote) {
+        if (!action.nextnotes) {
             console.log("ERROR in panggul animation: next note not defined but current note is not last.")
             return
         }
@@ -132,11 +133,13 @@ export const useAnimationEngine = () => {
         const svgInfo = animationInfo.svgInfo
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
-            if (svgInfo.svg && aAction.currnote) {
+            if (svgInfo.svg && aAction.currnotes) {
                 // Hightighting animation
-                var keyElement = (svgInfo.svg.querySelector(`#${aAction.currnote.keyname}${aAction.currnote.stroke ? " ." + aAction.currnote.stroke : ""}`))
-                //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
-                if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, aAction.currnote.duration), time) }
+                aAction.currnotes.forEach((note) => {
+                    var keyElement = (svgInfo.svg?.querySelector(`#${note.keyname}${note.stroke ? " ." + note.stroke : ""}`))
+                    //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
+                    if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, note.duration), time) }
+                })
                 // Panggul animation
                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
                     Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo), time)
