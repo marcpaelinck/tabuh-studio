@@ -3,13 +3,14 @@ import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
-import { instrumentConfigs } from '../config/config';
+import { animationConfig, instrumentConfigs, colorRGB } from '../config/config';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import colors from 'tailwindcss/colors'
 import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import { NotationArea } from './NotationArea';
+import type { AnimationNote } from '../utils/score';
 
 const svgBdrColorHex = colors.blue["300"]
 

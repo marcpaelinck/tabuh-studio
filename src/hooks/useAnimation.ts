@@ -1,7 +1,8 @@
-import type { AnimationAction, CursorAction } from "../utils/score";
+import type { AnimationAction, AnimationNote, CursorAction } from "../utils/score";
 import * as Tone from 'tone'
 import { useCallback, type Ref } from "react";
 import type { AnimationInfo, SVGInfo } from "../models/types";
+import { animationConfig, colorRGB } from "../config/config";
 
 const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
@@ -9,14 +10,28 @@ const bezier = "cubic-bezier(0,.25,1,.71)"; // default timing curve
 const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke (accelerates toward stroke)
 const selectedSpeed = 1 //TODO replace with value of speed selector
 
-export async function highlightNote(keyElement: Element, duration: Tone.Unit.Time) {
-    const durationMillis = Math.min(Tone.Time(duration).toMilliseconds(), 3000)
+
+// Retrieves the highlight color values [R, G, B] for the given note (instrument key).
+// PositionSeq can be used in case multiple positions are animated on the same instrument. The corresponding color
+// will then be selected from the list of colors, reusing the colors if positionSeq is larger than the number of 
+// available colors.
+const getHighlightRGB = (note: AnimationNote, positionSeq: number = 0): number[] => {
+    const colors: string[] = animationConfig.highlight[note.tone] || animationConfig.highlight[note.muting] || Object.values(animationConfig.highlight)[0]
+    if (!colors) return []
+    var color_id = positionSeq % colors.length;
+    var colorName: string = colors[color_id]
+    return colorRGB[colorName] || []
+}
+
+export async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {
+    const durationMillis = Math.min(Tone.Time(note.duration).toMilliseconds(), 3000)
+    const rgb: number[] = getHighlightRGB(note, positionIndex)
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
         [
             //TODO use colors from config
-            { fill: "rgba(0,255,255,1)", offset: 0, easing: bezier },
-            { fill: "rgba(0,255,255,0)", offset: 1, easing: bezier },
+            { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},1)`, offset: 0, easing: bezier },
+            { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`, offset: 1, easing: bezier },
         ],
         { duration: durationMillis }
     );
@@ -137,8 +152,11 @@ export const useAnimationEngine = () => {
                 // Hightighting animation
                 aAction.currnotes.forEach((note) => {
                     var keyElement = (svgInfo.svg?.querySelector(`#${note.keyname}${note.stroke ? " ." + note.stroke : ""}`))
+                    //TODO currentFocus type should be changed into string[] to enable multiple focused positions. 
+                    // Then change the next statement in: const positionIndex = currentFocus.indexOf(aAction.position)
+                    const positionIndex = 0
                     //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
-                    if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, note.duration), time) }
+                    if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, note, positionIndex), time) }
                 })
                 // Panggul animation
                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {

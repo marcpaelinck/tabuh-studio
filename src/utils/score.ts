@@ -1,4 +1,4 @@
-import { BaseNote, instrumentConfigs, noteConfigs } from '../config/config'
+import { instrumentConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../config/config'
 import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score, type Section } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
@@ -53,8 +53,9 @@ export type AnimationNote = {
   section: number
   time: Tone.Unit.TimeObject
   keyname: string
-  stroke: string | null
-  muting: string
+  tone: ToneType
+  stroke: StrokeType | null
+  muting: MutingType
   duration: Tone.Unit.TimeObject
   islast: boolean
 }
@@ -114,6 +115,7 @@ const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: b
       section: notationNote.section,
       time: n2TO(notationNote.t),
       keyname: keyname,
+      tone: note.tone,
       stroke: note.stroke,
       muting: note.muting,
       duration: n2TO(notationNote.d),
