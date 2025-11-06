@@ -226,7 +226,7 @@ export function createTimeline(score: Score | null): Timeline | null {
       const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
       const newSection = index > 0 ? newSystem || symbol.section !== symbols[index - 1].section : false
       const isLast = (index == symbols.length - 1)
-      if (newSystem || isLast) {
+      if (newSystem) {
         timeline.notation[position].push(createElement('p', { id: `${line}` }, currentline))
         currentline = ""
         line++
@@ -234,6 +234,10 @@ export function createTimeline(score: Score | null): Timeline | null {
       if (newSection) currentline += " "
       const range = [currentline.length, currentline.length + symbol.s.length]
       currentline += symbol.s
+      if (isLast) {
+        timeline.notation[position].push(createElement('p', { id: `${line}` }, currentline))
+        currentline = ""
+      }
       timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, islast: isLast, line: line, range: range })
     })
   })
