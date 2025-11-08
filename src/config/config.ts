@@ -227,7 +227,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG_1: {
         type: 'reyong',
         alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 'r', 'r?', 'b', 'b/', 'b?', 'x', 'x/'],
-        notes: [['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DENG0', 'DING1'], ['DENG0_MUTED', 'DING1_MUTED'], ['DENG0', 'DANG0'], ['DENG0_ABBR', 'DANG0_ABBR'], ['DENG0_MUTED', 'DANG0_MUTED'], ['XDUNG0'], ['XDUNG0_MUTED']],
+        notes: [['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DENG0', 'DING1'], ['DENG0_MUTED', 'DING1_MUTED'], ['DENG0', 'DANG0'], ['DENG0_ABBR', 'DANG0_ABBR'], ['DENG0_MUTED', 'DANG0_MUTED'], ['XDUNG0_MUTED'], ['XDUNG0_MUTED']],
         volume: -14,
         svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
@@ -235,7 +235,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG_2: {
         type: 'reyong',
         alphabet: ['u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'b', 'b/', 'b?', 'x', 'x/'],
-        notes: [['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING1', 'DENG1'], ['DING1_ABBR', 'DENG1_ABBR'], ['DING1_MUTED', 'DENG1_MUTED'], ['XDONG1'], ['XDONG1_MUTED']],
+        notes: [['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING1', 'DENG1'], ['DING1_ABBR', 'DENG1_ABBR'], ['DING1_MUTED', 'DENG1_MUTED'], ['XDONG1_MUTED'], ['XDONG1_MUTED']],
         volume: -14,
         svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
@@ -243,7 +243,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG_3: {
         type: 'reyong',
         alphabet: ['o', 'e', 'u', 'a', 'i<', 'o<', 'e<', 'b', 'b/', 'b?', 'x', 'x/'],
-        notes: [['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG1', 'DING2'], ['DUNG1_ABBR', 'DING2_ABBR'], ['DUNG1_MUTED', 'DING2_MUTED'], ['XDANG1'], ['XDANG1_MUTED']],
+        notes: [['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG1', 'DING2'], ['DUNG1_ABBR', 'DING2_ABBR'], ['DUNG1_MUTED', 'DING2_MUTED'], ['XDANG1_MUTED'], ['XDANG1_MUTED']],
         volume: -14,
         svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
@@ -251,7 +251,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG_4: {
         type: 'reyong',
         alphabet: ['u', 'a,', 'i<', 'o<', 'e<', 'u<', 'b', 'b/', 'b?', 'x', 'x/'],
-        notes: [['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG2'], ['DING2', 'DENG2'], ['DING2_ABBR', 'DENG2_ABBR'], ['DING2_MUTED', 'DENG2_MUTED'], ['XDENG2'], ['XDENG2_MUTED']],
+        notes: [['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG2'], ['DING2', 'DENG2'], ['DING2_ABBR', 'DENG2_ABBR'], ['DING2_MUTED', 'DENG2_MUTED'], ['XDENG2_MUTED'], ['XDENG2_MUTED']],
         volume: -14,
         svg_file: "/svg/GK_REYONG.svg",
         sampletemplate: "GK_REYONG_{note}.mp3",
