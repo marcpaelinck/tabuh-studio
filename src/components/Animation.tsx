@@ -36,7 +36,7 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGIn
 
 export default function Animation({focus, notationRef, animationInfoUpdater}: 
     {focus: string, notationRef: React.RefObject<NotationType | null>, animationInfoUpdater: Function}) : JSX.Element {
-    const defaultSvgSize = 40 // percent
+    const defaultSvgSize = 100 // percent
     const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
