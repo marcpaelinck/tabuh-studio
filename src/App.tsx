@@ -10,7 +10,7 @@ import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
-  const [scoreTitle, setScoreTitle] = useState<string>("")
+  const [scoreFile, setScoreFile] = useState<string>("")
   const [score, setScore] = useState<Score | null>(null)
   const [focus, setFocus] = useState<string>('')
   const focusReference: RefObject<string>  = useRef('')
@@ -20,7 +20,7 @@ export default function App() {
 
 
   const updateScoreTitle = (newScorefile: string): void => {
-      if (newScorefile !== scoreTitle) setScoreTitle(newScorefile)
+      if (newScorefile !== scoreFile) setScoreFile(newScorefile)
     }
  
     const updateFocus = (position: string): void => {
@@ -43,15 +43,15 @@ const updateTimeline = (timeline: Timeline): void => {
   // Load and parse the score when a new score title is selected
   useEffect(() => {
     const loadScore = async () => {
-      if (scoreTitle) {
-        let jsonScore = await readFile('scores/' + scoreTitle)
+      if (scoreFile) {
+        let jsonScore = await readFile('scores/' + scoreFile)
         const score = parseScore(jsonScore)
         setScore(score)
       }
       setIsLoading(false)
     }
     loadScore()
-  }, [scoreTitle])
+  }, [scoreFile])
   
 
   if (isLoading) {
