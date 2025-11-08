@@ -27,8 +27,8 @@ const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: stri
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, animationInfoRef, timelineUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, timelineUpdater: CallableFunction }): JSX.Element {
+export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeedRef, timelineUpdater}: 
+  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
 
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
@@ -64,18 +64,14 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, timelin
 
     console.log(`Creating schedule for ${score?.title}`)
     
-    // tempo actions ==> moved to sampleractions
-    // timeline.tempoactions.forEach((tAction: TempoAction) => {
-    //   Tone.getTransport().schedule((time) => changeTempo(time, tAction), tAction.time)
-    // })
     // instrument actions (notes)
     timeline.sampleractions.forEach((iAction: SamplerAction) => {
-      Tone.getTransport().schedule((time) => changeTempo(time, iAction), iAction.time)      
+      Tone.getTransport().schedule((time) => changeTempo(time, iAction, pbSpeedRef.current), iAction.time)      
       Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef.current), aAction.time)
+      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef.current, pbSpeedRef.current), aAction.time)
       })
     // Schedule cursor actions
     timeline.cursoractions.forEach((cAction: CursorAction) => {

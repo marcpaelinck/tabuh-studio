@@ -34,12 +34,15 @@ function itemListToOptions(keys: string[], values: string[], noSelectionValue?: 
 }
 
 export default function Selectors(
-    {score, scoreUpdater, focusUpdater}: {score: Score | null, scoreUpdater: Function, focusUpdater: Function}, 
+    {score, scoreUpdater, focusUpdater, speedUpdater}: {score: Score | null, scoreUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
     const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
     const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
     const [scoreIndex,setScoreIndex]  = useState<number>(0)
     const [focusIndex,setFocusIndex]  = useState<number>(0)
+    const [speedIndex,setSpeedIndex]  = useState<number>(9)
+    const speeds = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
+    const speedListItems = itemListToOptions(speeds, speeds)
 
 
     // Populate the score selector
@@ -79,10 +82,16 @@ export default function Selectors(
         focusUpdater(focusListItems[index].props.value)
     }
 
+    const onChangeSpeedSelector = (label: string, value: string, index: number) => {
+        setSpeedIndex(index)
+        speedUpdater(speeds[index])
+    }
+
     return (
             <div className="selectors flex flex-wrap">
                 <Selector id="songselector" title="Song" index={scoreIndex} width="3/10" items={scoreListItems} onChange={onChangeSongSelector}/>
                 <Selector id="focusselector" title="Focus" index={focusIndex} width="3/10" items={focusListItems} onChange={onChangeFocusSelector}/>
+                <Selector id="speedselector" title="Speed" index={speedIndex} width="3/10" items={speedListItems} onChange={onChangeSpeedSelector}/>
             </div>
         )
 }

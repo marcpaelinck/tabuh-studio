@@ -8,7 +8,6 @@ const moveToDuration = 500; // duration of the movement to the next key
 const strikeDuration = 600; // duration of the stroke
 const bezier = "cubic-bezier(0,.25,1,.71)"; // default timing curve
 const bezierStroke = "cubic-bezier(.99,-0.01,1,.51)"; // timing curve for stroke (accelerates toward stroke)
-const selectedSpeed = 1 //TODO replace with value of speed selector
 
 
 // Retrieves the highlight color values [R, G, B] for the given note (instrument key).
@@ -42,7 +41,7 @@ export async function highlightNote(keyElement: Element, note: AnimationNote, po
 //TODO implement
 const logConsole = (msg: string, caller: string) => { }
 
-function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
+function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: number) {
     var keyframes, options;
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnotes) return
 
@@ -77,7 +76,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo) {
             return
         }
         // var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
-        var millisToNextNote = Math.round(action.timeuntilMs / selectedSpeed)
+        var millisToNextNote = Math.round(action.timeuntilMs / pbSpeed)
         // Convert time durations to fractions (keyframe time indicators run from 0 to 1)
         var move_to_fraction = moveToDuration / millisToNextNote
         var stroke_fraction = strikeDuration / millisToNextNote
@@ -144,7 +143,7 @@ export const useAnimationEngine = () => {
 
 
     // For the use of Draw.schedule, see 
-    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo) => {
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo, pbSpeed: number) => {
         const svgInfo = animationInfo.svgInfo
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
@@ -160,7 +159,7 @@ export const useAnimationEngine = () => {
                 })
                 // Panggul animation
                 if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-                    Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo), time)
+                    Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo, pbSpeed), time)
                 }
             }
         }

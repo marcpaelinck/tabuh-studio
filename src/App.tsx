@@ -17,7 +17,9 @@ export default function App() {
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null)})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
+  const playbackSpeedRef = useRef<number>(1)
 
+  const updatePlaybackSpeed = (newSpeed: number) => {playbackSpeedRef.current=newSpeed / 100}
 
   const updateScoreTitle = (newScorefile: string): void => {
       if (newScorefile !== scoreFile) setScoreFile(newScorefile)
@@ -68,9 +70,9 @@ const updateTimeline = (timeline: Timeline): void => {
       <div className="w-1/10">
       </div>
       <div className={"w-8/10" + FRAMESTYLE}>
-        <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} />
+        <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
         {focus && <Animation focus={focus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
-        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} timelineUpdater={updateTimeline}/>
+        <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>
       </div>
     </div>
   )

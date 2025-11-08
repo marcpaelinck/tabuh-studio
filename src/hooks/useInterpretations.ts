@@ -1,12 +1,12 @@
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
-import { BaseNote } from '../config/config'
+import type { RefObject } from 'react'
 
 export function useInterpretations() {
-    const changeTempo = (time: number, action: SamplerAction) => {
+    const changeTempo = (time: number, action: SamplerAction, pbSpeed: number) => {
         if (action.bpm != undefined) {
             // if (action.bpm[0] !== Tone.getTransport().bpm.getValueAtTime(action.time) || action.bpm[1] !== Tone.getTransport().bpm.getValueAtTime(action.time)) {
-            Tone.getTransport().bpm.setValueAtTime(action.bpm, time)
+            Tone.getTransport().bpm.setValueAtTime(action.bpm * pbSpeed, time)
             // if (action.bpm[1] != action.bpm[0] && action.duration[BaseNote]) {
             // Tone.getTransport().bpm.rampTo(action.bpm[1], action.duration, "+0.001")
             // }
