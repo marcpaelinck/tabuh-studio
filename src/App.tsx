@@ -2,7 +2,7 @@
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
 import Animation from './components/Animation'
-import { type Score, type AnimationInfo, type NotationType } from './models/types'
+import { type Score, type AnimationInfo, type NotationType, type ScoreInfo, type System, type Section } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore, type Timeline } from './utils/score'
 import { useEffect, useRef, useState, type Ref, type RefObject } from 'react'
@@ -10,50 +10,66 @@ import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
-  const [scoreFile, setScoreFile] = useState<string>("")
+  const [songList, setSongList] = useState<string[]>([])
+  const [positionList, setPositionList] = useState<string[]>([])
+  const [selectedSong, setSelectedSong] = useState<string>("")
+  const [selectedFocus, setSelectedFocus] = useState<string>('')
   const [score, setScore] = useState<Score | null>(null)
-  const [focus, setFocus] = useState<string>('')
+  const songDictRef: RefObject<Record<string, string>> = useRef({})
   const focusReference: RefObject<string>  = useRef('')
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null)})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
   const playbackSpeedRef = useRef<number>(1)
 
-  const updatePlaybackSpeed = (newSpeed: number) => {playbackSpeedRef.current=newSpeed / 100}
-
-  const updateScoreTitle = (newScorefile: string): void => {
-      if (newScorefile !== scoreFile) setScoreFile(newScorefile)
+  const updateSong = (newSongName: string): void => {
+      if (newSongName !== selectedSong) setSelectedSong(newSongName)
     }
  
-    const updateFocus = (position: string): void => {
+  const updateFocus = (position: string): void => {
     if  (position !== focusReference.current) {
       focusReference.current=position
       if (timelineRef.current?.notation && position in timelineRef.current?.notation)
         notationRef.current = timelineRef.current.notation[position]
-      setFocus(position)
+      setSelectedFocus(position)
     }
   }
 
-const updateTimeline = (timeline: Timeline): void => {
-  timelineRef.current = timeline
-}
+  const updatePlaybackSpeed = (newSpeed: number) => {playbackSpeedRef.current=newSpeed / 100}
+
+  const updateTimeline = (timeline: Timeline): void => {timelineRef.current = timeline}
 
   const updateAnimationInfo = (animationInfo: AnimationInfo): void => {
     animationInfoRef.current = animationInfo
   }
   
+  // Retrieve information about available notation scores  
+  useEffect(() => {
+      async function fetchScores() {
+        const files = await readFile('scores/content.json');
+        const scoreInfo: ScoreInfo[] = JSON.parse(files)
+        songDictRef.current = Object.fromEntries(scoreInfo.map((score: ScoreInfo) => [score.title, score.file]))
+        setSongList(Object.keys(songDictRef.current))
+      }
+      fetchScores();
+  }, []);
+
   // Load and parse the score when a new score title is selected
   useEffect(() => {
     const loadScore = async () => {
-      if (scoreFile) {
-        let jsonScore = await readFile('scores/' + scoreFile)
-        const score = parseScore(jsonScore)
-        setScore(score)
+      if (selectedSong) {
+        let jsonScore = await readFile('scores/' + songDictRef.current[selectedSong])
+        const newScore = parseScore(jsonScore)
+            if (newScore && newScore!=score) {
+                setScore(newScore)
+                const instr_lists: string[] = newScore.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
+                setPositionList([...new Set(instr_lists)])
+            }
       }
       setIsLoading(false)
     }
     loadScore()
-  }, [scoreFile])
+  }, [selectedSong])
   
 
   if (isLoading) {
@@ -70,8 +86,8 @@ const updateTimeline = (timeline: Timeline): void => {
       <div className="w-1/10">
       </div>
       <div className={"w-8/10" + FRAMESTYLE}>
-        <Selectors score={score} scoreUpdater={updateScoreTitle} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
-        {focus && <Animation focus={focus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
+        <Selectors songList={songList} focusList={positionList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
+        {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>
       </div>
     </div>

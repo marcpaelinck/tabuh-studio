@@ -1,12 +1,22 @@
-import type { ChangeEvent, JSX, ReactElement, RefObject } from "react";
-import { useState, useEffect, useRef } from "react";
-import { readFile } from "../utils/filesystem";
-import type { Score, ScoreInfo, Section, System } from "../models/types";
+import type { ChangeEvent, JSX } from "react";
+import { useState } from "react";
+
+
+// Convert a list of string values to a list op option Elements.
+function itemListToOptions(values: string[], noSelectionValue?: string): JSX.Element[] {
+    const optionValues = values.map((value: string, index: number) => (
+                <option value={value}>{value}</option>
+            ))
+    const noSelectionOption = noSelectionValue ?  [<option value={""} label={""}>{noSelectionValue}</option>] : []
+    return noSelectionOption.concat(optionValues)
+}
 
 
 // Width is a fraction, e.g. 3/10
-function Selector({id, title, index, items, onChange} : {id: string, title: string, index: number,  width: string, items: JSX.Element[], onChange: CallableFunction}) {
-    // const [currValue, setCurrValue] = useState(value)
+function Selector({id, title, index, valueList, noSelectionValue, onChange} : 
+    {id: string, title: string, index: number,  width: string, valueList: string[], noSelectionValue?: string, onChange: CallableFunction}) {
+
+    const items: JSX.Element[] = itemListToOptions(valueList, noSelectionValue)
     return (
         <div className={`flex-auto gap-3`}>
             <div className="">
@@ -14,7 +24,7 @@ function Selector({id, title, index, items, onChange} : {id: string, title: stri
             <select id={id}  
                 title={title} 
                 value={items[index]?.props.value || 0}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => {onChange(e.target.selectedOptions[0].label, e.target.value, e.target.selectedIndex)}} 
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => {onChange(e.target.value, e.target.selectedIndex)}} 
                 className="bg-blue-300 border-blue-500 border rounded-md"
             >
                 { items }
@@ -24,74 +34,36 @@ function Selector({id, title, index, items, onChange} : {id: string, title: stri
     )
 }
 
-// Convert a list of string values to a list op option Elements.
-function itemListToOptions(keys: string[], values: string[], noSelectionValue?: string): JSX.Element[] {
-    const optionValues = keys.map((key: string, index: number) => (
-                <option value={values[index]} key={key}>{key}</option>
-            ))
-    const noSelectionOption = noSelectionValue ?  [<option value={""} label={""}>{noSelectionValue}</option>] : []
-    return noSelectionOption.concat(optionValues)
-}
-
 export default function Selectors(
-    {score, scoreUpdater, focusUpdater, speedUpdater}: {score: Score | null, scoreUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
+    {songList, focusList, songUpdater, focusUpdater, speedUpdater}: {songList: string[], focusList: string[], songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
-    const [scoreListItems, setScoreListItems] = useState<JSX.Element[]>([]);
-    const [focusListItems, setFocusListItems] = useState<JSX.Element[]>([]);
-    const [scoreIndex,setScoreIndex]  = useState<number>(0)
+    const [songIndex,setSongIndex]  = useState<number>(0)
     const [focusIndex,setFocusIndex]  = useState<number>(0)
     const [speedIndex,setSpeedIndex]  = useState<number>(9)
-    const speeds = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
-    const speedListItems = itemListToOptions(speeds, speeds)
+    const speedList = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
 
-
-    // Populate the score selector
-    useEffect(() => {
-        async function fetchScores() {
-            const files = await readFile('scores/content.json');
-            const scoreInfo: ScoreInfo[] = JSON.parse(files)
-            const titlelist: string[] = scoreInfo.map((score: ScoreInfo) => score.title)
-            const filelist: string[] = scoreInfo.map((score: ScoreInfo) => score.file)
-            setScoreListItems(itemListToOptions(titlelist, filelist, "Select a title"));
-        }
-        fetchScores();
-    }, []);
-
-    // Populate the focus selector with the instruments in the selected score
-    useEffect(() => {
-        async function fetchFocusInstruments(score: Score | null) {
-            let instruments: string[] = []
-            if (score) {
-                const instr_lists: string[] = score.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
-                instruments = [...new Set(instr_lists)]
-            }
-            setFocusListItems(itemListToOptions(instruments, instruments, "No focus"))
-        }
-        fetchFocusInstruments(score);
-    }, [score]);
-
-    const onChangeSongSelector = (label: string, value: string, index: number) => {
-        scoreUpdater(value)
-        setScoreIndex(index)
-        onChangeFocusSelector("", "", 0)
+    const onChangeSongSelector = (value: string, index: number) => {
+        songUpdater(value)
+        setSongIndex(index)
+        onChangeFocusSelector("", 0)
         
     }
 
-    const onChangeFocusSelector = (label: string, value: string, index: number) => {
+    const onChangeFocusSelector = (value: string, index: number) => {
         setFocusIndex(index)
-        focusUpdater(focusListItems[index].props.value)
+        focusUpdater(value)
     }
 
-    const onChangeSpeedSelector = (label: string, value: string, index: number) => {
+    const onChangeSpeedSelector = (value: string, index: number) => {
         setSpeedIndex(index)
-        speedUpdater(speeds[index])
+        speedUpdater(speedList[index])
     }
 
     return (
             <div className="selectors flex flex-wrap">
-                <Selector id="songselector" title="Song" index={scoreIndex} width="3/10" items={scoreListItems} onChange={onChangeSongSelector}/>
-                <Selector id="focusselector" title="Focus" index={focusIndex} width="3/10" items={focusListItems} onChange={onChangeFocusSelector}/>
-                <Selector id="speedselector" title="Speed" index={speedIndex} width="3/10" items={speedListItems} onChange={onChangeSpeedSelector}/>
+                <Selector id="songselector" title="Song" index={songIndex} width="3/10" valueList={songList} noSelectionValue="Select a title" onChange={onChangeSongSelector}/>
+                <Selector id="focusselector" title="Focus" index={focusIndex} width="3/10" valueList={focusList} noSelectionValue="No focus" onChange={onChangeFocusSelector}/>
+                <Selector id="speedselector" title="Speed" index={speedIndex} width="3/10" valueList={speedList} onChange={onChangeSpeedSelector}/>
             </div>
         )
 }
