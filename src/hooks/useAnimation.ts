@@ -1,6 +1,6 @@
 import type { AnimationAction, AnimationNote, CursorAction } from "../utils/score";
 import * as Tone from 'tone'
-import { useCallback, type Ref } from "react";
+import { useCallback } from "react";
 import type { AnimationInfo, SVGInfo } from "../models/types";
 import { animationConfig, colorRGB } from "../config/config";
 
@@ -39,7 +39,10 @@ export async function highlightNote(keyElement: Element, note: AnimationNote, po
 }
 
 //TODO implement
-const logConsole = (msg: string, caller: string) => { }
+const debugList: string[] = []
+const logConsole = (msg: string, caller: string) => {
+    if (debugList.includes(caller)) console.log(msg)
+}
 
 function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: number) {
     var keyframes, options;
@@ -136,7 +139,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
 }
 
 async function highlightCurrentNote(cAction: CursorAction, animationInfo: AnimationInfo) {
-    animationInfo.notationAreaRef.current?.highlight(cAction.line, cAction.range, cAction.newsystem)
+    animationInfo.notationAreaRef.current?.highlight(cAction.line, cAction.range)
 }
 
 export const useAnimationEngine = () => {

@@ -2,28 +2,14 @@ import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score, type AnimationInfo} from '../models/types'
-import { useState, type JSX, memo, useMemo, useEffect, useRef, type ClassType } from 'react'
+import { useState, type JSX, useMemo, useEffect } from 'react'
 import * as Tone from 'tone'
-import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type TempoAction, type Timeline } from '../utils/score'
+import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-
-const ScoreHeader = memo(function ScoreHeader({ title, composer }: { title: string; composer?: string }): JSX.Element {
-  return (
-    <div className="flex flex-col items-center">
-      <div className="text-xl italic">{title ? title : '<select a title>'}</div>
-      {composer && (
-        <div>
-          <span>by</span>
-          <span className="font-bold"> {composer}</span>
-        </div>
-      )}
-    </div>
-  )
-})
 
 type AudioState = 'false' | 'true' | 'wait'
 
@@ -48,7 +34,7 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     rewind()
   }, [timeline]);
 
-  function updateProgress(time: number){
+  function updateProgress(){
     setProgress(Tone.getTransport().seconds)
     Tone.getTransport()
   }
@@ -79,7 +65,8 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
       })
 
     setTotalDuration(Math.round(score.durationMs/1000))
-    Tone.getTransport().scheduleRepeat((time) => updateProgress(time), "2hz", 0)//, timeline.totalDurationTO)
+    //@ts-ignore unused `time` argument
+    Tone.getTransport().scheduleRepeat((time) => updateProgress(), "2hz", 0)//, timeline.totalDurationTO)
 
   }
 

@@ -2,9 +2,8 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the 
 // notation while the corresponding notes are being played.
 
-import { Component, createRef, type Ref, type RefObject } from "react"
+import { Component, createRef, type RefObject } from "react"
 import type { NotationType } from "../models/types";
-import ReactDOM from "react-dom";
 
 interface NotationAreaAttributes extends React.TextareaHTMLAttributes<HTMLDivElement>, React.RefAttributes<NotationArea> {
     notation: NotationType | null
@@ -27,7 +26,7 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
             this.state.textarea.current.scrollTop = this.state.textarea.current.scrollHeight;
     }
 
-    highlight = (line: number, range: number[], scroll: boolean) => {
+    highlight = (line: number, range: number[]) => {
         const para = this.state.textarea.current?.children[line]
         const para1 = this.state.textarea.current?.childNodes[line]
         para?.scrollIntoView({ behavior: "smooth", block: "center" });

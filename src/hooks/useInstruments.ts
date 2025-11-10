@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
@@ -12,13 +12,13 @@ export type LarasInstrument = {
 
 export type LarasInstruments = Record<string, LarasInstrument>
 
-const pitchShift: Tone.PitchShift = new Tone.PitchShift({
-  pitch: 0.0, // 1 unit equals 100 cents
-  windowSize: 0.07,
-  delayTime: 0,
-  feedback: 0
-}
-).toDestination();
+// const pitchShift: Tone.PitchShift = new Tone.PitchShift({
+//   pitch: 0.0, // 1 unit equals 100 cents
+//   windowSize: 0.07,
+//   delayTime: 0,
+//   feedback: 0
+// }
+// ).toDestination();
 
 const createSampler = ({ instr_type, samples, volume }: { instr_type: string, samples: { [key: string]: string }, volume: number }) => {
   if (instr_type == 'melodic')
@@ -57,10 +57,9 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
 }
 
 export const useInstruments = () => {
-  const [mutedInstruments, setMutedInstruments] = useState<Record<string, boolean>>({})
 
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
-  const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(instrumentConfigs).map((position, index) => [position, useRef(null)]))
+  const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(instrumentConfigs).map((position) => [position, useRef(null)]))
   useEffect(() => {
     for (const [position, config] of Object.entries(instrumentConfigs)) {
       // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
@@ -78,12 +77,10 @@ export const useInstruments = () => {
 
   const playInstrument = useCallback(
     (time: number, label: string, action: SamplerAction, focus: string) => {
-      if (!mutedInstruments[label] /*&& larasInstruments[label]*/) {
-        if (action.symbol === '.') larasInstruments[label].mute(time)
-        else { larasInstruments[label].play(random_attack_deviation(time), action, focus) }
-      }
+      if (action.symbol === '.') larasInstruments[label].mute(time)
+      else { larasInstruments[label].play(random_attack_deviation(time), action, focus) }
     },
-    [mutedInstruments],
+    [],
   )
 
   const muteAll = useCallback(

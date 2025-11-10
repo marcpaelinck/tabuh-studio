@@ -2,8 +2,7 @@ import { instrumentConfigs, noteConfigs, type MutingType, type StrokeType, type 
 import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score, type Section } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
-import { createElement, type DetailedReactHTMLElement } from 'react'
-import type { TimeObject } from 'tone/build/esm/core/type/Units'
+import { createElement } from 'react'
 
 export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
@@ -13,7 +12,7 @@ export function parseScore(input: string): Score {
   score.systems.forEach((system, sysidx, systemArray) => {
     system.sections.forEach((section, sectidx, sectionArray) => {
       section.starttimeMs = Math.round(currentTimeMs)
-      for (const [position, stave] of Object.entries(section.staves)) {
+      for (const [_, stave] of Object.entries(section.staves)) {
         var dataTimeMs = currentTimeMs
         stave.notes.forEach((note: JsonNote) => {
           // Use the average tempo to determine the time in ms.
@@ -140,17 +139,6 @@ export function createTimeline(score: Score | null): Timeline | null {
   }
   if (!score) return timeline
 
-  var currBpm: Tone.Unit.NormalRange = 0
-  // currVelocity will keep track of the velocity of each separate instrument position
-  // const currVelocity: { [position: string]: number } = Object.fromEntries(Object.keys(instrumentConfigs).map((pos) => [pos, 0]))
-  var currTime: Tone.Unit.TimeObject = n2TO(0)
-
-  // Used for tempo actions. Checks for a value change and returns null if no change is detected.
-  // function changedValues(values: number[], reference: number): number[] | null {
-  //   // return values
-  //   return (values[0] != reference || values[1] != reference) ? values : null
-  // }
-
   var totalDurationInBaseNotes = 0
   const positionScore: { [position: string]: JsonNote[] } = {}
   const positionNotation: { [position: string]: JsonSymbol[] } = {}
@@ -160,22 +148,6 @@ export function createTimeline(score: Score | null): Timeline | null {
       // Update the total duration time
       totalDurationInBaseNotes += section.duration
       timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
-
-      // Create tempo actions for each tempo change.
-      // Gradual changes are implemented with repeated bpm change every BaseNote time unit. 
-      // We avoid the bpm.rampUp function which causes timing problems.
-      // var newValues: number[] | null
-      // if (newValues = changedValues(section.tempo, currBpm)) {
-      //   for (let incr = 0; incr <= Math.trunc(section.duration); incr++) {
-      //     const duration: TimeObject = n2TO(1)
-      //     const time = n2TO(section.starttime + incr)
-      //     const bpm = Math.round(newValues[0] + (incr / section.duration) * (newValues[1] - newValues[0]))
-      //     timeline.tempoactions.push({ bpm: [bpm, bpm], time: time, duration: duration })
-      //   }
-
-      //   currBpm = section.tempo[1]
-      // }
-      // timeline.totalDurationTO = n2TO(totalDurationInBaseNotes)
 
       // Create sampler actions
       for (const [position, stave] of Object.entries(section.staves)) {
@@ -227,7 +199,7 @@ export function createTimeline(score: Score | null): Timeline | null {
       const newSection = index > 0 ? newSystem || symbol.section !== symbols[index - 1].section : false
       const isLast = (index == symbols.length - 1)
       if (newSystem) {
-        timeline.notation[position].push(createElement('p', { id: `${line}` }, currentline))
+        timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, class: 'balifont' }, currentline))
         currentline = ""
         line++
       }
@@ -235,7 +207,7 @@ export function createTimeline(score: Score | null): Timeline | null {
       const range = [currentline.length, currentline.length + symbol.s.length]
       currentline += symbol.s
       if (isLast) {
-        timeline.notation[position].push(createElement('p', { id: `${line}` }, currentline))
+        timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, class: 'balifont' }, currentline))
         currentline = ""
       }
       timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, islast: isLast, line: line, range: range })

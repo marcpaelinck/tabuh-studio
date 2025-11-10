@@ -3,19 +3,21 @@ import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
-import { animationConfig, instrumentConfigs, colorRGB } from '../config/config';
+import { instrumentConfigs } from '../config/config';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import colors from 'tailwindcss/colors'
 import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import { NotationArea } from './NotationArea';
-import type { AnimationNote } from '../utils/score';
 
 const svgBdrColorHex = colors.blue["300"]
+// const baseURL: string = document.querySelector("base")?.href || "xxxx"
+const baseURL: string = 'https://swarasanti.nl/wp-includes/js/midiplayer-test/'
 
 function positionToSvg(position: string): string  {
-    return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
+    console.log("loading SVG file")
+    return position in instrumentConfigs ? baseURL + instrumentConfigs[position].svg_file : ""
 }
 
 // Returns the content of the data section of the SVG file
@@ -52,6 +54,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
     }
 
     function panggulElement()  {return (svgElement.current && svgLoaded) ? svgElement.current.querySelector("#helpinghand") : null}
+    //@ts-ignore unused `svg` argument
     function setSvgLoadedFalse(svg: SVGSVGElement) {setSvgLoaded(false)}
 
     function setSvgStates(svg: SVGSVGElement) {

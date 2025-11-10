@@ -5,7 +5,7 @@ import Animation from './components/Animation'
 import { type Score, type AnimationInfo, type NotationType, type ScoreInfo, type System, type Section } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore, type Timeline } from './utils/score'
-import { useEffect, useRef, useState, type Ref, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
@@ -81,7 +81,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex w-screen min-h-0 ">
+    <div className="flex w-full min-h-0 ">
       {/*App frame is 8/10 of screen width and centered*/}
       <div className="w-1/10">
       </div>

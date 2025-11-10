@@ -1,6 +1,6 @@
 // INSTRUMENTS
 
-import type { DetailedReactHTMLElement, FunctionComponent, JSX } from "react"
+import type { JSX } from "react"
 import { NotationArea } from "../components/NotationArea"
 import type { MutingType, StrokeType, ToneType } from "../config/config"
 
@@ -48,7 +48,7 @@ export type Stave = {
 // Subdivision of a system, typically spans one kempli beat
 export type Section = {
   id: number
-  title: string
+  gongan: number
   starttime: number   // start time in base notes
   starttimeMs: number // start time in ms
   duration: number

@@ -1,6 +1,5 @@
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
-import type { RefObject } from 'react'
 
 export function useInterpretations() {
     const changeTempo = (time: number, action: SamplerAction, pbSpeed: number) => {

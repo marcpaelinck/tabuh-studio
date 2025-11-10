@@ -5,9 +5,9 @@ import { useState } from "react";
 // Convert a list of string values to a list op option Elements.
 function itemListToOptions(values: string[], noSelectionValue?: string): JSX.Element[] {
     const optionValues = values.map((value: string, index: number) => (
-                <option value={value}>{value}</option>
+                <option key={index+1} value={value}>{value}</option>
             ))
-    const noSelectionOption = noSelectionValue ?  [<option value={""} label={""}>{noSelectionValue}</option>] : []
+    const noSelectionOption = noSelectionValue ?  [<option key={0} value={""} label={""}>{noSelectionValue}</option>] : []
     return noSelectionOption.concat(optionValues)
 }
 
@@ -54,6 +54,7 @@ export default function Selectors(
         focusUpdater(value)
     }
 
+    //@ts-ignore unused `value` argument
     const onChangeSpeedSelector = (value: string, index: number) => {
         setSpeedIndex(index)
         speedUpdater(speedList[index])
