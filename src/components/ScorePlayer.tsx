@@ -139,18 +139,18 @@ return (
         </div>
         <div className="flex w-full">
           <div className="flex w-full items-center gap-5 justify-center select-none">
-            <div className="h-4 w-4 flex-shrink-0">
+            <div className="h-4 w-4 shrink-0">
               <button onClick={() => rewind()}><FaBackwardFast/></button>
             </div>
-            <div className="h-4 w-4 flex-shrink-0">
+            <div className="h-4 w-4 shrink-0">
               <button onClick={() => playPause()}>{playing? <FaPause/> : <FaPlay/>}</button>
             </div>
-            <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
+            <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
             <div className="flex w-full items-center ">
-              {/* <hr className="w-full border-1" /> */}
+              {/* <hr className="w-full border" /> */}
               <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
             </div>
-            <span className="flex w-12 flex-shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
+            <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
           </div>
         </div>
       </div>
