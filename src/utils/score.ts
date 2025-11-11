@@ -77,7 +77,6 @@ export type CursorAction = {
   symbol: string
   newsystem: boolean
   newsection: boolean
-  islast: boolean
   line: number
   range: number[]
 }
@@ -193,24 +192,25 @@ export function createTimeline(score: Score | null): Timeline | null {
     timeline.notation[position] = []
     const symbols: JsonSymbol[] = positionNotation[position]
     let currentline: string = ""
-    let line = 0
+    let line: number = 0
     symbols.forEach((symbol, index) => {
       const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
-      const newSection = index > 0 ? newSystem || symbol.section !== symbols[index - 1].section : false
-      const isLast = (index == symbols.length - 1)
-      if (newSystem) {
-        timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, class: 'balifont' }, currentline))
-        currentline = ""
-        line++
-      }
+      const newSection = index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
+      const lastNoteOfSection = (index == symbols.length - 1) || (symbols[index + 1].system != symbol.system)
+      // if (lastNoteOfSection) {
+      //   timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, className: 'balifont p-0 text-sm/6' }, currentline))
+      //   currentline = ""
+      //   line++
+      // }
       if (newSection) currentline += " "
       const range = [currentline.length, currentline.length + symbol.s.length]
       currentline += symbol.s
-      if (isLast) {
-        timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, class: 'balifont' }, currentline))
+      timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, line: line, range: range })
+      if (lastNoteOfSection) {
+        timeline.notation[position].push(createElement('p', { key: line, id: `notation-${line}`, className: 'appearance-none p-[0px] m-0 text-sm/6 balifont', class: 'p-[0px] text-sm/6 balifont' }, currentline))
         currentline = ""
+        line++
       }
-      timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, islast: isLast, line: line, range: range })
     })
   })
 

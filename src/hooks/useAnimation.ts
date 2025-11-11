@@ -49,8 +49,8 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnotes) return
 
     // Currently only one panggul can be animated
-    var currKey = action.currnotes ? action.currnotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
-    var nextKey = action.nextnotes ? action.nextnotes[0].keyname : currKey
+    var currKey = action.currnotes.length ? action.currnotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
+    var nextKey = action.nextnotes.length ? action.nextnotes[0].keyname : currKey
 
     if (action.currnotes[0].islast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
