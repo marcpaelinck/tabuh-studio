@@ -18,6 +18,26 @@
 .balifont {
     font-family: 'BaliMusic5';
     font-weight: normal;
-    font-style: normal;		
+    font-style: normal;	
+    font-size:small;
 }
 
+/* Force format for notation area. Overrules any WP Thema */
+p.balifont[id^="notation"] { 
+    padding: 0px;
+    margin: 0px;
+    line-height: 1.5;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  /* padding: 0.6em 1.2em; */
+  font-size: 1em;
+  font-weight: 500;
+  color: black;
+  font-family: inherit;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}

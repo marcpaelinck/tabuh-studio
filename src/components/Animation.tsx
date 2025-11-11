@@ -12,12 +12,10 @@ import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import { NotationArea } from './NotationArea';
 
 const svgBdrColorHex = colors.blue["300"]
-// const baseURL: string = document.querySelector("base")?.href || "xxxx"
-const baseURL: string = 'https://swarasanti.nl/wp-includes/js/midiplayer-test/'
 
 function positionToSvg(position: string): string  {
     console.log("loading SVG file")
-    return position in instrumentConfigs ? baseURL + instrumentConfigs[position].svg_file : ""
+    return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
 }
 
 // Returns the content of the data section of the SVG file

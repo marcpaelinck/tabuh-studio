@@ -5,12 +5,12 @@ import { AVERAGE_ATTACK_DELAY } from '../config/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
-export type LarasInstrument = {
+export type InstrumentSampler = {
   play: (time: number, action: SamplerAction, focus: string) => void
   mute: (time: number) => void
 }
 
-export type LarasInstruments = Record<string, LarasInstrument>
+export type InstrumentSamplers = Record<string, InstrumentSampler>
 
 // const pitchShift: Tone.PitchShift = new Tone.PitchShift({
 //   pitch: 0.0, // 1 unit equals 100 cents
@@ -36,7 +36,7 @@ const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([positi
   return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
 }))
 
-const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): LarasInstrument => {
+const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): InstrumentSampler => {
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
 
   return {
@@ -68,24 +68,24 @@ export const useInstruments = () => {
   }, [])
 
 
-  const larasInstruments: LarasInstruments = {}
+  const instrumentSamplers: InstrumentSamplers = {}
 
-  Object.keys(instrumentConfigs).forEach((key) => (larasInstruments[key] = createInstrument(key, samplers)))
+  Object.keys(instrumentConfigs).forEach((position) => (instrumentSamplers[position] = createInstrument(position, samplers)))
 
   // Adds a small random deviation to the note attack time for a more realistic execution
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
   const playInstrument = useCallback(
-    (time: number, label: string, action: SamplerAction, focus: string) => {
-      if (action.symbol === '.') larasInstruments[label].mute(time)
-      else { larasInstruments[label].play(random_attack_deviation(time), action, focus) }
+    (time: number, position: string, action: SamplerAction, focus: string) => {
+      if (action.symbol === '.') instrumentSamplers[position].mute(time)
+      else { instrumentSamplers[position].play(random_attack_deviation(time), action, focus) }
     },
     [],
   )
 
   const muteAll = useCallback(
-    (time: number) => Object.keys(larasInstruments).forEach((label) => larasInstruments[label].mute(time)),
-    [larasInstruments],
+    (time: number) => Object.keys(instrumentSamplers).forEach((label) => instrumentSamplers[label].mute(time)),
+    [instrumentSamplers],
   )
 
   return {
