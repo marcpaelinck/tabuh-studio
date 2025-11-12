@@ -83,9 +83,9 @@ export default function App() {
   return (
     <div className="flex w-full min-h-0 ">
       {/*App frame is 8/10 of screen width and centered*/}
-      <div className="w-1/10">
+      <div className="lg:w-1/10">
       </div>
-      <div className={"w-8/10" + FRAMESTYLE}>
+      <div className={"lg:w-8/10 sm:w-full" + FRAMESTYLE}>
         <Selectors songList={songList} focusList={positionList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
         {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>

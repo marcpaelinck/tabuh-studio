@@ -2,6 +2,7 @@
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
+/* For cursor in notation */
 ::highlight(notation-highlight) {
   background-color: peachpuff;
 }
@@ -22,7 +23,7 @@
     font-size:small;
 }
 
-/* Force format for notation area. Overrules any WP Thema */
+/* Force format for notation area. Overrules any WP Theme */
 p.balifont[id^="notation"] { 
     padding: 0px;
     margin: 0px;

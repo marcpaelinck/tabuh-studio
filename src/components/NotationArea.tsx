@@ -29,7 +29,8 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
     highlight = (line: number, range: number[]) => {
         const para = this.state.textarea.current?.children[line]
         const para1 = this.state.textarea.current?.childNodes[line]
-        para?.scrollIntoView({ behavior: "smooth", block: "center" });
+        //@ts-expect-error container option is valid but not recognized
+        para?.scrollIntoView({ behavior: "smooth", block: "center", container:"nearest" });
 
         const range1 = new Range();
         if (para1) {

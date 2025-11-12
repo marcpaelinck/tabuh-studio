@@ -32,6 +32,17 @@ export function parseScore(input: string): Score {
   return score
 }
 
+// Creates a dict {<instrument> -> [<positions>]} from a score object.s
+// const geInstrtPosDict = (score: Score): { [instrument: string]: string[] } => {
+//   const positions: string[] = score.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
+//   const instrPosDict: { [instrument: string]: string[] } = {}
+//   positions.forEach((position: string) => {
+//     const instrument: string = position.split("_")[0]
+//     instrPosDict[instrument] = (instrPosDict[instrument] || []).concat([position])
+//   })
+//   return instrPosDict
+// }
+
 export interface SamplerAction {
   time: Tone.Unit.TimeObject
   position: string
