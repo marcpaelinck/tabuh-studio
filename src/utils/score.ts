@@ -1,4 +1,4 @@
-import { instrumentConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../config/config'
+import { ignoreChars, instrumentConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../config/config'
 import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score, type Section } from '../models/types'
 import * as Tone from 'tone'
 import { n2TO } from './timeunits'
@@ -32,6 +32,11 @@ export function parseScore(input: string): Score {
   return score
 }
 
+// Remove chars that should be ignored. See remark in configs.ts
+const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ""), symbol)
+
+
+
 // Creates a dict {<instrument> -> [<positions>]} from a score object.s
 // const geInstrtPosDict = (score: Score): { [instrument: string]: string[] } => {
 //   const positions: string[] = score.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
@@ -46,7 +51,7 @@ export function parseScore(input: string): Score {
 export interface SamplerAction {
   time: Tone.Unit.TimeObject
   position: string
-  symbol: string
+  cleanedSymbol: string
   bpm: number
   velocity: Tone.Unit.NormalRange
   duration: Tone.Unit.TimeObject
@@ -73,7 +78,6 @@ export type AnimationNote = {
 export type AnimationAction = {
   time: Tone.Unit.TimeObject
   position: string
-  symbol: string
   prevsystem: number | null
   prevsection: number | null
   currnotes: AnimationNote[]
@@ -111,8 +115,8 @@ for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
 
 const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote[] => {
   if (!(position in note_to_shCode)) return []
-  const symbol = notationNote.s
-  const shorthandCodes = note_to_shCode[position][symbol] || []
+  const cleanedSymbol = cleanSymbol(notationNote.s)
+  const shorthandCodes = note_to_shCode[position][cleanedSymbol] || []
   const result: AnimationNote[] = []
   shorthandCodes.forEach((shCode) => {
     const instrType: string = instrumentConfigs[position].type
@@ -145,7 +149,13 @@ export function createTimeline(score: Score | null): Timeline | null {
   if (!score) return null
 
   const timeline: Timeline = {
-    totalDurationSec: 0, totalDurationTO: n2TO(0), tempoactions: [], sampleractions: [], animationactions: [], cursoractions: [], notation: {}
+    totalDurationSec: 0,
+    totalDurationTO: n2TO(0),
+    tempoactions: [],
+    sampleractions: [],
+    animationactions: [],
+    cursoractions: [],
+    notation: {}
   }
   if (!score) return timeline
 
@@ -170,7 +180,14 @@ export function createTimeline(score: Score | null): Timeline | null {
           note.v = velocity
           positionScore[position].push(note)
           const bpm = getCurrentBPM(section, sectionProgress)
-          timeline.sampleractions.push({ position: position, symbol: note.s, bpm: bpm, velocity: velocity, time: n2TO(note.t), duration: n2TO(note.d || 1) })
+          timeline.sampleractions.push({
+            position: position,
+            cleanedSymbol: cleanSymbol(note.s),
+            bpm: bpm,
+            velocity: velocity,
+            time: n2TO(note.t),
+            duration: n2TO(note.d || 1)
+          })
           sectionProgress += (note.d || 1)
         })
         stave.notation.forEach((symbol: JsonSymbol) => {
@@ -194,7 +211,16 @@ export function createTimeline(score: Score | null): Timeline | null {
       const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
       const prevSystem = index > 0 ? notes[index - 1].system : null
       const prevSection = index > 0 ? notes[index - 1].section : null
-      timeline.animationactions.push({ time: n2TO(note.t), position: position, symbol: note.s, prevsystem: prevSystem, prevsection: prevSection, currnotes: aNotes, nextnotes: nextANotes, timeuntil: timeUntil, timeuntilMs: timeUntilMs })
+      timeline.animationactions.push({
+        time: n2TO(note.t),
+        position: position,
+        prevsystem: prevSystem,
+        prevsection: prevSection,
+        currnotes: aNotes,
+        nextnotes: nextANotes,
+        timeuntil: timeUntil,
+        timeuntilMs: timeUntilMs
+      })
     })
   })
 
@@ -216,9 +242,24 @@ export function createTimeline(score: Score | null): Timeline | null {
       if (newSection) currentline += " "
       const range = [currentline.length, currentline.length + symbol.s.length]
       currentline += symbol.s
-      timeline.cursoractions.push({ time: n2TO(symbol.t), position: position, symbol: symbol.s, newsystem: newSystem, newsection: newSection, line: line, range: range })
+      timeline.cursoractions.push({
+        time: n2TO(symbol.t),
+        position: position,
+        symbol: symbol.s,
+        newsystem: newSystem,
+        newsection: newSection,
+        line: line,
+        range: range
+      })
       if (lastNoteOfSection) {
-        timeline.notation[position].push(createElement('p', { key: line, id: `notation-${line}`, className: 'appearance-none p-[0px] m-0 text-sm/6 balifont', class: 'p-[0px] text-sm/6 balifont' }, currentline))
+        timeline.notation[position].push(createElement('p',
+          {
+            key: line,
+            id: `notation-${line}`,
+            className: 'appearance-none p-[0px] m-0 text-sm/6 balifont',
+            class: 'p-[0px] text-sm/6 balifont'
+          },
+          currentline))
         currentline = ""
         line++
       }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
-import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { alwaysFocusPositions, dimRateNonFocusedInstruments, ignoreChars, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
 export type InstrumentSampler = {
@@ -21,7 +21,7 @@ export type InstrumentSamplers = Record<string, InstrumentSampler>
 // ).toDestination();
 
 const createSampler = ({ instr_type, samples, volume }: { instr_type: string, samples: { [key: string]: string }, volume: number }) => {
-  if (instr_type == 'melodic')
+  if (['daun', 'chimes'].includes(instr_type))
     // PitchShift currently disabled because it causes a slight time lag
     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
   else
@@ -43,12 +43,14 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
     play: (time: number, action: SamplerAction, focus: string) => {
       // const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
       const dimValue = (focus == "" || focus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
-      const indices = lookup[position].symbol2idxs[action.symbol]
+      // Remove chars that should be ignored. See remark in configs.ts
+      const cleanedSymbol = ignoreChars.reduce((symbol, char) => symbol.replace(char, ""), action.cleanedSymbol)
+      const indices = lookup[position].symbol2idxs[cleanedSymbol]
       if (indices && samplers[position].current) {
         try {
           sampler.current?.triggerAttackRelease(indices, action.duration, time, action.velocity * dimValue)
         } catch {
-          console.log(`ERROR: could not play sound ${action.position} ${action.symbol} `)
+          console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
         }
       }
     },
@@ -77,7 +79,7 @@ export const useInstruments = () => {
 
   const playInstrument = useCallback(
     (time: number, position: string, action: SamplerAction, focus: string) => {
-      if (action.symbol === '.') instrumentSamplers[position].mute(time)
+      if (action.cleanedSymbol === '.') instrumentSamplers[position].mute(time)
       else { instrumentSamplers[position].play(random_attack_deviation(time), action, focus) }
     },
     [],

@@ -1,33 +1,43 @@
-@layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import "tailwindcss";
 
-/* For cursor in notation */
 ::highlight(notation-highlight) {
   background-color: peachpuff;
 }
 
-@font-face {
-    font-family: 'BaliMusic5';
-    src: url('https://swarasanti.nl/wp-includes/js/midiplayer-test/fonts/BaliMusic5.woff2') format('woff2'),
-        url('https://swarasanti.nl/wp-includes/js/midiplayer-test/fonts/BaliMusic5.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.balifont {
-    font-family: 'BaliMusic5';
-    font-weight: normal;
-    font-style: normal;	
-    font-size:small;
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
 }
 
-/* Force format for notation area. Overrules any WP Theme */
-p.balifont[id^="notation"] { 
-    padding: 0px;
-    margin: 0px;
-    line-height: 1.5;
+body {
+  margin: 0;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
 }
 
 button {
@@ -36,9 +46,43 @@ button {
   /* padding: 0.6em 1.2em; */
   font-size: 1em;
   font-weight: 500;
-  color: black;
   font-family: inherit;
-  background-color: white;
+  background-color: #1a1a1a;
   cursor: pointer;
   transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@font-face {
+    font-family: 'BaliMusic5';
+    src: url('./fonts/BaliMusic5.woff2') format('woff2'),
+        url('./fonts/BaliMusic5.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.balifont {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
 }

@@ -19,6 +19,7 @@ export type MutingType = typeof _mutings_[number];
 export type InstrumentConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.
     // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
+    instrument: string
     type: string
     alphabet: string[]
     notes: string[][]
@@ -26,6 +27,11 @@ export type InstrumentConfig = {
     sampletemplate: string
     volume: number
 }
+
+// The following characters should be ignored when sending a note to a Sampler.
+// TODO This is a temporary solution to avoid having to double the length of each
+// alphabet for these rarely used modifiers.
+export const ignoreChars: string[] = ["_", "="]  // half and quarter base note duration.
 
 // Translates shorthand codes used in instrumentConfigs to Note records.
 // The stroke is used for the animation.
@@ -46,7 +52,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         'CUNG': { tone: 'CUNG', octave: null, stroke: null, muting: 'OPEN' },
         'KUNG': { tone: 'KUNG', octave: null, stroke: null, muting: 'OPEN' },
     },
-    'melodic': {
+    'daun': {
         'DONG0': { tone: 'DONG', octave: 0, stroke: null, muting: 'OPEN' },
         'DENG0': { tone: 'DENG', octave: 0, stroke: null, muting: 'OPEN' },
         'DUNG0': { tone: 'DUNG', octave: 0, stroke: null, muting: 'OPEN' },
@@ -78,7 +84,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         'DANG1_MUTED': { tone: 'DANG', octave: 1, stroke: null, muting: 'MUTED' },
         'DING2_MUTED': { tone: 'DING', octave: 2, stroke: null, muting: 'MUTED' },
     },
-    "reyong": {
+    "chimes": {
         // REYONG SPECIFIC
         'DENG0': { tone: 'DENG', octave: 0, stroke: 'KNOB', muting: 'OPEN' },
         'DUNG0': { tone: 'DUNG', octave: 0, stroke: 'KNOB', muting: 'OPEN' },
@@ -129,6 +135,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
 
 export const instrumentConfigs: Record<string, InstrumentConfig> = {
     GONGS: {
+        instrument: "GONGS",
         type: 'percussion',
         alphabet: ['G', 'P', 'T'],
         notes: [['GIR'], ['PUR'], ['TONG']],
@@ -137,6 +144,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_GONGS_{note}.mp3",
     },
     KEMPLI: {
+        instrument: "KEMPLI",
         type: 'percussion',
         alphabet: ['x?'],
         notes: [['X_MUTED']],
@@ -145,6 +153,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_KEMPLI_{note}.mp3",
     },
     CENGCENG: {
+        instrument: "CENGCENG",
         type: 'percussion',
         alphabet: ['x', 'x?'],
         notes: [['X_OPEN'], ['X_MUTED']],
@@ -153,6 +162,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_CENGCENG_{note}.mp3",
     },
     KENDANG: {
+        instrument: "KENDANG",
         type: 'percussion',
         alphabet: ['(', ')', '*', '0', '8', '9'],
         notes: [['TUT'], ['KUNG'], ['PAK'], ['CUNG'], ['KA'], ['DE']],
@@ -161,31 +171,35 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_KENDANG_{note}.wav",
     },
     JEGOGAN: {
-        type: 'melodic',
-        alphabet: ['i', 'o', 'e', 'u', 'a'],
-        notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
+        instrument: "JEGOGAN",
+        type: 'daun',
+        alphabet: ['i', 'o', 'e', 'u', 'a', 'i/', 'o/', 'e/', 'u/', 'a/'],
+        notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
         volume: -5,
         svg_file: "svg/GK_JEGOGAN.svg",
         sampletemplate: "GK_JEGOGAN_{note}.mp3",
     },
     CALUNG: {
-        type: 'melodic',
-        alphabet: ['i', 'o', 'e', 'u', 'a'],
-        notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
+        instrument: "CALUNG",
+        type: 'daun',
+        alphabet: ['i', 'o', 'e', 'u', 'a', 'i/', 'o/', 'e/', 'u/', 'a/'],
+        notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
         volume: -5,
         svg_file: "svg/GK_CALUNG.svg",
         sampletemplate: "GK_CALUNG_{note}.mp3",
     },
     PENYACAH: {
-        type: 'melodic',
-        alphabet: ['i', 'o', 'e', 'u', 'a'],
-        notes: [['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
-        volume: -5,
+        instrument: "PENYACAH",
+        type: 'daun',
+        alphabet: ['u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/'],
+        notes: [['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1']],
+        volume: -15,
         svg_file: "svg/GK_PENYACAH.svg",
         sampletemplate: "GK_PENYACAH_{note}.mp3",
     },
     KANTILAN_POLOS: {
-        type: 'melodic',
+        instrument: "KANTILAN",
+        type: 'daun',
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0'], ['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG0_ABBR'], ['DENG0_ABBR'], ['DUNG0_ABBR'], ['DANG0_ABBR'], ['DING1_ABBR'], ['DONG1_ABBR'], ['DENG1_ABBR'], ['DUNG1_ABBR'], ['DANG1_ABBR'], ['DING2_ABBR'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
@@ -193,7 +207,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_KANTILAN_{note}.mp3",
     },
     KANTILAN_SANGSIH: {
-        type: 'melodic',
+        instrument: "KANTILAN",
+        type: 'daun',
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0'], ['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG0_ABBR'], ['DENG0_ABBR'], ['DUNG0_ABBR'], ['DANG0_ABBR'], ['DING1_ABBR'], ['DONG1_ABBR'], ['DENG1_ABBR'], ['DUNG1_ABBR'], ['DANG1_ABBR'], ['DING2_ABBR'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
@@ -201,7 +216,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_KANTILAN_{note}.mp3",
     },
     PEMADE_POLOS: {
-        type: 'melodic',
+        instrument: "PEMADE",
+        type: 'daun',
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0'], ['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG0_ABBR'], ['DENG0_ABBR'], ['DUNG0_ABBR'], ['DANG0_ABBR'], ['DING1_ABBR'], ['DONG1_ABBR'], ['DENG1_ABBR'], ['DUNG1_ABBR'], ['DANG1_ABBR'], ['DING2_ABBR'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
@@ -209,7 +225,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_PEMADE_{note}.mp3",
     },
     PEMADE_SANGSIH: {
-        type: 'melodic',
+        instrument: "PEMADE",
+        type: 'daun',
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0'], ['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG0_ABBR'], ['DENG0_ABBR'], ['DUNG0_ABBR'], ['DANG0_ABBR'], ['DING1_ABBR'], ['DONG1_ABBR'], ['DENG1_ABBR'], ['DUNG1_ABBR'], ['DANG1_ABBR'], ['DING2_ABBR'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
@@ -217,7 +234,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_PEMADE_{note}.mp3",
     },
     UGAL: {
-        type: 'melodic',
+        instrument: "UGAL",
+        type: 'daun',
         alphabet: ['o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i<', 'o,/', 'e,/', 'u,/', 'a,/', 'i/', 'o/', 'e/', 'u/', 'a/', 'i</', 'o,?', 'e,?', 'u,?', 'a,?', 'i?', 'o?', 'e?', 'u?', 'a?', 'i<?'],
         notes: [['DONG0'], ['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG0_ABBR'], ['DENG0_ABBR'], ['DUNG0_ABBR'], ['DANG0_ABBR'], ['DING1_ABBR'], ['DONG1_ABBR'], ['DENG1_ABBR'], ['DUNG1_ABBR'], ['DANG1_ABBR'], ['DING2_ABBR'], ['DONG0_MUTED'], ['DENG0_MUTED'], ['DUNG0_MUTED'], ['DANG0_MUTED'], ['DING1_MUTED'], ['DONG1_MUTED'], ['DENG1_MUTED'], ['DUNG1_MUTED'], ['DANG1_MUTED'], ['DING2_MUTED']],
         volume: -14,
@@ -225,7 +243,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_UGAL_{note}.mp3",
     },
     REYONG_1: {
-        type: 'reyong',
+        instrument: "REYONG",
+        type: 'chimes',
         alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 'r', 'r?', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DENG0', 'DING1'], ['DENG0_MUTED', 'DING1_MUTED'], ['DENG0', 'DANG0'], ['DENG0_ABBR', 'DANG0_ABBR'], ['DENG0_MUTED', 'DANG0_MUTED'], ['XDUNG0'], ['XDUNG0_MUTED']],
         volume: -14,
@@ -233,7 +252,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_2: {
-        type: 'reyong',
+        instrument: "REYONG",
+        type: 'chimes',
         alphabet: ['u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING1', 'DENG1'], ['DING1_ABBR', 'DENG1_ABBR'], ['DING1_MUTED', 'DENG1_MUTED'], ['XDONG1'], ['XDONG1_MUTED']],
         volume: -14,
@@ -241,7 +261,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_3: {
-        type: 'reyong',
+        instrument: "REYONG",
+        type: 'chimes',
         alphabet: ['o', 'e', 'u', 'a', 'i<', 'o<', 'e<', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DONG1'], ['DENG1'], ['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG1', 'DING2'], ['DUNG1_ABBR', 'DING2_ABBR'], ['DUNG1_MUTED', 'DING2_MUTED'], ['XDANG1'], ['XDANG1_MUTED']],
         volume: -14,
@@ -249,7 +270,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         sampletemplate: "GK_REYONG_{note}.mp3",
     },
     REYONG_4: {
-        type: 'reyong',
+        instrument: "REYONG",
+        type: 'chimes',
         alphabet: ['u', 'a,', 'i<', 'o<', 'e<', 'u<', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DUNG1'], ['DANG1'], ['DING2'], ['DONG2'], ['DENG2'], ['DUNG2'], ['DING2', 'DENG2'], ['DING2_ABBR', 'DENG2_ABBR'], ['DING2_MUTED', 'DENG2_MUTED'], ['XDENG2'], ['XDENG2_MUTED']],
         volume: -14,

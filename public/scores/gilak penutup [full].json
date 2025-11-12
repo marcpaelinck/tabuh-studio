@@ -7,6 +7,7 @@
             "gongan": 1,
             "starttime": 0.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -183,6 +184,7 @@
             "gongan": 2,
             "starttime": 32.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -359,6 +361,7 @@
             "gongan": 3,
             "starttime": 64.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -535,6 +538,7 @@
             "gongan": 1,
             "starttime": 96.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -711,6 +715,7 @@
             "gongan": 2,
             "starttime": 128.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -887,6 +892,7 @@
             "gongan": 3,
             "starttime": 160.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -1063,6 +1069,7 @@
             "gongan": 1,
             "starttime": 192.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -1239,6 +1246,7 @@
             "gongan": 2,
             "starttime": 224.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -1415,6 +1423,7 @@
             "gongan": 4,
             "starttime": 256.0,
             "duration": 32.0,
+            "part": "Transition",
             "sections": [
                 {
                     "id": 1,
@@ -1591,6 +1600,7 @@
             "gongan": 5,
             "starttime": 288.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -1767,6 +1777,7 @@
             "gongan": 6,
             "starttime": 320.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -1943,6 +1954,7 @@
             "gongan": 7,
             "starttime": 352.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -2119,6 +2131,7 @@
             "gongan": 5,
             "starttime": 384.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -2295,6 +2308,7 @@
             "gongan": 6,
             "starttime": 416.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -2471,6 +2485,7 @@
             "gongan": 7,
             "starttime": 448.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -2647,6 +2662,7 @@
             "gongan": 5,
             "starttime": 480.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -2823,6 +2839,7 @@
             "gongan": 6,
             "starttime": 512.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -2999,6 +3016,7 @@
             "gongan": 7,
             "starttime": 544.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -3175,6 +3193,7 @@
             "gongan": 1,
             "starttime": 576.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -3351,6 +3370,7 @@
             "gongan": 2,
             "starttime": 608.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -3527,6 +3547,7 @@
             "gongan": 3,
             "starttime": 640.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -3703,6 +3724,7 @@
             "gongan": 1,
             "starttime": 672.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -3879,6 +3901,7 @@
             "gongan": 2,
             "starttime": 704.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -4055,6 +4078,7 @@
             "gongan": 3,
             "starttime": 736.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -4231,6 +4255,7 @@
             "gongan": 1,
             "starttime": 768.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -4407,6 +4432,7 @@
             "gongan": 2,
             "starttime": 800.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -4583,6 +4609,7 @@
             "gongan": 4,
             "starttime": 832.0,
             "duration": 32.0,
+            "part": "Transition",
             "sections": [
                 {
                     "id": 1,
@@ -4759,6 +4786,7 @@
             "gongan": 5,
             "starttime": 864.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -4935,6 +4963,7 @@
             "gongan": 6,
             "starttime": 896.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -5111,6 +5140,7 @@
             "gongan": 7,
             "starttime": 928.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -5287,6 +5317,7 @@
             "gongan": 5,
             "starttime": 960.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -5463,6 +5494,7 @@
             "gongan": 6,
             "starttime": 992.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -5639,6 +5671,7 @@
             "gongan": 7,
             "starttime": 1024.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -5815,6 +5848,7 @@
             "gongan": 5,
             "starttime": 1056.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -5991,6 +6025,7 @@
             "gongan": 6,
             "starttime": 1088.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -6167,6 +6202,7 @@
             "gongan": 7,
             "starttime": 1120.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -6343,6 +6379,7 @@
             "gongan": 1,
             "starttime": 1152.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -6519,6 +6556,7 @@
             "gongan": 2,
             "starttime": 1184.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -6695,6 +6733,7 @@
             "gongan": 3,
             "starttime": 1216.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -6871,6 +6910,7 @@
             "gongan": 1,
             "starttime": 1248.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -7047,6 +7087,7 @@
             "gongan": 2,
             "starttime": 1280.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -7223,6 +7264,7 @@
             "gongan": 3,
             "starttime": 1312.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -7399,6 +7441,7 @@
             "gongan": 1,
             "starttime": 1344.0,
             "duration": 32.0,
+            "part": "Unisono",
             "sections": [
                 {
                     "id": 1,
@@ -7575,6 +7618,7 @@
             "gongan": 2,
             "starttime": 1376.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -7751,6 +7795,7 @@
             "gongan": 4,
             "starttime": 1408.0,
             "duration": 32.0,
+            "part": "Transition",
             "sections": [
                 {
                     "id": 1,
@@ -7927,6 +7972,7 @@
             "gongan": 5,
             "starttime": 1440.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -8103,6 +8149,7 @@
             "gongan": 6,
             "starttime": 1472.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -8279,6 +8326,7 @@
             "gongan": 7,
             "starttime": 1504.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -8455,6 +8503,7 @@
             "gongan": 5,
             "starttime": 1536.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -8631,6 +8680,7 @@
             "gongan": 6,
             "starttime": 1568.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -8807,6 +8857,7 @@
             "gongan": 7,
             "starttime": 1600.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -8983,6 +9034,7 @@
             "gongan": 5,
             "starttime": 1632.0,
             "duration": 32.0,
+            "part": "Kotekan",
             "sections": [
                 {
                     "id": 1,
@@ -9159,6 +9211,7 @@
             "gongan": 6,
             "starttime": 1664.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -9335,6 +9388,7 @@
             "gongan": 8,
             "starttime": 1696.0,
             "duration": 32.0,
+            "part": "End",
             "sections": [
                 {
                     "id": 1,
@@ -9511,6 +9565,7 @@
             "gongan": 9,
             "starttime": 1728.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -9687,6 +9742,7 @@
             "gongan": 10,
             "starttime": 1760.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -9863,6 +9919,7 @@
             "gongan": 11,
             "starttime": 1792.0,
             "duration": 32.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,
@@ -10039,6 +10096,7 @@
             "gongan": 12,
             "starttime": 1824.0,
             "duration": 1.0,
+            "part": null,
             "sections": [
                 {
                     "id": 1,

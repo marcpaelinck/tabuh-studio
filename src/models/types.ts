@@ -61,6 +61,7 @@ export type System = {
   id: number
   starttime: number // start time of first section
   duration: number // sum of section durations
+  part: string
   sections: Section[]
 }
 
@@ -73,7 +74,10 @@ export type Score = {
 
 export type ScoreInfo = {
   title: string
+  instrumentgroup: string
   file: string
+  notationversion: string
+  pdf: string
 }
 
 // ANIMATION
