@@ -29,8 +29,10 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
     highlight = (line: number, range: number[]) => {
         const para = this.state.textarea.current?.children[line]
         const para1 = this.state.textarea.current?.childNodes[line]
+        // Note: the `container` parameter is not supported yet by all browsers
+        // See mdn documentation.
         //@ts-expect-error container option is valid but not recognized
-        para?.scrollIntoView({ behavior: "smooth", block: "center", container:"nearest" });
+        para?.scrollIntoView({ behavior: "smooth", block: block, container:"nearest" });
 
         const range1 = new Range();
         if (para1) {
@@ -50,7 +52,7 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
     render() {
         return (
             <>
-                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-25 text-sm/5 overflow-hidden border rounded-md p-2">
+                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
                 { this.props.notation }
                 </div>
             </>

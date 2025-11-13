@@ -1,3 +1,7 @@
+# Tabuh Studio
+
+Refer to the GitHub [wiki](https://github.com/marcpaelinck/tabuh-studio/wiki) for more information about this application.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

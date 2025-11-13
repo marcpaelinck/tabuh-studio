@@ -234,11 +234,7 @@ export function createTimeline(score: Score | null): Timeline | null {
       const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
       const newSection = index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
       const lastNoteOfSection = (index == symbols.length - 1) || (symbols[index + 1].system != symbol.system)
-      // if (lastNoteOfSection) {
-      //   timeline.notation[position].push(createElement('p', { key: line, id: `${line}`, className: 'balifont p-0 text-sm/6' }, currentline))
-      //   currentline = ""
-      //   line++
-      // }
+
       if (newSection) currentline += " "
       const range = [currentline.length, currentline.length + symbol.s.length]
       currentline += symbol.s
