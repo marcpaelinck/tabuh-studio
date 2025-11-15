@@ -40,12 +40,9 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
 
   return {
-    play: (time: number, action: SamplerAction, focus: string) => {
-      // const dimValue = (focus == "" || focusPositions.includes(focus)) ? 1 : dimRateNonFocusedInstruments
-      const dimValue = (focus == "" || focus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
-      // Remove chars that should be ignored. See remark in configs.ts
-      const cleanedSymbol = ignoreChars.reduce((symbol, char) => symbol.replace(char, ""), action.cleanedSymbol)
-      const indices = lookup[position].symbol2idxs[cleanedSymbol]
+    play: (time: number, action: SamplerAction, currentFocus: string) => {
+      const dimValue = (currentFocus == "" || currentFocus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
+      const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
       if (indices && samplers[position].current) {
         try {
           sampler.current?.triggerAttackRelease(indices, action.duration, time, action.velocity * dimValue)
@@ -78,9 +75,9 @@ export const useInstruments = () => {
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
   const playInstrument = useCallback(
-    (time: number, position: string, action: SamplerAction, focus: string) => {
-      if (action.cleanedSymbol === '.') instrumentSamplers[position].mute(time)
-      else { instrumentSamplers[position].play(random_attack_deviation(time), action, focus) }
+    (time: number, action: SamplerAction, currentFocus: string) => {
+      if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
+      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus) }
     },
     [],
   )

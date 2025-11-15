@@ -51,9 +51,9 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     console.log(`Creating schedule for ${score?.title}`)
     
     // instrument actions (notes)
-    timeline.sampleractions.forEach((iAction: SamplerAction) => {
-      Tone.getTransport().schedule((time) => changeTempo(time, iAction, pbSpeedRef.current), iAction.time)      
-      Tone.getTransport().schedule((time) => playInstrument(time, iAction.position, iAction, focusRef.current), iAction.time)
+    timeline.sampleractions.forEach((sAction: SamplerAction) => {
+      Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeedRef.current), sAction.time)      
+      Tone.getTransport().schedule((time) => playInstrument(time, sAction, focusRef.current), sAction.time)
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
