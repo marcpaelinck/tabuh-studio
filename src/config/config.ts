@@ -245,7 +245,7 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG_1: {
         instrument: "REYONG",
         type: 'chimes',
-        alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 'r', 'r?', 'b', 'b/', 'b?', 'x', 'x/'],
+        alphabet: ['e,', 'u,', 'a,', 'i', 'o', 'e', 't', 't?', 'b', 'b/', 'b?', 'x', 'x/'],
         notes: [['DENG0'], ['DUNG0'], ['DANG0'], ['DING1'], ['DONG1'], ['DENG1'], ['DENG0', 'DING1'], ['DENG0_MUTED', 'DING1_MUTED'], ['DENG0', 'DANG0'], ['DENG0_ABBR', 'DANG0_ABBR'], ['DENG0_MUTED', 'DANG0_MUTED'], ['XDUNG0'], ['XDUNG0_MUTED']],
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",

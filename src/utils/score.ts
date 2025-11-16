@@ -253,7 +253,6 @@ export function createTimeline(score: Score | null): Timeline | null {
             key: line,
             id: `notation-${line}`,
             className: 'appearance-none p-[0px] m-0 text-sm/6 balifont',
-            class: 'p-[0px] text-sm/6 balifont'
           },
           currentline))
         currentline = ""

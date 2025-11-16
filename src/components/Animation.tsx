@@ -6,12 +6,11 @@ import React from 'react';
 import { instrumentConfigs } from '../config/config';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import colors from 'tailwindcss/colors'
-import { FRAMESTYLE } from '../config/constants';
+import { FRAMESTYLE, svgBdrColorHex as blueBGColor } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import { NotationArea } from './NotationArea';
-
-const svgBdrColorHex = colors.blue["300"]
+import { Toggle } from 'rsuite'
+import 'rsuite/Toggle/styles/index.css';
 
 function positionToSvg(position: string): string  {
     console.log("loading SVG file")
@@ -37,7 +36,7 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGIn
 export default function Animation({focus, notationRef, animationInfoUpdater}: 
     {focus: string, notationRef: React.RefObject<NotationType | null>, animationInfoUpdater: Function}) : JSX.Element {
     const defaultSvgSize = 100 // percent
-    const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
+    // const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
@@ -89,15 +88,15 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
                         hasPanggul && (
                         <div className="w-3/10 align-bottom">
                             <form id="panggul-selector" >
-                                <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/>
-                                <label>show panggul</label>
+                                <Toggle id="show panggul" defaultChecked onChange={checked => setPanggulVisibility(checked)} >show panggul</Toggle>
+                                {/* <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/> */}
                             </form>  
                         </div>
                         )
                         }
                         <div className="w-6/10 pl-4 pr-4">
                             <Slider min={0} max={100} defaultValue={defaultSvgSize} 
-                                onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: svgBdrColorHex}, handle: {borderColor: svgBdrColorHex}}}/>
+                                onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: blueBGColor}, handle: {borderColor: blueBGColor}}}/>
                         </div>
                     </div>
                     <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} 

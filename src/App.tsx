@@ -9,9 +9,10 @@ import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
+  const defaultFocusList = ["No focus"]
   const [isLoading, setIsLoading] = useState(true)
   const [songList, setSongList] = useState<string[]>([])
-  const [positionList, setPositionList] = useState<string[]>([])
+  const [positionList, setPositionList] = useState<string[]>(defaultFocusList)
   const [selectedSong, setSelectedSong] = useState<string>("")
   const [selectedFocus, setSelectedFocus] = useState<string>('')
   const [score, setScore] = useState<Score | null>(null)
@@ -63,7 +64,8 @@ export default function App() {
             if (newScore && newScore!=score) {
                 setScore(newScore)
                 const instr_lists: string[] = newScore.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
-                setPositionList([...new Set(instr_lists)])
+                const focusList = defaultFocusList.concat(Array.from(new Set(instr_lists)))
+                setPositionList(focusList)
             }
       }
       setIsLoading(false)
