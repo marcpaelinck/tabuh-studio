@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ButtonToolbar, Dropdown } from "rsuite";
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
+import { speedList } from "../config/constants";
 
 // Convert a list of string values to a list op option Elements.
 function itemListToOptions(values: string[], onChange: CallableFunction): JSX.Element[] {
@@ -35,7 +36,6 @@ export default function Selectors(
     const [songIndex,setSongIndex]  = useState<number>(-1)
     const [focusIndex,setFocusIndex]  = useState<number>(1)
     const [speedIndex,setSpeedIndex]  = useState<number>(10)
-    const speedList = ["10", "20", "30", "40", "50", "60", "70", "80", "90", "100" ]
 
     const onChangeSongSelector = (index: number) => {
         console.log(`index=${index}, song=${songList[index-1]}`)
@@ -57,12 +57,14 @@ export default function Selectors(
         speedUpdater(speedList[index-1])
     }
 
+    const fmtPercent = (valList: number[] | string[]) => valList.map((val: number | string) => `${val}`.padStart(2, ' ') + '%')
+
     return (
             <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
                     <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
                     <Selector id="focusselector" title={focusList[focusIndex-1]} width="3/10" valueList={focusList} onChange={onChangeFocusSelector}/>
-                    <Selector id="speedselector" title={`speed: ${speedList[speedIndex-1]}%`} width="3/10" valueList={speedList} onChange={onChangeSpeedSelector}/>
+                    <Selector id="speedselector" title={`speed: ${speedList[speedIndex-1]}%`} width="3/10" valueList={fmtPercent(speedList)} onChange={onChangeSpeedSelector}/>
                 </ButtonToolbar>
             </div>
         )
