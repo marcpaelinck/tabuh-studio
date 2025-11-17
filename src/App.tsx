@@ -88,7 +88,9 @@ export default function App() {
       <div className="lg:w-1/10">
       </div>
       <div className={"lg:w-8/10 sm:w-full" + FRAMESTYLE}>
-        <Selectors songList={songList} focusList={positionList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
+        <div className="pt-6 pl-6 pr-6">
+          <Selectors songList={songList} focusList={positionList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
+        </div>
         {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>
       </div>

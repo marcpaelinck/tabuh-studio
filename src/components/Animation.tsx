@@ -7,7 +7,7 @@ import { instrumentConfigs } from '../config/config';
 import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import NotationArea from './NotationArea';
-import { Toggle, Slider } from 'rsuite'
+import { Toggle, Slider, Grid, Row, Col } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css';
 import 'rsuite/Slider/styles/index.css';
 
@@ -84,40 +84,53 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
     }    
 
     return(focus ? (
-            <div id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
-                <div>
-                    <NotationArea notation={notationRef.current} visible={notationVisible} hlFunction={highlightFunctionRef}/>
-                </div>
-                <div id="svg-embed" >
-                    <div id="animation-toggles" className="flex items-center">
-                        {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
-                        hasPanggul && (
-                        <div className="w-3/10 align-bottom">
+        <div className="m-6">
+            <Grid fluid id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
+                <Row id="animation-toggles-row" gutter={10} className="p-1">
+                        <Col xs={8} sm={8} md={4}>
                             <Toggle id="notation toggle" 
                                 defaultChecked ={notationVisible}
                                 onChange={checked => setNotationVisibility(checked)} 
                             >notation</Toggle>
-                            <Toggle id="panggul toggle" 
+                        </Col>
+                    {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
+                        hasPanggul && (
+                        <Col xs={8} sm={8}  md={4}>
+                            <Toggle 
+                                id="panggul toggle" 
                                 defaultChecked 
                                 onChange={checked => setPanggulVisibility(checked)} 
                             >panggul</Toggle>
-                        </div>
-                        )
-                        }
-                        <div className="w-6/10 pl-4 pr-4">
-                            <Slider progress
-                                className="flex w-full"
-                                barClassName="flex w-full"
-                                min={0} 
-                                max={100} 
-                                defaultValue={defaultSvgSize} 
-                                onChange={(val) => {updateSvgSize(val)}} 
-                            />
-                        </div>
+                        </Col>)
+                    }
+                </Row>
+                <Row id="notation-area-row"  className="p-2" >
+                    <div>
+                        <NotationArea notation={notationRef.current} visible={notationVisible} hlFunction={highlightFunctionRef}/>
                     </div>
-                    <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} 
-                        useRequestCache={true} beforeInjection={setSvgLoadedFalse} afterInjection={setSvgStates}/>
-                </div>
-            </div>) 
+                </Row>
+                <Row id="slider-row" className="pl-4 pr-4 pt-10">
+                    <Slider 
+                        progress
+                        className="flex w-full"
+                        barClassName="flex w-full"
+                        min={0} 
+                        max={100} 
+                        defaultValue={defaultSvgSize} 
+                        onChange={(val) => {updateSvgSize(val)}} 
+                    />
+                </Row>
+                <Row id="svg-embed-row" className="pt-2 pl-4 pr-4" >
+                    <ReactSVG 
+                        src={positionToSvg(focus)} 
+                        style={svgSizeStyle} 
+                        loading={() => <ClipLoader />} 
+                        useRequestCache={true} 
+                        beforeInjection={setSvgLoadedFalse} 
+                        afterInjection={setSvgStates}
+                    />
+                </Row>
+           </Grid>
+        </div> )
         : <div/>)
 }
