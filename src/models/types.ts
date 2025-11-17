@@ -1,7 +1,6 @@
 // INSTRUMENTS
 
 import type { JSX } from "react"
-import { NotationArea } from "../components/NotationArea"
 import type { MutingType, StrokeType, ToneType } from "../config/config"
 
 export type Instrument = {
@@ -98,5 +97,5 @@ export type NotationType = JSX.Element[]
 
 export type AnimationInfo = {
   svgInfo: SVGInfo
-  notationAreaRef: React.RefObject<NotationArea | null>
+  highlightRef: React.RefObject<CallableFunction | null>
 }

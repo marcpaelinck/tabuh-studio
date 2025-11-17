@@ -18,7 +18,7 @@ export default function App() {
   const [score, setScore] = useState<Score | null>(null)
   const songDictRef: RefObject<Record<string, string>> = useRef({})
   const focusReference: RefObject<string>  = useRef('')
-  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, notationAreaRef: useRef(null)})
+  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, highlightRef: useRef(() => {})})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
   const playbackSpeedRef = useRef<number>(1)

@@ -6,7 +6,7 @@ import React from 'react';
 import { instrumentConfigs } from '../config/config';
 import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
-import { NotationArea } from './NotationArea';
+import NotationArea from './NotationArea';
 import { Toggle, Slider } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css';
 import 'rsuite/Slider/styles/index.css';
@@ -42,8 +42,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const panggulRef = useRef<Element | null>(null)
     const [svgSizeStyle, setSvgSize] = useState<Object>({"width": `${defaultSvgSize}%`, "height": `${defaultSvgSize}%`})
-    const notationVisibleRef: React.RefObject<boolean> = useRef(true)
-    const  notationAreaRef: React.RefObject<NotationArea|null> = useRef(null)
+    const  highlightFunctionRef: React.RefObject<CallableFunction> = useRef(() => {})
     // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
 
     const updateSvgSize = (val: number | number[]) => {
@@ -59,7 +58,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
         if (svg) {
                 svgElement.current = svg
                 const svgInfo: SVGInfo = retrieve_svg_data(svgElement)
-                const animationInfo: AnimationInfo = {svgInfo: svgInfo, notationAreaRef: notationAreaRef}
+                const animationInfo: AnimationInfo = {svgInfo: svgInfo, highlightRef: highlightFunctionRef}
                 animationInfoUpdater(animationInfo) // pass animationInfo to App component
                 setSvgLoaded(true)
                 panggulRef.current = panggulElement()
@@ -87,10 +86,10 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
     return(focus ? (
             <div id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <div>
-                    <NotationArea ref={notationAreaRef} notation={notationRef.current} visible={notationVisible}/>
+                    <NotationArea notation={notationRef.current} visible={notationVisible} hlFunction={highlightFunctionRef}/>
                 </div>
                 <div id="svg-embed" >
-                    <div id="checkbox-and-slider" className="flex items-center">
+                    <div id="animation-toggles" className="flex items-center">
                         {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
                         hasPanggul && (
                         <div className="w-3/10 align-bottom">

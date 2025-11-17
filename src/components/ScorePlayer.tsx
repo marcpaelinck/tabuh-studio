@@ -113,7 +113,7 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     Tone.getTransport().seconds=0
     setProgress(0)
     // TODO: use `resetAnimation` callback that is passed as prop
-    animationInfoRef.current?.notationAreaRef.current?.clear()
+    // animationInfoRef.current?.notationAreaRef.current?.clear()
     pause()
   }
 

@@ -139,7 +139,8 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
 }
 
 async function highlightCurrentNote(cAction: CursorAction, animationInfo: AnimationInfo) {
-    animationInfo.notationAreaRef.current?.highlight(cAction.line, cAction.range)
+    if (animationInfo.highlightRef.current)
+        animationInfo.highlightRef.current({ line: cAction.line, range: cAction.range })
 }
 
 export const useAnimationEngine = () => {

@@ -2,29 +2,23 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the 
 // notation while the corresponding notes are being played.
 
-import { Component, createRef, type RefObject } from "react"
+import { useRef, type RefObject } from "react"
 import type { NotationType } from "../models/types";
 
-interface NotationAreaAttributes extends React.TextareaHTMLAttributes<HTMLDivElement>, React.RefAttributes<NotationArea> {
-    notation: NotationType | null
-    visible: boolean
+type HighlightRange = {
+    line: number
+    range: number[]
 }
 
-interface NotationAreaStates { 
-    text: string, 
-    textarea: RefObject<HTMLDivElement | null>,
-    props: NotationAreaAttributes
-}
+export default function NotationArea({notation, visible, hlFunction}:
+    {notation: NotationType | null, visible: boolean, hlFunction: RefObject<CallableFunction>}){
 
-export class NotationArea extends Component<NotationAreaAttributes, NotationAreaStates> {
-    constructor(props: NotationAreaAttributes) {
-        super(props);
-        this.state = {text: "", textarea: createRef(), props:props}
-    }
+    const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
-    highlight = (line: number, range: number[]) => {
-        const para = this.state.textarea.current?.children[line]
-        const para1 = this.state.textarea.current?.childNodes[line]
+    // Highlighting function: highlights the given range (line and character range)
+    hlFunction.current = (hlRange: HighlightRange) => {
+        const para = textAreaRef.current?.children[hlRange.line]
+        const para1 = textAreaRef.current?.childNodes[hlRange.line]
         // Note: the `container` parameter is not supported yet by all browsers
         // See mdn documentation.
         //@ts-expect-error container option is valid but not recognized
@@ -33,9 +27,9 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
         const range1 = new Range();
         if (para1) {
             const text = para1.firstChild
-            if (text){
-                range1.setStart(text, range[0]);
-                range1.setEnd(text, range[1]);
+            if (text && visible){
+                range1.setStart(text, hlRange.range[0]);
+                range1.setEnd(text, hlRange.range[1]);
                 const highlight = new Highlight(range1);       
                 CSS.highlights.set("notation-highlight", highlight)
             }
@@ -43,15 +37,11 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
 
     }
 
-    clear = () => this.setState({text: ""})
-
-    render() {
-        return (
-            <>
-                <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
-                    {this.state.props.visible &&  this.props.notation }
-                </div>
-            </>
-        );
-    }
+    return (
+        <>
+            <div id="NotationArea" ref={textAreaRef} className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
+                {visible &&  notation }
+            </div>
+        </>
+    );
 }
