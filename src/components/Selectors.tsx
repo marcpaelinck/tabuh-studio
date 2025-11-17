@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 import { useState } from "react";
 import { ButtonToolbar, Dropdown } from "rsuite";
+import 'rsuite/styles/index.less';
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from "../config/constants";
@@ -10,23 +11,20 @@ function itemListToOptions(values: string[], onChange: CallableFunction): JSX.El
     return values.map((value: string, index: number) => (
                 <Dropdown.Item
                     key={index} 
-                    onSelect={(eventKey: string, e: any) => {onChange(eventKey)}} 
+                    onSelect={(eventKey: string) => {onChange(eventKey)}} 
                     eventKey={index+1}
                 >{value}</Dropdown.Item>
             ))
 }
 
 
-// Width is a fraction, e.g. 3/10
 const Selector = ({valueList, onChange, ...props}: {valueList: string[], onChange: (index: number) => void, [key: string]: any}) => 
      {
     const items: JSX.Element[] = itemListToOptions(valueList, onChange)
     return (
-        // <div className={`flex-auto gap-3`}>
-            <Dropdown {...props}>
-                { items }
-            </Dropdown>
-        // </div>
+        <Dropdown {...props}>
+            { items }
+        </Dropdown>
     )
 }
 
@@ -57,12 +55,12 @@ export default function Selectors(
         speedUpdater(speedList[index-1])
     }
 
-    const fmtPercent = (valList: number[] | string[]) => valList.map((val: number | string) => `${val}`.padStart(2, ' ') + '%')
+    const fmtPercent = (valList: number[] | string[]) => valList.map((val: number | string) => `${val}%`)
 
     return (
             <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
-                    <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
+                    <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} className = "songselector" width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
                     <Selector id="focusselector" title={focusList[focusIndex-1]} width="3/10" valueList={focusList} onChange={onChangeFocusSelector}/>
                     <Selector id="speedselector" title={`speed: ${speedList[speedIndex-1]}%`} width="3/10" valueList={fmtPercent(speedList)} onChange={onChangeSpeedSelector}/>
                 </ButtonToolbar>

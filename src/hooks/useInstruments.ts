@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
-import { alwaysFocusPositions, dimRateNonFocusedInstruments, ignoreChars, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
 export type InstrumentSampler = {
@@ -29,10 +29,10 @@ const createSampler = ({ instr_type, samples, volume }: { instr_type: string, sa
 }
 
 const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([position, config]) => {
-  const noteList = [...new Set(config.notes.flat())]
+  const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
   const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, instrumentConfigs[position].sampletemplate)]))
   const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
-  const symbolToIndices = Object.fromEntries(config.alphabet.map((symbol, index) => [symbol, config.notes[index].map((repr) => noteToIndex[repr])]))
+  const symbolToIndices = Object.fromEntries(Object.entries(config.symbolToNoteNames).map(([symbol, notes]) => [symbol, notes.map((repr) => noteToIndex[repr])]))
   return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
 }))
 
@@ -83,7 +83,7 @@ export const useInstruments = () => {
   )
 
   const muteAll = useCallback(
-    (time: number) => Object.keys(instrumentSamplers).forEach((label) => instrumentSamplers[label].mute(time)),
+    (time: number) => Object.keys(instrumentSamplers).forEach((position) => instrumentSamplers[position].mute(time)),
     [instrumentSamplers],
   )
 

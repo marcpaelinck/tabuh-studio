@@ -4,13 +4,12 @@ import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
 import { instrumentConfigs } from '../config/config';
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
-import { FRAMESTYLE, svgBdrColorHex as blueBGColor } from '../config/constants';
+import { FRAMESTYLE } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import { NotationArea } from './NotationArea';
-import { Toggle } from 'rsuite'
+import { Toggle, Slider } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css';
+import 'rsuite/Slider/styles/index.css';
 
 function positionToSvg(position: string): string  {
     console.log("loading SVG file")
@@ -40,8 +39,10 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
     const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
+    const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const panggulRef = useRef<Element | null>(null)
     const [svgSizeStyle, setSvgSize] = useState<Object>({"width": `${defaultSvgSize}%`, "height": `${defaultSvgSize}%`})
+    const notationVisibleRef: React.RefObject<boolean> = useRef(true)
     const  notationAreaRef: React.RefObject<NotationArea|null> = useRef(null)
     // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
 
@@ -78,25 +79,41 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
             }
         }
     }
-//border-t-4 border-l-4 border-r-4 rounded-md p-4
+
+    function setNotationVisibility(isVisible: boolean){
+        setNotationVisible(isVisible)
+    }    
+
     return(focus ? (
             <div id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
-                <NotationArea ref={notationAreaRef} notation={notationRef.current}/>
+                <div>
+                    <NotationArea ref={notationAreaRef} notation={notationRef.current} visible={notationVisible}/>
+                </div>
                 <div id="svg-embed" >
                     <div id="checkbox-and-slider" className="flex items-center">
                         {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
                         hasPanggul && (
                         <div className="w-3/10 align-bottom">
-                            <form id="panggul-selector" >
-                                <Toggle id="show panggul" defaultChecked onChange={checked => setPanggulVisibility(checked)} >show panggul</Toggle>
-                                {/* <input type="checkbox" id="show panggul" onChange={e => setPanggulVisibility(e.target.checked)} defaultChecked={true} ref={checkBoxRef}/> */}
-                            </form>  
+                            <Toggle id="notation toggle" 
+                                defaultChecked ={notationVisible}
+                                onChange={checked => setNotationVisibility(checked)} 
+                            >notation</Toggle>
+                            <Toggle id="panggul toggle" 
+                                defaultChecked 
+                                onChange={checked => setPanggulVisibility(checked)} 
+                            >panggul</Toggle>
                         </div>
                         )
                         }
                         <div className="w-6/10 pl-4 pr-4">
-                            <Slider min={0} max={100} defaultValue={defaultSvgSize} 
-                                onChange={(val) => {updateSvgSize(val)}} styles={{track: {backgroundColor: blueBGColor}, handle: {borderColor: blueBGColor}}}/>
+                            <Slider progress
+                                className="flex w-full"
+                                barClassName="flex w-full"
+                                min={0} 
+                                max={100} 
+                                defaultValue={defaultSvgSize} 
+                                onChange={(val) => {updateSvgSize(val)}} 
+                            />
                         </div>
                     </div>
                     <ReactSVG src={positionToSvg(focus)} style={svgSizeStyle} loading={() => <ClipLoader />} 

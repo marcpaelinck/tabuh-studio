@@ -7,23 +7,19 @@ import type { NotationType } from "../models/types";
 
 interface NotationAreaAttributes extends React.TextareaHTMLAttributes<HTMLDivElement>, React.RefAttributes<NotationArea> {
     notation: NotationType | null
+    visible: boolean
 }
 
 interface NotationAreaStates { 
     text: string, 
-    textarea: RefObject<HTMLDivElement | null>
+    textarea: RefObject<HTMLDivElement | null>,
+    props: NotationAreaAttributes
 }
 
 export class NotationArea extends Component<NotationAreaAttributes, NotationAreaStates> {
     constructor(props: NotationAreaAttributes) {
         super(props);
-        this.state = {text: "", textarea: createRef()}
-    }
-
-    update = (newText: string) => {
-        this.setState({text: this.state.text + newText})
-        if (this.state.textarea.current)
-            this.state.textarea.current.scrollTop = this.state.textarea.current.scrollHeight;
+        this.state = {text: "", textarea: createRef(), props:props}
     }
 
     highlight = (line: number, range: number[]) => {
@@ -53,7 +49,7 @@ export class NotationArea extends Component<NotationAreaAttributes, NotationArea
         return (
             <>
                 <div id="NotationArea" ref={this.state.textarea} className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
-                { this.props.notation }
+                    {this.state.props.visible &&  this.props.notation }
                 </div>
             </>
         );

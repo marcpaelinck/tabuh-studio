@@ -108,15 +108,15 @@ export type Timeline = {
 }
 
 // Create a mapping for notes to shorthand code
-const note_to_shCode: { [position: string]: { [symbol: string]: string[] } } = {}
-for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
-  note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
-}
+// const note_to_shCode: { [position: string]: { [symbol: string]: string[] } } = {}
+// for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
+//   note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
+// }
 
 const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote[] => {
-  if (!(position in note_to_shCode)) return []
+  if (!(position in instrumentConfigs)) return []
   const cleanedSymbol = cleanSymbol(notationNote.s)
-  const shorthandCodes = note_to_shCode[position][cleanedSymbol] || []
+  const shorthandCodes = instrumentConfigs[position].symbolToNoteNames[cleanedSymbol] || []
   const result: AnimationNote[] = []
   shorthandCodes.forEach((shCode) => {
     const instrType: string = instrumentConfigs[position].type

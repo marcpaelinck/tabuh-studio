@@ -8,8 +8,8 @@ import { createTimeline, type AnimationAction, type CursorAction, type SamplerAc
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
-import Slider from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import { Slider } from 'rsuite';
+import 'rsuite/Slider/styles/index.css'
 
 type AudioState = 'false' | 'true' | 'wait'
 
@@ -147,8 +147,15 @@ return (
             </div>
             <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
             <div className="flex w-full items-center ">
-              {/* <hr className="w-full border" /> */}
-              <Slider min={0} max={totalDuration} value={progress} onChange={(val) => jumpToProgressTime(val)} styles={{track: {backgroundColor: '#8ec5ff'}, handle: {borderColor: '#8ec5ff'}}}/>
+              <Slider progress
+                className="flex w-full"
+                barClassName="flex w-full"
+                renderTooltip = {(value) => value ? toMmSs(value) : ""}
+                min={0} 
+                max={totalDuration} 
+                value={progress} 
+                onChange={(val) => jumpToProgressTime(val)} 
+              />
             </div>
             <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(totalDuration)}</p></span>
           </div>
