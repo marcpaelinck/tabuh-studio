@@ -22,7 +22,7 @@ const Selector = ({valueList, onChange, ...props}: {valueList: string[], onChang
      {
     const items: JSX.Element[] = itemListToOptions(valueList, onChange)
     return (
-        <Dropdown {...props}>
+        <Dropdown menuStyle={{overflow:"scroll", maxHeight: "300px"}} {...props}>
             { items }
         </Dropdown>
     )
@@ -60,7 +60,7 @@ export default function Selectors(
     return (
             <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
-                    <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} className = "songselector" width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
+                    <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} className="songselector" width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
                     <Selector id="focusselector" title={focusList[focusIndex-1]} width="3/10" valueList={focusList} onChange={onChangeFocusSelector}/>
                     <Selector id="speedselector" title={`speed: ${speedList[speedIndex-1]}%`} width="3/10" valueList={fmtPercent(speedList)} onChange={onChangeSpeedSelector}/>
                 </ButtonToolbar>

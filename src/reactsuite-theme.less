@@ -1,5 +1,9 @@
 // This files enables to modify the React Suite theme selected in main.txs
 // See https://rsuitejs.com/guide/customization-less/
 @import '/node_modules/rsuite/styles/index.less';
+@enable-css-reset: true;
 @primary-color: #0052cc;
-
+// Undo `color: inherit` setting which resets color of WordPress theme.
+h2 {
+    color: #dd3333;
+}
