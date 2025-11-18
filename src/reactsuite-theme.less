@@ -2,8 +2,36 @@
 // See https://rsuitejs.com/guide/customization-less/
 @import '/node_modules/rsuite/styles/index.less';
 @enable-css-reset: true;
-@primary-color: #0052cc;
+@primary-color: darkgray;
 // Undo `color: inherit` setting which resets color of WordPress theme.
 h2 {
     color: #dd3333;
+}
+
+.ts-theme-animation {
+    --rs-primary-50: #f7fff2;
+    --rs-primary-100: #cfebc0;
+    --rs-primary-200: #a5d48e;
+    --rs-primary-300: #81bf63;
+    --rs-primary-400: #5ea83e;
+    --rs-primary-500: #419421;
+    --rs-primary-600: #378f17;
+    --rs-primary-700: #2b850d;
+    --rs-primary-800: #1f7505;
+    --rs-primary-900: #156100;
+    --rs-slider-progress: var(--rs-primary-500)
+}
+
+.ts-theme-player {
+    --rs-primary-50: #fffaf2;
+    --rs-primary-100: #ffe9c2;
+    --rs-primary-200: #ffd991;
+    --rs-primary-300: #ffca61;
+    --rs-primary-400: #ffbe30;
+    --rs-primary-500: #ffb300;
+    --rs-primary-600: #f5af00;
+    --rs-primary-700: #e0a500;
+    --rs-primary-800: #c29100;
+    --rs-primary-900: #997500;
+    --rs-slider-progress: var(--rs-primary-500)
 }

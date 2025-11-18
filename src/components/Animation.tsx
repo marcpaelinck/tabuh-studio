@@ -4,7 +4,7 @@ import { ReactSVG } from 'react-svg'
 import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
 import { instrumentConfigs } from '../config/config';
-import { FRAMESTYLE } from '../config/constants';
+import { FRAMESTYLE, theme } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import NotationArea from './NotationArea';
 import { Toggle, Slider, Grid, Row, Col } from 'rsuite'
@@ -88,7 +88,9 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
             <Grid fluid id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
                         <Col xs={8} sm={8} md={4}>
-                            <Toggle id="notation toggle" 
+                            <Toggle 
+                                id="notation toggle"
+                                color={theme.animation}
                                 defaultChecked ={notationVisible}
                                 onChange={checked => setNotationVisibility(checked)} 
                             >notation</Toggle>
@@ -98,6 +100,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
                         <Col xs={8} sm={8}  md={4}>
                             <Toggle 
                                 id="panggul toggle" 
+                                color={theme.animation}
                                 defaultChecked 
                                 onChange={checked => setPanggulVisibility(checked)} 
                             >panggul</Toggle>
@@ -112,8 +115,8 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
                 <Row id="slider-row" className="pl-4 pr-4 pt-10">
                     <Slider 
                         progress
-                        className="flex w-full"
-                        barClassName="flex w-full"
+                        className="flex w-full ts-theme-animation"
+                        barClassName="flex w-full ts-theme-animation"
                         min={0} 
                         max={100} 
                         defaultValue={defaultSvgSize} 

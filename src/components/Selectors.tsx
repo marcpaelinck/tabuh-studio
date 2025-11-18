@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX, RefObject } from "react";
 import { useState } from "react";
 import { ButtonToolbar, Dropdown } from "rsuite";
 import 'rsuite/styles/index.less';
@@ -29,7 +29,8 @@ const Selector = ({valueList, onChange, ...props}: {valueList: string[], onChang
 }
 
 export default function Selectors(
-    {songList, focusList, songUpdater, focusUpdater, speedUpdater}: {songList: string[], focusList: string[], songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
+    {menuDisabled, songList, focusList, songUpdater, focusUpdater, speedUpdater}: 
+    {menuDisabled: RefObject<Record<string, boolean>>, songList: string[], focusList: string[], songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
     const [songIndex,setSongIndex]  = useState<number>(-1)
     const [focusIndex,setFocusIndex]  = useState<number>(1)
@@ -57,12 +58,38 @@ export default function Selectors(
 
     const fmtPercent = (valList: number[] | string[]) => valList.map((val: number | string) => `${val}%`)
 
+    const div: HTMLDivElement | null = document.querySelector("#--test--");
+    if (div) {
+        div.className = "ts-theme-animation"
+        const compStyles = getComputedStyle(div)
+        console.log(compStyles)
+    } else console.log("niet gelukt")
+
     return (
             <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
-                    <Selector id="songselector" title={songList[songIndex-1] || "Tabuh..."} className="songselector" width="3/10" valueList={songList} onChange={onChangeSongSelector}/>
-                    <Selector id="focusselector" title={focusList[focusIndex-1]} width="3/10" valueList={focusList} onChange={onChangeFocusSelector}/>
-                    <Selector id="speedselector" title={`speed: ${speedList[speedIndex-1]}%`} width="3/10" valueList={fmtPercent(speedList)} onChange={onChangeSpeedSelector}/>
+                    <Selector id="songselector" 
+                        disabled={menuDisabled.current["tabuh"]}
+                        title={songList[songIndex-1] || "Tabuh..."} 
+                        className="songselector" 
+                        // menuStyle={}
+                        width="3/10" valueList={songList} onChange={onChangeSongSelector}
+                    />
+                    <Selector 
+                        id="focusselector" 
+                        disabled={menuDisabled.current["focus"]}
+                        title={focusList[focusIndex-1]} 
+                        width="3/10" 
+                        valueList={focusList} 
+                        onChange={onChangeFocusSelector}
+                    />
+                    <Selector 
+                        id="speedselector" 
+                        title={`speed: ${speedList[speedIndex-1]}%`} 
+                        width="3/10" 
+                        valueList={fmtPercent(speedList)} 
+                        onChange={onChangeSpeedSelector}
+                    />
                 </ButtonToolbar>
             </div>
         )

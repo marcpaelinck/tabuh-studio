@@ -12,7 +12,8 @@ export default function App() {
   const defaultFocusList = ["No focus"]
   const [isLoading, setIsLoading] = useState(true)
   const [songList, setSongList] = useState<string[]>([])
-  const [positionList, setPositionList] = useState<string[]>(defaultFocusList)
+  const [focusList, setFocusList] = useState<string[]>(defaultFocusList)
+  const menuDisabled = useRef<Record<string, boolean>>({"tabuh": false, "focus": false})
   const [selectedSong, setSelectedSong] = useState<string>("")
   const [selectedFocus, setSelectedFocus] = useState<string>('')
   const [score, setScore] = useState<Score | null>(null)
@@ -44,13 +45,20 @@ export default function App() {
     animationInfoRef.current = animationInfo
   }
   
+  const setMenuDisabled = (label: string, value: boolean) => {
+    menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
+  }
+
   // Retrieve information about available notation scores  
   useEffect(() => {
       async function fetchScores() {
+        setMenuDisabled("tabuh", true)
+        setMenuDisabled("focus", true)
         const files = await readFile('scores/content.json');
         const scoreInfo: ScoreInfo[] = JSON.parse(files)
         songDictRef.current = Object.fromEntries(scoreInfo.map((score: ScoreInfo) => [score.title, score.file]))
         setSongList(Object.keys(songDictRef.current))
+        setMenuDisabled("tabuh", false)
       }
       fetchScores();
   }, []);
@@ -59,14 +67,16 @@ export default function App() {
   useEffect(() => {
     const loadScore = async () => {
       if (selectedSong) {
+        setMenuDisabled("focus", false)
         let jsonScore = await readFile('scores/' + songDictRef.current[selectedSong])
         const newScore = parseScore(jsonScore)
             if (newScore && newScore!=score) {
                 setScore(newScore)
                 const instr_lists: string[] = newScore.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
                 const focusList = defaultFocusList.concat(Array.from(new Set(instr_lists)))
-                setPositionList(focusList)
+                setFocusList(focusList)
             }
+        setMenuDisabled("focus", false)
       }
       setIsLoading(false)
     }
@@ -89,7 +99,7 @@ export default function App() {
       </div>
       <div className={"lg:w-8/10 sm:w-full" + FRAMESTYLE}>
         <div className="pt-6 pl-6 pr-6">
-          <Selectors songList={songList} focusList={positionList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
+          <Selectors menuDisabled={menuDisabled} songList={songList} focusList={focusList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
         </div>
         {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>

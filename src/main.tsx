@@ -9,6 +9,7 @@ import './index.css'
 
 createRoot(document.getElementById('tabuh-studio')!).render(
   <StrictMode>
+    <div id="--test--"/>
       <CustomProvider theme="light">
         <App />
       </CustomProvider>

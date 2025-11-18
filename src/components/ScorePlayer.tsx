@@ -148,8 +148,8 @@ return (
             <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
             <div className="flex w-full items-center ">
               <Slider progress
-                className="flex w-full"
-                barClassName="flex w-full"
+                className="flex w-full ts-theme-player"
+                barClassName="flex w-full ts-theme-player"
                 renderTooltip = {(value) => value ? toMmSs(value) : ""}
                 min={0} 
                 max={totalDuration} 
