@@ -1,93 +1,97 @@
 import type { JSX, RefObject } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonToolbar, Dropdown } from "rsuite";
 import 'rsuite/styles/index.less';
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
+import type { Score } from "../models/types";
+import { createFocusMenuItems, createSpeedMenuItems, createTabuhMenuItems, defaultSpeedOption, noFocusOption, noTabuhOption, menuItemListToMenu, type MenuItemInfo } from "../utils/selectorsUtils/selectorsUtils";
 import { speedList } from "../config/constants";
 
-// Convert a list of string values to a list op option Elements.
-function itemListToOptions(values: string[], onChange: CallableFunction): JSX.Element[] {
-    return values.map((value: string, index: number) => (
-                <Dropdown.Item
-                    key={index} 
-                    onSelect={(eventKey: string) => {onChange(eventKey)}} 
-                    eventKey={index+1}
-                >{value}</Dropdown.Item>
-            ))
-}
-
-
-const Selector = ({valueList, onChange, ...props}: {valueList: string[], onChange: (index: number) => void, [key: string]: any}) => 
+const Selector = ({valueList, scrollable, ...props}: {valueList: MenuItemInfo[], [key: string]: any, scrollable?: boolean}) => 
      {
-    const items: JSX.Element[] = itemListToOptions(valueList, onChange)
-    return (
-        <Dropdown menuStyle={{overflow:"scroll", maxHeight: "300px"}} {...props}>
+    const items: JSX.Element[] = menuItemListToMenu(props.id, valueList, props.onChange)
+       return (
+        <Dropdown menuStyle={{overflowY: scrollable?"scroll":"visible", maxHeight: scrollable?"300px":""}} {...props}>
             { items }
         </Dropdown>
     )
 }
 
 export default function Selectors(
-    {menuDisabled, songList, focusList, songUpdater, focusUpdater, speedUpdater}: 
-    {menuDisabled: RefObject<Record<string, boolean>>, songList: string[], focusList: string[], songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
+    {menuDisabled, songList, score, songUpdater, focusUpdater, speedUpdater}: 
+    {menuDisabled: RefObject<Record<string, boolean>>, songList: string[], score: Score | null, songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
-    const [songIndex,setSongIndex]  = useState<number>(-1)
-    const [focusIndex,setFocusIndex]  = useState<number>(1)
-    const [speedIndex,setSpeedIndex]  = useState<number>(10)
+    
+    const [tabuhMenuItems, setTabuhMenuItems] = useState<MenuItemInfo[]>([])
+    const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
+    const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
+    const [selectedSong,setSelectedSong]  = useState<MenuItemInfo>(noTabuhOption)
+    const [selectedFocus,setSelectedFocus]  = useState<MenuItemInfo>(noFocusOption)
+    const [selectedSpeed,setSelectedSpeed]  = useState<MenuItemInfo>(defaultSpeedOption)
 
-    const onChangeSongSelector = (index: number) => {
-        console.log(`index=${index}, song=${songList[index-1]}`)
-        setSongIndex(index)
-        songUpdater(songList[index-1])
-        onChangeFocusSelector(1)
-        
+    useEffect(() => {
+        const updateFixedMenus = async () => {
+            setTabuhMenuItems(createTabuhMenuItems(songList))
+            setSpeedMenuItems(createSpeedMenuItems(speedList))
+        }
+        updateFixedMenus()
+        }, [songList])
+
+    useEffect(() => {
+        const updateFocusMenu = async () => {
+            if (score) {
+                setFocusMenuItems(createFocusMenuItems(score))
+                }
+        }
+    updateFocusMenu()
+    }, [score])
+      
+
+    const onChangeTabuhSelector = async (item: MenuItemInfo) => {
+        setSelectedSong(item)
+        songUpdater(item.key)
+        onChangeFocusSelector(noFocusOption)
     }
 
-    const onChangeFocusSelector = (index: number) => {
-        console.log(`index=${index}, focus=${focusList[index-1]}`)
-        setFocusIndex(index)
-        focusUpdater(index==1 ? "" : focusList[index-1])
+    const onChangeFocusSelector = async (item: MenuItemInfo) => {
+        setSelectedFocus(item)
+        focusUpdater(item.key)
     }
 
-    const onChangeSpeedSelector = (index: number) => {
-        console.log(`index=${index}, speed=${speedList[index-1]}`)
-        setSpeedIndex(index)
-        speedUpdater(speedList[index-1])
+    const onChangeSpeedSelector = async (item: MenuItemInfo) => {
+        setSelectedSpeed(item)
+        speedUpdater(item.key)
     }
-
-    const fmtPercent = (valList: number[] | string[]) => valList.map((val: number | string) => `${val}%`)
-
-    const div: HTMLDivElement | null = document.querySelector("#--test--");
-    if (div) {
-        div.className = "ts-theme-animation"
-        const compStyles = getComputedStyle(div)
-        console.log(compStyles)
-    } else console.log("niet gelukt")
 
     return (
             <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
-                    <Selector id="songselector" 
-                        disabled={menuDisabled.current["tabuh"]}
-                        title={songList[songIndex-1] || "Tabuh..."} 
-                        className="songselector" 
-                        // menuStyle={}
-                        width="3/10" valueList={songList} onChange={onChangeSongSelector}
+                    <Selector 
+                        id="tabuhselector" 
+                        scrollable
+                        disabled={menuDisabled.current.tabuh}
+                        title={selectedSong.displayValue || noTabuhOption.displayValue} 
+                        className="tabuhselector" 
+                        width="3/10" 
+                        valueList={tabuhMenuItems} 
+                        onChange={onChangeTabuhSelector}
                     />
                     <Selector 
                         id="focusselector" 
-                        disabled={menuDisabled.current["focus"]}
-                        title={focusList[focusIndex-1]} 
+                        scrollable
+                        disabled={menuDisabled.current.focus}
+                        title={selectedFocus.displayValue || noFocusOption.displayValue} 
                         width="3/10" 
-                        valueList={focusList} 
+                        valueList={focusMenuItems} 
                         onChange={onChangeFocusSelector}
                     />
                     <Selector 
                         id="speedselector" 
-                        title={`speed: ${speedList[speedIndex-1]}%`} 
-                        width="3/10" 
-                        valueList={fmtPercent(speedList)} 
+                        scrollable
+                        title={`speed: ${selectedSpeed.displayValue}`} 
+                        width="2/10" 
+                        valueList={speedMenuItems} 
                         onChange={onChangeSpeedSelector}
                     />
                 </ButtonToolbar>

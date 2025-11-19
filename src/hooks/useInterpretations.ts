@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import type { SamplerAction } from '../utils/score'
+import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 
 export function useInterpretations() {
     const changeTempo = (time: number, action: SamplerAction, pbSpeed: number) => {

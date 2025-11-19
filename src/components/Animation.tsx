@@ -1,15 +1,15 @@
 import type { JSX } from 'react'
 import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import ClipLoader from 'react-spinners/ClipLoader'
 import React from 'react';
 import { instrumentConfigs } from '../config/config';
 import { FRAMESTYLE, theme } from '../config/constants';
 import type { AnimationInfo, NotationType, SVGInfo } from '../models/types';
 import NotationArea from './NotationArea';
-import { Toggle, Slider, Grid, Row, Col } from 'rsuite'
-import 'rsuite/Toggle/styles/index.css';
-import 'rsuite/Slider/styles/index.css';
+import { Toggle, Slider, Grid, Row, Col, Loader } from 'rsuite'
+import 'rsuite/Toggle/styles/index.css'
+import 'rsuite/Slider/styles/index.css'
+import 'rsuite/Loader/styles/index.css'
 
 function positionToSvg(position: string): string  {
     console.log("loading SVG file")
@@ -91,7 +91,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
                             <Toggle 
                                 id="notation toggle"
                                 color={theme.animation}
-                                defaultChecked ={notationVisible}
+                                defaultChecked={notationVisible}
                                 onChange={checked => setNotationVisibility(checked)} 
                             >notation</Toggle>
                         </Col>
@@ -127,7 +127,7 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
                     <ReactSVG 
                         src={positionToSvg(focus)} 
                         style={svgSizeStyle} 
-                        loading={() => <ClipLoader />} 
+                        loading={() => <Loader />} 
                         useRequestCache={true} 
                         beforeInjection={setSvgLoadedFalse} 
                         afterInjection={setSvgStates}

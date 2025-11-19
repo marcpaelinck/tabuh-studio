@@ -22,6 +22,7 @@ export type MutingType = typeof _mutings_[number];
 export type InstrumentConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.
     // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
+    name: string
     instrument: string
     type: string
     svg_file: string,
@@ -137,7 +138,8 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
 
 export const instrumentConfigs: Record<string, InstrumentConfig> = {
     GONGS: {
-        instrument: "GONGS",
+        name: "Gongs",
+        instrument: "Gongs",
         type: "percussion",
         volume: -5,
         svg_file: "svg/GK_GONGS.svg",
@@ -149,7 +151,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     KEMPLI: {
-        instrument: "KEMPLI",
+        name: "Kempli",
+        instrument: "Kempli",
         type: "percussion",
         volume: -5,
         svg_file: "",
@@ -157,7 +160,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         symbolToNoteNames: { "x?": ["X_MUTED"] }
     },
     CENGCENG: {
-        instrument: "CENGCENG",
+        name: "Cengceng",
+        instrument: "Cengceng",
         type: "percussion",
         volume: -14,
         svg_file: "",
@@ -168,7 +172,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     KENDANG: {
-        instrument: "KENDANG",
+        name: "Kendang",
+        instrument: "Kendang",
         type: "percussion",
         volume: 0,
         svg_file: "svg/GK_KENDANG.svg",
@@ -183,7 +188,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     JEGOGAN: {
-        instrument: "JEGOGAN",
+        name: "Jegogan",
+        instrument: "Jegogan",
         type: "daun",
         volume: -5,
         svg_file: "svg/GK_JEGOGAN.svg",
@@ -202,7 +208,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     CALUNG: {
-        instrument: "CALUNG",
+        name: "Calung",
+        instrument: "Calung",
         type: "daun",
         volume: -5,
         svg_file: "svg/GK_CALUNG.svg",
@@ -221,7 +228,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     PENYACAH: {
-        instrument: "PENYACAH",
+        name: "Penyacah",
+        instrument: "Penyacah",
         type: "daun",
         volume: -15,
         svg_file: "svg/GK_PENYACAH.svg",
@@ -244,7 +252,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     KANTILAN_POLOS: {
-        instrument: "KANTILAN",
+        name: "Kantilan polos",
+        instrument: "Kantilan",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -283,7 +292,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     KANTILAN_SANGSIH: {
-        instrument: "KANTILAN",
+        name: "Kantilan sangsih",
+        instrument: "Kantilan",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -322,7 +332,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     PEMADE_POLOS: {
-        instrument: "PEMADE",
+        name: "Pemade polos",
+        instrument: "Pemade",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -361,7 +372,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     PEMADE_SANGSIH: {
-        instrument: "PEMADE",
+        name: "Pemade sangsih",
+        instrument: "Pemade",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -400,7 +412,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     UGAL: {
-        instrument: "UGAL",
+        name: "Ugal",
+        instrument: "Ugal",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_UGAL.svg",
@@ -439,7 +452,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     REYONG_1: {
-        instrument: "REYONG",
+        name: "Reyong 1",
+        instrument: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -461,7 +475,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     REYONG_2: {
-        instrument: "REYONG",
+        name: "Reyong 2",
+        instrument: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -482,7 +497,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     REYONG_3: {
-        instrument: "REYONG",
+        name: "Reyong 3",
+        instrument: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -503,7 +519,8 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
         }
     },
     REYONG_4: {
-        instrument: "REYONG",
+        name: "Reyong 4",
+        instrument: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",

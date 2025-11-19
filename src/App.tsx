@@ -2,36 +2,34 @@
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
 import Animation from './components/Animation'
-import { type Score, type AnimationInfo, type NotationType, type ScoreInfo, type System, type Section } from './models/types'
+import { type Score, type AnimationInfo, type NotationType, type ScoreInfo } from './models/types'
 import { readFile } from './utils/filesystem'
-import { parseScore, type Timeline } from './utils/score'
+import { parseScore, type Timeline } from './utils/scoreplayerUtils/score'
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
 
 export default function App() {
-  const defaultFocusList = ["No focus"]
   const [isLoading, setIsLoading] = useState(true)
   const [songList, setSongList] = useState<string[]>([])
-  const [focusList, setFocusList] = useState<string[]>(defaultFocusList)
   const menuDisabled = useRef<Record<string, boolean>>({"tabuh": false, "focus": false})
-  const [selectedSong, setSelectedSong] = useState<string>("")
-  const [selectedFocus, setSelectedFocus] = useState<string>('')
+  const [selectedSong, setSelectedSong] = useState<string | null>(null)
+  const [selectedFocus, setSelectedFocus] = useState<string | null>(null)
   const [score, setScore] = useState<Score | null>(null)
   const songDictRef: RefObject<Record<string, string>> = useRef({})
-  const focusReference: RefObject<string>  = useRef('')
+  const focusReference: RefObject<string | null>  = useRef(null)
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, highlightRef: useRef(() => {})})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
   const playbackSpeedRef = useRef<number>(1)
 
-  const updateSong = (newSongName: string): void => {
+  const updateSong = (newSongName: string | null): void => {
       if (newSongName !== selectedSong) setSelectedSong(newSongName)
     }
  
-  const updateFocus = (position: string): void => {
+  const updateFocus = (position: string | null): void => {
     if  (position !== focusReference.current) {
       focusReference.current=position
-      if (timelineRef.current?.notation && position in timelineRef.current?.notation)
+      if (timelineRef.current?.notation && position && position in timelineRef.current?.notation)
         notationRef.current = timelineRef.current.notation[position]
       setSelectedFocus(position)
     }
@@ -72,9 +70,6 @@ export default function App() {
         const newScore = parseScore(jsonScore)
             if (newScore && newScore!=score) {
                 setScore(newScore)
-                const instr_lists: string[] = newScore.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
-                const focusList = defaultFocusList.concat(Array.from(new Set(instr_lists)))
-                setFocusList(focusList)
             }
         setMenuDisabled("focus", false)
       }
@@ -99,7 +94,7 @@ export default function App() {
       </div>
       <div className={"lg:w-8/10 sm:w-full" + FRAMESTYLE}>
         <div className="pt-6 pl-6 pr-6">
-          <Selectors menuDisabled={menuDisabled} songList={songList} focusList={focusList} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
+          <Selectors menuDisabled={menuDisabled} songList={songList} score={score} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
         </div>
         {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>

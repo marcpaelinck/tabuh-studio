@@ -4,7 +4,7 @@ import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score, type AnimationInfo} from '../models/types'
 import { useState, type JSX, useMemo, useEffect } from 'react'
 import * as Tone from 'tone'
-import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/score'
+import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/scoreplayerUtils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
@@ -14,18 +14,20 @@ import 'rsuite/Slider/styles/index.css'
 type AudioState = 'false' | 'true' | 'wait'
 
 export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeedRef, timelineUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
+  { score: Score | null, focusRef: React.RefObject<string | null>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
 
+  // STATE VARIABLES
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
   const [playing, setPlaying] = useState<boolean>(false)
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
 
+  // HOOKS
   const { playInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
   const { animateInstrument, animateNotation } = useAnimationEngine()
 
-  // recreate the Transport schedule when a new score is selected
+  // MEMOS AND EFFECTS
   const timeline = useMemo(() => createTimeline(score), [score])
   
   useEffect(() => {
@@ -140,10 +142,10 @@ return (
         <div className="flex w-full">
           <div className="flex w-full items-center gap-5 justify-center select-none">
             <div className="h-4 w-4 shrink-0">
-              <button onClick={() => rewind()}><FaBackwardFast/></button>
+              <button onClick={() => rewind()}><FaBackwardFast color="orange"/></button>
             </div>
             <div className="h-4 w-4 shrink-0">
-              <button onClick={() => playPause()}>{playing? <FaPause/> : <FaPlay/>}</button>
+              <button onClick={() => playPause()}>{playing? <FaPause color="orange"/> : <FaPlay color="orange"/>}</button>
             </div>
             <span className="flex w-12 shrink-0 justify-center"><p>{toMmSs(progress)}</p>{" "}</span>
             <div className="flex w-full items-center ">

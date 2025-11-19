@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
-import type { SamplerAction } from '../utils/score'
+import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
 export type InstrumentSampler = {
-  play: (time: number, action: SamplerAction, focus: string) => void
+  play: (time: number, action: SamplerAction, focus: string | null) => void
   mute: (time: number) => void
 }
 
@@ -40,8 +40,8 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
 
   return {
-    play: (time: number, action: SamplerAction, currentFocus: string) => {
-      const dimValue = (currentFocus == "" || currentFocus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
+    play: (time: number, action: SamplerAction, currentFocus: string | null) => {
+      const dimValue = (!currentFocus || currentFocus == position || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
       const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
       if (indices && samplers[position].current) {
         try {
@@ -75,7 +75,7 @@ export const useInstruments = () => {
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
   const playInstrument = useCallback(
-    (time: number, action: SamplerAction, currentFocus: string) => {
+    (time: number, action: SamplerAction, currentFocus: string | null) => {
       if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
       else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus) }
     },

@@ -1,4 +1,4 @@
-import type { AnimationAction, AnimationNote, CursorAction } from "../utils/score";
+import type { AnimationAction, AnimationNote, CursorAction } from "../utils/scoreplayerUtils/score";
 import * as Tone from 'tone'
 import { useCallback } from "react";
 import type { AnimationInfo, SVGInfo } from "../models/types";
@@ -147,7 +147,7 @@ export const useAnimationEngine = () => {
 
 
     // For the use of Draw.schedule, see 
-    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string, animationInfo: AnimationInfo, pbSpeed: number) => {
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string | null, animationInfo: AnimationInfo, pbSpeed: number) => {
         const svgInfo = animationInfo.svgInfo
         if (aAction.position === currentFocus) {
             // const svgInfo = svgInfoRef.current
@@ -169,7 +169,7 @@ export const useAnimationEngine = () => {
         }
     }, [])
 
-    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string, animationInfo: AnimationInfo) => {
+    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string | null, animationInfo: AnimationInfo) => {
         if (cAction.position === currentFocus) {
             Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfo), time)
         }
