@@ -14,7 +14,7 @@ import 'rsuite/Slider/styles/index.css'
 type AudioState = 'false' | 'true' | 'wait'
 
 export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeedRef, timelineUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string | null>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
+  { score: Score | null, focusRef: React.RefObject<string[]>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
 
   // STATE VARIABLES
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')

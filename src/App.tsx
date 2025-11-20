@@ -7,35 +7,37 @@ import { readFile } from './utils/filesystem'
 import { parseScore, type Timeline } from './utils/scoreplayerUtils/score'
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import { FRAMESTYLE } from './config/constants'
+import { focusDefaultOption, speedDefaultOption } from './utils/selectorsUtils/selectorsUtils'
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
   const [songList, setSongList] = useState<string[]>([])
   const menuDisabled = useRef<Record<string, boolean>>({"tabuh": false, "focus": false})
   const [selectedSong, setSelectedSong] = useState<string | null>(null)
-  const [selectedFocus, setSelectedFocus] = useState<string | null>(null)
+  const [selectedFocus, setSelectedFocus] = useState<string[]>([])
   const [score, setScore] = useState<Score | null>(null)
   const songDictRef: RefObject<Record<string, string>> = useRef({})
-  const focusReference: RefObject<string | null>  = useRef(null)
+  const focusReference: RefObject<string[]>  = useRef(focusDefaultOption.value as string[])
+  const playbackSpeedRef = useRef<number>(speedDefaultOption.value as number)
   const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, highlightRef: useRef(() => {})})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
   const notationRef: RefObject<NotationType | null> = useRef(null)
-  const playbackSpeedRef = useRef<number>(1)
-
+  
   const updateSong = (newSongName: string | null): void => {
       if (newSongName !== selectedSong) setSelectedSong(newSongName)
     }
  
-  const updateFocus = (position: string | null): void => {
+  const updateFocus = (position: string[]): void => {
     if  (position !== focusReference.current) {
       focusReference.current=position
-      if (timelineRef.current?.notation && position && position in timelineRef.current?.notation)
-        notationRef.current = timelineRef.current.notation[position]
+      //TODO currently only displaying notation for the first focus position
+      if (timelineRef.current?.notation && position && position[0] in timelineRef.current?.notation)
+        notationRef.current = timelineRef.current.notation[position[0]]
       setSelectedFocus(position)
     }
   }
 
-  const updatePlaybackSpeed = (newSpeed: number) => {playbackSpeedRef.current=newSpeed / 100}
+  const updatePlaybackSpeed = (newSpeed: number) => {playbackSpeedRef.current=newSpeed}
 
   const updateTimeline = (timeline: Timeline): void => {timelineRef.current = timeline}
 

@@ -549,9 +549,9 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
             "o<": ["DONG2"],
             "e<": ["DENG2"],
             "u<": ["DUNG2"],
-            "b": ["DING2", "DENG2"],
-            "b/": ["DING2_ABBR", "DENG2_ABBR"],
-            "b?": ["DING2_MUTED", "DENG2_MUTED"],
+            "b": ["DONG2", "DUNG2"],
+            "b/": ["DONG2_ABBR", "DUNG2_ABBR"],
+            "b?": ["DONG2_MUTED", "DUNG2_MUTED"],
             "x": ["XDENG2"],
             "x/": ["XDENG2_MUTED"]
         }
@@ -592,9 +592,9 @@ export const animationConfig: Record<string, Partial<Record<MutingType | ToneTyp
     // Highlight keys can be a pitch or a muting type.
     // In case of a multiple match the pitch takes priority.
     highlight: {
-        OPEN: ["green", "lime"],
-        ABBREVIATED: ["blue", "aqua"],
-        MUTED: ["purple", "fuchsia"],
+        OPEN: ["l-green", "l-blue", "l-cyan", "l-magenta"],
+        ABBREVIATED: ["m-green", "m-blue", "m-cyan", "m-magenta"],
+        MUTED: ["d-green", "d-blue", "d-cyan", "d-magenta"],
         KA: ["green"],
         PAK: ["green"],
         DE: ["blue"],
@@ -605,6 +605,18 @@ export const animationConfig: Record<string, Partial<Record<MutingType | ToneTyp
 }
 
 export const colorRGB: Record<string, number[]> = {
+    "l-green": [0, 255, 0],
+    "m-green": [0, 160, 0],
+    "d-green": [0, 80, 0],
+    "l-blue": [0, 0, 255],
+    "m-blue": [0, 0, 160],
+    "d-blue": [0, 0, 80],
+    "l-cyan": [0, 255, 255],
+    "m-cyan": [0, 160, 160],
+    "d-cyan": [0, 80, 80],
+    "l-magenta": [255, 0, 255],
+    "m-magenta": [160, 0, 160],
+    "d-magenta": [80, 0, 80],
     "aliceblue": [240, 248, 255],
     "antiquewhite": [250, 235, 215],
     "aqua": [0, 255, 255],

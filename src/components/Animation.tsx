@@ -11,8 +11,14 @@ import 'rsuite/Toggle/styles/index.css'
 import 'rsuite/Slider/styles/index.css'
 import 'rsuite/Loader/styles/index.css'
 
-function positionToSvg(position: string): string  {
-    return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
+// Returns the SVG filename for the given position if found.
+// In case more than one position is given, all positions must use the same SVG file.
+// (Animation can currently animate only one instrument at the same time)
+function positionToSvg(positions: string[]): string  {
+    const svgList: string[] = []
+    positions.forEach((pos: string)=> svgList.push(instrumentConfigs[pos]?.svg_file))
+    const uniqueList: string[] = [...new Set(svgList)]
+    return uniqueList.length==1 ? uniqueList[0] : ""
 }
 
 // Returns the content of the data section of the SVG file
@@ -32,7 +38,7 @@ const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGIn
 }
 
 export default function Animation({focus, notationRef, animationInfoUpdater}: 
-    {focus: string, notationRef: React.RefObject<NotationType | null>, animationInfoUpdater: Function}) : JSX.Element {
+    {focus: string[], notationRef: React.RefObject<NotationType | null>, animationInfoUpdater: Function}) : JSX.Element {
     const defaultSvgSize = 100 // percent
     // const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
     const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
@@ -82,15 +88,16 @@ export default function Animation({focus, notationRef, animationInfoUpdater}:
         setNotationVisible(isVisible)
     }    
 
-    return(focus ? (
+    return(focus.length > 0 ? (
         <div className="m-6">
             <Grid fluid id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
                         <Col xs={8} sm={8} md={4}>
                             <Toggle 
                                 id="notation toggle"
+                                disabled={notationRef.current==null}
                                 color={theme.animation}
-                                defaultChecked={notationVisible}
+                                defaultChecked={notationRef.current!=null && notationVisible}
                                 onChange={checked => setNotationVisibility(checked)} 
                             >notation</Toggle>
                         </Col>

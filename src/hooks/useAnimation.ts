@@ -147,30 +147,32 @@ export const useAnimationEngine = () => {
 
 
     // For the use of Draw.schedule, see 
-    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string | null, animationInfo: AnimationInfo, pbSpeed: number) => {
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string[], animationInfo: AnimationInfo, pbSpeed: number) => {
         const svgInfo = animationInfo.svgInfo
-        if (aAction.position === currentFocus) {
-            // const svgInfo = svgInfoRef.current
+        if (currentFocus.includes(aAction.position)) {
             if (svgInfo.svg && aAction.currnotes) {
                 // Hightighting animation
                 aAction.currnotes.forEach((note) => {
                     var keyElement = (svgInfo.svg?.querySelector(`#${note.keyname}${note.stroke ? " ." + note.stroke : ""}`))
-                    //TODO currentFocus type should be changed into string[] to enable multiple focused positions. 
-                    // Then change the next statement in: const positionIndex = currentFocus.indexOf(aAction.position)
-                    const positionIndex = 0
+                    // positionIndex will be used to select the highlight color combinations.
+                    const positionIndex = currentFocus.indexOf(aAction.position)
                     //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
                     if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, note, positionIndex), time) }
                 })
                 // Panggul animation
-                if (svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
+                // Currently only active for the first of multiple focus positions. 
+                const positionIndex = 0
+                // TODO: Set positionIndex according to user selection.
+                if (aAction.position == currentFocus[positionIndex] && svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
                     Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo, pbSpeed), time)
                 }
             }
         }
     }, [])
 
-    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string | null, animationInfo: AnimationInfo) => {
-        if (cAction.position === currentFocus) {
+    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string[], animationInfo: AnimationInfo) => {
+        // if (currentFocus.includes(cAction.position)) {
+        if (currentFocus.length > 0 && currentFocus[0] === cAction.position) {
             Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfo), time)
         }
     }, [])
