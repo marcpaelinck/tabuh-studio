@@ -130,12 +130,6 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
 
 return (
     <div className="flex flex-col justify-between">
-      {/* <div className="custom-scrollbar flex h-full flex-col overflow-scroll">
-        <div className="my-4">
-          <ScoreHeader title={score.title} composer={score.composer} />
-        </div>
-      </div> */}
-
       <div className="max-width-200 gap-1 px-4 pt-3 pb-4 text-xs">
         <div className="flex justify-center">
         </div>

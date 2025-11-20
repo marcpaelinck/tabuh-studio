@@ -12,7 +12,6 @@ import 'rsuite/Slider/styles/index.css'
 import 'rsuite/Loader/styles/index.css'
 
 function positionToSvg(position: string): string  {
-    console.log("loading SVG file")
     return position in instrumentConfigs ? instrumentConfigs[position].svg_file : ""
 }
 

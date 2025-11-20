@@ -3,26 +3,32 @@ import { instrumentConfigs } from "../../config/config";
 import type { Score, Section, System } from "../../models/types";
 import type { JSX } from "react";
 
+export type MenuItemInfo = { 
+    key: string | number | null, 
+    displayValue: string, 
+    values: (string | number | null)[] 
+}
+
 // Data for a menu item
-export const noTabuhOption: MenuItemInfo = {key: null, displayValue: "Tabuh..."}
-export const noFocusOption: MenuItemInfo = {key: null, displayValue: "No Focus"}
-export const defaultSpeedOption: MenuItemInfo = {key: 100, displayValue: "100%"}
+export const noTabuhOption: MenuItemInfo = {key: null, displayValue: "Tabuh...", values:[null]}
+export const noFocusOption: MenuItemInfo = {key: null, displayValue: "No Focus", values:[null]}
+export const defaultSpeedOption: MenuItemInfo = {key: 100, displayValue: "100%", values:[null]}
 
-export type MenuItemInfo = { key: string | number | null, displayValue: string }
-
-const createMenuItem = (key: string, value:string): MenuItemInfo =>  {return {key: key, displayValue: value}}
+const createItemInfo = (key: string, value:string, values: (string | number | null)[]): MenuItemInfo =>  {
+    return {key: key, displayValue: value, values:values}
+}
 
 // Create lists of MenuItemInfo objects that will be used to populate the menus.
 
 export function createTabuhMenuItems(values: string[]): MenuItemInfo[] {
     return [noTabuhOption].concat(
-        values.map((value: string) => createMenuItem(value, value))
+        values.map((value: string) => createItemInfo(value, value, [value]))
     )
 }
 
 export function createSpeedMenuItems(values: number[]): MenuItemInfo[] {
     return [noTabuhOption].concat(
-        values.map((value: number) => createMenuItem(`${value}`, `${value}%`))
+        values.map((value: number) => createItemInfo(`${value}`, `${value}%`, [value]))
     )
 }
 
@@ -38,8 +44,8 @@ export function createFocusMenuItems(score: Score): MenuItemInfo[]  {
     // Look up the instrument in the instrumentConfigs dict and group by instrument
     const posByInstrument: Record<string, MenuItemInfo[]> = {}
     positions.forEach((position) => {
-        const instrument: string = instrumentConfigs[position]?.instrument || ""
-        const item = createMenuItem(position, instrumentConfigs[position].name)
+        const instrument: string = instrumentConfigs[position].instrumentName 
+        const item = createItemInfo(position, instrumentConfigs[position].name, [position])
         if (! (instrument in posByInstrument)) posByInstrument[instrument] = []
         posByInstrument[instrument].push(item)
     })
@@ -48,7 +54,9 @@ export function createFocusMenuItems(score: Score): MenuItemInfo[]  {
     Object.entries(posByInstrument).forEach(([instr, items]) => {
         if (items.length > 1) {
             // Instrument has multiple positions: add an option to select all positions
-            itemList.push(createMenuItem(instr, instr))
+            const key = instr
+            const values = items.reduce((aggr:  (string | number | null)[], curr) => aggr.concat(curr.values), [])
+            itemList.push(createItemInfo(key, instr, values))
             items.forEach((item) => item.displayValue = "- " + item.displayValue)
         }
         items.forEach((item) => itemList.push(item))
@@ -56,19 +64,20 @@ export function createFocusMenuItems(score: Score): MenuItemInfo[]  {
     return itemList
 }
 
-// Creates a DropDown.Item object
-export const ddItem = (id: string, key:string | number | null, value: string, onChange: CallableFunction) => {
+// Creates a DropDown.Item object that returns a MenuItemInfo object when selected
+export const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: CallableFunction) => {
     return (     
         <Dropdown.Item
-            key={id}
-            eventKey={key}
+            key={`${menuName}-option-${index}`}
+            eventKey={item.key}
             //@ts-ignore
-            onSelect={(eventKey: string, event) => {onChange(createMenuItem(eventKey, event.target.innerText))}} 
-        >{value}</Dropdown.Item>
+            onSelect={(eventKey: string, event) => {onChange(item)}} 
+        >{item.displayValue}</Dropdown.Item>
     )}
 
 
 // Creates a list of DropDown.Item objects based on a list of MenuItemInfo objects.
 export function menuItemListToMenu(menuName: string, items: MenuItemInfo[], onChange: CallableFunction): JSX.Element[] {
-    return items.map((item: MenuItemInfo, index: number) => ddItem(`${menuName}-option-${index}`, item.key, item.displayValue, onChange))
+    // return items.map((item: MenuItemInfo, index: number) => ddItem(`${menuName}-option-${index}`, item.key, item.displayValue, onChange))
+    return items.map((item: MenuItemInfo, index: number) => DDItem(item, index, menuName, onChange))
 }

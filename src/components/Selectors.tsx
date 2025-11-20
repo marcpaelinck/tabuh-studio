@@ -48,18 +48,25 @@ export default function Selectors(
     }, [score])
       
 
+    function debugLog(item: MenuItemInfo, menu: string) {
+        console.log(`${menu}: ${item.key} ${item.displayValue} ${"[" + item.values.reduce((aggr, val) => aggr + (aggr? ", " : "") + val) + "]"}`)
+    }
+
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
+        debugLog(item, 'TABUH')
         setSelectedSong(item)
         songUpdater(item.key)
         onChangeFocusSelector(noFocusOption)
     }
 
     const onChangeFocusSelector = async (item: MenuItemInfo) => {
+        debugLog(item, 'FOCUS')
         setSelectedFocus(item)
         focusUpdater(item.key)
     }
 
     const onChangeSpeedSelector = async (item: MenuItemInfo) => {
+        debugLog(item, 'SPEED')
         setSelectedSpeed(item)
         speedUpdater(item.key)
     }
