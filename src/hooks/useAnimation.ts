@@ -1,7 +1,7 @@
 import type { AnimationAction, AnimationNote, CursorAction } from "../utils/scoreplayerUtils/score";
 import * as Tone from 'tone'
-import { useCallback } from "react";
-import type { AnimationInfo, SVGInfo } from "../models/types";
+import { useCallback, type RefObject } from "react";
+import type { AnimationInfo, MenuItemInfo, SVGInfo } from "../models/types";
 import { animationConfig, colorRGB } from "../config/config";
 
 const moveToDuration = 500; // duration of the movement to the next key
@@ -147,8 +147,8 @@ export const useAnimationEngine = () => {
 
 
     // For the use of Draw.schedule, see 
-    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string[], animationInfo: AnimationInfo, pbSpeed: number) => {
-        const svgInfo = animationInfo.svgInfo
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string[], animationInfoRef: RefObject<AnimationInfo>, pbSpeed: number) => {
+        const svgInfo = animationInfoRef.current.svgInfo
         if (currentFocus.includes(aAction.position)) {
             if (svgInfo.svg && aAction.currnotes) {
                 // Hightighting animation
@@ -161,19 +161,18 @@ export const useAnimationEngine = () => {
                 })
                 // Panggul animation
                 // Currently only active for the first of multiple focus positions. 
-                const positionIndex = 0
                 // TODO: Set positionIndex according to user selection.
-                if (aAction.position == currentFocus[positionIndex] && svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
+                if (aAction.position == animationInfoRef.current.panggulOptionRef.current?.value && svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
                     Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo, pbSpeed), time)
                 }
             }
         }
     }, [])
 
-    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string[], animationInfo: AnimationInfo) => {
+    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string[], animationInfoRef: RefObject<AnimationInfo>) => {
         // if (currentFocus.includes(cAction.position)) {
         if (currentFocus.length > 0 && currentFocus[0] === cAction.position) {
-            Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfo), time)
+            Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfoRef.current), time)
         }
     }, [])
 

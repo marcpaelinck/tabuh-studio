@@ -2,7 +2,7 @@
 import ScorePlayer from './components/ScorePlayer'
 import Selectors from './components/Selectors'
 import Animation from './components/Animation'
-import { type Score, type AnimationInfo, type NotationType, type ScoreInfo } from './models/types'
+import { type Score, type AnimationInfo, type ScoreInfo } from './models/types'
 import { readFile } from './utils/filesystem'
 import { parseScore, type Timeline } from './utils/scoreplayerUtils/score'
 import { useEffect, useRef, useState, type RefObject } from 'react'
@@ -11,18 +11,19 @@ import { focusDefaultOption, speedDefaultOption } from './utils/selectorsUtils/s
 
 export default function App() {
   const [isLoading, setIsLoading] = useState(true)
-  const [songList, setSongList] = useState<string[]>([])
   const menuDisabled = useRef<Record<string, boolean>>({"tabuh": false, "focus": false})
   const [selectedSong, setSelectedSong] = useState<string | null>(null)
   const [selectedFocus, setSelectedFocus] = useState<string[]>([])
-  const [score, setScore] = useState<Score | null>(null)
-  const songDictRef: RefObject<Record<string, string>> = useRef({})
   const focusReference: RefObject<string[]>  = useRef(focusDefaultOption.value as string[])
+  const [score, setScore] = useState<Score | null>(null)
+  const [songDict, setSongDict] = useState<Record<string, string>>({})
+  var songList: string[] = Object.keys(songDict)
+
   const playbackSpeedRef = useRef<number>(speedDefaultOption.value as number)
-  const animationInfoRef: RefObject<AnimationInfo> = useRef<AnimationInfo>({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, highlightRef: useRef(() => {})})
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
-  const notationRef: RefObject<NotationType | null> = useRef(null)
-  
+
+  const animationInfoRef: RefObject<AnimationInfo> =useRef({ svgInfo: {svg: null, panggul: null, x: null, y: 2, animation: null}, highlightRef: useRef(() => {}), panggulRef: useRef(null), panggulOptionRef: useRef(null), notationRef: useRef(null)})
+
   const updateSong = (newSongName: string | null): void => {
       if (newSongName !== selectedSong) setSelectedSong(newSongName)
     }
@@ -32,7 +33,7 @@ export default function App() {
       focusReference.current=position
       //TODO currently only displaying notation for the first focus position
       if (timelineRef.current?.notation && position && position[0] in timelineRef.current?.notation)
-        notationRef.current = timelineRef.current.notation[position[0]]
+        animationInfoRef.current.notationRef.current = timelineRef.current.notation[position[0]]
       setSelectedFocus(position)
     }
   }
@@ -41,10 +42,6 @@ export default function App() {
 
   const updateTimeline = (timeline: Timeline): void => {timelineRef.current = timeline}
 
-  const updateAnimationInfo = (animationInfo: AnimationInfo): void => {
-    animationInfoRef.current = animationInfo
-  }
-  
   const setMenuDisabled = (label: string, value: boolean) => {
     menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
   }
@@ -56,8 +53,7 @@ export default function App() {
         setMenuDisabled("focus", true)
         const files = await readFile('scores/content.json');
         const scoreInfo: ScoreInfo[] = JSON.parse(files)
-        songDictRef.current = Object.fromEntries(scoreInfo.map((score: ScoreInfo) => [score.title, score.file]))
-        setSongList(Object.keys(songDictRef.current))
+        setSongDict(Object.fromEntries(scoreInfo.map((score: ScoreInfo) => [score.title, score.file])))
         setMenuDisabled("tabuh", false)
       }
       fetchScores();
@@ -68,7 +64,7 @@ export default function App() {
     const loadScore = async () => {
       if (selectedSong) {
         setMenuDisabled("focus", false)
-        let jsonScore = await readFile('scores/' + songDictRef.current[selectedSong])
+        let jsonScore = await readFile('scores/' + songDict[selectedSong])
         const newScore = parseScore(jsonScore)
             if (newScore && newScore!=score) {
                 setScore(newScore)
@@ -98,7 +94,7 @@ export default function App() {
         <div className="pt-6 pl-6 pr-6">
           <Selectors menuDisabled={menuDisabled} songList={songList} score={score} songUpdater={updateSong} focusUpdater={updateFocus} speedUpdater={updatePlaybackSpeed}/>
         </div>
-        {selectedFocus && <Animation focus={selectedFocus} notationRef={notationRef} animationInfoUpdater={updateAnimationInfo}/>}
+        {selectedFocus && <Animation focus={selectedFocus} animationInfoRef={animationInfoRef}/>}
         <ScorePlayer score={score} focusRef={focusReference} animationInfoRef={animationInfoRef} pbSpeedRef={playbackSpeedRef}  timelineUpdater={updateTimeline}/>
       </div>
     </div>

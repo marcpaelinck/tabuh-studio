@@ -1,17 +1,9 @@
 import { instrumentConfigs } from "../../config/config";
-import type { Score, Section, System } from "../../models/types";
+import type { MenuItemInfo, menuValueType, Score, Section, System } from "../../models/types";
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.
 // The `value` field can be a list of values. This is useful if the menu item is an 
 // aggregation (e.g. an instrument containing multiple instrument positions).
-
-type menuValueType = string | number | null | (string | number | null)[]
-
-export type MenuItemInfo = { 
-    key: string | number | null, 
-    displayValue: string, 
-    value: menuValueType
-}
 
 // Data for a menu item
 export const tabuhDefaultOption: MenuItemInfo = {key: null, displayValue: "Tabuh...", value:null}

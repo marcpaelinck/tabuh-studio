@@ -1,6 +1,6 @@
 // INSTRUMENTS
 
-import type { JSX } from "react"
+import type { JSX, RefObject } from "react"
 import type { MutingType, StrokeType, ToneType } from "../config/config"
 
 export type Instrument = {
@@ -95,7 +95,17 @@ export type SVGInfo = {
 // export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
 export type NotationType = JSX.Element[]
 
+export type menuValueType = string | number | null | (string | number | null)[]
+
+export type MenuItemInfo = {
+  key: string | number | null,
+  displayValue: string,
+  value: menuValueType
+}
 export type AnimationInfo = {
   svgInfo: SVGInfo
   highlightRef: React.RefObject<CallableFunction | null>
+  panggulRef: React.RefObject<Element | null>
+  panggulOptionRef: React.RefObject<MenuItemInfo | null>
+  notationRef: RefObject<NotationType | null>
 }

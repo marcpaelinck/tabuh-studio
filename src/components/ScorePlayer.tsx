@@ -2,7 +2,7 @@ import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
 import { type Score, type AnimationInfo} from '../models/types'
-import { useState, type JSX, useMemo, useEffect } from 'react'
+import { useState, type JSX, useMemo, useEffect, type RefObject } from 'react'
 import * as Tone from 'tone'
 import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/scoreplayerUtils/score'
   //-------------------------CONTROLS--------------------------------------
@@ -14,7 +14,7 @@ import 'rsuite/Slider/styles/index.css'
 type AudioState = 'false' | 'true' | 'wait'
 
 export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeedRef, timelineUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string[]>, animationInfoRef:React.RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
+  { score: Score | null, focusRef: React.RefObject<string[]>, animationInfoRef:RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
 
   // STATE VARIABLES
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
@@ -59,11 +59,11 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef.current, pbSpeedRef.current), aAction.time)
+      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef, pbSpeedRef.current), aAction.time)
       })
     // Schedule cursor actions
     timeline.cursoractions.forEach((cAction: CursorAction) => {
-      Tone.getTransport().schedule((time) => animateNotation(time, cAction, focusRef.current, animationInfoRef.current), cAction.time)
+      Tone.getTransport().schedule((time) => animateNotation(time, cAction, focusRef.current, animationInfoRef), cAction.time)
       })
 
     setTotalDuration(Math.round(score.durationMs/1000))

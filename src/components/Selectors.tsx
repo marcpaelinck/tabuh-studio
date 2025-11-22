@@ -1,32 +1,14 @@
 import type { JSX, RefObject } from "react";
 import { useEffect, useState } from "react";
-import { ButtonToolbar, Dropdown } from "rsuite";
+import { ButtonToolbar } from "rsuite";
 import 'rsuite/styles/index.less';
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
-import type { Score } from "../models/types";
-import { createFocusMenuItems, createSpeedMenuItems, createTabuhMenuItems, speedDefaultOption, focusDefaultOption, tabuhDefaultOption, type MenuItemInfo } from "../utils/selectorsUtils/selectorsUtils";
+import type { MenuItemInfo, Score } from "../models/types";
+import { createFocusMenuItems, createSpeedMenuItems, createTabuhMenuItems, speedDefaultOption, focusDefaultOption, tabuhDefaultOption } from "../utils/selectorsUtils/selectorsUtils";
 import { speedList } from "../config/constants";
+import Selector from "./Selector";
 
-export const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: CallableFunction) => {
-    return (     
-        <Dropdown.Item
-            key={`${menuName}-option-${index}`}
-            eventKey={item.key}
-            //@ts-ignore: can't figure out typing for `event`.
-            onSelect={(eventKey: string, event) => {onChange(item)}} 
-        >{item.displayValue}</Dropdown.Item>
-    )}
-
-const Selector = ({valueList, scrollable, ...props}: {valueList: MenuItemInfo[], [key: string]: any, scrollable?: boolean}) => 
-     {
-    const items: JSX.Element[] = valueList.map((item: MenuItemInfo, index: number) => DDItem(item, index, props.id, props.onChange))
-       return (
-        <Dropdown menuStyle={{overflowY: scrollable?"scroll":"visible", maxHeight: scrollable?"300px":""}} {...props}>
-            { items }
-        </Dropdown>
-    )
-}
 
 export default function Selectors(
     {menuDisabled, songList, score, songUpdater, focusUpdater, speedUpdater}: 
