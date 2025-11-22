@@ -1,4 +1,4 @@
-import { doSanityCheck, instrumentConfigs, SOUNDS_FOLDER } from "../config/config";
+import { doSanityCheck, positionConfigs, SOUNDS_FOLDER } from "../config/config";
 import { fileExists } from "./filesystem";
 
 export function soundFiles(notes: string[], fileTemplate: string): string[] {
@@ -15,12 +15,12 @@ export function soundFile(note: string, fileTemplate: string): string {
 // e.g. GK_JEGOGAN_I1_O.mp3
 async function sanityCheck() {
     var logMessage = ""
-    const instrPitchStroke = Object.entries(instrumentConfigs).map(([instr, config]) =>
+    const instrPitchStroke = Object.entries(positionConfigs).map(([instr, config]) =>
         Object.values(config.symbolToNoteNames).flat().map((note) => [instr, note])
     ).flat()
     for (const [instr, note] of instrPitchStroke) {
-        const filename = instrumentConfigs[instr].sampletemplate.replace('{note}', note)
-        const found = instr in instrumentConfigs && await fileExists(SOUNDS_FOLDER + filename)
+        const filename = positionConfigs[instr].sampletemplate.replace('{note}', note)
+        const found = instr in positionConfigs && await fileExists(SOUNDS_FOLDER + filename)
         if (!found) logMessage += `X ${filename} not found in ${SOUNDS_FOLDER}\n`
         // else console.log(`V ${filename} found in ${SOUNDS_FOLDER}`)
     }

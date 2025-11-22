@@ -2,7 +2,7 @@ import type { JSX, RefObject } from 'react'
 import { useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import React from 'react';
-import { instrumentConfigs } from '../config/config';
+import { positionConfigs } from '../config/config';
 import { FRAMESTYLE, theme } from '../config/constants';
 import type { AnimationInfo, MenuItemInfo, NotationType, SVGInfo } from '../models/types';
 import NotationArea from './NotationArea';
@@ -18,7 +18,7 @@ import Selector from './Selector';
 // (Animation can currently animate only one instrument at the same time)
 function positionToSvg(positions: string[]): string  {
     const svgList: string[] = []
-    positions.forEach((pos: string)=> svgList.push(instrumentConfigs[pos]?.svg_file))
+    positions.forEach((pos: string)=> svgList.push(positionConfigs[pos]?.svg_file))
     const uniqueList: string[] = [...new Set(svgList)]
     return uniqueList.length==1 ? uniqueList[0] : ""
 }
@@ -77,7 +77,6 @@ export default function Animation({focus, animationInfoRef}:
 
     function setPanggulVisibility(selection: MenuItemInfo){
         animationInfoRef.current.panggulOptionRef.current = selection
-        animationInfoRef.current.panggulOptionRef.current = animationInfoRef.current.panggulOptionRef.current
         // setPanggulSelection(selection)
         if (svgElement.current && hasPanggul){
             const panggul = panggulElement()
@@ -98,7 +97,7 @@ export default function Animation({focus, animationInfoRef}:
     const  panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = defaultPanggulOption
         const menuItems: MenuItemInfo[] = focus.map((position) => {
-            return {key: position, displayValue: instrumentConfigs[position].name, value:position }
+            return {key: position, displayValue: positionConfigs[position].name, value:position }
         })
         animationInfoRef.current.panggulOptionRef.current = menuItems.length>0 ? menuItems[0] : defaultPanggulOption
         // setPanggulSelection(defaultPanggulOption)

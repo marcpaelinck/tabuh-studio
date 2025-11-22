@@ -1,4 +1,4 @@
-import { ignoreChars, instrumentConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
+import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
 import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score, type Section } from '../../models/types'
 import * as Tone from 'tone'
 import { n2TO } from '../timeunits'
@@ -113,12 +113,12 @@ export type Timeline = {
 // }
 
 const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote[] => {
-  if (!(position in instrumentConfigs)) return []
+  if (!(position in positionConfigs)) return []
   const cleanedSymbol = cleanSymbol(notationNote.s)
-  const shorthandCodes = instrumentConfigs[position].symbolToNoteNames[cleanedSymbol] || []
+  const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
   const result: AnimationNote[] = []
   shorthandCodes.forEach((shCode) => {
-    const instrType: string = instrumentConfigs[position].type
+    const instrType: string = positionConfigs[position].type
     if (!shCode) return null
     const note: Note = noteConfigs[instrType][shCode]
     const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`

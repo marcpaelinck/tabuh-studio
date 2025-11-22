@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
-import { alwaysFocusPositions, dimRateNonFocusedInstruments, instrumentConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
 
 export type InstrumentSampler = {
@@ -28,9 +28,9 @@ const createSampler = ({ instr_type, samples, volume }: { instr_type: string, sa
     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
 
-const lookup = Object.fromEntries(Object.entries(instrumentConfigs).map(([position, config]) => {
+const lookup = Object.fromEntries(Object.entries(positionConfigs).map(([position, config]) => {
   const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
-  const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, instrumentConfigs[position].sampletemplate)]))
+  const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, positionConfigs[position].sampletemplate)]))
   const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
   const symbolToIndices = Object.fromEntries(Object.entries(config.symbolToNoteNames).map(([symbol, notes]) => [symbol, notes.map((repr) => noteToIndex[repr])]))
   return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
@@ -58,9 +58,9 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
 export const useInstruments = () => {
 
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
-  const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(instrumentConfigs).map((position) => [position, useRef(null)]))
+  const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(positionConfigs).map((position) => [position, useRef(null)]))
   useEffect(() => {
-    for (const [position, config] of Object.entries(instrumentConfigs)) {
+    for (const [position, config] of Object.entries(positionConfigs)) {
       // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
       samplers[position].current = createSampler({ instr_type: config.type, samples: lookup[position].idx2sample, volume: config.volume }).toDestination()
     }
@@ -69,7 +69,7 @@ export const useInstruments = () => {
 
   const instrumentSamplers: InstrumentSamplers = {}
 
-  Object.keys(instrumentConfigs).forEach((position) => (instrumentSamplers[position] = createInstrument(position, samplers)))
+  Object.keys(positionConfigs).forEach((position) => (instrumentSamplers[position] = createInstrument(position, samplers)))
 
   // Adds a small random deviation to the note attack time for a more realistic execution
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()

@@ -1,4 +1,4 @@
-import { instrumentConfigs } from "../../config/config";
+import { instrumentConfigs, positionConfigs, type InstrumentConfig } from "../../config/config";
 import type { MenuItemInfo, menuValueType, Score, Section, System } from "../../models/types";
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.
@@ -33,28 +33,13 @@ export function createFocusMenuItems(score: Score): MenuItemInfo[]  {
             (section: Section) => Object.keys(section.staves)
         ).flat()
     ).flat()
-    // Reduce to single occurrences and sort
-    const positions = Array.from(new Set(posList)).sort()
-    // Look up the instrument in the instrumentConfigs dict and group by instrument
-    const posByInstrument: Record<string, MenuItemInfo[]> = {}
-    positions.forEach((position) => {
-        console.log(position)
-        const instrument: string = instrumentConfigs[position].instrumentName 
-        const item = createItemInfo(position, instrumentConfigs[position].name, [position])
-        if (! (instrument in posByInstrument)) posByInstrument[instrument] = []
-        posByInstrument[instrument].push(item)
-    })
-    // Create the menu item list.
-    const itemList: MenuItemInfo[] = []
-    Object.entries(posByInstrument).forEach(([instr, items]) => {
-        if (items.length > 1) {
-            // Instrument has multiple positions: add an option to select all positions
-            const key = instr
-            const values = items.reduce((aggr:  (string | number | null)[], curr) => aggr.concat(curr.value), [])
-            itemList.push(createItemInfo(key, instr, values))
-            items.forEach((item) => item.displayValue = "- " + item.displayValue)
-        }
-        items.forEach((item) => itemList.push(item))
-    })
-    return [focusDefaultOption].concat(itemList)
+    // Reduce to single occurrences
+    const positions = Array.from(new Set(posList))
+    // Select the instruments from instrumentConfigs that contain the positions
+    var instrumentList: [string, InstrumentConfig][] = Object.entries(instrumentConfigs).filter(([_, info])=>positions.includes(info.positions[0]))
+    // Sort the instrument list
+    instrumentList = instrumentList.sort(([key1, _1], [key2, _2]) => key1.localeCompare(key2))
+    // Create the menu items
+    const menuItems: MenuItemInfo[] = instrumentList.map(([key, info]) => {return {key: key, displayValue: info.name, value: info.positions}})
+    return [focusDefaultOption].concat(menuItems)
 }

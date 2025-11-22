@@ -20,11 +20,14 @@ const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = typeof _mutings_[number];
 
 export type InstrumentConfig = {
+    name: string
+    positions: string[]
+}
+
+export type PositionConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.
     // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
     name: string
-    instrument: string
-    instrumentName: string
     type: string
     svg_file: string,
     sampletemplate: string
@@ -138,10 +141,23 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
 }
 
 export const instrumentConfigs: Record<string, InstrumentConfig> = {
+    GONGS: { name: "Gongs", positions: ["GONGS"] },
+    KEMPLI: { name: "Kempli", positions: ["KEMPLI"], },
+    CENGCENG: { name: "Cengceng", positions: ["CENGCENG"], },
+    KENDANG: { name: "Kendang", positions: ["KENDANG"], },
+    JEGOGAN: { name: "Jegogan", positions: ["JEGOGAN"], },
+    CALUNG: { name: "Calung", positions: ["CALUNG"], },
+    PENYACAH: { name: "Penyacah", positions: ["PENYACAH"], },
+    PEMADE: { name: "Pemade", positions: ["PEMADE_POLOS", "PEMADE_SANGSIH"], },
+    KANTILAN: { name: "Kantilan", positions: ["KANTILAN_POLOS", "KANTILAN_SANGSIH"], },
+    PEMADE_SANGSIH: { name: "Pemade sangsih", positions: ["PEMADE SANGSIH"], },
+    UGAL: { name: "Ugal", positions: ["UGAL"], },
+    REYONG: { name: "Reyong", positions: ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], },
+}
+
+export const positionConfigs: Record<string, PositionConfig> = {
     GONGS: {
         name: "Gongs",
-        instrument: "GONGS",
-        instrumentName: "Gongs",
         type: "percussion",
         volume: -5,
         svg_file: "svg/GK_GONGS.svg",
@@ -154,8 +170,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     KEMPLI: {
         name: "Kempli",
-        instrument: "KEMPLI",
-        instrumentName: "Kempli",
         type: "percussion",
         volume: -5,
         svg_file: "",
@@ -164,8 +178,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     CENGCENG: {
         name: "Cengceng",
-        instrument: "CENGCENG",
-        instrumentName: "Cengceng",
         type: "percussion",
         volume: -14,
         svg_file: "",
@@ -177,8 +189,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     KENDANG: {
         name: "Kendang",
-        instrument: "KENDANG",
-        instrumentName: "Kendang",
         type: "percussion",
         volume: 0,
         svg_file: "svg/GK_KENDANG.svg",
@@ -194,8 +204,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     JEGOGAN: {
         name: "Jegogan",
-        instrument: "JEGOGAN",
-        instrumentName: "Jegogan",
         type: "daun",
         volume: -5,
         svg_file: "svg/GK_JEGOGAN.svg",
@@ -215,8 +223,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     CALUNG: {
         name: "Calung",
-        instrument: "CALUNG",
-        instrumentName: "Calung",
         type: "daun",
         volume: -5,
         svg_file: "svg/GK_CALUNG.svg",
@@ -236,8 +242,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     PENYACAH: {
         name: "Penyacah",
-        instrument: "PENYACAH",
-        instrumentName: "Penyacah",
         type: "daun",
         volume: -15,
         svg_file: "svg/GK_PENYACAH.svg",
@@ -261,8 +265,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     KANTILAN_POLOS: {
         name: "Kantilan polos",
-        instrument: "KANTILAN",
-        instrumentName: "Kantilan",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -302,8 +304,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     KANTILAN_SANGSIH: {
         name: "Kantilan sangsih",
-        instrument: "KANTILAN",
-        instrumentName: "Kantilan",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -343,8 +343,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     PEMADE_POLOS: {
         name: "Pemade polos",
-        instrument: "PEMADE",
-        instrumentName: "Pemade",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -384,8 +382,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     PEMADE_SANGSIH: {
         name: "Pemade sangsih",
-        instrument: "PEMADE",
-        instrumentName: "Pemade",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_GANGSA.svg",
@@ -425,8 +421,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     UGAL: {
         name: "Ugal",
-        instrument: "UGAL",
-        instrumentName: "Ugal",
         type: "daun",
         volume: -14,
         svg_file: "svg/GK_UGAL.svg",
@@ -466,8 +460,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     REYONG_1: {
         name: "Reyong 1",
-        instrument: "REYONG",
-        instrumentName: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -490,8 +482,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     REYONG_2: {
         name: "Reyong 2",
-        instrument: "REYONG",
-        instrumentName: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -513,8 +503,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     REYONG_3: {
         name: "Reyong 3",
-        instrument: "REYONG",
-        instrumentName: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
@@ -536,8 +524,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     },
     REYONG_4: {
         name: "Reyong 4",
-        instrument: "REYONG",
-        instrumentName: "Reyong",
         type: "chimes",
         volume: -14,
         svg_file: "svg/GK_REYONG.svg",
