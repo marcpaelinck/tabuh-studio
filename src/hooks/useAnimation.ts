@@ -1,7 +1,7 @@
 import type { AnimationAction, AnimationNote, CursorAction } from "../utils/scoreplayerUtils/score";
 import * as Tone from 'tone'
 import { useCallback, type RefObject } from "react";
-import type { AnimationInfo, MenuItemInfo, SVGInfo } from "../models/types";
+import type { MenuItemInfo, SVGInfo } from "../models/types";
 import { animationConfig, colorRGB } from "../config/config";
 
 const moveToDuration = 500; // duration of the movement to the next key
@@ -22,7 +22,7 @@ const getHighlightRGB = (note: AnimationNote, positionSeq: number = 0): number[]
     return colorRGB[colorName] || []
 }
 
-export async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {
+async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {
     const durationMillis = Math.min(Tone.Time(note.duration).toMilliseconds(), 3000)
     const rgb: number[] = getHighlightRGB(note, positionIndex)
     var highlightKeyframes = new KeyframeEffect(
@@ -138,41 +138,39 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
     });
 }
 
-async function highlightCurrentNote(cAction: CursorAction, animationInfo: AnimationInfo) {
-    if (animationInfo.highlightRef.current)
-        animationInfo.highlightRef.current({ line: cAction.line, range: cAction.range })
-}
+export const useAnimationEngine = (svgInfoRef: RefObject<SVGInfo>, highlightFunctionRef: RefObject<CallableFunction>, panggulOptionRef: RefObject<MenuItemInfo>, currentFocusRef: RefObject<string[]>, pbSpeedRef: RefObject<number>) => {
 
-export const useAnimationEngine = () => {
-
+    async function highlightCurrentNote(cAction: CursorAction) {
+        if (highlightFunctionRef.current)
+            highlightFunctionRef.current({ line: cAction.line, range: cAction.range })
+    }
 
     // For the use of Draw.schedule, see 
-    const animateInstrument = useCallback((time: number, aAction: AnimationAction, currentFocus: string[], animationInfoRef: RefObject<AnimationInfo>, pbSpeed: number) => {
-        const svgInfo = animationInfoRef.current.svgInfo
-        if (currentFocus.includes(aAction.position)) {
-            if (svgInfo.svg && aAction.currnotes) {
+    const animateInstrument = useCallback((time: number, aAction: AnimationAction) => {
+        if (currentFocusRef.current.includes(aAction.position)) {
+            if (svgInfoRef.current.svg && aAction.currnotes) {
                 // Hightighting animation
                 aAction.currnotes.forEach((note) => {
-                    var keyElement = (svgInfo.svg?.querySelector(`#${note.keyname}${note.stroke ? " ." + note.stroke : ""}`))
+                    var keyElement = (svgInfoRef.current.svg?.querySelector(`#${note.keyname}${note.stroke ? " ." + note.stroke : ""}`))
                     // positionIndex will be used to select the highlight color combinations.
-                    const positionIndex = currentFocus.indexOf(aAction.position)
+                    const positionIndex = currentFocusRef.current.indexOf(aAction.position)
                     //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
                     if (keyElement) { Tone.getDraw().schedule(() => highlightNote(keyElement, note, positionIndex), time) }
                 })
                 // Panggul animation
                 // Currently only active for the first of multiple focus positions. 
                 // TODO: Set positionIndex according to user selection.
-                if (aAction.position == animationInfoRef.current.panggulOptionRef.current?.value && svgInfo.panggul && svgInfo.x && svgInfo.y != null && svgInfo.animation) {
-                    Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfo, pbSpeed), time)
+                if (aAction.position == panggulOptionRef.current?.value && svgInfoRef.current.panggul && svgInfoRef.current.x && svgInfoRef.current.y != null && svgInfoRef.current.animation) {
+                    Tone.getDraw().schedule(() => animatePanggul(aAction, svgInfoRef.current, pbSpeedRef.current), time)
                 }
             }
         }
-    }, [])
+    }, [svgInfoRef.current, panggulOptionRef.current, currentFocusRef.current, pbSpeedRef.current])
 
-    const animateNotation = useCallback((time: number, cAction: CursorAction, currentFocus: string[], animationInfoRef: RefObject<AnimationInfo>) => {
+    const animateNotation = useCallback((time: number, cAction: CursorAction) => {
         // if (currentFocus.includes(cAction.position)) {
-        if (currentFocus.length > 0 && currentFocus[0] === cAction.position) {
-            Tone.getDraw().schedule(() => highlightCurrentNote(cAction, animationInfoRef.current), time)
+        if (currentFocusRef.current.length > 0 && currentFocusRef.current[0] === cAction.position) {
+            Tone.getDraw().schedule(() => highlightCurrentNote(cAction), time)
         }
     }, [])
 

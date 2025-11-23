@@ -1,10 +1,9 @@
 import type { JSX, RefObject } from 'react'
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import React from 'react';
 import { positionConfigs } from '../config/config';
 import { FRAMESTYLE, theme } from '../config/constants';
-import type { AnimationInfo, MenuItemInfo, NotationType, SVGInfo } from '../models/types';
+import type { AnimationData,MenuItemInfo, NotationElement, SVGInfo } from '../models/types';
 import NotationArea from './NotationArea';
 import { Toggle, Slider, Grid, Row, Col, Loader } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
@@ -12,6 +11,7 @@ import 'rsuite/Slider/styles/index.css'
 import 'rsuite/Loader/styles/index.css'
 import 'rsuite/DropDown/styles/index.css'
 import Selector from './Selector';
+import { type XCoordRecord, type YCoordRecord } from '../models/types';
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.
@@ -24,62 +24,47 @@ function positionToSvg(positions: string[]): string  {
 }
 
 // Returns the content of the data section of the SVG file
-const retrieve_svg_data = (svgRef: React.RefObject<SVGSVGElement | null>): SVGInfo => {
-    if (!svgRef.current) return { svg: null, panggul: null, x: null, y: null, animation: null }
-    const panggul: SVGUseElement | null = svgRef.current?.querySelector("#helpinghand")
-    const data_x: HTMLDataElement | null = svgRef.current.querySelector("data.x");
-    const data_y: HTMLDataElement | null = svgRef.current.querySelector("data.y");
-    var data_animation: HTMLDataElement | null = svgRef.current.querySelector("data.animation");
-    //@ts-expect-error
+const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
+    if (!svgElement) return { svg: null, panggul: null, x: null, y: null, animation: null }
+    const panggul: SVGUseElement | null = svgElement?.querySelector("#helpinghand")
+    const data_x: HTMLDataElement | null = svgElement.querySelector("data.x");
+    const data_y: HTMLDataElement | null = svgElement.querySelector("data.y");
+    var data_animation: HTMLDataElement | null = svgElement.querySelector("data.animation");
+    //@ts-ignore: incorrect error for attributes.value
     const xValues: XCoordRecord = data_x ? JSON.parse(data_x.attributes.value.value) : null;
-    //@ts-expect-error
+    //@ts-ignore: incorrect error for attributes.value
     const yValues: YCoordRecord = data_y ? JSON.parse(data_y.attributes.value.value) : null;
-    //@ts-expect-error
+    //@ts-ignore: incorrect error for attributes.value
     const animationValues: AnimationData = data_animation ? JSON.parse(data_animation?.attributes.value.value) : null;
-    return { svg: svgRef.current, panggul: panggul, x: xValues, y: (yValues ? yValues.y : 0), animation: animationValues }
+    return { svg: svgElement, panggul: panggul, x: xValues, y: (yValues ? yValues.y : 0), animation: animationValues }
 }
 
-const defaultPanggulOption: MenuItemInfo = {key: "HIDE", displayValue: "Hide", value: null}
+export const panggulDefaultOption: MenuItemInfo = {key: "HIDE", displayValue: "Hide", value: null}
 
-export default function Animation({focus, animationInfoRef}: 
-    {focus: string[], animationInfoRef: RefObject<AnimationInfo>}) : JSX.Element {
+export default function Animation({focus, notationElement, panggulMenuItems, highlightFunctionRef, panggulOption,  setPanggulOption, setSVGInfo}: 
+    {focus: string[], notationElement: NotationElement | null,  panggulMenuItems: MenuItemInfo[] , panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<CallableFunction>, setPanggulOption: CallableFunction, setSVGInfo: CallableFunction}) : JSX.Element {
     const defaultSvgSize = 100 // percent
-    // const checkBoxRef: React.RefObject<HTMLInputElement | null>  = useRef(null)
-    const svgElement: React.RefObject<SVGSVGElement | null>  = useRef(null)
-    const [svgLoaded, setSvgLoaded] = useState<boolean>(false)
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
-    // const [panggulSelection, setPanggulSelection] = useState<MenuItemInfo>(defaultPanggulOption)
     const [svgSizeStyle, setSvgSize] = useState<Object>({"width": `${defaultSvgSize}%`, "height": `${defaultSvgSize}%`})
-    const  highlightFunctionRef: React.RefObject<CallableFunction> = useRef(() => {})
-    // const [localSvgElement, setLocalSvgElement] = useState<HTMLDivElement | null>(null)
+    const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({svg: null, panggul: null,x: null, y: null, animation: null})
 
     const updateSvgSize = (val: number | number[]) => {
         const size: number = Math.round(typeof val=="number" ? val : val[0])
         setSvgSize({"width": `${size}%`, "height": `${size}%`})
     }
 
-    function panggulElement()  {return (svgElement.current && svgLoaded) ? svgElement.current.querySelector("#helpinghand") : null}
-    //@ts-ignore unused `svg` argument
-    function setSvgLoadedFalse(svg: SVGSVGElement) {setSvgLoaded(false)}
-
     async function setSvgStates(svg: SVGSVGElement) {
         if (svg) {
-                svgElement.current = svg
-                const svgInfo: SVGInfo = retrieve_svg_data(svgElement)
-                animationInfoRef.current.svgInfo= svgInfo
-                animationInfoRef.current.highlightRef= highlightFunctionRef
-                setSvgLoaded(true)
-                animationInfoRef.current.panggulRef.current = panggulElement()
-                setHasPanggul(panggulElement() ? true : false)
+                svgInfoRef.current = retrieve_svg_data(svg)
+                setSVGInfo(svgInfoRef.current)
+                setHasPanggul(svgInfoRef.current.panggul ? true : false)
         }
     }
 
     function setPanggulVisibility(selection: MenuItemInfo){
-        animationInfoRef.current.panggulOptionRef.current = selection
-        // setPanggulSelection(selection)
-        if (svgElement.current && hasPanggul){
-            const panggul = panggulElement()
+        if (svgInfoRef.current.svg && hasPanggul){
+            const panggul = svgInfoRef.current.panggul
             if (panggul && selection.value) {
                 if (panggul.classList.contains("invisible")) {
                     panggul.classList.remove("invisible")
@@ -87,23 +72,13 @@ export default function Animation({focus, animationInfoRef}:
             } else if (panggul && ! panggul.classList.contains("invisible")) {
                 panggul.classList.add("invisible")
             }
+            setPanggulOption(selection)
         }
     }
 
     function setNotationVisibility(isVisible: boolean){
         setNotationVisible(isVisible)
     }
-    
-    const  panggulMenuItems: MenuItemInfo[] = useMemo(() => {
-        const hideItem: MenuItemInfo = defaultPanggulOption
-        const menuItems: MenuItemInfo[] = focus.map((position) => {
-            return {key: position, displayValue: positionConfigs[position].name, value:position }
-        })
-        animationInfoRef.current.panggulOptionRef.current = menuItems.length>0 ? menuItems[0] : defaultPanggulOption
-        // setPanggulSelection(defaultPanggulOption)
-        return [hideItem].concat(menuItems)
-    }
-    , [focus])
 
     return(focus.length > 0 ? (
         <div className="m-6">
@@ -112,24 +87,18 @@ export default function Animation({focus, animationInfoRef}:
                         <Col xs={8} sm={8} md={4}>
                             <Toggle 
                                 id="notation toggle"
-                                disabled={animationInfoRef.current.notationRef.current==null}
+                                disabled={notationElement==null}
                                 color={theme.animation}
-                                defaultChecked={animationInfoRef.current.notationRef.current!=null && notationVisible}
+                                defaultChecked={notationElement!=null && notationVisible}
                                 onChange={checked => setNotationVisibility(checked)} 
                             >notation</Toggle>
                         </Col>
                     {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
                         hasPanggul && (
                         <Col xs={8} sm={8}  md={4}>
-                            {/* <Toggle 
-                                id="panggul toggle" 
-                                color={theme.animation}
-                                defaultChecked 
-                                onChange={checked => setPanggulVisibility(checked)} 
-                            >panggul</Toggle> */}
                             <Selector 
                                 id="panggul selector"
-                                title={"panggul: " + (animationInfoRef.current.panggulOptionRef.current?.value ? animationInfoRef.current.panggulOptionRef.current?.displayValue : "Hidden")} 
+                                title={"panggul: " + (panggulOption.value ?  panggulOption.displayValue : "hidden")} 
                                 className="tabuhselector" 
                                 width="3/10" 
                                 valueList={panggulMenuItems} 
@@ -140,7 +109,7 @@ export default function Animation({focus, animationInfoRef}:
                 </Row>
                 <Row id="notation-area-row"  className="p-2" >
                     <div>
-                        <NotationArea notation={animationInfoRef.current.notationRef.current} visible={notationVisible} hlFunction={highlightFunctionRef}/>
+                        <NotationArea notation={notationElement} visible={notationVisible} highlightFunctionRef={highlightFunctionRef}/>
                     </div>
                 </Row>
                 <Row id="slider-row" className="pl-4 pr-4 pt-10">
@@ -160,7 +129,6 @@ export default function Animation({focus, animationInfoRef}:
                         style={svgSizeStyle} 
                         loading={() => <Loader />} 
                         useRequestCache={true} 
-                        beforeInjection={setSvgLoadedFalse} 
                         afterInjection={setSvgStates}
                     />
                 </Row>

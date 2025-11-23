@@ -3,20 +3,20 @@
 // notation while the corresponding notes are being played.
 
 import { useRef, type RefObject } from "react"
-import type { NotationType } from "../models/types";
+import type { NotationElement } from "../models/types";
 
 type HighlightRange = {
     line: number
     range: number[]
 }
 
-export default function NotationArea({notation, visible, hlFunction}:
-    {notation: NotationType | null, visible: boolean, hlFunction: RefObject<CallableFunction>}){
+export default function NotationArea({notation, visible, highlightFunctionRef}:
+    {notation: NotationElement | null, visible: boolean, highlightFunctionRef: RefObject<CallableFunction>}){
 
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
     // Highlighting function: highlights the given range (line and character range)
-    hlFunction.current = (hlRange: HighlightRange) => {
+    const highlightFunction: CallableFunction = (hlRange: HighlightRange) => {
         const para = textAreaRef.current?.children[hlRange.line]
         const para1 = textAreaRef.current?.childNodes[hlRange.line]
         // Note: the `container` parameter is not supported yet by all browsers
@@ -36,6 +36,8 @@ export default function NotationArea({notation, visible, hlFunction}:
         }
 
     }
+
+    highlightFunctionRef.current = highlightFunction
 
     return (
         <>

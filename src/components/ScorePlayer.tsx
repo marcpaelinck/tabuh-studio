@@ -1,8 +1,8 @@
 import { useAnimationEngine } from '../hooks/useAnimation'
 import { useInstruments } from '../hooks/useInstruments'
 import { useInterpretations } from '../hooks/useInterpretations'
-import { type Score, type AnimationInfo} from '../models/types'
-import { useState, type JSX, useMemo, useEffect, type RefObject } from 'react'
+import { type Score, type SVGInfo, type MenuItemInfo} from '../models/types'
+import { useState, type JSX, useMemo, useEffect, type RefObject, useRef } from 'react'
 import * as Tone from 'tone'
 import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/scoreplayerUtils/score'
   //-------------------------CONTROLS--------------------------------------
@@ -10,11 +10,12 @@ import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
 import { Slider } from 'rsuite';
 import 'rsuite/Slider/styles/index.css'
+import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeedRef, timelineUpdater}: 
-  { score: Score | null, focusRef: React.RefObject<string[]>, animationInfoRef:RefObject<AnimationInfo>, pbSpeedRef: React.RefObject<number>, timelineUpdater: CallableFunction }): JSX.Element {
+export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOption, highlightFunctionRef, timelineUpdater}: 
+  { score: Score | null, focus: string[], pbSpeed: number, svgInfo: SVGInfo, panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<CallableFunction>, timelineUpdater: CallableFunction }): JSX.Element {
 
   // STATE VARIABLES
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
@@ -22,10 +23,22 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
   const [progress, setProgress] = useState<number>(0)
   const [totalDuration, setTotalDuration] = useState<number>(0)
 
+  const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({svg: null, panggul: null,x: null, y: null, animation: null})
+  const panggulOptionRef: RefObject<MenuItemInfo> = useRef<MenuItemInfo>(panggulDefaultOption)
+  const focusRef: RefObject<string[]> = useRef<string[]>([])
+  const pbSpeedRef: RefObject<number> = useRef<number>(1)
+  svgInfoRef.current = svgInfo
+  panggulOptionRef.current = panggulOption
+  focusRef.current = focus
+  pbSpeedRef.current = pbSpeed
+
+
+
+  
   // HOOKS
   const { playInstrument, muteAll} = useInstruments()
   const {changeTempo} = useInterpretations()
-  const { animateInstrument, animateNotation } = useAnimationEngine()
+  const { animateInstrument, animateNotation } = useAnimationEngine(svgInfoRef, highlightFunctionRef, panggulOptionRef, focusRef, pbSpeedRef)
 
   // MEMOS AND EFFECTS
   const timeline = useMemo(() => createTimeline(score), [score])
@@ -54,16 +67,16 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     
     // instrument actions (notes)
     timeline.sampleractions.forEach((sAction: SamplerAction) => {
-      Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeedRef.current), sAction.time)      
-      Tone.getTransport().schedule((time) => playInstrument(time, sAction, focusRef.current), sAction.time)
+      Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)      
+      Tone.getTransport().schedule((time) => playInstrument(time, sAction, focus), sAction.time)
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
-      Tone.getTransport().schedule((time) => animateInstrument(time, aAction, focusRef.current, animationInfoRef, pbSpeedRef.current), aAction.time)
+      Tone.getTransport().schedule((time) => animateInstrument(time, aAction), aAction.time)
       })
     // Schedule cursor actions
     timeline.cursoractions.forEach((cAction: CursorAction) => {
-      Tone.getTransport().schedule((time) => animateNotation(time, cAction, focusRef.current, animationInfoRef), cAction.time)
+      Tone.getTransport().schedule((time) => animateNotation(time, cAction), cAction.time)
       })
 
     setTotalDuration(Math.round(score.durationMs/1000))
@@ -114,8 +127,6 @@ export default function ScorePlayer({ score, focusRef, animationInfoRef, pbSpeed
     Tone.getTransport().stop()
     Tone.getTransport().seconds=0
     setProgress(0)
-    // TODO: use `resetAnimation` callback that is passed as prop
-    // animationInfoRef.current?.notationAreaRef.current?.clear()
     pause()
   }
 

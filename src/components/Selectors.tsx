@@ -11,8 +11,8 @@ import Selector from "./Selector";
 
 
 export default function Selectors(
-    {menuDisabled, songList, score, songUpdater, focusUpdater, speedUpdater}: 
-    {menuDisabled: RefObject<Record<string, boolean>>, songList: string[], score: Score | null, songUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
+    {menuDisabled, scoreList: songList, score, scoreUpdater: songUpdater, focusUpdater, speedUpdater}: 
+    {menuDisabled: RefObject<Record<string, boolean>>, scoreList: string[], score: Score | null, scoreUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
     
     const [tabuhMenuItems, setTabuhMenuItems] = useState<MenuItemInfo[]>([])

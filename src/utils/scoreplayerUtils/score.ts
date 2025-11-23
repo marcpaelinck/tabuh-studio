@@ -1,5 +1,5 @@
 import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
-import { type JsonNote, type JsonSymbol, type NotationType, type Note, type Score, type Section } from '../../models/types'
+import { type JsonNote, type JsonSymbol, type NotationElement, type Note, type Score, type Section } from '../../models/types'
 import * as Tone from 'tone'
 import { n2TO } from '../timeunits'
 import { createElement } from 'react'
@@ -103,7 +103,7 @@ export type Timeline = {
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
   cursoractions: CursorAction[]
-  notation: { [position: string]: NotationType }
+  notation: { [position: string]: NotationElement }
 }
 
 // Create a mapping for notes to shorthand code

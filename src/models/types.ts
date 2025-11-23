@@ -82,6 +82,7 @@ export type ScoreInfo = {
 // ANIMATION
 
 export type XCoordRecord = { [note: string]: number } | null
+export type YCoordRecord = { y: number } | null
 export type AnimationData = { hover_x: number, hover_y: number, stroke_x: number, stroke_y: number, stroke_rotation: number, stroke_scale: number[] } | null
 
 export type SVGInfo = {
@@ -93,7 +94,7 @@ export type SVGInfo = {
 }
 
 // export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
-export type NotationType = JSX.Element[]
+export type NotationElement = JSX.Element[]
 
 export type menuValueType = string | number | null | (string | number | null)[]
 
@@ -101,11 +102,4 @@ export type MenuItemInfo = {
   key: string | number | null,
   displayValue: string,
   value: menuValueType
-}
-export type AnimationInfo = {
-  svgInfo: SVGInfo
-  highlightRef: React.RefObject<CallableFunction | null>
-  panggulRef: React.RefObject<Element | null>
-  panggulOptionRef: React.RefObject<MenuItemInfo | null>
-  notationRef: RefObject<NotationType | null>
 }

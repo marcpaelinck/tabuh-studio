@@ -1,4 +1,4 @@
-import { instrumentConfigs, positionConfigs, type InstrumentConfig } from "../../config/config";
+import { instrumentConfigs, type InstrumentConfig } from "../../config/config";
 import type { MenuItemInfo, menuValueType, Score, Section, System } from "../../models/types";
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.
