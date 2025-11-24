@@ -1,17 +1,17 @@
 import type { JSX, RefObject } from 'react'
 import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import { positionConfigs } from '../config/config';
-import { FRAMESTYLE, theme } from '../config/constants';
-import type { AnimationData,MenuItemInfo, NotationParagraph, SVGInfo } from '../models/types';
+import { positionConfigs } from '../../config/config';
+import { FRAMESTYLE, theme } from '../../config/constants';
+import type { AnimationData,MenuItemInfo, NotationParagraph, SVGInfo } from '../../models/types';
 import NotationArea from './NotationArea';
 import { Toggle, Slider, Grid, Row, Col, Loader } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import 'rsuite/Slider/styles/index.css'
 import 'rsuite/Loader/styles/index.css'
 import 'rsuite/DropDown/styles/index.css'
-import Selector from './Selector';
-import { type XCoordRecord, type YCoordRecord } from '../models/types';
+import Selector from '../Selector';
+import { type XCoordRecord, type YCoordRecord } from '../../models/types';
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.

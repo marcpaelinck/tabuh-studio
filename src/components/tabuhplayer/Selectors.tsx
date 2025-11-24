@@ -4,10 +4,10 @@ import { ButtonToolbar } from "rsuite";
 import 'rsuite/styles/index.less';
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
-import type { MenuItemInfo, Score } from "../models/types";
-import { createFocusMenuItems, createSpeedMenuItems, createTabuhMenuItems, speedDefaultOption, focusDefaultOption, tabuhDefaultOption } from "../utils/selectorsUtils/selectorsUtils";
-import { speedList } from "../config/constants";
-import Selector from "./Selector";
+import type { MenuItemInfo, Score } from "../../models/types";
+import { createFocusMenuItems, createSpeedMenuItems, createTabuhMenuItems, speedDefaultOption, focusDefaultOption, tabuhDefaultOption } from "../../utils/selectorsUtils/selectorsUtils";
+import { speedList } from "../../config/constants";
+import Selector from "../Selector";
 
 
 export default function Selectors(

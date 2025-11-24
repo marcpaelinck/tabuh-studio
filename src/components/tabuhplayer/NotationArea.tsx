@@ -3,7 +3,7 @@
 // notation while the corresponding notes are being played.
 
 import { useRef, type RefObject } from "react"
-import type { NotationParagraph as NotationParagraph } from "../models/types";
+import type { NotationParagraph as NotationParagraph } from "../../models/types";
 
 type HighlightRange = {
     line: number

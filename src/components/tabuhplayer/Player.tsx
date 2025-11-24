@@ -1,10 +1,10 @@
-import { useAnimationEngine } from '../hooks/useAnimation'
-import { useInstruments } from '../hooks/useInstruments'
-import { useInterpretations } from '../hooks/useInterpretations'
-import { type Score, type SVGInfo, type MenuItemInfo} from '../models/types'
+import { useAnimationEngine } from '../../hooks/useAnimation'
+import { useInstruments } from '../../hooks/useInstruments'
+import { useInterpretations } from '../../hooks/useInterpretations'
+import { type Score, type SVGInfo, type MenuItemInfo} from '../../models/types'
 import { useState, type JSX, useMemo, useEffect, type RefObject, useRef } from 'react'
 import * as Tone from 'tone'
-import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../utils/scoreplayerUtils/score'
+import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../../utils/scoreplayerUtils/score'
   //-------------------------CONTROLS--------------------------------------
 import {FaPlay, FaPause} from "react-icons/fa"
 import {FaBackwardFast} from "react-icons/fa6"
