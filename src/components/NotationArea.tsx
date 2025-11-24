@@ -3,7 +3,7 @@
 // notation while the corresponding notes are being played.
 
 import { useRef, type RefObject } from "react"
-import type { NotationElement } from "../models/types";
+import type { NotationParagraph as NotationParagraph } from "../models/types";
 
 type HighlightRange = {
     line: number
@@ -11,7 +11,7 @@ type HighlightRange = {
 }
 
 export default function NotationArea({notation, visible, highlightFunctionRef}:
-    {notation: NotationElement | null, visible: boolean, highlightFunctionRef: RefObject<CallableFunction>}){
+    {notation: NotationParagraph[] | null, visible: boolean, highlightFunctionRef: RefObject<CallableFunction>}){
 
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 

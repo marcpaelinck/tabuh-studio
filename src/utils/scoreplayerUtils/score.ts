@@ -1,8 +1,8 @@
 import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
-import { type JsonNote, type JsonSymbol, type NotationElement, type Note, type Score, type Section } from '../../models/types'
+import { type JsonNote, type JsonSymbol, type Note, type Score, type Section } from '../../models/types'
 import * as Tone from 'tone'
 import { n2TO } from '../timeunits'
-import { createElement } from 'react'
+import { createElement, type HTMLAttributes, type ReactElement } from 'react'
 
 export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
@@ -34,19 +34,6 @@ export function parseScore(input: string): Score {
 
 // Remove chars that should be ignored. See remark in configs.ts
 const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ""), symbol)
-
-
-
-// Creates a dict {<instrument> -> [<positions>]} from a score object.s
-// const geInstrtPosDict = (score: Score): { [instrument: string]: string[] } => {
-//   const positions: string[] = score.systems.map((system: System) => system.sections.map((section: Section) => Object.keys(section.staves)).flat()).flat()
-//   const instrPosDict: { [instrument: string]: string[] } = {}
-//   positions.forEach((position: string) => {
-//     const instrument: string = position.split("_")[0]
-//     instrPosDict[instrument] = (instrPosDict[instrument] || []).concat([position])
-//   })
-//   return instrPosDict
-// }
 
 export interface SamplerAction {
   time: Tone.Unit.TimeObject
@@ -103,7 +90,7 @@ export type Timeline = {
   sampleractions: SamplerAction[]
   animationactions: AnimationAction[]
   cursoractions: CursorAction[]
-  notation: { [position: string]: NotationElement }
+  notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
 }
 
 // Create a mapping for notes to shorthand code

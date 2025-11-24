@@ -1,6 +1,6 @@
 // INSTRUMENTS
 
-import type { JSX, RefObject } from "react"
+import type { HTMLAttributes, JSX, ReactElement, RefObject } from "react"
 import type { MutingType, StrokeType, ToneType } from "../config/config"
 
 export type Instrument = {
@@ -94,7 +94,7 @@ export type SVGInfo = {
 }
 
 // export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
-export type NotationElement = JSX.Element[]
+export type NotationParagraph = ReactElement<HTMLAttributes<HTMLParagraphElement>>
 
 export type menuValueType = string | number | null | (string | number | null)[]
 

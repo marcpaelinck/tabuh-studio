@@ -21,7 +21,7 @@ export default function App() {
   const scoreDict = useScoreDict(setMenuDisabled)
   const [selectedScore, setSelectedScore] = useState<string | null>(null)
   const [selectedFocus, setSelectedFocus] = useState<string[]>([])
-  const [notationElement, setNotationElement] = useState<JSX.Element[] | null>(null)
+  const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
   const [score, setScore] = useState<Score | null>(null)
   const highlightFunctionRef: RefObject<CallableFunction> = useRef<CallableFunction>(()=>{})
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
@@ -41,7 +41,7 @@ export default function App() {
       setSelectedFocus(focus)
       //TODO currently only displaying notation for the first focus position
       if (timelineRef.current?.notation && focus && focus[0] in timelineRef.current?.notation)
-        setNotationElement(timelineRef.current.notation[focus[0]])
+        setNotationParas(timelineRef.current.notation[focus[0]])
     }
   }
       
@@ -96,7 +96,7 @@ export default function App() {
         {selectedFocus.length>0 && 
         <Animation 
           focus={selectedFocus} 
-          notationElement={notationElement} 
+          notationElement={notationParas} 
           panggulMenuItems={panggulMenuItems} 
           panggulOption={panggulOption} 
           highlightFunctionRef={highlightFunctionRef} 
