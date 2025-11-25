@@ -29,7 +29,24 @@ p.balifont[id^="notation"] {
     margin: 0px;
     line-height: 1.5;
 }
-
+.balifont12 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 12pt;
+}
+.balifont14 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 14pt;
+}
+.balifont16 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 16pt;
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;

@@ -26,7 +26,7 @@ export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: 
 
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
 
-  // Disable menus if data is loading
+  // Disable menus when data is loading
   useEffect(() => {
     setMenuDisabled("tabuh", loadingTabuhDict)
     setMenuDisabled("focus", loadingTabuhDict || loadingScore || ! score)
@@ -60,7 +60,7 @@ export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: 
             menuDisabled={menuDisabled} 
             scoreList={scoreList} 
             score={score} 
-            scoreUpdater={(value: string) => loadScore(value, tabuhDict)} 
+            scoreUpdater={(value: string) => loadScore(tabuhDict[value])} 
             focusUpdater={updateFocus} 
             speedUpdater={setPlaybackSpeed}/>
         </div>

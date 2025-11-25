@@ -17,8 +17,7 @@ const createItemInfo = (key: string, value:string, values: menuValueType): MenuI
 // Create lists of MenuItemInfo objects that will be used to populate the menus.
 
 export function createTabuhMenuItems(values: string[]): MenuItemInfo[] {
-    return [tabuhDefaultOption].concat(
-        values.map((value: string) => createItemInfo(value, value, value))
+    return values.map((value: string) => createItemInfo(value, value, value)
     )
 }
 

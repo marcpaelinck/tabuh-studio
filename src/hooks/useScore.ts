@@ -1,25 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Score } from "../models/types";
 import { readFile } from "../utils/filesystem";
 import { parseScore } from "../utils/scoreplayerUtils/score";
 
 // Loads and parses a score when a new tabuh (score title) is selected
 export const useScore = (initValue: Score | null): [Score, CallableFunction, boolean] => {
-    const [tabuh, setTabuh] = useState<string | null>(null)
+    const [fileName, setFileName] = useState<string | null>(null)
     const [score, setScore] = useState<Score | null>(initValue)
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const tabuhDictRef = useRef<Record<string, string>>({})
 
-    function loadNewScore(tabuhName: string, tabuhDict: Record<string, string>) {
-        tabuhDictRef.current = tabuhDict
-        setTabuh(tabuhName)
+    function loadScore(name: string) {
+        setFileName(name)
     }
 
     useEffect(() => {
-        const loadScore = async () => {
-            if (tabuh) {
+        const load = async () => {
+            if (fileName) {
                 setIsLoading(true)
-                let jsonScore = await readFile('scores/' + tabuhDictRef.current[tabuh])
+                let jsonScore = await readFile('scores/' + fileName)
                 const newScore = parseScore(jsonScore)
                 if (newScore && newScore != score) {
                     setScore(newScore)
@@ -27,8 +25,8 @@ export const useScore = (initValue: Score | null): [Score, CallableFunction, boo
                 setIsLoading(false)
             }
         }
-        loadScore()
-    }, [tabuh])
+        load()
+    }, [fileName])
 
-    return [score as Score, loadNewScore, isLoading]
+    return [score as Score, loadScore, isLoading]
 }

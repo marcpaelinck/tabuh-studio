@@ -80,9 +80,26 @@ button:focus-visible {
     font-style: normal;
     font-display: swap;
 }
-
 .balifont {
     font-family: 'BaliMusic5';
     font-weight: normal;
     font-style: normal;		
+}
+.balifont12 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 12pt;
+}
+.balifont14 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 14pt;
+}
+.balifont16 {
+    font-family: 'BaliMusic5';
+    font-weight: normal;
+    font-style: normal;		
+    font-size: 16pt;
 }

@@ -84,7 +84,7 @@ export default function Animation({focus, notationElement, panggulMenuItems, hig
         <div className="m-6">
             <Grid fluid id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
-                        <Col xs={8} sm={8} md={4}>
+                        <Col span="auto">
                             <Toggle 
                                 id="notation toggle"
                                 disabled={notationElement==null}
@@ -95,12 +95,11 @@ export default function Animation({focus, notationElement, panggulMenuItems, hig
                         </Col>
                     {// The panggul checkbox is only visible if the embedded SVG code has a panggul element
                         hasPanggul && (
-                        <Col xs={8} sm={8}  md={4}>
+                        <Col span="auto">
                             <Selector 
                                 id="panggul selector"
                                 title={"panggul: " + (panggulOption.value ?  panggulOption.displayValue : "hidden")} 
                                 className="tabuhselector" 
-                                width="3/10" 
                                 valueList={panggulMenuItems} 
                                 onChange={setPanggulVisibility}
                             />                            
