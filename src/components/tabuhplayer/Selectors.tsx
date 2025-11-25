@@ -1,7 +1,6 @@
 import type { JSX, RefObject } from "react";
 import { useEffect, useState } from "react";
 import { ButtonToolbar } from "rsuite";
-import 'rsuite/styles/index.less';
 import 'rsuite/Dropdown/styles/index.css';
 import 'rsuite/ButtonToolbar/styles/index.css';
 import type { MenuItemInfo, Score } from "../../models/types";
@@ -11,7 +10,7 @@ import Selector from "../Selector";
 
 
 export default function Selectors(
-    {menuDisabled, scoreList: songList, score, scoreUpdater: songUpdater, focusUpdater, speedUpdater}: 
+    {menuDisabled, scoreList, score, scoreUpdater, focusUpdater, speedUpdater}: 
     {menuDisabled: RefObject<Record<string, boolean>>, scoreList: string[], score: Score | null, scoreUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
     
@@ -24,11 +23,11 @@ export default function Selectors(
 
     useEffect(() => {
         const updateFixedMenus = async () => {
-            setTabuhMenuItems(createTabuhMenuItems(songList))
+            setTabuhMenuItems(createTabuhMenuItems(scoreList))
             setSpeedMenuItems(createSpeedMenuItems(speedList))
         }
         updateFixedMenus()
-        }, [songList])
+        }, [scoreList])
 
     useEffect(() => {
         const updateFocusMenu = async () => {
@@ -50,7 +49,7 @@ export default function Selectors(
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
         setSelectedSong(item)
-        songUpdater(item.value)
+        scoreUpdater(item.value)
         onChangeFocusSelector(focusDefaultOption)
     }
 

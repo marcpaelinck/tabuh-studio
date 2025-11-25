@@ -1,9 +1,15 @@
-// This files enables to modify the React Suite theme selected in main.txs
-// See https://rsuitejs.com/guide/customization-less/
-@import '/node_modules/rsuite/styles/index.less';
-@enable-css-reset: true;
-@primary-color: darkgray;
-// Undo `color: inherit` setting which resets color of WordPress theme.
+/* This files enables to modify the React Suite theme selected in main.txs
+/ See https://rsuitejs.com/guide/customization-less/ */
+
+:root {
+  --rs-primary-50: #e3f2fd;
+  --rs-primary-100: #bbdefb;
+  --rs-primary-200: #90caf9;
+  --rs-primary-500: #2196f3; /* Primary Color */
+  /* ...more variables */
+}
+
+/* Undo `color: inherit` setting which resets color of WordPress theme.*/
 h2 {
     color: #dd3333;
 }

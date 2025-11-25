@@ -1,41 +1,37 @@
-// import ScoreEditor from './ScoreEditor'
 import Player from './Player'
 import Selectors from './Selectors'
 import Animation from './Animation'
 import { panggulDefaultOption } from './Animation'
-import { type MenuItemInfo, type Score, type SVGInfo } from '../../models/types'
-import { readFile } from '../../utils/filesystem'
-import { parseScore, type Timeline } from '../../utils/scoreplayerUtils/score'
+import { type MenuItemInfo, type SVGInfo } from '../../models/types'
+import { type Timeline } from '../../utils/scoreplayerUtils/score'
 import { useEffect, useMemo, useRef, useState, type JSX, type RefObject } from 'react'
-import { FRAMESTYLE } from '../../config/constants'
 import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import { positionConfigs } from '../../config/config';
-import { useScoreDict } from '../../hooks/useScoreList'
+import { useScore } from '../../hooks/useScore'
 
-export default function TabuhPlayer() {
-  const [isLoading, setIsLoading] = useState(true)
+export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: Record<string, string>, loadingTabuhDict: boolean}) {
   const menuDisabled = useRef<Record<string, boolean>>({"tabuh": false, "focus": false})
   const setMenuDisabled = (label: string, value: boolean) => {
     menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
   }
-  const scoreDict = useScoreDict(setMenuDisabled)
-  const [selectedScore, setSelectedScore] = useState<string | null>(null)
+  const [score, loadScore, loadingScore] = useScore(null)
   const [selectedFocus, setSelectedFocus] = useState<string[]>([])
   const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
-  const [score, setScore] = useState<Score | null>(null)
   const highlightFunctionRef: RefObject<CallableFunction> = useRef<CallableFunction>(()=>{})
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
   const [svgInfo, setSvgInfo] = useState<SVGInfo>({svg: null, panggul: null,x: null, y: null, animation: null})
   const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
-  var scoreList: string[] = Object.keys(scoreDict)
+  var scoreList: string[] = Object.keys(tabuhDict)
 
   const timelineRef: RefObject<Timeline | null>  = useRef(null)
 
-  const updateScore = (newScoreName: string | null): void => {
-      if (newScoreName !== selectedScore) setSelectedScore(newScoreName)
-    }
- 
+  // Disable menus if data is loading
+  useEffect(() => {
+    setMenuDisabled("tabuh", loadingTabuhDict)
+    setMenuDisabled("focus", loadingTabuhDict || loadingScore || ! score)
+  }, [loadingTabuhDict, loadingScore])
+
   const updateFocus = (focus: string[]): void => {
     if  (focus !== selectedFocus) {
       setSelectedFocus(focus)
@@ -57,41 +53,16 @@ export default function TabuhPlayer() {
 
   const updateTimeline = (timeline: Timeline): void => {timelineRef.current = timeline}
 
-
-  // Load and parse the score when a new score title is selected
-  useEffect(() => {
-    const loadScore = async () => {
-      if (selectedScore) {
-        setMenuDisabled("focus", false)
-        let jsonScore = await readFile('scores/' + scoreDict[selectedScore])
-        const newScore = parseScore(jsonScore)
-            if (newScore && newScore!=score) {
-                setScore(newScore)
-            }
-        setMenuDisabled("focus", false)
-      }
-      setIsLoading(false)
-    }
-    loadScore()
-  }, [selectedScore])
-  
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <span className="font-mono text-lg">Loading...</span>
-      </div>
-    )
-  }
-
   return (
-    <>
-      <div className="lg:w-1/10">
-      </div>
-      <div className={"lg:w-8/10 sm:w-full" + FRAMESTYLE}>
-        {/* Puts the player window in the middle of the containing div */}
+    <div id="TabuhPlayer">
         <div className="pt-6 pl-6 pr-6">
-          <Selectors menuDisabled={menuDisabled} scoreList={scoreList} score={score} scoreUpdater={updateScore} focusUpdater={updateFocus} speedUpdater={setPlaybackSpeed}/>
+          <Selectors 
+            menuDisabled={menuDisabled} 
+            scoreList={scoreList} 
+            score={score} 
+            scoreUpdater={(value: string) => loadScore(value, tabuhDict)} 
+            focusUpdater={updateFocus} 
+            speedUpdater={setPlaybackSpeed}/>
         </div>
         {selectedFocus.length>0 && 
         <Animation 
@@ -112,7 +83,6 @@ export default function TabuhPlayer() {
           highlightFunctionRef={highlightFunctionRef} 
           timelineUpdater={updateTimeline}
         />
-      </div>
-    </>
+    </div>
   )
 }
