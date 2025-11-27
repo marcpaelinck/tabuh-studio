@@ -1,5 +1,5 @@
 import Player from './Player'
-import Selectors from './Selectors'
+import Menu from './Menu'
 import Animation from './Animation'
 import { panggulDefaultOption } from './Animation'
 import { type MenuItemInfo, type SVGInfo } from '../../models/types'
@@ -40,6 +40,8 @@ export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: 
         setNotationParas(timelineRef.current.notation[focus[0]])
     }
   }
+
+  const updateScore = (value: string) => loadScore(tabuhDict[value])
       
   const  panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
@@ -56,11 +58,11 @@ export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: 
   return (
     <div id="TabuhPlayer">
         <div className="pt-6 pl-6 pr-6">
-          <Selectors 
+          <Menu 
             menuDisabled={menuDisabled} 
             scoreList={scoreList} 
             score={score} 
-            scoreUpdater={(value: string) => loadScore(tabuhDict[value])} 
+            scoreUpdater={updateScore} 
             focusUpdater={updateFocus} 
             speedUpdater={setPlaybackSpeed}/>
         </div>

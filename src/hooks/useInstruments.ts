@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
 import { soundFile } from '../utils/config'
+import { DebugContext } from '../App'
 
 export type InstrumentSampler = {
-  play: (time: number, action: SamplerAction, focus: string[]) => void
+  play: (time: number, action: SamplerAction, focus: string[], debug: CallableFunction) => void
   mute: (time: number) => void
 }
 
@@ -40,8 +41,9 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
   const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
 
   return {
-    play: (time: number, action: SamplerAction, currentFocus: string[]) => {
+    play: (time: number, action: SamplerAction, currentFocus: string[], debug) => {
       const dimValue = (currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
+      debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
       const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
       if (indices && samplers[position].current) {
         try {
@@ -56,6 +58,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
 }
 
 export const useInstruments = () => {
+  const debug: CallableFunction = useContext(DebugContext);
 
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
   const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(positionConfigs).map((position) => [position, useRef(null)]))
@@ -77,7 +80,7 @@ export const useInstruments = () => {
   const playInstrument = useCallback(
     (time: number, action: SamplerAction, currentFocus: string[]) => {
       if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
-      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus) }
+      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus, debug) }
     },
     [],
   )
