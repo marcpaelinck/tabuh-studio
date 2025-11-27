@@ -4,7 +4,7 @@ import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import EditIcon from '@rsuite/icons/Edit'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import 'rsuite/Toggle/styles/index.css'
-import { createContext, createRef, useState, type RefObject } from 'react'
+import { createContext, useState} from 'react'
 import { FRAMESTYLE } from './config/constants'
 import TabuhEditor from './components/tabuheditor/TabuhEditor'
 import { useTabuhDict } from './hooks/useTabuhDict'
@@ -15,7 +15,7 @@ export const DebugContext = createContext<CallableFunction>(()=>{})
 export default function App() {
 
   // Set to false to remove debug window
-  const debugMode: boolean = true
+  const debugMode: boolean = false
 
   const [active, setActive] = useState<"editor"|"player">("player")
   const [tabuhDict, loadingTabuhDict] = useTabuhDict({})

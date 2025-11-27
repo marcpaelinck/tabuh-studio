@@ -41,7 +41,7 @@ export default function Menu(
 
     function debugLog(item: MenuItemInfo, menu: string) {
         const strValue = Array.isArray(item.value) 
-            ?  item.value.reduce((aggr, val) => aggr + (aggr? ", " : "") + val, "[") + "]" 
+            ?  item.value.reduce((aggr, val) => aggr + (aggr=="["? "" : ", ") + val, "[") + "]" 
             : item.value
         console.log(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
     }

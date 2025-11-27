@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import { AVERAGE_ATTACK_DELAY } from '../config/constants'
@@ -57,7 +57,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
   }
 }
 
-export const useInstruments = () => {
+export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
   const debug: CallableFunction = useContext(DebugContext);
 
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
@@ -78,9 +78,9 @@ export const useInstruments = () => {
   const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
   const playInstrument = useCallback(
-    (time: number, action: SamplerAction, currentFocus: string[]) => {
+    (time: number, action: SamplerAction) => {
       if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
-      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus, debug) }
+      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocusRef.current, debug) }
     },
     [],
   )

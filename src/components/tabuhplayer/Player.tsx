@@ -36,7 +36,7 @@ export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOpt
 
   
   // HOOKS
-  const { playInstrument, muteAll} = useInstruments()
+  const { playInstrument, muteAll} = useInstruments(focusRef)
   const {changeTempo} = useInterpretations()
   const { animateInstrument, animateNotation } = useAnimationEngine(svgInfoRef, highlightFunctionRef, panggulOptionRef, focusRef, pbSpeedRef)
 
@@ -68,7 +68,7 @@ export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOpt
     // instrument actions (notes)
     timeline.sampleractions.forEach((sAction: SamplerAction) => {
       Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)      
-      Tone.getTransport().schedule((time) => playInstrument(time, sAction, focus), sAction.time)
+      Tone.getTransport().schedule((time) => playInstrument(time, sAction), sAction.time)
     })
     // Schedule animation actions
     timeline.animationactions.forEach((aAction: AnimationAction) => {
