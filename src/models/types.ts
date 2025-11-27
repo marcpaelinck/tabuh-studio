@@ -96,10 +96,20 @@ export type SVGInfo = {
 // export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
 export type NotationParagraph = ReactElement<HTMLAttributes<HTMLParagraphElement>>
 
+// MENUS
+
 export type menuValueType = string | number | null | (string | number | null)[]
+
+export type MenuInfo = {
+  disabled: Record<MenuName, boolean>,
+}
 
 export type MenuItemInfo = {
   key: string | number | null,
   displayValue: string,
   value: menuValueType
 }
+
+type MenuName = string
+
+export type MenuCollectionInfo = Record<MenuName, MenuInfo>

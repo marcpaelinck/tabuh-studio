@@ -1,4 +1,4 @@
-import type { JSX, RefObject } from "react";
+import type { JSX } from "react";
 import { useEffect, useState } from "react";
 import { ButtonToolbar } from "rsuite";
 import 'rsuite/Dropdown/styles/index.css';
@@ -8,9 +8,9 @@ import { createTabuhMenuItems, tabuhDefaultOption } from "../../utils/selectorsU
 import Selector from "../Selector";
 
 
-export default function Selectors(
-    {menuDisabled, scoreList: songList, scoreUpdater: songUpdater}: 
-    {menuDisabled: RefObject<Record<string, boolean>>, scoreList: string[], scoreUpdater: Function}, 
+export default function Menu(
+    {menuDisabled, tabuhList, scoreUpdater}: 
+    {menuDisabled: boolean, tabuhList: string[], scoreUpdater: Function}, 
     ) : JSX.Element {
     
     const [tabuhMenuItems, setTabuhMenuItems] = useState<MenuItemInfo[]>([])
@@ -18,10 +18,10 @@ export default function Selectors(
 
     useEffect(() => {
         const updateFixedMenus = async () => {
-            setTabuhMenuItems(createTabuhMenuItems(songList))
+            setTabuhMenuItems(createTabuhMenuItems(tabuhList))
         }
         updateFixedMenus()
-        }, [songList])
+        }, [tabuhList])
 
 
     function debugLog(item: MenuItemInfo, menu: string) {
@@ -34,16 +34,15 @@ export default function Selectors(
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
         setSelectedSong(item)
-        songUpdater(item.value)
+        scoreUpdater(item.value)
     }
 
     return (
-            <div className="selectors flex flex-wrap">
                 <ButtonToolbar>
                     <Selector 
                         id="tabuhselector" 
                         scrollable
-                        disabled={menuDisabled.current.tabuh}
+                        disabled={menuDisabled}
                         title={selectedSong.displayValue || tabuhDefaultOption.displayValue} 
                         className="tabuhselector" 
                         width="3/10" 
@@ -51,6 +50,5 @@ export default function Selectors(
                         onChange={onChangeTabuhSelector}
                     />
                 </ButtonToolbar>
-            </div>
         )
 }

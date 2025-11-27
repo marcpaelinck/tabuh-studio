@@ -103,3 +103,16 @@ button:focus-visible {
     font-style: normal;		
     font-size: 16pt;
 }
+@keyframes blinker {
+  0% {fill: #000000;}
+  50% {fill: #00000000;}
+  100% {fill: #000000}
+}
+.cursor-visible {
+  animation: blinker 1s infinite;
+}
+.cursor-hidden {
+  fill: white;
+}
+
+

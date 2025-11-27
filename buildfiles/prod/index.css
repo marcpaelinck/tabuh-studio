@@ -59,3 +59,15 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+@keyframes blinker {
+  0% {fill: #000000;}
+  50% {fill: #00000000;}
+  100% {fill: #000000}
+}
+.cursor-visible {
+  animation: blinker 1s infinite;
+}
+.cursor-hidden {
+  fill: white;
+}
+

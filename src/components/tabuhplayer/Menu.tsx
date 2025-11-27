@@ -9,7 +9,7 @@ import { speedList } from "../../config/constants";
 import Selector from "../Selector";
 
 
-export default function Selectors(
+export default function Menu(
     {menuDisabled, scoreList, score, scoreUpdater, focusUpdater, speedUpdater}: 
     {menuDisabled: RefObject<Record<string, boolean>>, scoreList: string[], score: Score | null, scoreUpdater: Function, focusUpdater: Function, speedUpdater: Function}, 
     ) : JSX.Element {
@@ -17,7 +17,7 @@ export default function Selectors(
     const [tabuhMenuItems, setTabuhMenuItems] = useState<MenuItemInfo[]>([])
     const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
-    const [selectedSong,setSelectedSong]  = useState<MenuItemInfo>(tabuhDefaultOption)
+    const [selectedTabuh,setSelectedTabuh]  = useState<MenuItemInfo>(tabuhDefaultOption)
     const [selectedFocus,setSelectedFocus]  = useState<MenuItemInfo>(focusDefaultOption)
     const [selectedSpeed,setSelectedSpeed]  = useState<MenuItemInfo>(speedDefaultOption)
 
@@ -48,7 +48,7 @@ export default function Selectors(
 
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
-        setSelectedSong(item)
+        setSelectedTabuh(item)
         scoreUpdater(item.value)
         onChangeFocusSelector(focusDefaultOption)
     }
@@ -72,7 +72,7 @@ export default function Selectors(
                         id="tabuhselector" 
                         scrollable
                         disabled={menuDisabled.current.tabuh}
-                        title={selectedSong.displayValue || tabuhDefaultOption.displayValue} 
+                        title={selectedTabuh.displayValue || tabuhDefaultOption.displayValue} 
                         className="tabuhselector" 
                         width="3/10" 
                         valueList={tabuhMenuItems} 
