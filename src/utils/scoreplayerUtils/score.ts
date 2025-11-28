@@ -1,5 +1,5 @@
 import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
-import { type JsonNote, type JsonSymbol, type Note, type Score, type Section } from '../../models/types'
+import { type JsonNote, type JsonSymbol, type Note, type Score, type Section, type Stave } from '../../models/types'
 import * as Tone from 'tone'
 import { n2TO } from '../timeunits'
 import { createElement, type HTMLAttributes, type ReactElement } from 'react'
@@ -42,6 +42,7 @@ export interface SamplerAction {
   bpm: number
   velocity: Tone.Unit.NormalRange
   duration: Tone.Unit.TimeObject
+  isLast: boolean
 }
 
 export type TempoAction = {
@@ -149,8 +150,8 @@ export function createTimeline(score: Score | null): Timeline | null {
   const positionScore: { [position: string]: JsonNote[] } = {}
   const positionNotation: { [position: string]: JsonSymbol[] } = {}
 
-  score.systems.forEach((system) => {
-    system.sections.forEach((section) => {
+  score.systems.forEach((system, sysidx) => {
+    system.sections.forEach((section, secidx) => {
       // Update the total duration time
       totalDurationInBaseNotes += section.duration
       timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
@@ -172,7 +173,8 @@ export function createTimeline(score: Score | null): Timeline | null {
             bpm: bpm,
             velocity: velocity,
             time: n2TO(note.t),
-            duration: n2TO(note.d || 1)
+            duration: n2TO(note.d || 1),
+            isLast: (sysidx == score.systems.length - 1 && secidx == system.sections.length - 1)
           })
           sectionProgress += (note.d || 1)
         })

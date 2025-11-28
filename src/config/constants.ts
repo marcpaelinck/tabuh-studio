@@ -7,6 +7,9 @@ export const FRAMESTYLE = " rounded-xl shadow-lg shadow-gray-400 border border-g
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
+export const introTime: number = 2000 // silence added before the beginning of the score in milliseconds
+export const outroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
+
 type Color = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'violet';
 
 export const theme: Record<string, Color> = {

@@ -1,10 +1,11 @@
 import { useCallback, useContext, useEffect, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
-import { AVERAGE_ATTACK_DELAY } from '../config/constants'
-import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER } from '../config/config'
+import { AVERAGE_ATTACK_DELAY, outroTime } from '../config/constants'
+import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER, BaseNote } from '../config/config'
 import { soundFile } from '../utils/config'
 import { DebugContext } from '../App'
+import { millis2BaseNote } from '../utils/timeunits'
 
 export type InstrumentSampler = {
   play: (time: number, action: SamplerAction, focus: string[], debug: CallableFunction) => void
@@ -46,8 +47,15 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
       debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
       const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
       if (indices && samplers[position].current) {
+        var duration: Tone.Unit.TimeObject = action.duration
+        // Extend the last note to allow the sound to attenuate
+        //TODO Do not extend the last note when looping from the last note.
+        if (action.isLast) {
+          //@ts-ignore
+          duration[BaseNote] += millis2BaseNote(outroTime, action.bpm)
+        }
         try {
-          sampler.current?.triggerAttackRelease(indices, action.duration, time, action.velocity * dimValue)
+          sampler.current?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
         } catch {
           console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
         }
