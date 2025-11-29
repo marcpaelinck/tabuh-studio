@@ -5,37 +5,6 @@ import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
 import { createElement, type HTMLAttributes, type ReactElement } from 'react'
 import { introTime, outroTime } from '../../config/constants'
 
-
-export function parseScoreOld(input: string): Score {
-  const score: Score = JSON.parse(input)
-  // This function also calculates times in ms for each note, to be used by the animation.
-  // The reason is that Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
-  var currentTimeMs = 0
-  score.systems.forEach((system, sysidx, systemArray) => {
-    system.sections.forEach((section, sectidx, sectionArray) => {
-      section.starttimeMs = Math.round(currentTimeMs)
-      for (const [_, stave] of Object.entries(section.staves)) {
-        var dataTimeMs = currentTimeMs
-        stave.notes.forEach((note: JsonNote) => {
-          // Use the average tempo to determine the time in ms.
-          const currTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * (note.t - section.starttime) / section.duration
-          dataTimeMs = section.starttimeMs + 1000 * ((note.t - section.starttime) / 4) * (60 / (0.5 * (section.tempo[0] + currTempo)))
-          note.ms = dataTimeMs
-          note.section = section.id
-          note.system = system.id
-        })
-      }
-      currentTimeMs += 1000 * (section.duration / 4) * (60 / (0.5 * (section.tempo[0] + section.tempo[1])))
-      if (sysidx === systemArray.length - 1 && sectidx === sectionArray.length - 1) {
-        score.durationMs = currentTimeMs
-      }
-    })
-  })
-  console.log("OLD VERSION")
-  console.log(score)
-  return score
-}
-
 export function parseScore(input: string): Score {
   const score: Score = JSON.parse(input)
   // This function also calculates times in ms for each note, to be used by the animation.
