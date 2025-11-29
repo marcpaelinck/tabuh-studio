@@ -52,16 +52,17 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
     var currKey = action.currnotes.length ? action.currnotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
     var nextKey = action.nextnotes.length ? action.nextnotes[0].keyname : currKey
 
-    if (action.currnotes[0].islast /*&& !this.dom.loopCheckbox.checked*/) {
+    if (action.currnotes.length > 0 && action.currnotes[0].isLast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
         logConsole("last note", "helpinghand");
         keyframes = [
             {
+                // Start where the previous animation ended: the moment the key is struck
                 transform: `translate(${svgInfo.x[currKey] + svgInfo.animation.stroke_x}px, ${svgInfo.y + svgInfo.animation.stroke_y
                     }px) rotate(${svgInfo.animation.stroke_rotation}deg) scale(1, 1)`,
                 offset: 0,
             },
-            // Step 1: move to (almost) the next note minus x_idle_offset horizontal units. These will be used in step 2.
+            // Step 1: move the panggul bck to upward position.
             {
                 transform: `translate(${svgInfo.x[currKey]}px, ${svgInfo.y}px) rotate(0)`,
                 offset: 1,
@@ -72,7 +73,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
             fill: "forwards",
             easing: bezier,
             composite: "replace",
-        };
+        }
     } else {
         if (!action.nextnotes) {
             console.log("ERROR in panggul animation: next note not defined but current note is not last.")

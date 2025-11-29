@@ -1,10 +1,12 @@
 import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
-import { type JsonNote, type JsonSymbol, type Note, type Score, type Section, type Stave } from '../../models/types'
+import { type JsonNote, type JsonSymbol, type Note, type Score, type Section, type Stave, type System } from '../../models/types'
 import * as Tone from 'tone'
-import { n2TO } from '../timeunits'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
 import { createElement, type HTMLAttributes, type ReactElement } from 'react'
+import { introTime, outroTime } from '../../config/constants'
 
-export function parseScore(input: string): Score {
+
+export function parseScoreOld(input: string): Score {
   const score: Score = JSON.parse(input)
   // This function also calculates times in ms for each note, to be used by the animation.
   // The reason is that Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
@@ -29,6 +31,52 @@ export function parseScore(input: string): Score {
       }
     })
   })
+  console.log("OLD VERSION")
+  console.log(score)
+  return score
+}
+
+export function parseScore(input: string): Score {
+  const score: Score = JSON.parse(input)
+  // This function also calculates times in ms for each note, to be used by the animation.
+  // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
+  var currentTimeMs = introTime
+  // TODO the following result will be incorrect if tempo[1] != tempo[0]
+  const introTimeBn = millis2BaseNoteEquiv(introTime, score.systems[0].sections[0].tempo[0])
+  score.systems.forEach((system, sysidx, systemArray) => {
+    system.starttime += introTimeBn
+    system.sections.forEach((section, sectidx, sectionArray) => {
+      section.starttime += introTimeBn
+      section.starttimeMs = Math.round(currentTimeMs)
+      // The time for all instruments is synced at the start of each section.
+      // This will ensure that notation errors will not propagate throughout the score.
+      for (const [_, stave] of Object.entries(section.staves)) {
+        var relTime = 0 // Time relative to the section's start time
+        stave.notes.forEach((note: JsonNote, idx) => {
+          // Convert the first note's absolute start time to relative time.
+          // TODO in the future the note's time attribute should be given relative to the section start time.
+          note.t += introTimeBn
+          relTime = note.t - section.starttime
+          // Determine the *average* tempo from the section start to the note start. This accounts for the factor 0.5
+          const avgTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * 0.5 * relTime / section.duration
+          note.ms = section.starttimeMs + BaseNoteEquiv2Millis(note.t - section.starttime, avgTempo)
+          note.section = section.id
+          note.system = system.id
+          relTime += note.d
+        })
+        stave.notation.forEach((symbol: JsonSymbol) => {
+          symbol.t += introTimeBn
+        })
+      }
+      currentTimeMs += BaseNoteEquiv2Millis(section.duration, section.tempo)
+      if (sysidx === systemArray.length - 1 && sectidx === sectionArray.length - 1) {
+        // Last section
+        score.durationMs = currentTimeMs
+      }
+    })
+  })
+  console.log("NEW VERSION")
+  console.log(score)
   return score
 }
 
@@ -51,6 +99,8 @@ export type TempoAction = {
   duration: Tone.Unit.TimeObject
 }
 
+type FirstLast = "first" | "last" | "none"
+
 export type AnimationNote = {
   system: number
   section: number
@@ -60,7 +110,7 @@ export type AnimationNote = {
   stroke: StrokeType | null
   muting: MutingType
   duration: Tone.Unit.TimeObject
-  islast: boolean
+  isLast: boolean
 }
 
 export type AnimationAction = {
@@ -100,7 +150,7 @@ export type Timeline = {
 //   note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
 // }
 
-const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: boolean): AnimationNote[] => {
+const note2AnimationNotes = (position: string, notationNote: JsonNote, ìsLast: boolean): AnimationNote[] => {
   if (!(position in positionConfigs)) return []
   const cleanedSymbol = cleanSymbol(notationNote.s)
   const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
@@ -119,7 +169,7 @@ const note2AnimationNotes = (position: string, notationNote: JsonNote, isLast: b
       stroke: note.stroke,
       muting: note.muting,
       duration: n2TO(notationNote.d),
-      islast: isLast
+      isLast: ìsLast
     })
   })
   return result
@@ -190,13 +240,25 @@ export function createTimeline(score: Score | null): Timeline | null {
   // Create animation actions
   Object.keys(positionScore).forEach((position) => {
     const notes: JsonNote[] = positionScore[position]
+    // Add an animation action for the displacement of the panggul 
+    // from the starting position to the first note
+    timeline.animationactions.push({
+      time: n2TO(0),
+      position: position,
+      prevsystem: null,
+      prevsection: null,
+      currnotes: [],
+      nextnotes: note2AnimationNotes(position, notes[1], false),
+      timeuntil: n2TO(notes[1].t),
+      timeuntilMs: notes[1].ms
+    })
     notes.forEach((note, index) => {
-      const currIsLast = (index == notes.length - 1)
+      const currIsLast: boolean = (index == notes.length - 1)
       const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
-      const nextIsLast = (index == notes.length - 2)
+      const nextIsLast: boolean = (index == notes.length - 2)
       const nextANotes: AnimationNote[] = currIsLast ? [] : note2AnimationNotes(position, notes[index + 1], nextIsLast)
       const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
-      const timeUntilMs: number = currIsLast ? 1000 : (notes[index + 1].ms - note.ms)
+      const timeUntilMs: number = currIsLast ? outroTime : (notes[index + 1].ms - note.ms)
       const prevSystem = index > 0 ? notes[index - 1].system : null
       const prevSection = index > 0 ? notes[index - 1].section : null
       timeline.animationactions.push({
@@ -209,6 +271,9 @@ export function createTimeline(score: Score | null): Timeline | null {
         timeuntil: timeUntil,
         timeuntilMs: timeUntilMs
       })
+      // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
+      // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
+
     })
   })
 

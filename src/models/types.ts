@@ -39,7 +39,7 @@ export type JsonSymbol = {
 
 // Notation of one section for one instrument position
 export type Stave = {
-  velocity: number[]
+  velocity: [number, number]
   notes: JsonNote[]
   notation: JsonSymbol[]
 }
@@ -51,7 +51,7 @@ export type Section = {
   starttime: number   // start time in base notes
   starttimeMs: number // start time in ms
   duration: number
-  tempo: number[]
+  tempo: [number, number]
   staves: { [position: string]: Stave }
 }
 

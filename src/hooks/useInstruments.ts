@@ -5,7 +5,7 @@ import { AVERAGE_ATTACK_DELAY, outroTime } from '../config/constants'
 import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER, BaseNote } from '../config/config'
 import { soundFile } from '../utils/config'
 import { DebugContext } from '../App'
-import { millis2BaseNote } from '../utils/timeunits'
+import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
   play: (time: number, action: SamplerAction, focus: string[], debug: CallableFunction) => void
@@ -52,7 +52,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
         //TODO Do not extend the last note when looping from the last note.
         if (action.isLast) {
           //@ts-ignore
-          duration[BaseNote] += millis2BaseNote(outroTime, action.bpm)
+          duration[BaseNote] += millis2BaseNoteEquiv(outroTime, action.bpm)
         }
         try {
           sampler.current?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)

@@ -55,7 +55,7 @@ export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOpt
   }
 
   function createSchedule(timeline: Timeline | null) {
-    // Creates the schedule for the Transport object.f
+    // Creates the schedule for the Transport object.
     if (! timeline || !score) return
 
     if (audioStarted) pause()
@@ -65,7 +65,11 @@ export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOpt
 
     console.log(`Creating schedule for ${score?.title}`)
     
-    // instrument actions (notes)
+    // tempo and instrument actions (notes)
+    // Set the initial tempo to 60 (intro time)
+    const initialBpm = score.systems[0].sections[0].tempo[0]
+    const tAction = {time: {"16n":0},position: "", cleanedSymbol: "", bpm: initialBpm, velocity: 0, duration: {"16n":0}, isLast: false}
+    Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)      
     timeline.sampleractions.forEach((sAction: SamplerAction) => {
       Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)      
       Tone.getTransport().schedule((time) => playInstrument(time, sAction), sAction.time)
