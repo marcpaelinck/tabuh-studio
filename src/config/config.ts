@@ -150,10 +150,13 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     PENYACAH: { name: "Penyacah", positions: ["PENYACAH"], },
     PEMADE: { name: "Pemade", positions: ["PEMADE_POLOS", "PEMADE_SANGSIH"], },
     KANTILAN: { name: "Kantilan", positions: ["KANTILAN_POLOS", "KANTILAN_SANGSIH"], },
-    PEMADE_SANGSIH: { name: "Pemade sangsih", positions: ["PEMADE SANGSIH"], },
     UGAL: { name: "Ugal", positions: ["UGAL"], },
     REYONG: { name: "Reyong", positions: ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], },
 }
+
+
+
+export const editorSortingOrder = ["UGAL", "PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4", "PENYACAH", "CALUNG", "JEGOGAN", "GONGS", "CENGCENG", "KENDANG", "KEMPLI"]
 
 export const positionConfigs: Record<string, PositionConfig> = {
     GONGS: {

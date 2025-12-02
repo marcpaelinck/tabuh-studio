@@ -1,6 +1,6 @@
 // INSTRUMENTS
 
-import type { HTMLAttributes, JSX, ReactElement, RefObject } from "react"
+import type { Component, HTMLAttributes, JSX, ReactElement, RefObject } from "react"
 import type { MutingType, StrokeType, ToneType } from "../config/config"
 
 export type Instrument = {
@@ -113,3 +113,15 @@ export type MenuItemInfo = {
 type MenuName = string
 
 export type MenuCollectionInfo = Record<MenuName, MenuInfo>
+
+export type TextCursorPosition = {
+  x: number,
+  y: number,
+  leftSymbol: SVGTSpanElement | null,
+  rightSymbol: SVGTSpanElement | null
+}
+
+export type HighlightRange = {
+  line: number
+  range: number[]
+}

@@ -1,16 +1,15 @@
-// import ScoreEditor from './components/ScoreEditor'
 import { VStack, Toggle } from 'rsuite'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import EditIcon from '@rsuite/icons/Edit'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import 'rsuite/Toggle/styles/index.css'
-import { createContext, useState} from 'react'
+import { createContext, useState, type Dispatch} from 'react'
 import { FRAMESTYLE } from './config/constants'
 import TabuhEditor from './components/tabuheditor/TabuhEditor'
 import { useTabuhDict } from './hooks/useTabuhDict'
 import DebugWindow from './components/DebugWindow'
 
-export const DebugContext = createContext<CallableFunction>(()=>{})
+export const DebugContext = createContext<Dispatch<string>>(()=>{})
 
 export default function App() {
 

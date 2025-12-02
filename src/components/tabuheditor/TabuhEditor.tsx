@@ -22,14 +22,14 @@ export default function TabuhEditor({tabuhDict, loadingTabuhDict} :
     }, [score])
 
     return (
-        <div id="TabuhPlayer">
+        <div id="TabuhEditor">
             <VStack className="m-5">
                 <Menu 
                     menuDisabled={menuDisabled} 
                     tabuhList={scoreList} 
                     scoreUpdater={(value: string) => loadScore(tabuhDict[value])} 
                 />    
-                <EditWindow/>
+                <EditWindow score={score}/>
             </VStack>
         </div>
 )

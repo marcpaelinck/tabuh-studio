@@ -2,9 +2,9 @@ import Player from './Player'
 import Menu from './Menu'
 import Animation from './Animation'
 import { panggulDefaultOption } from './Animation'
-import { type MenuItemInfo, type SVGInfo } from '../../models/types'
+import { type HighlightRange, type MenuItemInfo, type SVGInfo } from '../../models/types'
 import { type Timeline } from '../../utils/scoreplayerUtils/score'
-import { useEffect, useMemo, useRef, useState, type JSX, type RefObject } from 'react'
+import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import { positionConfigs } from '../../config/config';
 import { useScore } from '../../hooks/useScore'
@@ -17,7 +17,7 @@ export default function TabuhPlayer({tabuhDict, loadingTabuhDict} : {tabuhDict: 
   const [score, loadScore, loadingScore] = useScore(null)
   const [selectedFocus, setSelectedFocus] = useState<string[]>([])
   const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
-  const highlightFunctionRef: RefObject<CallableFunction> = useRef<CallableFunction>(()=>{})
+  const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(()=>{})
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
   const [svgInfo, setSvgInfo] = useState<SVGInfo>({svg: null, panggul: null,x: null, y: null, animation: null})
   const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)

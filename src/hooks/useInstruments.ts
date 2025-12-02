@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, type RefObject } from 'react'
+import { useCallback, useContext, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import { AVERAGE_ATTACK_DELAY, outroTime } from '../config/constants'
@@ -8,7 +8,7 @@ import { DebugContext } from '../App'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
-  play: (time: number, action: SamplerAction, focus: string[], debug: CallableFunction) => void
+  play: (time: number, action: SamplerAction, focus: string[], debug: Dispatch<string>) => void
   mute: (time: number) => void
 }
 
@@ -66,7 +66,7 @@ const createInstrument = (position: string, samplers: Record<string, React.RefOb
 }
 
 export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
-  const debug: CallableFunction = useContext(DebugContext);
+  const debug: Dispatch<string> = useContext(DebugContext);
 
   // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
   const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(positionConfigs).map((position) => [position, useRef(null)]))

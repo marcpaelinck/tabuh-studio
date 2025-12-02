@@ -1,7 +1,7 @@
 import type { AnimationAction, AnimationNote, CursorAction } from "../utils/scoreplayerUtils/score";
 import * as Tone from 'tone'
-import { useCallback, type RefObject } from "react";
-import type { MenuItemInfo, SVGInfo } from "../models/types";
+import { useCallback, type Dispatch, type RefObject } from "react";
+import type { HighlightRange, MenuItemInfo, SVGInfo } from "../models/types";
 import { animationConfig, colorRGB } from "../config/config";
 
 const moveToDuration = 500; // duration of the movement to the next key
@@ -139,7 +139,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
     });
 }
 
-export const useAnimationEngine = (svgInfoRef: RefObject<SVGInfo>, highlightFunctionRef: RefObject<CallableFunction>, panggulOptionRef: RefObject<MenuItemInfo>, currentFocusRef: RefObject<string[]>, pbSpeedRef: RefObject<number>) => {
+export const useAnimationEngine = (svgInfoRef: RefObject<SVGInfo>, highlightFunctionRef: RefObject<Dispatch<HighlightRange>>, panggulOptionRef: RefObject<MenuItemInfo>, currentFocusRef: RefObject<string[]>, pbSpeedRef: RefObject<number>) => {
 
     async function highlightCurrentNote(cAction: CursorAction) {
         if (highlightFunctionRef.current)

@@ -149,10 +149,10 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
   return Math.round(section.tempo[0] + (relBNTime / section.duration) * (section.tempo[1] - section.tempo[0]))
 }
 
-export function createTimeline(score: Score | null): Timeline | null {
+export function createTimeline(score: Score): Timeline {
   // Timeline will be used to create the Transport schedule
 
-  if (!score) return null
+  if (score == {} as Score) return {} as Timeline
 
   const timeline: Timeline = {
     totalDurationSec: 0,

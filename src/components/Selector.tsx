@@ -1,8 +1,8 @@
 import { Dropdown } from "rsuite"
-import type { JSX } from "react"
+import type { Dispatch, JSX } from "react"
 import type { MenuItemInfo } from "../models/types"
 
-const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: CallableFunction) => {
+const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: Dispatch<MenuItemInfo>) => {
     return (     
         <Dropdown.Item
             key={`${menuName}-option-${index}`}

@@ -1,8 +1,8 @@
 import { useAnimationEngine } from '../../hooks/useAnimation'
 import { useInstruments } from '../../hooks/useInstruments'
 import { useInterpretations } from '../../hooks/useInterpretations'
-import { type Score, type SVGInfo, type MenuItemInfo} from '../../models/types'
-import { useState, type JSX, useMemo, useEffect, type RefObject, useRef } from 'react'
+import { type Score, type SVGInfo, type MenuItemInfo, type HighlightRange} from '../../models/types'
+import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
 import * as Tone from 'tone'
 import { createTimeline, type AnimationAction, type CursorAction, type SamplerAction, type Timeline } from '../../utils/scoreplayerUtils/score'
   //-------------------------CONTROLS--------------------------------------
@@ -15,7 +15,7 @@ import { panggulDefaultOption } from './Animation'
 type AudioState = 'false' | 'true' | 'wait'
 
 export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOption, highlightFunctionRef, timelineUpdater}: 
-  { score: Score | null, focus: string[], pbSpeed: number, svgInfo: SVGInfo, panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<CallableFunction>, timelineUpdater: CallableFunction }): JSX.Element {
+  { score: Score, focus: string[], pbSpeed: number, svgInfo: SVGInfo, panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<Dispatch<HighlightRange>>, timelineUpdater: Dispatch<Timeline> }): JSX.Element {
 
   // STATE VARIABLES
   const [audioStarted, setAudioStarted] = useState<AudioState>('false')
@@ -41,7 +41,7 @@ export default function ScorePlayer({ score, focus, pbSpeed, svgInfo, panggulOpt
   const { animateInstrument, animateNotation } = useAnimationEngine(svgInfoRef, highlightFunctionRef, panggulOptionRef, focusRef, pbSpeedRef)
 
   // MEMOS AND EFFECTS
-  const timeline = useMemo(() => createTimeline(score), [score])
+  const timeline = useMemo<Timeline>(() => createTimeline(score), [score])
   
   useEffect(() => {
     timelineUpdater(timeline)

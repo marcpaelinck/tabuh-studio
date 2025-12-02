@@ -1,9 +1,9 @@
-import type { JSX, RefObject } from 'react'
+import type { Dispatch, JSX, RefObject } from 'react'
 import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import { positionConfigs } from '../../config/config';
 import { FRAMESTYLE, theme } from '../../config/constants';
-import type { AnimationData,MenuItemInfo, NotationParagraph, SVGInfo } from '../../models/types';
+import type { AnimationData,HighlightRange,MenuItemInfo, NotationParagraph, SVGInfo } from '../../models/types';
 import NotationArea from './NotationArea';
 import { Toggle, Slider, Grid, Row, Col, Loader } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
@@ -42,7 +42,7 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 export const panggulDefaultOption: MenuItemInfo = {key: "HIDE", displayValue: "Hide", value: null}
 
 export default function Animation({focus, notationElement, panggulMenuItems, highlightFunctionRef, panggulOption,  setPanggulOption, setSVGInfo}: 
-    {focus: string[], notationElement: NotationParagraph[] | null,  panggulMenuItems: MenuItemInfo[] , panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<CallableFunction>, setPanggulOption: CallableFunction, setSVGInfo: CallableFunction}) : JSX.Element {
+    {focus: string[], notationElement: NotationParagraph[] | null,  panggulMenuItems: MenuItemInfo[] , panggulOption: MenuItemInfo, highlightFunctionRef: RefObject<Dispatch<HighlightRange>>, setPanggulOption: Dispatch<MenuItemInfo>, setSVGInfo: Dispatch<SVGInfo>}) : JSX.Element {
     const defaultSvgSize = 100 // percent
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)

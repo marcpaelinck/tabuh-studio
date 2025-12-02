@@ -2,21 +2,16 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the 
 // notation while the corresponding notes are being played.
 
-import { useRef, type RefObject } from "react"
-import type { NotationParagraph as NotationParagraph } from "../../models/types";
-
-type HighlightRange = {
-    line: number
-    range: number[]
-}
+import { useRef, type Dispatch, type RefObject } from "react"
+import type { HighlightRange, NotationParagraph as NotationParagraph } from "../../models/types";
 
 export default function NotationArea({notation, visible, highlightFunctionRef}:
-    {notation: NotationParagraph[] | null, visible: boolean, highlightFunctionRef: RefObject<CallableFunction>}){
+    {notation: NotationParagraph[] | null, visible: boolean, highlightFunctionRef: RefObject<Dispatch<HighlightRange>>}){
 
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
     // Highlighting function: highlights the given range (line and character range)
-    const highlightFunction: CallableFunction = (hlRange: HighlightRange) => {
+    const highlightFunction: Dispatch<HighlightRange> = (hlRange: HighlightRange) => {
         const para = textAreaRef.current?.children[hlRange.line]
         const para1 = textAreaRef.current?.childNodes[hlRange.line]
         // Note: the `container` parameter is not supported yet by all browsers

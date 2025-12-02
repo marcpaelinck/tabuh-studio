@@ -1,22 +1,27 @@
-import { Container } from "rsuite"
-import TextLine from "./TextLine"
+import { Box } from "rsuite"
+import { useState } from "react"
+import type { Score, TextCursorPosition} from "../../models/types"
+import { ScoreText } from "./Containers"
 
-function Cursor() {
+function Cursor({position}: {position: TextCursorPosition}) {
     return (
-            <symbol id="te-cursor">
-                <rect id="CursorTemplate" x="0" y="0" width={2} height={20} fill="#000000" />
-            </symbol>            
+        <rect id="CursorTemplate" width={1.5} height={20} fill="#000000" x={position.x} y={position.y} className="cursor-visible" transform="translate(-1 1)"/>
     )
 }
 
-export default function EditWindow()
+export default function EditWindow({score}:{score: Score | null})
     {
+        const [cursorPosition, setCursorPosition] = useState<TextCursorPosition>({x: 0, y: 0, leftSymbol: null, rightSymbol: null})
+        const svgHeight = score ? score.systems.length * 14 * 12 : 0
+
         return (
-            <Container className="w-full overflow-scroll border rounded-md p-2">
-            <svg className="balifont16" viewBox="0 0 1500 500" xmlns="http://www.w3.org/2000/svg">
-                <Cursor/>
-                <TextLine id={0} content={["a", "e", "i", "o", "a,"]}/>
+            <Box className="w-full flex border overflow-scroll h-200 rounded-md p-2">
+            <svg className={`w-full h-${svgHeight}`} xmlns="http://www.w3.org/2000/svg">
+                {score!=null && (<>
+                    <ScoreText score={score} setCursorPosition={setCursorPosition}/>
+                    <Cursor position={cursorPosition} />
+                </>)}
             </svg>
-            </Container>
+            </Box>
         )
     }
