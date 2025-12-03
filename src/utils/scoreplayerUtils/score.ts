@@ -44,8 +44,6 @@ export function parseScore(input: string): Score {
       }
     })
   })
-  console.log("NEW VERSION")
-  console.log(score)
   return score
 }
 
