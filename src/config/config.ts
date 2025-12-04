@@ -4,6 +4,9 @@ export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume 
 export const BaseNote: "1n" | "2n" | "4n" | "8n" | "16n" | "32n" = "16n"
 export const SOUNDS_FOLDER = 'sounds/'
 export const alwaysFocusPositions = ["KEMPLI", "GONGS"]
+export const editorFontSize = 14
+export const editorDoNotDisplay = ["KEMPLI"]
+
 
 // Check if the set of sample files is complete
 export const doSanityCheck = false

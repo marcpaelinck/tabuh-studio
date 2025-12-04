@@ -1,11 +1,11 @@
-import { useMemo, useRef, type Dispatch, type SVGAttributes} from "react"
+import { useMemo, useRef, type Dispatch, type HTMLAttributes, type SVGAttributes} from "react"
 import type { JsonSymbol, TextCursorPosition } from "../../models/types"
 import { FontSymbol } from "./TextContainer"
+import { editorFontSize } from "../../config/config"
 
 export function CellTextContainer({content, editable, setCursorPosition, ...props}:
-    {content: JsonSymbol[] | string[], editable: boolean, setCursorPosition: Dispatch<TextCursorPosition>} & Omit<SVGAttributes<SVGTSpanElement>, "id">) {
+    {content: JsonSymbol[] | string[] | string, editable: boolean, setCursorPosition: Dispatch<TextCursorPosition>} & HTMLAttributes<HTMLDivElement>) {
     const lineRef = useRef<HTMLDivElement | null>(null)
-    const fs = 14 // font size
 
     // CHanges the cursor's SVG coordinates and surrounding symbols when the textline is clicked.
     const moveCursor = (event: React.MouseEvent<HTMLSpanElement>) => {
@@ -36,18 +36,19 @@ export function CellTextContainer({content, editable, setCursorPosition, ...prop
 
         return (
             <>
-                {content ? content.map((symbol) => {
+                {content ? (Array.isArray(content) ? content.map((symbol) => {
                     key+=1
                     if (key==1) {}
                     return <FontSymbol className={props.className} key={key} symbol={symbol} />
-                }) : <></>}
+                }) : content) : <></>}
             </>
         )
     }, [content])
 
     return(
         <>
-            <div ref={lineRef} className={`text-[${fs}pt] balifont`} >{textContent}</div>
+            <div ref={lineRef} {...props} >{textContent}</div>
+            {/* className={`text-[${editorFontSize}pt] balifont`} */}
         </>
     )
 

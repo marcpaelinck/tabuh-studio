@@ -1,9 +1,8 @@
 import type { Dispatch } from "react";
 import type { Score, Section, System, TextCursorPosition } from "../../models/types";
 import { TextContainer } from "./TextContainer";
-import { editorSortingOrder, positionConfigs } from "../../config/config";
+import { editorDoNotDisplay, editorSortingOrder, positionConfigs } from "../../config/config";
 
-const doNotDisplay = ["KEMPLI"]
 const colsBetweenSections = 1
 const rowsBetweenSystems = 2
 
@@ -13,7 +12,7 @@ export function SectionText({ id, section, row, col, setCursorPosition}: { id: s
         <g id={`tags-${id}`}></g>
         <g id={`staves-${id}`}>
             {Object.entries(section.staves).toSorted(([p1, _1], [p2, _2])=>editorSortingOrder.indexOf(p1) - editorSortingOrder.indexOf(p2)).map(([position, stave], idx) => {
-                    const show =!doNotDisplay.includes(position)
+                    const show =!editorDoNotDisplay.includes(position)
                     return (
                     <>
                      {(section.id==1 && show) && <TextContainer key={`pos-${id}-${idx}`} id={`pos-${id}-${idx}`} x={0} y={row+idx} content={[positionConfigs[position].name]} editable={false} setCursorPosition={setCursorPosition}/>}
