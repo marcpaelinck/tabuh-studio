@@ -1,6 +1,6 @@
-import { Box } from 'rsuite';
-import type { Score, TextCursorPosition } from '../../models/types';
-import { ScoreTableView } from './ScoreTableView';
+import { Box } from 'rsuite'
+import type { Score, TextCursorPosition } from '../../models/types'
+import { ScoreAccordeonView } from './ScoreAccordeonView'
 
 function Cursor({ position }: { position: TextCursorPosition }) {
     return (
@@ -14,23 +14,21 @@ function Cursor({ position }: { position: TextCursorPosition }) {
             className="cursor-visible"
             transform="translate(-1 1)"
         />
-    );
+    )
 }
 
 export default function EditWindow({ score }: { score: Score | null }) {
-    const windowHeight = 200;
-
     return (
-        <Box className={`w-full flex border height-${windowHeight} rounded-md p-2`}>
+        <Box className={`w-full flex border h-200  rounded-md p-2  overflow-scroll`}>
             {/* <svg className={`w-full h-${svgHeight}`} xmlns="http://www.w3.org/2000/svg"> */}
             {score != null && (
                 <>
                     {/* <ScoreText score={score} setCursorPosition={setCursorPosition}/> */}
-                    <ScoreTableView score={score} />
+                    <ScoreAccordeonView score={score} />
                     {/* <Cursor position={cursorPosition} /> */}
                 </>
             )}
             {/* </svg> */}
         </Box>
-    );
+    )
 }

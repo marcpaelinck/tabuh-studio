@@ -1,7 +1,6 @@
-import { useMemo, useRef, type Dispatch, type HTMLAttributes, type SVGAttributes } from 'react'
+import { useMemo, useRef, type HTMLAttributes } from 'react'
 import type { JsonSymbol, TextCursorPosition } from '../../models/types'
 import { FontSymbol } from './TextContainer'
-import { editorFontSize } from '../../config/config'
 
 export function CellTextContainer({
     content,
