@@ -1,37 +1,63 @@
-import { useEffect, useState } from 'react';
-import { useScore } from '../../hooks/useScore';
-import EditWindow from './EditWindow';
-import Menu from './Menu';
-import { VStack } from 'rsuite';
+import { useEffect, useState } from 'react'
+import { useScore } from '../../hooks/useScore'
+import Menu from './Menu'
+import { Box, Button, HStack, VStack } from 'rsuite'
+import { ScoreAccordeonView } from './ScoreAccordeonView'
+import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
+import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
+import { editorInitialExpandState } from '../../config/config'
 
 export default function TabuhEditor({
     tabuhDict,
     loadingTabuhDict
 }: {
-    tabuhDict: Record<string, string>;
-    loadingTabuhDict: boolean;
+    tabuhDict: Record<string, string>
+    loadingTabuhDict: boolean
 }) {
-    const [score, loadScore, loadingScore] = useScore(null);
-    const [menuDisabled, setMenuDisabled] = useState<boolean>(false);
-
-    var scoreList: string[] = Object.keys(tabuhDict);
+    const [score, loadScore, loadingScore] = useScore(null)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [expanded, setExpanded] = useState<Record<number, boolean>>({})
+    const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
+    var scoreList: string[] = Object.keys(tabuhDict)
 
     useEffect(() => {
-        setMenuDisabled(loadingTabuhDict);
-    }, [loadingTabuhDict, loadingScore]);
+        setLoading(loadingTabuhDict || loadingScore)
+    }, [loadingTabuhDict, loadingScore])
 
-    useEffect(() => {}, [score]);
+    useEffect(() => {}, [score])
+
+    function expandAll(expand: boolean) {
+        const newExpanded = Object.fromEntries(Object.keys(expanded).map((id) => [id, expand]))
+        setExpanded(newExpanded)
+        setButtonIsExpand(!expand)
+    }
 
     return (
         <div id="TabuhEditor">
             <VStack className="m-5">
-                <Menu
-                    menuDisabled={menuDisabled}
-                    tabuhList={scoreList}
-                    scoreUpdater={(value: string) => loadScore(tabuhDict[value])}
-                />
-                <EditWindow score={score} />
+                <HStack>
+                    <Menu
+                        menuDisabled={loading}
+                        tabuhList={scoreList}
+                        scoreUpdater={(value: string) => loadScore(tabuhDict[value])}
+                    />
+                    <Button
+                        appearance="primary"
+                        startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
+                        onClick={() => expandAll(buttonIsExpand)}
+                    />
+                </HStack>
+                <Box className={`w-full flex border h-200  rounded-md p-2  overflow-scroll`}>
+                    {score != null && (
+                        <ScoreAccordeonView
+                            score={score}
+                            expanded={expanded}
+                            setExpanded={setExpanded}
+                            loading={loading}
+                        />
+                    )}
+                </Box>
             </VStack>
         </div>
-    );
+    )
 }
