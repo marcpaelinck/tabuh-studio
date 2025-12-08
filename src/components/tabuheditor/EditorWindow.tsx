@@ -1,12 +1,21 @@
-import { Accordion, HStack, Input, Placeholder, Text, VStack } from 'rsuite'
+import { Accordion, HStack, Input, Placeholder, Text, VStack, type InputProps } from 'rsuite'
 import type { Score, Stave, TableRowDataType } from '../../models/types'
-import { useEffect, useState, type Dispatch, type HTMLAttributes, type ReactNode } from 'react'
+import {
+    useEffect,
+    useRef,
+    useState,
+    type ChangeEvent,
+    type Dispatch,
+    type HTMLAttributes,
+    type ReactNode
+} from 'react'
 import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
 import 'rsuite/Divider/styles/index.css'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { editorInitialExpandState, positionConfigs } from '../../config/config'
+import { useKeyboardListener } from '../../hooks/useKeyboard'
 
 var uniqueKeyValue = 0
 
@@ -15,18 +24,39 @@ function uniqueKey() {
     return uniqueKeyValue
 }
 
+function ControlledInput({
+    acceptOnly,
+    ...props
+}: { acceptOnly: string[] } & HTMLAttributes<HTMLTextAreaElement> & InputProps) {
+    const ref = useRef<HTMLTextAreaElement>(null)
+    const [keyboardListener] = useKeyboardListener(ref, acceptOnly)
+
+    useEffect(() => {
+        // Remove event listener if cell is being re-rendered
+        ref.current?.removeEventListener('keydown', keyboardListener)
+        ref.current?.addEventListener('keydown', keyboardListener)
+    }, [])
+
+    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        console.log('changed')
+    }
+
+    return <textarea ref={ref} onChange={(e) => handleChange(e)} {...props} />
+}
+
 function SystemDetails({ staffs, colWidths }: { staffs: [string, Stave[]][]; colWidths: number[] }): ReactNode {
     const staffNodes = staffs.map(([pos, staves]: [string, Stave[]]) => {
         const staveNodes = staves.map((stave: Stave, idx: number) => {
             const width: string = getTextWidthInPx('x'.repeat(colWidths[idx]), 14) + 15 + 'px'
+            const acceptOnly: string[] = Object.keys(positionConfigs[pos].symbolToNoteNames)
             return (
                 <>
-                    <Input
+                    <ControlledInput
+                        acceptOnly={acceptOnly}
                         key={idx}
                         defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
-                        // as="div"
                         style={{ width: width }}
-                        className={`balifont10 h-5 overflow-clip p-0`}
+                        className={`balifont10 h-5 resize-none overflow-clip p-0`}
                     />
                 </>
             )
@@ -43,7 +73,7 @@ function SystemDetails({ staffs, colWidths }: { staffs: [string, Stave[]][]; col
     return <VStack>{staffNodes}</VStack>
 }
 
-export function ScoreAccordeonView({
+export default function EditorWindow({
     score,
     expanded,
     setExpanded,
@@ -73,7 +103,7 @@ export function ScoreAccordeonView({
                 Math.max(...Object.values(section.staves).map((stave) => stave.notation.length))
             )
             const staffs = positions.map((position) => [
-                positionConfigs[position].name,
+                position,
                 system.sections.map((section) => section.staves[position]).flat(1)
             ])
             const summary = {

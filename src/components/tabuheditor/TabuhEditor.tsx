@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useScore } from '../../hooks/useScore'
 import Menu from './Menu'
 import { Box, Button, HStack, VStack } from 'rsuite'
-import { ScoreAccordeonView } from './ScoreAccordeonView'
+import EditorWindow from './EditorWindow'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
 import { editorInitialExpandState } from '../../config/config'
@@ -49,12 +49,7 @@ export default function TabuhEditor({
                 </HStack>
                 <Box className={`w-full flex border h-200  rounded-md p-2  overflow-scroll`}>
                     {score != null && (
-                        <ScoreAccordeonView
-                            score={score}
-                            expanded={expanded}
-                            setExpanded={setExpanded}
-                            loading={loading}
-                        />
+                        <EditorWindow score={score} expanded={expanded} setExpanded={setExpanded} loading={loading} />
                     )}
                 </Box>
             </VStack>
