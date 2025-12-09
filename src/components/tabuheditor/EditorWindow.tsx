@@ -1,14 +1,6 @@
 import { Accordion, Col, Grid, Placeholder, Row, Text, VStack, type InputProps } from 'rsuite'
 import type { Score, Stave, TableRowDataType } from '../../models/types'
-import {
-    useEffect,
-    useRef,
-    useState,
-    type ChangeEvent,
-    type Dispatch,
-    type HTMLAttributes,
-    type ReactNode
-} from 'react'
+import { useEffect, useState, type Dispatch, type HTMLAttributes, type ReactNode } from 'react'
 import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
@@ -18,7 +10,7 @@ import 'rsuite/Row/styles/index.css'
 import 'rsuite/Col/styles/index.css'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
-import { useKeyboardListener } from '../../hooks/useKeyboard'
+import { NavigationGrid, NavigationInputCell } from '../ControlledGrid/NavigationGrid'
 
 var uniqueKeyValue = 0
 
@@ -27,69 +19,38 @@ function uniqueKey() {
     return uniqueKeyValue
 }
 
-function ControlledInput({
-    posId,
-    secId,
-    validSymbols,
-    getUp,
-    getDown,
-    ...props
+function SystemDetails({
+    sysId,
+    staffs,
+    colWidths
 }: {
-    posId: number
-    secId: number
-    validSymbols: string[]
-    getUp: CallableFunction
-    getDown: CallableFunction
-} & HTMLAttributes<HTMLTextAreaElement> &
-    InputProps) {
-    const ref = useRef<HTMLTextAreaElement>(null)
-    const [keyboardListener] = useKeyboardListener(
-        ref,
-        validSymbols,
-        () => getUp(posId, secId),
-        () => getDown(posId, secId)
-    )
-
-    useEffect(() => {
-        // Remove event listener if cell is being re-rendered
-        ref.current?.removeEventListener('keydown', keyboardListener)
-        ref.current?.addEventListener('keydown', keyboardListener)
-    }, [])
-
-    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        console.log('changed')
-    }
-
-    return <textarea ref={ref} onChange={(e) => handleChange(e)} {...props} />
-}
-
-function SystemDetails({ staffs, colWidths }: { staffs: [string, Stave[]][]; colWidths: number[] }): ReactNode {
+    sysId: number
+    staffs: [string, Stave[]][]
+    colWidths: number[]
+}): ReactNode {
     const staffNodes = staffs.map(([pos, staves]: [string, Stave[]], pidx) => {
         const staveNodes = staves.map((stave: Stave, sidx: number) => {
             const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
             const validSymbols: string[] = Object.keys(positionConfigs[pos].symbolToNoteNames)
             return (
-                <Col key={pidx * 100 + sidx} span="auto">
-                    <ControlledInput
+                <Col id={`COL-${pidx * 100 + sidx}`} key={pidx * 100 + sidx} span="auto">
+                    <NavigationInputCell
                         key={pidx * 100 + sidx}
                         posId={pidx}
                         secId={sidx}
-                        getUp={getUp}
-                        getDown={getDown}
                         validSymbols={validSymbols}
                         defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
                         style={{ width: width }}
                         className={`balifont10 h-5 resize-none overflow-clip p-0`}
                         spellCheck="false"
-                        readOnly={true}
                     />
                 </Col>
             )
         })
 
         return (
-            <Row>
-                <Col span="auto">
+            <Row id={`ROW-${sysId}-${pos}`}>
+                <Col id={`COL-${sysId}-POS`} span="auto">
                     <Text as="div" className="w-40 h-5">
                         {positionConfigs[pos].name}
                     </Text>
@@ -98,13 +59,6 @@ function SystemDetails({ staffs, colWidths }: { staffs: [string, Stave[]][]; col
             </Row>
         )
     })
-
-    function getUp(posId: number, secId: number) {
-        return staffNodes.find((n) => n.props.posId == posId - 1 && n.props.secId == secId) || null
-    }
-    function getDown(posId: number, secId: number) {
-        return staffNodes.find((n) => n.props.posId == posId + 1 && n.props.secId == secId) || null
-    }
 
     return <VStack>{staffNodes}</VStack>
 }
@@ -172,9 +126,9 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(sys.id)
                 }}>
-                <Grid fluid={false} className="ml-0">
-                    <SystemDetails staffs={sys.staffs} colWidths={sys.colWidths} />
-                </Grid>
+                <NavigationGrid id={`GRID-4(sys.id)`} fluid={false} className="ml-0">
+                    <SystemDetails sysId={sys.id} staffs={sys.staffs} colWidths={sys.colWidths} />
+                </NavigationGrid>
             </Accordion.Panel>
         )
     })

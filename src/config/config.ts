@@ -25,6 +25,16 @@ export const editorFontSize = 14
 export const editorDoNotDisplay = ['KEMPLI']
 export const editorInitialExpandState = false
 
+export type NavigationAction =
+    | 'cellup'
+    | 'celldown'
+    | 'cellleft'
+    | 'cellright'
+    | 'rowstart'
+    | 'rowend'
+    | 'firstrow'
+    | 'lastrow'
+
 export const editorSortingOrder = [
     'UGAL',
     'PEMADE_POLOS',

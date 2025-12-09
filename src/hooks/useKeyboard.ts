@@ -1,7 +1,31 @@
 import { type RefObject } from 'react'
+import type { NavigationAction } from '../config/config'
 
-type KeyType = 'ArrowUp' | 'ArrowDown' | 'Shift' | 'Ctrl' | 'Alt'
-type Action = ['pop-left', number] | ['pop-right', number] | ['insert', string] | ['ignore'] | ['cellup'] | ['celldown']
+type KeyType =
+    | 'ArrowUp'
+    | 'ArrowDown'
+    | 'ArrowLeft'
+    | 'ArrowRight'
+    | 'Shift'
+    | 'Ctrl'
+    | 'Alt'
+    | 'Home'
+    | 'End'
+    | 'PgUp'
+    | 'PgDn'
+type Action =
+    | ['pop-left', number]
+    | ['pop-right', number]
+    | ['insert', string]
+    | ['ignore']
+    | ['cellup']
+    | ['celldown']
+    | ['cellleft']
+    | ['cellright']
+    | ['rowstart']
+    | ['rowend']
+    | ['firstrow']
+    | ['lastrow']
 type ActionRecord = {
     keys: KeyType[]
     left: RegExp | null // regex describing the character(s) left of the cursor
@@ -17,14 +41,20 @@ type ActionRecord = {
 //        by the regular expressions.
 // Note2: For `left`/`right`, the regex ^$ detects that the cursor is at the beginning/end of the field.
 const keyActions: ActionRecord[] = [
+    // Typing
     { keys: ['ArrowUp', 'Ctrl'], left: /[aeiours],$/, right: null, action: ['pop-left', 1] },
     { keys: ['ArrowUp', 'Ctrl'], left: /[aeiours]$/, right: null, action: ['insert', '<'] },
     { keys: ['ArrowUp', 'Ctrl'], left: /[^aeiours,]$|^$/, right: null, action: ['ignore'] },
     { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
     { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
-    { keys: ['ArrowDown', 'Ctrl'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] }
-    // { keys: ['ArrowUp'], left: null, right: null, action: ['cellup'] },
-    // { keys: ['ArrowDown'], left: null, right: null, action: ['celldown'] }
+    { keys: ['ArrowDown', 'Ctrl'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] },
+    // Navigation
+    { keys: ['ArrowUp'], left: null, right: null, action: ['cellup'] },
+    { keys: ['ArrowDown'], left: null, right: null, action: ['celldown'] },
+    { keys: ['ArrowLeft'], left: /^$/, right: null, action: ['cellleft'] },
+    { keys: ['ArrowRight'], left: null, right: /^$/, action: ['cellright'] },
+    { keys: ['Home', 'Ctrl'], left: null, right: null, action: ['rowstart'] },
+    { keys: ['End', 'Ctrl'], left: null, right: null, action: ['rowend'] }
 ]
 
 const match = (eventVal: boolean | string | string[], actionVal: boolean | string | string[] | RegExp | null) => {
@@ -46,8 +76,7 @@ const match = (eventVal: boolean | string | string[], actionVal: boolean | strin
 export const useKeyboardListener = (
     ref: RefObject<HTMLTextAreaElement | null>,
     acceptOnly: string[],
-    getUp: CallableFunction,
-    getDown: CallableFunction
+    navigate: (action: NavigationAction) => RefObject<HTMLTextAreaElement | null>
 ) => {
     // Defined as hook in order to be able to use states, e.g. 'octavation on' which could work similarly to caps lock
 
@@ -70,8 +99,10 @@ export const useKeyboardListener = (
             event.altKey ? 'Alt' : null
         ].filter((v) => v != null)
         // Find a match with a keyAction
+        console.log(event.key)
         for (const a of keyActions) {
             if (match(eventKeys, a.keys) && match(left, a.left) && match(right, a.right)) {
+                console.log('pass')
                 event.preventDefault()
 
                 if (a.action[0] == 'insert') {
@@ -95,10 +126,21 @@ export const useKeyboardListener = (
                     console.log('IGNORE')
                     break
                 }
-                if (a.action[0] == 'cellup') {
-                    console.log('UP')
-                    const element: HTMLTextAreaElement = getUp()
-                    element.focus()
+                if (
+                    [
+                        'cellup',
+                        'celldown',
+                        'cellleft',
+                        'cellright',
+                        'rowstart',
+                        'rowend',
+                        'firstrow',
+                        'lastrow'
+                    ].includes(a.action[0])
+                ) {
+                    console.log(a.action[0])
+                    const elementRef: RefObject<HTMLTextAreaElement | null> = navigate(a.action[0] as NavigationAction)
+                    elementRef.current?.focus()
                     break
                 }
             }
