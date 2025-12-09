@@ -1,5 +1,5 @@
-import { doSanityCheck, positionConfigs, SOUNDS_FOLDER } from '../config/config'
-import { fileExists } from './filesystem'
+import { doSanityCheck, positionConfigs, SOUNDS_FOLDER } from './config'
+import { fileExists } from '../utils/filesystem'
 
 export function soundFiles(notes: string[], fileTemplate: string): string[] {
     return notes.map(([tone, muting]) => fileTemplate.replace('{tone}', `${tone}`).replace('{muting}', `${muting}`))

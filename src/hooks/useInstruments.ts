@@ -11,7 +11,7 @@ import {
     SOUNDS_FOLDER,
     BaseNote
 } from '../config/config'
-import { soundFile } from '../utils/config'
+import { soundFile } from '../config/configfunctions'
 import { DebugContext } from '../App'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 

@@ -1,6 +1,6 @@
 // INSTRUMENTS
 
-import type { Component, HTMLAttributes, JSX, ReactElement, RefObject } from 'react'
+import type { HTMLAttributes, ReactElement } from 'react'
 import type { MutingType, StrokeType, ToneType } from '../config/config'
 
 export type Instrument = { id: string; name: string; alphabet: string[] }
