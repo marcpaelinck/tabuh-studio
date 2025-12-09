@@ -42,17 +42,21 @@ type ActionRecord = {
 // Note2: For `left`/`right`, the regex ^$ detects that the cursor is at the beginning/end of the field.
 const keyActions: ActionRecord[] = [
     // Typing
-    { keys: ['ArrowUp', 'Ctrl'], left: /[aeiours],$/, right: null, action: ['pop-left', 1] },
-    { keys: ['ArrowUp', 'Ctrl'], left: /[aeiours]$/, right: null, action: ['insert', '<'] },
-    { keys: ['ArrowUp', 'Ctrl'], left: /[^aeiours,]$|^$/, right: null, action: ['ignore'] },
-    { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
-    { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
-    { keys: ['ArrowDown', 'Ctrl'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] },
+    { keys: ['ArrowUp', 'Alt'], left: /[aeiours],$/, right: null, action: ['pop-left', 1] },
+    { keys: ['ArrowUp', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', '<'] },
+    { keys: ['ArrowUp', 'Alt'], left: /[^aeiours,]$|^$/, right: null, action: ['ignore'] },
+    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
+    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
+    { keys: ['ArrowDown', 'Alt'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] },
     // Navigation
     { keys: ['ArrowUp'], left: null, right: null, action: ['cellup'] },
     { keys: ['ArrowDown'], left: null, right: null, action: ['celldown'] },
     { keys: ['ArrowLeft'], left: /^$/, right: null, action: ['cellleft'] },
     { keys: ['ArrowRight'], left: null, right: /^$/, action: ['cellright'] },
+    { keys: ['ArrowUp', 'Ctrl'], left: null, right: null, action: ['firstrow'] },
+    { keys: ['ArrowDown', 'Ctrl'], left: null, right: null, action: ['lastrow'] },
+    { keys: ['ArrowLeft', 'Ctrl'], left: null, right: null, action: ['cellleft'] },
+    { keys: ['ArrowRight', 'Ctrl'], left: null, right: null, action: ['cellright'] },
     { keys: ['Home', 'Ctrl'], left: null, right: null, action: ['rowstart'] },
     { keys: ['End', 'Ctrl'], left: null, right: null, action: ['rowend'] }
 ]
@@ -65,8 +69,9 @@ const match = (eventVal: boolean | string | string[], actionVal: boolean | strin
         // `sca` values
         (Array.isArray(eventVal) &&
             Array.isArray(actionVal) &&
-            eventVal.length == actionVal.length &&
-            new Set(eventVal).difference(new Set(actionVal)).size == 0) ||
+            new Set(eventVal).size == new Set(actionVal).size &&
+            new Set(eventVal).difference(new Set(actionVal)).size == 0 &&
+            new Set(actionVal).difference(new Set(eventVal)).size == 0) ||
         // Not used currently
         (typeof actionVal == 'boolean' && eventVal == actionVal)
     // console.log(`key=${eventVal} a=${actionVal} match=${returnValue}`)
@@ -140,7 +145,11 @@ export const useKeyboardListener = (
                 ) {
                     console.log(a.action[0])
                     const elementRef: RefObject<HTMLTextAreaElement | null> = navigate(a.action[0] as NavigationAction)
-                    elementRef.current?.focus()
+                    if (elementRef.current) {
+                        elementRef.current?.focus()
+                        elementRef.current.selectionStart = 0
+                        elementRef.current.selectionEnd = 0
+                    }
                     break
                 }
             }
