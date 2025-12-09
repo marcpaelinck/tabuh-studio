@@ -1,7 +1,7 @@
-import { useState, type RefObject } from 'react'
+import { useState, type ReactElement, type ReactNode, type RefObject } from 'react'
 
 type KeyType = 'ArrowUp' | 'ArrowDown' | 'Shift' | 'Ctrl' | 'Alt'
-type Action = ['pop-left', number] | ['pop-right', number] | ['insert', string] | ['ignore']
+type Action = ['pop-left', number] | ['pop-right', number] | ['insert', string] | ['ignore'] | ['cellup'] | ['celldown']
 type ActionRecord = {
     keys: KeyType[]
     left: RegExp | null // regex describing the character(s) left of the cursor
@@ -23,6 +23,8 @@ const keyActions: ActionRecord[] = [
     { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
     { keys: ['ArrowDown', 'Ctrl'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
     { keys: ['ArrowDown', 'Ctrl'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] }
+    // { keys: ['ArrowUp'], left: null, right: null, action: ['cellup'] },
+    // { keys: ['ArrowDown'], left: null, right: null, action: ['celldown'] }
 ]
 
 const match = (eventVal: boolean | string | string[], actionVal: boolean | string | string[] | RegExp | null) => {
@@ -41,7 +43,12 @@ const match = (eventVal: boolean | string | string[], actionVal: boolean | strin
     return returnValue
 }
 
-export const useKeyboardListener = (ref: RefObject<HTMLTextAreaElement | null>, acceptOnly: string[]) => {
+export const useKeyboardListener = (
+    ref: RefObject<HTMLTextAreaElement | null>,
+    acceptOnly: string[],
+    getUp: CallableFunction,
+    getDown: CallableFunction
+) => {
     // Defined as hook in order to be able to use states, e.g. 'octavation on' which could work similarly to caps lock
 
     function keyboardListener(event: KeyboardEvent) {
@@ -85,7 +92,13 @@ export const useKeyboardListener = (ref: RefObject<HTMLTextAreaElement | null>, 
                     break
                 }
                 if (a.action[0] == 'ignore') {
-                    console.log(`IGNORE ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
+                    console.log('IGNORE')
+                    break
+                }
+                if (a.action[0] == 'cellup') {
+                    console.log('UP')
+                    const element: HTMLTextAreaElement = getUp()
+                    element.focus()
                     break
                 }
             }

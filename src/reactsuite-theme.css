@@ -2,11 +2,11 @@
 / See https://rsuitejs.com/guide/customization-less/ */
 
 :root {
-  --rs-primary-50: #e3f2fd;
-  --rs-primary-100: #bbdefb;
-  --rs-primary-200: #90caf9;
-  --rs-primary-500: #2196f3; /* Primary Color */
-  /* ...more variables */
+    --rs-primary-50: #e3f2fd;
+    --rs-primary-100: #bbdefb;
+    --rs-primary-200: #90caf9;
+    --rs-primary-500: #2196f3; /* Primary Color */
+    /* ...more variables */
 }
 
 /* Undo `color: inherit` setting which resets color of WordPress theme.*/
@@ -25,7 +25,7 @@ h2 {
     --rs-primary-700: #2b850d;
     --rs-primary-800: #1f7505;
     --rs-primary-900: #156100;
-    --rs-slider-progress: var(--rs-primary-500)
+    --rs-slider-progress: var(--rs-primary-500);
 }
 
 .ts-theme-player {
@@ -39,5 +39,5 @@ h2 {
     --rs-primary-700: #e0a500;
     --rs-primary-800: #c29100;
     --rs-primary-900: #997500;
-    --rs-slider-progress: var(--rs-primary-500)
+    --rs-slider-progress: var(--rs-primary-500);
 }

@@ -1,4 +1,4 @@
-import { Accordion, HStack, Input, Placeholder, Text, VStack, type InputProps } from 'rsuite'
+import { Accordion, Col, Grid, Placeholder, Row, Text, VStack, type InputProps } from 'rsuite'
 import type { Score, Stave, TableRowDataType } from '../../models/types'
 import {
     useEffect,
@@ -13,8 +13,11 @@ import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
 import 'rsuite/Divider/styles/index.css'
+import 'rsuite/Grid/styles/index.css'
+import 'rsuite/Row/styles/index.css'
+import 'rsuite/Col/styles/index.css'
 import { getTextWidthInPx } from '../../utils/measurements'
-import { editorInitialExpandState, positionConfigs } from '../../config/config'
+import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 
 var uniqueKeyValue = 0
@@ -25,11 +28,27 @@ function uniqueKey() {
 }
 
 function ControlledInput({
-    acceptOnly,
+    posId,
+    secId,
+    validSymbols,
+    getUp,
+    getDown,
     ...props
-}: { acceptOnly: string[] } & HTMLAttributes<HTMLTextAreaElement> & InputProps) {
+}: {
+    posId: number
+    secId: number
+    validSymbols: string[]
+    getUp: CallableFunction
+    getDown: CallableFunction
+} & HTMLAttributes<HTMLTextAreaElement> &
+    InputProps) {
     const ref = useRef<HTMLTextAreaElement>(null)
-    const [keyboardListener] = useKeyboardListener(ref, acceptOnly)
+    const [keyboardListener] = useKeyboardListener(
+        ref,
+        validSymbols,
+        () => getUp(posId, secId),
+        () => getDown(posId, secId)
+    )
 
     useEffect(() => {
         // Remove event listener if cell is being re-rendered
@@ -45,31 +64,48 @@ function ControlledInput({
 }
 
 function SystemDetails({ staffs, colWidths }: { staffs: [string, Stave[]][]; colWidths: number[] }): ReactNode {
-    const staffNodes = staffs.map(([pos, staves]: [string, Stave[]]) => {
-        const staveNodes = staves.map((stave: Stave, idx: number) => {
-            const width: string = getTextWidthInPx('x'.repeat(colWidths[idx]), 14) + 15 + 'px'
-            const acceptOnly: string[] = Object.keys(positionConfigs[pos].symbolToNoteNames)
+    const staffNodes = staffs.map(([pos, staves]: [string, Stave[]], pidx) => {
+        const staveNodes = staves.map((stave: Stave, sidx: number) => {
+            const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
+            const validSymbols: string[] = Object.keys(positionConfigs[pos].symbolToNoteNames)
             return (
-                <>
+                <Col key={pidx * 100 + sidx} span="auto">
                     <ControlledInput
-                        acceptOnly={acceptOnly}
-                        key={idx}
+                        key={pidx * 100 + sidx}
+                        posId={pidx}
+                        secId={sidx}
+                        getUp={getUp}
+                        getDown={getDown}
+                        validSymbols={validSymbols}
                         defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
                         style={{ width: width }}
                         className={`balifont10 h-5 resize-none overflow-clip p-0`}
+                        spellCheck="false"
+                        readOnly={true}
                     />
-                </>
+                </Col>
             )
         })
+
         return (
-            <HStack className="w-full">
-                <Text as="div" className="w-50 h-5">
-                    {pos}
-                </Text>
+            <Row>
+                <Col span="auto">
+                    <Text as="div" className="w-40 h-5">
+                        {positionConfigs[pos].name}
+                    </Text>
+                </Col>
                 {staveNodes}
-            </HStack>
+            </Row>
         )
     })
+
+    function getUp(posId: number, secId: number) {
+        return staffNodes.find((n) => n.props.posId == posId - 1 && n.props.secId == secId) || null
+    }
+    function getDown(posId: number, secId: number) {
+        return staffNodes.find((n) => n.props.posId == posId + 1 && n.props.secId == secId) || null
+    }
+
     return <VStack>{staffNodes}</VStack>
 }
 
@@ -95,10 +131,13 @@ export default function EditorWindow({
     }
 
     useEffect(() => {
+        // Convert new score to data record structure
         setProcessing(true)
         const newData: TableRowDataType[] = []
         score.systems.forEach((system) => {
-            const positions = Object.keys(system.sections[0].staves)
+            const positions = Object.keys(system.sections[0].staves).toSorted(
+                (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
+            )
             const colWidths = system.sections.map((section) =>
                 Math.max(...Object.values(section.staves).map((stave) => stave.notation.length))
             )
@@ -133,7 +172,9 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(sys.id)
                 }}>
-                <SystemDetails staffs={sys.staffs} colWidths={sys.colWidths} />
+                <Grid fluid={false} className="ml-0">
+                    <SystemDetails staffs={sys.staffs} colWidths={sys.colWidths} />
+                </Grid>
             </Accordion.Panel>
         )
     })

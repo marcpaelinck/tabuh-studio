@@ -14,44 +14,8 @@ export const alwaysFocusPositions = ['KEMPLI', 'GONGS']
 // Check if the set of sample files is complete
 export const doSanityCheck = false
 
-export const NOTES = [
-    'C1',
-    'C#1',
-    'D1',
-    'D#1',
-    'E1',
-    'F1',
-    'F#1',
-    'G1',
-    'G#1',
-    'A1',
-    'A#1',
-    'B1',
-    'C2',
-    'C#2',
-    'D2',
-    'D#2',
-    'E2',
-    'F2',
-    'F#2',
-    'G2',
-    'G#2',
-    'A2',
-    'A#2',
-    'B2',
-    'C3',
-    'C#3',
-    'D3',
-    'D#3',
-    'E3',
-    'F3',
-    'F#3',
-    'G3',
-    'G#3',
-    'A3',
-    'A#3',
-    'B3'
-]
+// prettier-ignore
+export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
 
 // Typing of tone and muting
 // See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
