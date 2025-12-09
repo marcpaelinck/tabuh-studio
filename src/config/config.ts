@@ -1,11 +1,57 @@
 import type { Note } from '../models/types'
+export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
+
+// TAILWIND STYLES
+
+export const FRAMESTYLE = ' rounded-xl shadow-lg shadow-gray-400 border border-gray-300 '
+
+// THEME
+
+type Color = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'violet'
+
+export const theme: Record<string, Color> = { main: 'blue', animation: 'green', player: 'orange' }
+
+export const tsStyleSheet = () => {
+    for (const sheet of document.styleSheets) {
+        if (sheet.title === 'reactsuite-theme.less') {
+            return sheet
+        }
+    }
+}
 
 // EDITOR
+
 export const editorFontSize = 14
 export const editorDoNotDisplay = ['KEMPLI']
 export const editorInitialExpandState = false
 
+export const editorSortingOrder = [
+    'UGAL',
+    'PEMADE_POLOS',
+    'PEMADE_SANGSIH',
+    'KANTILAN_POLOS',
+    'KANTILAN_SANGSIH',
+    'REYONG_1',
+    'REYONG_2',
+    'REYONG_3',
+    'REYONG_4',
+    'PENYACAH',
+    'CALUNG',
+    'JEGOGAN',
+    'GONGS',
+    'CENGCENG',
+    'KENDANG',
+    'KEMPLI'
+]
+
 // PLAYER
+
+// List of playback speeds for selector
+export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+export const introTime: number = 2000 // silence added before the beginning of the score in milliseconds
+export const outroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
+
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
 export const BaseNote: '1n' | '2n' | '4n' | '8n' | '16n' | '32n' = '16n'
 export const SOUNDS_FOLDER = 'sounds/'
@@ -15,28 +61,13 @@ export const alwaysFocusPositions = ['KEMPLI', 'GONGS']
 export const doSanityCheck = false
 
 // prettier-ignore
-export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2','F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
+export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2',
+                      'F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
 
 // Typing of tone and muting
 // See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
-const _tones_ = [
-    'DING',
-    'DONG',
-    'DENG',
-    'DUNG',
-    'DANG',
-    'GIR',
-    'PUR',
-    'TONG',
-    'X',
-    'X',
-    'KA',
-    'PAK',
-    'DE',
-    'TUT',
-    'CUNG',
-    'KUNG'
-] as const
+// prettier-ignore
+const _tones_ = ['DING','DONG','DENG','DUNG','DANG','GIR','PUR','TONG','X','X','KA','PAK','DE','TUT','CUNG','KUNG'] as const
 export type ToneType = (typeof _tones_)[number] // 'DING' | 'DONG' | 'DENG' | ...
 const _strokes_ = ['KNOB', 'RIM'] as const
 export type StrokeType = (typeof _strokes_)[number]
@@ -174,25 +205,6 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     UGAL: { name: 'Ugal', positions: ['UGAL'] },
     REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] }
 }
-
-export const editorSortingOrder = [
-    'UGAL',
-    'PEMADE_POLOS',
-    'PEMADE_SANGSIH',
-    'KANTILAN_POLOS',
-    'KANTILAN_SANGSIH',
-    'REYONG_1',
-    'REYONG_2',
-    'REYONG_3',
-    'REYONG_4',
-    'PENYACAH',
-    'CALUNG',
-    'JEGOGAN',
-    'GONGS',
-    'CENGCENG',
-    'KENDANG',
-    'KEMPLI'
-]
 
 export const positionConfigs: Record<string, PositionConfig> = {
     GONGS: {
@@ -568,6 +580,8 @@ export const positionConfigs: Record<string, PositionConfig> = {
         }
     }
 }
+
+// ANIMATION
 
 export type InstrumentAnimationInfo = { group: string; label: string; svg_file: string }
 

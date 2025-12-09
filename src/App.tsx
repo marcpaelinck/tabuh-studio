@@ -1,25 +1,25 @@
-import { VStack, Toggle } from 'rsuite';
-import PlayOutlineIcon from '@rsuite/icons/PlayOutline';
-import EditIcon from '@rsuite/icons/Edit';
-import TabuhPlayer from './components/tabuhplayer/TabuhPlayer';
-import { createContext, useState, type Dispatch } from 'react';
-import { FRAMESTYLE } from './config/constants';
-import TabuhEditor from './components/tabuheditor/TabuhEditor';
-import { useTabuhDict } from './hooks/useTabuhDict';
-import DebugWindow from './components/DebugWindow';
+import { VStack, Toggle } from 'rsuite'
+import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
+import EditIcon from '@rsuite/icons/Edit'
+import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
+import { createContext, useState, type Dispatch } from 'react'
+import { FRAMESTYLE } from './config/config'
+import TabuhEditor from './components/tabuheditor/TabuhEditor'
+import { useTabuhDict } from './hooks/useTabuhDict'
+import DebugWindow from './components/DebugWindow'
 
-export const DebugContext = createContext<Dispatch<string>>(() => {});
+export const DebugContext = createContext<Dispatch<string>>(() => {})
 
 export default function App() {
     // Set to false to remove debug window
-    const debugMode: boolean = false;
+    const debugMode: boolean = false
 
-    const [active, setActive] = useState<'editor' | 'player'>('player');
-    const [tabuhDict, loadingTabuhDict] = useTabuhDict({});
-    const [debugMessage, setDebugMessage] = useState<string | null>(null);
+    const [active, setActive] = useState<'editor' | 'player'>('player')
+    const [tabuhDict, loadingTabuhDict] = useTabuhDict({})
+    const [debugMessage, setDebugMessage] = useState<string | null>(null)
 
     function debug(message: string) {
-        setDebugMessage(message);
+        setDebugMessage(message)
     }
 
     return (
@@ -45,5 +45,5 @@ export default function App() {
                 </VStack>
             </DebugContext>
         </div>
-    );
+    )
 }

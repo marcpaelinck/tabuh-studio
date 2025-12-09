@@ -1,114 +1,116 @@
-import { ignoreChars, positionConfigs, noteConfigs, type MutingType, type StrokeType, type ToneType } from '../../config/config'
-import { type JsonNote, type JsonSymbol, type Note, type Score, type Section, type Stave, type System } from '../../models/types'
+import {
+    ignoreChars,
+    positionConfigs,
+    noteConfigs,
+    type MutingType,
+    type StrokeType,
+    type ToneType
+} from '../../config/config'
+import { type JsonNote, type JsonSymbol, type Note, type Score, type Section } from '../../models/types'
 import * as Tone from 'tone'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
 import { createElement, type HTMLAttributes, type ReactElement } from 'react'
-import { introTime, outroTime } from '../../config/constants'
+import { introTime, outroTime } from '../../config/config'
 
 export function parseScore(input: string): Score {
-  const score: Score = JSON.parse(input)
-  // This function also calculates times in ms for each note, to be used by the animation.
-  // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
-  var currentTimeMs = introTime
-  // TODO the following result will be incorrect if tempo[1] != tempo[0]
-  const introTimeBn = millis2BaseNoteEquiv(introTime, score.systems[0].sections[0].tempo[0])
-  score.systems.forEach((system, sysidx, systemArray) => {
-    system.starttime += introTimeBn
-    system.sections.forEach((section, sectidx, sectionArray) => {
-      section.starttime += introTimeBn
-      section.starttimeMs = Math.round(currentTimeMs)
-      // The time for all instruments is synced at the start of each section.
-      // This will ensure that notation errors will not propagate throughout the score.
-      for (const [_, stave] of Object.entries(section.staves)) {
-        var relTime = 0 // Time relative to the section's start time
-        stave.notes.forEach((note: JsonNote, idx) => {
-          // Convert the first note's absolute start time to relative time.
-          // TODO in the future the note's time attribute should be given relative to the section start time.
-          note.t += introTimeBn
-          relTime = note.t - section.starttime
-          // Determine the *average* tempo from the section start to the note start. This accounts for the factor 0.5
-          const avgTempo = section.tempo[0] + (section.tempo[1] - section.tempo[0]) * 0.5 * relTime / section.duration
-          note.ms = section.starttimeMs + BaseNoteEquiv2Millis(note.t - section.starttime, avgTempo)
-          note.section = section.id
-          note.system = system.id
-          relTime += note.d
+    const score: Score = JSON.parse(input)
+    // This function also calculates times in ms for each note, to be used by the animation.
+    // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
+    var currentTimeMs = introTime
+    // TODO the following result will be incorrect if tempo[1] != tempo[0]
+    const introTimeBn = millis2BaseNoteEquiv(introTime, score.systems[0].sections[0].tempo[0])
+    score.systems.forEach((system, sysidx, systemArray) => {
+        system.starttime += introTimeBn
+        system.sections.forEach((section, sectidx, sectionArray) => {
+            section.starttime += introTimeBn
+            section.starttimeMs = Math.round(currentTimeMs)
+            // The time for all instruments is synced at the start of each section.
+            // This will ensure that notation errors will not propagate throughout the score.
+            for (const [_, stave] of Object.entries(section.staves)) {
+                var relTime = 0 // Time relative to the section's start time
+                stave.notes.forEach((note: JsonNote) => {
+                    // Convert the first note's absolute start time to relative time.
+                    // TODO in the future the note's time attribute should be given relative to the section start time.
+                    note.t += introTimeBn
+                    relTime = note.t - section.starttime
+                    // Determine the *average* tempo from the section start to the note start. This accounts for the factor 0.5
+                    const avgTempo =
+                        section.tempo[0] + ((section.tempo[1] - section.tempo[0]) * 0.5 * relTime) / section.duration
+                    note.ms = section.starttimeMs + BaseNoteEquiv2Millis(note.t - section.starttime, avgTempo)
+                    note.section = section.id
+                    note.system = system.id
+                    relTime += note.d
+                })
+                stave.notation.forEach((symbol: JsonSymbol) => {
+                    symbol.t += introTimeBn
+                })
+            }
+            currentTimeMs += BaseNoteEquiv2Millis(section.duration, section.tempo)
+            if (sysidx === systemArray.length - 1 && sectidx === sectionArray.length - 1) {
+                // Last section
+                score.durationMs = currentTimeMs
+            }
         })
-        stave.notation.forEach((symbol: JsonSymbol) => {
-          symbol.t += introTimeBn
-        })
-      }
-      currentTimeMs += BaseNoteEquiv2Millis(section.duration, section.tempo)
-      if (sysidx === systemArray.length - 1 && sectidx === sectionArray.length - 1) {
-        // Last section
-        score.durationMs = currentTimeMs
-      }
     })
-  })
-  return score
+    return score
 }
 
 // Remove chars that should be ignored. See remark in configs.ts
-const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ""), symbol)
+const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ''), symbol)
 
 export interface SamplerAction {
-  time: Tone.Unit.TimeObject
-  position: string
-  cleanedSymbol: string
-  bpm: number
-  velocity: Tone.Unit.NormalRange
-  duration: Tone.Unit.TimeObject
-  isLast: boolean
+    time: Tone.Unit.TimeObject
+    position: string
+    cleanedSymbol: string
+    bpm: number
+    velocity: Tone.Unit.NormalRange
+    duration: Tone.Unit.TimeObject
+    isLast: boolean
 }
 
-export type TempoAction = {
-  time: Tone.Unit.TimeObject
-  bpm: (Tone.Unit.NormalRange)[]
-  duration: Tone.Unit.TimeObject
-}
-
-type FirstLast = "first" | "last" | "none"
+export type TempoAction = { time: Tone.Unit.TimeObject; bpm: Tone.Unit.NormalRange[]; duration: Tone.Unit.TimeObject }
 
 export type AnimationNote = {
-  system: number
-  section: number
-  time: Tone.Unit.TimeObject
-  keyname: string
-  tone: ToneType
-  stroke: StrokeType | null
-  muting: MutingType
-  duration: Tone.Unit.TimeObject
-  isLast: boolean
+    system: number
+    section: number
+    time: Tone.Unit.TimeObject
+    keyname: string
+    tone: ToneType
+    stroke: StrokeType | null
+    muting: MutingType
+    duration: Tone.Unit.TimeObject
+    isLast: boolean
 }
 
 export type AnimationAction = {
-  time: Tone.Unit.TimeObject
-  position: string
-  prevsystem: number | null
-  prevsection: number | null
-  currnotes: AnimationNote[]
-  nextnotes: AnimationNote[]
-  timeuntil: Tone.Unit.TimeObject
-  timeuntilMs: number
+    time: Tone.Unit.TimeObject
+    position: string
+    prevsystem: number | null
+    prevsection: number | null
+    currnotes: AnimationNote[]
+    nextnotes: AnimationNote[]
+    timeuntil: Tone.Unit.TimeObject
+    timeuntilMs: number
 }
 
 export type CursorAction = {
-  time: Tone.Unit.TimeObject
-  position: string
-  symbol: string
-  newsystem: boolean
-  newsection: boolean
-  line: number
-  range: number[]
+    time: Tone.Unit.TimeObject
+    position: string
+    symbol: string
+    newsystem: boolean
+    newsection: boolean
+    line: number
+    range: number[]
 }
 
 export type Timeline = {
-  totalDurationSec: number
-  totalDurationTO: Tone.Unit.TimeObject  // Total duration expressed as BaseNote units
-  tempoactions: TempoAction[]
-  sampleractions: SamplerAction[]
-  animationactions: AnimationAction[]
-  cursoractions: CursorAction[]
-  notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
+    totalDurationSec: number
+    totalDurationTO: Tone.Unit.TimeObject // Total duration expressed as BaseNote units
+    tempoactions: TempoAction[]
+    sampleractions: SamplerAction[]
+    animationactions: AnimationAction[]
+    cursoractions: CursorAction[]
+    notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
 }
 
 // Create a mapping for notes to shorthand code
@@ -118,168 +120,176 @@ export type Timeline = {
 // }
 
 const note2AnimationNotes = (position: string, notationNote: JsonNote, ìsLast: boolean): AnimationNote[] => {
-  if (!(position in positionConfigs)) return []
-  const cleanedSymbol = cleanSymbol(notationNote.s)
-  const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
-  const result: AnimationNote[] = []
-  shorthandCodes.forEach((shCode) => {
-    const instrType: string = positionConfigs[position].type
-    if (!shCode) return null
-    const note: Note = noteConfigs[instrType][shCode]
-    const keyname: string = `${note.tone}${note.octave != null ? note.octave : ""}`
-    result.push({
-      system: notationNote.system,
-      section: notationNote.section,
-      time: n2TO(notationNote.t),
-      keyname: keyname,
-      tone: note.tone,
-      stroke: note.stroke,
-      muting: note.muting,
-      duration: n2TO(notationNote.d),
-      isLast: ìsLast
+    if (!(position in positionConfigs)) return []
+    const cleanedSymbol = cleanSymbol(notationNote.s)
+    const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
+    const result: AnimationNote[] = []
+    shorthandCodes.forEach((shCode) => {
+        const instrType: string = positionConfigs[position].type
+        if (!shCode) return null
+        const note: Note = noteConfigs[instrType][shCode]
+        const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
+        result.push({
+            system: notationNote.system,
+            section: notationNote.section,
+            time: n2TO(notationNote.t),
+            keyname: keyname,
+            tone: note.tone,
+            stroke: note.stroke,
+            muting: note.muting,
+            duration: n2TO(notationNote.d),
+            isLast: ìsLast
+        })
     })
-  })
-  return result
+    return result
 }
 
 // Returns the tempo at the given time in BaseNote units relative to the start of the section.
 const getCurrentBPM = (section: Section, relBNTime: number): number => {
-  return Math.round(section.tempo[0] + (relBNTime / section.duration) * (section.tempo[1] - section.tempo[0]))
+    return Math.round(section.tempo[0] + (relBNTime / section.duration) * (section.tempo[1] - section.tempo[0]))
 }
 
 export function createTimeline(score: Score): Timeline {
-  // Timeline will be used to create the Transport schedule
+    // Timeline will be used to create the Transport schedule
 
-  if (score == {} as Score) return {} as Timeline
+    if (score == ({} as Score)) return {} as Timeline
 
-  const timeline: Timeline = {
-    totalDurationSec: 0,
-    totalDurationTO: n2TO(0),
-    tempoactions: [],
-    sampleractions: [],
-    animationactions: [],
-    cursoractions: [],
-    notation: {}
-  }
-  if (!score) return timeline
+    const timeline: Timeline = {
+        totalDurationSec: 0,
+        totalDurationTO: n2TO(0),
+        tempoactions: [],
+        sampleractions: [],
+        animationactions: [],
+        cursoractions: [],
+        notation: {}
+    }
+    if (!score) return timeline
 
-  var totalDurationInBaseNotes = 0
-  const positionScore: { [position: string]: JsonNote[] } = {}
-  const positionNotation: { [position: string]: JsonSymbol[] } = {}
+    var totalDurationInBaseNotes = 0
+    const positionScore: { [position: string]: JsonNote[] } = {}
+    const positionNotation: { [position: string]: JsonSymbol[] } = {}
 
-  score.systems.forEach((system, sysidx) => {
-    system.sections.forEach((section, secidx) => {
-      // Update the total duration time
-      totalDurationInBaseNotes += section.duration
-      timeline.totalDurationSec += (section.duration / 4) * 60 / (0.5 * (section.tempo[0] + section.tempo[1]))
+    score.systems.forEach((system, sysidx) => {
+        system.sections.forEach((section, secidx) => {
+            // Update the total duration time
+            totalDurationInBaseNotes += section.duration
+            timeline.totalDurationSec += ((section.duration / 4) * 60) / (0.5 * (section.tempo[0] + section.tempo[1]))
 
-      // Create sampler actions
-      for (const [position, stave] of Object.entries(section.staves)) {
-        if (!(position in positionScore)) positionScore[position] = []
-        if (!(position in positionNotation)) positionNotation[position] = []
-        var sectionProgress: number = 0
-        stave.notes.forEach((note) => {
-          // create separate scores for each position, which will be used to create the animation actions 
-          var velocity: number = stave.velocity[0] + (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
-          note.v = velocity
-          positionScore[position].push(note)
-          const bpm = getCurrentBPM(section, sectionProgress)
-          timeline.sampleractions.push({
+            // Create sampler actions
+            for (const [position, stave] of Object.entries(section.staves)) {
+                if (!(position in positionScore)) positionScore[position] = []
+                if (!(position in positionNotation)) positionNotation[position] = []
+                var sectionProgress: number = 0
+                stave.notes.forEach((note) => {
+                    // create separate scores for each position, which will be used to create the animation actions
+                    var velocity: number =
+                        stave.velocity[0] +
+                        (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+                    note.v = velocity
+                    positionScore[position].push(note)
+                    const bpm = getCurrentBPM(section, sectionProgress)
+                    timeline.sampleractions.push({
+                        position: position,
+                        cleanedSymbol: cleanSymbol(note.s),
+                        bpm: bpm,
+                        velocity: velocity,
+                        time: n2TO(note.t),
+                        duration: n2TO(note.d || 1),
+                        isLast: sysidx == score.systems.length - 1 && secidx == system.sections.length - 1
+                    })
+                    sectionProgress += note.d || 1
+                })
+                stave.notation.forEach((symbol: JsonSymbol) => {
+                    symbol.system = system.id
+                    symbol.section = section.id
+                    positionNotation[position].push(symbol)
+                })
+            }
+        })
+    })
+
+    // Create animation actions
+    Object.keys(positionScore).forEach((position) => {
+        const notes: JsonNote[] = positionScore[position]
+        // Add an animation action for the displacement of the panggul
+        // from the starting position to the first note
+        timeline.animationactions.push({
+            time: n2TO(0),
             position: position,
-            cleanedSymbol: cleanSymbol(note.s),
-            bpm: bpm,
-            velocity: velocity,
-            time: n2TO(note.t),
-            duration: n2TO(note.d || 1),
-            isLast: (sysidx == score.systems.length - 1 && secidx == system.sections.length - 1)
-          })
-          sectionProgress += (note.d || 1)
+            prevsystem: null,
+            prevsection: null,
+            currnotes: [],
+            nextnotes: note2AnimationNotes(position, notes[1], false),
+            timeuntil: n2TO(notes[1].t),
+            timeuntilMs: notes[1].ms
         })
-        stave.notation.forEach((symbol: JsonSymbol) => {
-          symbol.system = system.id
-          symbol.section = section.id
-          positionNotation[position].push(symbol)
+        notes.forEach((note, index) => {
+            const currIsLast: boolean = index == notes.length - 1
+            const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
+            const nextIsLast: boolean = index == notes.length - 2
+            const nextANotes: AnimationNote[] = currIsLast
+                ? []
+                : note2AnimationNotes(position, notes[index + 1], nextIsLast)
+            const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
+            const timeUntilMs: number = currIsLast ? outroTime : notes[index + 1].ms - note.ms
+            const prevSystem = index > 0 ? notes[index - 1].system : null
+            const prevSection = index > 0 ? notes[index - 1].section : null
+            timeline.animationactions.push({
+                time: n2TO(note.t),
+                position: position,
+                prevsystem: prevSystem,
+                prevsection: prevSection,
+                currnotes: aNotes,
+                nextnotes: nextANotes,
+                timeuntil: timeUntil,
+                timeuntilMs: timeUntilMs
+            })
+            // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
+            // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
         })
-      }
     })
-  })
 
-  // Create animation actions
-  Object.keys(positionScore).forEach((position) => {
-    const notes: JsonNote[] = positionScore[position]
-    // Add an animation action for the displacement of the panggul 
-    // from the starting position to the first note
-    timeline.animationactions.push({
-      time: n2TO(0),
-      position: position,
-      prevsystem: null,
-      prevsection: null,
-      currnotes: [],
-      nextnotes: note2AnimationNotes(position, notes[1], false),
-      timeuntil: n2TO(notes[1].t),
-      timeuntilMs: notes[1].ms
+    // Create cursor actions
+    Object.keys(positionNotation).forEach((position) => {
+        timeline.notation[position] = []
+        const symbols: JsonSymbol[] = positionNotation[position]
+        let currentline: string = ''
+        let line: number = 0
+        symbols.forEach((symbol, index) => {
+            const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
+            const newSection =
+                index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
+            const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].system != symbol.system
+
+            if (newSection) currentline += ' '
+            const range = [currentline.length, currentline.length + symbol.s.length]
+            currentline += symbol.s
+            timeline.cursoractions.push({
+                time: n2TO(symbol.t),
+                position: position,
+                symbol: symbol.s,
+                newsystem: newSystem,
+                newsection: newSection,
+                line: line,
+                range: range
+            })
+            if (lastNoteOfSection) {
+                timeline.notation[position].push(
+                    createElement(
+                        'p',
+                        {
+                            key: line,
+                            id: `notation-${line}`,
+                            className: 'appearance-none p-[0px] m-0 text-sm/6 balifont'
+                        },
+                        currentline
+                    )
+                )
+                currentline = ''
+                line++
+            }
+        })
     })
-    notes.forEach((note, index) => {
-      const currIsLast: boolean = (index == notes.length - 1)
-      const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
-      const nextIsLast: boolean = (index == notes.length - 2)
-      const nextANotes: AnimationNote[] = currIsLast ? [] : note2AnimationNotes(position, notes[index + 1], nextIsLast)
-      const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
-      const timeUntilMs: number = currIsLast ? outroTime : (notes[index + 1].ms - note.ms)
-      const prevSystem = index > 0 ? notes[index - 1].system : null
-      const prevSection = index > 0 ? notes[index - 1].section : null
-      timeline.animationactions.push({
-        time: n2TO(note.t),
-        position: position,
-        prevsystem: prevSystem,
-        prevsection: prevSection,
-        currnotes: aNotes,
-        nextnotes: nextANotes,
-        timeuntil: timeUntil,
-        timeuntilMs: timeUntilMs
-      })
-      // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
-      // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
 
-    })
-  })
-
-  // Create cursor actions
-  Object.keys(positionNotation).forEach((position) => {
-    timeline.notation[position] = []
-    const symbols: JsonSymbol[] = positionNotation[position]
-    let currentline: string = ""
-    let line: number = 0
-    symbols.forEach((symbol, index) => {
-      const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
-      const newSection = index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
-      const lastNoteOfSection = (index == symbols.length - 1) || (symbols[index + 1].system != symbol.system)
-
-      if (newSection) currentline += " "
-      const range = [currentline.length, currentline.length + symbol.s.length]
-      currentline += symbol.s
-      timeline.cursoractions.push({
-        time: n2TO(symbol.t),
-        position: position,
-        symbol: symbol.s,
-        newsystem: newSystem,
-        newsection: newSection,
-        line: line,
-        range: range
-      })
-      if (lastNoteOfSection) {
-        timeline.notation[position].push(createElement('p',
-          {
-            key: line,
-            id: `notation-${line}`,
-            className: 'appearance-none p-[0px] m-0 text-sm/6 balifont',
-          },
-          currentline))
-        currentline = ""
-        line++
-      }
-    })
-  })
-
-  return timeline
+    return timeline
 }

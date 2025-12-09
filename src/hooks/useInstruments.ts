@@ -1,15 +1,23 @@
 import { useCallback, useContext, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import * as Tone from 'tone'
 import type { SamplerAction } from '../utils/scoreplayerUtils/score'
-import { AVERAGE_ATTACK_DELAY, outroTime } from '../config/constants'
-import { alwaysFocusPositions, dimRateNonFocusedInstruments, positionConfigs, NOTES, SOUNDS_FOLDER, BaseNote } from '../config/config'
+import {
+    AVERAGE_ATTACK_DELAY,
+    outroTime,
+    alwaysFocusPositions,
+    dimRateNonFocusedInstruments,
+    positionConfigs,
+    NOTES,
+    SOUNDS_FOLDER,
+    BaseNote
+} from '../config/config'
 import { soundFile } from '../utils/config'
 import { DebugContext } from '../App'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
-  play: (time: number, action: SamplerAction, focus: string[], debug: Dispatch<string>) => void
-  mute: (time: number) => void
+    play: (time: number, action: SamplerAction, focus: string[], debug: Dispatch<string>) => void
+    mute: (time: number) => void
 }
 
 export type InstrumentSamplers = Record<string, InstrumentSampler>
@@ -22,85 +30,116 @@ export type InstrumentSamplers = Record<string, InstrumentSampler>
 // }
 // ).toDestination();
 
-const createSampler = ({ instr_type, samples, volume }: { instr_type: string, samples: { [key: string]: string }, volume: number }) => {
-  if (['daun', 'chimes'].includes(instr_type))
-    // PitchShift currently disabled because it causes a slight time lag
-    return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
-  else
-    return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
+const createSampler = ({
+    instr_type,
+    samples,
+    volume
+}: {
+    instr_type: string
+    samples: { [key: string]: string }
+    volume: number
+}) => {
+    if (['daun', 'chimes'].includes(instr_type))
+        // PitchShift currently disabled because it causes a slight time lag
+        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
+    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
 
-const lookup = Object.fromEntries(Object.entries(positionConfigs).map(([position, config]) => {
-  const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
-  const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], soundFile(note, positionConfigs[position].sampletemplate)]))
-  const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
-  const symbolToIndices = Object.fromEntries(Object.entries(config.symbolToNoteNames).map(([symbol, notes]) => [symbol, notes.map((repr) => noteToIndex[repr])]))
-  return [position, { "idx2sample": indexToSample, "symbol2idxs": symbolToIndices }]
-}))
+const lookup = Object.fromEntries(
+    Object.entries(positionConfigs).map(([position, config]) => {
+        const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
+        const indexToSample = Object.fromEntries(
+            noteList.map((note, index) => [NOTES[index], soundFile(note, positionConfigs[position].sampletemplate)])
+        )
+        const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
+        const symbolToIndices = Object.fromEntries(
+            Object.entries(config.symbolToNoteNames).map(([symbol, notes]) => [
+                symbol,
+                notes.map((repr) => noteToIndex[repr])
+            ])
+        )
+        return [position, { idx2sample: indexToSample, symbol2idxs: symbolToIndices }]
+    })
+)
 
-const createInstrument = (position: string, samplers: Record<string, React.RefObject<Tone.Sampler | null>>): InstrumentSampler => {
-  const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
+const createInstrument = (
+    position: string,
+    samplers: Record<string, React.RefObject<Tone.Sampler | null>>
+): InstrumentSampler => {
+    const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
 
-  return {
-    play: (time: number, action: SamplerAction, currentFocus: string[], debug) => {
-      const dimValue = (currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)) ? 1 : dimRateNonFocusedInstruments
-      debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
-      const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
-      if (indices && samplers[position].current) {
-        var duration: Tone.Unit.TimeObject = action.duration
-        // Extend the last note to allow the sound to attenuate
-        //TODO Do not extend the last note when looping from the last note.
-        if (action.isLast) {
-          //@ts-ignore
-          duration[BaseNote] += millis2BaseNoteEquiv(outroTime, action.bpm)
-        }
-        try {
-          sampler.current?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
-        } catch {
-          console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
-        }
-      }
-    },
-    mute: (time: number) => sampler.current?.releaseAll(time),
-  }
+    return {
+        play: (time: number, action: SamplerAction, currentFocus: string[], debug) => {
+            const dimValue =
+                currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)
+                    ? 1
+                    : dimRateNonFocusedInstruments
+            debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
+            const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
+            if (indices && samplers[position].current) {
+                var duration: Tone.Unit.TimeObject = action.duration
+                // Extend the last note to allow the sound to attenuate
+                //TODO Do not extend the last note when looping from the last note.
+                if (action.isLast) {
+                    //@ts-ignore
+                    duration[BaseNote] += millis2BaseNoteEquiv(outroTime, action.bpm)
+                }
+                try {
+                    sampler.current?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
+                } catch {
+                    console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
+                }
+            }
+        },
+        mute: (time: number) => sampler.current?.releaseAll(time)
+    }
 }
 
 export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
-  const debug: Dispatch<string> = useContext(DebugContext);
+    const debug: Dispatch<string> = useContext(DebugContext)
 
-  // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
-  const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(Object.keys(positionConfigs).map((position) => [position, useRef(null)]))
-  useEffect(() => {
-    for (const [position, config] of Object.entries(positionConfigs)) {
-      // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
-      samplers[position].current = createSampler({ instr_type: config.type, samples: lookup[position].idx2sample, volume: config.volume }).toDestination()
-    }
-  }, [])
+    // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
+    const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(
+        Object.keys(positionConfigs).map((position) => [position, useRef(null)])
+    )
+    useEffect(() => {
+        for (const [position, config] of Object.entries(positionConfigs)) {
+            // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
+            samplers[position].current = createSampler({
+                instr_type: config.type,
+                samples: lookup[position].idx2sample,
+                volume: config.volume
+            }).toDestination()
+        }
+    }, [])
 
+    const instrumentSamplers: InstrumentSamplers = {}
 
-  const instrumentSamplers: InstrumentSamplers = {}
+    Object.keys(positionConfigs).forEach(
+        (position) => (instrumentSamplers[position] = createInstrument(position, samplers))
+    )
 
-  Object.keys(positionConfigs).forEach((position) => (instrumentSamplers[position] = createInstrument(position, samplers)))
+    // Adds a small random deviation to the note attack time for a more realistic execution
+    const random_attack_deviation = (time: number) =>
+        time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
-  // Adds a small random deviation to the note attack time for a more realistic execution
-  const random_attack_deviation = (time: number) => time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
+    const playInstrument = useCallback((time: number, action: SamplerAction) => {
+        if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
+        else {
+            instrumentSamplers[action.position].play(
+                random_attack_deviation(time),
+                action,
+                currentFocusRef.current,
+                debug
+            )
+        }
+    }, [])
 
-  const playInstrument = useCallback(
-    (time: number, action: SamplerAction) => {
-      if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
-      else { instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocusRef.current, debug) }
-    },
-    [],
-  )
+    const muteAll = useCallback(
+        (time: number) =>
+            Object.keys(instrumentSamplers).forEach((position) => instrumentSamplers[position].mute(time)),
+        [instrumentSamplers]
+    )
 
-  const muteAll = useCallback(
-    (time: number) => Object.keys(instrumentSamplers).forEach((position) => instrumentSamplers[position].mute(time)),
-    [instrumentSamplers],
-  )
-
-  return {
-    playInstrument,
-    muteAll,
-  }
+    return { playInstrument, muteAll }
 }
-
