@@ -1,5 +1,6 @@
 import { type RefObject } from 'react'
-import type { NavigationAction } from '../config/config'
+import { instrumentConfigs, positionConfigs, type NavigationAction } from '../config/config'
+import _ from 'lodash'
 
 type KeyType =
     | 'ArrowUp'
@@ -17,7 +18,8 @@ type Action =
     | ['pop-left', number]
     | ['pop-right', number]
     | ['insert', string]
-    | ['ignore']
+    | ['cursorleft']
+    | ['cursorright']
     | ['cellup']
     | ['celldown']
     | ['cellleft']
@@ -26,6 +28,7 @@ type Action =
     | ['rowend']
     | ['firstrow']
     | ['lastrow']
+    | ['ignore']
 type ActionRecord = {
     keys: KeyType[]
     left: RegExp | null // regex describing the character(s) left of the cursor
@@ -33,6 +36,9 @@ type ActionRecord = {
     action: Action
 }
 
+const len1Symbol: RegExp = /(?!=[AEIOURS])[a-z890*()]$/
+const len2Symbol: RegExp = /([AEIOURS][a-z890*()])|((?!=[AEIOURS])[a-z890*()][,\</\?\[\]_=])$/
+const len3Symbol: RegExp = /([AEIOURS][a-z890*()])|((?!=[AEIOURS])[a-z890*()][,\</\?\[\]_=])$/
 // Definition of keyboard codes that should be intercepted + action to perform.
 // keys: key combination.
 // left, right: regex to match the strings to the left and right of the cursor (null = don't care).
@@ -41,25 +47,54 @@ type ActionRecord = {
 //        by the regular expressions.
 // Note2: For `left`/`right`, the regex ^$ detects that the cursor is at the beginning/end of the field.
 const keyActions: ActionRecord[] = [
-    // Typing
+    // TYPING
+    // octavate upward
     { keys: ['ArrowUp', 'Alt'], left: /[aeiours],$/, right: null, action: ['pop-left', 1] },
     { keys: ['ArrowUp', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', '<'] },
     { keys: ['ArrowUp', 'Alt'], left: /[^aeiours,]$|^$/, right: null, action: ['ignore'] },
+    // octavate downward
     { keys: ['ArrowDown', 'Alt'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
     { keys: ['ArrowDown', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
     { keys: ['ArrowDown', 'Alt'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] },
-    // Navigation
+
+    // NAVIGATION
+    // navigate within a cell: ensure that cursor skips entire (compound) symbols
+    { keys: ['ArrowLeft'], left: /.+$/, right: null, action: ['cursorleft'] },
+    { keys: ['ArrowRight'], left: null, right: /.+$/, action: ['cursorright'] },
+    // move cell selection left or right
+    { keys: ['ArrowLeft'], left: /^$/, right: null, action: ['cellleft'] },
+    { keys: ['ArrowLeft', 'Ctrl'], left: null, right: null, action: ['cellleft'] },
+    { keys: ['ArrowRight'], left: null, right: /^$/, action: ['cellright'] },
+    { keys: ['ArrowRight', 'Ctrl'], left: null, right: null, action: ['cellright'] },
+    // move cell selection up or down
     { keys: ['ArrowUp'], left: null, right: null, action: ['cellup'] },
     { keys: ['ArrowDown'], left: null, right: null, action: ['celldown'] },
-    { keys: ['ArrowLeft'], left: /^$/, right: null, action: ['cellleft'] },
-    { keys: ['ArrowRight'], left: null, right: /^$/, action: ['cellright'] },
+    // move cell selection to top or bottom of column / start or end of row
     { keys: ['ArrowUp', 'Ctrl'], left: null, right: null, action: ['firstrow'] },
     { keys: ['ArrowDown', 'Ctrl'], left: null, right: null, action: ['lastrow'] },
-    { keys: ['ArrowLeft', 'Ctrl'], left: null, right: null, action: ['cellleft'] },
-    { keys: ['ArrowRight', 'Ctrl'], left: null, right: null, action: ['cellright'] },
     { keys: ['Home', 'Ctrl'], left: null, right: null, action: ['rowstart'] },
     { keys: ['End', 'Ctrl'], left: null, right: null, action: ['rowend'] }
 ]
+
+type RegExpDict = Record<string, string>
+// Return values:
+// regExp: regular expression for all valid symbols
+// regExpByLength: regular expressions for valid symbols, grouped by symbol length
+// keystrokes: list of unique individual chars occurring in valid symbols
+function getValids(validSymbols: string[]): [RegExp, RegExpDict, string[]] {
+    const lengths = [...new Set(validSymbols.map((sym) => sym.length))]
+    const regexpEntries: [number, string][] = lengths.map((len) => [
+        len,
+        validSymbols
+            .filter((sym) => sym.length == len || len == 0)
+            .map((sym) => _.escapeRegExp(sym))
+            .join('|')
+    ])
+    const regExpByLength: RegExpDict = Object.fromEntries(regexpEntries.filter(([key, _]) => key > 0))
+    const regExp: RegExp = RegExp(validSymbols.map((sym) => _.escapeRegExp(sym)).join('|'))
+    const keystrokes = [...new Set(validSymbols.join(''))] // set of unique characters
+    return [regExp, regExpByLength, keystrokes]
+}
 
 const match = (eventVal: boolean | string | string[], actionVal: boolean | string | string[] | RegExp | null) => {
     const returnValue: boolean =
@@ -80,10 +115,11 @@ const match = (eventVal: boolean | string | string[], actionVal: boolean | strin
 
 export const useKeyboardListener = (
     ref: RefObject<HTMLTextAreaElement | null>,
-    acceptOnly: string[],
+    validSymbols: string[],
     navigate: (action: NavigationAction) => RefObject<HTMLTextAreaElement | null>
 ) => {
     // Defined as hook in order to be able to use states, e.g. 'octavation on' which could work similarly to caps lock
+    const [validRegExp, validRegExpByLength, validKeystrokes] = getValids(validSymbols)
 
     function keyboardListener(event: KeyboardEvent) {
         // console.log(`${event.code} ${event.ctrlKey} ${target.selectionEnd}`)
@@ -91,7 +127,7 @@ export const useKeyboardListener = (
         const target = ref.current
 
         // Block all invalid keystrokes
-        if (event.key.length == 1 && !acceptOnly.includes(event.key)) {
+        if (event.key.length == 1 && !validKeystrokes.includes(event.key)) {
             event.preventDefault()
             return
         }
@@ -152,8 +188,28 @@ export const useKeyboardListener = (
                     }
                     break
                 }
+                if (['cursorleft', 'cursorright'].includes(a.action[0])) {
+                    const direction = a.action[0] == 'cursorleft' ? -1 : 1
+                    const compare = a.action[0] == 'cursorleft' ? left : right
+                    for (const length of Object.keys(validRegExpByLength).sort().reverse()) {
+                        const regExp = RegExp(
+                            (a.action[0] == 'cursorright' ? '^' : '') +
+                                '(' +
+                                validRegExpByLength[length] +
+                                ')' +
+                                (a.action[0] == 'cursorleft' ? '$' : '')
+                        )
+                        if (match(compare, regExp)) {
+                            target.selectionStart += direction * Number(length)
+                            target.selectionEnd = target.selectionStart
+                            break
+                        }
+                    }
+                    break
+                }
             }
         }
     }
+
     return [keyboardListener]
 }

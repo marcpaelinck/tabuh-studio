@@ -11,6 +11,7 @@ import 'rsuite/Col/styles/index.css'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
 import { NavigationGrid, NavigationInputCell } from '../ControlledGrid/NavigationGrid'
+import { getValidSymbols } from '../../utils/alphabet'
 
 var uniqueKeyValue = 0
 
@@ -31,7 +32,7 @@ function SystemDetails({
     const staffNodes = staffs.map(([pos, staves]: [string, Stave[]], pidx) => {
         const staveNodes = staves.map((stave: Stave, sidx: number) => {
             const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
-            const validSymbols: string[] = Object.keys(positionConfigs[pos].symbolToNoteNames)
+            const validSymbols: string[] = getValidSymbols(pos, true)
             return (
                 <Col id={`COL-${pidx * 100 + sidx}`} key={pidx * 100 + sidx} span="auto">
                     <NavigationInputCell

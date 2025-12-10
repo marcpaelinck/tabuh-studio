@@ -39,8 +39,6 @@ const defaultNavFunc: NavigationFunctionsType = {
 }
 
 export const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)
-export const RowCounter: Context<number> = createContext(0)
-export const ColCounter: Context<number> = createContext(0)
 
 type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
 type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
