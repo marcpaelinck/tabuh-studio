@@ -119,7 +119,11 @@ export type EditorSystemData = {
 }
 
 // SCORE PROCESSING AND TIMELINE CREATION
+
+export type PlayBackState = 'playing' | 'paused' | 'stopped'
+
 export interface SamplerAction {
+    action: 'play' | 'mute'
     time: BaseNoteTimeObj
     position: string
     cleanedSymbol: string
@@ -129,7 +133,7 @@ export interface SamplerAction {
     isLast: boolean
 }
 
-export type TempoAction = { time: Tone.Unit.TimeObject; bpm: Tone.Unit.NormalRange[]; duration: Tone.Unit.TimeObject }
+export type TempoAction = { time: BaseNoteTimeObj; bpm: Tone.Unit.NormalRange; duration: BaseNoteTimeObj }
 
 export type AnimationNote = {
     system: number
@@ -173,4 +177,12 @@ export type TimeLine = {
     cursoractions: CursorAction[]
     initialBPM: number
     notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
+}
+
+// functions that should be called
+export type actionFunctions = {
+    play: ((time: number, action: SamplerAction) => void) | null
+    animate: ((time: number, action: AnimationAction) => void) | null
+    cursor: ((time: number, action: CursorAction) => void) | null
+    onEndofSched: ((time: number) => void) | null
 }

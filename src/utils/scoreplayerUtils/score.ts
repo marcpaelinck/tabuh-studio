@@ -12,16 +12,16 @@ import {
 import * as Tone from 'tone'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
 import { createElement } from 'react'
-import { introTime, outroTime } from '../../config/config'
+import { defaultIntroTime, defaultOutroTime } from '../../config/config'
 import { cleanSymbol } from '../alphabet'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)
     // This function also calculates times in ms for each note, to be used by the animation.
     // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
-    var currentTimeMs = introTime
+    var currentTimeMs = defaultIntroTime
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
-    const introTimeBn = millis2BaseNoteEquiv(introTime, score.systems[0].sections[0].tempo[0])
+    const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, score.systems[0].sections[0].tempo[0])
     score.systems.forEach((system, sysidx, systemArray) => {
         system.starttime += introTimeBn
         system.sections.forEach((section, sectidx, sectionArray) => {
@@ -135,6 +135,7 @@ export function createTimeline(score: Score): TimeLine {
                     positionScore[position].push(note)
                     const bpm = getCurrentBPM(section, sectionProgress)
                     timeline.sampleractions.push({
+                        action: 'play',
                         position: position,
                         cleanedSymbol: cleanSymbol(note.s),
                         bpm: bpm,
@@ -177,7 +178,7 @@ export function createTimeline(score: Score): TimeLine {
                 ? []
                 : note2AnimationNotes(position, notes[index + 1], nextIsLast)
             const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
-            const timeUntilMs: number = currIsLast ? outroTime : notes[index + 1].ms - note.ms
+            const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
             const prevSystem = index > 0 ? notes[index - 1].system : null
             const prevSection = index > 0 ? notes[index - 1].section : null
             timeline.animationactions.push({

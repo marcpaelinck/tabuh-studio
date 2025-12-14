@@ -1,7 +1,13 @@
-import type { AnimationAction, AnimationNote, CursorAction } from '../utils/scoreplayerUtils/score'
 import * as Tone from 'tone'
 import { useCallback, type Dispatch, type RefObject } from 'react'
-import type { HighlightRange, MenuItemInfo, SVGInfo } from '../models/types'
+import type {
+    AnimationAction,
+    AnimationNote,
+    CursorAction,
+    HighlightRange,
+    MenuItemInfo,
+    SVGInfo
+} from '../models/types'
 import { animationConfig, colorRGB } from '../config/config'
 
 const moveToDuration = 500 // duration of the movement to the next key

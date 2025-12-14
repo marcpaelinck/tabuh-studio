@@ -100,7 +100,8 @@ export default function ScorePlayer({
         // tempo and instrument actions (notes)
         // Set the initial tempo to 60 (intro time)
         const initialBpm = score.systems[0].sections[0].tempo[0]
-        const tAction = {
+        const tAction: SamplerAction = {
+            action: 'play',
             time: { '16n': 0 },
             position: '',
             cleanedSymbol: '',

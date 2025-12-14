@@ -59,8 +59,8 @@ export const editorSortingOrder = [
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-export const introTime: number = 2000 // silence added before the beginning of the score in milliseconds
-export const outroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
+export const defaultIntroTime: number = 2000 // silence added before the beginning of the score in milliseconds
+export const defaultOutroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
 
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
 export const BaseNote: '16n' = '16n'

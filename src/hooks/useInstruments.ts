@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useMemo, useRef, type Dispatch, typ
 import * as Tone from 'tone'
 import {
     AVERAGE_ATTACK_DELAY,
-    outroTime,
+    defaultOutroTime,
     alwaysFocusPositions,
     dimRateNonFocusedInstruments,
     positionConfigs,
@@ -76,7 +76,11 @@ const lookup = Object.fromEntries(
     })
 )
 
-const createInstrument = (position: string, samplers: Record<string, Tone.Sampler | null>): InstrumentSampler => {
+const createInstrument = (
+    position: string,
+    samplers: Record<string, Tone.Sampler | null>,
+    outroTime: number
+): InstrumentSampler => {
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
@@ -106,7 +110,7 @@ const createInstrument = (position: string, samplers: Record<string, Tone.Sample
     }
 }
 
-export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
+export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: number = defaultOutroTime) => {
     const debug: Dispatch<string> = useContext(DebugContext)
 
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
@@ -120,7 +124,7 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
 
     const instrumentSamplers: InstrumentSamplers = useMemo(() => {
         return Object.fromEntries(
-            Object.keys(positionConfigs).map((position) => [position, createInstrument(position, samplers)])
+            Object.keys(positionConfigs).map((position) => [position, createInstrument(position, samplers, outroTime)])
         )
     }, [currentFocusRef])
 

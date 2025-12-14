@@ -1,5 +1,6 @@
-import { Accordion, Col, HStack, IconButton, Placeholder, Row, Text, VStack } from 'rsuite'
-import type { Score, Stave, EditorSystemData, Staffs, AudioState } from '../../models/types'
+import { Accordion, Col, HStack, Placeholder, Row, Text, VStack } from 'rsuite'
+import { IoPlayCircleOutline, IoPlayCircle, IoPauseCircle } from 'react-icons/io5'
+import type { Score, Stave, EditorSystemData, Staffs, PlayBackState } from '../../models/types'
 import {
     createContext,
     useContext,
@@ -12,7 +13,6 @@ import {
     type ReactNode,
     type RefObject
 } from 'react'
-import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
@@ -44,20 +44,27 @@ function uniqueKey(): number {
 
 const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
 
-function SystemDetails({ systemData }: { systemData: EditorSystemData }): ReactNode {
+// Contains the editable notation of one system (gongan)
+function SystemDetails({
+    systemData,
+    pbState,
+    setPbState
+}: {
+    systemData: EditorSystemData
+    pbState: PlayBackState
+    setPbState: Dispatch<PlayBackState>
+}): ReactNode {
     const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
-    const [playing, setPlaying] = useState<boolean>(false)
     const [playbackActive, setPlaybackActive] = useState<boolean>(false)
 
     function playPauseClicked() {
-        // Be aware that setPlaying is async
         if (!playbackActive) {
             audioFunc.playPause(true, [systemData])
-            setPlaying(true)
+            setPbState('playing')
             setPlaybackActive(true)
         } else {
-            audioFunc.playPause(!playing)
-            setPlaying(!playing)
+            audioFunc.playPause(!(pbState == 'playing'))
+            setPbState(pbState == 'playing' ? 'paused' : 'playing')
         }
     }
 
@@ -97,9 +104,14 @@ function SystemDetails({ systemData }: { systemData: EditorSystemData }): ReactN
         <>
             <HStack>
                 <button onClick={playPauseClicked}>
-                    {playing ? <FaPause color="orange" /> : <FaPlay color="orange" />}
+                    {pbState == 'playing' ? (
+                        <IoPlayCircle color="orange" size="2em" />
+                    ) : pbState == 'paused' ? (
+                        <IoPauseCircle color="orange" size="2em" />
+                    ) : (
+                        <IoPlayCircleOutline color="gray" size="2em" />
+                    )}
                 </button>
-                {/* <IconButton icon={<PlayOutlineIcon className="m-0" onClick={() => audioFunc.play([systemData])} />} /> */}
             </HStack>
 
             <VStack>{staffNodes}</VStack>
@@ -122,8 +134,8 @@ export default function EditorWindow({
     const [data, setData] = useState<EditorSystemData[]>([])
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
-    const { playInstrument, muteAll } = useInstruments(focusRef)
-    const [audioStarted, setAudioStarted] = useState<AudioState>('false')
+    const { playInstrument, muteAll } = useInstruments(focusRef, 0)
+    const [playbackState, setPlaybackState] = useState<PlayBackState>('stopped')
     const audioFunctions: AudioFunctionsType = { playPause: playPause }
 
     function flipExpanded(id: number) {
@@ -132,19 +144,20 @@ export default function EditorWindow({
         setExpanded(newExpanded)
     }
 
+    function onEndOfPlayback(time: number) {
+        Tone.getTransport().stop()
+        Tone.getTransport().seconds = 0
+        setPlaybackState('stopped')
+    }
+
     async function playPause(doPlay: boolean, data?: EditorSystemData[]) {
-        console.log(`Tone state is ${Tone.getContext().state}`)
         if (Tone.getContext().state == 'suspended') {
-            console.log('trying to start audio')
             Tone.start()
-            setAudioStarted('wait')
             await Tone.loaded()
-            console.log(`Tone state is ${Tone.getContext().state}`)
-            setAudioStarted('true')
         }
         if (data) {
             const timeLine = createTimelineFromEditor(data)
-            scheduleTransport(timeLine, playInstrument)
+            scheduleTransport(timeLine, playInstrument, null, null, onEndOfPlayback)
         }
         // Tone.getTransport().start()
         if (doPlay) {
@@ -200,7 +213,7 @@ export default function EditorWindow({
                     id={`GRID-4(${systemData.id})`}
                     fluid={false}
                     className="ml-0">
-                    <SystemDetails systemData={systemData} />
+                    <SystemDetails systemData={systemData} pbState={playbackState} setPbState={setPlaybackState} />
                 </NavigationGrid>
             </Accordion.Panel>
         )
