@@ -6,16 +6,21 @@ import {
     useContext,
     useEffect,
     useRef,
+    useState,
     type ChangeEvent,
     type Context,
     type HTMLProps,
     type ReactElement,
     type RefObject
 } from 'react'
+import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import { Grid, HStack, IconButton, type GridProps } from 'rsuite'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
-import type { EditorSystemData, SamplerAction } from '../../models/types'
+import { useScheduler } from '../../hooks/createSchedule'
+import { type EditorSystemData, type TimeLine } from '../../models/types'
+import { createTimelineFromEditor } from '../../utils/scoreplayerUtils/score'
+import * as Tone from 'tone'
 
 interface NavigationGridProps extends GridProps {
     id?: string
@@ -27,18 +32,22 @@ interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     validSymbols: string[]
 }
 
-export interface NavigationFunctionsType {
+interface NavigationFunctionsType {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
-    updateSystemData: (data: EditorSystemData) => void
+    setSystemData: (data: EditorSystemData) => void
+    play: (data: EditorSystemData[], pbSpeed?: number) => void
 }
 
-export const defaultNavFunc: NavigationFunctionsType = {
+type OptionsType = { singleSystem: boolean; loop: boolean }
+
+const defaultNavFunc: NavigationFunctionsType = {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => {},
     navigate: (action: NavigationAction, row: number, col: number): RefObject<HTMLTextAreaElement | null> => {
         return { current: null }
     },
-    updateSystemData: (data: EditorSystemData) => {}
+    setSystemData: (data: EditorSystemData) => {},
+    play: (data: EditorSystemData[], pbSpeed?: number) => {}
 }
 
 const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)
@@ -48,21 +57,17 @@ type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, Grid
 
 // Extension of the React Suite Grid element with additional facilities to enable keyboard navigation
 // Each row in NavigationGrid should contain the same number of columns otherwise an exception is raised.
-export function NavigationGrid({
-    playInstrument,
-    ...props
-}: { playInstrument: (time: number, action: SamplerAction) => void } & NavigationGridProps): ReactElement<GridProps> {
+export function NavigationGrid({ ...props }: NavigationGridProps): ReactElement<GridProps> {
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    // const [systemData, setSystemData] = useState<EditorSystemData | null>(null)
-    // const playInstrument = () => {}
-    // const muteAll = () => {}
-    function updateSystemData(cellData: string) {}
+    const [systemData, setSystemData] = useState<EditorSystemData | null>(null)
+    const [updateSchedule] = useScheduler()
 
-    const navigationFunctions: NavigationFunctionsType = {
-        register: registerComponent,
-        navigate: navigate,
-        updateSystemData: (data: EditorSystemData) => {}
+    function play() {
+        if (!systemData) return
+        const timeLine = createTimelineFromEditor([systemData])
+        updateSchedule(timeLine)
+        Tone.getTransport().start()
     }
 
     function registerComponent(row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) {
@@ -102,8 +107,18 @@ export function NavigationGrid({
         }
     }
 
+    const navigationFunctions: NavigationFunctionsType = {
+        register: registerComponent,
+        navigate: navigate,
+        setSystemData: setSystemData,
+        play: play
+    }
+
     return (
         <>
+            <HStack>
+                <IconButton icon={<PlayOutlineIcon />} />
+            </HStack>
             <NavigationFunctions value={navigationFunctions}>
                 <Grid {...props} />
             </NavigationFunctions>

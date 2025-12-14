@@ -3,7 +3,7 @@ import Menu from './Menu'
 import Animation from './Animation'
 import { panggulDefaultOption } from './Animation'
 import { type HighlightRange, type MenuItemInfo, type SVGInfo } from '../../models/types'
-import { type Timeline } from '../../utils/scoreplayerUtils/score'
+import { type TimeLine } from '../../models/types'
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import { positionConfigs } from '../../config/config'
@@ -30,7 +30,7 @@ export default function TabuhPlayer({
 
     var scoreList: string[] = Object.keys(tabuhDict)
 
-    const timelineRef: RefObject<Timeline | null> = useRef(null)
+    const timelineRef: RefObject<TimeLine | null> = useRef(null)
 
     // Disable menus when data is loading
     useEffect(() => {
@@ -58,7 +58,7 @@ export default function TabuhPlayer({
         return [hideItem].concat(menuItems)
     }, [selectedFocus])
 
-    const updateTimeline = (timeline: Timeline): void => {
+    const updateTimeline = (timeline: TimeLine): void => {
         timelineRef.current = timeline
     }
 

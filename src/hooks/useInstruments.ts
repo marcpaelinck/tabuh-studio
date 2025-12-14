@@ -1,6 +1,5 @@
-import { useCallback, useContext, useEffect, useRef, type Dispatch, type RefObject } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, type Dispatch, type RefObject } from 'react'
 import * as Tone from 'tone'
-import type { SamplerAction } from '../utils/scoreplayerUtils/score'
 import {
     AVERAGE_ATTACK_DELAY,
     outroTime,
@@ -14,6 +13,7 @@ import {
 import { soundFile } from '../config/configfunctions'
 import { DebugContext } from '../App'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
+import type { SamplerAction } from '../models/types'
 
 export type InstrumentSampler = {
     play: (time: number, action: SamplerAction, focus: string[], debug: Dispatch<string>) => void
@@ -45,6 +45,20 @@ const createSampler = ({
     else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
 
+const createSamplers = (): Record<string, Tone.Sampler> => {
+    const entries = Object.entries(positionConfigs).map(([position, config]) => {
+        return [
+            position,
+            createSampler({
+                instr_type: config.type,
+                samples: lookup[position].idx2sample,
+                volume: config.volume
+            }).toDestination()
+        ]
+    })
+    return Object.fromEntries(entries)
+}
+
 const lookup = Object.fromEntries(
     Object.entries(positionConfigs).map(([position, config]) => {
         const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
@@ -62,11 +76,8 @@ const lookup = Object.fromEntries(
     })
 )
 
-const createInstrument = (
-    position: string,
-    samplers: Record<string, React.RefObject<Tone.Sampler | null>>
-): InstrumentSampler => {
-    const sampler: React.RefObject<Tone.Sampler | null> = samplers[position]
+const createInstrument = (position: string, samplers: Record<string, Tone.Sampler | null>): InstrumentSampler => {
+    const sampler: Tone.Sampler | null = samplers[position]
 
     return {
         play: (time: number, action: SamplerAction, currentFocus: string[], debug) => {
@@ -76,7 +87,7 @@ const createInstrument = (
                     : dimRateNonFocusedInstruments
             debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
             const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
-            if (indices && samplers[position].current) {
+            if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = action.duration
                 // Extend the last note to allow the sound to attenuate
                 //TODO Do not extend the last note when looping from the last note.
@@ -85,13 +96,13 @@ const createInstrument = (
                     duration[BaseNote] += millis2BaseNoteEquiv(outroTime, action.bpm)
                 }
                 try {
-                    sampler.current?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
+                    sampler?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
                 } catch {
                     console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
                 }
             }
         },
-        mute: (time: number) => sampler.current?.releaseAll(time)
+        mute: (time: number) => sampler?.releaseAll(time)
     }
 }
 
@@ -99,31 +110,28 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>) => {
     const debug: Dispatch<string> = useContext(DebugContext)
 
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
-    const samplers: Record<string, React.RefObject<Tone.Sampler | null>> = Object.fromEntries(
-        Object.keys(positionConfigs).map((position) => [position, useRef(null)])
-    )
-    useEffect(() => {
-        for (const [position, config] of Object.entries(positionConfigs)) {
-            // samplers[position].current = new Tone.Sampler({ urls: Object.fromEntries(config.samples.map((sample, index) => [NOTES[index], sample])), baseUrl: SOUNDS_FOLDER }).toDestination()
-            samplers[position].current = createSampler({
-                instr_type: config.type,
-                samples: lookup[position].idx2sample,
-                volume: config.volume
-            }).toDestination()
-        }
-    }, [])
+    // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
+    //     Object.keys(positionConfigs).map((position) => [position, null])
+    // )
 
-    const instrumentSamplers: InstrumentSamplers = {}
+    const samplers: Record<string, Tone.Sampler | null> = useMemo(() => {
+        return createSamplers()
+    }, [currentFocusRef])
 
-    Object.keys(positionConfigs).forEach(
-        (position) => (instrumentSamplers[position] = createInstrument(position, samplers))
-    )
+    const instrumentSamplers: InstrumentSamplers = useMemo(() => {
+        return Object.fromEntries(
+            Object.keys(positionConfigs).map((position) => [position, createInstrument(position, samplers)])
+        )
+    }, [currentFocusRef])
 
     // Adds a small random deviation to the note attack time for a more realistic execution
     const random_attack_deviation = (time: number) =>
         time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
     const playInstrument = useCallback((time: number, action: SamplerAction) => {
+        // console.log(
+        //     `playing ${action.position} ${action.cleanedSymbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
+        // )
         if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
         else {
             instrumentSamplers[action.position].play(

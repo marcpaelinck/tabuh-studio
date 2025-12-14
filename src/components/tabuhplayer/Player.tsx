@@ -1,16 +1,19 @@
 import { useAnimationEngine } from '../../hooks/useAnimation'
 import { useInstruments } from '../../hooks/useInstruments'
 import { useInterpretations } from '../../hooks/useInterpretations'
-import { type Score, type SVGInfo, type MenuItemInfo, type HighlightRange } from '../../models/types'
-import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
-import * as Tone from 'tone'
 import {
-    createTimeline,
+    type Score,
+    type SVGInfo,
+    type MenuItemInfo,
+    type HighlightRange,
     type AnimationAction,
     type CursorAction,
     type SamplerAction,
-    type Timeline
-} from '../../utils/scoreplayerUtils/score'
+    type TimeLine
+} from '../../models/types'
+import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
+import * as Tone from 'tone'
+import { createTimeline } from '../../utils/scoreplayerUtils/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPlay, FaPause } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
@@ -35,7 +38,7 @@ export default function ScorePlayer({
     svgInfo: SVGInfo
     panggulOption: MenuItemInfo
     highlightFunctionRef: RefObject<Dispatch<HighlightRange>>
-    timelineUpdater: Dispatch<Timeline>
+    timelineUpdater: Dispatch<TimeLine>
 }): JSX.Element {
     // STATE VARIABLES
     const [audioStarted, setAudioStarted] = useState<AudioState>('false')
@@ -70,7 +73,7 @@ export default function ScorePlayer({
     )
 
     // MEMOS AND EFFECTS
-    const timeline = useMemo<Timeline>(() => createTimeline(score), [score])
+    const timeline = useMemo<TimeLine>(() => createTimeline(score), [score])
 
     useEffect(() => {
         timelineUpdater(timeline)
@@ -83,7 +86,7 @@ export default function ScorePlayer({
         Tone.getTransport()
     }
 
-    function createSchedule(timeline: Timeline | null) {
+    function createSchedule(timeline: TimeLine | null) {
         // Creates the schedule for the Transport object.
         if (!timeline || !score) return
 

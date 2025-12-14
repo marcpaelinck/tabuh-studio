@@ -24,8 +24,6 @@ export default function TabuhEditor({
         setLoading(loadingTabuhDict || loadingScore)
     }, [loadingTabuhDict, loadingScore])
 
-    useEffect(() => {}, [score])
-
     function expandAll(expand: boolean) {
         const newExpanded = Object.fromEntries(Object.keys(expanded).map((id) => [id, expand]))
         setExpanded(newExpanded)

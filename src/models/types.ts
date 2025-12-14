@@ -1,9 +1,10 @@
-// INSTRUMENTS
-
+import * as Tone from 'tone'
 import type { HTMLAttributes, ReactElement } from 'react'
-import type { MutingType, StrokeType, ToneType } from '../config/config'
+import type { BaseNoteTimeObj, MutingType, StrokeType, ToneType } from '../config/config'
 
+// INSTRUMENTS / AUDIO
 export type Instrument = { id: string; name: string; alphabet: string[] }
+export type AudioState = 'false' | 'true' | 'wait'
 
 // NOTATION
 
@@ -105,5 +106,71 @@ export type TextCursorPosition = {
 
 export type HighlightRange = { line: number; range: number[] }
 
-// EDIT TABLE
-export type TableRowDataType = Record<string | number, any>
+// EDIT TABLE: contains system data in a format that can easily be displayed in the editor
+export type Staffs = Record<string, Stave[]>
+
+export type EditorSystemData = {
+    key: number // unique row id
+    id: number // system id
+    system: string
+    part: string
+    staffs: Staffs
+    colWidths: number[]
+}
+
+// SCORE PROCESSING AND TIMELINE CREATION
+export interface SamplerAction {
+    time: BaseNoteTimeObj
+    position: string
+    cleanedSymbol: string
+    bpm: number
+    velocity: Tone.Unit.NormalRange
+    duration: BaseNoteTimeObj
+    isLast: boolean
+}
+
+export type TempoAction = { time: Tone.Unit.TimeObject; bpm: Tone.Unit.NormalRange[]; duration: Tone.Unit.TimeObject }
+
+export type AnimationNote = {
+    system: number
+    section: number
+    time: Tone.Unit.TimeObject
+    keyname: string
+    tone: ToneType
+    stroke: StrokeType | null
+    muting: MutingType
+    duration: Tone.Unit.TimeObject
+    isLast: boolean
+}
+
+export type AnimationAction = {
+    time: Tone.Unit.TimeObject
+    position: string
+    prevsystem: number | null
+    prevsection: number | null
+    currnotes: AnimationNote[]
+    nextnotes: AnimationNote[]
+    timeuntil: Tone.Unit.TimeObject
+    timeuntilMs: number
+}
+
+export type CursorAction = {
+    time: Tone.Unit.TimeObject
+    position: string
+    section: number
+    system: number
+    symbol: string
+    line: number
+    range: number[]
+}
+
+export type TimeLine = {
+    totalDurationSec: number
+    totalDurationTO: Tone.Unit.TimeObject // Total duration expressed as BaseNote units
+    tempoactions: TempoAction[]
+    sampleractions: SamplerAction[]
+    animationactions: AnimationAction[]
+    cursoractions: CursorAction[]
+    initialBPM: number
+    notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
+}

@@ -1,18 +1,6 @@
-import { Accordion, Col, HStack, IconButton, Placeholder, Row, Text, VStack } from 'rsuite'
-import type { Score, Stave, EditorSystemData, Staffs, AudioState } from '../../models/types'
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-    type Context,
-    type Dispatch,
-    type HTMLAttributes,
-    type ReactNode,
-    type RefObject
-} from 'react'
-import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
+import { Accordion, Col, Placeholder, Row, Text, VStack } from 'rsuite'
+import type { Score, Stave, EditorSystemData, Staffs } from '../../models/types'
+import { useEffect, useState, type Dispatch, type HTMLAttributes, type ReactNode } from 'react'
 import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
@@ -24,44 +12,18 @@ import { getTextWidthInPx } from '../../utils/measurements'
 import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
 import { NavigationGrid, NavigationInputCell } from '../ControlledGrid/NavigationGrid'
 import { getValidSymbols } from '../../utils/alphabet'
-import { useInstruments } from '../../hooks/useInstruments'
-import { createTimelineFromEditor, scheduleTransport } from '../../hooks/createSchedule'
-import * as Tone from 'tone'
-import { FaPause, FaPlay } from 'react-icons/fa'
 
 var uniqueKeyValue = 0
-
-export interface AudioFunctionsType {
-    playPause: (doPlay: boolean, data?: EditorSystemData[]) => void
-}
-
-const defaultAudioFunc: AudioFunctionsType = { playPause: (doPlay: boolean, data?: EditorSystemData[]) => {} }
 
 function uniqueKey(): number {
     uniqueKeyValue += 1
     return uniqueKeyValue
 }
 
-const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
-
 function SystemDetails({ systemData }: { systemData: EditorSystemData }): ReactNode {
-    const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
-    const [playing, setPlaying] = useState<boolean>(false)
-    const [playbackActive, setPlaybackActive] = useState<boolean>(false)
-
-    function playPauseClicked() {
-        // Be aware that setPlaying is async
-        if (!playbackActive) {
-            audioFunc.playPause(true, [systemData])
-            setPlaying(true)
-            setPlaybackActive(true)
-        } else {
-            audioFunc.playPause(!playing)
-            setPlaying(!playing)
-        }
-    }
-
+    // console.log(staffs)
     const staffNodes = Object.entries(systemData.staffs).map(([pos, staves], pidx) => {
+        // console.log(staves)
         const staveNodes = staves.map((stave: Stave, sidx: number) => {
             const width: string = getTextWidthInPx('x'.repeat(systemData.colWidths[sidx]), 14) + 15 + 'px'
             const validSymbols: string[] = getValidSymbols(pos, true)
@@ -93,24 +55,13 @@ function SystemDetails({ systemData }: { systemData: EditorSystemData }): ReactN
         )
     })
 
-    return (
-        <>
-            <HStack>
-                <button onClick={playPauseClicked}>
-                    {playing ? <FaPause color="orange" /> : <FaPlay color="orange" />}
-                </button>
-                {/* <IconButton icon={<PlayOutlineIcon className="m-0" onClick={() => audioFunc.play([systemData])} />} /> */}
-            </HStack>
-
-            <VStack>{staffNodes}</VStack>
-        </>
-    )
+    return <VStack>{staffNodes}</VStack>
 }
 
 export default function EditorWindow({
     score,
     expanded,
-    setExpanded,
+    setExpanded, // Updates the
     loading,
     ...props
 }: {
@@ -121,37 +72,11 @@ export default function EditorWindow({
 } & HTMLAttributes<HTMLDivElement>) {
     const [data, setData] = useState<EditorSystemData[]>([])
     const [processing, setProcessing] = useState<boolean>(false)
-    const focusRef: RefObject<string[]> = useRef<string[]>([])
-    const { playInstrument, muteAll } = useInstruments(focusRef)
-    const [audioStarted, setAudioStarted] = useState<AudioState>('false')
-    const audioFunctions: AudioFunctionsType = { playPause: playPause }
 
     function flipExpanded(id: number) {
         const newExpanded = {}
         Object.assign(newExpanded, expanded, Object.fromEntries([[id, !expanded[id]]]))
         setExpanded(newExpanded)
-    }
-
-    async function playPause(doPlay: boolean, data?: EditorSystemData[]) {
-        console.log(`Tone state is ${Tone.getContext().state}`)
-        if (Tone.getContext().state == 'suspended') {
-            console.log('trying to start audio')
-            Tone.start()
-            setAudioStarted('wait')
-            await Tone.loaded()
-            console.log(`Tone state is ${Tone.getContext().state}`)
-            setAudioStarted('true')
-        }
-        if (data) {
-            const timeLine = createTimelineFromEditor(data)
-            scheduleTransport(timeLine, playInstrument)
-        }
-        // Tone.getTransport().start()
-        if (doPlay) {
-            if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
-        } else {
-            Tone.getTransport().pause()
-        }
     }
 
     useEffect(() => {
@@ -179,38 +104,35 @@ export default function EditorWindow({
             }
             newData.push(summary)
         })
-        console.log(newData)
         setData(newData)
         const initExpandState = Object.fromEntries(newData.map((sysInfo) => [sysInfo.id, editorInitialExpandState]))
         setExpanded(initExpandState)
         setProcessing(false)
     }, [score])
+    // header={}
 
     const systems = data.map((systemData) => {
         return (
-            <Accordion.Panel
-                key={systemData.key}
-                header={`${systemData.id} ${systemData.part}`}
-                expanded={expanded[systemData.id]}
-                onSelect={() => {
-                    flipExpanded(systemData.id)
-                }}>
-                <NavigationGrid
-                    playInstrument={playInstrument}
-                    id={`GRID-4(${systemData.id})`}
-                    fluid={false}
-                    className="ml-0">
-                    <SystemDetails systemData={systemData} />
-                </NavigationGrid>
-            </Accordion.Panel>
+            <div key={systemData.id} className="relative border-t border-red-100">
+                <Accordion.Panel
+                    key={systemData.key}
+                    header={`${systemData.id} ${systemData.part}`}
+                    expanded={expanded[systemData.id]}
+                    onSelect={() => {
+                        flipExpanded(systemData.id)
+                    }}
+                    className="justify-between">
+                    <NavigationGrid id={`GRID-4(${systemData.id})`} fluid={false} className="ml-0">
+                        <SystemDetails systemData={systemData} />
+                    </NavigationGrid>
+                </Accordion.Panel>
+            </div>
         )
     })
 
     return (
         <div className="w-full">
-            <AudioFunctions value={audioFunctions}>
-                {loading || processing ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion>{systems}</Accordion>}
-            </AudioFunctions>
+            {loading || processing ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion>{systems}</Accordion>}
         </div>
     )
 }

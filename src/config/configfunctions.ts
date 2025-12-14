@@ -1,4 +1,4 @@
-import { doSanityCheck, positionConfigs, SOUNDS_FOLDER } from './config'
+import { doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
 import { fileExists } from '../utils/filesystem'
 
 export function soundFiles(notes: string[], fileTemplate: string): string[] {
@@ -8,6 +8,9 @@ export function soundFiles(notes: string[], fileTemplate: string): string[] {
 export function soundFile(note: string, fileTemplate: string): string {
     return fileTemplate.replace('{note}', note)
 }
+
+export const isExtension = (symbol: string): boolean => EXTENSION.includes(symbol)
+export const isMuting = (symbol: string): boolean => MUTING.includes(symbol)
 
 // Checks if all sound files can be found.
 // File names should be formatted as {instrumentarium}_{instrument}_{tone}_{muting}.mp3

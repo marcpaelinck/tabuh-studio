@@ -1,5 +1,5 @@
 import { type RefObject } from 'react'
-import { instrumentConfigs, positionConfigs, type NavigationAction } from '../config/config'
+import { type NavigationAction } from '../config/config'
 import _ from 'lodash'
 
 type KeyType =
@@ -35,17 +35,13 @@ type ActionRecord = {
     right: RegExp | null // regex describing the character(s) right of the cursor
     action: Action
 }
+// Used to find a match with an ActionRecord elements
+type SearchRecord = { keys: KeyType[]; left: string; right: string }
 
-const len1Symbol: RegExp = /(?!=[AEIOURS])[a-z890*()]$/
-const len2Symbol: RegExp = /([AEIOURS][a-z890*()])|((?!=[AEIOURS])[a-z890*()][,\</\?\[\]_=])$/
-const len3Symbol: RegExp = /([AEIOURS][a-z890*()])|((?!=[AEIOURS])[a-z890*()][,\</\?\[\]_=])$/
 // Definition of keyboard codes that should be intercepted + action to perform.
 // keys: key combination.
 // left, right: regex to match the strings to the left and right of the cursor (null = don't care).
 // action: action code + parameter(s).
-// Note1: In general for each key combination, all possible left/right combinations should be accounted for
-//        by the regular expressions.
-// Note2: For `left`/`right`, the regex ^$ detects that the cursor is at the beginning/end of the field.
 const keyActions: ActionRecord[] = [
     // TYPING
     // octavate upward
@@ -96,21 +92,13 @@ function getValids(validSymbols: string[]): [RegExp, RegExpDict, string[]] {
     return [regExp, regExpByLength, keystrokes]
 }
 
-const match = (eventVal: boolean | string | string[], actionVal: boolean | string | string[] | RegExp | null) => {
-    const returnValue: boolean =
-        actionVal == null ||
-        // `key` value
-        (actionVal instanceof RegExp && typeof eventVal == 'string' && actionVal.test(eventVal)) ||
-        // `sca` values
-        (Array.isArray(eventVal) &&
-            Array.isArray(actionVal) &&
-            new Set(eventVal).size == new Set(actionVal).size &&
-            new Set(eventVal).difference(new Set(actionVal)).size == 0 &&
-            new Set(actionVal).difference(new Set(eventVal)).size == 0) ||
-        // Not used currently
-        (typeof actionVal == 'boolean' && eventVal == actionVal)
-    // console.log(`key=${eventVal} a=${actionVal} match=${returnValue}`)
-    return returnValue
+const match = (event: SearchRecord, action: ActionRecord) => {
+    const keysMatch = event.keys.length === action.keys.length && event.keys.every((x) => action.keys.includes(x))
+    if (!keysMatch) return false
+    const leftMatch = !action.left || action.left.test(event.left)
+    if (!leftMatch) return false
+    const rightMatch = !action.right || action.right.test(event.right)
+    return rightMatch
 }
 
 export const useKeyboardListener = (
@@ -123,48 +111,51 @@ export const useKeyboardListener = (
 
     function keyboardListener(event: KeyboardEvent) {
         // console.log(`${event.code} ${event.ctrlKey} ${target.selectionEnd}`)
+        // Check that target exists
         if (!ref.current || event.target !== ref.current) return
         const target = ref.current
 
-        // Block all invalid keystrokes
+        // Prevent invalid keystrokes
         if (event.key.length == 1 && !validKeystrokes.includes(event.key)) {
             event.preventDefault()
             return
         }
-        const left = target.value.slice(0, target.selectionEnd)
-        const right = target.value.slice(target.selectionEnd)
-        const eventKeys: string[] = [
-            event.key,
-            event.shiftKey ? 'Shift' : null,
-            event.ctrlKey ? 'Ctrl' : null,
-            event.altKey ? 'Alt' : null
-        ].filter((v) => v != null)
-        // Find a match with a keyAction
-        console.log(event.key)
-        for (const a of keyActions) {
-            if (match(eventKeys, a.keys) && match(left, a.left) && match(right, a.right)) {
-                console.log('pass')
+        // Create a search record to search a matching keyAction record
+        const eventRecord: SearchRecord = {
+            keys: [
+                event.key,
+                event.shiftKey ? 'Shift' : null,
+                event.ctrlKey ? 'Ctrl' : null,
+                event.altKey ? 'Alt' : null
+            ].filter((v) => v != null) as KeyType[],
+            left: target.value.slice(0, target.selectionEnd), // string to the left of the cursor
+            right: target.value.slice(target.selectionEnd) // string to the right of the cursor
+        }
+        // Find a matching keyAction record and perform the corresponding key action if found
+        for (const keyAction of keyActions) {
+            if (match(eventRecord, keyAction)) {
+                // console.log('pass')
                 event.preventDefault()
 
-                if (a.action[0] == 'insert') {
-                    if (a.action.length > 1 && a.action[1] != null) {
-                        target.setRangeText(a.action[1])
+                if (keyAction.action[0] == 'insert') {
+                    if (keyAction.action.length > 1 && keyAction.action[1] != null) {
+                        target.setRangeText(keyAction.action[1])
                         target.selectionStart += 1
                         target.selectionEnd = target.selectionStart
-                        console.log(`INSERT ${a.action[1]}`)
+                        // console.log(`INSERT ${a.action[1]}`)
                     } else console.log('unexpected null keyAction value(s)')
                     break
                 }
-                if (a.action[0] == 'pop-left') {
-                    if (a.action.length > 1 && a.action[1] != null) {
-                        target.selectionStart -= a.action[1]
-                        console.log(`REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
+                if (keyAction.action[0] == 'pop-left') {
+                    if (keyAction.action.length > 1 && keyAction.action[1] != null) {
+                        target.selectionStart -= keyAction.action[1]
+                        // console.log(`REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
                         target.setRangeText('')
                     } else console.log('unexpected null keyAction value(s)')
                     break
                 }
-                if (a.action[0] == 'ignore') {
-                    console.log('IGNORE')
+                if (keyAction.action[0] == 'ignore') {
+                    // console.log('IGNORE')
                     break
                 }
                 if (
@@ -177,10 +168,11 @@ export const useKeyboardListener = (
                         'rowend',
                         'firstrow',
                         'lastrow'
-                    ].includes(a.action[0])
+                    ].includes(keyAction.action[0])
                 ) {
-                    console.log(a.action[0])
-                    const elementRef: RefObject<HTMLTextAreaElement | null> = navigate(a.action[0] as NavigationAction)
+                    const elementRef: RefObject<HTMLTextAreaElement | null> = navigate(
+                        keyAction.action[0] as NavigationAction
+                    )
                     if (elementRef.current) {
                         elementRef.current?.focus()
                         elementRef.current.selectionStart = 0
@@ -188,18 +180,18 @@ export const useKeyboardListener = (
                     }
                     break
                 }
-                if (['cursorleft', 'cursorright'].includes(a.action[0])) {
-                    const direction = a.action[0] == 'cursorleft' ? -1 : 1
-                    const compare = a.action[0] == 'cursorleft' ? left : right
+                if (['cursorleft', 'cursorright'].includes(keyAction.action[0])) {
+                    // Skip an entire symbol, which might consist of multiple characters.
+                    const direction = keyAction.action[0] == 'cursorright' ? 1 : -1
+                    const contentToMatch = direction > 0 ? eventRecord.right : eventRecord.left
+                    const regexStart = direction > 0 ? '^' : ''
+                    const regexEnd = direction > 0 ? '' : '$'
+
+                    // Find a match for the previous/next (compound) symbol. Start with longest possible symbol code.
                     for (const length of Object.keys(validRegExpByLength).sort().reverse()) {
-                        const regExp = RegExp(
-                            (a.action[0] == 'cursorright' ? '^' : '') +
-                                '(' +
-                                validRegExpByLength[length] +
-                                ')' +
-                                (a.action[0] == 'cursorleft' ? '$' : '')
-                        )
-                        if (match(compare, regExp)) {
+                        // validRegExpByLength[length] matches all valid symbols of a given length.
+                        const regExp = RegExp(regexStart + '(' + validRegExpByLength[length] + ')' + regexEnd)
+                        if (regExp.test(contentToMatch)) {
                             target.selectionStart += direction * Number(length)
                             target.selectionEnd = target.selectionStart
                             break

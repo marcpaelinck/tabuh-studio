@@ -1,16 +1,19 @@
+import { ignoreChars, positionConfigs, noteConfigs } from '../../config/config'
 import {
-    ignoreChars,
-    positionConfigs,
-    noteConfigs,
-    type MutingType,
-    type StrokeType,
-    type ToneType
-} from '../../config/config'
-import { type JsonNote, type JsonSymbol, type Note, type Score, type Section } from '../../models/types'
+    type JsonNote,
+    type JsonSymbol,
+    type Note,
+    type Score,
+    type Section,
+    type EditorSystemData,
+    type AnimationNote,
+    type TimeLine
+} from '../../models/types'
 import * as Tone from 'tone'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
-import { createElement, type HTMLAttributes, type ReactElement } from 'react'
+import { createElement } from 'react'
 import { introTime, outroTime } from '../../config/config'
+import { cleanSymbol } from '../alphabet'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)
@@ -55,64 +58,6 @@ export function parseScore(input: string): Score {
     return score
 }
 
-// Remove chars that should be ignored. See remark in configs.ts
-const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ''), symbol)
-
-export interface SamplerAction {
-    time: Tone.Unit.TimeObject
-    position: string
-    cleanedSymbol: string
-    bpm: number
-    velocity: Tone.Unit.NormalRange
-    duration: Tone.Unit.TimeObject
-    isLast: boolean
-}
-
-export type TempoAction = { time: Tone.Unit.TimeObject; bpm: Tone.Unit.NormalRange[]; duration: Tone.Unit.TimeObject }
-
-export type AnimationNote = {
-    system: number
-    section: number
-    time: Tone.Unit.TimeObject
-    keyname: string
-    tone: ToneType
-    stroke: StrokeType | null
-    muting: MutingType
-    duration: Tone.Unit.TimeObject
-    isLast: boolean
-}
-
-export type AnimationAction = {
-    time: Tone.Unit.TimeObject
-    position: string
-    prevsystem: number | null
-    prevsection: number | null
-    currnotes: AnimationNote[]
-    nextnotes: AnimationNote[]
-    timeuntil: Tone.Unit.TimeObject
-    timeuntilMs: number
-}
-
-export type CursorAction = {
-    time: Tone.Unit.TimeObject
-    position: string
-    symbol: string
-    newsystem: boolean
-    newsection: boolean
-    line: number
-    range: number[]
-}
-
-export type Timeline = {
-    totalDurationSec: number
-    totalDurationTO: Tone.Unit.TimeObject // Total duration expressed as BaseNote units
-    tempoactions: TempoAction[]
-    sampleractions: SamplerAction[]
-    animationactions: AnimationAction[]
-    cursoractions: CursorAction[]
-    notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
-}
-
 // Create a mapping for notes to shorthand code
 // const note_to_shCode: { [position: string]: { [symbol: string]: string[] } } = {}
 // for (const [position, posConfigs] of Object.entries(instrumentConfigs)) {
@@ -149,14 +94,15 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
     return Math.round(section.tempo[0] + (relBNTime / section.duration) * (section.tempo[1] - section.tempo[0]))
 }
 
-export function createTimeline(score: Score): Timeline {
-    // Timeline will be used to create the Transport schedule
+// Creates a timeline object for the Player application
+export function createTimeline(score: Score): TimeLine {
+    // TimeLine will be used to create the Transport schedule
 
-    if (score == ({} as Score)) return {} as Timeline
-
-    const timeline: Timeline = {
+    if (!score || score == ({} as Score)) return {} as TimeLine
+    const timeline: TimeLine = {
         totalDurationSec: 0,
         totalDurationTO: n2TO(0),
+        initialBPM: 60, // Update after BPM and velocity have been added to EditorSystemData
         tempoactions: [],
         sampleractions: [],
         animationactions: [],
@@ -266,10 +212,10 @@ export function createTimeline(score: Score): Timeline {
             currentline += symbol.s
             timeline.cursoractions.push({
                 time: n2TO(symbol.t),
+                system: symbol.system,
+                section: symbol.section,
                 position: position,
                 symbol: symbol.s,
-                newsystem: newSystem,
-                newsection: newSection,
                 line: line,
                 range: range
             })

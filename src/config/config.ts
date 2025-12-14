@@ -63,7 +63,8 @@ export const introTime: number = 2000 // silence added before the beginning of t
 export const outroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
 
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
-export const BaseNote: '1n' | '2n' | '4n' | '8n' | '16n' | '32n' = '16n'
+export const BaseNote: '16n' = '16n'
+export type BaseNoteTimeObj = { '16n': number }
 export const SOUNDS_FOLDER = 'sounds/'
 export const alwaysFocusPositions = ['KEMPLI', 'GONGS']
 
@@ -83,6 +84,8 @@ const _strokes_ = ['KNOB', 'RIM'] as const
 export type StrokeType = (typeof _strokes_)[number]
 const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = (typeof _mutings_)[number]
+
+// INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
 
 export type InstrumentConfig = { name: string; positions: string[] }
 
@@ -216,14 +219,19 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] }
 }
 
+// ALPHABET + SAMPLES
+//TODO separate alphabet info from samples info. Same for instrument type.
+export const EXTENSION = ['-', ' ']
+export const MUTING = ['.']
+
 export const positionConfigs: Record<string, PositionConfig> = {
     GONGS: {
         name: 'Gongs',
-        type: 'percussion',
+        type: 'percussion', //TODO move type to instrument and grouping info
         volume: -5,
         svg_file: 'svg/GK_GONGS.svg',
         sampletemplate: 'GK_GONGS_{note}.mp3',
-        symbolToNoteNames: { G: ['GIR'], P: ['PUR'], T: ['TONG'] }
+        symbolToNoteNames: { G: ['GIR'], P: ['PUR'], T: ['TONG'] } //TODO move alphabet info to separate settings
     },
     KEMPLI: {
         name: 'Kempli',
