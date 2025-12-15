@@ -1,4 +1,4 @@
-// NavigationGrid and NavigationCell enable to navigate horizontally and vertically
+// NavigationGrid and NavigationInputCell enable to navigate horizontally and vertically
 // through a table-shaped Grid structure (i.e. with equal number of columns in each row).
 
 import { useEffect, useRef, useState, type ReactElement, type RefObject } from 'react'
@@ -6,9 +6,9 @@ import { Grid, type GridProps } from 'rsuite'
 import type { NavigationAction } from '../../config/config'
 import type { EditorCellCursor, EditorSystemData, SamplerAction } from '../../models/types'
 import _ from 'lodash'
-import type { GridInfo, NavigationFunctionsType, NavigationGridProps } from './_types'
 import { noCursor } from './_constants'
-import { NavigationFunctions } from '../ControlledGrid/constants'
+import { NavigationFunctions } from './contexts'
+import type { GridInfo, NavigationFunctionsType, NavigationGridProps } from './_types'
 
 // Extension of the React Suite Grid element with additional facilities to enable keyboard navigation
 // Each row in NavigationGrid should contain the same number of columns otherwise an exception is raised.

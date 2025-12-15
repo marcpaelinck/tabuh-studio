@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, type ChangeEvent } from 'react'
 import type { NavigationCellProps, NavigationFunctionsType } from './_types'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
-import { NavigationFunctions } from '../ControlledGrid/constants'
+import { NavigationFunctions } from './contexts'
 
 export function NavigationCell({ posId, secId, validSymbols, ...props }: NavigationCellProps) {
     const ref = useRef<HTMLTextAreaElement>(null)

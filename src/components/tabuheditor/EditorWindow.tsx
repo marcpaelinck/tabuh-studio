@@ -1,44 +1,17 @@
-import { Accordion, Col, HStack, Placeholder, Row, Text, VStack } from 'rsuite'
-import { IoPlayCircleOutline, IoPlayCircle, IoPauseCircle } from 'react-icons/io5'
-import type {
-    Score,
-    Stave,
-    EditorSystemData,
-    Staffs,
-    PlayBackState,
-    CursorAction,
-    EditorCellCursor
-} from '../../models/types'
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-    type Context,
-    type Dispatch,
-    type HTMLAttributes,
-    type ReactNode,
-    type RefObject
-} from 'react'
+import { Accordion, Placeholder } from 'rsuite'
 import 'rsuite/Accordion/styles/index.css'
-import 'rsuite/Input/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
-import 'rsuite/Divider/styles/index.css'
 import 'rsuite/Grid/styles/index.css'
-import 'rsuite/Row/styles/index.css'
-import 'rsuite/Col/styles/index.css'
-import { getTextWidthInPx } from '../../utils/measurements'
-import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
-import { NavigationGrid } from '../ControlledGrid/NavigationGrid'
-import { getValidSymbols } from '../../utils/alphabet'
+import type { Score, EditorSystemData, Staffs, PlayBackState, CursorAction, EditorCellCursor } from '../../models/types'
+import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
+import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
+import { NavigationGrid } from './NavigationGrid'
 import { useInstruments } from '../../hooks/useInstruments'
 import { createTimelineFromEditor, scheduleTransport } from '../../hooks/createSchedule'
 import * as Tone from 'tone'
-import { NavigationCell } from '../ControlledGrid/NavigationCell'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
-import { noCursor } from '../ControlledGrid/constants'
 import { SystemDetails } from './SystemGrid'
+import { noCursor } from './_constants'
 
 var uniqueKeyValue = 0
 
