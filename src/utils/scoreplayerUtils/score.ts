@@ -1,19 +1,20 @@
-import { ignoreChars, positionConfigs, noteConfigs } from '../../config/config'
+import { positionConfigs, noteConfigs, type BaseNoteTimeObj } from '../../config/config'
 import {
     type JsonNote,
     type JsonSymbol,
     type Note,
     type Score,
     type Section,
-    type EditorSystemData,
     type AnimationNote,
-    type TimeLine
+    type TimeLine,
+    type ActionFunctions
 } from '../../models/types'
 import * as Tone from 'tone'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
 import { createElement } from 'react'
 import { defaultIntroTime, defaultOutroTime } from '../../config/config'
 import { cleanSymbol } from '../alphabet'
+import { assert } from 'tone/build/esm/core/util/Debug'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)
@@ -95,7 +96,7 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
 }
 
 // Creates a timeline object for the Player application
-export function createTimeline(score: Score): TimeLine {
+export function createTimeline(score: Score, actionFunctions: ActionFunctions): TimeLine {
     // TimeLine will be used to create the Transport schedule
 
     if (!score || score == ({} as Score)) return {} as TimeLine
@@ -107,6 +108,7 @@ export function createTimeline(score: Score): TimeLine {
         sampleractions: [],
         animationactions: [],
         cursoractions: [],
+        genericactions: [], // currently only used for final action when playback reaches end of schedule
         notation: {}
     }
     if (!score) return timeline
@@ -122,121 +124,135 @@ export function createTimeline(score: Score): TimeLine {
             timeline.totalDurationSec += ((section.duration / 4) * 60) / (0.5 * (section.tempo[0] + section.tempo[1]))
 
             // Create sampler actions
-            for (const [position, stave] of Object.entries(section.staves)) {
-                if (!(position in positionScore)) positionScore[position] = []
-                if (!(position in positionNotation)) positionNotation[position] = []
-                var sectionProgress: number = 0
-                stave.notes.forEach((note) => {
-                    // create separate scores for each position, which will be used to create the animation actions
-                    var velocity: number =
-                        stave.velocity[0] +
-                        (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
-                    note.v = velocity
-                    positionScore[position].push(note)
-                    const bpm = getCurrentBPM(section, sectionProgress)
-                    timeline.sampleractions.push({
-                        action: 'play',
-                        position: position,
-                        cleanedSymbol: cleanSymbol(note.s),
-                        bpm: bpm,
-                        velocity: velocity,
-                        time: n2TO(note.t),
-                        duration: n2TO(note.d || 1),
-                        isLast: sysidx == score.systems.length - 1 && secidx == system.sections.length - 1
+            if (actionFunctions.play) {
+                for (const [position, stave] of Object.entries(section.staves)) {
+                    if (!(position in positionScore)) positionScore[position] = []
+                    if (!(position in positionNotation)) positionNotation[position] = []
+                    var sectionProgress: number = 0
+                    stave.notes.forEach((note) => {
+                        // create separate scores for each position, which will be used to create the animation actions
+                        var velocity: number =
+                            stave.velocity[0] +
+                            (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+                        note.v = velocity
+                        positionScore[position].push(note)
+                        const bpm = getCurrentBPM(section, sectionProgress)
+                        if (!actionFunctions.play) return // redundant, this is just to avoid a ts error
+                        timeline.sampleractions.push({
+                            action: actionFunctions.play,
+                            position: position,
+                            cleanedSymbol: cleanSymbol(note.s),
+                            bpm: bpm,
+                            velocity: velocity,
+                            time: n2TO(note.t),
+                            duration: n2TO(note.d || 1),
+                            isLast: sysidx == score.systems.length - 1 && secidx == system.sections.length - 1
+                        })
+                        sectionProgress += note.d || 1
                     })
-                    sectionProgress += note.d || 1
-                })
-                stave.notation.forEach((symbol: JsonSymbol) => {
-                    symbol.system = system.id
-                    symbol.section = section.id
-                    positionNotation[position].push(symbol)
-                })
+                    stave.notation.forEach((symbol: JsonSymbol) => {
+                        symbol.system = system.id
+                        symbol.section = section.id
+                        positionNotation[position].push(symbol)
+                    })
+                }
             }
         })
     })
+    if (actionFunctions.generic)
+        timeline.genericactions.push({ action: actionFunctions.generic, time: n2TO(totalDurationInBaseNotes) })
 
     // Create animation actions
     Object.keys(positionScore).forEach((position) => {
         const notes: JsonNote[] = positionScore[position]
         // Add an animation action for the displacement of the panggul
         // from the starting position to the first note
-        timeline.animationactions.push({
-            time: n2TO(0),
-            position: position,
-            prevsystem: null,
-            prevsection: null,
-            currnotes: [],
-            nextnotes: note2AnimationNotes(position, notes[1], false),
-            timeuntil: n2TO(notes[1].t),
-            timeuntilMs: notes[1].ms
-        })
-        notes.forEach((note, index) => {
-            const currIsLast: boolean = index == notes.length - 1
-            const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
-            const nextIsLast: boolean = index == notes.length - 2
-            const nextANotes: AnimationNote[] = currIsLast
-                ? []
-                : note2AnimationNotes(position, notes[index + 1], nextIsLast)
-            const timeUntil: Tone.Unit.TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
-            const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
-            const prevSystem = index > 0 ? notes[index - 1].system : null
-            const prevSection = index > 0 ? notes[index - 1].section : null
+        if (actionFunctions.animate) {
             timeline.animationactions.push({
-                time: n2TO(note.t),
+                action: actionFunctions.animate,
+                time: n2TO(0),
                 position: position,
-                prevsystem: prevSystem,
-                prevsection: prevSection,
-                currnotes: aNotes,
-                nextnotes: nextANotes,
-                timeuntil: timeUntil,
-                timeuntilMs: timeUntilMs
+                prevsystem: null,
+                prevsection: null,
+                currnotes: [],
+                nextnotes: note2AnimationNotes(position, notes[1], false),
+                timeuntil: n2TO(notes[1].t),
+                timeuntilMs: notes[1].ms
             })
-            // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
-            // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
-        })
+            notes.forEach((note, index) => {
+                const currIsLast: boolean = index == notes.length - 1
+                const aNotes: AnimationNote[] = note2AnimationNotes(position, notes[index], currIsLast)
+                const nextIsLast: boolean = index == notes.length - 2
+                const nextANotes: AnimationNote[] = currIsLast
+                    ? []
+                    : note2AnimationNotes(position, notes[index + 1], nextIsLast)
+                const timeUntil: BaseNoteTimeObj = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
+                const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
+                const prevSystem = index > 0 ? notes[index - 1].system : null
+                const prevSection = index > 0 ? notes[index - 1].section : null
+                if (!actionFunctions.animate) return // redundant, this is just to avoid a ts error
+                timeline.animationactions.push({
+                    action: actionFunctions.animate,
+                    time: n2TO(note.t),
+                    position: position,
+                    prevsystem: prevSystem,
+                    prevsection: prevSection,
+                    currnotes: aNotes,
+                    nextnotes: nextANotes,
+                    timeuntil: timeUntil,
+                    timeuntilMs: timeUntilMs
+                })
+                // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
+                // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
+            })
+        }
     })
 
     // Create cursor actions
-    Object.keys(positionNotation).forEach((position) => {
-        timeline.notation[position] = []
-        const symbols: JsonSymbol[] = positionNotation[position]
-        let currentline: string = ''
-        let line: number = 0
-        symbols.forEach((symbol, index) => {
-            const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
-            const newSection =
-                index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
-            const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].system != symbol.system
+    if (actionFunctions.cursor) {
+        Object.keys(positionNotation).forEach((position) => {
+            timeline.notation[position] = []
+            const symbols: JsonSymbol[] = positionNotation[position]
+            let currentline: string = ''
+            let line: number = 0
+            symbols.forEach((symbol, index) => {
+                const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
+                const newSection =
+                    index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
+                const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].system != symbol.system
 
-            if (newSection) currentline += ' '
-            const range = [currentline.length, currentline.length + symbol.s.length]
-            currentline += symbol.s
-            timeline.cursoractions.push({
-                time: n2TO(symbol.t),
-                system: symbol.system,
-                section: symbol.section,
-                position: position,
-                symbol: symbol.s,
-                line: line,
-                range: range
-            })
-            if (lastNoteOfSection) {
-                timeline.notation[position].push(
-                    createElement(
-                        'p',
-                        {
-                            key: line,
-                            id: `notation-${line}`,
-                            className: 'appearance-none p-[0px] m-0 text-sm/6 balifont'
-                        },
-                        currentline
+                if (newSection) currentline += ' '
+                const range = [currentline.length, currentline.length + symbol.s.length]
+                currentline += symbol.s
+                if (!actionFunctions.cursor) return // redundant, this is just to avoid a ts error
+                timeline.cursoractions.push({
+                    action: actionFunctions.cursor,
+                    time: n2TO(symbol.t),
+                    system: symbol.system,
+                    section: symbol.section,
+                    position: position,
+                    symbol: symbol.s,
+                    line: line,
+                    range: range
+                })
+                if (lastNoteOfSection) {
+                    timeline.notation[position].push(
+                        createElement(
+                            'p',
+                            {
+                                key: line,
+                                id: `notation-${line}`,
+                                className: 'appearance-none p-[0px] m-0 text-sm/6 balifont'
+                            },
+                            currentline
+                        )
                     )
-                )
-                currentline = ''
-                line++
-            }
+                    currentline = ''
+                    line++
+                }
+            })
         })
-    })
+    }
 
     return timeline
 }

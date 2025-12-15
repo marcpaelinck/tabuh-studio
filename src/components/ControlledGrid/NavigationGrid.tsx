@@ -1,63 +1,58 @@
 // NavigationGrid and NavigationInputCell enable to navigate horizontally and vertically
 // through a table-shaped Grid structure (i.e. with equal number of columns in each row).
 
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    type ChangeEvent,
-    type Context,
-    type HTMLProps,
-    type ReactElement,
-    type RefObject
-} from 'react'
-import { Grid, HStack, IconButton, type GridProps } from 'rsuite'
-import { useKeyboardListener } from '../../hooks/useKeyboard'
+import { useEffect, useRef, useState, type ReactElement, type RefObject } from 'react'
+import { Grid, type GridProps } from 'rsuite'
 import type { NavigationAction } from '../../config/config'
-import type { EditorSystemData, SamplerAction } from '../../models/types'
-
-interface NavigationGridProps extends GridProps {
-    id?: string
-}
-
-interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
-    posId: number
-    secId: number
-    validSymbols: string[]
-}
-
-export interface NavigationFunctionsType {
-    register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
-    navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
-    updateSystemData: (data: EditorSystemData) => void
-}
-
-export const defaultNavFunc: NavigationFunctionsType = {
-    register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => {},
-    navigate: (action: NavigationAction, row: number, col: number): RefObject<HTMLTextAreaElement | null> => {
-        return { current: null }
-    },
-    updateSystemData: (data: EditorSystemData) => {}
-}
-
-const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)
-
-type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
-type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
+import type { EditorCellCursor, EditorSystemData, SamplerAction } from '../../models/types'
+import _ from 'lodash'
+import type { GridInfo, NavigationFunctionsType, NavigationGridProps } from './types'
+import { NavigationFunctions, noCursor } from './constants'
 
 // Extension of the React Suite Grid element with additional facilities to enable keyboard navigation
 // Each row in NavigationGrid should contain the same number of columns otherwise an exception is raised.
 export function NavigationGrid({
+    systemData,
     playInstrument,
+    cursorMovement,
     ...props
-}: { playInstrument: (time: number, action: SamplerAction) => void } & NavigationGridProps): ReactElement<GridProps> {
+}: {
+    systemData: EditorSystemData
+    playInstrument: (time: number, action: SamplerAction) => void
+    cursorMovement: EditorCellCursor
+} & NavigationGridProps): ReactElement<GridProps> {
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    // const [systemData, setSystemData] = useState<EditorSystemData | null>(null)
-    // const playInstrument = () => {}
-    // const muteAll = () => {}
-    function updateSystemData(cellData: string) {}
+    const [currCursor, setCurrCursor] = useState<EditorCellCursor>(noCursor)
+    const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
+
+    function highlight(cell: HTMLTextAreaElement, on: boolean) {
+        const props = ['border-1', 'border-solid', 'border-red-500']
+        props.forEach((prop) => {
+            if (on && !cell.classList.contains(prop)) cell.classList.add(prop)
+            if (!on && cell.classList.contains(prop)) cell.classList.remove(prop)
+        })
+    }
+    const logging: boolean = false
+
+    useEffect(() => {
+        if (cursorMovement.system != systemData.id) return
+        if (_.isEqual(cursorMovement, currCursor)) {
+            if (logging) console.log(`no change from ${currCursor.position}-${currCursor.measure}`)
+            return
+        }
+        if (logging)
+            console.log(
+                `yes change from ${currCursor.position}-${currCursor.measure} to ${cursorMovement.position}-${cursorMovement.measure}`
+            )
+        const currTextArea = _.isEqual(currCursor, noCursor)
+            ? null
+            : grid.current.cells[posToRow[currCursor.position]][currCursor.measure].current
+        if (currTextArea) highlight(currTextArea, false)
+        const textArea = grid.current.cells[posToRow[cursorMovement.position]][cursorMovement.measure].current
+        if (textArea) highlight(textArea, true)
+        setCurrCursor(cursorMovement)
+    }, [cursorMovement])
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -108,36 +103,5 @@ export function NavigationGrid({
                 <Grid {...props} />
             </NavigationFunctions>
         </>
-    )
-}
-
-export function NavigationInputCell({ posId, secId, validSymbols, ...props }: NavigationCellProps) {
-    const ref = useRef<HTMLTextAreaElement>(null)
-    const navFunc: NavigationFunctionsType = useContext(NavigationFunctions)
-    const [keyboardListener] = useKeyboardListener(ref, validSymbols, (action: NavigationAction) =>
-        navFunc.navigate(action, posId, secId)
-    )
-
-    useEffect(() => {
-        navFunc.register(posId, secId, ref)
-    }, [])
-
-    function onFocus(on: boolean) {
-        if (on) ref.current?.addEventListener('keydown', keyboardListener)
-        else ref.current?.removeEventListener('keydown', keyboardListener)
-    }
-
-    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        console.log('changed')
-    }
-
-    return (
-        <textarea
-            ref={ref}
-            onChange={(e) => handleChange(e)}
-            onFocus={() => onFocus(true)}
-            onBlur={() => onFocus(false)}
-            {...props}
-        />
     )
 }

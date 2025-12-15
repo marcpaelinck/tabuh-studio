@@ -9,7 +9,9 @@ import {
     type AnimationAction,
     type CursorAction,
     type SamplerAction,
-    type TimeLine
+    type TimeLine,
+    type TempoAction,
+    type ActionFunctions
 } from '../../models/types'
 import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
 import * as Tone from 'tone'
@@ -72,8 +74,15 @@ export default function ScorePlayer({
         pbSpeedRef
     )
 
+    const actionFunctions: ActionFunctions = {
+        play: playInstrument,
+        animate: animateInstrument,
+        cursor: animateNotation,
+        generic: null
+    }
+
     // MEMOS AND EFFECTS
-    const timeline = useMemo<TimeLine>(() => createTimeline(score), [score])
+    const timeline = useMemo<TimeLine>(() => createTimeline(score, actionFunctions), [score])
 
     useEffect(() => {
         timelineUpdater(timeline)
@@ -100,28 +109,19 @@ export default function ScorePlayer({
         // tempo and instrument actions (notes)
         // Set the initial tempo to 60 (intro time)
         const initialBpm = score.systems[0].sections[0].tempo[0]
-        const tAction: SamplerAction = {
-            action: 'play',
-            time: { '16n': 0 },
-            position: '',
-            cleanedSymbol: '',
-            bpm: initialBpm,
-            velocity: 0,
-            duration: { '16n': 0 },
-            isLast: false
-        }
+        const tAction: TempoAction = { time: { '16n': 0 }, bpm: initialBpm, duration: { '16n': 0 } }
         Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
         timeline.sampleractions.forEach((sAction: SamplerAction) => {
             Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)
-            Tone.getTransport().schedule((time) => playInstrument(time, sAction), sAction.time)
+            Tone.getTransport().schedule((time) => sAction.action(time, sAction), sAction.time)
         })
         // Schedule animation actions
         timeline.animationactions.forEach((aAction: AnimationAction) => {
-            Tone.getTransport().schedule((time) => animateInstrument(time, aAction), aAction.time)
+            Tone.getTransport().schedule((time) => aAction.action(time, aAction), aAction.time)
         })
         // Schedule cursor actions
         timeline.cursoractions.forEach((cAction: CursorAction) => {
-            Tone.getTransport().schedule((time) => animateNotation(time, cAction), cAction.time)
+            Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
         })
 
         setTotalDuration(Math.round(score.durationMs / 1000))

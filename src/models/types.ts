@@ -117,13 +117,23 @@ export type EditorSystemData = {
     staffs: Staffs
     colWidths: number[]
 }
+export type EditorCellCursor = { system: number; position: string; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
 export type PlayBackState = 'playing' | 'paused' | 'stopped'
 
+export type GenericFunction = (time: number) => void
+export type SamplerFunction = (time: number, action: SamplerAction) => void
+export type AnimationFunction = (time: number, action: AnimationAction) => void
+export type CursorFunction = (time: number, action: CursorAction) => void
+
+export type GenericAction = { action: GenericFunction; time: BaseNoteTimeObj }
+
+export type TempoAction = { time: BaseNoteTimeObj; bpm: Tone.Unit.NormalRange; duration: BaseNoteTimeObj }
+
 export interface SamplerAction {
-    action: 'play' | 'mute'
+    action: SamplerFunction
     time: BaseNoteTimeObj
     position: string
     cleanedSymbol: string
@@ -133,33 +143,33 @@ export interface SamplerAction {
     isLast: boolean
 }
 
-export type TempoAction = { time: BaseNoteTimeObj; bpm: Tone.Unit.NormalRange; duration: BaseNoteTimeObj }
-
 export type AnimationNote = {
     system: number
     section: number
-    time: Tone.Unit.TimeObject
+    time: BaseNoteTimeObj
     keyname: string
     tone: ToneType
     stroke: StrokeType | null
     muting: MutingType
-    duration: Tone.Unit.TimeObject
+    duration: BaseNoteTimeObj
     isLast: boolean
 }
 
 export type AnimationAction = {
-    time: Tone.Unit.TimeObject
+    action: AnimationFunction
+    time: BaseNoteTimeObj
     position: string
     prevsystem: number | null
     prevsection: number | null
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
-    timeuntil: Tone.Unit.TimeObject
+    timeuntil: BaseNoteTimeObj
     timeuntilMs: number
 }
 
 export type CursorAction = {
-    time: Tone.Unit.TimeObject
+    action: CursorFunction
+    time: BaseNoteTimeObj
     position: string
     section: number
     system: number
@@ -170,19 +180,20 @@ export type CursorAction = {
 
 export type TimeLine = {
     totalDurationSec: number
-    totalDurationTO: Tone.Unit.TimeObject // Total duration expressed as BaseNote units
+    totalDurationTO: BaseNoteTimeObj // Total duration expressed as BaseNote units
     tempoactions: TempoAction[]
     sampleractions: SamplerAction[]
     animationactions: AnimationAction[]
     cursoractions: CursorAction[]
+    genericactions: GenericAction[]
     initialBPM: number
     notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
 }
 
-// functions that should be called
-export type actionFunctions = {
-    play: ((time: number, action: SamplerAction) => void) | null
-    animate: ((time: number, action: AnimationAction) => void) | null
-    cursor: ((time: number, action: CursorAction) => void) | null
-    onEndofSched: ((time: number) => void) | null
+// functions that should be called when creating the Tone.Transport schedule
+export type ActionFunctions = {
+    play: SamplerFunction | null
+    animate: AnimationFunction | null
+    cursor: CursorFunction | null
+    generic: GenericFunction | null
 }

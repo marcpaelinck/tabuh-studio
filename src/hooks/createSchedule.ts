@@ -1,8 +1,10 @@
 import * as Tone from 'tone'
 import type {
+    ActionFunctions,
     AnimationAction,
     CursorAction,
     EditorSystemData,
+    GenericAction,
     SamplerAction,
     TempoAction,
     TimeLine
@@ -10,7 +12,6 @@ import type {
 import { n2TO, TO2n } from '../utils/timeunits'
 import { cleanSymbol } from '../utils/alphabet'
 import { isExtension, isMuting } from '../config/configfunctions'
-import { Timeline } from 'rsuite'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,
@@ -23,7 +24,7 @@ const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: 
 }
 
 // Creates a timeline to play back (parts of) the score in the editor
-export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
+export function createTimelineFromEditor(data: EditorSystemData[], actionFunctions: ActionFunctions): TimeLine {
     const timeline: TimeLine = {
         totalDurationSec: 0,
         totalDurationTO: n2TO(0),
@@ -32,6 +33,7 @@ export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
         sampleractions: [],
         animationactions: [],
         cursoractions: [],
+        genericactions: [],
         notation: {}
     }
 
@@ -52,10 +54,10 @@ export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
             currTime = sysStartTime
             measures.forEach((measure, measureidx) => {
                 const lastMeasure = lastSystem && measureidx == measures.length - 1
-                var cursorPos = 0
+                cursorPos = 0
                 measure.notation.forEach((symbol, symidx) => {
                     const endOfPosition = lastMeasure && symidx == measure.notation.length - 1
-                    if (!isExtension(symbol.s) || endOfPosition) {
+                    if (actionFunctions.play && (!isExtension(symbol.s) || endOfPosition)) {
                         // Encountered a new note symbol, a muting symbol or last symbol for this instrument position.
                         if (currNote) {
                             // Need to close and save the currently 'playing' note.
@@ -70,7 +72,7 @@ export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
                         if (!isExtension(symbol.s) && !isMuting(symbol.s)) {
                             // Create a sampler action for the new note
                             currNote = {
-                                action: 'play',
+                                action: actionFunctions.play,
                                 position: position,
                                 cleanedSymbol: cleanSymbol(symbol.s),
                                 bpm: bpm,
@@ -85,16 +87,29 @@ export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
                             }
                         }
                     }
-                    // Create cursor actions
-                    timeline.cursoractions.push({
-                        time: n2TO(currTime),
-                        system: symbol.system,
-                        section: symbol.section,
-                        position: position,
-                        symbol: symbol.s,
-                        line: 0,
-                        range: [cursorPos, cursorPos + symbol.s.length]
-                    })
+                    // Create cursor actions if the system-section-position combi differs
+                    // from the previous entry
+                    const last =
+                        timeline.cursoractions.length > 0
+                            ? timeline.cursoractions[timeline.cursoractions.length - 1]
+                            : null
+                    const same =
+                        last != null &&
+                        system.id == last.system &&
+                        measureidx == last.section &&
+                        position == last.position
+                    if (actionFunctions.cursor && !same) {
+                        timeline.cursoractions.push({
+                            action: actionFunctions.cursor,
+                            time: n2TO(currTime),
+                            system: system.id,
+                            section: measureidx,
+                            position: position,
+                            symbol: symbol.s,
+                            line: 0,
+                            range: [cursorPos, cursorPos + symbol.s.length]
+                        })
+                    }
                     cursorPos += symbol.s.length
                     currTime += 1
                 })
@@ -103,18 +118,13 @@ export function createTimelineFromEditor(data: EditorSystemData[]): TimeLine {
         maxStaffDuration = Math.max(currTime - sysStartTime, maxStaffDuration)
     })
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
-
+    if (actionFunctions.generic)
+        timeline.genericactions.push({ action: actionFunctions.generic, time: timeline.totalDurationTO })
+    console.log(timeline)
     return timeline
 }
 
-export function scheduleTransport(
-    timeLine: TimeLine | null,
-    play: ((time: number, action: SamplerAction) => void) | null = null,
-    animate: ((time: number, action: AnimationAction) => void) | null = null,
-    cursor: ((time: number, action: CursorAction) => void) | null = null,
-    onEndofSched: ((time: number) => void) | null = null,
-    pbSpeed: number = 1
-) {
+export function scheduleTransport(timeLine: TimeLine | null, pbSpeed: number = 1) {
     // Creates the schedule for the Transport object.
     if (!timeLine) return
 
@@ -122,25 +132,22 @@ export function scheduleTransport(
     Tone.getTransport().cancel()
     Tone.getTransport().seconds = 0
 
-    // tempo and instrument actions (notes)
+    // Tempo and instrument actions (notes)
     // Set the initial tempo to 60 (intro time)
     const tAction: TempoAction = { time: { '16n': 0 }, bpm: timeLine.initialBPM, duration: { '16n': 0 } }
     Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
-    if (play) {
-        timeLine.sampleractions.forEach((sAction: SamplerAction) => {
-            Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)
-            Tone.getTransport().schedule((time) => play(time, sAction), sAction.time)
-        })
-    }
-    if (onEndofSched) {
-        Tone.getTransport().schedule((time) => onEndofSched(time), timeLine.totalDurationTO)
-    }
+    timeLine.sampleractions.forEach((sAction: SamplerAction) => {
+        Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)
+        Tone.getTransport().schedule((time) => sAction.action(time, sAction), sAction.time)
+    })
 
-    // timeline.animationactions.forEach((aAction: AnimationAction) => {
-    //     Tone.getTransport().schedule((time) => animateInstrument(time, aAction), aAction.time)
-    // })
-    // // Schedule cursor actions
-    // timeline.cursoractions.forEach((cAction: CursorAction) => {
-    //     Tone.getTransport().schedule((time) => animateNotation(time, cAction), cAction.time)
-    // })
+    // Cursor actions
+    timeLine.cursoractions.forEach((cAction: CursorAction) => {
+        Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
+    })
+
+    // Action for when end of schedule is reached
+    timeLine.genericactions.forEach((gAction: GenericAction) => {
+        Tone.getTransport().schedule((time) => gAction.action(time), gAction.time)
+    })
 }

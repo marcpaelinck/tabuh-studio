@@ -1,6 +1,14 @@
 import { Accordion, Col, HStack, Placeholder, Row, Text, VStack } from 'rsuite'
 import { IoPlayCircleOutline, IoPlayCircle, IoPauseCircle } from 'react-icons/io5'
-import type { Score, Stave, EditorSystemData, Staffs, PlayBackState } from '../../models/types'
+import type {
+    Score,
+    Stave,
+    EditorSystemData,
+    Staffs,
+    PlayBackState,
+    CursorAction,
+    EditorCellCursor
+} from '../../models/types'
 import {
     createContext,
     useContext,
@@ -22,101 +30,21 @@ import 'rsuite/Row/styles/index.css'
 import 'rsuite/Col/styles/index.css'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { editorInitialExpandState, editorSortingOrder, positionConfigs } from '../../config/config'
-import { NavigationGrid, NavigationInputCell } from '../ControlledGrid/NavigationGrid'
+import { NavigationGrid } from '../ControlledGrid/NavigationGrid'
 import { getValidSymbols } from '../../utils/alphabet'
 import { useInstruments } from '../../hooks/useInstruments'
 import { createTimelineFromEditor, scheduleTransport } from '../../hooks/createSchedule'
 import * as Tone from 'tone'
-import { FaPause, FaPlay } from 'react-icons/fa'
+import { NavigationCell } from '../ControlledGrid/NavigationCell'
+import { AudioFunctions, type AudioFunctionsType } from './contexts'
+import { noCursor } from '../ControlledGrid/constants'
+import { SystemDetails } from './SystemGrid'
 
 var uniqueKeyValue = 0
-
-export interface AudioFunctionsType {
-    playPause: (doPlay: boolean, data?: EditorSystemData[]) => void
-}
-
-const defaultAudioFunc: AudioFunctionsType = { playPause: (doPlay: boolean, data?: EditorSystemData[]) => {} }
 
 function uniqueKey(): number {
     uniqueKeyValue += 1
     return uniqueKeyValue
-}
-
-const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
-
-// Contains the editable notation of one system (gongan)
-function SystemDetails({
-    systemData,
-    pbState,
-    setPbState
-}: {
-    systemData: EditorSystemData
-    pbState: PlayBackState
-    setPbState: Dispatch<PlayBackState>
-}): ReactNode {
-    const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
-    const [playbackActive, setPlaybackActive] = useState<boolean>(false)
-
-    function playPauseClicked() {
-        if (!playbackActive) {
-            audioFunc.playPause(true, [systemData])
-            setPbState('playing')
-            setPlaybackActive(true)
-        } else {
-            audioFunc.playPause(!(pbState == 'playing'))
-            setPbState(pbState == 'playing' ? 'paused' : 'playing')
-        }
-    }
-
-    const staffNodes = Object.entries(systemData.staffs).map(([pos, staves], pidx) => {
-        const staveNodes = staves.map((stave: Stave, sidx: number) => {
-            const width: string = getTextWidthInPx('x'.repeat(systemData.colWidths[sidx]), 14) + 15 + 'px'
-            const validSymbols: string[] = getValidSymbols(pos, true)
-            return (
-                <Col id={`COL-${pidx * 100 + sidx}`} key={pidx * 100 + sidx} span="auto">
-                    <NavigationInputCell
-                        key={pidx * 100 + sidx}
-                        posId={pidx}
-                        secId={sidx}
-                        validSymbols={validSymbols}
-                        defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
-                        style={{ width: width }}
-                        className={`balifont10 h-5 resize-none overflow-clip p-0`}
-                        spellCheck="false"
-                    />
-                </Col>
-            )
-        })
-
-        return (
-            <Row id={`ROW-${systemData.id}-${pos}`}>
-                <Col id={`COL-${systemData.id}-POS`} span="auto">
-                    <Text as="div" className="w-40 h-5">
-                        {positionConfigs[pos].name}
-                    </Text>
-                </Col>
-                {staveNodes}
-            </Row>
-        )
-    })
-
-    return (
-        <>
-            <HStack>
-                <button onClick={playPauseClicked}>
-                    {pbState == 'playing' ? (
-                        <IoPlayCircle color="orange" size="2em" />
-                    ) : pbState == 'paused' ? (
-                        <IoPauseCircle color="orange" size="2em" />
-                    ) : (
-                        <IoPlayCircleOutline color="gray" size="2em" />
-                    )}
-                </button>
-            </HStack>
-
-            <VStack>{staffNodes}</VStack>
-        </>
-    )
 }
 
 export default function EditorWindow({
@@ -137,6 +65,7 @@ export default function EditorWindow({
     const { playInstrument, muteAll } = useInstruments(focusRef, 0)
     const [playbackState, setPlaybackState] = useState<PlayBackState>('stopped')
     const audioFunctions: AudioFunctionsType = { playPause: playPause }
+    const [cursor, setCursor] = useState<EditorCellCursor>(noCursor)
 
     function flipExpanded(id: number) {
         const newExpanded = {}
@@ -148,6 +77,12 @@ export default function EditorWindow({
         Tone.getTransport().stop()
         Tone.getTransport().seconds = 0
         setPlaybackState('stopped')
+        setCursor(noCursor)
+    }
+
+    function moveCursor(time: number, cAction: CursorAction) {
+        setCursor({ system: cAction.system, position: cAction.position, measure: cAction.section })
+        console.log(`setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`)
     }
 
     async function playPause(doPlay: boolean, data?: EditorSystemData[]) {
@@ -156,8 +91,14 @@ export default function EditorWindow({
             await Tone.loaded()
         }
         if (data) {
-            const timeLine = createTimelineFromEditor(data)
-            scheduleTransport(timeLine, playInstrument, null, null, onEndOfPlayback)
+            const timeLine = createTimelineFromEditor(data, {
+                play: playInstrument,
+                animate: null,
+                // cursor: moveCursor,
+                cursor: moveCursor,
+                generic: onEndOfPlayback
+            })
+            scheduleTransport(timeLine)
         }
         // Tone.getTransport().start()
         if (doPlay) {
@@ -211,6 +152,8 @@ export default function EditorWindow({
                 <NavigationGrid
                     playInstrument={playInstrument}
                     id={`GRID-4(${systemData.id})`}
+                    systemData={systemData}
+                    cursorMovement={cursor}
                     fluid={false}
                     className="ml-0">
                     <SystemDetails systemData={systemData} pbState={playbackState} setPbState={setPlaybackState} />

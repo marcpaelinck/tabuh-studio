@@ -1,10 +1,10 @@
 import * as Tone from 'tone'
-import type { SamplerAction } from '../models/types'
+import type { SamplerAction, TempoAction } from '../models/types'
 
 export function useInterpretations() {
-    const changeTempo: (time: number, action: SamplerAction, pbSpeed: number) => void = (
+    const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
         time: number,
-        action: SamplerAction,
+        action: TempoAction | SamplerAction,
         pbSpeed: number
     ) => {
         if (action.bpm != undefined) {
