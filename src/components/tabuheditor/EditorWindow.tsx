@@ -5,12 +5,11 @@ import 'rsuite/Grid/styles/index.css'
 import type { Score, EditorSystemData, Staffs, PlayBackState, CursorAction, EditorCellCursor } from '../../models/types'
 import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
-import { NavigationGrid } from './NavigationGrid'
 import { useInstruments } from '../../hooks/useInstruments'
 import { createTimelineFromEditor, scheduleTransport } from '../../hooks/createSchedule'
 import * as Tone from 'tone'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
-import { SystemDetails } from './SystemGrid'
+import { SystemGrid } from './SystemGrid'
 import { noCursor } from './_constants'
 
 var uniqueKeyValue = 0
@@ -122,15 +121,12 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(systemData.id)
                 }}>
-                <NavigationGrid
-                    playInstrument={playInstrument}
-                    id={`GRID-4(${systemData.id})`}
+                <SystemGrid
                     systemData={systemData}
+                    pbState={playbackState}
+                    setPbState={setPlaybackState}
                     cursorMovement={cursor}
-                    fluid={false}
-                    className="ml-0">
-                    <SystemDetails systemData={systemData} pbState={playbackState} setPbState={setPlaybackState} />
-                </NavigationGrid>
+                />
             </Accordion.Panel>
         )
     })

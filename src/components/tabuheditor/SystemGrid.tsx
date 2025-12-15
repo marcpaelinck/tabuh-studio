@@ -1,25 +1,35 @@
-import { useContext, useState, type Dispatch, type ReactNode } from 'react'
-import type { EditorSystemData, PlayBackState, Stave } from '../../models/types'
-import { AudioFunctions, type AudioFunctionsType } from './contexts'
+import { useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type RefObject } from 'react'
+import type { EditorCellCursor, EditorSystemData, PlayBackState, Stave } from '../../models/types'
+import { AudioFunctions, NavigationFunctions, type AudioFunctionsType } from './contexts'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { getValidSymbols } from '../../utils/alphabet'
 import { NavigationCell } from './NavigationCell'
-import { Col, HStack, Row, Text, VStack } from 'rsuite'
+import { Col, Grid, HStack, Row, Text, VStack } from 'rsuite'
 import { IoPauseCircle, IoPlayCircle, IoPlayCircleOutline } from 'react-icons/io5'
-import { positionConfigs } from '../../config/config'
+import { positionConfigs, type NavigationAction } from '../../config/config'
+import type { GridInfo, NavigationFunctionsType } from './_types'
+import { noCursor } from './_constants'
+import _ from 'lodash'
 
 // Contains the editable notation of one system (gongan)
-export function SystemDetails({
+export function SystemGrid({
     systemData,
     pbState,
-    setPbState
+    setPbState,
+    cursorMovement,
+    ...props
 }: {
     systemData: EditorSystemData
     pbState: PlayBackState
     setPbState: Dispatch<PlayBackState>
+    cursorMovement: EditorCellCursor
 }): ReactNode {
     const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
     const [playbackActive, setPlaybackActive] = useState<boolean>(false)
+    const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
+    const nullpointer = useRef<HTMLTextAreaElement | null>(null)
+    const [currCursor, setCurrCursor] = useState<EditorCellCursor>(noCursor)
+    const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
 
     function playPauseClicked() {
         if (!playbackActive) {
@@ -29,6 +39,77 @@ export function SystemDetails({
         } else {
             audioFunc.playPause(!(pbState == 'playing'))
             setPbState(pbState == 'playing' ? 'paused' : 'playing')
+        }
+    }
+
+    function highlight(cell: HTMLTextAreaElement, on: boolean) {
+        const props = ['border-1', 'border-solid', 'border-red-500']
+        props.forEach((prop) => {
+            if (on && !cell.classList.contains(prop)) cell.classList.add(prop)
+            if (!on && cell.classList.contains(prop)) cell.classList.remove(prop)
+        })
+    }
+    const logging: boolean = false
+
+    useEffect(() => {
+        if (cursorMovement.system != systemData.id) return
+        if (_.isEqual(cursorMovement, currCursor)) {
+            if (logging) console.log(`no change from ${currCursor.position}-${currCursor.measure}`)
+            return
+        }
+        if (logging)
+            console.log(
+                `yes change from ${currCursor.position}-${currCursor.measure} to ${cursorMovement.position}-${cursorMovement.measure}`
+            )
+        const currTextArea = _.isEqual(currCursor, noCursor)
+            ? null
+            : grid.current.cells[posToRow[currCursor.position]][currCursor.measure].current
+        if (currTextArea) highlight(currTextArea, false)
+        const textArea = grid.current.cells[posToRow[cursorMovement.position]][cursorMovement.measure].current
+        if (textArea) highlight(textArea, true)
+        setCurrCursor(cursorMovement)
+    }, [cursorMovement])
+
+    const navigationFunctions: NavigationFunctionsType = {
+        register: registerComponent,
+        navigate: navigate,
+        updateSystemData: (data: EditorSystemData) => {}
+    }
+
+    function registerComponent(row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) {
+        if (!element) {
+            throw new Error('Missing element')
+        }
+        // console.log(`registering ${row}, ${col}`)
+        if (!(row in grid.current.cells)) grid.current.cells[row] = {}
+        grid.current.cells[row][col] = element
+        grid.current.maxRowId = Math.max(row, grid.current.maxRowId)
+        grid.current.maxColId = Math.max(col, grid.current.maxColId)
+        // console.log(`registering cell (${grid.current.rowCount}, ${grid.current.colCount})`)
+    }
+    // Returns neighbouring cell (above, below, left, right, row start, row end)
+    function navigate(action: NavigationAction, row: number, col: number) {
+        switch (action) {
+            case 'cellup':
+                if (row > 0) return grid.current.cells[row - 1][col]
+                return nullpointer
+            case 'celldown':
+                if (row + 1 in grid.current.cells) return grid.current.cells[row + 1][col]
+                return nullpointer
+            case 'cellleft':
+                if (col > 0) return grid.current.cells[row][col - 1]
+                return nullpointer
+            case 'cellright':
+                if (col + 1 in grid.current.cells[row]) return grid.current.cells[row][col + 1]
+                return nullpointer
+            case 'rowstart':
+                return grid.current.cells[row][0]
+            case 'rowend':
+                return grid.current.cells[row][grid.current.maxColId]
+            case 'firstrow':
+                return grid.current.cells[0][col]
+            case 'lastrow':
+                return grid.current.cells[grid.current.maxRowId][col]
         }
     }
 
@@ -78,7 +159,11 @@ export function SystemDetails({
                 </button>
             </HStack>
 
-            <VStack>{staffNodes}</VStack>
+            <NavigationFunctions value={navigationFunctions}>
+                <Grid>
+                    <VStack>{staffNodes}</VStack>
+                </Grid>
+            </NavigationFunctions>
         </>
     )
 }
