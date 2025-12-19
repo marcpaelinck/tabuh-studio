@@ -94,7 +94,10 @@ function getValids(validSymbols: string[]): [RegExp, RegExpDict, string[]] {
 }
 
 const match = (event: SearchRecord, action: ActionRecord) => {
-    const keysMatch = event.keys.length === action.keys.length && event.keys.every((x) => action.keys.includes(x))
+    const keysMatch =
+        event.keys.length === action.keys.length &&
+        event.keys.every((x) => action.keys.includes(x)) &&
+        action.keys.every((x) => event.keys.includes(x))
     if (!keysMatch) return false
     const leftMatch = !action.left || action.left.test(event.left)
     if (!leftMatch) return false
