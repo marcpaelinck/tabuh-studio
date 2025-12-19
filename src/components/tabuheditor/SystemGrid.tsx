@@ -7,21 +7,24 @@ import { NavigationCell } from './NavigationCell'
 import { Col, Grid, HStack, Row, Text, VStack } from 'rsuite'
 import { IoPauseCircle, IoPlayCircle, IoPlayCircleOutline } from 'react-icons/io5'
 import { positionConfigs, type NavigationAction } from '../../config/config'
-import type { GridInfo, NavigationFunctionsType } from './_types'
+import type { NavigationFunctionsType } from './_types'
 import { noCursor } from './_constants'
 import _ from 'lodash'
+
+type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
+type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
 
 // Contains the editable notation of one system (gongan)
 export function SystemGrid({
     systemData,
-    pbState,
-    setPbState,
+    playbackState,
+    setPlaybackState,
     cursorMovement,
     ...props
 }: {
     systemData: EditorSystemData
-    pbState: PlayBackState
-    setPbState: Dispatch<PlayBackState>
+    playbackState: PlayBackState
+    setPlaybackState: Dispatch<PlayBackState>
     cursorMovement: EditorCellCursor
 }): ReactNode {
     const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
@@ -34,11 +37,11 @@ export function SystemGrid({
     function playPauseClicked() {
         if (!playbackActive) {
             audioFunc.playPause(true, [systemData])
-            setPbState('playing')
+            setPlaybackState('playing')
             setPlaybackActive(true)
         } else {
-            audioFunc.playPause(!(pbState == 'playing'))
-            setPbState(pbState == 'playing' ? 'paused' : 'playing')
+            audioFunc.playPause(!(playbackState == 'playing'))
+            setPlaybackState(playbackState == 'playing' ? 'paused' : 'playing')
         }
     }
 
@@ -121,8 +124,8 @@ export function SystemGrid({
                 <Col id={`COL-${pidx * 100 + sidx}`} key={pidx * 100 + sidx} span="auto">
                     <NavigationCell
                         key={pidx * 100 + sidx}
-                        posId={pidx}
-                        secId={sidx}
+                        rowId={pidx}
+                        colId={sidx}
                         validSymbols={validSymbols}
                         defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
                         style={{ width: width }}
@@ -149,9 +152,9 @@ export function SystemGrid({
         <>
             <HStack>
                 <button onClick={playPauseClicked}>
-                    {pbState == 'playing' ? (
+                    {playbackState == 'playing' ? (
                         <IoPlayCircle color="orange" size="2em" />
-                    ) : pbState == 'paused' ? (
+                    ) : playbackState == 'paused' ? (
                         <IoPauseCircle color="orange" size="2em" />
                     ) : (
                         <IoPlayCircleOutline color="gray" size="2em" />

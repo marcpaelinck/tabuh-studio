@@ -123,8 +123,8 @@ export default function EditorWindow({
                 }}>
                 <SystemGrid
                     systemData={systemData}
-                    pbState={playbackState}
-                    setPbState={setPlaybackState}
+                    playbackState={playbackState}
+                    setPlaybackState={setPlaybackState}
                     cursorMovement={cursor}
                 />
             </Accordion.Panel>
@@ -132,10 +132,12 @@ export default function EditorWindow({
     })
 
     return (
-        <div className="w-full">
-            <AudioFunctions value={audioFunctions}>
-                {loading || processing ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion>{systems}</Accordion>}
-            </AudioFunctions>
-        </div>
+        <AudioFunctions value={audioFunctions}>
+            {loading || processing ? (
+                <Placeholder.Grid rows={12} columns={6} />
+            ) : (
+                <Accordion className="w-full">{systems}</Accordion>
+            )}
+        </AudioFunctions>
     )
 }

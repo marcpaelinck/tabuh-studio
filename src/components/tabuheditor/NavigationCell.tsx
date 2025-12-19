@@ -1,18 +1,24 @@
-import { useContext, useEffect, useRef, type ChangeEvent } from 'react'
-import type { NavigationCellProps, NavigationFunctionsType } from './_types'
+import { useContext, useEffect, useRef, type ChangeEvent, type HTMLProps } from 'react'
+import type { NavigationFunctionsType } from './_types'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
 import { NavigationFunctions } from './contexts'
 
-export function NavigationCell({ posId, secId, validSymbols, ...props }: NavigationCellProps) {
+interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
+    rowId: number
+    colId: number
+    validSymbols: string[]
+}
+
+export function NavigationCell({ rowId, colId, validSymbols, ...props }: NavigationCellProps) {
     const ref = useRef<HTMLTextAreaElement>(null)
     const navFunc: NavigationFunctionsType = useContext(NavigationFunctions)
     const [keyboardListener] = useKeyboardListener(ref, validSymbols, (action: NavigationAction) =>
-        navFunc.navigate(action, posId, secId)
+        navFunc.navigate(action, rowId, colId)
     )
 
     useEffect(() => {
-        navFunc.register(posId, secId, ref)
+        navFunc.register(rowId, colId, ref)
     }, [])
 
     function onFocus(on: boolean) {
