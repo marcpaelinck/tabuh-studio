@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, type Dispatch, type RefObject } from 'react'
+import { useCallback, useMemo, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
     AVERAGE_ATTACK_DELAY,
@@ -11,12 +11,12 @@ import {
     BaseNote
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import { DebugContext } from '../App'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 import type { SamplerAction } from '../models/types'
+import { debug } from '../utils/debugger'
 
 export type InstrumentSampler = {
-    play: (time: number, action: SamplerAction, focus: string[], debug: Dispatch<string>) => void
+    play: (time: number, action: SamplerAction, focus: string[]) => void
     mute: (time: number) => void
 }
 
@@ -84,12 +84,15 @@ const createInstrument = (
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
-        play: (time: number, action: SamplerAction, currentFocus: string[], debug) => {
+        play: (time: number, action: SamplerAction, currentFocus: string[]) => {
             const dimValue =
                 currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
+            debug(
+                `focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`,
+                createInstrument.name
+            )
             const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = action.duration
@@ -102,7 +105,7 @@ const createInstrument = (
                 try {
                     sampler?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
                 } catch {
-                    console.log(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
+                    console.error(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
                 }
             }
         },
@@ -111,8 +114,6 @@ const createInstrument = (
 }
 
 export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: number = defaultOutroTime) => {
-    const debug: Dispatch<string> = useContext(DebugContext)
-
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -133,17 +134,13 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: 
         time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
     const playInstrument = useCallback((time: number, action: SamplerAction) => {
-        // console.log(
-        //     `playing ${action.position} ${action.cleanedSymbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
-        // )
+        debug(
+            `playing ${action.position} ${action.cleanedSymbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`,
+            playInstrument.name
+        )
         if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
         else {
-            instrumentSamplers[action.position].play(
-                random_attack_deviation(time),
-                action,
-                currentFocusRef.current,
-                debug
-            )
+            instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocusRef.current)
         }
     }, [])
 

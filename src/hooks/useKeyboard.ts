@@ -1,6 +1,7 @@
 import { type RefObject } from 'react'
 import { type NavigationAction } from '../config/config'
 import _ from 'lodash'
+import { debug } from '../utils/debugger'
 
 type KeyType =
     | 'ArrowUp'
@@ -110,7 +111,7 @@ export const useKeyboardListener = (
     const [validRegExp, validRegExpByLength, validKeystrokes] = getValids(validSymbols)
 
     function keyboardListener(event: KeyboardEvent) {
-        // console.log(`${event.code} ${event.ctrlKey} ${target.selectionEnd}`)
+        debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`, keyboardListener.name)
         // Check that target exists
         if (!ref.current || event.target !== ref.current) return
         const target = ref.current
@@ -134,7 +135,7 @@ export const useKeyboardListener = (
         // Find a matching keyAction record and perform the corresponding key action if found
         for (const keyAction of keyActions) {
             if (match(eventRecord, keyAction)) {
-                // console.log('pass')
+                debug('pass', keyboardListener.name)
                 event.preventDefault()
 
                 if (keyAction.action[0] == 'insert') {
@@ -142,20 +143,23 @@ export const useKeyboardListener = (
                         target.setRangeText(keyAction.action[1])
                         target.selectionStart += 1
                         target.selectionEnd = target.selectionStart
-                        // console.log(`INSERT ${a.action[1]}`)
-                    } else console.log('unexpected null keyAction value(s)')
+                        debug(`INSERT ${keyAction.action[1]}`, keyboardListener.name)
+                    } else debug('unexpected null keyAction value(s)', keyboardListener.name)
                     break
                 }
                 if (keyAction.action[0] == 'pop-left') {
                     if (keyAction.action.length > 1 && keyAction.action[1] != null) {
                         target.selectionStart -= keyAction.action[1]
-                        // console.log(`REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
+                        debug(
+                            `REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`,
+                            keyboardListener.name
+                        )
                         target.setRangeText('')
-                    } else console.log('unexpected null keyAction value(s)')
+                    } else debug('unexpected null keyAction value(s)', keyboardListener.name)
                     break
                 }
                 if (keyAction.action[0] == 'ignore') {
-                    // console.log('IGNORE')
+                    debug('IGNORE', keyboardListener.name)
                     break
                 }
                 if (

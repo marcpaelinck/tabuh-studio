@@ -22,6 +22,7 @@ import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
 import { panggulDefaultOption } from './Animation'
+import { debug } from '../../utils/debugger'
 
 type AudioState = 'false' | 'true' | 'wait'
 
@@ -104,7 +105,7 @@ export default function ScorePlayer({
         Tone.getTransport().cancel()
         Tone.getTransport().seconds = 0
 
-        console.log(`Creating schedule for ${score?.title}`)
+        debug(`Creating schedule for ${score?.title}`, ScorePlayer.name)
 
         // tempo and instrument actions (notes)
         // Set the initial tempo to 60 (intro time)

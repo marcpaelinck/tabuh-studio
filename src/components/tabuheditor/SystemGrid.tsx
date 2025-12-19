@@ -10,6 +10,7 @@ import { positionConfigs, type NavigationAction } from '../../config/config'
 import type { NavigationFunctionsType } from './_types'
 import { noCursor } from './_constants'
 import _ from 'lodash'
+import { debug } from '../../utils/debugger'
 
 type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
 type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
@@ -57,12 +58,13 @@ export function SystemGrid({
     useEffect(() => {
         if (cursorMovement.system != systemData.id) return
         if (_.isEqual(cursorMovement, currCursor)) {
-            if (logging) console.log(`no change from ${currCursor.position}-${currCursor.measure}`)
+            if (logging) debug(`no change from ${currCursor.position}-${currCursor.measure}`, SystemGrid.name)
             return
         }
         if (logging)
-            console.log(
-                `yes change from ${currCursor.position}-${currCursor.measure} to ${cursorMovement.position}-${cursorMovement.measure}`
+            debug(
+                `yes change from ${currCursor.position}-${currCursor.measure} to ${cursorMovement.position}-${cursorMovement.measure}`,
+                SystemGrid.name
             )
         const currTextArea = _.isEqual(currCursor, noCursor)
             ? null
@@ -83,12 +85,12 @@ export function SystemGrid({
         if (!element) {
             throw new Error('Missing element')
         }
-        // console.log(`registering ${row}, ${col}`)
+        // debug(`registering ${row}, ${col}`, SystemGrid.name)
         if (!(row in grid.current.cells)) grid.current.cells[row] = {}
         grid.current.cells[row][col] = element
         grid.current.maxRowId = Math.max(row, grid.current.maxRowId)
         grid.current.maxColId = Math.max(col, grid.current.maxColId)
-        // console.log(`registering cell (${grid.current.rowCount}, ${grid.current.colCount})`)
+        // debug(`registering cell (${grid.current.rowCount}, ${grid.current.colCount})`, SystemGrid.name)
     }
     // Returns neighbouring cell (above, below, left, right, row start, row end)
     function navigate(action: NavigationAction, row: number, col: number) {

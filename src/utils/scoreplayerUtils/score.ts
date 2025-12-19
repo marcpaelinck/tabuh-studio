@@ -203,7 +203,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                     timeuntilMs: timeUntilMs
                 })
                 // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
-                // console.log(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
+                // debug(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `, createTimeline.name)
             })
         }
     })

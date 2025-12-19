@@ -30,7 +30,7 @@ async function sanityCheck() {
         if (!found) logMessage += `X ${filename} not found in ${SOUNDS_FOLDER}\n`
         // else console.log(`V ${filename} found in ${SOUNDS_FOLDER}`)
     }
-    if (logMessage) console.log(logMessage)
+    if (logMessage) console.error(logMessage)
 }
 if (doSanityCheck) sanityCheck()
 

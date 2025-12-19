@@ -9,6 +9,7 @@ import type {
     SVGInfo
 } from '../models/types'
 import { animationConfig, colorRGB } from '../config/config'
+import { debug } from '../utils/debugger'
 
 const moveToDuration = 500 // duration of the movement to the next key
 const strikeDuration = 600 // duration of the stroke
@@ -46,12 +47,6 @@ async function highlightNote(keyElement: Element, note: AnimationNote, positionI
     animation.play()
 }
 
-//TODO implement
-const debugList: string[] = []
-const logConsole = (msg: string, caller: string) => {
-    if (debugList.includes(caller)) console.log(msg)
-}
-
 function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: number) {
     var keyframes, options
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnotes)
@@ -63,7 +58,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
 
     if (action.currnotes.length > 0 && action.currnotes[0].isLast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
-        logConsole('last note', 'helpinghand')
+        debug('last note', animatePanggul.name)
         keyframes = [
             {
                 // Start where the previous animation ended: the moment the key is struck
@@ -78,7 +73,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
         options = { duration: strikeDuration, fill: 'forwards', easing: bezier, composite: 'replace' }
     } else {
         if (!action.nextnotes) {
-            console.log('ERROR in panggul animation: next note not defined but current note is not last.')
+            console.error('ERROR in panggul animation: next note not defined but current note is not last.')
             return
         }
         // var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
@@ -137,7 +132,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
             a.commitStyles() // Persist the final position of the animation
         } catch (exception) {
             // Happens when user switches intrument during animation: animation's target does not exist any more
-            logConsole('switching instrument during animation', 'helpinghand')
+            debug('switching instrument during animation', animatePanggul.name)
         }
         a.cancel()
     })

@@ -11,6 +11,7 @@ import * as Tone from 'tone'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
 import { SystemGrid } from './SystemGrid'
 import { noCursor } from './_constants'
+import { debug } from '../../utils/debugger'
 
 var uniqueKeyValue = 0
 
@@ -54,7 +55,10 @@ export default function EditorWindow({
 
     function moveCursor(time: number, cAction: CursorAction) {
         setCursor({ system: cAction.system, position: cAction.position, measure: cAction.section })
-        console.log(`setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`)
+        debug(
+            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
+            EditorWindow.name
+        )
     }
 
     async function playPause(doPlay: boolean, data?: EditorSystemData[]) {
@@ -105,7 +109,7 @@ export default function EditorWindow({
             }
             newData.push(summary)
         })
-        console.log(newData)
+        debug(newData, EditorWindow.name)
         setData(newData)
         const initExpandState = Object.fromEntries(newData.map((sysInfo) => [sysInfo.id, editorInitialExpandState]))
         setExpanded(initExpandState)

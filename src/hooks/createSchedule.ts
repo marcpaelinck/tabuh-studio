@@ -12,6 +12,7 @@ import type {
 import { n2TO, TO2n } from '../utils/timeunits'
 import { cleanSymbol } from '../utils/alphabet'
 import { isExtension, isMuting } from '../config/configfunctions'
+import { debug } from '../utils/debugger'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,
@@ -120,7 +121,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
     if (actionFunctions.generic)
         timeline.genericactions.push({ action: actionFunctions.generic, time: timeline.totalDurationTO })
-    console.log(timeline)
+    debug(timeline, createTimelineFromEditor.name)
     return timeline
 }
 

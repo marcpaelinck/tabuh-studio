@@ -3,6 +3,7 @@ import type { NavigationFunctionsType } from './_types'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
 import { NavigationFunctions } from './contexts'
+import { debug } from '../../utils/debugger'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     rowId: number
@@ -27,7 +28,7 @@ export function NavigationCell({ rowId, colId, validSymbols, ...props }: Navigat
     }
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        console.log('changed')
+        debug('changed', NavigationCell.name)
     }
 
     return (

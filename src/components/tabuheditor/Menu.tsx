@@ -6,6 +6,7 @@ import 'rsuite/ButtonToolbar/styles/index.css'
 import type { MenuItemInfo } from '../../models/types'
 import { createTabuhMenuItems, tabuhDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import Selector from '../Selector'
+import { debug } from '../../utils/debugger'
 
 export default function Menu({
     menuDisabled,
@@ -30,7 +31,7 @@ export default function Menu({
         const strValue = Array.isArray(item.value)
             ? item.value.reduce((aggr, val) => aggr + (aggr ? ', ' : '') + val, '[') + ']'
             : item.value
-        console.log(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
+        debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`, Menu.name)
     }
 
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
