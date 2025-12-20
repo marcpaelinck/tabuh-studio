@@ -1,0 +1,84 @@
+import { Col, Row, Text } from 'rsuite'
+import { getTextWidthInPx } from '../../utils/measurements'
+import { MeasureNode } from './MeasureNode'
+import { getValidSymbols } from '../../utils/alphabet'
+import { positionConfigs } from '../../config/config'
+import type { EditorCellCursor, AudioState, Measure } from '../../models/types'
+import { noCursor } from './_constants'
+import { useEffect, useState } from 'react'
+import type { GridRowInfo } from './_types'
+import _ from 'lodash'
+import type { PlaybackState } from '../../hooks/playbackReducer'
+
+export function StaffNode({
+    systemId,
+    position,
+    rowId,
+    measures,
+    colWidths,
+    gridRow,
+    playbackState
+}: {
+    systemId: number
+    position: string
+    rowId: number
+    measures: Measure[]
+    colWidths: number[]
+    gridRow: GridRowInfo
+    playbackState: PlaybackState
+}) {
+    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
+
+    function highlight(cell: HTMLTextAreaElement, on: boolean) {
+        const props = ['border-1', 'border-solid', 'border-red-500']
+        props.forEach((prop) => {
+            if (on && !cell.classList.contains(prop)) cell.classList.add(prop)
+            if (!on && cell.classList.contains(prop)) cell.classList.remove(prop)
+        })
+    }
+
+    // Updates the cell highlight during playback
+    useEffect(() => {
+        if (highlightedCell == noCursor && playbackState.cursor.system != systemId) return
+        if (_.isEqual(playbackState.cursor, highlightedCell)) {
+            return
+        }
+        const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current
+        if (currTextArea) highlight(currTextArea, false)
+        if (playbackState.cursor != noCursor) {
+            const textArea = gridRow[playbackState.cursor.measure].current
+            if (textArea) highlight(textArea, true)
+            setHighlightedCell(playbackState.cursor)
+        }
+    }, [playbackState])
+
+    const measureNodes = measures.map((measure: Measure, sidx: number) => {
+        const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
+        const validSymbols: string[] = getValidSymbols(position, true)
+        return (
+            <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
+                <MeasureNode
+                    key={rowId * 100 + sidx}
+                    rowId={rowId}
+                    colId={sidx}
+                    validSymbols={validSymbols}
+                    defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
+                    style={{ width: width }}
+                    className={`balifont10 h-5 resize-none overflow-clip p-0`}
+                    spellCheck="false"
+                />
+            </Col>
+        )
+    })
+
+    return (
+        <Row id={`ROW-${position}`}>
+            <Col id={`COL-POSITION`} span="auto">
+                <Text as="div" className="w-40 h-5">
+                    {positionConfigs[position].name}
+                </Text>
+            </Col>
+            {measureNodes}
+        </Row>
+    )
+}

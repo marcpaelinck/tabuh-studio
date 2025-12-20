@@ -12,3 +12,6 @@ export interface NavigationFunctionsType {
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
     updateSystemData: (data: EditorSystemData) => void
 }
+
+export type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
+export type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }

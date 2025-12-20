@@ -11,7 +11,7 @@ interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     validSymbols: string[]
 }
 
-export function NavigationCell({ rowId, colId, validSymbols, ...props }: NavigationCellProps) {
+export function MeasureNode({ rowId, colId, validSymbols, ...props }: NavigationCellProps) {
     const ref = useRef<HTMLTextAreaElement>(null)
     const navFunc: NavigationFunctionsType = useContext(NavigationFunctions)
     const [keyboardListener] = useKeyboardListener(ref, validSymbols, (action: NavigationAction) =>
@@ -28,7 +28,7 @@ export function NavigationCell({ rowId, colId, validSymbols, ...props }: Navigat
     }
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-        debug('changed', NavigationCell.name)
+        debug('changed', MeasureNode.name)
     }
 
     return (

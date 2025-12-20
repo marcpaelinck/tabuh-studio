@@ -1,38 +1,25 @@
-import {
-    useContext,
-    useEffect,
-    useReducer,
-    useRef,
-    useState,
-    type Dispatch,
-    type ReactNode,
-    type RefObject
-} from 'react'
-import type { CursorAction, EditorCellCursor, EditorSystemData, PlayBackState, Stave } from '../../models/types'
+import { useContext, useEffect, useReducer, useRef, useState, type ReactNode, type RefObject } from 'react'
+import type { CursorAction, EditorCellCursor, EditorSystemData } from '../../models/types'
 import { AudioFunctions, NavigationFunctions, type AudioFunctionsType } from './contexts'
-import { getTextWidthInPx } from '../../utils/measurements'
-import { getValidSymbols } from '../../utils/alphabet'
-import { NavigationCell } from './NavigationCell'
 import { Col, Grid, HStack, Row, Text, VStack } from 'rsuite'
 import { IoPauseCircle, IoPlayCircle, IoPlayCircleOutline } from 'react-icons/io5'
-import { positionConfigs, type NavigationAction } from '../../config/config'
-import type { NavigationFunctionsType } from './_types'
+import { type NavigationAction } from '../../config/config'
+import type { GridInfo, NavigationFunctionsType } from './_types'
 import { noCursor } from './_constants'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
 import { playBack } from '../../hooks/playbackReducer'
-
-type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
-type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
+import { StaffNode } from './StaffNode'
 
 // Contains the editable notation of one system (gongan)
-export function SystemGrid({ systemData, ...props }: { systemData: EditorSystemData }): ReactNode {
+export function SystemNode({ systemData, ...props }: { systemData: EditorSystemData }): ReactNode {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
     const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
+
+    if ([1, 13].includes(systemData.id)) debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
 
     async function stopPlayback(time: number) {
         playback({ type: 'stop' })
@@ -46,7 +33,7 @@ export function SystemGrid({ systemData, ...props }: { systemData: EditorSystemD
         })
         debug(
             `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
-            SystemGrid.name
+            SystemNode.name
         )
     }
 
@@ -61,38 +48,6 @@ export function SystemGrid({ systemData, ...props }: { systemData: EditorSystemD
         if (playbackState.audioState == 'playing') playback({ type: 'pause' })
         else playback({ type: 'play' })
     }
-
-    function highlight(cell: HTMLTextAreaElement, on: boolean) {
-        const props = ['border-1', 'border-solid', 'border-red-500']
-        props.forEach((prop) => {
-            if (on && !cell.classList.contains(prop)) cell.classList.add(prop)
-            if (!on && cell.classList.contains(prop)) cell.classList.remove(prop)
-        })
-    }
-    const logging: boolean = false
-
-    useEffect(() => {
-        if (highlightedCell == noCursor && playbackState.cursor.system != systemData.id) return
-        if (_.isEqual(playbackState.cursor, highlightedCell)) {
-            if (logging) debug(`no change from ${highlightedCell.position}-${highlightedCell.measure}`, SystemGrid.name)
-            return
-        }
-        if (logging)
-            debug(
-                `yes change from ${highlightedCell.position}-${highlightedCell.measure} to ${playbackState.cursor.position}-${playbackState.cursor.measure}`,
-                SystemGrid.name
-            )
-        const currTextArea = _.isEqual(highlightedCell, noCursor)
-            ? null
-            : grid.current.cells[posToRow[highlightedCell.position]][highlightedCell.measure].current
-        if (currTextArea) highlight(currTextArea, false)
-        if (playbackState.cursor != noCursor) {
-            const textArea =
-                grid.current.cells[posToRow[playbackState.cursor.position]][playbackState.cursor.measure].current
-            if (textArea) highlight(textArea, true)
-            setHighlightedCell(playbackState.cursor)
-        }
-    }, [playbackState])
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -137,35 +92,17 @@ export function SystemGrid({ systemData, ...props }: { systemData: EditorSystemD
         }
     }
 
-    const staffNodes = Object.entries(systemData.staffs).map(([pos, staves], pidx) => {
-        const staveNodes = staves.map((stave: Stave, sidx: number) => {
-            const width: string = getTextWidthInPx('x'.repeat(systemData.colWidths[sidx]), 14) + 15 + 'px'
-            const validSymbols: string[] = getValidSymbols(pos, true)
-            return (
-                <Col id={`COL-${pidx * 100 + sidx}`} key={pidx * 100 + sidx} span="auto">
-                    <NavigationCell
-                        key={pidx * 100 + sidx}
-                        rowId={pidx}
-                        colId={sidx}
-                        validSymbols={validSymbols}
-                        defaultValue={stave.notation.map((jSym) => jSym.s).join('')}
-                        style={{ width: width }}
-                        className={`balifont10 h-5 resize-none overflow-clip p-0`}
-                        spellCheck="false"
-                    />
-                </Col>
-            )
-        })
-
+    const staffNodes = Object.entries(systemData.staffs).map(([position, staves], rowId) => {
         return (
-            <Row id={`ROW-${systemData.id}-${pos}`}>
-                <Col id={`COL-${systemData.id}-POS`} span="auto">
-                    <Text as="div" className="w-40 h-5">
-                        {positionConfigs[pos].name}
-                    </Text>
-                </Col>
-                {staveNodes}
-            </Row>
+            <StaffNode
+                systemId={systemData.id}
+                position={position}
+                rowId={rowId}
+                measures={staves}
+                colWidths={systemData.colWidths}
+                gridRow={grid.current.cells[posToRow[position]]}
+                playbackState={playbackState}
+            />
         )
     })
 

@@ -1,12 +1,12 @@
 import * as Tone from 'tone'
 import { debug } from '../utils/debugger'
-import type { EditorCellCursor, EditorSystemData, PlayBackState } from '../models/types'
+import type { EditorCellCursor, EditorSystemData, AudioState } from '../models/types'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import { createTimelineFromEditor, scheduleTransport } from './createSchedule'
 import { noCursor } from '../components/tabuheditor/_constants'
 
-type PbState = { cursor: EditorCellCursor; audioState: PlayBackState }
-type PbAction = {
+export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState }
+export type playbackAction = {
     type: 'load' | 'play' | 'pause' | 'stop' | 'cursor'
     data?: EditorSystemData[]
     audiofunctions?: AudioFunctionsType
@@ -21,7 +21,7 @@ async function asyncPlay() {
     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
 }
 
-export function playBack(state: PbState, action: PbAction): PbState {
+export function playBack(state: PlaybackState, action: playbackAction): PlaybackState {
     switch (action.type) {
         case 'load': {
             if (action.data && action.audiofunctions) {

@@ -4,7 +4,6 @@ import type { BaseNoteTimeObj, MutingType, StrokeType, ToneType } from '../confi
 
 // INSTRUMENTS / AUDIO
 export type Instrument = { id: string; name: string; alphabet: string[] }
-export type AudioState = 'false' | 'true' | 'wait'
 
 // NOTATION
 
@@ -35,7 +34,7 @@ export type JsonSymbol = {
 }
 
 // Notation of one section for one instrument position
-export type Stave = { velocity: [number, number]; notes: JsonNote[]; notation: JsonSymbol[] }
+export type Measure = { velocity: [number, number]; notes: JsonNote[]; notation: JsonSymbol[] }
 
 // Subdivision of a system, typically spans one kempli beat
 export type Section = {
@@ -45,7 +44,7 @@ export type Section = {
     starttimeMs: number // start time in ms
     duration: number
     tempo: [number, number]
-    staves: { [position: string]: Stave }
+    staves: { [position: string]: Measure }
 }
 
 // Subdivision of a score, typically spans one gongan
@@ -107,7 +106,7 @@ export type TextCursorPosition = {
 export type HighlightRange = { line: number; range: number[] }
 
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
-export type Staffs = Record<string, Stave[]>
+export type Staffs = Record<string, Measure[]>
 
 export type EditorSystemData = {
     key: number // unique row id
@@ -121,7 +120,7 @@ export type EditorCellCursor = { system: number; position: string; measure: numb
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
-export type PlayBackState = 'nodata' | 'playing' | 'paused' | 'stopped'
+export type AudioState = 'nodata' | 'playing' | 'paused' | 'stopped'
 
 export type GenericFunction = (time: number) => void
 export type SamplerFunction = (time: number, action: SamplerAction) => void

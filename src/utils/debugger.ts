@@ -2,7 +2,7 @@ const debugOn: Record<string, boolean> = {
     createInstrument: false,
     createTimelineFromEditor: false,
     createTimeline: false,
-    EditorWindow: true,
+    EditorWindow: false,
     keyboardListener: true,
     Menu: false,
     NavigationCell: false,

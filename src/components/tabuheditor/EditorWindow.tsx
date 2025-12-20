@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type R
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { useInstruments } from '../../hooks/useInstruments'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
-import { SystemGrid } from './SystemGrid'
+import { SystemNode } from './SystemNode'
 import { debug } from '../../utils/debugger'
 
 var uniqueKeyValue = 0
@@ -82,7 +82,7 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(systemData.id)
                 }}>
-                <SystemGrid systemData={systemData} />
+                <SystemNode systemData={systemData} />
             </Accordion.Panel>
         )
     })
