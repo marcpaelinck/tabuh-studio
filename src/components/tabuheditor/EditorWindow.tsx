@@ -50,7 +50,7 @@ export default function EditorWindow({
                 (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
             )
             const colWidths = system.sections.map((section) =>
-                Math.max(...Object.values(section.staves).map((stave) => stave.notation.length))
+                Math.max(...Object.values(section.staves).map((measure) => measure.notation.length))
             )
             const staffs: Staffs = Object.fromEntries(
                 positions.map((position) => [position, system.sections.map((section) => section.staves[position])])

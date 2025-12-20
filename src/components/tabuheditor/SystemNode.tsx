@@ -92,13 +92,13 @@ export function SystemNode({ systemData, ...props }: { systemData: EditorSystemD
         }
     }
 
-    const staffNodes = Object.entries(systemData.staffs).map(([position, staves], rowId) => {
+    const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
         return (
             <StaffNode
                 systemId={systemData.id}
                 position={position}
                 rowId={rowId}
-                measures={staves}
+                measures={measures}
                 colWidths={systemData.colWidths}
                 gridRow={grid.current.cells[posToRow[position]]}
                 playbackState={playbackState}

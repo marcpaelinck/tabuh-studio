@@ -30,9 +30,9 @@ export function parseScore(input: string): Score {
             section.starttimeMs = Math.round(currentTimeMs)
             // The time for all instruments is synced at the start of each section.
             // This will ensure that notation errors will not propagate throughout the score.
-            for (const [_, stave] of Object.entries(section.staves)) {
+            for (const [_, measure] of Object.entries(section.staves)) {
                 var relTime = 0 // Time relative to the section's start time
-                stave.notes.forEach((note: JsonNote) => {
+                measure.notes.forEach((note: JsonNote) => {
                     // Convert the first note's absolute start time to relative time.
                     // TODO in the future the note's time attribute should be given relative to the section start time.
                     note.t += introTimeBn
@@ -45,7 +45,7 @@ export function parseScore(input: string): Score {
                     note.system = system.id
                     relTime += note.d
                 })
-                stave.notation.forEach((symbol: JsonSymbol) => {
+                measure.notation.forEach((symbol: JsonSymbol) => {
                     symbol.t += introTimeBn
                 })
             }
@@ -125,15 +125,15 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
 
             // Create sampler actions
             if (actionFunctions.play) {
-                for (const [position, stave] of Object.entries(section.staves)) {
+                for (const [position, measure] of Object.entries(section.staves)) {
                     if (!(position in positionScore)) positionScore[position] = []
                     if (!(position in positionNotation)) positionNotation[position] = []
                     var sectionProgress: number = 0
-                    stave.notes.forEach((note) => {
+                    measure.notes.forEach((note) => {
                         // create separate scores for each position, which will be used to create the animation actions
                         var velocity: number =
-                            stave.velocity[0] +
-                            (sectionProgress / section.duration) * (stave.velocity[1] - stave.velocity[0])
+                            measure.velocity[0] +
+                            (sectionProgress / section.duration) * (measure.velocity[1] - measure.velocity[0])
                         note.v = velocity
                         positionScore[position].push(note)
                         const bpm = getCurrentBPM(section, sectionProgress)
@@ -150,7 +150,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                         })
                         sectionProgress += note.d || 1
                     })
-                    stave.notation.forEach((symbol: JsonSymbol) => {
+                    measure.notation.forEach((symbol: JsonSymbol) => {
                         symbol.system = system.id
                         symbol.section = section.id
                         positionNotation[position].push(symbol)
