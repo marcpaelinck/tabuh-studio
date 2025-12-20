@@ -20,30 +20,27 @@ export function SystemGrid({
     systemData,
     playbackState,
     setPlaybackState,
-    cursorMovement,
+    cursorPosition,
     ...props
 }: {
     systemData: EditorSystemData
     playbackState: PlayBackState
     setPlaybackState: Dispatch<PlayBackState>
-    cursorMovement: EditorCellCursor
+    cursorPosition: EditorCellCursor
 }): ReactNode {
     const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
-    const [playbackActive, setPlaybackActive] = useState<boolean>(false)
+    const [playbackDataLoaded, setPlaybackDataLoaded] = useState<boolean>(false)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    const [currCursor, setCurrCursor] = useState<EditorCellCursor>(noCursor)
+    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
 
     function playPauseClicked() {
-        if (!playbackActive) {
-            audioFunc.playPause(true, [systemData])
-            setPlaybackState('playing')
-            setPlaybackActive(true)
-        } else {
-            audioFunc.playPause(!(playbackState == 'playing'))
-            setPlaybackState(playbackState == 'playing' ? 'paused' : 'playing')
+        if (!playbackDataLoaded) {
+            audioFunc.loadData([systemData])
         }
+        audioFunc.playPause(!(playbackState == 'playing'))
+        setPlaybackState(playbackState == 'playing' ? 'paused' : 'playing')
     }
 
     function highlight(cell: HTMLTextAreaElement, on: boolean) {
@@ -56,24 +53,26 @@ export function SystemGrid({
     const logging: boolean = false
 
     useEffect(() => {
-        if (cursorMovement.system != systemData.id) return
-        if (_.isEqual(cursorMovement, currCursor)) {
-            if (logging) debug(`no change from ${currCursor.position}-${currCursor.measure}`, SystemGrid.name)
+        if (highlightedCell == noCursor && cursorPosition.system != systemData.id) return
+        if (_.isEqual(cursorPosition, highlightedCell)) {
+            if (logging) debug(`no change from ${highlightedCell.position}-${highlightedCell.measure}`, SystemGrid.name)
             return
         }
         if (logging)
             debug(
-                `yes change from ${currCursor.position}-${currCursor.measure} to ${cursorMovement.position}-${cursorMovement.measure}`,
+                `yes change from ${highlightedCell.position}-${highlightedCell.measure} to ${cursorPosition.position}-${cursorPosition.measure}`,
                 SystemGrid.name
             )
-        const currTextArea = _.isEqual(currCursor, noCursor)
+        const currTextArea = _.isEqual(highlightedCell, noCursor)
             ? null
-            : grid.current.cells[posToRow[currCursor.position]][currCursor.measure].current
+            : grid.current.cells[posToRow[highlightedCell.position]][highlightedCell.measure].current
         if (currTextArea) highlight(currTextArea, false)
-        const textArea = grid.current.cells[posToRow[cursorMovement.position]][cursorMovement.measure].current
-        if (textArea) highlight(textArea, true)
-        setCurrCursor(cursorMovement)
-    }, [cursorMovement])
+        if (cursorPosition != noCursor) {
+            const textArea = grid.current.cells[posToRow[cursorPosition.position]][cursorPosition.measure].current
+            if (textArea) highlight(textArea, true)
+            setHighlightedCell(cursorPosition)
+        }
+    }, [cursorPosition])
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -165,7 +164,7 @@ export function SystemGrid({
             </HStack>
 
             <NavigationFunctions value={navigationFunctions}>
-                <Grid>
+                <Grid className="ml-4">
                     <VStack>{staffNodes}</VStack>
                 </Grid>
             </NavigationFunctions>

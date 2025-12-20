@@ -37,7 +37,7 @@ export default function EditorWindow({
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument, muteAll } = useInstruments(focusRef, 0)
     const [playbackState, setPlaybackState] = useState<PlayBackState>('stopped')
-    const audioFunctions: AudioFunctionsType = { playPause: playPause }
+    const audioFunctions: AudioFunctionsType = { loadData: loadData, playPause: playPause }
     const [cursor, setCursor] = useState<EditorCellCursor>(noCursor)
 
     function flipExpanded(id: number) {
@@ -46,7 +46,7 @@ export default function EditorWindow({
         setExpanded(newExpanded)
     }
 
-    function onEndOfPlayback(time: number) {
+    async function stopPlayback(time: number) {
         Tone.getTransport().stop()
         Tone.getTransport().seconds = 0
         setPlaybackState('stopped')
@@ -61,27 +61,38 @@ export default function EditorWindow({
         )
     }
 
-    async function playPause(doPlay: boolean, data?: EditorSystemData[]) {
+    function loadData(data: EditorSystemData[]) {
+        if (data) {
+            debug(`loading data for sys ${data[0].id}`, EditorWindow.name)
+            const timeLine = createTimelineFromEditor(data, {
+                play: playInstrument,
+                animate: null,
+                cursor: moveCursor,
+                generic: stopPlayback
+            })
+            scheduleTransport(timeLine)
+        }
+    }
+
+    async function playPause(doPlay: boolean) {
         if (Tone.getContext().state == 'suspended') {
             Tone.start()
             await Tone.loaded()
         }
-        if (data) {
-            const timeLine = createTimelineFromEditor(data, {
-                play: playInstrument,
-                animate: null,
-                // cursor: moveCursor,
-                cursor: moveCursor,
-                generic: onEndOfPlayback
-            })
-            scheduleTransport(timeLine)
-        }
-        // Tone.getTransport().start()
         if (doPlay) {
             if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
         } else {
             Tone.getTransport().pause()
         }
+        // if (playbackState != 'playing') {
+        //     debug(`playing`, usePlayback.name)
+        //     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
+        //     setPlaybackState('playing')
+        // } else {
+        //     debug(`pausing`, usePlayback.name)
+        //     Tone.getTransport().pause()
+        //     setPlaybackState('paused')
+        // }
     }
 
     useEffect(() => {
@@ -129,7 +140,7 @@ export default function EditorWindow({
                     systemData={systemData}
                     playbackState={playbackState}
                     setPlaybackState={setPlaybackState}
-                    cursorMovement={cursor}
+                    cursorPosition={cursor}
                 />
             </Accordion.Panel>
         )
