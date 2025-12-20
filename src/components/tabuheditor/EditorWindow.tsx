@@ -2,15 +2,12 @@ import { Accordion, Placeholder } from 'rsuite'
 import 'rsuite/Accordion/styles/index.css'
 import 'rsuite/Placeholder/styles/index.css'
 import 'rsuite/Grid/styles/index.css'
-import type { Score, EditorSystemData, Staffs, PlayBackState, CursorAction, EditorCellCursor } from '../../models/types'
+import type { Score, EditorSystemData, Staffs } from '../../models/types'
 import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { useInstruments } from '../../hooks/useInstruments'
-import { createTimelineFromEditor, scheduleTransport } from '../../hooks/createSchedule'
-import * as Tone from 'tone'
-import { AudioFunctions, type AudioFunctionsType } from './contexts'
+import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { SystemGrid } from './SystemGrid'
-import { noCursor } from './_constants'
 import { debug } from '../../utils/debugger'
 
 var uniqueKeyValue = 0
@@ -36,63 +33,12 @@ export default function EditorWindow({
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument, muteAll } = useInstruments(focusRef, 0)
-    const [playbackState, setPlaybackState] = useState<PlayBackState>('stopped')
-    const audioFunctions: AudioFunctionsType = { loadData: loadData, playPause: playPause }
-    const [cursor, setCursor] = useState<EditorCellCursor>(noCursor)
+    const audioFunctions: AudioFunctionsType = Object.assign(defaultAudioFunc, { playInstrument })
 
     function flipExpanded(id: number) {
         const newExpanded = {}
         Object.assign(newExpanded, expanded, Object.fromEntries([[id, !expanded[id]]]))
         setExpanded(newExpanded)
-    }
-
-    async function stopPlayback(time: number) {
-        Tone.getTransport().stop()
-        Tone.getTransport().seconds = 0
-        setPlaybackState('stopped')
-        setCursor(noCursor)
-    }
-
-    function moveCursor(time: number, cAction: CursorAction) {
-        setCursor({ system: cAction.system, position: cAction.position, measure: cAction.section })
-        debug(
-            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
-            EditorWindow.name
-        )
-    }
-
-    function loadData(data: EditorSystemData[]) {
-        if (data) {
-            debug(`loading data for sys ${data[0].id}`, EditorWindow.name)
-            const timeLine = createTimelineFromEditor(data, {
-                play: playInstrument,
-                animate: null,
-                cursor: moveCursor,
-                generic: stopPlayback
-            })
-            scheduleTransport(timeLine)
-        }
-    }
-
-    async function playPause(doPlay: boolean) {
-        if (Tone.getContext().state == 'suspended') {
-            Tone.start()
-            await Tone.loaded()
-        }
-        if (doPlay) {
-            if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
-        } else {
-            Tone.getTransport().pause()
-        }
-        // if (playbackState != 'playing') {
-        //     debug(`playing`, usePlayback.name)
-        //     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
-        //     setPlaybackState('playing')
-        // } else {
-        //     debug(`pausing`, usePlayback.name)
-        //     Tone.getTransport().pause()
-        //     setPlaybackState('paused')
-        // }
     }
 
     useEffect(() => {
@@ -136,12 +82,7 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(systemData.id)
                 }}>
-                <SystemGrid
-                    systemData={systemData}
-                    playbackState={playbackState}
-                    setPlaybackState={setPlaybackState}
-                    cursorPosition={cursor}
-                />
+                <SystemGrid systemData={systemData} />
             </Accordion.Panel>
         )
     })
@@ -151,7 +92,7 @@ export default function EditorWindow({
             {loading || processing ? (
                 <Placeholder.Grid rows={12} columns={6} />
             ) : (
-                <Accordion className="w-full">{systems}</Accordion>
+                <Accordion className="w-full overflow-scroll">{systems}</Accordion>
             )}
         </AudioFunctions>
     )

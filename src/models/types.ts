@@ -121,7 +121,7 @@ export type EditorCellCursor = { system: number; position: string; measure: numb
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
-export type PlayBackState = 'playing' | 'paused' | 'stopped'
+export type PlayBackState = 'nodata' | 'playing' | 'paused' | 'stopped'
 
 export type GenericFunction = (time: number) => void
 export type SamplerFunction = (time: number, action: SamplerAction) => void

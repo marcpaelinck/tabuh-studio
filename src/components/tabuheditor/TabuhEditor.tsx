@@ -45,7 +45,7 @@ export default function TabuhEditor({
                         onClick={() => expandAll(buttonIsExpand)}
                     />
                 </HStack>
-                <Box className={`w-full flex border h-200  rounded-md p-2  overflow-scroll`}>
+                <Box className={`w-full flex border h-200  rounded-md p-2`}>
                     {score != null && (
                         <EditorWindow score={score} expanded={expanded} setExpanded={setExpanded} loading={loading} />
                     )}

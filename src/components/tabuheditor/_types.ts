@@ -7,10 +7,6 @@ export interface NavigationGridProps extends GridProps {
     id?: string
 }
 
-export interface AudioFunctionsType {
-    playPause: (doPlay: boolean, data?: EditorSystemData[]) => void
-}
-
 export interface NavigationFunctionsType {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>

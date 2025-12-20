@@ -1,16 +1,18 @@
 import { createContext, type Context, type RefObject } from 'react'
-import type { EditorSystemData } from '../../models/types'
+import type { CursorAction, CursorFunction, EditorSystemData, GenericFunction, SamplerAction } from '../../models/types'
 import type { NavigationFunctionsType } from './_types'
 import type { NavigationAction } from '../../config/config'
 
 export interface AudioFunctionsType {
-    loadData: (data: EditorSystemData[]) => void
-    playPause: (doPlay: boolean) => void
+    playInstrument: (time: number, action: SamplerAction) => void
+    moveCursor: CursorFunction
+    genericFunction: GenericFunction
 }
 
 export const defaultAudioFunc: AudioFunctionsType = {
-    loadData: (data: EditorSystemData[]) => {},
-    playPause: (doPlay: boolean) => {}
+    playInstrument: (time: number, action: SamplerAction) => {},
+    moveCursor: (time: number, cAction: CursorAction) => {},
+    genericFunction: (time: number) => {}
 }
 export const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
 

@@ -1,5 +1,14 @@
-import { useContext, useEffect, useRef, useState, type Dispatch, type ReactNode, type RefObject } from 'react'
-import type { EditorCellCursor, EditorSystemData, PlayBackState, Stave } from '../../models/types'
+import {
+    useContext,
+    useEffect,
+    useReducer,
+    useRef,
+    useState,
+    type Dispatch,
+    type ReactNode,
+    type RefObject
+} from 'react'
+import type { CursorAction, EditorCellCursor, EditorSystemData, PlayBackState, Stave } from '../../models/types'
 import { AudioFunctions, NavigationFunctions, type AudioFunctionsType } from './contexts'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { getValidSymbols } from '../../utils/alphabet'
@@ -11,36 +20,46 @@ import type { NavigationFunctionsType } from './_types'
 import { noCursor } from './_constants'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
+import { playBack } from '../../hooks/playbackReducer'
 
 type GridRowInfo = Record<number, RefObject<HTMLTextAreaElement | null>>
 type GridInfo = { maxRowId: number; maxColId: number; cells: Record<number, GridRowInfo> }
 
 // Contains the editable notation of one system (gongan)
-export function SystemGrid({
-    systemData,
-    playbackState,
-    setPlaybackState,
-    cursorPosition,
-    ...props
-}: {
-    systemData: EditorSystemData
-    playbackState: PlayBackState
-    setPlaybackState: Dispatch<PlayBackState>
-    cursorPosition: EditorCellCursor
-}): ReactNode {
-    const audioFunc: AudioFunctionsType = useContext(AudioFunctions)
-    const [playbackDataLoaded, setPlaybackDataLoaded] = useState<boolean>(false)
+export function SystemGrid({ systemData, ...props }: { systemData: EditorSystemData }): ReactNode {
+    const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
+    const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
+
+    async function stopPlayback(time: number) {
+        playback({ type: 'stop' })
+        playback({ type: 'cursor', cursor: noCursor })
+    }
+
+    function moveCursor(time: number, cAction: CursorAction) {
+        playback({
+            type: 'cursor',
+            cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
+        })
+        debug(
+            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
+            SystemGrid.name
+        )
+    }
 
     function playPauseClicked() {
-        if (!playbackDataLoaded) {
-            audioFunc.loadData([systemData])
+        if (playbackState.audioState == 'nodata') {
+            playback({
+                type: 'load',
+                data: [systemData],
+                audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
+            })
         }
-        audioFunc.playPause(!(playbackState == 'playing'))
-        setPlaybackState(playbackState == 'playing' ? 'paused' : 'playing')
+        if (playbackState.audioState == 'playing') playback({ type: 'pause' })
+        else playback({ type: 'play' })
     }
 
     function highlight(cell: HTMLTextAreaElement, on: boolean) {
@@ -53,26 +72,27 @@ export function SystemGrid({
     const logging: boolean = false
 
     useEffect(() => {
-        if (highlightedCell == noCursor && cursorPosition.system != systemData.id) return
-        if (_.isEqual(cursorPosition, highlightedCell)) {
+        if (highlightedCell == noCursor && playbackState.cursor.system != systemData.id) return
+        if (_.isEqual(playbackState.cursor, highlightedCell)) {
             if (logging) debug(`no change from ${highlightedCell.position}-${highlightedCell.measure}`, SystemGrid.name)
             return
         }
         if (logging)
             debug(
-                `yes change from ${highlightedCell.position}-${highlightedCell.measure} to ${cursorPosition.position}-${cursorPosition.measure}`,
+                `yes change from ${highlightedCell.position}-${highlightedCell.measure} to ${playbackState.cursor.position}-${playbackState.cursor.measure}`,
                 SystemGrid.name
             )
         const currTextArea = _.isEqual(highlightedCell, noCursor)
             ? null
             : grid.current.cells[posToRow[highlightedCell.position]][highlightedCell.measure].current
         if (currTextArea) highlight(currTextArea, false)
-        if (cursorPosition != noCursor) {
-            const textArea = grid.current.cells[posToRow[cursorPosition.position]][cursorPosition.measure].current
+        if (playbackState.cursor != noCursor) {
+            const textArea =
+                grid.current.cells[posToRow[playbackState.cursor.position]][playbackState.cursor.measure].current
             if (textArea) highlight(textArea, true)
-            setHighlightedCell(cursorPosition)
+            setHighlightedCell(playbackState.cursor)
         }
-    }, [cursorPosition])
+    }, [playbackState])
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -153,9 +173,9 @@ export function SystemGrid({
         <>
             <HStack>
                 <button onClick={playPauseClicked}>
-                    {playbackState == 'playing' ? (
+                    {playbackState.audioState == 'playing' ? (
                         <IoPlayCircle color="orange" size="2em" />
-                    ) : playbackState == 'paused' ? (
+                    ) : playbackState.audioState == 'paused' ? (
                         <IoPauseCircle color="orange" size="2em" />
                     ) : (
                         <IoPlayCircleOutline color="gray" size="2em" />
