@@ -1,4 +1,4 @@
-import { positionConfigs, noteConfigs, type BaseNoteTimeObj } from '../../config/config'
+import { positionConfigs, noteConfigs, type BaseNoteTimeObj } from '../config/config'
 import {
     type JsonNote,
     type JsonSymbol,
@@ -8,13 +8,11 @@ import {
     type AnimationNote,
     type TimeLine,
     type ActionFunctions
-} from '../../models/types'
-import * as Tone from 'tone'
-import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../timeunits'
+} from '../models/types'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from './timeunits'
 import { createElement } from 'react'
-import { defaultIntroTime, defaultOutroTime } from '../../config/config'
-import { cleanSymbol } from '../alphabet'
-import { assert } from 'tone/build/esm/core/util/Debug'
+import { defaultIntroTime, defaultOutroTime } from '../config/config'
+import { cleanSymbol } from './alphabet'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)

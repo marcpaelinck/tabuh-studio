@@ -3,6 +3,7 @@ import type { CursorAction, CursorFunction, EditorSystemData, GenericFunction, S
 import type { NavigationFunctionsType } from './_types'
 import type { NavigationAction } from '../../config/config'
 
+// Audio functions: used for playback from the editor interface
 export interface AudioFunctionsType {
     playInstrument: (time: number, action: SamplerAction) => void
     moveCursor: CursorFunction
@@ -16,6 +17,8 @@ export const defaultAudioFunc: AudioFunctionsType = {
 }
 export const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
 
+// Navigation functions: used by the keyboard listener
+// register is used to access individual cells while avoiding passing a ref which slows down the app.
 export const defaultNavFunc: NavigationFunctionsType = {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => {},
     navigate: (action: NavigationAction, row: number, col: number): RefObject<HTMLTextAreaElement | null> => {

@@ -15,7 +15,7 @@ import {
 } from '../../models/types'
 import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
 import * as Tone from 'tone'
-import { createTimeline } from '../../utils/scoreplayerUtils/score'
+import { createTimeline } from '../../utils/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPlay, FaPause } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'

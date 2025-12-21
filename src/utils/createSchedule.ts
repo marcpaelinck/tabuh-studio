@@ -9,10 +9,10 @@ import type {
     TempoAction,
     TimeLine
 } from '../models/types'
-import { n2TO, TO2n } from '../utils/timeunits'
-import { cleanSymbol } from '../utils/alphabet'
+import { n2TO, TO2n } from './timeunits'
+import { cleanSymbol } from './alphabet'
 import { isExtension, isMuting } from '../config/configfunctions'
-import { debug } from '../utils/debugger'
+import { debug } from './debugger'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,

@@ -1,9 +1,9 @@
-import { Col, Row, Text } from 'rsuite'
+import { Checkbox, Col, Row, Text } from 'rsuite'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { MeasureNode } from './MeasureNode'
 import { getValidSymbols } from '../../utils/alphabet'
 import { positionConfigs } from '../../config/config'
-import type { EditorCellCursor, AudioState, Measure } from '../../models/types'
+import type { EditorCellCursor, Measure } from '../../models/types'
 import { noCursor } from './_constants'
 import { useEffect, useState } from 'react'
 import type { GridRowInfo } from './_types'
@@ -28,6 +28,7 @@ export function StaffNode({
     playbackState: PlaybackState
 }) {
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
+    const [pbOn, setPbOn] = useState<boolean>(true)
 
     function highlight(cell: HTMLTextAreaElement, on: boolean) {
         const props = ['border-1', 'border-solid', 'border-red-500']
@@ -45,7 +46,7 @@ export function StaffNode({
         }
         const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current
         if (currTextArea) highlight(currTextArea, false)
-        if (playbackState.cursor != noCursor) {
+        if (playbackState.cursor != noCursor && pbOn) {
             const textArea = gridRow[playbackState.cursor.measure].current
             if (textArea) highlight(textArea, true)
             setHighlightedCell(playbackState.cursor)
@@ -77,6 +78,9 @@ export function StaffNode({
                 <Text as="div" className="w-40 h-5">
                     {positionConfigs[position].name}
                 </Text>
+            </Col>
+            <Col id={`COL-POSITION`} span="auto">
+                <Checkbox checked={pbOn} defaultChecked onChange={() => setPbOn(!pbOn)} />
             </Col>
             {measureNodes}
         </Row>

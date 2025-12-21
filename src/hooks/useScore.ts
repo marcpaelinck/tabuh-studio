@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import type { Score } from "../models/types";
-import { readFile } from "../utils/filesystem";
-import { parseScore } from "../utils/scoreplayerUtils/score";
+import { useEffect, useState } from 'react'
+import type { Score } from '../models/types'
+import { readFile } from '../utils/filesystem'
+import { parseScore } from '../utils/score'
 
 // Loads and parses a score when a new tabuh (score title) is selected
 export const useScore = (initValue: Score | null): [Score, CallableFunction, boolean] => {
