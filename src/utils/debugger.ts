@@ -3,12 +3,13 @@ const debugOn: Record<string, boolean> = {
     createTimelineFromEditor: false,
     createTimeline: false,
     EditorWindow: false,
-    keyboardListener: true,
+    keyboardListener: false,
     Menu: false,
+    MeasureNode: true,
     NavigationCell: false,
     registerComponent: false,
     ScorePlayer: false,
-    SystemGrid: true
+    SystemGrid: false
 }
 
 export const debug = (message: any, caller: string) => {

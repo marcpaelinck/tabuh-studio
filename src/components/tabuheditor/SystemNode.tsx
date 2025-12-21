@@ -11,7 +11,7 @@ import { debug } from '../../utils/debugger'
 import { playBack } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
 
-// Contains the editable notation of one system (gongan)
+// Creates a grid containing the notation of one system/gongan.
 export function SystemNode({ systemData, ...props }: { systemData: EditorSystemData }): ReactNode {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })

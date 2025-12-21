@@ -10,6 +10,8 @@ import type { GridRowInfo } from './_types'
 import _ from 'lodash'
 import type { PlaybackState } from '../../hooks/playbackReducer'
 
+// Creates a row of cells containing one staff: a line of notation within a system/gongan,
+// which corresponds with the notation of a single instrument position.
 export function StaffNode({
     systemId,
     position,
@@ -31,17 +33,20 @@ export function StaffNode({
     const [pbOn, setPbOn] = useState<boolean>(true)
 
     function highlight(cell: HTMLTextAreaElement, on: boolean) {
-        const props = ['border-1', 'border-solid', 'border-red-500']
-        props.forEach((prop) => {
-            if (on && !cell.classList.contains(prop)) cell.classList.add(prop)
-            if (!on && cell.classList.contains(prop)) cell.classList.remove(prop)
+        const classes = ['border-1', 'border-solid', 'border-red-500']
+        classes.forEach((value) => {
+            if (on && !cell.classList.contains(value)) cell.classList.add(value)
+            if (!on && cell.classList.contains(value)) cell.classList.remove(value)
         })
     }
 
-    // Updates the cell highlight during playback
+    // Update the cell highlight during playback
     useEffect(() => {
         if (highlightedCell == noCursor && playbackState.cursor.system != systemId) return
+        // If the cursor has moved to another system we might need to switch off highlighting in the current system.
         if (_.isEqual(playbackState.cursor, highlightedCell)) {
+            // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
+            // but highlighting of symbols within a measure is not implemented (yet).
             return
         }
         const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current

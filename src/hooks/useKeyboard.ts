@@ -2,6 +2,8 @@ import { type RefObject } from 'react'
 import { type NavigationAction } from '../config/config'
 import _ from 'lodash'
 import { debug } from '../utils/debugger'
+import { type KeyboardEvent } from 'react'
+import type { ElementWithValueTracker } from '../components/tabuheditor/_types'
 
 type KeyType =
     | 'ArrowUp'
@@ -113,11 +115,26 @@ export const useKeyboardListener = (
     // Defined as hook in order to be able to use states, e.g. 'octavation on' which could work similarly to caps lock
     const [validRegExp, validRegExpByLength, validKeystrokes] = getValids(validSymbols)
 
-    function keyboardListener(event: KeyboardEvent) {
+    // Checks for a matching valid symbol at the beginning (direction==1) or end (direction==-1) of a string.
+    // Returns the length of the symbol if a match is found, null otherwise.
+    function matchValidChar(contentToMatch: string, direction: -1 | 1): number | null {
+        const regexStart = direction > 0 ? '^' : ''
+        const regexEnd = direction > 0 ? '' : '$'
+
+        for (const length of Object.keys(validRegExpByLength).sort().reverse()) {
+            // validRegExpByLength[length] matches all valid symbols of a given length.
+            const regExp = RegExp(regexStart + '(' + validRegExpByLength[length] + ')' + regexEnd)
+            if (regExp.test(contentToMatch)) return Number(length)
+        }
+        return null
+    }
+
+    function keyboardListener(event: KeyboardEvent<HTMLTextAreaElement>) {
+        var changed = false
         debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`, keyboardListener.name)
         // Check that target exists
         if (!ref.current || event.target !== ref.current) return
-        const target = ref.current
+        const target: ElementWithValueTracker = ref.current as ElementWithValueTracker
 
         // Prevent invalid keystrokes
         if (event.key.length == 1 && !validKeystrokes.includes(event.key)) {
@@ -143,14 +160,25 @@ export const useKeyboardListener = (
 
                 if (keyAction.action[0] == 'insert') {
                     if (keyAction.action.length > 1 && keyAction.action[1] != null) {
+                        // Check that insert results in a valid symbol
+                        const isValid =
+                            (!keyAction.left || matchValidChar(eventRecord.left + keyAction.action[1], -1)) &&
+                            (!keyAction.right || matchValidChar(keyAction.action[1] + eventRecord.right, 1))
+                        if (!isValid) break
                         target.setRangeText(keyAction.action[1])
                         target.selectionStart += 1
                         target.selectionEnd = target.selectionStart
+                        changed = true
                         debug(`INSERT ${keyAction.action[1]}`, keyboardListener.name)
                     } else debug('unexpected null keyAction value(s)', keyboardListener.name)
                     break
                 }
                 if (keyAction.action[0] == 'pop-left') {
+                    // Check that pop action results in a valid symbol
+                    const leftEnd = eventRecord.left.length - keyAction.action[1]
+                    const isValid =
+                        !keyAction.left || leftEnd <= 0 || matchValidChar(eventRecord.left.slice(0, leftEnd), -1)
+                    if (!isValid) break
                     if (keyAction.action.length > 1 && keyAction.action[1] != null) {
                         target.selectionStart -= keyAction.action[1]
                         debug(
@@ -158,6 +186,7 @@ export const useKeyboardListener = (
                             keyboardListener.name
                         )
                         target.setRangeText('')
+                        changed = true
                     } else debug('unexpected null keyAction value(s)', keyboardListener.name)
                     break
                 }
@@ -207,6 +236,14 @@ export const useKeyboardListener = (
                     break
                 }
             }
+        }
+        if (changed) {
+            const [selStart, selEnd] = [target.selectionStart, target.selectionEnd]
+            target.select()
+            target._valueTracker.setValue(document.getSelection()?.toString() || '')
+            target.selectionStart = selStart
+            target.selectionEnd = selEnd
+            target.dispatchEvent(new Event('change'))
         }
     }
 
