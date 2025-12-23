@@ -145,7 +145,7 @@ export default function EditorWindow({
                     <Whisper
                         ref={whisperRef}
                         key={`Whisper-${systemData.id}`}
-                        placement="top"
+                        placement="autoVertical"
                         trigger="contextMenu"
                         speaker={
                             <Popover>

@@ -49,12 +49,18 @@ export function StaffNode({
             // but highlighting of symbols within a measure is not implemented (yet).
             return
         }
+        // Remove highlight from current cell
         const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current
-        if (currTextArea) highlight(currTextArea, false)
-        if (playbackState.cursor != noCursor && pbOn) {
+        if (currTextArea) {
+            highlight(currTextArea, false)
+        }
+        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor && pbOn) {
+            // Highlight cell
             const textArea = gridRow[playbackState.cursor.measure].current
             if (textArea) highlight(textArea, true)
             setHighlightedCell(playbackState.cursor)
+        } else {
+            setHighlightedCell(noCursor)
         }
     }, [playbackState])
 
