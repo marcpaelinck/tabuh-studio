@@ -8,7 +8,7 @@ import type { GridInfo, NavigationFunctionsType } from './_types'
 import { noCursor } from './_constants'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
-import { playBack } from '../../hooks/playbackReducer'
+import { playBack, type PlaybackState } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
 
 // Creates a grid containing the notation of one system/gongan.
@@ -16,47 +16,49 @@ export function SystemNode({
     systemData,
     sequence,
     update,
+    playbackState,
     ...props
 }: {
     systemData: EditorSystemData
     sequence: number
     update: (sysData: EditorSystemData, seqId: number) => void
+    playbackState: PlaybackState
 }): ReactNode {
-    const audio: AudioFunctionsType = useContext(AudioFunctions)
+    // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
-    const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
+    // const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
 
-    if ([1, 13].includes(systemData.id)) debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
+    // if ([1, 13].includes(systemData.id)) debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
 
-    async function stopPlayback(time: number) {
-        playback({ type: 'stop' })
-        playback({ type: 'cursor', cursor: noCursor })
-    }
+    // async function stopPlayback(time: number) {
+    //     playback({ type: 'stop' })
+    //     playback({ type: 'cursor', cursor: noCursor })
+    // }
 
-    function moveCursor(time: number, cAction: CursorAction) {
-        playback({
-            type: 'cursor',
-            cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
-        })
-        debug(
-            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
-            SystemNode.name
-        )
-    }
+    // function moveCursor(time: number, cAction: CursorAction) {
+    //     playback({
+    //         type: 'cursor',
+    //         cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
+    //     })
+    //     debug(
+    //         `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
+    //         SystemNode.name
+    //     )
+    // }
 
-    function playPauseClicked() {
-        if (playbackState.audioState == 'nodata') {
-            playback({
-                type: 'load',
-                data: [systemData],
-                audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
-            })
-        }
-        if (playbackState.audioState == 'playing') playback({ type: 'pause' })
-        else playback({ type: 'play' })
-    }
+    // function playPauseClicked() {
+    //     if (playbackState.audioState == 'nodata') {
+    //         playback({
+    //             type: 'load',
+    //             data: [systemData],
+    //             audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
+    //         })
+    //     }
+    //     if (playbackState.audioState == 'playing') playback({ type: 'pause' })
+    //     else playback({ type: 'play' })
+    // }
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -118,8 +120,8 @@ export function SystemNode({
 
     return (
         <>
-            <HStack>
-                <button onClick={playPauseClicked}>
+            {/* <HStack> */}
+            {/* <button onClick={playPauseClicked}>
                     {playbackState.audioState == 'playing' ? (
                         <IoPlayCircle color="orange" size="2em" />
                     ) : playbackState.audioState == 'paused' ? (
@@ -127,8 +129,8 @@ export function SystemNode({
                     ) : (
                         <IoPlayCircleOutline color="gray" size="2em" />
                     )}
-                </button>
-            </HStack>
+                </button> */}
+            {/* </HStack> */}
 
             <NavigationFunctions value={navigationFunctions}>
                 <Grid className="ml-4">

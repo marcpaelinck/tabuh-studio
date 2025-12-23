@@ -1,6 +1,16 @@
 import { Accordion, Button, ButtonGroup, Divider, HStack, Menu, Placeholder, Popover, Stack, Whisper } from 'rsuite'
-import type { Score, EditorSystemData, Staffs } from '../../models/types'
-import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
+import type { Score, EditorSystemData, Staffs, CursorAction } from '../../models/types'
+import {
+    useContext,
+    useEffect,
+    useReducer,
+    useRef,
+    useState,
+    type Dispatch,
+    type HTMLAttributes,
+    type MouseEvent,
+    type RefObject
+} from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { useInstruments } from '../../hooks/useInstruments'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
@@ -8,6 +18,9 @@ import { SystemNode } from './SystemNode'
 import { debug } from '../../utils/debugger'
 import { SystemContextMenu } from './SystemContextMenu'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
+import { playBack, type PlaybackState } from '../../hooks/playbackReducer'
+import { noCursor } from './_constants'
+import { IoPause, IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline } from 'react-icons/io5'
 
 var uniqueKeyValue = 0
 
@@ -70,6 +83,44 @@ export default function EditorWindow({
         setProcessing(false)
     }, [score])
 
+    // AUDIO AND CURSOR PLAYBACK FUNCTIONS
+
+    const audio: AudioFunctionsType = useContext(AudioFunctions)
+    const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
+
+    async function stopPlayback(time: number) {
+        playback({ type: 'stop' })
+        playback({ type: 'cursor', cursor: noCursor })
+    }
+
+    function moveCursor(time: number, cAction: CursorAction) {
+        playback({
+            type: 'cursor',
+            cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
+        })
+        debug(
+            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
+            SystemNode.name
+        )
+    }
+
+    function playPauseClicked(event: MouseEvent<HTMLElement>, sysDataId: number, singleSystem: boolean) {
+        console.log(`playing sys seq=${sysDataId}`)
+        event.stopPropagation()
+        // if (playbackState.audioState == 'nodata') {
+        if (playbackState.cursor.system != data[sysDataId].id) {
+            playback({
+                type: 'load',
+                data: singleSystem ? [data[sysDataId]] : data.slice(sysDataId, data.length),
+                audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
+            })
+        }
+        if (playbackState.audioState == 'playing') playback({ type: 'pause' })
+        else playback({ type: 'play' })
+    }
+
+    // CONTEXT MENU
+
     var dummy: OverlayTriggerHandle = {
         updatePosition: () => {},
         open: () => {},
@@ -81,6 +132,10 @@ export default function EditorWindow({
 
     function updateData(sysData: EditorSystemData, seqId: number) {
         setData([...data.slice(0, seqId), sysData, ...data.slice(seqId + 1)])
+    }
+
+    function buttonColor(seqId: number, playbackState: PlaybackState) {
+        return seqId == playbackState.cursor.system ? 'orange' : 'gray'
     }
 
     const whisperRef = useRef<OverlayTriggerHandle>(dummy)
@@ -101,17 +156,24 @@ export default function EditorWindow({
                         }>
                         <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
                             <ButtonGroup>
-                                <Button
-                                    as={'div'}
-                                    active
-                                    onClick={(e) => {
-                                        console.log('click')
-                                        e.stopPropagation()
-                                    }}>
-                                    Day
+                                <Button as="div" onClick={(e) => playPauseClicked(e, seqId, true)}>
+                                    {playbackState.audioState == 'playing' ? (
+                                        <IoPause color={buttonColor(systemData.id, playbackState)} />
+                                    ) : playbackState.audioState == 'paused' ? (
+                                        <IoPlay color={buttonColor(systemData.id, playbackState)} />
+                                    ) : (
+                                        <IoPlayOutline color="gray" />
+                                    )}
                                 </Button>
-                                <Button as={'div'}>Week</Button>
-                                <Button as={'div'}>Month</Button>
+                                <Button as="div" onClick={(e) => playPauseClicked(e, seqId, false)}>
+                                    {playbackState.audioState == 'playing' ? (
+                                        <IoPause color={buttonColor(systemData.id, playbackState)} />
+                                    ) : playbackState.audioState == 'paused' ? (
+                                        <IoPlaySkipForward color={buttonColor(systemData.id, playbackState)} />
+                                    ) : (
+                                        <IoPlaySkipForwardOutline color="gray" />
+                                    )}
+                                </Button>
                             </ButtonGroup>
                             <span>{`${systemData.id} ${systemData.part}`}</span>
                         </HStack>
@@ -121,7 +183,14 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(systemData.id)
                 }}>
-                {expanded[systemData.id] && <SystemNode systemData={systemData} sequence={seqId} update={updateData} />}
+                {expanded[systemData.id] && (
+                    <SystemNode
+                        playbackState={playbackState}
+                        systemData={systemData}
+                        sequence={seqId}
+                        update={updateData}
+                    />
+                )}
             </Accordion.Panel>
         )
     })

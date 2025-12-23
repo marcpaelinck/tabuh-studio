@@ -42,7 +42,7 @@ export function StaffNode({
 
     // Update the cell highlight during playback
     useEffect(() => {
-        if (highlightedCell == noCursor && playbackState.cursor.system != systemId) return
+        if (!gridRow || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) return
         // If the cursor has moved to another system we might need to switch off highlighting in the current system.
         if (_.isEqual(playbackState.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,

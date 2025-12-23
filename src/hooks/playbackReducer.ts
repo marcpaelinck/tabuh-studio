@@ -4,6 +4,7 @@ import type { EditorCellCursor, EditorSystemData, AudioState } from '../models/t
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { noCursor } from '../components/tabuheditor/_constants'
+import { useState } from 'react'
 
 export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState }
 export type playbackAction = {
@@ -18,7 +19,11 @@ async function asyncPlay() {
         Tone.start()
         await Tone.loaded()
     }
-    if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
+    if (Tone.getTransport().state !== 'started') {
+        // Wait for the transport's schedule
+        await new Promise((resolve) => setTimeout(resolve, 500))
+        Tone.getTransport().start()
+    }
 }
 
 export function playBack(state: PlaybackState, action: playbackAction): PlaybackState {
@@ -49,7 +54,7 @@ export function playBack(state: PlaybackState, action: playbackAction): Playback
         case 'stop': {
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
-            return { cursor: state.cursor, audioState: 'stopped' }
+            return { cursor: noCursor, audioState: 'nodata' }
         }
         case 'cursor':
             if (action.cursor) {
