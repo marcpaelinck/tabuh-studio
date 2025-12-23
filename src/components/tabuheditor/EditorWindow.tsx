@@ -1,4 +1,4 @@
-import { Accordion, Menu, Placeholder, Popover, Whisper } from 'rsuite'
+import { Accordion, Button, ButtonGroup, Divider, HStack, Menu, Placeholder, Popover, Stack, Whisper } from 'rsuite'
 import type { Score, EditorSystemData, Staffs } from '../../models/types'
 import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
@@ -86,28 +86,43 @@ export default function EditorWindow({
     const whisperRef = useRef<OverlayTriggerHandle>(dummy)
     const systems = data.map((systemData, seqId) => {
         return (
-            <Whisper
-                ref={whisperRef}
-                key={`Whisper-${systemData.id}`}
-                placement="top"
-                trigger="contextMenu"
-                speaker={
-                    <Popover>
-                        <SystemContextMenu data={systemData} ref={whisperRef} />
-                    </Popover>
-                }>
-                <Accordion.Panel
-                    key={systemData.key}
-                    header={`${systemData.id} ${systemData.part}`}
-                    expanded={expanded[systemData.id]}
-                    onSelect={() => {
-                        flipExpanded(systemData.id)
-                    }}>
-                    {expanded[systemData.id] && (
-                        <SystemNode systemData={systemData} sequence={seqId} update={updateData} />
-                    )}
-                </Accordion.Panel>
-            </Whisper>
+            <Accordion.Panel
+                key={systemData.key}
+                header={
+                    <Whisper
+                        ref={whisperRef}
+                        key={`Whisper-${systemData.id}`}
+                        placement="top"
+                        trigger="contextMenu"
+                        speaker={
+                            <Popover>
+                                <SystemContextMenu data={systemData} ref={whisperRef} />
+                            </Popover>
+                        }>
+                        <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
+                            <ButtonGroup>
+                                <Button
+                                    as={'div'}
+                                    active
+                                    onClick={(e) => {
+                                        console.log('click')
+                                        e.stopPropagation()
+                                    }}>
+                                    Day
+                                </Button>
+                                <Button as={'div'}>Week</Button>
+                                <Button as={'div'}>Month</Button>
+                            </ButtonGroup>
+                            <span>{`${systemData.id} ${systemData.part}`}</span>
+                        </HStack>
+                    </Whisper>
+                }
+                expanded={expanded[systemData.id]}
+                onSelect={() => {
+                    flipExpanded(systemData.id)
+                }}>
+                {expanded[systemData.id] && <SystemNode systemData={systemData} sequence={seqId} update={updateData} />}
+            </Accordion.Panel>
         )
     })
 
