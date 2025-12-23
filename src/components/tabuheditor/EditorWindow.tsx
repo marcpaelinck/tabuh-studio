@@ -1,4 +1,4 @@
-import { Accordion, Button, ButtonGroup, Divider, HStack, Menu, Placeholder, Popover, Stack, Whisper } from 'rsuite'
+import { Accordion, Button, ButtonGroup, Divider, HStack, Placeholder, Popover, Whisper } from 'rsuite'
 import type { Score, EditorSystemData, Staffs, CursorAction } from '../../models/types'
 import {
     useContext,
@@ -44,7 +44,7 @@ export default function EditorWindow({
     const [data, setData] = useState<EditorSystemData[]>([])
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
-    const { playInstrument, muteAll } = useInstruments(focusRef, 0)
+    const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = Object.assign(defaultAudioFunc, { playInstrument })
 
     function flipExpanded(id: number) {
@@ -119,8 +119,6 @@ export default function EditorWindow({
         else playback({ type: 'play' })
     }
 
-    // CONTEXT MENU
-
     var dummy: OverlayTriggerHandle = {
         updatePosition: () => {},
         open: () => {},
@@ -155,7 +153,7 @@ export default function EditorWindow({
                             </Popover>
                         }>
                         <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
-                            <ButtonGroup>
+                            <ButtonGroup size="sm">
                                 <Button as="div" onClick={(e) => playPauseClicked(e, seqId, true)}>
                                     {playbackState.audioState == 'playing' ? (
                                         <IoPause color={buttonColor(systemData.id, playbackState)} />

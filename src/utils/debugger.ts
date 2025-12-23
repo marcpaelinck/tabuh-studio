@@ -1,6 +1,6 @@
 const debugOn: Record<string, boolean> = {
     createInstrument: false,
-    createTimelineFromEditor: false,
+    createTimelineFromEditor: true,
     createTimeline: false,
     EditorWindow: false,
     keyboardListener: false,
