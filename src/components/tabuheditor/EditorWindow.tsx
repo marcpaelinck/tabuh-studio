@@ -1,7 +1,4 @@
-import { Accordion, Placeholder } from 'rsuite'
-import 'rsuite/Accordion/styles/index.css'
-import 'rsuite/Placeholder/styles/index.css'
-import 'rsuite/Grid/styles/index.css'
+import { Accordion, Menu, Placeholder, Popover, Whisper } from 'rsuite'
 import type { Score, EditorSystemData, Staffs } from '../../models/types'
 import { useEffect, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
@@ -9,6 +6,8 @@ import { useInstruments } from '../../hooks/useInstruments'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { SystemNode } from './SystemNode'
 import { debug } from '../../utils/debugger'
+import { SystemContextMenu } from './SystemContextMenu'
+import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 
 var uniqueKeyValue = 0
 
@@ -36,9 +35,7 @@ export default function EditorWindow({
     const audioFunctions: AudioFunctionsType = Object.assign(defaultAudioFunc, { playInstrument })
 
     function flipExpanded(id: number) {
-        const newExpanded = {}
-        Object.assign(newExpanded, expanded, Object.fromEntries([[id, !expanded[id]]]))
-        setExpanded(newExpanded)
+        setExpanded({ ...expanded, ...Object.fromEntries([[id, !expanded[id]]]) })
     }
 
     useEffect(() => {
@@ -73,17 +70,44 @@ export default function EditorWindow({
         setProcessing(false)
     }, [score])
 
-    const systems = data.map((systemData) => {
+    var dummy: OverlayTriggerHandle = {
+        updatePosition: () => {},
+        open: () => {},
+        close: () => {},
+        getState: () => {
+            return { open: false }
+        }
+    }
+
+    function updateData(sysData: EditorSystemData, seqId: number) {
+        setData([...data.slice(0, seqId), sysData, ...data.slice(seqId + 1)])
+    }
+
+    const whisperRef = useRef<OverlayTriggerHandle>(dummy)
+    const systems = data.map((systemData, seqId) => {
         return (
-            <Accordion.Panel
-                key={systemData.key}
-                header={`${systemData.id} ${systemData.part}`}
-                expanded={expanded[systemData.id]}
-                onSelect={() => {
-                    flipExpanded(systemData.id)
-                }}>
-                <SystemNode systemData={systemData} />
-            </Accordion.Panel>
+            <Whisper
+                ref={whisperRef}
+                key={`Whisper-${systemData.id}`}
+                placement="top"
+                trigger="contextMenu"
+                speaker={
+                    <Popover>
+                        <SystemContextMenu data={systemData} ref={whisperRef} />
+                    </Popover>
+                }>
+                <Accordion.Panel
+                    key={systemData.key}
+                    header={`${systemData.id} ${systemData.part}`}
+                    expanded={expanded[systemData.id]}
+                    onSelect={() => {
+                        flipExpanded(systemData.id)
+                    }}>
+                    {expanded[systemData.id] && (
+                        <SystemNode systemData={systemData} sequence={seqId} update={updateData} />
+                    )}
+                </Accordion.Panel>
+            </Whisper>
         )
     })
 

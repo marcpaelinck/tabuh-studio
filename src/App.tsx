@@ -7,6 +7,7 @@ import { FRAMESTYLE } from './config/config'
 import TabuhEditor from './components/tabuheditor/TabuhEditor'
 import { useTabuhDict } from './hooks/useTabuhDict'
 import DebugWindow from './components/DebugWindow'
+import 'rsuite/dist/rsuite.css'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 

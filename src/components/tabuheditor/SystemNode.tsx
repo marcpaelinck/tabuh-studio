@@ -12,7 +12,16 @@ import { playBack } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
 
 // Creates a grid containing the notation of one system/gongan.
-export function SystemNode({ systemData, ...props }: { systemData: EditorSystemData }): ReactNode {
+export function SystemNode({
+    systemData,
+    sequence,
+    update,
+    ...props
+}: {
+    systemData: EditorSystemData
+    sequence: number
+    update: (sysData: EditorSystemData, seqId: number) => void
+}): ReactNode {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
@@ -66,6 +75,7 @@ export function SystemNode({ systemData, ...props }: { systemData: EditorSystemD
         grid.current.maxColId = Math.max(col, grid.current.maxColId)
         // debug(`registering cell (${grid.current.rowCount}, ${grid.current.colCount})`, SystemGrid.name)
     }
+
     // Returns neighbouring cell (above, below, left, right, row start, row end)
     function navigate(action: NavigationAction, row: number, col: number) {
         switch (action) {
