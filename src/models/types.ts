@@ -34,7 +34,7 @@ export type JsonSymbol = {
 }
 
 // Notation of one section for one instrument position
-export type Measure = { velocity: [number, number]; notes: JsonNote[]; notation: JsonSymbol[] }
+export type Measure = { tempo: [number, number]; velocity: [number, number]; notes: JsonNote[]; notation: JsonSymbol[] }
 
 // Subdivision of a system, typically spans one kempli beat
 export type Section = {

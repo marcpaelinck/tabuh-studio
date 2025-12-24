@@ -14,13 +14,13 @@ export function SystemNode({
     systemData,
     sequence,
     update,
-    playbackState,
+    playbackStateRef,
     ...props
 }: {
     systemData: EditorSystemData
     sequence: number
     update: (sysData: EditorSystemData, seqId: number) => void
-    playbackState: PlaybackState
+    playbackStateRef: RefObject<PlaybackState>
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
@@ -80,7 +80,7 @@ export function SystemNode({
                 measures={measures}
                 colWidths={systemData.colWidths}
                 gridRow={grid.current.cells[posToRow[position]]}
-                playbackState={playbackState}
+                playbackStateRef={playbackStateRef}
             />
         )
     })

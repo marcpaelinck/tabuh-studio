@@ -5,7 +5,7 @@ import { getValidSymbols } from '../../utils/alphabet'
 import { positionConfigs } from '../../config/config'
 import type { EditorCellCursor, Measure } from '../../models/types'
 import { noCursor } from './_constants'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type RefObject } from 'react'
 import type { GridRowInfo } from './_types'
 import _ from 'lodash'
 import type { PlaybackState } from '../../hooks/playbackReducer'
@@ -19,7 +19,7 @@ export function StaffNode({
     measures,
     colWidths,
     gridRow,
-    playbackState
+    playbackStateRef
 }: {
     systemId: number
     position: string
@@ -27,7 +27,7 @@ export function StaffNode({
     measures: Measure[]
     colWidths: number[]
     gridRow: GridRowInfo
-    playbackState: PlaybackState
+    playbackStateRef: RefObject<PlaybackState>
 }) {
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const [pbOn, setPbOn] = useState<boolean>(true)
@@ -42,9 +42,9 @@ export function StaffNode({
 
     // Update the cell highlight during playback
     useEffect(() => {
-        if (!gridRow || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) return
+        if (!gridRow || (highlightedCell == noCursor && playbackStateRef.current.cursor.system != systemId)) return
         // If the cursor has moved to another system we might need to switch off highlighting in the current system.
-        if (_.isEqual(playbackState.cursor, highlightedCell)) {
+        if (_.isEqual(playbackStateRef.current.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).
             return
@@ -54,15 +54,15 @@ export function StaffNode({
         if (currTextArea) {
             highlight(currTextArea, false)
         }
-        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor && pbOn) {
+        if (playbackStateRef.current.cursor.system == systemId && playbackStateRef.current.cursor != noCursor && pbOn) {
             // Highlight cell
-            const textArea = gridRow[playbackState.cursor.measure].current
+            const textArea = gridRow[playbackStateRef.current.cursor.measure].current
             if (textArea) highlight(textArea, true)
-            setHighlightedCell(playbackState.cursor)
+            setHighlightedCell(playbackStateRef.current.cursor)
         } else {
             setHighlightedCell(noCursor)
         }
-    }, [playbackState])
+    }, [playbackStateRef.current])
 
     const measureNodes = measures.map((measure: Measure, sidx: number) => {
         const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'

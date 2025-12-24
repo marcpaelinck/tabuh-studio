@@ -28,7 +28,7 @@ async function asyncPlay() {
     }
 }
 
-export function playBack(state: PlaybackState, action: playbackAction): PlaybackState {
+export function reducer(state: PlaybackState, action: playbackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
             if (action.data && action.audiofunctions) {
