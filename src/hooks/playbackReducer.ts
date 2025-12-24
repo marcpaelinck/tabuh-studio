@@ -5,9 +5,12 @@ import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { noCursor } from '../components/tabuheditor/_constants'
 
-export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState }
+export type PlaybackType = 'single' | 'multiple' | 'none'
+export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor'
+export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; playbackType: PlaybackType }
 export type playbackAction = {
-    type: 'load' | 'play' | 'pause' | 'stop' | 'cursor'
+    actionType: ActionType
+    playbackType?: PlaybackType
     data?: EditorSystemData[]
     audiofunctions?: AudioFunctionsType
     cursor?: EditorCellCursor
@@ -26,7 +29,7 @@ async function asyncPlay() {
 }
 
 export function playBack(state: PlaybackState, action: playbackAction): PlaybackState {
-    switch (action.type) {
+    switch (action.actionType) {
         case 'load': {
             if (action.data && action.audiofunctions) {
                 debug(`loading data for sys ${action.data[0].id}`, 'audioReducer')
@@ -37,29 +40,33 @@ export function playBack(state: PlaybackState, action: playbackAction): Playback
                     generic: action.audiofunctions.genericFunction
                 })
                 scheduleTransport(timeLine)
-                return { cursor: state.cursor, audioState: 'stopped' }
+                return { ...state, audioState: 'stopped' }
             }
-            console.error('audio reducer: action is "load" but data or functions are missing')
-            return { cursor: noCursor, audioState: 'nodata' }
+            console.error('audio reducer: action is "load" but data or functions are missing.')
+            return { ...state, cursor: noCursor, audioState: 'nodata' }
         }
         case 'play': {
-            asyncPlay()
-            return { cursor: state.cursor, audioState: 'playing' }
+            if (action.playbackType) {
+                asyncPlay()
+                return { ...state, audioState: 'playing', playbackType: action.playbackType }
+            }
+            console.error('audio reducer: action is "play" but playback type is missing.')
+            return { ...state }
         }
         case 'pause': {
             Tone.getTransport().pause()
-            return { cursor: state.cursor, audioState: 'paused' }
+            return { ...state, audioState: 'paused' }
         }
         case 'stop': {
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
-            return { cursor: noCursor, audioState: 'nodata' }
+            return { ...state, cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'cursor':
             if (action.cursor) {
-                return { cursor: action.cursor, audioState: state.audioState }
+                return { ...state, cursor: action.cursor }
             }
-            console.error('audio reducer: action is "cursor" but cursor attribute is missing')
+            console.error('audio reducer: action is "cursor" but cursor attribute is missing.')
             return { ...state }
     }
 }

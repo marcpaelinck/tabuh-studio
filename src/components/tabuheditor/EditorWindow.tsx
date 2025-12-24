@@ -86,16 +86,20 @@ export default function EditorWindow({
     // AUDIO AND CURSOR PLAYBACK FUNCTIONS
 
     const audio: AudioFunctionsType = useContext(AudioFunctions)
-    const [playbackState, playback] = useReducer(playBack, { cursor: noCursor, audioState: 'nodata' })
+    const [playbackState, playback] = useReducer(playBack, {
+        cursor: noCursor,
+        audioState: 'nodata',
+        playbackType: 'none'
+    })
 
     async function stopPlayback(time: number) {
-        playback({ type: 'stop' })
-        playback({ type: 'cursor', cursor: noCursor })
+        playback({ actionType: 'stop' })
+        playback({ actionType: 'cursor', cursor: noCursor })
     }
 
     function moveCursor(time: number, cAction: CursorAction) {
         playback({
-            type: 'cursor',
+            actionType: 'cursor',
             cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
         })
         debug(
@@ -110,13 +114,14 @@ export default function EditorWindow({
         // if (playbackState.audioState == 'nodata') {
         if (playbackState.cursor.system != data[sysDataId].id) {
             playback({
-                type: 'load',
+                actionType: 'load',
                 data: singleSystem ? [data[sysDataId]] : data.slice(sysDataId, data.length),
                 audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
             })
         }
-        if (playbackState.audioState == 'playing') playback({ type: 'pause' })
-        else playback({ type: 'play' })
+        if (playbackState.audioState == 'playing')
+            playback({ actionType: 'pause', playbackType: singleSystem ? 'single' : 'multiple' })
+        else playback({ actionType: 'play', playbackType: singleSystem ? 'single' : 'multiple' })
     }
 
     var dummy: OverlayTriggerHandle = {
@@ -138,6 +143,7 @@ export default function EditorWindow({
 
     const whisperRef = useRef<OverlayTriggerHandle>(dummy)
     const systems = data.map((systemData, seqId) => {
+        const pbType = playbackState.audioState + playbackState.playbackType
         return (
             <Accordion.Panel
                 key={systemData.key}
@@ -155,18 +161,18 @@ export default function EditorWindow({
                         <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
                             <ButtonGroup size="sm">
                                 <Button as="div" onClick={(e) => playPauseClicked(e, seqId, true)}>
-                                    {playbackState.audioState == 'playing' ? (
+                                    {pbType == 'playingsingle' ? (
                                         <IoPause color={buttonColor(systemData.id, playbackState)} />
-                                    ) : playbackState.audioState == 'paused' ? (
+                                    ) : pbType == 'pausedsingle' ? (
                                         <IoPlay color={buttonColor(systemData.id, playbackState)} />
                                     ) : (
                                         <IoPlayOutline color="gray" />
                                     )}
                                 </Button>
                                 <Button as="div" onClick={(e) => playPauseClicked(e, seqId, false)}>
-                                    {playbackState.audioState == 'playing' ? (
+                                    {pbType == 'playingmultiple' ? (
                                         <IoPause color={buttonColor(systemData.id, playbackState)} />
-                                    ) : playbackState.audioState == 'paused' ? (
+                                    ) : pbType == 'pausedmultiple' ? (
                                         <IoPlaySkipForward color={buttonColor(systemData.id, playbackState)} />
                                     ) : (
                                         <IoPlaySkipForwardOutline color="gray" />
