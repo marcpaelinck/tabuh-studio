@@ -8,6 +8,7 @@ import TabuhEditor from './components/tabuheditor/TabuhEditor'
 import { useTabuhDict } from './hooks/useTabuhDict'
 import DebugWindow from './components/DebugWindow'
 import 'rsuite/dist/rsuite.css'
+import { TabuhEditor1 } from './components/tabuheditor/TabuhEditor1'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
@@ -40,7 +41,7 @@ export default function App() {
                         {active == 'player' ? (
                             <TabuhPlayer tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
                         ) : (
-                            <TabuhEditor tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                            <TabuhEditor1 tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
                         )}
                     </div>
                 </VStack>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } 
 import type { EditorCellCursor, EditorSystemData } from '../../models/types'
 import { NavigationFunctions } from './contexts'
 import { Grid, VStack } from 'rsuite'
-import { positionConfigs, type NavigationAction } from '../../config/config'
+import { type NavigationAction } from '../../config/config'
 import type { GridInfo, NavigationFunctionsType } from './_types'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
@@ -38,7 +38,6 @@ export function SystemNode({
         return (pbValue: boolean) => {
             const newPbOn = { ...pbOn }
             newPbOn[position] = pbValue
-            debug(newPbOn, SystemNode.name)
             setPbOn(newPbOn)
         }
     }

@@ -153,7 +153,7 @@ export default function EditorWindow({
             {loading || processing ? (
                 <Placeholder.Grid rows={12} columns={6} />
             ) : (
-                <Accordion className="w-full overflow-scroll">{systems}</Accordion>
+                <Accordion className="w-full">{systems}</Accordion>
             )}
         </AudioFunctions>
     )

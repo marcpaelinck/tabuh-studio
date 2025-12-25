@@ -32,7 +32,7 @@ export default function TabuhEditor({
 
     return (
         <div id="TabuhEditor">
-            <VStack className="m-5">
+            <VStack id="EditorContainer" className="m-5">
                 <HStack>
                     <Menu
                         menuDisabled={loading}
