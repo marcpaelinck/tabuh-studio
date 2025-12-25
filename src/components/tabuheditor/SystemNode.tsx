@@ -1,5 +1,5 @@
-import { useRef, type ReactNode, type RefObject } from 'react'
-import type { EditorSystemData } from '../../models/types'
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import type { EditorCellCursor, EditorSystemData } from '../../models/types'
 import { NavigationFunctions } from './contexts'
 import { Grid, VStack } from 'rsuite'
 import { type NavigationAction } from '../../config/config'
@@ -8,6 +8,7 @@ import _ from 'lodash'
 import { debug } from '../../utils/debugger'
 import { type PlaybackState } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
+import { noCursor } from './_constants'
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
@@ -23,17 +24,63 @@ export function SystemNode({
     playbackState: PlaybackState
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
+    const systemId = systemData.id
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
+    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
 
-    debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
+    debug(`(re-)rendering system ${systemId}`, SystemNode.name)
 
-    const navigationFunctions: NavigationFunctionsType = {
-        register: registerComponent,
-        navigate: navigate,
-        updateSystemData: (data: EditorSystemData) => {}
+    const navigationFunctions: NavigationFunctionsType = useMemo(() => {
+        return { register: registerComponent, navigate: navigate, updateSystemData: (data: EditorSystemData) => {} }
+    }, [])
+
+    function highlight(cell: HTMLTextAreaElement | null, on: boolean) {
+        if (!cell) return
+        const classes = ['border-1', 'border-solid', 'border-red-500']
+        classes.forEach((value) => {
+            if (on && !cell.classList.contains(value)) cell.classList.add(value)
+            if (!on && cell.classList.contains(value)) cell.classList.remove(value)
+        })
     }
+
+    // Update the cell highlight during playback. All measures for the current beat are
+    // highlighted here at once. This is why we ignore all cursor changes except for the KEMPLI.
+    useEffect(() => {
+        if (
+            playbackState.cursor.position != 'KEMPLI' ||
+            !grid ||
+            (highlightedCell == noCursor && playbackState.cursor.system != systemId)
+        ) {
+            debug(`nothing to highlight`, StaffNode.name)
+            return
+        }
+
+        // If the cursor has moved to another system we might need to switch off highlighting in the current system.
+        if (_.isEqual(playbackState.cursor, highlightedCell)) {
+            // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
+            // but highlighting of symbols within a measure is not implemented (yet).
+            return
+        }
+        // Remove highlight from current cells
+        if (!_.isEqual(highlightedCell, noCursor)) {
+            for (var row = 0; row <= grid.current.maxRowId; row++)
+                highlight(grid.current.cells[row][highlightedCell.measure].current, false)
+        }
+        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor /*&& pbOn*/) {
+            // Highlight cell
+            debug(
+                `Highlighting sys=${playbackState.cursor.system} measure=${playbackState.cursor.measure}`,
+                SystemNode.name
+            )
+            for (var row = 0; row <= grid.current.maxRowId; row++)
+                highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
+            setHighlightedCell(playbackState.cursor)
+        } else {
+            setHighlightedCell(noCursor)
+        }
+    }, [playbackState])
 
     function registerComponent(row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) {
         if (!element) {
@@ -71,19 +118,23 @@ export function SystemNode({
         }
     }
 
-    const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
-        return (
-            <StaffNode
-                systemId={systemData.id}
-                position={position}
-                rowId={rowId}
-                measures={measures}
-                colWidths={systemData.colWidths}
-                gridRow={grid.current.cells[posToRow[position]]}
-                playbackState={playbackState}
-            />
-        )
-    })
+    const staffNodes = useMemo(
+        () =>
+            Object.entries(systemData.staffs).map(([position, measures], rowId) => {
+                debug(`useMemo: recreating staffnodes of system ${systemId}`, SystemNode.name)
+                return (
+                    <StaffNode
+                        systemId={systemId}
+                        position={position}
+                        rowId={rowId}
+                        measures={measures}
+                        colWidths={systemData.colWidths}
+                        // gridRow={grid.current.cells[posToRow[position]]}
+                    />
+                )
+            }),
+        [systemData]
+    )
 
     return (
         <NavigationFunctions value={navigationFunctions}>

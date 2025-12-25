@@ -1,6 +1,15 @@
 import { Accordion, Divider, HStack, Placeholder, Popover, Whisper } from 'rsuite'
 import type { Score, EditorSystemData, Staffs } from '../../models/types'
-import { useEffect, useReducer, useRef, useState, type Dispatch, type HTMLAttributes, type RefObject } from 'react'
+import {
+    useEffect,
+    useMemo,
+    useReducer,
+    useRef,
+    useState,
+    type Dispatch,
+    type HTMLAttributes,
+    type RefObject
+} from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { useInstruments } from '../../hooks/useInstruments'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
@@ -36,7 +45,7 @@ export default function EditorWindow({
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
-    const audioFunctions: AudioFunctionsType = Object.assign(defaultAudioFunc, { playInstrument })
+    const audioFunctions: AudioFunctionsType = useMemo(() => Object.assign(defaultAudioFunc, { playInstrument }), [])
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
     const [playbackState, playback] = useReducer(playbackReducer, {

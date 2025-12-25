@@ -5,7 +5,7 @@ import { getValidSymbols } from '../../utils/alphabet'
 import { positionConfigs } from '../../config/config'
 import type { EditorCellCursor, Measure } from '../../models/types'
 import { noCursor } from './_constants'
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useMemo, useState, type RefObject } from 'react'
 import type { GridRowInfo } from './_types'
 import _ from 'lodash'
 import type { PlaybackState } from '../../hooks/playbackReducer'
@@ -18,81 +18,43 @@ export function StaffNode({
     position,
     rowId,
     measures,
-    colWidths,
-    gridRow,
-    playbackState
+    colWidths
+    // gridRow
 }: {
     systemId: number
     position: string
     rowId: number
     measures: Measure[]
     colWidths: number[]
-    gridRow: GridRowInfo
-    playbackState: PlaybackState
+    // gridRow: GridRowInfo
 }) {
-    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const [pbOn, setPbOn] = useState<boolean>(true)
 
     if (position == 'REYONG_1') debug(`(re-)rendering stave ${systemId} ${position}`, StaffNode.name)
 
-    function highlight(cell: HTMLTextAreaElement, on: boolean) {
-        const classes = ['border-1', 'border-solid', 'border-red-500']
-        classes.forEach((value) => {
-            if (on && !cell.classList.contains(value)) cell.classList.add(value)
-            if (!on && cell.classList.contains(value)) cell.classList.remove(value)
-        })
-    }
-
-    // Update the cell highlight during playback
-    useEffect(() => {
-        if (!gridRow || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) {
-            debug(`nothing to highlight`, StaffNode.name)
-            return
-        }
-
-        // If the cursor has moved to another system we might need to switch off highlighting in the current system.
-        if (_.isEqual(playbackState.cursor, highlightedCell)) {
-            // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
-            // but highlighting of symbols within a measure is not implemented (yet).
-            return
-        }
-        // Remove highlight from current cell
-        const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current
-        if (currTextArea) {
-            debug(
-                `Highlighting sys=${playbackState.cursor.system} pos=${playbackState.cursor.position} meas=${playbackState.cursor.measure}`,
-                StaffNode.name
-            )
-            highlight(currTextArea, false)
-        }
-        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor && pbOn) {
-            // Highlight cell
-            const textArea = gridRow[playbackState.cursor.measure].current
-            if (textArea) highlight(textArea, true)
-            setHighlightedCell(playbackState.cursor)
-        } else {
-            setHighlightedCell(noCursor)
-        }
-    }, [playbackState])
-
-    const measureNodes = measures.map((measure: Measure, sidx: number) => {
-        const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
-        const validSymbols: string[] = getValidSymbols(position, true)
-        return (
-            <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
-                <MeasureNode
-                    key={rowId * 100 + sidx}
-                    rowId={rowId}
-                    colId={sidx}
-                    validSymbols={validSymbols}
-                    defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
-                    style={{ width: width }}
-                    className={`balifont10 h-5 resize-none overflow-clip p-0`}
-                    spellCheck="false"
-                />
-            </Col>
-        )
-    })
+    const measureNodes = useMemo(
+        () =>
+            measures.map((measure: Measure, sidx: number) => {
+                debug(`useMemo: recreating measures of system ${systemId} ${position}`, StaffNode.name)
+                const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
+                const validSymbols: string[] = getValidSymbols(position, true)
+                return (
+                    <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
+                        <MeasureNode
+                            key={rowId * 100 + sidx}
+                            rowId={rowId}
+                            colId={sidx}
+                            validSymbols={validSymbols}
+                            defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
+                            style={{ width: width }}
+                            className={`balifont10 h-5 resize-none overflow-clip p-0`}
+                            spellCheck="false"
+                        />
+                    </Col>
+                )
+            }),
+        []
+    )
 
     return (
         <Row id={`ROW-${position}`}>

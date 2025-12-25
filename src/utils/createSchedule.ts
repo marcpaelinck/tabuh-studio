@@ -91,8 +91,8 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                             }
                         }
                     }
-                    // Create cursor actions if the system-section-position combi differs
-                    // from the previous entry
+                    // Create cursor actions if the system-section combi differs
+                    // from the previous entry. Therefore we only one position (KEMPLI).
                     const last =
                         timeline.cursoractions.length > 0
                             ? timeline.cursoractions[timeline.cursoractions.length - 1]
@@ -102,7 +102,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                         system.id == last.system &&
                         measureidx == last.section &&
                         position == last.position
-                    if (actionFunctions.cursor && !same) {
+                    if (actionFunctions.cursor && !same && position == 'KEMPLI') {
                         timeline.cursoractions.push({
                             action: actionFunctions.cursor,
                             time: n2TO(currTime),

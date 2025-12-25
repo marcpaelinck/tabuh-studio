@@ -117,6 +117,7 @@ export type EditorSystemData = {
     colWidths: number[]
 }
 export type EditorCellCursor = { system: number; position: string; measure: number }
+export type EditorBeatCursor = { system: number; beat: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
