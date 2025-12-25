@@ -3,6 +3,7 @@ import type { ElementWithValueTracker, NavigationFunctionsType } from './_types'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
 import { NavigationFunctions } from './contexts'
+import { debug } from '../../utils/debugger'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     rowId: number
@@ -20,11 +21,16 @@ export function MeasureNode({ rowId, colId, validSymbols, ...props }: Navigation
         navFunc.navigate(action, rowId, colId)
     )
 
+    if (rowId == 5 && colId == 5) debug(`(re-)rendering measure ${rowId} ${colId}`, MeasureNode.name)
+
     useEffect(() => {
         navFunc.register(rowId, colId, ref)
     }, [])
 
-    const highlightChanged = (event: ChangeEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLTextAreaElement>) => {
+    // Highlight the cell background if the content has been modified by the user.
+    const highlightOnChangedContent = (
+        event: ChangeEvent<HTMLTextAreaElement> | KeyboardEvent<HTMLTextAreaElement>
+    ) => {
         const cell = event.target as HTMLTextAreaElement & ElementWithValueTracker
         const changed = cell._valueTracker.getValue() != props.defaultValue
         const classes = ['bg-amber-100']
@@ -37,10 +43,10 @@ export function MeasureNode({ rowId, colId, validSymbols, ...props }: Navigation
     return (
         <textarea
             ref={ref}
-            onChange={highlightChanged}
+            onChange={highlightOnChangedContent}
             onKeyDown={(e) => {
                 keyboardListener(e)
-                highlightChanged(e)
+                highlightOnChangedContent(e)
             }}
             {...props}
         />

@@ -8,7 +8,7 @@ import { SystemNode } from './SystemNode'
 import { debug } from '../../utils/debugger'
 import { SystemContextMenu } from './SystemContextMenu'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import { reducer, type PlaybackState } from '../../hooks/playbackReducer'
+import { playbackReducer, type PlaybackState } from '../../hooks/playbackReducer'
 import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
 
@@ -37,12 +37,13 @@ export default function EditorWindow({
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = Object.assign(defaultAudioFunc, { playInstrument })
-    const [playbackState, playback] = useReducer(reducer, {
+    //TODO: playbackState was moved from individual SystemNode components to parent
+    // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
+    const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
         audioState: 'nodata',
         playbackType: 'none'
     })
-    const playbackStateRef = useRef<PlaybackState>(playbackState)
 
     function flipExpanded(id: number) {
         setExpanded({ ...expanded, ...Object.fromEntries([[id, !expanded[id]]]) })
@@ -84,7 +85,7 @@ export default function EditorWindow({
         setData([...data.slice(0, seqId), sysData, ...data.slice(seqId + 1)])
     }
 
-    var dummy: OverlayTriggerHandle = {
+    var dummyWhisper: OverlayTriggerHandle = {
         updatePosition: () => {},
         open: () => {},
         close: () => {},
@@ -92,7 +93,7 @@ export default function EditorWindow({
             return { open: false }
         }
     }
-    const whisperRef = useRef<OverlayTriggerHandle>(dummy)
+    const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
 
     const systems = data.map((systemData, seqId) => {
         return (
@@ -128,7 +129,7 @@ export default function EditorWindow({
                 }}>
                 {expanded[systemData.id] && (
                     <SystemNode
-                        playbackStateRef={playbackStateRef}
+                        playbackState={playbackState}
                         systemData={systemData}
                         sequence={seqId}
                         update={updateData}

@@ -14,20 +14,20 @@ export function SystemNode({
     systemData,
     sequence,
     update,
-    playbackStateRef,
+    playbackState,
     ...props
 }: {
     systemData: EditorSystemData
     sequence: number
     update: (sysData: EditorSystemData, seqId: number) => void
-    playbackStateRef: RefObject<PlaybackState>
+    playbackState: PlaybackState
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
 
-    if ([1, 13].includes(systemData.id)) debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
+    debug(`(re-)rendering system ${systemData.id}`, SystemNode.name)
 
     const navigationFunctions: NavigationFunctionsType = {
         register: registerComponent,
@@ -80,7 +80,7 @@ export function SystemNode({
                 measures={measures}
                 colWidths={systemData.colWidths}
                 gridRow={grid.current.cells[posToRow[position]]}
-                playbackStateRef={playbackStateRef}
+                playbackState={playbackState}
             />
         )
     })

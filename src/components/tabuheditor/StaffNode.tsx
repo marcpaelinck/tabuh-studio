@@ -9,6 +9,7 @@ import { useEffect, useState, type RefObject } from 'react'
 import type { GridRowInfo } from './_types'
 import _ from 'lodash'
 import type { PlaybackState } from '../../hooks/playbackReducer'
+import { debug } from '../../utils/debugger'
 
 // Creates a row of cells containing one staff: a line of notation within a system/gongan,
 // which corresponds with the notation of a single instrument position.
@@ -19,7 +20,7 @@ export function StaffNode({
     measures,
     colWidths,
     gridRow,
-    playbackStateRef
+    playbackState
 }: {
     systemId: number
     position: string
@@ -27,10 +28,12 @@ export function StaffNode({
     measures: Measure[]
     colWidths: number[]
     gridRow: GridRowInfo
-    playbackStateRef: RefObject<PlaybackState>
+    playbackState: PlaybackState
 }) {
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const [pbOn, setPbOn] = useState<boolean>(true)
+
+    if (position == 'REYONG_1') debug(`(re-)rendering stave ${systemId} ${position}`, StaffNode.name)
 
     function highlight(cell: HTMLTextAreaElement, on: boolean) {
         const classes = ['border-1', 'border-solid', 'border-red-500']
@@ -42,9 +45,13 @@ export function StaffNode({
 
     // Update the cell highlight during playback
     useEffect(() => {
-        if (!gridRow || (highlightedCell == noCursor && playbackStateRef.current.cursor.system != systemId)) return
+        if (!gridRow || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) {
+            debug(`nothing to highlight`, StaffNode.name)
+            return
+        }
+
         // If the cursor has moved to another system we might need to switch off highlighting in the current system.
-        if (_.isEqual(playbackStateRef.current.cursor, highlightedCell)) {
+        if (_.isEqual(playbackState.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).
             return
@@ -52,17 +59,21 @@ export function StaffNode({
         // Remove highlight from current cell
         const currTextArea = _.isEqual(highlightedCell, noCursor) ? null : gridRow[highlightedCell.measure].current
         if (currTextArea) {
+            debug(
+                `Highlighting sys=${playbackState.cursor.system} pos=${playbackState.cursor.position} meas=${playbackState.cursor.measure}`,
+                StaffNode.name
+            )
             highlight(currTextArea, false)
         }
-        if (playbackStateRef.current.cursor.system == systemId && playbackStateRef.current.cursor != noCursor && pbOn) {
+        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor && pbOn) {
             // Highlight cell
-            const textArea = gridRow[playbackStateRef.current.cursor.measure].current
+            const textArea = gridRow[playbackState.cursor.measure].current
             if (textArea) highlight(textArea, true)
-            setHighlightedCell(playbackStateRef.current.cursor)
+            setHighlightedCell(playbackState.cursor)
         } else {
             setHighlightedCell(noCursor)
         }
-    }, [playbackStateRef.current])
+    }, [playbackState])
 
     const measureNodes = measures.map((measure: Measure, sidx: number) => {
         const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
