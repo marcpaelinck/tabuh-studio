@@ -17,7 +17,7 @@ import { SystemNode } from './SystemNode'
 import { debug } from '../../utils/debugger'
 import { SystemContextMenu } from './SystemContextMenu'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import { playbackReducer, type PlaybackState } from '../../hooks/playbackReducer'
+import { playbackReducer } from '../../hooks/playbackReducer'
 import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
 

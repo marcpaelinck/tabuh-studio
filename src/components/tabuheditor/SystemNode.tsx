@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } 
 import type { EditorCellCursor, EditorSystemData } from '../../models/types'
 import { NavigationFunctions } from './contexts'
 import { Grid, VStack } from 'rsuite'
-import { type NavigationAction } from '../../config/config'
+import { positionConfigs, type NavigationAction } from '../../config/config'
 import type { GridInfo, NavigationFunctionsType } from './_types'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
@@ -24,13 +24,24 @@ export function SystemNode({
     playbackState: PlaybackState
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
+    const positions = Object.keys(systemData.staffs)
     const systemId = systemData.id
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    const posToRow = Object.fromEntries(Object.keys(systemData.staffs).map((key, idx) => [key, idx]))
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
+    const pbOnInit = Object.fromEntries(positions.map((position) => [position, true]))
+    const [pbOn, setPbOn] = useState<Record<string, boolean>>(pbOnInit)
 
     debug(`(re-)rendering system ${systemId}`, SystemNode.name)
+
+    const setStavePbOn = (position: string) => {
+        return (pbValue: boolean) => {
+            const newPbOn = { ...pbOn }
+            newPbOn[position] = pbValue
+            debug(newPbOn, SystemNode.name)
+            setPbOn(newPbOn)
+        }
+    }
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
         return { register: registerComponent, navigate: navigate, updateSystemData: (data: EditorSystemData) => {} }
@@ -48,16 +59,11 @@ export function SystemNode({
     // Update the cell highlight during playback. All measures for the current beat are
     // highlighted here at once. This is why we ignore all cursor changes except for the KEMPLI.
     useEffect(() => {
-        if (
-            playbackState.cursor.position != 'KEMPLI' ||
-            !grid ||
-            (highlightedCell == noCursor && playbackState.cursor.system != systemId)
-        ) {
-            debug(`nothing to highlight`, StaffNode.name)
+        // If the cursor has moved to another system we might need to switch off highlighting in the current system.
+        if (!grid || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) {
+            debug(`nothing to highlight`, SystemNode.name)
             return
         }
-
-        // If the cursor has moved to another system we might need to switch off highlighting in the current system.
         if (_.isEqual(playbackState.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).
@@ -74,8 +80,9 @@ export function SystemNode({
                 `Highlighting sys=${playbackState.cursor.system} measure=${playbackState.cursor.measure}`,
                 SystemNode.name
             )
-            for (var row = 0; row <= grid.current.maxRowId; row++)
-                highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
+            for (var row = 0; row <= grid.current.maxRowId; row++) {
+                if (pbOn[positions[row]]) highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
+            }
             setHighlightedCell(playbackState.cursor)
         } else {
             setHighlightedCell(noCursor)
@@ -129,11 +136,13 @@ export function SystemNode({
                         rowId={rowId}
                         measures={measures}
                         colWidths={systemData.colWidths}
+                        pbOn={pbOn[position]}
+                        setPbOn={setStavePbOn(position)}
                         // gridRow={grid.current.cells[posToRow[position]]}
                     />
                 )
             }),
-        [systemData]
+        [systemData, pbOn]
     )
 
     return (

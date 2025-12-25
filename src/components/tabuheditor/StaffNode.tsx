@@ -18,18 +18,18 @@ export function StaffNode({
     position,
     rowId,
     measures,
-    colWidths
-    // gridRow
+    colWidths,
+    pbOn,
+    setPbOn
 }: {
     systemId: number
     position: string
     rowId: number
     measures: Measure[]
     colWidths: number[]
-    // gridRow: GridRowInfo
+    pbOn: boolean
+    setPbOn: (value: boolean) => void
 }) {
-    const [pbOn, setPbOn] = useState<boolean>(true)
-
     if (position == 'REYONG_1') debug(`(re-)rendering stave ${systemId} ${position}`, StaffNode.name)
 
     const measureNodes = useMemo(
@@ -64,7 +64,7 @@ export function StaffNode({
                 </Text>
             </Col>
             <Col id={`COL-POSITION`} span="auto">
-                <Checkbox checked={pbOn} defaultChecked onChange={() => setPbOn(!pbOn)} />
+                <Checkbox checked={pbOn} onChange={() => setPbOn(!pbOn)} />
             </Col>
             {measureNodes}
         </Row>
