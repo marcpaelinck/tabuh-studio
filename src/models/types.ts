@@ -34,12 +34,17 @@ export type JsonSymbol = {
 }
 
 // Notation of one section for one instrument position
-export type Measure = { tempo: [number, number]; velocity: [number, number]; notes: JsonNote[]; notation: JsonSymbol[] }
+export type Measure = {
+    tempo: [number, number]
+    velocity: [number, number]
+    notes: JsonNote[]
+    notation: JsonSymbol[]
+    notation_?: JsonSymbol[] // used to keep modified notation that has not been saved yet
+}
 
 // Subdivision of a system, typically spans one kempli beat
 export type Section = {
     id: number
-    gongan: number
     starttime: number // start time in base notes
     starttimeMs: number // start time in ms
     duration: number
@@ -49,7 +54,9 @@ export type Section = {
 
 // Subdivision of a score, typically spans one gongan
 export type System = {
-    id: number
+    key: string // unique, fixed uuid.
+    id: number // // Sequence number, used as identification in the UI. Can change when systems are added/removed/sorted.
+    gongan: number // ID from the `gamelan-notation` python application. Unused in this application.
     starttime: number // start time of first section
     duration: number // sum of section durations
     part: string
@@ -109,7 +116,7 @@ export type HighlightRange = { line: number; range: number[] }
 export type Staffs = Record<string, Measure[]>
 
 export type EditorSystemData = {
-    key: number // unique row id
+    key: string // unique row id
     id: number // system id
     system: string
     part: string

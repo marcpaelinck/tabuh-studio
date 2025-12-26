@@ -13,6 +13,7 @@ import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from './timeunits'
 import { createElement } from 'react'
 import { defaultIntroTime, defaultOutroTime } from '../config/config'
 import { cleanSymbol } from './alphabet'
+import { v4 as uuidv4 } from 'uuid'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)
@@ -22,6 +23,7 @@ export function parseScore(input: string): Score {
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
     const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, score.systems[0].sections[0].tempo[0])
     score.systems.forEach((system, sysidx, systemArray) => {
+        system.key = uuidv4()
         system.starttime += introTimeBn
         system.sections.forEach((section, sectidx, sectionArray) => {
             section.starttime += introTimeBn

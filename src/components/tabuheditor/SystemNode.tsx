@@ -13,14 +13,12 @@ import { noCursor } from './_constants'
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
     systemData,
-    sequence,
     update,
     playbackState,
     ...props
 }: {
     systemData: EditorSystemData
-    sequence: number
-    update: (sysData: EditorSystemData, seqId: number) => void
+    update: (sysData: EditorSystemData, sysIdx?: number) => void
     playbackState: PlaybackState
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)

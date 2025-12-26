@@ -25,7 +25,8 @@
         "react-svg": "^16.3.0",
         "rsuite": "^6.0.0",
         "tailwindcss": "^4.1.17",
-        "tone": "^15.1.22"
+        "tone": "^15.1.22",
+        "uuid": "^13.0.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.33.0",

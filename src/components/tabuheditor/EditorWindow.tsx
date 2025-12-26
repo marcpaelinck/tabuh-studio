@@ -20,14 +20,8 @@ import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { playbackReducer } from '../../hooks/playbackReducer'
 import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
-
-var uniqueKeyValue = 0
-
-// TODO use uuid function
-function uniqueKey(): number {
-    uniqueKeyValue += 1
-    return uniqueKeyValue
-}
+import _ from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function EditorWindow({
     score,
@@ -37,9 +31,9 @@ export default function EditorWindow({
     ...props
 }: {
     score: Score
-    expanded: Record<number, boolean>
+    expanded: Record<string, boolean>
     loading: boolean
-    setExpanded: Dispatch<Record<number, boolean>>
+    setExpanded: Dispatch<Record<string, boolean>>
 } & HTMLAttributes<HTMLDivElement>) {
     const [data, setData] = useState<EditorSystemData[]>([])
     const [processing, setProcessing] = useState<boolean>(false)
@@ -54,15 +48,15 @@ export default function EditorWindow({
         playbackType: 'none'
     })
 
-    function flipExpanded(id: number) {
-        setExpanded({ ...expanded, ...Object.fromEntries([[id, !expanded[id]]]) })
+    function flipExpanded(key: string) {
+        setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
     }
 
     useEffect(() => {
         // Convert new score to data record structure
         setProcessing(true)
         const newData: EditorSystemData[] = []
-        score.systems.forEach((system) => {
+        score.systems.forEach((system, sysIdx) => {
             const positions = Object.keys(system.sections[0].staves).toSorted(
                 (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
             )
@@ -73,9 +67,8 @@ export default function EditorWindow({
                 positions.map((position) => [position, system.sections.map((section) => section.staves[position])])
             )
             const summary: EditorSystemData = {
-                id: system.id,
-                // Unique key will force to recreate content when new data is loaded
-                key: uniqueKey(),
+                id: sysIdx,
+                key: system.key,
                 system: system.id.toString(),
                 part: system.part || '-',
                 staffs: staffs,
@@ -90,8 +83,23 @@ export default function EditorWindow({
         setProcessing(false)
     }, [score])
 
-    function updateData(sysData: EditorSystemData, seqId: number) {
-        setData([...data.slice(0, seqId), sysData, ...data.slice(seqId + 1)])
+    // Updates an existing system data element (sysIdx undefined) or adds a new data element (sysIdx given)
+    function updateData(systemData: EditorSystemData, sysIdx?: number) {
+        const newSysData = _.cloneDeep(systemData)
+        if (sysIdx) {
+            // assign a unique id to the copied system data
+            newSysData.key = uuidv4()
+            newSysData.part += ' ( copy)'
+        }
+        const index = sysIdx ? sysIdx : data.findIndex((sysData) => sysData.id == systemData.id)
+        if (!index) {
+            console.error(`system id ${systemData.id} not found.`)
+            return
+        }
+        const nextIdx = sysIdx ? index : index + 1
+        const newData = [...data.slice(0, index), newSysData, ...data.slice(nextIdx)]
+        newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
+        setData([...data.slice(0, index), newSysData, ...data.slice(nextIdx)])
     }
 
     var dummyWhisper: OverlayTriggerHandle = {
@@ -104,7 +112,9 @@ export default function EditorWindow({
     }
     const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
 
-    const systems = data.map((systemData, seqId) => {
+    debug(data, EditorWindow.name)
+
+    const systems = data.map((systemData, sysIdx) => {
         return (
             <Accordion.Panel
                 key={systemData.key}
@@ -118,7 +128,12 @@ export default function EditorWindow({
                         followCursor
                         speaker={
                             <Popover>
-                                <SystemContextMenu data={systemData} ref={whisperRef} />
+                                <SystemContextMenu
+                                    data={data}
+                                    systemData={systemData}
+                                    update={updateData}
+                                    ref={whisperRef}
+                                />
                             </Popover>
                         }>
                         <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
@@ -132,17 +147,12 @@ export default function EditorWindow({
                         </HStack>
                     </Whisper>
                 }
-                expanded={expanded[systemData.id]}
+                expanded={expanded[systemData.key]}
                 onSelect={() => {
-                    flipExpanded(systemData.id)
+                    flipExpanded(systemData.key)
                 }}>
-                {expanded[systemData.id] && (
-                    <SystemNode
-                        playbackState={playbackState}
-                        systemData={systemData}
-                        sequence={seqId}
-                        update={updateData}
-                    />
+                {expanded[systemData.key] && (
+                    <SystemNode systemData={systemData} update={updateData} playbackState={playbackState} />
                 )}
             </Accordion.Panel>
         )

@@ -4,11 +4,10 @@ import EditIcon from '@rsuite/icons/Edit'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { createContext, useState, type Dispatch } from 'react'
 import { FRAMESTYLE } from './config/config'
-import TabuhEditor from './components/tabuheditor/TabuhEditor'
 import { useTabuhDict } from './hooks/useTabuhDict'
 import DebugWindow from './components/DebugWindow'
 import 'rsuite/dist/rsuite.css'
-import { TabuhEditor1 } from './components/tabuheditor/TabuhEditor1'
+import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
@@ -41,7 +40,7 @@ export default function App() {
                         {active == 'player' ? (
                             <TabuhPlayer tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
                         ) : (
-                            <TabuhEditor1 tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                            <TabuhEditor tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
                         )}
                     </div>
                 </VStack>

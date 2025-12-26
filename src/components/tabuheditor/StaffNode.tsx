@@ -35,6 +35,7 @@ export function StaffNode({
                 debug(`useMemo: recreating measures of system ${systemId} ${position}`, StaffNode.name)
                 const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
                 const validSymbols: string[] = getValidSymbols(position, true)
+                const currValue = measure.notation_ ? measure.notation_ : measure.notation
                 return (
                     <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
                         <MeasureNode
@@ -42,6 +43,7 @@ export function StaffNode({
                             rowId={rowId}
                             colId={sidx}
                             validSymbols={validSymbols}
+                            measureData={measure}
                             defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
                             style={{ width: width }}
                             className={`balifont10 h-5 resize-none overflow-clip p-0`}

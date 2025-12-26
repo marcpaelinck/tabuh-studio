@@ -1,16 +1,16 @@
 const debugOn: Record<string, boolean> = {
     createInstrument: false,
-    createTimelineFromEditor: true,
+    createTimelineFromEditor: false,
     createTimeline: false,
-    EditorWindow: true,
-    keyboardListener: false,
+    EditorWindow: false,
+    useKeyboardListener: true,
     Menu: false,
-    MeasureNode: true,
-    NavigationCell: true,
+    MeasureNode: false,
+    NavigationCell: false,
     registerComponent: false,
     ScorePlayer: false,
-    StaffNode: true,
-    SystemNode: true
+    StaffNode: false,
+    SystemNode: false
 }
 
 export const debug = (message: any, caller: string) => {
