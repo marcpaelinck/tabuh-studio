@@ -39,7 +39,7 @@ export type Measure = {
     velocity: [number, number]
     notes: JsonNote[]
     notation: JsonSymbol[]
-    notation_?: JsonSymbol[] // used to keep modified notation that has not been saved yet
+    notation_?: JsonSymbol[] // cache used to keep user edits that have not been saved yet
 }
 
 // Subdivision of a system, typically spans one kempli beat
@@ -118,7 +118,6 @@ export type Staffs = Record<string, Measure[]>
 export type EditorSystemData = {
     key: string // unique row id
     id: number // system id
-    system: string
     part: string
     staffs: Staffs
     colWidths: number[]

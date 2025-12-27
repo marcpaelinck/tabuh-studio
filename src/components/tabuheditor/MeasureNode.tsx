@@ -42,14 +42,13 @@ export function MeasureNode({ rowId, colId, validSymbols, measureData, ...props 
 
     useEffect(() => {
         navFunc.register(rowId, colId, ref)
-        // Display the buffered edited value if previous edits have not yet been saved.
-        // This initialization is necessary because collapsing an harmonica panel removes the entire system grid.
+        // Edits are cached until the user saves their changes.
+        // Display the cached value if previous edits have not yet been saved.
         if (measureData.notation_ && ref.current)
             ref.current.value = measureData.notation_.map((jSym) => jSym.s).join('')
         highlightOnChangedContent(ref.current)
     }, [])
 
-    type EventsForHighlight = ChangeEvent | KeyboardEvent | ReactEventHandler
     // Highlight the cell background if the content has been modified by the user.
     const highlightOnChangedContent = (cell: HTMLTextAreaElement | null, initial: boolean = false) => {
         if (!cell) return

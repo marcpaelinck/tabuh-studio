@@ -1,68 +1,127 @@
-import { type RefObject, type SyntheticEvent } from 'react'
-import { IoSaveOutline } from 'react-icons/io5'
-import { Menu } from 'rsuite'
+import { type Dispatch, type RefObject, type SyntheticEvent } from 'react'
+import { IoCloseCircleOutline, IoSaveOutline } from 'react-icons/io5'
+import { Menu, useDialog } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import type { EditorSystemData } from '../../models/types'
+import { v4 as uuidv4 } from 'uuid'
+import _ from 'lodash'
+import { debug } from '../../utils/debugger'
 
 export function SystemContextMenu({
     data,
     systemData,
-    update,
+    setData,
+    templates,
+    setTemplates,
     ref,
     ...props
 }: {
-    data: EditorSystemData[]
-    systemData: EditorSystemData
-    update: (sysData: EditorSystemData, sysIdx?: number) => void
+    data: EditorSystemData[] // complete music notation
+    systemData: EditorSystemData // notation of current system
+    setData: Dispatch<EditorSystemData[]> // updates music notation
+    templates: Record<string, EditorSystemData>
+    setTemplates: Dispatch<Record<string, EditorSystemData>> // updates music notation
     ref: RefObject<OverlayTriggerHandle>
 }) {
     // const ref = useRef<HTMLDivElement>(null)
+    const dialog = useDialog()
 
-    const handleSelect = (eventKey: string | number | undefined, event: SyntheticEvent<Element, Event>) => {
+    // Executes changes according to the selected action from the menu
+    async function updateData(eventKey: string | number | undefined, event: SyntheticEvent<Element, Event>) {
         event.stopPropagation()
-        ref.current.close()
-        switch (eventKey) {
-            case 1: {
+        if (typeof eventKey != 'string') return // to appease TypeScript
+        const [action, source, where] = eventKey.split(',')
+
+        var newSysData: EditorSystemData | null = _.cloneDeep(systemData)
+        var sliceIndex1 = systemData.id
+        var sliceIndex2 = systemData.id
+
+        switch (action) {
+            case 'new': {
+                newSysData.key = uuidv4()
+                if (source != 'blank') newSysData.part += ' ( copy)'
+                // Reset the edit buffers of the measures.
+                // Also clear the values in case action=='new'
+                Object.values(newSysData.staffs).forEach((measures) => {
+                    measures.forEach((measure) => {
+                        measure.notation_ = undefined
+                        if (source == 'blank') measure.notation = []
+                    })
+                })
+                if (where == 'below') {
+                    sliceIndex1 = systemData.id + 1
+                    sliceIndex2 = systemData.id + 1
+                }
+                break
+            }
+            case 'mark': {
+                event.target.dispatchEvent(new Event('close'))
+                const name = await dialog.prompt('Template name:', {
+                    title: 'Mark as a template',
+                    defaultValue: '',
+                    validate: (value) => {
+                        const isValid = value.length > 0 && !(value in templates)
+                        return [isValid, 'This name is already in use.']
+                    }
+                })
+                if (typeof name === 'string') {
+                    setTemplates({ ...templates, ...Object.fromEntries([[name, systemData]]) })
+                }
                 return
             }
-            case 2: {
-                return
+            case 'save': {
+                Object.values(newSysData.staffs).forEach((measures) => {
+                    measures.forEach((measure) => {
+                        if (measure.notation_) {
+                            measure.notation = measure.notation_
+                            measure.notation_ = undefined
+                        }
+                    })
+                })
+                sliceIndex2 = systemData.id + 1
+                break
             }
-            case 3:
-            case 4: {
-                const index = data.findIndex((sysData) => sysData.id == systemData.id)
-                if (!index) console.error(`system id ${systemData.id} not found.`)
-                else update(systemData, index)
-                return
+            case 'delete': {
+                sliceIndex2 = systemData.id + 1
+                newSysData = null
+                break
             }
-            case 4: {
-                return
-            }
-            case 5: {
-                return
-            }
-            case 6: {
+            default: {
+                console.error(`Unexpected action ${action} ignored.`)
                 return
             }
         }
+        const newData = newSysData
+            ? [...data.slice(0, sliceIndex1), newSysData, ...data.slice(sliceIndex2)]
+            : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
+        // Update all system IDs
+        newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
+        debug(newSysData, SystemContextMenu.name)
+        debug(data, SystemContextMenu.name)
+        debug(newData, SystemContextMenu.name)
+        setData(newData)
     }
 
     return (
-        <Menu onSelect={handleSelect}>
-            <Menu.Item disabled eventKey={1}>
-                Add empty above
-            </Menu.Item>
-            <Menu.Item disabled eventKey={2}>
-                Add empty below
-            </Menu.Item>
-            <Menu.Item eventKey={3}>Add copy above</Menu.Item>
-            <Menu.Item eventKey={4}>Add copy below</Menu.Item>
+        <Menu onSelect={updateData}>
+            <Menu.Item eventKey={'new,blank,above'}>Insert new above</Menu.Item>
+            <Menu.Item eventKey={'new,blank,below'}>Insert new below</Menu.Item>
+            <Menu.Item eventKey={'new,current,above'}>Insert copy above</Menu.Item>
+            <Menu.Item eventKey={'new,current,below'}>Insert copy below</Menu.Item>
             <Menu.Separator />
-            <Menu.Item disabled eventKey={5}>
-                Mark as template
+            <Menu.Item eventKey={'mark'}>Mark as template</Menu.Item>
+            <Menu.Item disabled eventKey={'new,template,above'}>
+                Copy template above
+            </Menu.Item>
+            <Menu.Item disabled eventKey={'new,template,below'}>
+                copy template below
             </Menu.Item>
             <Menu.Separator />
-            <Menu.Item disabled eventKey={6} icon={<IoSaveOutline />}>
+            <Menu.Item eventKey={'delete'} icon={<IoCloseCircleOutline color="red" />}>
+                Delete
+            </Menu.Item>
+            <Menu.Separator />
+            <Menu.Item eventKey={'save'} icon={<IoSaveOutline />}>
                 Save changes
             </Menu.Item>
         </Menu>

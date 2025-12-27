@@ -9,16 +9,15 @@ import { debug } from '../../utils/debugger'
 import { type PlaybackState } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
 import { noCursor } from './_constants'
+import type { CMActionType } from './EditorWindow'
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
     systemData,
-    update,
     playbackState,
     ...props
 }: {
     systemData: EditorSystemData
-    update: (sysData: EditorSystemData, sysIdx?: number) => void
     playbackState: PlaybackState
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)

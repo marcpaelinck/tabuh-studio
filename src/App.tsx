@@ -1,4 +1,4 @@
-import { VStack, Toggle } from 'rsuite'
+import { VStack, Toggle, CustomProvider } from 'rsuite'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import EditIcon from '@rsuite/icons/Edit'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
@@ -24,27 +24,29 @@ export default function App() {
     }
 
     return (
-        <div className="flex w-full min-h-0 ">
-            <DebugContext value={debug}>
-                <VStack id="vstack" className="flex w-full" align="center">
-                    <Toggle
-                        size={'lg'}
-                        color="violet"
-                        checkedChildren={<PlayOutlineIcon />}
-                        unCheckedChildren={<EditIcon />}
-                        defaultChecked
-                        onChange={(checked) => setActive(checked ? 'player' : 'editor')}
-                    />
-                    {debugMode && <DebugWindow message={debugMessage} />}
-                    <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
-                        {active == 'player' ? (
-                            <TabuhPlayer tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
-                        ) : (
-                            <TabuhEditor tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
-                        )}
-                    </div>
-                </VStack>
-            </DebugContext>
-        </div>
+        <CustomProvider>
+            <div className="flex w-full min-h-0 ">
+                <DebugContext value={debug}>
+                    <VStack id="vstack" className="flex w-full" align="center">
+                        <Toggle
+                            size={'lg'}
+                            color="violet"
+                            checkedChildren={<PlayOutlineIcon />}
+                            unCheckedChildren={<EditIcon />}
+                            defaultChecked
+                            onChange={(checked) => setActive(checked ? 'player' : 'editor')}
+                        />
+                        {debugMode && <DebugWindow message={debugMessage} />}
+                        <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
+                            {active == 'player' ? (
+                                <TabuhPlayer tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                            ) : (
+                                <TabuhEditor tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                            )}
+                        </div>
+                    </VStack>
+                </DebugContext>
+            </div>
+        </CustomProvider>
     )
 }

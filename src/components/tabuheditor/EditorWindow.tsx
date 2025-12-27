@@ -22,6 +22,9 @@ import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+import findKeyByValue from '../../utils/objectUtils'
+
+export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
 export default function EditorWindow({
     score,
@@ -36,6 +39,7 @@ export default function EditorWindow({
     setExpanded: Dispatch<Record<string, boolean>>
 } & HTMLAttributes<HTMLDivElement>) {
     const [data, setData] = useState<EditorSystemData[]>([])
+    const [templates, setTemplates] = useState<Record<string, EditorSystemData>>({})
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
@@ -69,7 +73,6 @@ export default function EditorWindow({
             const summary: EditorSystemData = {
                 id: sysIdx,
                 key: system.key,
-                system: system.id.toString(),
                 part: system.part || '-',
                 staffs: staffs,
                 colWidths: colWidths
@@ -83,24 +86,59 @@ export default function EditorWindow({
         setProcessing(false)
     }, [score])
 
-    // Updates an existing system data element (sysIdx undefined) or adds a new data element (sysIdx given)
-    function updateData(systemData: EditorSystemData, sysIdx?: number) {
-        const newSysData = _.cloneDeep(systemData)
-        if (sysIdx) {
-            // assign a unique id to the copied system data
-            newSysData.key = uuidv4()
-            newSysData.part += ' ( copy)'
-        }
-        const index = sysIdx ? sysIdx : data.findIndex((sysData) => sysData.id == systemData.id)
-        if (!index) {
-            console.error(`system id ${systemData.id} not found.`)
-            return
-        }
-        const nextIdx = sysIdx ? index : index + 1
-        const newData = [...data.slice(0, index), newSysData, ...data.slice(nextIdx)]
-        newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
-        setData([...data.slice(0, index), newSysData, ...data.slice(nextIdx)])
-    }
+    // // Executes CRUD changes according to the selected action from the (context) menu
+    // function updateData(action: CMActionType, systemData: EditorSystemData, before: boolean) {
+    //     var newSysData: EditorSystemData | null = _.cloneDeep(systemData)
+    //     var sliceIndex1 = systemData.id
+    //     var sliceIndex2 = systemData.id
+    //     switch (action) {
+    //         case 'new':
+    //         case 'copy': {
+    //             newSysData.key = uuidv4()
+    //             newSysData.part += ' ( copy)'
+    //             // Reset the edit buffers of the measures.
+    //             // Also clear the values in case action=='new'
+    //             Object.values(newSysData.staffs).forEach((measures) => {
+    //                 measures.forEach((measure) => {
+    //                     measure.notation_ = undefined
+    //                     if (action == 'new') measure.notation = []
+    //                 })
+    //             })
+    //             if (!before) {
+    //                 sliceIndex1 = systemData.id + 1
+    //                 sliceIndex2 = systemData.id + 1
+    //             }
+    //             break
+    //         }
+    //         case 'modify': {
+    //             Object.values(newSysData.staffs).forEach((measures) => {
+    //                 measures.forEach((measure) => {
+    //                     if (measure.notation_) {
+    //                         measure.notation = measure.notation_
+    //                         measure.notation_ = undefined
+    //                     }
+    //                 })
+    //             })
+    //             sliceIndex2 = systemData.id + 1
+    //             break
+    //         }
+    //         case 'delete': {
+    //             sliceIndex2 = systemData.id + 1
+    //             newSysData = null
+    //             break
+    //         }
+    //         default: {
+    //             console.error(`Unexpected action ${action} ignored.`)
+    //             return
+    //         }
+    //     }
+    //     const newData = newSysData
+    //         ? [...data.slice(0, sliceIndex1), newSysData, ...data.slice(sliceIndex2)]
+    //         : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
+    //     // Update all system IDs
+    //     newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
+    //     setData(newData)
+    // }
 
     var dummyWhisper: OverlayTriggerHandle = {
         updatePosition: () => {},
@@ -115,6 +153,7 @@ export default function EditorWindow({
     debug(data, EditorWindow.name)
 
     const systems = data.map((systemData, sysIdx) => {
+        systemData.id = sysIdx
         return (
             <Accordion.Panel
                 key={systemData.key}
@@ -131,7 +170,9 @@ export default function EditorWindow({
                                 <SystemContextMenu
                                     data={data}
                                     systemData={systemData}
-                                    update={updateData}
+                                    setData={setData}
+                                    templates={templates}
+                                    setTemplates={setTemplates}
                                     ref={whisperRef}
                                 />
                             </Popover>
@@ -144,6 +185,7 @@ export default function EditorWindow({
                                 playbackState={playbackState}
                             />
                             <span>{`${systemData.id} ${systemData.part}`}</span>
+                            <span className="text-green-500">{findKeyByValue(templates, systemData) || ''}</span>
                         </HStack>
                     </Whisper>
                 }
@@ -151,9 +193,7 @@ export default function EditorWindow({
                 onSelect={() => {
                     flipExpanded(systemData.key)
                 }}>
-                {expanded[systemData.key] && (
-                    <SystemNode systemData={systemData} update={updateData} playbackState={playbackState} />
-                )}
+                {expanded[systemData.key] && <SystemNode systemData={systemData} playbackState={playbackState} />}
             </Accordion.Panel>
         )
     })

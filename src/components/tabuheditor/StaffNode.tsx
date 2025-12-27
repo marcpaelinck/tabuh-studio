@@ -46,7 +46,7 @@ export function StaffNode({
                             measureData={measure}
                             defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
                             style={{ width: width }}
-                            className={`balifont10 h-5 resize-none overflow-clip p-0`}
+                            className={`balifont10 h-5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             spellCheck="false"
                         />
                     </Col>

@@ -10,6 +10,7 @@ const debugOn: Record<string, boolean> = {
     registerComponent: false,
     ScorePlayer: false,
     StaffNode: false,
+    SystemContextMenu: true,
     SystemNode: false
 }
 
