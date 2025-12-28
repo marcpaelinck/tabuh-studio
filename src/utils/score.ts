@@ -32,6 +32,7 @@ export function parseScore(input: string): Score {
             // This will ensure that notation errors will not propagate throughout the score.
             for (const [_, measure] of Object.entries(section.staves)) {
                 var relTime = 0 // Time relative to the section's start time
+                measure.tempo = section.tempo
                 measure.notes.forEach((note: JsonNote) => {
                     // Convert the first note's absolute start time to relative time.
                     // TODO in the future the note's time attribute should be given relative to the section start time.

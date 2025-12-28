@@ -79,7 +79,9 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                                 action: actionFunctions.play,
                                 position: position,
                                 cleanedSymbol: cleanSymbol(symbol.s),
-                                bpm: bpm,
+                                bpm:
+                                    measure.tempo[0] +
+                                    (symidx / measure.notation.length) * (measure.tempo[1] - measure.tempo[0]),
                                 velocity: velocity,
                                 time: n2TO(currTime),
                                 duration: n2TO(1), // can be updated later
@@ -91,7 +93,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                             }
                         }
                     }
-                    // Create cursor actions if the system-section combi differs
+                    // Create cursor and tempo actions if the system-section combi differs
                     // from the previous entry. Therefore we only one position (KEMPLI).
                     const last =
                         timeline.cursoractions.length > 0

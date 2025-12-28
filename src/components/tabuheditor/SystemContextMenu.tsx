@@ -39,8 +39,8 @@ export function SystemContextMenu({
         return (
             <>
                 <SelectionModal
-                    title="Choose an instrument"
-                    message="Pick one from the list"
+                    title="Insert copy from labeled system"
+                    message="Select a label"
                     options={Object.keys(labels).map((key) => {
                         return { label: key, value: key }
                     })}

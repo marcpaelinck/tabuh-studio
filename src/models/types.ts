@@ -49,7 +49,7 @@ export type Section = {
     starttimeMs: number // start time in ms
     duration: number
     tempo: [number, number]
-    staves: { [position: string]: Measure } //TODO: rename to `staffs`. Needs to be renamed in all input files too.
+    staves: { [position: string]: Measure } //TODO: rename to `measures`. Needs to be renamed in all input files too.
 }
 
 // Subdivision of a score, typically spans one gongan

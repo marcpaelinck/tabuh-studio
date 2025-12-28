@@ -66,7 +66,6 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({
                 {message && <p style={{ marginBottom: '1rem' }}>{message}</p>}
                 <Form layout="vertical">
                     <Form.Group>
-                        <Form.Label>Options</Form.Label>
                         <SelectPicker
                             data={options}
                             value={selectedValue}
