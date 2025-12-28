@@ -13,7 +13,7 @@ export function SystemContextMenu({
     systemData,
     setData,
     labels,
-    setLabels: setTemplates,
+    setLabels,
     whisperRef,
     ...props
 }: {
@@ -24,11 +24,9 @@ export function SystemContextMenu({
     setLabels: Dispatch<Record<string, EditorSystemData>> // updates music notation
     whisperRef: RefObject<OverlayTriggerHandle>
 }) {
-    // const ref = useRef<HTMLDivElement>(null)
     const dialog = useDialog()
 
     // Lets the user select a labelled system
-
     function SysLabelSelector(
         {
             onClose
@@ -59,8 +57,6 @@ export function SystemContextMenu({
 
     // Executes changes according to the selected action from the menu
     async function updateData(eventKey: string | number | undefined, event: SyntheticEvent<Element, Event>) {
-        event.stopPropagation() // Avoid click to propagate to whatever is underneath the popup menu
-        whisperRef.current.close() // close the menu
         if (typeof eventKey != 'string') return // to appease TypeScript
         const [action, source, where] = eventKey.split(',')
 
@@ -100,21 +96,45 @@ export function SystemContextMenu({
                 break
             }
             case 'label': {
-                event.target.dispatchEvent(new Event('close'))
-                const name = await dialog.prompt('Label:', {
-                    title: 'Add a label',
-                    defaultValue: '',
-                    validate: (value) => {
-                        const isValid = value.length > 0 && !(value in labels)
-                        return [isValid, 'This name is already in use.']
+                // newSysData = _.cloneDeep(systemData)
+                if (source == 'create') {
+                    const name = await dialog.prompt('Label:', {
+                        title: 'Add a label',
+                        defaultValue: '',
+                        validate: (value) => {
+                            const isValid = value.length > 0 && !(value in labels)
+                            return [isValid, 'This name is already in use.']
+                        }
+                    })
+                    if (typeof name === 'string') {
+                        // Remove any existing label for this system from the labels list (should not be necessary)
+                        const cleanedLabels = Object.fromEntries(
+                            Object.entries(labels).filter(
+                                ([label, value]) => label !== systemData.label && value != systemData
+                            )
+                        )
+                        // Assign label and update labels list
+                        systemData.label = name
+                        setLabels({ ...cleanedLabels, ...Object.fromEntries([[name, systemData]]) })
                     }
-                })
-                if (typeof name === 'string') {
-                    systemData.label = name
-                    setTemplates({ ...labels, ...Object.fromEntries([[name, systemData]]) })
+                } else {
+                    if (systemData.label) {
+                        if (systemData.label in labels) {
+                            // Update labels list
+                            const newLabels = Object.fromEntries(
+                                Object.entries(labels).filter(
+                                    ([label, value]) => label !== systemData.label && value != systemData
+                                )
+                            )
+                            setLabels(newLabels)
+                            // Remove label
+                            systemData.label = undefined
+                        } else console.error(`System's label does not occur in the 'labels' list.`)
+                    } else console.error(`Current system doesn't have any label`)
                 }
-                sliceIndex1 = systemData.id
-                sliceIndex2 = systemData.id
+                // sliceIndex1 = systemData.id
+                // sliceIndex2 = systemData.id + 1
+                debug(systemData.label, SystemContextMenu.name)
                 return
             }
             case 'save': {
@@ -146,21 +166,36 @@ export function SystemContextMenu({
             : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
         // Update all system IDs
         newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
-        debug(newSysData, SystemContextMenu.name)
-        debug(data, SystemContextMenu.name)
-        debug(newData, SystemContextMenu.name)
         setData(newData)
     }
 
+    const hasLabel = typeof systemData.label == 'string'
+
     return (
-        <Menu onSelect={updateData}>
+        <Menu
+            onSelect={updateData}
+            onClick={(e) => {
+                debug(systemData.label, SystemContextMenu.name)
+                e.stopPropagation()
+                whisperRef.current.close()
+            }}>
             <Menu.Item eventKey={'new,blank,above'}>Insert new above</Menu.Item>
             <Menu.Item eventKey={'new,blank,below'}>Insert new below</Menu.Item>
             <Menu.Item eventKey={'new,current,above'}>Insert copy above</Menu.Item>
             <Menu.Item eventKey={'new,current,below'}>Insert copy below</Menu.Item>
             <Menu.Separator />
-            <Menu.Item eventKey={'label,new'}>Add label</Menu.Item>
-            <Menu.Item eventKey={'label,delete'}>Remove label</Menu.Item>
+            {!hasLabel && (
+                <Menu.Item disabled={typeof systemData.label == 'string'} eventKey={'label,create'}>
+                    Add label
+                </Menu.Item>
+            )}
+            {hasLabel && (
+                <Menu.Item
+                    disabled={systemData.label == undefined || systemData.label == null}
+                    eventKey={'label,remove'}>
+                    Remove label
+                </Menu.Item>
+            )}
             <Menu.Item eventKey={'new,label,above'}>Copy labeled above</Menu.Item>
             <Menu.Item eventKey={'new,label,below'}>copy labeled below</Menu.Item>
             <Menu.Separator />
