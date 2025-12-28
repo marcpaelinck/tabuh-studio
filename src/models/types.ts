@@ -119,6 +119,7 @@ export type EditorSystemData = {
     key: string // unique row id
     id: number // system id
     part: string
+    label?: string
     staffs: Staffs
     colWidths: number[]
 }

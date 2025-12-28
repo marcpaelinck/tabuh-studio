@@ -21,7 +21,6 @@ import { playbackReducer } from '../../hooks/playbackReducer'
 import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
 import _ from 'lodash'
-import { v4 as uuidv4 } from 'uuid'
 import findKeyByValue from '../../utils/objectUtils'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
@@ -39,7 +38,7 @@ export default function EditorWindow({
     setExpanded: Dispatch<Record<string, boolean>>
 } & HTMLAttributes<HTMLDivElement>) {
     const [data, setData] = useState<EditorSystemData[]>([])
-    const [templates, setTemplates] = useState<Record<string, EditorSystemData>>({})
+    const [labels, setLabels] = useState<Record<string, EditorSystemData>>({})
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
@@ -86,60 +85,6 @@ export default function EditorWindow({
         setProcessing(false)
     }, [score])
 
-    // // Executes CRUD changes according to the selected action from the (context) menu
-    // function updateData(action: CMActionType, systemData: EditorSystemData, before: boolean) {
-    //     var newSysData: EditorSystemData | null = _.cloneDeep(systemData)
-    //     var sliceIndex1 = systemData.id
-    //     var sliceIndex2 = systemData.id
-    //     switch (action) {
-    //         case 'new':
-    //         case 'copy': {
-    //             newSysData.key = uuidv4()
-    //             newSysData.part += ' ( copy)'
-    //             // Reset the edit buffers of the measures.
-    //             // Also clear the values in case action=='new'
-    //             Object.values(newSysData.staffs).forEach((measures) => {
-    //                 measures.forEach((measure) => {
-    //                     measure.notation_ = undefined
-    //                     if (action == 'new') measure.notation = []
-    //                 })
-    //             })
-    //             if (!before) {
-    //                 sliceIndex1 = systemData.id + 1
-    //                 sliceIndex2 = systemData.id + 1
-    //             }
-    //             break
-    //         }
-    //         case 'modify': {
-    //             Object.values(newSysData.staffs).forEach((measures) => {
-    //                 measures.forEach((measure) => {
-    //                     if (measure.notation_) {
-    //                         measure.notation = measure.notation_
-    //                         measure.notation_ = undefined
-    //                     }
-    //                 })
-    //             })
-    //             sliceIndex2 = systemData.id + 1
-    //             break
-    //         }
-    //         case 'delete': {
-    //             sliceIndex2 = systemData.id + 1
-    //             newSysData = null
-    //             break
-    //         }
-    //         default: {
-    //             console.error(`Unexpected action ${action} ignored.`)
-    //             return
-    //         }
-    //     }
-    //     const newData = newSysData
-    //         ? [...data.slice(0, sliceIndex1), newSysData, ...data.slice(sliceIndex2)]
-    //         : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
-    //     // Update all system IDs
-    //     newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
-    //     setData(newData)
-    // }
-
     var dummyWhisper: OverlayTriggerHandle = {
         updatePosition: () => {},
         open: () => {},
@@ -171,9 +116,9 @@ export default function EditorWindow({
                                     data={data}
                                     systemData={systemData}
                                     setData={setData}
-                                    templates={templates}
-                                    setTemplates={setTemplates}
-                                    ref={whisperRef}
+                                    labels={labels}
+                                    setLabels={setLabels}
+                                    whisperRef={whisperRef}
                                 />
                             </Popover>
                         }>
@@ -185,7 +130,7 @@ export default function EditorWindow({
                                 playbackState={playbackState}
                             />
                             <span>{`${systemData.id} ${systemData.part}`}</span>
-                            <span className="text-green-500">{findKeyByValue(templates, systemData) || ''}</span>
+                            <span className="text-green-500">{findKeyByValue(labels, systemData) || ''}</span>
                         </HStack>
                     </Whisper>
                 }
