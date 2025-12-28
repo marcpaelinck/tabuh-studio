@@ -76,12 +76,13 @@ export function SystemContextMenu({
                     const label: string = await dialog.open(SysLabelSelector)
                     if (!label) return
                     newSysData = _.cloneDeep(labels[label])
-                    newSysData.label = label
+                    newSysData.label = undefined
+                    newSysData.copyfrom = label
                 } else newSysData = _.cloneDeep(systemData)
                 if (!newSysData) return // TODO remove when blanks are created from 'scratch'.
 
                 newSysData.key = uuidv4()
-                if (source == 'current') newSysData.part += ' (copy)'
+                if (source == 'current') newSysData.copyfrom = systemData.label || '<no label>'
 
                 // Reset the edit buffers of the measures.
                 // Also clear the values in case action=='new'

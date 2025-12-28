@@ -119,9 +119,11 @@ export type EditorSystemData = {
     key: string // unique row id
     id: number // system id
     part: string
-    label?: string
     staffs: Staffs
     colWidths: number[]
+    label?: string
+    goto?: string // label
+    copyfrom?: string // label
 }
 export type EditorCellCursor = { system: number; position: string; measure: number }
 export type EditorBeatCursor = { system: number; beat: number }

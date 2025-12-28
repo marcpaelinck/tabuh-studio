@@ -5,7 +5,7 @@ import { useContext } from 'react'
 import { debug } from '../../utils/debugger'
 import { SystemNode } from './SystemNode'
 import type { PlaybackState, PlaybackType } from '../../hooks/playbackReducer'
-import type { MouseEvent } from 'react'
+import type { HTMLAttributes, MouseEvent } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 
@@ -14,14 +14,15 @@ export function PlayBackButtons({
     systemId,
     // pbType,
     playbackState,
-    playback
+    playback,
+    ...props
 }: {
     data: EditorSystemData[]
     systemId: number
     // pbType: PlaybackType
     playbackState: PlaybackState
     playback: CallableFunction
-}) {
+} & HTMLAttributes<HTMLDivElement>) {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
 
     async function stopPlayback(time: number) {
@@ -90,7 +91,7 @@ export function PlayBackButtons({
     )
 
     return (
-        <ButtonGroup size="sm">
+        <ButtonGroup size="sm" className={props.className}>
             {button('single')}
             {button('multiple')}
         </ButtonGroup>

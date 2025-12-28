@@ -1,4 +1,4 @@
-import { Accordion, Divider, HStack, Placeholder, Popover, Whisper } from 'rsuite'
+import { Accordion, Col, Grid, Placeholder, Popover, Row, Whisper } from 'rsuite'
 import type { Score, EditorSystemData, Staffs } from '../../models/types'
 import {
     useEffect,
@@ -8,6 +8,7 @@ import {
     useState,
     type Dispatch,
     type HTMLAttributes,
+    type ReactNode,
     type RefObject
 } from 'react'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
@@ -21,9 +22,30 @@ import { playbackReducer } from '../../hooks/playbackReducer'
 import { noCursor } from './_constants'
 import { PlayBackButtons } from './PlaybackButtons'
 import _ from 'lodash'
-import findKeyByValue from '../../utils/objectUtils'
+import { AiOutlineNumber, AiOutlinePieChart } from 'react-icons/ai'
+import { IoMdCopy } from 'react-icons/io'
+import { IoPricetagOutline, IoArrowForwardOutline } from 'react-icons/io5'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
+
+function PanelCol({
+    span,
+    text,
+    icon,
+    color,
+    ...props
+}: { span: number; text: string; icon: ReactNode; color?: string } & HTMLAttributes<HTMLDivElement>) {
+    return (
+        <Col
+            as="div"
+            span={span}
+            className="flex bg-gray-100 border-2 border-white divide-solid "
+            style={{ color: color }}>
+            {text.length > 0 && icon}
+            <span>{text}</span>
+        </Col>
+    )
+}
 
 export default function EditorWindow({
     score,
@@ -72,7 +94,7 @@ export default function EditorWindow({
             const summary: EditorSystemData = {
                 id: sysIdx,
                 key: system.key,
-                part: system.part || '-',
+                part: system.part,
                 staffs: staffs,
                 colWidths: colWidths
             }
@@ -94,8 +116,6 @@ export default function EditorWindow({
         }
     }
     const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
-
-    debug(data, EditorWindow.name)
 
     const systems = data.map((systemData, sysIdx) => {
         systemData.id = sysIdx
@@ -122,16 +142,41 @@ export default function EditorWindow({
                                 />
                             </Popover>
                         }>
-                        <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}>
-                            <PlayBackButtons
-                                data={data}
-                                systemId={systemData.id}
-                                playback={playback}
-                                playbackState={playbackState}
-                            />
-                            <span>{`${systemData.id} ${systemData.part}`}</span>
-                            <span className="text-green-500">{findKeyByValue(labels, systemData) || ''}</span>
-                        </HStack>
+                        {/* <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}> */}
+                        <Grid id="grid" className="ml-0">
+                            <Row id="row">
+                                <Col span={4} className="flex">
+                                    <PlayBackButtons
+                                        data={data}
+                                        systemId={systemData.id}
+                                        playback={playback}
+                                        playbackState={playbackState}
+                                        className="content-start"
+                                    />
+                                </Col>
+                                <PanelCol span={2} text={`${systemData.id}`} icon={<AiOutlineNumber />} />
+                                <PanelCol span={4} text={`${systemData.part || ''}`} icon={<AiOutlinePieChart />} />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.label || ''}`}
+                                    icon={<IoPricetagOutline />}
+                                    color="orange"
+                                />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.copyfrom || ''}`}
+                                    icon={<IoMdCopy />}
+                                    color="blue"
+                                />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.goto || ''}`}
+                                    icon={<IoArrowForwardOutline />}
+                                    color="green"
+                                />
+                            </Row>
+                        </Grid>
+                        {/* </HStack> */}
                     </Whisper>
                 }
                 expanded={expanded[systemData.key]}
