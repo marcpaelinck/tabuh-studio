@@ -119,11 +119,14 @@ export default function EditorWindow({
 
     const systems = data.map((systemData, sysIdx) => {
         systemData.id = sysIdx
+        // Structure:
+        // - Panel Header: contains context menu and System summary information
+        // - Panel content (visible when panel is expanded): System grid (SystemNode)
         return (
             <Accordion.Panel
                 key={systemData.key}
+                // Panel Header
                 header={
-                    // Context menu
                     <Whisper
                         ref={whisperRef}
                         key={`Whisper-${systemData.id}`}
@@ -142,8 +145,8 @@ export default function EditorWindow({
                                 />
                             </Popover>
                         }>
-                        {/* <HStack className="w-full" divider={<Divider vertical h={20} color="blue" />} spacing={20}> */}
                         <Grid id="grid" className="ml-0">
+                            {/* Displays info about the System */}
                             <Row id="row">
                                 <Col span={4} className="flex">
                                     <PlayBackButtons
@@ -176,13 +179,13 @@ export default function EditorWindow({
                                 />
                             </Row>
                         </Grid>
-                        {/* </HStack> */}
                     </Whisper>
                 }
                 expanded={expanded[systemData.key]}
                 onSelect={() => {
                     flipExpanded(systemData.key)
                 }}>
+                {/* Panel content: visible when panel is expanded */}
                 {expanded[systemData.key] && <SystemNode systemData={systemData} playbackState={playbackState} />}
             </Accordion.Panel>
         )
