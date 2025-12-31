@@ -1,13 +1,5 @@
-import {
-    useContext,
-    useEffect,
-    useRef,
-    type ChangeEvent,
-    type KeyboardEvent,
-    type HTMLProps,
-    type ReactEventHandler
-} from 'react'
-import type { ElementWithValueTracker, NavigationFunctionsType } from './_types'
+import { useContext, useEffect, useRef, type HTMLProps } from 'react'
+import type { NavigationFunctionsType } from './_types'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { NavigationAction } from '../../config/config'
 import { NavigationFunctions } from './contexts'

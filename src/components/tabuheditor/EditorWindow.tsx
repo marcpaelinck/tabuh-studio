@@ -39,10 +39,10 @@ function PanelCol({
         <Col
             as="div"
             span={span}
-            className="flex bg-gray-100 border-2 border-white divide-solid "
+            className="flex bg-gray-100 border-2 border-white divide-solid"
             style={{ color: color }}>
             {text.length > 0 && icon}
-            <span>{text}</span>
+            <span className="text-sm pl-3">{text}</span>
         </Col>
     )
 }
@@ -117,8 +117,17 @@ export default function EditorWindow({
     }
     const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
 
-    const systems = data.map((systemData, sysIdx) => {
-        systemData.id = sysIdx
+    // (Re-)number the systems. Numbering can change when a system is inserted.
+    // Need to do this separately so that systemData.copyfromkey gets the correct system id.
+    data.forEach((systemData, sysIdx) => (systemData.id = sysIdx))
+
+    const systems = data.map((systemData) => {
+        // Update the 'copyfrom' field with the source's label or id.
+        // This value can change due to user edits.
+        if (systemData.copyfromkey) {
+            const source = data.find((sysData) => sysData.key == systemData.copyfromkey)
+            if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+        }
         // Structure:
         // - Panel Header: contains context menu and System summary information
         // - Panel content (visible when panel is expanded): System grid (SystemNode)

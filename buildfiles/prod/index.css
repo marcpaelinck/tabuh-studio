@@ -1,30 +1,35 @@
 @layer theme, base, components, utilities;
-@import "tailwindcss/theme.css" layer(theme);
-@import "tailwindcss/utilities.css" layer(utilities);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
 
 /* For cursor in notation */
 ::highlight(notation-highlight) {
-  background-color: peachpuff;
+    background-color: peachpuff;
 }
 
 @font-face {
     font-family: 'BaliMusic5';
-    src: url('https://swarasanti.nl/wp-includes/js/midiplayer-test/fonts/BaliMusic5.woff2') format('woff2'),
+    src:
+        url('https://swarasanti.nl/wp-includes/js/midiplayer-test/fonts/BaliMusic5.woff2') format('woff2'),
         url('https://swarasanti.nl/wp-includes/js/midiplayer-test/fonts/BaliMusic5.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
+.rs-btn-start-icon {
+    /* Correct React Suite button not centered */
+    margin-right: 0px;
+}
 
 .balifont {
     font-family: 'BaliMusic5';
     font-weight: normal;
-    font-style: normal;	
-    font-size:small;
+    font-style: normal;
+    font-size: small;
 }
 
 /* Force format for notation area. Overrules any WP Theme */
-p.balifont[id^="notation"] { 
+p.balifont[id^='notation'] {
     padding: 0px;
     margin: 0px;
     line-height: 1.5;
@@ -32,42 +37,30 @@ p.balifont[id^="notation"] {
 .balifont12 {
     font-family: 'BaliMusic5';
     font-weight: normal;
-    font-style: normal;		
+    font-style: normal;
     font-size: 12pt;
 }
 .balifont14 {
     font-family: 'BaliMusic5';
     font-weight: normal;
-    font-style: normal;		
+    font-style: normal;
     font-size: 14pt;
 }
 .balifont16 {
     font-family: 'BaliMusic5';
     font-weight: normal;
-    font-style: normal;		
+    font-style: normal;
     font-size: 16pt;
 }
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  /* padding: 0.6em 1.2em; */
-  font-size: 1em;
-  font-weight: 500;
-  color: black;
-  font-family: inherit;
-  background-color: white;
-  cursor: pointer;
-  transition: border-color 0.25s;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    /* padding: 0.6em 1.2em; */
+    font-size: 1em;
+    font-weight: 500;
+    color: black;
+    font-family: inherit;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.25s;
 }
-@keyframes blinker {
-  0% {fill: #000000;}
-  50% {fill: #00000000;}
-  100% {fill: #000000}
-}
-.cursor-visible {
-  animation: blinker 1s infinite;
-}
-.cursor-hidden {
-  fill: white;
-}
-

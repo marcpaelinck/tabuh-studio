@@ -123,7 +123,8 @@ export type EditorSystemData = {
     colWidths: number[]
     label?: string
     goto?: string // label
-    copyfrom?: string // label
+    copyfrom?: string // label or id of copied system
+    copyfromkey?: string // key or id of copied system
 }
 export type EditorCellCursor = { system: number; position: string; measure: number }
 export type EditorBeatCursor = { system: number; beat: number }

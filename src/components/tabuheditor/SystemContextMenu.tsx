@@ -77,12 +77,16 @@ export function SystemContextMenu({
                     if (!label) return
                     newSysData = _.cloneDeep(labels[label])
                     newSysData.label = undefined
+                    newSysData.copyfromkey = labels[label].key
                     newSysData.copyfrom = label
                 } else newSysData = _.cloneDeep(systemData)
                 if (!newSysData) return // TODO remove when blanks are created from 'scratch'.
 
                 newSysData.key = uuidv4()
-                if (source == 'current') newSysData.copyfrom = systemData.label || '<no label>'
+                if (source == 'current') {
+                    newSysData.copyfromkey = systemData.key
+                    newSysData.copyfrom = systemData.label || `#${systemData.id}`
+                }
 
                 // Reset the edit buffers of the measures.
                 // Also clear the values in case action=='new'
@@ -180,33 +184,31 @@ export function SystemContextMenu({
                 e.stopPropagation()
                 whisperRef.current.close()
             }}>
-            <Menu.Item eventKey={'new,blank,above'}>Insert new above</Menu.Item>
-            <Menu.Item eventKey={'new,blank,below'}>Insert new below</Menu.Item>
-            <Menu.Item eventKey={'new,current,above'}>Insert copy above</Menu.Item>
-            <Menu.Item eventKey={'new,current,below'}>Insert copy below</Menu.Item>
+            <Menu.Item eventKey={'new,blank,above'} children="Insert new above" />
+            <Menu.Item eventKey={'new,blank,below'} children="Insert new below" />
+            <Menu.Item eventKey={'new,current,above'} children="Insert copy above" />
+            <Menu.Item eventKey={'new,current,below'} children="Insert copy below" />
             <Menu.Separator />
             {!hasLabel && (
-                <Menu.Item disabled={typeof systemData.label == 'string'} eventKey={'label,create'}>
-                    Add label
-                </Menu.Item>
+                <Menu.Item
+                    disabled={typeof systemData.label == 'string'}
+                    eventKey={'label,create'}
+                    children="Add label"
+                />
             )}
             {hasLabel && (
                 <Menu.Item
                     disabled={systemData.label == undefined || systemData.label == null}
-                    eventKey={'label,remove'}>
-                    Remove label
-                </Menu.Item>
+                    eventKey={'label,remove'}
+                    children="Remove label"
+                />
             )}
-            <Menu.Item eventKey={'new,label,above'}>Copy labeled above</Menu.Item>
-            <Menu.Item eventKey={'new,label,below'}>copy labeled below</Menu.Item>
+            <Menu.Item eventKey={'new,label,above'} children="Copy labeled above" />
+            <Menu.Item eventKey={'new,label,below'} children="copy labeled below" />
             <Menu.Separator />
-            <Menu.Item eventKey={'delete'} icon={<IoCloseCircleOutline color="red" />}>
-                Delete
-            </Menu.Item>
+            <Menu.Item eventKey={'delete'} icon={<IoCloseCircleOutline color="red" />} children="Delete" />
             <Menu.Separator />
-            <Menu.Item eventKey={'save'} icon={<IoSaveOutline />}>
-                Save changes
-            </Menu.Item>
+            <Menu.Item eventKey={'save'} icon={<IoSaveOutline />} children="Save changes" />
         </Menu>
     )
 }
