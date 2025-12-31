@@ -117,8 +117,8 @@ export default function EditorWindow({
     }
     const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
 
-    // (Re-)number the systems. Numbering can change when a system is inserted.
-    // Need to do this separately so that systemData.copyfromkey gets the correct system id.
+    // (Re-)number the systems: numbering can change when systems are inserted.
+    // Need to do this separately before updating systemData.copyfromkey.
     data.forEach((systemData, sysIdx) => (systemData.id = sysIdx))
 
     const systems = data.map((systemData) => {

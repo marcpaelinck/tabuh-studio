@@ -25,7 +25,7 @@ export function SystemNode({
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
-    const pbOnInit = Object.fromEntries(positions.map((position) => [position, true]))
+    const pbOnInit = Object.fromEntries(positions.map((position) => [position, false]))
     const [pbOn, setPbOn] = useState<Record<string, boolean>>(pbOnInit)
 
     debug(`(re-)rendering system ${systemId}`, SystemNode.name)
@@ -76,7 +76,7 @@ export function SystemNode({
                 SystemNode.name
             )
             for (var row = 0; row <= grid.current.maxRowId; row++) {
-                if (pbOn[positions[row]]) highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
+                highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
             }
             setHighlightedCell(playbackState.cursor)
         } else {

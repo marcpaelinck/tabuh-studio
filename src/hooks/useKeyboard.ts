@@ -11,6 +11,8 @@ type KeyType =
     | 'ArrowDown'
     | 'ArrowLeft'
     | 'ArrowRight'
+    | 'Backspace'
+    | 'Delete'
     | 'Shift'
     | 'Ctrl'
     | 'Alt'
@@ -19,8 +21,10 @@ type KeyType =
     | 'PgUp'
     | 'PgDn'
 type Action =
-    | ['pop-left', number]
-    | ['pop-right', number]
+    | ['pop-left-char']
+    | ['pop-left-symbol']
+    | ['pop-right-char']
+    | ['pop-right-symbol']
     | ['insert', string]
     | ['cursorleft']
     | ['cursorright']
@@ -38,9 +42,10 @@ type ActionRecord = {
     left: RegExp | null // regex describing the character(s) left of the cursor
     right: RegExp | null // regex describing the character(s) right of the cursor
     action: Action
+    value?: string | number
 }
 // Used to find a match with an ActionRecord elements
-type SearchRecord = { keys: KeyType[]; left: string; right: string }
+type SearchRecord = { keys: KeyType[]; left: string; right: string; selection: string }
 
 // Definition of keyboard codes that should be intercepted + action to perform.
 // keys: key combination.
@@ -49,14 +54,16 @@ type SearchRecord = { keys: KeyType[]; left: string; right: string }
 const keyActions: ActionRecord[] = [
     // TYPING
     // octavate upward
-    { keys: ['ArrowUp', 'Alt'], left: /[aeiours],$/, right: null, action: ['pop-left', 1] },
+    { keys: ['ArrowUp', 'Alt'], left: /[aeiours],$/, right: null, action: ['pop-left-char'] },
     { keys: ['ArrowUp', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', '<'] },
     { keys: ['ArrowUp', 'Alt'], left: /[^aeiours,]$|^$/, right: null, action: ['ignore'] },
     // octavate downward
-    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]<$/, right: null, action: ['pop-left', 1] },
+    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]<$/, right: null, action: ['pop-left-char'] },
     { keys: ['ArrowDown', 'Alt'], left: /[aeiours]$/, right: null, action: ['insert', ','] },
     { keys: ['ArrowDown', 'Alt'], left: /[^aeiours<]$|^$/, right: null, action: ['ignore'] },
-
+    // deletion
+    { keys: ['Backspace'], left: /.+/, right: null, action: ['pop-left-symbol'] },
+    { keys: ['Delete'], left: null, right: /.+/, action: ['pop-right-symbol'] },
     // NAVIGATION
     // navigate within a cell: ensure that cursor skips entire (compound) symbols
     { keys: ['ArrowLeft'], left: /.+$/, right: null, action: ['cursorleft'] },
@@ -196,8 +203,9 @@ export const useKeyboardListener = (
                 event.ctrlKey ? 'Ctrl' : null,
                 event.altKey ? 'Alt' : null
             ].filter((v) => v != null) as KeyType[],
-            left: target.value.slice(0, target.selectionEnd), // string to the left of the cursor
-            right: target.value.slice(target.selectionEnd) // string to the right of the cursor
+            left: target.value.slice(0, target.selectionStart), // string to the left of the cursor
+            right: target.value.slice(target.selectionEnd), // string to the right of the cursor
+            selection: target.value.slice(target.selectionStart, target.selectionEnd)
         }
         // Find a matching keyAction record and perform the corresponding key action if found
         for (const keyAction of keyActions) {
@@ -220,21 +228,48 @@ export const useKeyboardListener = (
                     } else debug('unexpected null keyAction value(s)', useKeyboardListener.name)
                     break
                 }
-                if (keyAction.action[0] == 'pop-left') {
+                if (keyAction.action[0] == 'pop-left-char') {
                     // Check that pop action results in a valid symbol
-                    const leftEnd = eventRecord.left.length - keyAction.action[1]
+                    const leftEnd = eventRecord.left.length - 1
                     const isValid =
                         !keyAction.left || leftEnd <= 0 || matchValidChar(eventRecord.left.slice(0, leftEnd), -1)
                     if (!isValid) break
-                    if (keyAction.action.length > 1 && keyAction.action[1] != null) {
-                        target.selectionStart -= keyAction.action[1]
-                        debug(
-                            `REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`,
-                            useKeyboardListener.name
-                        )
-                        target.setRangeText('')
-                        changed = true
-                    } else debug('unexpected null keyAction value(s)', useKeyboardListener.name)
+                    target.selectionStart -= 1
+                    debug(
+                        `REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`,
+                        useKeyboardListener.name
+                    )
+                    target.setRangeText('')
+                    changed = true
+                    break
+                }
+                if (['pop-left-symbol', 'pop-right-symbol'].includes(keyAction.action[0])) {
+                    // Delete the selection if any, otherwise the symbol left/right of the cursor.
+                    var [selStart, selEnd] = [target.selectionStart, target.selectionEnd]
+                    var [left, deleteTarget, right] = [eventRecord.left, eventRecord.selection, eventRecord.right]
+                    if (!deleteTarget) {
+                        // No selection. Select symbol closest to the cursor.
+                        if (keyAction.action[0] == 'pop-left-symbol') {
+                            const targetLen = matchValidChar(left, -1)
+                            selStart -= targetLen || 0
+                        } else {
+                            const targetLen = matchValidChar(right, 1)
+                            selEnd += targetLen || 0
+                        }
+                        left = target.value.slice(0, selStart)
+                        deleteTarget = target.value.slice(selStart, selEnd)
+                        right = target.value.slice(selEnd)
+                    }
+                    if (deleteTarget) {
+                        // Delete target only if the characters left and right of the cursor will remain valid.
+                        if (!left || (matchValidChar(left, -1) && (!right || matchValidChar(right, 1)))) {
+                            debug(`${keyAction.action[0].toUpperCase()} ${deleteTarget}`, useKeyboardListener.name)
+                            target.selectionStart = selStart
+                            target.selectionEnd = selEnd
+                            target.setRangeText('')
+                            changed = true
+                        }
+                    }
                     break
                 }
                 if (keyAction.action[0] == 'ignore') {
