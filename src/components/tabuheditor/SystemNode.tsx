@@ -1,20 +1,16 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
-import type { EditorCellCursor, EditorSystemData, JsonSymbol } from '../../models/types'
-import { NavigationFunctions, type NavigationFunctionsType } from './contexts'
-import { Checkbox, Col, Grid, Row, VStack, Text } from 'rsuite'
-import { positionConfigs, type NavigationAction } from '../../config/config'
-import type { GridInfo } from './_types'
 import _ from 'lodash'
-import { debug } from '../../utils/debugger'
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
+import { positionConfigs, type NavigationAction } from '../../config/config'
 import { type PlaybackState } from '../../hooks/playbackReducer'
+import { useRules } from '../../hooks/useRules'
+import type { EditorCellCursor, EditorSystemData, JsonSymbol } from '../../models/types'
+import { notation2text } from '../../utils/alphabet'
+import { debug } from '../../utils/debugger'
 import { StaffNode } from './StaffNode'
 import { noCursor } from './_constants'
-import { useRules } from '../../hooks/useRules'
-import { notation2text } from '../../utils/alphabet'
-
-const groupedInit = Object.fromEntries(
-    Object.keys(positionConfigs).map((position) => [position, position.includes('KANTILAN')])
-)
+import type { GridInfo } from './_types'
+import { NavigationFunctions, type NavigationFunctionsType } from './contexts'
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({

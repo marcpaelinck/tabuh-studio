@@ -1,5 +1,3 @@
-import { Accordion, Col, Grid, Placeholder, Popover, Row, Whisper } from 'rsuite'
-import type { Score, EditorSystemData, Staffs } from '../../models/types'
 import {
     useEffect,
     useMemo,
@@ -8,44 +6,22 @@ import {
     useState,
     type Dispatch,
     type HTMLAttributes,
-    type ReactNode,
     type RefObject
 } from 'react'
-import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
-import { useInstruments } from '../../hooks/useInstruments'
-import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
-import { SystemNode } from './SystemNode'
-import { debug } from '../../utils/debugger'
-import { SystemContextMenu } from './SystemContextMenu'
+import { Accordion, Placeholder, Popover, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
+import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
+import { useInstruments } from '../../hooks/useInstruments'
+import type { EditorSystemData, Score, Staffs } from '../../models/types'
+import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
-import { PlayBackButtons } from './PlaybackButtons'
-import _ from 'lodash'
-import { AiOutlineNumber, AiOutlinePieChart } from 'react-icons/ai'
-import { IoMdCopy } from 'react-icons/io'
-import { IoPricetagOutline, IoArrowForwardOutline } from 'react-icons/io5'
+import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
+import { SystemContextMenu } from './SystemContextMenu'
+import { SystemNode } from './SystemNode'
+import { SystemSummary } from './SystemSummary'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
-
-function PanelCol({
-    span,
-    text,
-    icon,
-    color,
-    ...props
-}: { span: number; text: string; icon: ReactNode; color?: string } & HTMLAttributes<HTMLDivElement>) {
-    return (
-        <Col
-            as="div"
-            span={span}
-            className="flex bg-gray-100 border-2 border-white divide-solid"
-            style={{ color: color }}>
-            {text.length > 0 && icon}
-            <span className="text-sm pl-3">{text}</span>
-        </Col>
-    )
-}
 
 export default function EditorWindow({
     score,
@@ -164,40 +140,13 @@ export default function EditorWindow({
                                 />
                             </Popover>
                         }>
-                        <Grid id="grid" className="ml-0">
-                            {/* Displays info about the System */}
-                            <Row id="row">
-                                <Col span={4} className="flex">
-                                    <PlayBackButtons
-                                        data={data}
-                                        systemId={systemData.id}
-                                        playback={playback}
-                                        playbackState={playbackState}
-                                        className="content-start"
-                                    />
-                                </Col>
-                                <PanelCol span={2} text={`${systemData.id}`} icon={<AiOutlineNumber />} />
-                                <PanelCol span={4} text={`${systemData.part || ''}`} icon={<AiOutlinePieChart />} />
-                                <PanelCol
-                                    span={4}
-                                    text={`${systemData.label || ''}`}
-                                    icon={<IoPricetagOutline />}
-                                    color="orange"
-                                />
-                                <PanelCol
-                                    span={4}
-                                    text={`${systemData.copyfrom || ''}`}
-                                    icon={<IoMdCopy />}
-                                    color="blue"
-                                />
-                                <PanelCol
-                                    span={4}
-                                    text={`${systemData.goto || ''}`}
-                                    icon={<IoArrowForwardOutline />}
-                                    color="green"
-                                />
-                            </Row>
-                        </Grid>
+                        <SystemSummary
+                            data={data}
+                            systemData={systemData}
+                            updateSysData={updateSystemData}
+                            playback={playback}
+                            playbackState={playbackState}
+                        />
                     </Whisper>
                 }
                 expanded={expanded[systemData.key]}

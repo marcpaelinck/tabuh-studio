@@ -1,11 +1,11 @@
-import { useContext, useEffect, useMemo, useRef, useState, type HTMLProps } from 'react'
-import type { NavigationFunctionsType } from './contexts'
-import { useKeyboardListener } from '../../hooks/useKeyboard'
+import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import type { NavigationAction } from '../../config/config'
-import { NavigationFunctions } from './contexts'
-import { debug } from '../../utils/debugger'
+import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { EditorSystemData, JsonSymbol, Measure } from '../../models/types'
-import { symbolValidationUtils, parseNotationText, notation2text } from '../../utils/alphabet'
+import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
+import { debug } from '../../utils/debugger'
+import type { NavigationFunctionsType } from './contexts'
+import { NavigationFunctions } from './contexts'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     position: string
@@ -46,8 +46,13 @@ export function MeasureNode({
         setMeasure(newMeasure)
     }
 
-    if (false && rowId == 4 && colId == 1)
-        debug(`(re-)rendering ${props.id} to ${notation2text(measure.notation_ || measure.notation)}`, MeasureNode.name)
+    useEffect(() => {
+        navFunc.register(rowId, colId, ref)
+        // Edits are cached until the user saves their changes.
+        // Display the cached value if previous edits have not yet been saved.
+        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.map((jSym) => jSym.s).join('')
+        highlightOnChangedContent(ref.current)
+    }, [])
 
     useEffect(() => {
         debug(`updating data of cell ${rowId},${colId} to ${ref.current?.value}`, MeasureNode.name)
@@ -56,14 +61,6 @@ export function MeasureNode({
             highlightOnChangedContent(ref.current)
         }
     }, [systemData])
-
-    useEffect(() => {
-        navFunc.register(rowId, colId, ref)
-        // Edits are cached until the user saves their changes.
-        // Display the cached value if previous edits have not yet been saved.
-        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.map((jSym) => jSym.s).join('')
-        highlightOnChangedContent(ref.current)
-    }, [])
 
     // Highlight the cell background if the content has been modified by the user.
     const highlightOnChangedContent = (cell: HTMLTextAreaElement | null, initial: boolean = false) => {

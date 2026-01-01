@@ -1,14 +1,14 @@
 import * as Tone from 'tone'
-import { debug } from '../utils/debugger'
-import type { EditorCellCursor, EditorSystemData, AudioState } from '../models/types'
-import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
-import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { noCursor } from '../components/tabuheditor/_constants'
+import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
+import type { AudioState, EditorCellCursor, EditorSystemData } from '../models/types'
+import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
+import { debug } from '../utils/debugger'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
 export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor'
 export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; playbackType: PlaybackType }
-export type playbackAction = {
+export type PlaybackAction = {
     actionType: ActionType
     playbackType?: PlaybackType
     data?: EditorSystemData[]
@@ -28,7 +28,7 @@ async function asyncPlay() {
     }
 }
 
-export function playbackReducer(state: PlaybackState, action: playbackAction): PlaybackState {
+export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
             if (action.data && action.audiofunctions) {
