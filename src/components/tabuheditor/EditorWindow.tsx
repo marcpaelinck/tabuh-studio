@@ -128,99 +128,91 @@ export default function EditorWindow({
     // Need to do this separately before updating systemData.copyfromkey.
     data.forEach((systemData, sysIdx) => (systemData.id = sysIdx))
 
-    const systems = useMemo(
-        () =>
-            data.map((systemData) => {
-                // Update the 'copyfrom' field with the source's label or id.
-                // This value can change due to user edits.
-                if (systemData.copyfromkey) {
-                    const source = data.find((sysData) => sysData.key == systemData.copyfromkey)
-                    if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+    const systems = data.map((systemData) => {
+        // Update the 'copyfrom' field with the source's label or id.
+        // This value can change due to user edits.
+        if (systemData.copyfromkey) {
+            const source = data.find((sysData) => sysData.key == systemData.copyfromkey)
+            if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+        }
+        // Structure:
+        // - Panel Header: contains context menu and System summary information
+        // - Panel content (visible when panel is expanded): System grid (SystemNode)
+        debug(`recreating all systems`, EditorWindow.name)
+        return (
+            <Accordion.Panel
+                key={systemData.key}
+                // Panel Header
+                header={
+                    <Whisper
+                        ref={whisperRef}
+                        key={`Whisper-${systemData.id}`}
+                        placement="autoVertical"
+                        trigger="contextMenu"
+                        followCursor
+                        speaker={
+                            <Popover>
+                                <SystemContextMenu
+                                    data={data}
+                                    systemData={systemData}
+                                    setData={setData}
+                                    labels={labels}
+                                    setLabels={setLabels}
+                                    whisperRef={whisperRef}
+                                />
+                            </Popover>
+                        }>
+                        <Grid id="grid" className="ml-0">
+                            {/* Displays info about the System */}
+                            <Row id="row">
+                                <Col span={4} className="flex">
+                                    <PlayBackButtons
+                                        data={data}
+                                        systemId={systemData.id}
+                                        playback={playback}
+                                        playbackState={playbackState}
+                                        className="content-start"
+                                    />
+                                </Col>
+                                <PanelCol span={2} text={`${systemData.id}`} icon={<AiOutlineNumber />} />
+                                <PanelCol span={4} text={`${systemData.part || ''}`} icon={<AiOutlinePieChart />} />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.label || ''}`}
+                                    icon={<IoPricetagOutline />}
+                                    color="orange"
+                                />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.copyfrom || ''}`}
+                                    icon={<IoMdCopy />}
+                                    color="blue"
+                                />
+                                <PanelCol
+                                    span={4}
+                                    text={`${systemData.goto || ''}`}
+                                    icon={<IoArrowForwardOutline />}
+                                    color="green"
+                                />
+                            </Row>
+                        </Grid>
+                    </Whisper>
                 }
-                // Structure:
-                // - Panel Header: contains context menu and System summary information
-                // - Panel content (visible when panel is expanded): System grid (SystemNode)
-                debug(`recreating all systems`, EditorWindow.name)
-                return (
-                    <Accordion.Panel
-                        key={systemData.key}
-                        // Panel Header
-                        header={
-                            <Whisper
-                                ref={whisperRef}
-                                key={`Whisper-${systemData.id}`}
-                                placement="autoVertical"
-                                trigger="contextMenu"
-                                followCursor
-                                speaker={
-                                    <Popover>
-                                        <SystemContextMenu
-                                            data={data}
-                                            systemData={systemData}
-                                            setData={setData}
-                                            labels={labels}
-                                            setLabels={setLabels}
-                                            whisperRef={whisperRef}
-                                        />
-                                    </Popover>
-                                }>
-                                <Grid id="grid" className="ml-0">
-                                    {/* Displays info about the System */}
-                                    <Row id="row">
-                                        <Col span={4} className="flex">
-                                            <PlayBackButtons
-                                                data={data}
-                                                systemId={systemData.id}
-                                                playback={playback}
-                                                playbackState={playbackState}
-                                                className="content-start"
-                                            />
-                                        </Col>
-                                        <PanelCol span={2} text={`${systemData.id}`} icon={<AiOutlineNumber />} />
-                                        <PanelCol
-                                            span={4}
-                                            text={`${systemData.part || ''}`}
-                                            icon={<AiOutlinePieChart />}
-                                        />
-                                        <PanelCol
-                                            span={4}
-                                            text={`${systemData.label || ''}`}
-                                            icon={<IoPricetagOutline />}
-                                            color="orange"
-                                        />
-                                        <PanelCol
-                                            span={4}
-                                            text={`${systemData.copyfrom || ''}`}
-                                            icon={<IoMdCopy />}
-                                            color="blue"
-                                        />
-                                        <PanelCol
-                                            span={4}
-                                            text={`${systemData.goto || ''}`}
-                                            icon={<IoArrowForwardOutline />}
-                                            color="green"
-                                        />
-                                    </Row>
-                                </Grid>
-                            </Whisper>
-                        }
-                        expanded={expanded[systemData.key]}
-                        onSelect={() => {
-                            flipExpanded(systemData.key)
-                        }}>
-                        {/* Panel content: visible when panel is expanded */}
+                expanded={expanded[systemData.key]}
+                onSelect={() => {
+                    flipExpanded(systemData.key)
+                }}>
+                {/* Panel content: visible when panel is expanded */}
 
-                        <SystemNode
-                            systemData={systemData}
-                            updateSystemData={updateSystemData}
-                            playbackState={playbackState}
-                            visible={expanded[systemData.key]}
-                        />
-                    </Accordion.Panel>
-                )
-            }),
-        [data, expanded]
-    )
+                <SystemNode
+                    systemData={systemData}
+                    updateSystemData={updateSystemData}
+                    playbackState={playbackState}
+                    visible={expanded[systemData.key]}
+                />
+            </Accordion.Panel>
+        )
+    })
 
     return (
         <AudioFunctions value={audioFunctions}>

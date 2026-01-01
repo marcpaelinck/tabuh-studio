@@ -40,13 +40,6 @@ export function SystemNode({
 
     if (systemId == 0 || systemId == 13) debug(`(re-)rendering system ${systemId}`, SystemNode.name)
 
-    // const setPositionGrouping = (position: string, value: boolean) => {
-    //     debug(value, SystemNode.name)
-    //     const newGroupValue = { ...grouped }
-    //     newGroupValue[position] = value
-    //     setGrouped(newGroupValue)
-    // }
-
     useEffect(() => debug(`recreating system ${systemId} due to change of data`, SystemNode.name), [systemData])
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
@@ -175,7 +168,6 @@ export function SystemNode({
                     measures={measures}
                     systemData={systemData}
                     colWidths={systemData.colWidths}
-                    // gridRow={grid.current.cells[posToRow[position]]}
                 />
             </Row>
         )
