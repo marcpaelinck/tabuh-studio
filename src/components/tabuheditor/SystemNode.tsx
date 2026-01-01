@@ -34,8 +34,6 @@ export function SystemNode({
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
-    // const [grouped, setGrouped] = useState<Record<string, boolean>>(groupedInit)
-    const groupedRef = useRef<Record<string, boolean>>(groupedInit)
     const { castNotation } = useRules()
 
     if (systemId == 0 || systemId == 13) debug(`(re-)rendering system ${systemId}`, SystemNode.name)
@@ -64,10 +62,15 @@ export function SystemNode({
     // highlighted here at once. This is why we ignore all cursor changes except for the KEMPLI.
     useEffect(() => {
         // If the cursor has moved to another system we might need to switch off highlighting in the current system.
-        if (!grid || (highlightedCell == noCursor && playbackState.cursor.system != systemId)) {
-            debug(`nothing to highlight`, SystemNode.name)
+        if (
+            !grid.current ||
+            _.isEmpty(grid.current.cells) ||
+            (highlightedCell == noCursor && playbackState.cursor.system != systemId)
+        ) {
+            debug(`nothing to highlight (panel closed)`, SystemNode.name)
             return
         }
+        console.log(grid.current.cells)
         if (_.isEqual(playbackState.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).
@@ -137,13 +140,23 @@ export function SystemNode({
         if (systemData.positions[rowId] != 'PEMADE_POLOS') return
         const newSystemData = { ...systemData }
         systemData.positions.forEach((position) => {
-            if (!groupedRef.current[position]) return
+            if (!systemData.grouped.includes(position)) return
             const newNotation = castNotation(notation, position, colId)
             if (cached) newSystemData.staffs[position][colId].notation_ = newNotation
             else newSystemData.staffs[position][colId].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`, SystemNode.name)
         })
         updateSystemData(newSystemData)
+    }
+
+    function updateGrouped(position: string, isGrouped: boolean) {
+        const newSysData = { ...systemData }
+        if (isGrouped && !newSysData.grouped.includes(position)) newSysData.grouped.push(position)
+        else {
+            const idx = newSysData.grouped.indexOf(position)
+            if (idx > -1) newSysData.grouped.splice(idx, 1)
+        }
+        updateSystemData(newSysData)
     }
 
     const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
@@ -157,8 +170,8 @@ export function SystemNode({
                 </Col>
                 <Col id={`COL-POSITION`} span="auto">
                     <Checkbox
-                        defaultChecked={groupedRef.current[position]}
-                        onChange={(_, checked) => (groupedRef.current[position] = checked)}
+                        defaultChecked={systemData.grouped.includes(position)}
+                        onChange={(_, checked) => updateGrouped(position, checked)}
                     />
                 </Col>
                 <StaffNode

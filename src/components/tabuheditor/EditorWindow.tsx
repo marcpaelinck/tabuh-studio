@@ -65,6 +65,7 @@ export default function EditorWindow({
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => Object.assign(defaultAudioFunc, { playInstrument }), [])
+
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
     const [playbackState, playback] = useReducer(playbackReducer, {
@@ -96,6 +97,7 @@ export default function EditorWindow({
                 key: system.key,
                 part: system.part,
                 positions: positions,
+                grouped: [],
                 staffs: staffs,
                 colWidths: colWidths
             }
@@ -204,12 +206,14 @@ export default function EditorWindow({
                 }}>
                 {/* Panel content: visible when panel is expanded */}
 
-                <SystemNode
-                    systemData={systemData}
-                    updateSystemData={updateSystemData}
-                    playbackState={playbackState}
-                    visible={expanded[systemData.key]}
-                />
+                {expanded[systemData.key] && (
+                    <SystemNode
+                        systemData={systemData}
+                        updateSystemData={updateSystemData}
+                        playbackState={playbackState}
+                        visible={expanded[systemData.key]}
+                    />
+                )}
             </Accordion.Panel>
         )
     })

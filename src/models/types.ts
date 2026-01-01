@@ -120,6 +120,7 @@ export type EditorSystemData = {
     id: number // system id
     part: string
     positions: string[] // sorted list of positions ordered as displayed in the editor
+    grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
     staffs: Staffs
     colWidths: number[]
     label?: string
