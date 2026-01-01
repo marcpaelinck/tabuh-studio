@@ -5,6 +5,7 @@ import { debug } from '../utils/debugger'
 import { type KeyboardEvent } from 'react'
 import type { ElementWithValueTracker } from '../components/tabuheditor/_types'
 import type { JsonSymbol } from '../models/types'
+import { symbolValidationUtils } from '../utils/alphabet'
 
 type KeyType =
     | 'ArrowUp'
@@ -84,39 +85,6 @@ const keyActions: ActionRecord[] = [
     { keys: ['End', 'Ctrl'], left: null, right: null, action: 'rowend' }
 ]
 
-type ValidsReturnValues = {
-    validRegExpSymbol: RegExp
-    validRegExpCell: RegExp
-    validKeystrokes: string[]
-    validRegExpByLength: Record<string, string>
-}
-// Return values:
-// validRegExpSymbol: regular expression for all valid symbols
-// validRegExpCell: regular expression to parse an entire cell into valid symbols
-// validRegExpByLength: regular expressions for valid symbols, grouped by symbol length
-// validKeystrokes: list of unique individual chars occurring in valid symbols
-function getValids(validSymbols: string[]): ValidsReturnValues {
-    const lengths = [...new Set(validSymbols.map((sym) => sym.length))]
-    const regexpEntries: [number, string][] = lengths.map((len) => [
-        len,
-        validSymbols
-            .filter((sym) => sym.length == len || len == 0)
-            .map((sym) => _.escapeRegExp(sym))
-            .join('|')
-    ])
-    const validRegExpByLength: Record<string, string> = Object.fromEntries(regexpEntries.filter(([key, _]) => key > 0))
-    // RegExp to match any valid symbol. The RegExp will match symbol containing the most characters first.
-    const strExpr = validSymbols
-        .sort((sym1, sym2) => sym2.length - sym1.length)
-        .map((sym) => _.escapeRegExp(sym))
-        .join('|')
-    const validRegExpSymbol: RegExp = RegExp(strExpr)
-    // const validRegExpCell: RegExp = RegExp('^(' + strExpr + ')*$', 'g')
-    const validRegExpCell: RegExp = RegExp(strExpr, 'g')
-    const validKeystrokes = [...new Set(validSymbols.join(''))] // set of unique characters
-    return { validRegExpSymbol, validRegExpCell, validRegExpByLength, validKeystrokes }
-}
-
 const match = (event: SearchRecord, action: ActionRecord) => {
     const keysMatch =
         event.keys.length === action.keys.length &&
@@ -130,13 +98,15 @@ const match = (event: SearchRecord, action: ActionRecord) => {
 }
 
 export const useKeyboardListener = (
+    id: string,
     ref: RefObject<HTMLTextAreaElement | null>,
     validSymbols: string[],
     navigate: (action: NavigationAction) => RefObject<HTMLTextAreaElement | null>,
     updateNotation: Dispatch<JsonSymbol[]>
 ) => {
     // Defined as hook in order to be able to use states, such as keyboard definitions, 'smart edit' or 'octavation on'.
-    const { validRegExpSymbol, validRegExpCell, validRegExpByLength, validKeystrokes } = getValids(validSymbols)
+    const { validRegExpSymbol, validRegExpCell, validRegExpByLength, validKeystrokes } =
+        symbolValidationUtils(validSymbols)
 
     // Checks for a matching valid symbol at the beginning (direction==1) or end (direction==-1) of a string.
     // Returns the length of the symbol if a match is found, null otherwise.
@@ -163,7 +133,7 @@ export const useKeyboardListener = (
         const notation = [...matches.map((el) => el[0])]
         if (cellValue && notation.join('') != cellValue)
             // const notation = cellValue ? validRegExpCell.exec(cellValue) : []
-            console.error(`invalid cell content: ${cellValue}`)
+            console.error(`${id}: invalid cell content: ${cellValue}. Valids are: ${validSymbols.join(' ')}`)
         if (notation.length == 0) updateNotation([])
         else
             updateNotation(

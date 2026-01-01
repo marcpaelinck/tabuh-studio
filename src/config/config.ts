@@ -219,6 +219,22 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] }
 }
 
+// Next two lists used when applying multiple instrument notation
+export const polosPositions = [
+    'JEGOGAN',
+    'CALUNG',
+    'UGAL',
+    'PENYACAH',
+    'PEMADE_POLOS',
+    'KANTILAN_POLOS',
+    'REYONG_1',
+    'REYONG_2',
+    'REYONG_3',
+    'REYONG_4'
+]
+
+export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
+
 // ALPHABET + SAMPLES
 //TODO separate alphabet info from samples info. Same for instrument type.
 export const EXTENSION = ['-', ' ']

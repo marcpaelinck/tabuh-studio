@@ -1,45 +1,61 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
-import type { EditorCellCursor, EditorSystemData } from '../../models/types'
-import { NavigationFunctions } from './contexts'
-import { Grid, VStack } from 'rsuite'
-import { type NavigationAction } from '../../config/config'
-import type { GridInfo, NavigationFunctionsType } from './_types'
+import type { EditorCellCursor, EditorSystemData, JsonSymbol } from '../../models/types'
+import { NavigationFunctions, type NavigationFunctionsType } from './contexts'
+import { Checkbox, Col, Grid, Row, VStack, Text } from 'rsuite'
+import { positionConfigs, type NavigationAction } from '../../config/config'
+import type { GridInfo } from './_types'
 import _ from 'lodash'
 import { debug } from '../../utils/debugger'
 import { type PlaybackState } from '../../hooks/playbackReducer'
 import { StaffNode } from './StaffNode'
 import { noCursor } from './_constants'
+import { useRules } from '../../hooks/useRules'
+import { notation2text } from '../../utils/alphabet'
+
+const groupedInit = Object.fromEntries(
+    Object.keys(positionConfigs).map((position) => [position, position.includes('KANTILAN')])
+)
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
     systemData,
     playbackState,
+    updateSystemData,
+    visible,
     ...props
 }: {
     systemData: EditorSystemData
     playbackState: PlaybackState
+    updateSystemData: (data: EditorSystemData) => void
+    visible: boolean
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
-    const positions = Object.keys(systemData.staffs)
     const systemId = systemData.id
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
-    const pbOnInit = Object.fromEntries(positions.map((position) => [position, false]))
-    const [pbOn, setPbOn] = useState<Record<string, boolean>>(pbOnInit)
+    // const [grouped, setGrouped] = useState<Record<string, boolean>>(groupedInit)
+    const groupedRef = useRef<Record<string, boolean>>(groupedInit)
+    const { castNotation } = useRules()
 
-    debug(`(re-)rendering system ${systemId}`, SystemNode.name)
+    if (systemId == 0 || systemId == 13) debug(`(re-)rendering system ${systemId}`, SystemNode.name)
 
-    const setStavePbOn = (position: string) => {
-        return (pbValue: boolean) => {
-            const newPbOn = { ...pbOn }
-            newPbOn[position] = pbValue
-            setPbOn(newPbOn)
-        }
-    }
+    // const setPositionGrouping = (position: string, value: boolean) => {
+    //     debug(value, SystemNode.name)
+    //     const newGroupValue = { ...grouped }
+    //     newGroupValue[position] = value
+    //     setGrouped(newGroupValue)
+    // }
+
+    useEffect(() => debug(`recreating system ${systemId} due to change of data`, SystemNode.name), [systemData])
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
-        return { register: registerComponent, navigate: navigate, updateSystemData: (data: EditorSystemData) => {} }
+        return {
+            register: registerComponent,
+            navigate: navigate,
+            updateSystemData: updateSystemData,
+            applyRules: applyRules
+        }
     }, [])
 
     function highlight(cell: HTMLTextAreaElement | null, on: boolean) {
@@ -69,7 +85,7 @@ export function SystemNode({
             for (var row = 0; row <= grid.current.maxRowId; row++)
                 highlight(grid.current.cells[row][highlightedCell.measure].current, false)
         }
-        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor /*&& pbOn*/) {
+        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor) {
             // Highlight cell
             debug(
                 `Highlighting sys=${playbackState.cursor.system} measure=${playbackState.cursor.measure}`,
@@ -120,31 +136,58 @@ export function SystemNode({
         }
     }
 
-    const staffNodes = useMemo(
-        () =>
-            Object.entries(systemData.staffs).map(([position, measures], rowId) => {
-                debug(`useMemo: recreating staffnodes of system ${systemId}`, SystemNode.name)
-                return (
-                    <StaffNode
-                        systemId={systemId}
-                        position={position}
-                        rowId={rowId}
-                        measures={measures}
-                        colWidths={systemData.colWidths}
-                        pbOn={pbOn[position]}
-                        setPbOn={setStavePbOn(position)}
-                        // gridRow={grid.current.cells[posToRow[position]]}
+    // Fills the notation of the given measure (colId) for all grouped instruments
+    // by casting the given notation for each instrument.
+    function applyRules(notation: JsonSymbol[], rowId: number, colId: number, cached: boolean) {
+        // Input should currently come from Pemade polos part
+        // TODO add a separate input field for grouped positions
+        if (systemData.positions[rowId] != 'PEMADE_POLOS') return
+        const newSystemData = { ...systemData }
+        systemData.positions.forEach((position) => {
+            if (!groupedRef.current[position]) return
+            const newNotation = castNotation(notation, position, colId)
+            if (cached) newSystemData.staffs[position][colId].notation_ = newNotation
+            else newSystemData.staffs[position][colId].notation = newNotation
+            debug(`updated notation of ${position} to ${notation2text(newNotation)}`, SystemNode.name)
+        })
+        updateSystemData(newSystemData)
+    }
+
+    const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
+        if (systemId == 0) debug(`useMemo: recreating staffnodes of system ${systemId}`, SystemNode.name)
+        return (
+            <Row id={`ROW-${position}`}>
+                <Col id={`COL-POSITION`} span="auto">
+                    <Text as="div" className="w-40 h-5">
+                        {positionConfigs[position].name}
+                    </Text>
+                </Col>
+                <Col id={`COL-POSITION`} span="auto">
+                    <Checkbox
+                        defaultChecked={groupedRef.current[position]}
+                        onChange={(_, checked) => (groupedRef.current[position] = checked)}
                     />
-                )
-            }),
-        [systemData, pbOn]
-    )
+                </Col>
+                <StaffNode
+                    systemId={systemId}
+                    position={position}
+                    rowId={rowId}
+                    measures={measures}
+                    systemData={systemData}
+                    colWidths={systemData.colWidths}
+                    // gridRow={grid.current.cells[posToRow[position]]}
+                />
+            </Row>
+        )
+    })
 
     return (
-        <NavigationFunctions value={navigationFunctions}>
-            <Grid className="ml-4">
-                <VStack>{staffNodes}</VStack>
-            </Grid>
-        </NavigationFunctions>
+        visible && (
+            <NavigationFunctions value={navigationFunctions}>
+                <Grid className="ml-4">
+                    <VStack>{staffNodes}</VStack>
+                </Grid>
+            </NavigationFunctions>
+        )
     )
 }

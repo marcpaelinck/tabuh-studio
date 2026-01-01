@@ -3,14 +3,14 @@ const debugOn: Record<string, boolean> = {
     createTimelineFromEditor: false,
     createTimeline: false,
     EditorWindow: false,
-    useKeyboardListener: true,
+    useKeyboardListener: false,
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
     registerComponent: false,
     ScorePlayer: false,
     StaffNode: false,
-    SystemContextMenu: true,
+    SystemContextMenu: false,
     SystemNode: false
 }
 

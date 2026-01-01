@@ -119,6 +119,7 @@ export type EditorSystemData = {
     key: string // unique row id
     id: number // system id
     part: string
+    positions: string[] // sorted list of positions ordered as displayed in the editor
     staffs: Staffs
     colWidths: number[]
     label?: string
