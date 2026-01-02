@@ -77,6 +77,7 @@ export default function EditorWindow({
                 staffs: staffs,
                 colWidths: colWidths
             }
+            console.log(newData)
             newData.push(summary)
         })
         debug(newData, EditorWindow.name)

@@ -1,3 +1,13 @@
+import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
+import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
+import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
+import DataAuthorizeIcon from '@rsuite/icons/DataAuthorize'
+import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
+import PeoplesIcon from '@rsuite/icons/Peoples'
+import PieChartIcon from '@rsuite/icons/PieChart'
+import SearchIcon from '@rsuite/icons/Search'
+import SettingIcon from '@rsuite/icons/Setting'
+import { useEffect, useState } from 'react'
 import {
     Box,
     Button,
@@ -14,22 +24,11 @@ import {
     useMediaQuery,
     VStack
 } from 'rsuite'
-import DashboardIcon from '@rsuite/icons/Dashboard'
-import PeoplesIcon from '@rsuite/icons/Peoples'
-import PieChartIcon from '@rsuite/icons/PieChart'
-import DataAuthorizeIcon from '@rsuite/icons/DataAuthorize'
-import SettingIcon from '@rsuite/icons/Setting'
-import SearchIcon from '@rsuite/icons/Search'
-import logo from '/dist/icons/tabuh-studio_icon.svg'
-import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
-import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
-import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
-import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
-import { useEffect, useState } from 'react'
 import { editorInitialExpandState } from '../../config/config'
 import { useScore } from '../../hooks/useScore'
-import Menu from './Menu'
 import EditorWindow from './EditorWindow'
+import Menu from './Menu'
+import logo from '/dist/icons/tabuh-studio_icon.svg'
 
 const NavHeader = ({ expanded }: { expanded: boolean }) => {
     if (!expanded) {
@@ -70,11 +69,12 @@ export function TabuhEditor({
     const [activeKey, setActiveKey] = useState('1')
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpanded = sidenavExpanded && !isMobile
-    //DUMMIES
+    //END DUMMIES
     const [score, loadScore, loadingScore] = useScore(null)
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
+    const [keyboard, SetKeyboard] = useState<string>('regular')
     var scoreList: string[] = Object.keys(tabuhDict)
 
     useEffect(() => {
@@ -126,29 +126,34 @@ export function TabuhEditor({
                     </Sidenav.Header>
                     <Sidenav.Body>
                         <Nav activeKey={activeKey} onSelect={setActiveKey}>
-                            <Nav.Item eventKey="1" icon={<DashboardIcon />}>
-                                Overview
-                            </Nav.Item>
-                            <Nav.Menu eventKey="2" title="Customers" icon={<PeoplesIcon />}>
-                                <Nav.Item eventKey="2-1">Users</Nav.Item>
-                                <Nav.Item eventKey="2-2">Groups</Nav.Item>
+                            <Nav.Menu eventKey="1" title="File" icon={<PeoplesIcon />}>
+                                <Nav.Item eventKey="file-open">Open...</Nav.Item>
+                                <Nav.Item eventKey="file-save">Save</Nav.Item>
+                                <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
                             </Nav.Menu>
-                            <Nav.Menu eventKey="3" title="Analytics" icon={<PieChartIcon />}>
-                                <Nav.Item eventKey="3-1">Geo</Nav.Item>
-                                <Nav.Item eventKey="3-2">Devices</Nav.Item>
-                                <Nav.Item eventKey="3-3">Loyalty</Nav.Item>
-                                <Nav.Item eventKey="3-4">Visit Depth</Nav.Item>
+                            <Nav.Menu eventKey="2" title="Instruments" icon={<PieChartIcon />}>
+                                <Nav.Item eventKey="instruments-select">Select</Nav.Item>
+                                <Nav.Item eventKey="instruments-definition">Definition</Nav.Item>
                             </Nav.Menu>
-                            <Nav.Menu eventKey="4" title="Security" icon={<DataAuthorizeIcon />}>
-                                <Nav.Item eventKey="4-1">Users</Nav.Item>
-                                <Nav.Item eventKey="4-2">Roles</Nav.Item>
-                                <Nav.Item eventKey="4-3">Permissions</Nav.Item>
+                            <Nav.Menu eventKey="3" title="Keyboard" icon={<DataAuthorizeIcon />}>
+                                <Nav.Item
+                                    active={keyboard == 'regular'}
+                                    onSelect={() => SetKeyboard('regular')}
+                                    eventKey="keyboard-regular">
+                                    Regular
+                                </Nav.Item>
+                                <Nav.Item
+                                    active={keyboard == 'laras'}
+                                    onSelect={() => SetKeyboard('laras')}
+                                    eventKey="keyboard-laras">
+                                    Laras
+                                </Nav.Item>
                             </Nav.Menu>
 
-                            <Nav.Menu eventKey="5" title="Settings" icon={<SettingIcon />}>
-                                <Nav.Item eventKey="5-1">Applications</Nav.Item>
-                                <Nav.Item eventKey="5-2">Channels</Nav.Item>
-                                <Nav.Item eventKey="5-3">Versions</Nav.Item>
+                            <Nav.Menu eventKey="4" title="Settings" icon={<SettingIcon />}>
+                                <Nav.Item eventKey="settings-instruments">Instruments</Nav.Item>
+                                <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
+                                <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
                             </Nav.Menu>
                         </Nav>
                     </Sidenav.Body>

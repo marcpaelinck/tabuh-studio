@@ -11,7 +11,8 @@ const debugOn: Record<string, boolean> = {
     ScorePlayer: false,
     StaffNode: false,
     SystemContextMenu: false,
-    SystemNode: false
+    SystemNode: false,
+    SystemSummary: true
 }
 
 export const debug = (message: any, caller: string) => {

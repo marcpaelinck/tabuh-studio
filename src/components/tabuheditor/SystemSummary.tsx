@@ -1,92 +1,105 @@
-import { useRef, useState, type ActionDispatch, type FocusEvent, type HTMLAttributes, type MouseEvent } from 'react'
-import { AiOutlinePieChart } from 'react-icons/ai'
+// The system summary contains the fields and buttons that appear in the header of each collapsible system section.
+// This summary contains button + text field combinations. The button can either enable to edit the field
+// (e.g. in case of the part or label name) or perform an action (copy current or labeled section). In the
+// latter case, the field will contain information about the copied system.
+
+import { useRef, useState, type ActionDispatch, type FocusEvent, type HTMLAttributes, type UIEvent } from 'react'
+import { AiOutlineNumber, AiOutlinePieChart } from 'react-icons/ai'
 import { IoMdCopy } from 'react-icons/io'
 import { IoArrowForwardOutline, IoPricetagOutline } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
 import { PiCheck, PiX } from 'react-icons/pi'
-import { Col, Grid, Input, InputGroup, Row } from 'rsuite'
+import { Col, Grid, IconButton, Input, InputGroup, Row } from 'rsuite'
 import type { PlaybackAction, PlaybackState } from '../../hooks/playbackReducer'
 import type { EditorSystemData } from '../../models/types'
+import { debug } from '../../utils/debugger'
 import { PlayBackButtons } from './PlaybackButtons'
 
-interface PanelColProps extends HTMLAttributes<HTMLDivElement> {
+type FieldNameType = 'id' | 'part' | 'label' | 'copy' | 'goto'
+
+interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     span: number
-    fieldname: string
-    text: string
-    Icon: IconType
-    editable?: boolean
-    update?: (fieldname: string, value: string | undefined) => void
-    color?: string
+    fieldname: FieldNameType
+    value: string | number | undefined
+    execute: (fieldname: string, value?: string) => void
 }
-function PanelCol({
-    span,
-    fieldname,
-    text,
-    Icon,
-    color,
-    editable = false,
-    update = () => {},
-    ...props
-}: PanelColProps) {
+
+// This is a single summary item containing a button and a value field.
+// Depending on the item's specs, the button's action will optionally collect information
+// from the user (e.g. new field value or label name of the system to copy)
+// and will then perform the `execute` function.
+function SummaryItem({ span, fieldname, value, execute, ...props }: SummaryItemProps) {
+    interface SpecType {
+        icon: IconType
+        action: string
+        color: string
+    }
+    const specs: Record<string, SpecType> = {
+        id: { icon: AiOutlineNumber, action: 'none', color: 'black' },
+        part: { icon: AiOutlinePieChart, action: 'edit', color: 'black' },
+        label: { icon: IoPricetagOutline, action: 'edit', color: 'orange' },
+        copy: { icon: IoMdCopy, action: 'copy', color: 'blue' },
+        goto: { icon: IoArrowForwardOutline, action: 'goto', color: 'green' }
+    }
+    const Icon = specs[fieldname].icon
+
     const [editing, setEditing] = useState<boolean>(false)
     const ref = useRef<HTMLInputElement>(null)
 
+    function doAction(event: UIEvent | FocusEvent, action: string) {
+        debug(`executing action ${action}`, SystemSummary.name)
+        event.stopPropagation()
+        if (action == 'edit') {
+            setEditing(true)
+            return
+        }
+        setEditing(false)
+        if (action != 'cancel') execute(fieldname, ref.current?.value)
+    }
+
+    // Pressing the Enter key in an input field will end editing and save the content.
     function onEnter(e: any) {
         if (e.key === 'Enter') {
             e.target.blur()
-            doSave(e)
+            doAction(e, 'save')
         }
-    }
-
-    function doEdit(event: MouseEvent<SVGElement>) {
-        event.stopPropagation()
-        setEditing(true)
-    }
-
-    function doSave(event: MouseEvent<SVGElement>) {
-        event.stopPropagation()
-        setEditing(false)
-        update(fieldname, ref.current?.value)
-    }
-
-    function doClose(event: MouseEvent<SVGElement> | FocusEvent<HTMLInputElement>) {
-        event.stopPropagation()
-        setEditing(false)
     }
 
     const inputField = (
         <InputGroup inside size="xs">
             <Input
                 ref={ref}
-                defaultValue={text}
+                defaultValue={value || ''}
                 onClick={(e) => e.stopPropagation()}
                 onKeyUp={onEnter}
-                onBlur={doClose}
+                onBlur={(e) => doAction(e, 'cancel')}
             />
             <InputGroup.Addon as="span">
-                <PiCheck onClick={doSave} className="hover:text-green-600 hover:cursor-pointer" />
-                <PiX onClick={doClose} className="hover:text-red-600 hover:cursor-pointer" />
+                {/* Save (V) and cancel (X) buttons */}
+                <PiCheck onClick={(e) => doAction(e, 'save')} className="hover:text-green-800 hover:cursor-pointer" />
+                <PiX onClick={(e) => doAction(e, 'cancel')} className="hover:text-red-800 hover:cursor-pointer" />
             </InputGroup.Addon>
         </InputGroup>
     )
+    const icon = (
+        <Icon
+            size="1rem"
+            onClick={(event: UIEvent<SVGElement>) => {
+                doAction(event, specs[fieldname].action)
+            }}
+        />
+    )
 
     return (
-        <Col
-            as="div"
-            span={span}
-            className="flex bg-gray-100 border-2 border-white divide-solid items-center"
-            style={{ color: color }}>
-            <Icon
-                onClick={(event) => {
-                    if (editable) doEdit(event)
-                }}
-            />
-            <span className="text-sm pl-3"> {editing ? inputField : text}</span>
+        <Col as="div" span={span} className="flex bg-gray-100 border-2 border-white divide-solid items-center">
+            {specs[fieldname].action == 'none' ? icon : <IconButton icon={icon} className="p-0" />}
+            <span style={{ color: specs[fieldname].color }} className="text-sm pl-3">
+                {editing ? inputField : `${value || ''}`}
+            </span>
         </Col>
     )
 }
 
-// Information that is displayed in the header part of each panel header. See EditorWindow.
 interface SystemSummaryProps {
     data: EditorSystemData[]
     systemData: EditorSystemData
@@ -95,15 +108,18 @@ interface SystemSummaryProps {
     playbackState: PlaybackState
 }
 export function SystemSummary({ data, systemData, updateSysData, playback, playbackState }: SystemSummaryProps) {
-    function update(fieldname: string, value: string | undefined) {
+    // Payload of the summary field buttons after optional value input by user.
+    function execute(fieldname: string, value?: string) {
         const newSystemData = { ...systemData }
         switch (fieldname) {
             case 'part':
-                if (value) newSystemData.part = value
+                if (typeof value == 'string') newSystemData.part = value
                 break
             case 'label':
-                if (value) newSystemData.label = value
+                if (typeof value == 'string') newSystemData.label = value
                 break
+            case 'copy':
+            case 'goto':
             default:
         }
         updateSysData(newSystemData)
@@ -122,38 +138,11 @@ export function SystemSummary({ data, systemData, updateSysData, playback, playb
                         className="content-start"
                     />
                 </Col>
-                {/* <PanelCol span={2} text={`${systemData.id}`} icon={<AiOutlineNumber />} /> */}
-                <PanelCol
-                    span={4}
-                    fieldname="part"
-                    text={`${systemData.part || ''}`}
-                    Icon={AiOutlinePieChart}
-                    editable
-                    update={update}
-                />
-                <PanelCol
-                    span={4}
-                    fieldname="label"
-                    text={`${systemData.label || ''}`}
-                    Icon={IoPricetagOutline}
-                    editable
-                    update={update}
-                    color="orange"
-                />
-                <PanelCol
-                    span={4}
-                    fieldname="copyfrom"
-                    text={`${systemData.copyfrom || ''}`}
-                    Icon={IoMdCopy}
-                    color="blue"
-                />
-                <PanelCol
-                    span={4}
-                    fieldname="goto"
-                    text={`${systemData.goto || ''}`}
-                    Icon={IoArrowForwardOutline}
-                    color="green"
-                />
+                <SummaryItem span={2} fieldname="id" value={systemData.id + 1} execute={execute} />
+                <SummaryItem span={4} fieldname="part" value={systemData.part} execute={execute} />
+                <SummaryItem span={4} fieldname="label" value={systemData.label} execute={execute} />
+                <SummaryItem span={4} fieldname="copy" value={systemData.copyfrom} execute={execute} />
+                <SummaryItem span={4} fieldname="goto" value={systemData.goto} execute={execute} />
             </Row>
         </Grid>
     )
