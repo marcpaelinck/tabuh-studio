@@ -63,10 +63,9 @@ export function SystemNode({
             _.isEmpty(grid.current.cells) ||
             (highlightedCell == noCursor && playbackState.cursor.system != systemId)
         ) {
-            debug(`nothing to highlight (panel closed)`, SystemNode.name)
+            debug(`nothing to highlight (panel closed)`, SystemNode.name + 'Offset')
             return
         }
-        console.log(grid.current.cells)
         if (_.isEqual(playbackState.cursor, highlightedCell)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).

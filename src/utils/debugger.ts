@@ -7,12 +7,14 @@ const debugOn: Record<string, boolean> = {
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
+    PlayBackButtons: false,
     registerComponent: false,
     ScorePlayer: false,
     StaffNode: false,
     SystemContextMenu: false,
     SystemNode: false,
-    SystemSummary: true
+    SystemNodeOffset: false,
+    SummaryItem: false
 }
 
 export const debug = (message: any, caller: string) => {

@@ -8,8 +8,7 @@ import {
     type HTMLAttributes,
     type RefObject
 } from 'react'
-import { Accordion, Placeholder, Popover, Whisper } from 'rsuite'
-import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
+import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
 import { useInstruments } from '../../hooks/useInstruments'
@@ -17,9 +16,9 @@ import type { EditorSystemData, Score, Staffs } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
-import { SystemContextMenu } from './SystemContextMenu'
+import { PlayBackButtons } from './PlaybackButtons'
+import { SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
-import { SystemSummary } from './SystemSummary'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
@@ -77,7 +76,6 @@ export default function EditorWindow({
                 staffs: staffs,
                 colWidths: colWidths
             }
-            console.log(newData)
             newData.push(summary)
         })
         debug(newData, EditorWindow.name)
@@ -93,19 +91,27 @@ export default function EditorWindow({
         setData(newData)
     }
 
-    var dummyWhisper: OverlayTriggerHandle = {
-        updatePosition: () => {},
-        open: () => {},
-        close: () => {},
-        getState: () => {
-            return { open: false }
+    function summaryItemAction(fieldname: string, systemData: EditorSystemData, value?: string) {
+        const newSystemData = { ...systemData }
+        switch (fieldname) {
+            case 'part':
+                if (typeof value == 'string') newSystemData.part = value
+                break
+            case 'label':
+                if (typeof value == 'string') newSystemData.label = value
+                break
+            case 'copy':
+            case 'goto':
+            default:
         }
+        updateSystemData(newSystemData)
     }
-    const whisperRef = useRef<OverlayTriggerHandle>(dummyWhisper)
 
     // (Re-)number the systems: numbering can change when systems are inserted.
     // Need to do this separately before updating systemData.copyfromkey.
     data.forEach((systemData, sysIdx) => (systemData.id = sysIdx))
+
+    const systemIdPrefix = 'system-'
 
     const systems = data.map((systemData) => {
         // Update the 'copyfrom' field with the source's label or id.
@@ -118,37 +124,33 @@ export default function EditorWindow({
         // - Panel Header: contains context menu and System summary information
         // - Panel content (visible when panel is expanded): System grid (SystemNode)
         debug(`recreating all systems`, EditorWindow.name)
+        const execute = (fieldname: string, value?: string) => summaryItemAction(fieldname, systemData, value)
         return (
             <Accordion.Panel
+                id={`${systemIdPrefix}${systemData.id}`}
                 key={systemData.key}
                 // Panel Header
                 header={
-                    <Whisper
-                        ref={whisperRef}
-                        key={`Whisper-${systemData.id}`}
-                        placement="autoVertical"
-                        trigger="contextMenu"
-                        followCursor
-                        speaker={
-                            <Popover>
-                                <SystemContextMenu
+                    <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
+                        {/* Displays info about the System */}
+                        <Row id="row">
+                            <Col span={3} className="flex">
+                                <PlayBackButtons
                                     data={data}
-                                    systemData={systemData}
-                                    setData={setData}
-                                    labels={labels}
-                                    setLabels={setLabels}
-                                    whisperRef={whisperRef}
+                                    systemId={systemData.id}
+                                    systemIdPrefix={systemIdPrefix}
+                                    playback={playback}
+                                    playbackState={playbackState}
+                                    className="content-start"
                                 />
-                            </Popover>
-                        }>
-                        <SystemSummary
-                            data={data}
-                            systemData={systemData}
-                            updateSysData={updateSystemData}
-                            playback={playback}
-                            playbackState={playbackState}
-                        />
-                    </Whisper>
+                            </Col>
+                            <SummaryItem span={2} fieldname="id" value={systemData.id + 1} />
+                            <SummaryItem span={4} fieldname="part" value={systemData.part} execute={execute} />
+                            <SummaryItem span={4} fieldname="label" value={systemData.label} execute={execute} />
+                            <SummaryItem span={4} fieldname="copy" value={systemData.copyfrom} execute={execute} />
+                            <SummaryItem span={4} fieldname="goto" value={systemData.goto} execute={execute} />
+                        </Row>
+                    </Grid>
                 }
                 expanded={expanded[systemData.key]}
                 onSelect={() => {

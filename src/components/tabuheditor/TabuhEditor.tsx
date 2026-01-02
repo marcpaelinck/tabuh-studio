@@ -1,13 +1,12 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
-import DataAuthorizeIcon from '@rsuite/icons/DataAuthorize'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
-import PeoplesIcon from '@rsuite/icons/Peoples'
-import PieChartIcon from '@rsuite/icons/PieChart'
 import SearchIcon from '@rsuite/icons/Search'
-import SettingIcon from '@rsuite/icons/Setting'
 import { useEffect, useState } from 'react'
+import { FaRegKeyboard } from 'react-icons/fa6'
+import { GiXylophone } from 'react-icons/gi'
+import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import {
     Box,
     Button,
@@ -110,6 +109,7 @@ export function TabuhEditor({
                     <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
                         {score != null && (
                             <EditorWindow
+                                id="editor window component"
                                 score={score}
                                 expanded={expanded}
                                 setExpanded={setExpanded}
@@ -126,16 +126,15 @@ export function TabuhEditor({
                     </Sidenav.Header>
                     <Sidenav.Body>
                         <Nav activeKey={activeKey} onSelect={setActiveKey}>
-                            <Nav.Menu eventKey="1" title="File" icon={<PeoplesIcon />}>
+                            <Nav.Menu eventKey="1" title="File" icon={<IoFolderOpenOutline />}>
                                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
                                 <Nav.Item eventKey="file-save">Save</Nav.Item>
                                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
                             </Nav.Menu>
-                            <Nav.Menu eventKey="2" title="Instruments" icon={<PieChartIcon />}>
+                            <Nav.Menu eventKey="2" title="Instruments" icon={<GiXylophone />}>
                                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
-                                <Nav.Item eventKey="instruments-definition">Definition</Nav.Item>
                             </Nav.Menu>
-                            <Nav.Menu eventKey="3" title="Keyboard" icon={<DataAuthorizeIcon />}>
+                            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
                                 <Nav.Item
                                     active={keyboard == 'regular'}
                                     onSelect={() => SetKeyboard('regular')}
@@ -150,8 +149,8 @@ export function TabuhEditor({
                                 </Nav.Item>
                             </Nav.Menu>
 
-                            <Nav.Menu eventKey="4" title="Settings" icon={<SettingIcon />}>
-                                <Nav.Item eventKey="settings-instruments">Instruments</Nav.Item>
+                            <Nav.Menu eventKey="4" title="Settings" icon={<IoSettingsOutline />}>
+                                <Nav.Item eventKey="settings-instruments">Instrument definitions</Nav.Item>
                                 <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
                                 <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
                             </Nav.Menu>

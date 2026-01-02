@@ -1,5 +1,5 @@
-import { doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
 import { fileExists } from '../utils/filesystem'
+import { doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
 
 export function soundFiles(notes: string[], fileTemplate: string): string[] {
     return notes.map(([tone, muting]) => fileTemplate.replace('{tone}', `${tone}`).replace('{muting}', `${muting}`))
@@ -28,7 +28,6 @@ async function sanityCheck() {
         const filename = positionConfigs[instr].sampletemplate.replace('{note}', note)
         const found = instr in positionConfigs && (await fileExists(SOUNDS_FOLDER + filename))
         if (!found) logMessage += `X ${filename} not found in ${SOUNDS_FOLDER}\n`
-        // else console.log(`V ${filename} found in ${SOUNDS_FOLDER}`)
     }
     if (logMessage) console.error(logMessage)
 }

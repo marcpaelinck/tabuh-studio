@@ -1,29 +1,29 @@
-import type { CursorAction, EditorSystemData } from '../../models/types'
-import { noCursor } from './_constants'
-import { AudioFunctions, type AudioFunctionsType } from './contexts'
-import { useContext } from 'react'
-import { debug } from '../../utils/debugger'
-import { SystemNode } from './SystemNode'
-import type { PlaybackState, PlaybackType } from '../../hooks/playbackReducer'
 import type { HTMLAttributes, MouseEvent } from 'react'
+import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
+import type { PlaybackState, PlaybackType } from '../../hooks/playbackReducer'
+import type { CursorAction, EditorSystemData } from '../../models/types'
+import { debug } from '../../utils/debugger'
+import { noCursor } from './_constants'
+import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
 export function PlayBackButtons({
     data,
     systemId,
-    // pbType,
+    systemIdPrefix,
     playbackState,
     playback,
     ...props
 }: {
     data: EditorSystemData[]
     systemId: number
-    // pbType: PlaybackType
+    systemIdPrefix: string
     playbackState: PlaybackState
     playback: CallableFunction
 } & HTMLAttributes<HTMLDivElement>) {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
+    const buttongroupRef = useRef<HTMLDivElement>(null)
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -37,8 +37,11 @@ export function PlayBackButtons({
         })
         debug(
             `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
-            SystemNode.name
+            PlayBackButtons.name
         )
+        const currElement = document.getElementById(`${systemIdPrefix}${cAction.system}`)
+        debug(`scrolling ${currElement?.id} into view`, PlayBackButtons.name)
+        currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
     function isDisabled(pbType: PlaybackType) {
@@ -52,7 +55,7 @@ export function PlayBackButtons({
             playback({ actionType: 'stop' })
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
-            console.log(`playing sys seq=${systemId}`)
+            debug(`playing sys seq=${systemId}`, PlayBackButtons.name)
             // Load new data
             const index = data.findIndex((sysData) => sysData.id == systemId)
             if (index < 0) {
@@ -91,7 +94,7 @@ export function PlayBackButtons({
     )
 
     return (
-        <ButtonGroup size="sm" className={props.className}>
+        <ButtonGroup size="sm" className={props.className} as="div" ref={buttongroupRef}>
             {button('single')}
             {button('multiple')}
         </ButtonGroup>
