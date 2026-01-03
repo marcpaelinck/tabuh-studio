@@ -1,19 +1,24 @@
-import { positionConfigs, noteConfigs, type BaseNoteTimeObj } from '../config/config'
+import { createElement } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 import {
+    defaultIntroTime,
+    defaultOutroTime,
+    noteConfigs,
+    positionConfigs,
+    type BaseNoteTimeObj
+} from '../config/config'
+import {
+    type ActionFunctions,
+    type AnimationNote,
     type JsonNote,
     type JsonSymbol,
     type Note,
     type Score,
     type Section,
-    type AnimationNote,
-    type TimeLine,
-    type ActionFunctions
+    type TimeLine
 } from '../models/types'
-import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from './timeunits'
-import { createElement } from 'react'
-import { defaultIntroTime, defaultOutroTime } from '../config/config'
 import { cleanSymbol } from './alphabet'
-import { v4 as uuidv4 } from 'uuid'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from './timeunits'
 
 export function parseScore(input: string): Score {
     const score: Score = JSON.parse(input)
@@ -152,8 +157,8 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                         sectionProgress += note.d || 1
                     })
                     measure.notation.forEach((symbol: JsonSymbol) => {
-                        symbol.system = system.id
-                        symbol.section = section.id
+                        symbol.sysId = system.id
+                        symbol.sectionId = section.id
                         positionNotation[position].push(symbol)
                     })
                 }
@@ -217,10 +222,10 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
             let currentline: string = ''
             let line: number = 0
             symbols.forEach((symbol, index) => {
-                const newSystem = index > 0 ? symbol.system != symbols[index - 1].system : false
+                const newSystem = index > 0 ? symbol.sysId != symbols[index - 1].sysId : false
                 const newSection =
-                    index > 0 ? !newSystem && (newSystem || symbol.section !== symbols[index - 1].section) : false
-                const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].system != symbol.system
+                    index > 0 ? !newSystem && (newSystem || symbol.sectionId !== symbols[index - 1].sectionId) : false
+                const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].sysId != symbol.sysId
 
                 if (newSection) currentline += ' '
                 const range = [currentline.length, currentline.length + symbol.s.length]
@@ -229,8 +234,8 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                 timeline.cursoractions.push({
                     action: actionFunctions.cursor,
                     time: n2TO(symbol.t),
-                    system: symbol.system,
-                    section: symbol.section,
+                    system: symbol.sysId,
+                    section: symbol.sectionId,
                     position: position,
                     symbol: symbol.s,
                     line: line,

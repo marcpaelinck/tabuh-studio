@@ -10,14 +10,14 @@ import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
 export function PlayBackButtons({
     data,
-    systemId,
+    systemIdx,
     systemIdPrefix,
     playbackState,
     playback,
     ...props
 }: {
     data: EditorSystemData[]
-    systemId: number
+    systemIdx: number
     systemIdPrefix: string
     playbackState: PlaybackState
     playback: CallableFunction
@@ -55,11 +55,11 @@ export function PlayBackButtons({
             playback({ actionType: 'stop' })
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
-            debug(`playing sys seq=${systemId}`, PlayBackButtons.name)
+            debug(`playing sys seq=${systemIdx}`, PlayBackButtons.name)
             // Load new data
-            const index = data.findIndex((sysData) => sysData.id == systemId)
+            const index = data.findIndex((sysData) => sysData.index == systemIdx)
             if (index < 0) {
-                console.error(`no playback data found for system ${systemId}`)
+                console.error(`no playback data found for system ${systemIdx}`)
             }
             playback({
                 actionType: 'load',
@@ -71,7 +71,7 @@ export function PlayBackButtons({
     }
 
     function buttonColor(pbType: PlaybackType) {
-        return systemId == playbackState.cursor.system && playbackState.playbackType == pbType ? 'orange' : 'gray'
+        return systemIdx == playbackState.cursor.sysIdx && playbackState.playbackType == pbType ? 'orange' : 'gray'
     }
 
     const playIcon = (pbType: PlaybackType, color: string) =>

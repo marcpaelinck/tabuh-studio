@@ -1,7 +1,8 @@
 import * as Tone from 'tone'
+import { positionConfigs } from '../config/config'
+import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     ActionFunctions,
-    AnimationAction,
     CursorAction,
     EditorSystemData,
     GenericAction,
@@ -9,11 +10,9 @@ import type {
     TempoAction,
     TimeLine
 } from '../models/types'
-import { n2TO, TO2n } from './timeunits'
 import { cleanSymbol } from './alphabet'
-import { isExtension, isMuting } from '../config/configfunctions'
 import { debug } from './debugger'
-import { positionConfigs } from '../config/config'
+import { n2TO, TO2n } from './timeunits'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,

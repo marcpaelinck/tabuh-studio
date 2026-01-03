@@ -26,15 +26,15 @@ export function SystemNode({
     visible: boolean
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
-    const systemId = systemData.id
+    const systemIdx = systemData.index
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const { castNotation } = useRules()
 
-    if (systemId == 0 || systemId == 13) debug(`(re-)rendering system ${systemId}`, SystemNode.name)
+    if (systemIdx == 1 || systemIdx == 13) debug(`(re-)rendering system ${systemIdx}`, SystemNode.name)
 
-    useEffect(() => debug(`recreating system ${systemId} due to change of data`, SystemNode.name), [systemData])
+    useEffect(() => debug(`recreating system ${systemIdx} due to change of data`, SystemNode.name), [systemData])
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
         return {
@@ -61,7 +61,7 @@ export function SystemNode({
         if (
             !grid.current ||
             _.isEmpty(grid.current.cells) ||
-            (highlightedCell == noCursor && playbackState.cursor.system != systemId)
+            (highlightedCell == noCursor && playbackState.cursor.sysIdx != systemIdx)
         ) {
             debug(`nothing to highlight (panel closed)`, SystemNode.name + 'Offset')
             return
@@ -76,10 +76,10 @@ export function SystemNode({
             for (var row = 0; row <= grid.current.maxRowId; row++)
                 highlight(grid.current.cells[row][highlightedCell.measure].current, false)
         }
-        if (playbackState.cursor.system == systemId && playbackState.cursor != noCursor) {
+        if (playbackState.cursor.sysIdx == systemIdx && playbackState.cursor != noCursor) {
             // Highlight cell
             debug(
-                `Highlighting sys=${playbackState.cursor.system} measure=${playbackState.cursor.measure}`,
+                `Highlighting sys=${playbackState.cursor.sysIdx} measure=${playbackState.cursor.measure}`,
                 SystemNode.name
             )
             for (var row = 0; row <= grid.current.maxRowId; row++) {
@@ -155,7 +155,7 @@ export function SystemNode({
     }
 
     const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
-        if (systemId == 0) debug(`useMemo: recreating staffnodes of system ${systemId}`, SystemNode.name)
+        if (systemIdx == 0) debug(`useMemo: recreating staffnodes of system ${systemIdx}`, SystemNode.name)
         return (
             <Row id={`ROW-${position}`}>
                 <Col id={`COL-POSITION`} span="auto">
@@ -170,7 +170,7 @@ export function SystemNode({
                     />
                 </Col>
                 <StaffNode
-                    systemId={systemId}
+                    systemId={systemIdx}
                     position={position}
                     rowId={rowId}
                     measures={measures}

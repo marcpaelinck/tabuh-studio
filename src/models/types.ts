@@ -1,5 +1,5 @@
-import * as Tone from 'tone'
 import type { HTMLAttributes, ReactElement } from 'react'
+import * as Tone from 'tone'
 import type { BaseNoteTimeObj, MutingType, StrokeType, ToneType } from '../config/config'
 
 // INSTRUMENTS / AUDIO
@@ -26,8 +26,8 @@ export type JsonNote = {
 
 // Used as
 export type JsonSymbol = {
-    system: number
-    section: number
+    sysId: number
+    sectionId: number
     s: string
     t: number // attack time in base notes
     d: number
@@ -116,8 +116,9 @@ export type HighlightRange = { line: number; range: number[] }
 export type Staffs = Record<string, Measure[]>
 
 export type EditorSystemData = {
-    key: string // unique row id
-    id: number // system id
+    uuid: string // unique uuid, never changes
+    id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
+    index: number // row index, starts with 0, can change when data items are added / deleted
     part: string
     positions: string[] // sorted list of positions ordered as displayed in the editor
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
@@ -128,7 +129,7 @@ export type EditorSystemData = {
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // key or id of copied system
 }
-export type EditorCellCursor = { system: number; position: string; measure: number }
+export type EditorCellCursor = { sysIdx: number; position: string; measure: number }
 export type EditorBeatCursor = { system: number; beat: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION

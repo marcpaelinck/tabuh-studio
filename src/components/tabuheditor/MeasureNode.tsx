@@ -80,7 +80,7 @@ export function MeasureNode({
             // measureData.notation = measureData.notation_
             const notationStr: string[] = parseNotationText(ref.current.value, validRegExpCell)
             const notation = notationStr.map((sym) => {
-                return { system: systemData.id, section: colId, s: sym, t: 0, d: 1 }
+                return { sysId: systemData.id, sectionId: colId, s: sym, t: 0, d: 1 }
             })
             navFunc.applyRules(notation, rowId, colId, true)
             const newSysData = { ...systemData }

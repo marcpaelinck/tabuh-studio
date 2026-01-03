@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import { useState, type Dispatch, type RefObject, type SyntheticEvent } from 'react'
 import { IoCloseCircleOutline, IoSaveOutline } from 'react-icons/io5'
 import { Menu, useDialog } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import type { EditorSystemData } from '../../models/types'
 import { v4 as uuidv4 } from 'uuid'
-import _ from 'lodash'
+import type { EditorSystemData } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import SelectionModal from '../SelectionModal'
 
@@ -77,15 +77,15 @@ export function SystemContextMenu({
                     if (!label) return
                     newSysData = _.cloneDeep(labels[label])
                     newSysData.label = undefined
-                    newSysData.copyfromkey = labels[label].key
+                    newSysData.copyfromkey = labels[label].uuid
                     newSysData.copyfrom = label
                 } else newSysData = _.cloneDeep(systemData)
                 if (!newSysData) return // TODO remove when blanks are created from 'scratch'.
 
-                newSysData.key = uuidv4()
+                newSysData.uuid = uuidv4()
                 if (source == 'current') {
-                    newSysData.copyfromkey = systemData.key
-                    newSysData.copyfrom = systemData.label || `#${systemData.id}`
+                    newSysData.copyfromkey = systemData.uuid
+                    newSysData.copyfrom = systemData.label || `#${systemData.index}`
                 }
 
                 // Reset the edit buffers of the measures.
@@ -96,8 +96,8 @@ export function SystemContextMenu({
                         if (source == 'blank') measure.notation = []
                     })
                 })
-                sliceIndex1 = where == 'above' ? systemData.id : systemData.id + 1
-                sliceIndex2 = where == 'above' ? systemData.id : systemData.id + 1
+                sliceIndex1 = where == 'above' ? systemData.index : systemData.index + 1
+                sliceIndex2 = where == 'above' ? systemData.index : systemData.index + 1
                 break
             }
             case 'label': {
@@ -152,13 +152,13 @@ export function SystemContextMenu({
                         }
                     })
                 })
-                sliceIndex1 = systemData.id
-                sliceIndex2 = systemData.id + 1
+                sliceIndex1 = systemData.index
+                sliceIndex2 = systemData.index + 1
                 break
             }
             case 'delete': {
-                sliceIndex1 = systemData.id
-                sliceIndex2 = systemData.id + 1
+                sliceIndex1 = systemData.index
+                sliceIndex2 = systemData.index + 1
                 break
             }
             default: {
@@ -170,7 +170,7 @@ export function SystemContextMenu({
             ? [...data.slice(0, sliceIndex1), newSysData, ...data.slice(sliceIndex2)]
             : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
         // Update all system IDs
-        newData.forEach((sysData, sysIdx) => (sysData.id = sysIdx))
+        newData.forEach((sysData, sysIdx) => (sysData.index = sysIdx))
         setData(newData)
     }
 

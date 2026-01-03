@@ -1,16 +1,16 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import { positionConfigs, FRAMESTYLE, theme } from '../../config/config'
+import { Col, Grid, Loader, Row, Slider, Toggle } from 'rsuite'
+import 'rsuite/Toggle/styles/index.css'
+import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, HighlightRange, MenuItemInfo, NotationParagraph, SVGInfo } from '../../models/types'
 import NotationArea from './NotationArea'
-import { Toggle, Slider, Grid, Row, Col, Loader } from 'rsuite'
-import 'rsuite/Toggle/styles/index.css'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
-import Selector from '../Selector'
 import { type XCoordRecord, type YCoordRecord } from '../../models/types'
+import Selector from '../Selector'
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.
@@ -102,7 +102,7 @@ export default function Animation({
 
     return focus.length > 0 ? (
         <div className="m-6">
-            <Grid fluid id="Animation" color="blue" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
+            <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
                     <Col span="auto">
                         <Toggle
