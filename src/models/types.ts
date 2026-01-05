@@ -125,9 +125,10 @@ export type EditorSystemData = {
     staffs: Staffs
     colWidths: number[]
     label?: string
-    goto?: string // label
+    goto?: string // label or id of system to which the goto points
+    gotokey?: string // uuid of system to which the goto points
     copyfrom?: string // label or id of copied system
-    copyfromkey?: string // key or id of copied system
+    copyfromkey?: string // uuid copied system
 }
 export type EditorCellCursor = { sysIdx: number; position: string; measure: number }
 export type EditorBeatCursor = { system: number; beat: number }

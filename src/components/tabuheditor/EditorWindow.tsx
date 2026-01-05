@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import { v4 as uuidv4 } from 'uuid'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
 import { useInstruments } from '../../hooks/useInstruments'
@@ -19,7 +20,7 @@ import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { PlayBackButtons } from './PlaybackButtons'
-import { SummaryItem } from './SummaryItem'
+import { SCol, SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
@@ -94,21 +95,53 @@ export default function EditorWindow({
         setData(newData)
     }
 
+    function updatePointers(newData: EditorSystemData[]) {
+        // Update fields that depend on pointers to another system
+        newData.map((systemData, idx) => {
+            if (systemData.copyfromkey) {
+                const source = newData.find((sysData) => sysData.uuid == systemData.copyfromkey)
+                if (source && source.uuid != systemData.uuid)
+                    systemData.copyfrom = source.label ? source.label : `#${source.id}`
+                else {
+                    systemData.copyfrom = undefined
+                    systemData.copyfromkey = undefined
+                }
+            } else systemData.copyfrom = undefined
+            if (systemData.gotokey) {
+                const destination = newData.find((sysData) => sysData.uuid == systemData.gotokey)
+                if (destination) {
+                    debug(`found goto destination ${destination.uuid}`, EditorWindow.name)
+                    {
+                        systemData.goto = destination.label ? destination.label : `#${destination.id}`
+                    }
+                } else {
+                    systemData.goto = undefined
+                    systemData.gotokey = undefined
+                }
+            } else systemData.goto = undefined
+        })
+    }
+
     // Handles user actions triggered with buttons in the panel header
     function summaryItemAction(fieldname: string, systemData: EditorSystemData, value?: string) {
+        debug(`processing ${fieldname}`, EditorWindow.name)
         // Used for insertion and update
-        var newSystemData: EditorSystemData | null = null
-        // Used for insertion and deletion. Default is set to replace current.
+        var newSystemData: EditorSystemData | null = _.cloneDeep(systemData)
+        // Reset the edit buffers of the measures.
+        Object.values(newSystemData.staffs).forEach((measures) => {
+            measures.forEach((measure) => {
+                measure.notation_ = undefined
+            })
+        })
+        // Determines where to insert the new system data item. Default is set to replace current.
         var sliceIndex1: number = systemData.index
         var sliceIndex2: number = systemData.index + 1
         switch (fieldname) {
             case 'part':
                 // Modify the `part` field of the system
-                newSystemData = _.cloneDeep(systemData)
                 if (typeof value == 'string') newSystemData.part = value
                 break
             case 'label':
-                newSystemData = _.cloneDeep(systemData)
                 if (typeof value == 'string') {
                     // New label: add it to the list
                     // First remove any existing label for the current system
@@ -121,23 +154,59 @@ export default function EditorWindow({
                     setLabels(newLabels)
                 }
                 break
+            case 'new': {
+                // Creates an empty system based on the measure settings of the current systemn.
+                Object.values(newSystemData.staffs).forEach((measures) => {
+                    // clear existing values
+                    measures.forEach((measure) => {
+                        measure.notation_ = undefined
+                        measure.notation = []
+                    })
+                })
+                newSystemData.part = ''
+                newSystemData.label = undefined
+                newSystemData.gotokey = undefined
+                newSystemData.uuid = uuidv4()
+                sliceIndex1 = systemData.index + 1 // Insert below current
+                break
+            }
             case 'copy': {
                 const source = data.find((sys) => sys.uuid == value)
                 if (!source) {
                     console.error(`copy system: could not find system ${value}`)
                     return
                 }
-                newSystemData = _.cloneDeep(source)
-                newSystemData.uuid = _.uniqueId()
+                newSystemData.uuid = uuidv4()
                 newSystemData.label = undefined
                 newSystemData.copyfromkey = source.uuid
-                newSystemData.copyfrom = source.label || `#${source.index}`
+                // newSystemData.copyfrom = source.label || `#${source.index}`
                 sliceIndex1 = systemData.index + 1 // Copy after the current system
                 break
             }
             case 'goto':
+                if (!value) {
+                    newSystemData.gotokey = undefined
+                } else {
+                    const destination = data.find((sys) => sys.uuid == value)
+                    if (!destination) {
+                        console.error(`goto: could not find system ${value}`)
+                        return
+                    }
+                    newSystemData.gotokey = destination.uuid
+                }
+                break
+            case 'delete':
                 console.log(value)
+                if (newSystemData.label) {
+                    newLabels = { ...labels }
+                    delete labels[newSystemData.label]
+                    setLabels(newLabels)
+                }
+                newSystemData = null
+                break
             default:
+                // Unrecognized action
+                return
         }
         // Replace, remove or insert system
         const newData = newSystemData
@@ -148,40 +217,57 @@ export default function EditorWindow({
             sysData.index = sysIdx
             sysData.id = sysIdx + 1
         })
+        updatePointers(newData)
         setData(newData)
     }
 
     // (Re-) number the system index and id values.
     // Should be performed at each render due to possible user actions (insert or delete system).
+    const gotoTargets: string[] = []
     data.forEach((systemData, sysIdx) => {
         systemData.index = sysIdx
         systemData.id = systemData.index + 1
+        if (systemData.gotokey) gotoTargets.push(systemData.gotokey)
     })
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
-    // 1. List of labelled systems
-    const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
-        label: label,
-        value: sysData.uuid
-    }))
-    const labelledUuid = labelOptions.map((entry) => entry.value)
-    //
-    // 1. List of non-labelled systems
-    const idOptions: InputOption<string>[] = data
-        .filter((sysData) => !labelledUuid.includes(sysData.uuid))
-        .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
-    // Merge both lists
-    const labelIdOptions = [...labelOptions, ...idOptions]
+    function systemSelectorOptions(self: EditorSystemData, includeSelf: boolean, includeNone: boolean) {
+        // List of labelled systems
+        const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
+            label: label,
+            value: sysData.uuid
+        }))
+        const labelledUuid = labelOptions.map((entry) => entry.value)
+        //
+        // 2. List of non-labelled systems
+        const idOptions: InputOption<string>[] = data
+            .filter((sysData) => !labelledUuid.includes(sysData.uuid))
+            .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
+        // Merge both lists
+        var options = [...labelOptions, ...idOptions]
+        // Remove the systemData item for which the list is being created
+        options = options.filter((o) => o.value != self.uuid)
+        // Add 'self' to the start of the list if requested.
+        if (includeSelf) {
+            options = [{ label: '<this system>', value: self.uuid }, ...options]
+        }
+        if (includeNone) {
+            options = [{ label: '<none>', value: undefined }, ...options]
+        }
+        return options
+    }
 
     const systemIdPrefix = 'system-'
-    const systems = data.map((systemData) => {
+    const gotokeys = data.filter((sys) => sys.gotokey).map((sys) => sys.uuid)
+    console.log(gotokeys)
+    const systems = data.map((systemData, idx) => {
         // Update the 'copyfrom' field with the source's label or id.
         // This value can change due to user edits.
-        if (systemData.copyfromkey) {
-            const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
-            if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
-        }
+        // if (systemData.copyfromkey) {
+        //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
+        //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+        // }
         // Structure:
         // - Panel Header: contains context menu and System summary information
         // - Panel content (visible when panel is expanded): System grid (SystemNode)
@@ -205,23 +291,38 @@ export default function EditorWindow({
                                     className="content-start"
                                 />
                             </Col>
-                            <SummaryItem span={2} fieldname="id" value={systemData.id} />
-                            <SummaryItem span={4} fieldname="part" value={systemData.part} execute={execute} />
-                            <SummaryItem span={4} fieldname="label" value={systemData.label} execute={execute} />
-                            <SummaryItem
-                                span={4}
-                                fieldname="copy"
-                                value={systemData.copyfrom}
-                                labels={labelIdOptions}
-                                execute={execute}
-                            />
-                            <SummaryItem
-                                span={4}
-                                fieldname="goto"
-                                value={systemData.goto}
-                                labels={labelIdOptions}
-                                execute={execute}
-                            />
+                            <SCol span={2}>
+                                <SummaryItem item="id" sysData={systemData} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="part" sysData={systemData} execute={execute} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="new" sysData={systemData} execute={execute} />
+                                <SummaryItem
+                                    item="copy"
+                                    sysData={systemData}
+                                    options={systemSelectorOptions(systemData, true, false)}
+                                    execute={execute}
+                                />
+                                <SummaryItem
+                                    item="delete"
+                                    gototargets={gotoTargets}
+                                    sysData={systemData}
+                                    execute={execute}
+                                />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem
+                                    item="goto"
+                                    sysData={systemData}
+                                    options={systemSelectorOptions(systemData, false, true)}
+                                    execute={execute}
+                                />
+                            </SCol>
                         </Row>
                     </Grid>
                 }

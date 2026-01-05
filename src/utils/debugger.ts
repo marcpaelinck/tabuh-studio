@@ -2,7 +2,7 @@ const debugOn: Record<string, boolean> = {
     createInstrument: false,
     createTimelineFromEditor: false,
     createTimeline: false,
-    EditorWindow: true,
+    EditorWindow: false,
     useKeyboardListener: false,
     Menu: false,
     MeasureNode: false,
@@ -13,7 +13,7 @@ const debugOn: Record<string, boolean> = {
     StaffNode: false,
     SystemContextMenu: false,
     SystemNode: false,
-    SummaryItem: true
+    SummaryItem: false
 }
 
 export const debug = (message: any, caller: string) => {

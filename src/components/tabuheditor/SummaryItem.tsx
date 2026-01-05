@@ -1,84 +1,162 @@
 // The system summary contains the fields and buttons that appear in the header of each collapsible system section.
-// This summary contains button + text field combinations. The button can either enable to edit the field
-// (e.g. in case of the part or label name) or perform an action (copy current or labeled section). In the
-// latter case, the field will contain information about the copied system.
-
-import { useRef, useState, type HTMLAttributes, type UIEvent } from 'react'
+// This summary contains buttons optionally combined with a text field. The item type determines the button's action
+// such as editing a field name (e.g. `part` or `label`) or creating/copying a section. After the action is performed
+// the field will contain the result of the action (e.g. new field value or id/label of copied system).
+import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { AiOutlineNumber, AiOutlinePieChart } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
-import { IoMdCopy } from 'react-icons/io'
+import { FcAddRow, FcDeleteRow } from 'react-icons/fc'
 import { IoArrowForwardOutline, IoPricetagOutline } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
-import { Col, Form, IconButton, Input, InputGroup, InputPicker } from 'rsuite'
+import { PiCopySimpleLight } from 'react-icons/pi'
+import {
+    Col,
+    IconButton,
+    Input,
+    InputGroup,
+    InputPicker,
+    Tooltip,
+    Whisper,
+    type ColProps,
+    type PickerHandle
+} from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import type { EditorSystemData } from '../../models/types'
 import { debug } from '../../utils/debugger'
 
-const ValidatedInput = ({
-    name,
-    label,
-    // accepter,
-    ...rest
-}: {
-    name: string
-    label: string
-    // accepter: CallableFunction
-}) => (
-    <Form>
-        <Form.Group controlId={name}>
-            <Form.Label>{label} </Form.Label>
-            <Form.Control name={name} {...rest} />
-            {/* <Form.Control name={name} accepter={accepter} {...rest} /> */}
-        </Form.Group>
-    </Form>
-)
+// Col item formatted to contain summary items
+export function SCol({ ...props }: ColProps) {
+    return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
+}
 
-type FieldNameType = 'id' | 'part' | 'label' | 'copy' | 'goto'
+type ItemType = 'id' | 'part' | 'label' | 'new' | 'copy' | 'delete' | 'goto'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
-    span: number
-    fieldname: FieldNameType
-    value: string | number | undefined
+    item: ItemType
+    sysData: EditorSystemData
+    labels?: Record<string, EditorSystemData>
+    gototargets?: string[] // list of uuid's of systems that occur in some 'gotokey' field
     execute?: (fieldname: string, value?: string) => void
-    labels?: InputOption<string>[]
+    options?: InputOption<string>[]
 }
 
 // This is a single summary item containing a button and a value field.
 // Depending on the item's specs, the button's action will optionally collect information
 // from the user (e.g. new field value or label name of the system to copy)
 // and will then perform the `execute` function.
-export function SummaryItem({ span, fieldname, value, execute, labels, ...props }: SummaryItemProps) {
+export function SummaryItem({ item, sysData, labels, gototargets, execute, options, ...props }: SummaryItemProps) {
     interface SpecType {
         icon: IconType
+        iconcolor?: string
         action: string
-        color: string
+        hasfield: boolean
+        fieldval?: string | number
+        textcolor?: string
     }
     const specs: Record<string, SpecType> = {
-        id: { icon: AiOutlineNumber, action: 'none', color: 'black' },
-        part: { icon: AiOutlinePieChart, action: 'edit', color: 'black' },
-        label: { icon: IoPricetagOutline, action: 'edit', color: 'orange' },
-        copy: { icon: IoMdCopy, action: 'copy', color: 'blue' },
-        goto: { icon: IoArrowForwardOutline, action: 'goto', color: 'green' }
+        id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id },
+        part: { icon: AiOutlinePieChart, iconcolor: '#83C4F9', action: 'edit', hasfield: true, fieldval: sysData.part },
+        label: {
+            icon: IoPricetagOutline,
+            iconcolor: '#83C4F9',
+            action: 'edit',
+            hasfield: true,
+            fieldval: sysData.label,
+            textcolor: 'orange'
+        },
+        new: { icon: FcAddRow, iconcolor: '#83C4F9', action: 'new', hasfield: false },
+        copy: {
+            icon: PiCopySimpleLight,
+            iconcolor: '#83C4F9',
+            action: 'copy',
+            hasfield: true,
+            fieldval: sysData.copyfrom,
+            textcolor: 'blue'
+        },
+        delete: { icon: FcDeleteRow, iconcolor: '#83C4F9', action: 'delete', hasfield: false },
+        goto: {
+            icon: IoArrowForwardOutline,
+            iconcolor: '#83C4F9',
+            action: 'goto',
+            hasfield: true,
+            fieldval: sysData.goto,
+            textcolor: 'green'
+        }
     }
     const [editing, setEditing] = useState<boolean>(false)
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLInputElement & PickerHandle>(null)
+    const [warning, setWarning] = useState<string | null>(null)
 
-    function doAction(event: any, action: string, value?: string) {
-        event.target.blur()
-        debug(`executing action ${action} value=${value}`, SummaryItem.name)
+    // Action performed on button click event and after field editing/selection.
+    function buttonAction(event: any, action: string) {
         event.stopPropagation()
-        if (['edit', 'copy', 'goto'].includes(action)) {
+        debug(`executing button action ${action}`, SummaryItem.name)
+        if (specs[item].hasfield) {
             setEditing(true)
             return
         }
         setEditing(false)
-        if (action != 'cancel' && execute) execute(fieldname, value || inputRef.current?.value)
+        if (action != 'cancel' && validate() && execute) execute(item)
+    }
+
+    useEffect(() => {
+        // Cancel editing when Esc key is pressed or when user clicks anywhere outside the input field.
+        // The input field's onClick handler stops propagation to avoid closing it on mouse click.
+        if (editing) {
+            function handleEscapeKey(event: KeyboardEvent) {
+                if (event.code === 'Escape') {
+                    setEditing(false)
+                }
+            }
+            function handleClick(event: PointerEvent) {
+                setEditing(false)
+            }
+            document.addEventListener('keydown', handleEscapeKey)
+            document.addEventListener('click', handleClick)
+            return () => {
+                // Cleanup functions
+                document.removeEventListener('keydown', handleEscapeKey)
+                document.removeEventListener('click', handleClick)
+            }
+        }
+    }, [editing])
+
+    function inputAction(event: any, action: string, value: string | undefined) {
+        event.target.blur()
+        event.stopPropagation()
+        debug(`warning is ${warning}`, SummaryItem.name)
+        if (action != 'cancel' && !(warning == null)) return
+        const returnValue = value || inputRef.current?.value
+        debug(`executing field action ${action} value=${returnValue}`, SummaryItem.name)
+        setEditing(false)
+        setWarning(null) // Can only reach this point if cancel was selected.
+        if (action != 'cancel' && execute) execute(item, returnValue)
+    }
+
+    function validate(value?: string | undefined): boolean {
+        var msg: string | null = null
+        switch (item) {
+            case 'label': {
+                if (labels && value && Object.keys(labels).includes(value)) msg = 'This name is already in use'
+                debug(`labels=${JSON.stringify(Object.keys(labels || []))} value=${value}`, SummaryItem.name)
+                break
+            }
+            case 'delete': {
+                if (gototargets?.includes(sysData.uuid)) msg = 'Goto labels are pointing to this system'
+                break
+            }
+            default:
+        }
+        debug(`validate is ${msg}`, SummaryItem.name)
+        setWarning(msg)
+        return msg == null
     }
 
     // Pressing the Enter key in an input field will end editing and save the content.
     function onEnter(e: any, value?: string) {
         if (e.key === 'Enter') {
             e.target.blur()
-            doAction(e, 'save', value)
+            inputAction(e, 'save', value)
         }
     }
 
@@ -89,9 +167,10 @@ export function SummaryItem({ span, fieldname, value, execute, labels, ...props 
             <IconButton
                 as="span"
                 size="xs"
-                appearance="subtle"
+                appearance={action == 'save' ? 'subtle' : 'link'}
                 color={action == 'save' ? 'green' : 'red'}
-                icon={<Icon onClick={(e) => doAction(e, action)} />}
+                icon={<Icon />}
+                onClick={(e) => inputAction(e, action, inputRef.current?.value)}
             />
         )
     }
@@ -101,61 +180,63 @@ export function SummaryItem({ span, fieldname, value, execute, labels, ...props 
         <InputGroup inside size="xs" {...props}>
             <Input
                 ref={inputRef}
-                defaultValue={value || ''}
+                defaultValue={specs[item].fieldval || ''}
                 onClick={(e) => e.stopPropagation()}
                 onKeyUp={onEnter}
-                onBlur={(e) => doAction(e, 'cancel')}
+                onChange={validate}
             />
             <InputGroup.Addon as="span">
-                {/* Save (V) and cancel (X) buttons */}
-                <SaveCancelBtn action="save" />
                 <SaveCancelBtn action="cancel" />
+                <SaveCancelBtn action="save" />
             </InputGroup.Addon>
         </InputGroup>
-    )
-
-    const validatedInput = (
-        <ValidatedInput name={specs[fieldname].action} label={specs[fieldname].action}></ValidatedInput>
     )
 
     // Selection list for 'copy' and 'goto' actions
     const inputPicker = (
         <InputPicker
-            data={labels || []}
-            defaultValue={value || ''}
+            ref={inputRef}
+            data={options || []}
+            defaultValue={specs[item].fieldval || ''}
             onClick={(e) => e.stopPropagation()}
-            onChange={(val, e) => doAction(e, 'save', val)}
-            placeholder={`select system to ${specs[fieldname].action}`}
+            onChange={(val, e) => inputAction(e, 'save', val)}
+            placeholder={`system to ${specs[item].action}`}
+            width="100%"
         />
     )
 
     const inputMethod =
-        specs[fieldname].action == 'edit'
-            ? inputField
-            : ['copy', 'goto'].includes(specs[fieldname].action)
-              ? inputPicker
-              : null
+        specs[item].action == 'edit' ? inputField : ['copy', 'goto'].includes(specs[item].action) ? inputPicker : null
 
-    const SummaryIcon = specs[fieldname].icon
-    const summaryIcon = (
-        <SummaryIcon
-            size="1rem"
-            onClick={(event: UIEvent<SVGElement>) => {
-                doAction(event, specs[fieldname].action)
-            }}
-        />
-    )
+    const SummaryIcon = specs[item].icon
+    const summaryIcon = <SummaryIcon size="1.3rem" color={specs[item].iconcolor} />
 
     return (
-        <Col as="div" span={span} className="flex bg-gray-100 border-2 border-white divide-solid items-center">
-            {specs[fieldname].action == 'none' ? (
+        <>
+            {specs[item].action == 'none' ? (
                 summaryIcon
             ) : (
-                <IconButton size="sm" as={'span'} icon={summaryIcon} className="p-0" />
+                <Whisper placement="bottom" trigger={warning ? 'click' : 'none'} speaker={<Tooltip>{warning}</Tooltip>}>
+                    <IconButton
+                        size="sm"
+                        as={'span'}
+                        icon={summaryIcon}
+                        onClick={(event: MouseEvent<HTMLElement>) => {
+                            buttonAction(event, specs[item].action)
+                        }}
+                        className="p-0"
+                    />
+                </Whisper>
             )}
-            <span style={{ color: specs[fieldname].color }} className="text-sm pl-3">
-                {editing ? inputMethod : `${value || ''}`}
-            </span>
-        </Col>
+            {specs[item].hasfield ? (
+                <Whisper placement="bottom" open={warning != null} speaker={<Tooltip>{warning}</Tooltip>}>
+                    <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
+                        {editing ? inputMethod : `${specs[item].fieldval || ''}`}
+                    </span>
+                </Whisper>
+            ) : (
+                <></>
+            )}
+        </>
     )
 }
