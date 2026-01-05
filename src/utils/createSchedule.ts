@@ -100,14 +100,15 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                             : null
                     const same =
                         last != null &&
-                        system.id == last.system &&
+                        system.uuid == last.sysuuid &&
                         measureidx == last.section &&
                         position == last.position
-                    if (actionFunctions.cursor && !same && position == 'KEMPLI') {
+                    // if (actionFunctions.cursor && !same && position == 'KEMPLI') {
+                    if (actionFunctions.cursor && !same) {
                         timeline.cursoractions.push({
                             action: actionFunctions.cursor,
                             time: n2TO(currTime),
-                            system: system.id,
+                            sysuuid: system.uuid,
                             section: measureidx,
                             position: position,
                             symbol: symbol.s,

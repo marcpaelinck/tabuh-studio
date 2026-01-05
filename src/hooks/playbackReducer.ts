@@ -1,12 +1,14 @@
 import * as Tone from 'tone'
 import { noCursor } from '../components/tabuheditor/_constants'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
-import type { AudioState, EditorCellCursor, EditorSystemData } from '../models/types'
+import type { EditorCellCursor, EditorSystemData } from '../models/types'
 import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { debug } from '../utils/debugger'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
 export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor'
+export type AudioState = 'nodata' | 'playing' | 'paused' | 'stopped'
+
 export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; playbackType: PlaybackType }
 export type PlaybackAction = {
     actionType: ActionType

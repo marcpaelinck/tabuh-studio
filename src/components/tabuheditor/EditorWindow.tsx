@@ -73,7 +73,7 @@ export default function EditorWindow({
             const summary: EditorSystemData = {
                 index: sysIdx,
                 id: sysIdx + 1,
-                uuid: system.key,
+                uuid: system.uuid,
                 part: system.part,
                 positions: positions,
                 grouped: [],
@@ -196,7 +196,6 @@ export default function EditorWindow({
                 }
                 break
             case 'delete':
-                console.log(value)
                 if (newSystemData.label) {
                     newLabels = { ...labels }
                     delete labels[newSystemData.label]
@@ -259,8 +258,6 @@ export default function EditorWindow({
     }
 
     const systemIdPrefix = 'system-'
-    const gotokeys = data.filter((sys) => sys.gotokey).map((sys) => sys.uuid)
-    console.log(gotokeys)
     const systems = data.map((systemData, idx) => {
         // Update the 'copyfrom' field with the source's label or id.
         // This value can change due to user edits.
@@ -274,7 +271,7 @@ export default function EditorWindow({
         const execute = (fieldname: string, value?: string) => summaryItemAction(fieldname, systemData, value)
         return (
             <Accordion.Panel
-                id={`${systemIdPrefix}${systemData.id}`}
+                id={`${systemIdPrefix}${systemData.uuid}`}
                 key={systemData.uuid}
                 // Panel Header
                 header={
@@ -284,7 +281,7 @@ export default function EditorWindow({
                             <Col span={3} className="flex">
                                 <PlayBackButtons
                                     data={data}
-                                    systemIdx={systemData.index}
+                                    sysUuid={systemData.uuid}
                                     systemIdPrefix={systemIdPrefix}
                                     playback={playback}
                                     playbackState={playbackState}

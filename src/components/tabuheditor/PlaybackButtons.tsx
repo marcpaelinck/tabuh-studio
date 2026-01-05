@@ -2,7 +2,7 @@ import type { HTMLAttributes, MouseEvent } from 'react'
 import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
-import type { PlaybackState, PlaybackType } from '../../hooks/playbackReducer'
+import type { PlaybackAction, PlaybackState, PlaybackType } from '../../hooks/playbackReducer'
 import type { CursorAction, EditorSystemData } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
@@ -10,17 +10,17 @@ import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
 export function PlayBackButtons({
     data,
-    systemIdx,
+    sysUuid,
     systemIdPrefix,
     playbackState,
     playback,
     ...props
 }: {
     data: EditorSystemData[]
-    systemIdx: number
+    sysUuid: string
     systemIdPrefix: string
     playbackState: PlaybackState
-    playback: CallableFunction
+    playback: (action: PlaybackAction) => void
 } & HTMLAttributes<HTMLDivElement>) {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
     const buttongroupRef = useRef<HTMLDivElement>(null)
@@ -33,13 +33,13 @@ export function PlayBackButtons({
     function moveCursor(time: number, cAction: CursorAction) {
         playback({
             actionType: 'cursor',
-            cursor: { system: cAction.system, position: cAction.position, measure: cAction.section }
+            cursor: { sysUuid: cAction.sysuuid, position: cAction.position, measure: cAction.section }
         })
         debug(
-            `setting cursor to sys=${cAction.system} pos=${cAction.position} measure=${cAction.section}`,
+            `setting cursor to sys=${cAction.sysuuid} pos=${cAction.position} measure=${cAction.section}`,
             PlayBackButtons.name
         )
-        const currElement = document.getElementById(`${systemIdPrefix}${cAction.system}`)
+        const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
         debug(`scrolling ${currElement?.id} into view`, PlayBackButtons.name)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
@@ -55,11 +55,11 @@ export function PlayBackButtons({
             playback({ actionType: 'stop' })
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
-            debug(`playing sys seq=${systemIdx}`, PlayBackButtons.name)
+            debug(`playing sys seq=${sysUuid}`, PlayBackButtons.name)
             // Load new data
-            const index = data.findIndex((sysData) => sysData.index == systemIdx)
+            const index = data.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
-                console.error(`no playback data found for system ${systemIdx}`)
+                console.error(`no playback data found for system ${sysUuid}`)
             }
             playback({
                 actionType: 'load',
@@ -71,7 +71,8 @@ export function PlayBackButtons({
     }
 
     function buttonColor(pbType: PlaybackType) {
-        return systemIdx == playbackState.cursor.sysIdx && playbackState.playbackType == pbType ? 'orange' : 'gray'
+        debug(`button-sysidx=${sysUuid} and cursorSysidx=${playbackState.cursor.sysUuid}`, PlayBackButtons.name)
+        return sysUuid == playbackState.cursor.sysUuid && playbackState.playbackType == pbType ? 'orange' : 'gray'
     }
 
     const playIcon = (pbType: PlaybackType, color: string) =>

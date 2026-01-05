@@ -26,15 +26,17 @@ export function SystemNode({
     visible: boolean
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
-    const systemIdx = systemData.index
+    const systemUuid = systemData.uuid
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
     const { castNotation } = useRules()
 
-    if (systemIdx == 1 || systemIdx == 13) debug(`(re-)rendering system ${systemIdx}`, SystemNode.name)
+    if (systemData.id == 1 || systemData.id == 13) debug(`(re-)rendering system ${systemUuid}`, SystemNode.name)
 
-    useEffect(() => debug(`recreating system ${systemIdx} due to change of data`, SystemNode.name), [systemData])
+    useEffect(() => debug(playbackState, SystemNode.name), [playbackState])
+
+    useEffect(() => debug(`recreating system ${systemUuid} due to change of data`, SystemNode.name), [systemData])
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
         return {
@@ -57,11 +59,12 @@ export function SystemNode({
     // Update the cell highlight during playback. All measures for the current beat are
     // highlighted here at once. This is why we ignore all cursor changes except for the KEMPLI.
     useEffect(() => {
+        debug(`new playbackState for sys=${playbackState.cursor.sysUuid}, this is sys ${systemUuid}`, SystemNode.name)
         // If the cursor has moved to another system we might need to switch off highlighting in the current system.
         if (
             !grid.current ||
             _.isEmpty(grid.current.cells) ||
-            (highlightedCell == noCursor && playbackState.cursor.sysIdx != systemIdx)
+            (highlightedCell == noCursor && playbackState.cursor.sysUuid != systemUuid)
         ) {
             debug(`nothing to highlight (panel closed)`, SystemNode.name + 'Offset')
             return
@@ -76,10 +79,10 @@ export function SystemNode({
             for (var row = 0; row <= grid.current.maxRowId; row++)
                 highlight(grid.current.cells[row][highlightedCell.measure].current, false)
         }
-        if (playbackState.cursor.sysIdx == systemIdx && playbackState.cursor != noCursor) {
+        if (playbackState.cursor.sysUuid == systemUuid && playbackState.cursor != noCursor) {
             // Highlight cell
             debug(
-                `Highlighting sys=${playbackState.cursor.sysIdx} measure=${playbackState.cursor.measure}`,
+                `Highlighting sys=${playbackState.cursor.sysUuid} measure=${playbackState.cursor.measure}`,
                 SystemNode.name
             )
             for (var row = 0; row <= grid.current.maxRowId; row++) {
@@ -155,7 +158,7 @@ export function SystemNode({
     }
 
     const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
-        if (systemIdx == 0) debug(`useMemo: recreating staffnodes of system ${systemIdx}`, SystemNode.name)
+        if (systemData.index == 0) debug(`useMemo: recreating staffnodes of system ${systemUuid}`, SystemNode.name)
         return (
             <Row id={`ROW-${position}`}>
                 <Col id={`COL-POSITION`} span="auto">
@@ -170,7 +173,7 @@ export function SystemNode({
                     />
                 </Col>
                 <StaffNode
-                    systemId={systemIdx}
+                    sysUuid={systemUuid}
                     position={position}
                     rowId={rowId}
                     measures={measures}

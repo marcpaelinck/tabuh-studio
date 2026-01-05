@@ -1,6 +1,6 @@
 const debugOn: Record<string, boolean> = {
     createInstrument: false,
-    createTimelineFromEditor: false,
+    createTimelineFromEditor: true,
     createTimeline: false,
     EditorWindow: false,
     useKeyboardListener: false,
@@ -12,7 +12,7 @@ const debugOn: Record<string, boolean> = {
     ScorePlayer: false,
     StaffNode: false,
     SystemContextMenu: false,
-    SystemNode: false,
+    SystemNode: true,
     SummaryItem: false
 }
 

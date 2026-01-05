@@ -55,28 +55,29 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     }
     const specs: Record<string, SpecType> = {
         id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id },
-        part: { icon: AiOutlinePieChart, iconcolor: '#83C4F9', action: 'edit', hasfield: true, fieldval: sysData.part },
+        // '#83C4F9'#1C78E0
+        part: { icon: AiOutlinePieChart, iconcolor: '#1C78E0', action: 'edit', hasfield: true, fieldval: sysData.part },
         label: {
             icon: IoPricetagOutline,
-            iconcolor: '#83C4F9',
+            iconcolor: '#1C78E0',
             action: 'edit',
             hasfield: true,
             fieldval: sysData.label,
             textcolor: 'orange'
         },
-        new: { icon: FcAddRow, iconcolor: '#83C4F9', action: 'new', hasfield: false },
+        new: { icon: FcAddRow, iconcolor: '#1C78E0', action: 'new', hasfield: false },
         copy: {
             icon: PiCopySimpleLight,
-            iconcolor: '#83C4F9',
+            iconcolor: '#1C78E0',
             action: 'copy',
             hasfield: true,
             fieldval: sysData.copyfrom,
             textcolor: 'blue'
         },
-        delete: { icon: FcDeleteRow, iconcolor: '#83C4F9', action: 'delete', hasfield: false },
+        delete: { icon: FcDeleteRow, iconcolor: '#1C78E0', action: 'delete', hasfield: false },
         goto: {
             icon: IoArrowForwardOutline,
-            iconcolor: '#83C4F9',
+            iconcolor: '#1C78E0',
             action: 'goto',
             hasfield: true,
             fieldval: sysData.goto,

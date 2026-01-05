@@ -1,39 +1,38 @@
 import { Col } from 'rsuite'
+import type { EditorSystemData, Measure } from '../../models/types'
+import { getValidSymbols } from '../../utils/alphabet'
+import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'
 import { MeasureNode } from './MeasureNode'
-import { getValidSymbols } from '../../utils/alphabet'
-import type { EditorSystemData, Measure } from '../../models/types'
-import _ from 'lodash'
-import { debug } from '../../utils/debugger'
 
 // Creates a row of cells containing one staff: a line of notation within a system/gongan,
 // which corresponds with the notation of a single instrument position.
 export function StaffNode({
-    systemId,
+    sysUuid,
     position,
     rowId,
     measures,
     systemData,
     colWidths
 }: {
-    systemId: number
+    sysUuid: string
     position: string
     rowId: number
     measures: Measure[]
     systemData: EditorSystemData
     colWidths: number[]
 }) {
-    if (position == 'REYONG_1') debug(`(re-)rendering stave ${systemId} ${position}`, StaffNode.name)
+    if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`, StaffNode.name)
 
     const measureNodes = measures.map((measure: Measure, sidx: number) => {
-        debug(`useMemo: recreating measures of system ${systemId} ${position}`, StaffNode.name)
+        debug(`useMemo: recreating measures of system ${sysUuid} ${position}`, StaffNode.name)
         const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
         const validSymbols: string[] = getValidSymbols(position, true)
         return (
             <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
                 <MeasureNode
-                    key={`sys ${systemId} ${position} measure ${sidx}`}
-                    id={`sys ${systemId} ${position} measure ${sidx}`}
+                    key={`sys ${sysUuid} ${position} measure ${sidx}`}
+                    id={`sys ${sysUuid} ${position} measure ${sidx}`}
                     position={position}
                     rowId={rowId}
                     colId={sidx}

@@ -28,7 +28,7 @@ export function parseScore(input: string): Score {
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
     const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, score.systems[0].sections[0].tempo[0])
     score.systems.forEach((system, sysidx, systemArray) => {
-        system.key = uuidv4()
+        system.uuid = uuidv4()
         system.starttime += introTimeBn
         system.sections.forEach((section, sectidx, sectionArray) => {
             section.starttime += introTimeBn
@@ -48,7 +48,7 @@ export function parseScore(input: string): Score {
                         section.tempo[0] + ((section.tempo[1] - section.tempo[0]) * 0.5 * relTime) / section.duration
                     note.ms = section.starttimeMs + BaseNoteEquiv2Millis(note.t - section.starttime, avgTempo)
                     note.section = section.id
-                    note.system = system.id
+                    note.sysUuid = system.uuid
                     relTime += note.d
                 })
                 measure.notation.forEach((symbol: JsonSymbol) => {
@@ -82,7 +82,7 @@ const note2AnimationNotes = (position: string, notationNote: JsonNote, ìsLast: 
         const note: Note = noteConfigs[instrType][shCode]
         const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
         result.push({
-            system: notationNote.system,
+            sysUuid: notationNote.sysUuid,
             section: notationNote.section,
             time: n2TO(notationNote.t),
             keyname: keyname,
@@ -157,7 +157,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                         sectionProgress += note.d || 1
                     })
                     measure.notation.forEach((symbol: JsonSymbol) => {
-                        symbol.sysId = system.id
+                        symbol.sysUuid = system.uuid
                         symbol.sectionId = section.id
                         positionNotation[position].push(symbol)
                     })
@@ -178,7 +178,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                 action: actionFunctions.animate,
                 time: n2TO(0),
                 position: position,
-                prevsystem: null,
+                prevsysUuid: null,
                 prevsection: null,
                 currnotes: [],
                 nextnotes: note2AnimationNotes(position, notes[1], false),
@@ -194,14 +194,14 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                     : note2AnimationNotes(position, notes[index + 1], nextIsLast)
                 const timeUntil: BaseNoteTimeObj = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
                 const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
-                const prevSystem = index > 0 ? notes[index - 1].system : null
+                const prevSystem = index > 0 ? notes[index - 1].sysUuid : null
                 const prevSection = index > 0 ? notes[index - 1].section : null
                 if (!actionFunctions.animate) return // redundant, this is just to avoid a ts error
                 timeline.animationactions.push({
                     action: actionFunctions.animate,
                     time: n2TO(note.t),
                     position: position,
-                    prevsystem: prevSystem,
+                    prevsysUuid: prevSystem,
                     prevsection: prevSection,
                     currnotes: aNotes,
                     nextnotes: nextANotes,
@@ -222,10 +222,10 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
             let currentline: string = ''
             let line: number = 0
             symbols.forEach((symbol, index) => {
-                const newSystem = index > 0 ? symbol.sysId != symbols[index - 1].sysId : false
+                const newSystem = index > 0 ? symbol.sysUuid != symbols[index - 1].sysUuid : false
                 const newSection =
                     index > 0 ? !newSystem && (newSystem || symbol.sectionId !== symbols[index - 1].sectionId) : false
-                const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].sysId != symbol.sysId
+                const lastNoteOfSection = index == symbols.length - 1 || symbols[index + 1].sysUuid != symbol.sysUuid
 
                 if (newSection) currentline += ' '
                 const range = [currentline.length, currentline.length + symbol.s.length]
@@ -234,7 +234,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                 timeline.cursoractions.push({
                     action: actionFunctions.cursor,
                     time: n2TO(symbol.t),
-                    system: symbol.sysId,
+                    sysuuid: symbol.sysUuid,
                     section: symbol.sectionId,
                     position: position,
                     symbol: symbol.s,

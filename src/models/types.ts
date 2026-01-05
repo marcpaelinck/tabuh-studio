@@ -15,7 +15,7 @@ export type Note = {
 }
 
 export type JsonNote = {
-    system: number
+    sysUuid: string
     section: number
     s: string
     t: number // attack time in base notes
@@ -26,7 +26,7 @@ export type JsonNote = {
 
 // Used as
 export type JsonSymbol = {
-    sysId: number
+    sysUuid: string
     sectionId: number
     s: string
     t: number // attack time in base notes
@@ -54,7 +54,7 @@ export type Section = {
 
 // Subdivision of a score, typically spans one gongan
 export type System = {
-    key: string // unique, fixed uuid.
+    uuid: string // unique, fixed uuid.
     id: number // // Sequence number, used as identification in the UI. Can change when systems are added/removed/sorted.
     gongan: number // ID from the `gamelan-notation` python application. Unused in this application.
     starttime: number // start time of first section
@@ -130,12 +130,9 @@ export type EditorSystemData = {
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // uuid copied system
 }
-export type EditorCellCursor = { sysIdx: number; position: string; measure: number }
-export type EditorBeatCursor = { system: number; beat: number }
+export type EditorCellCursor = { sysUuid: string; position: string; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
-
-export type AudioState = 'nodata' | 'playing' | 'paused' | 'stopped'
 
 export type GenericFunction = (time: number) => void
 export type SamplerFunction = (time: number, action: SamplerAction) => void
@@ -158,7 +155,7 @@ export interface SamplerAction {
 }
 
 export type AnimationNote = {
-    system: number
+    sysUuid: string
     section: number
     time: BaseNoteTimeObj
     keyname: string
@@ -173,7 +170,7 @@ export type AnimationAction = {
     action: AnimationFunction
     time: BaseNoteTimeObj
     position: string
-    prevsystem: number | null
+    prevsysUuid: string | null
     prevsection: number | null
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
@@ -186,7 +183,7 @@ export type CursorAction = {
     time: BaseNoteTimeObj
     position: string
     section: number
-    system: number
+    sysuuid: string
     symbol: string
     line: number
     range: number[]
