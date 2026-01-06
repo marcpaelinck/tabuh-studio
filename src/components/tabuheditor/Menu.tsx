@@ -1,12 +1,12 @@
 import type { JSX } from 'react'
 import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
-import 'rsuite/Dropdown/styles/index.css'
 import 'rsuite/ButtonToolbar/styles/index.css'
+import 'rsuite/Dropdown/styles/index.css'
 import type { MenuItemInfo } from '../../models/types'
+import { debug } from '../../utils/debugger'
 import { createTabuhMenuItems, tabuhDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import Selector from '../Selector'
-import { debug } from '../../utils/debugger'
 
 export default function Menu({
     menuDisabled,
@@ -31,7 +31,7 @@ export default function Menu({
         const strValue = Array.isArray(item.value)
             ? item.value.reduce((aggr, val) => aggr + (aggr ? ', ' : '') + val, '[') + ']'
             : item.value
-        debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`, Menu.name)
+        debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
     }
 
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {

@@ -123,7 +123,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
     if (actionFunctions.generic)
         timeline.genericactions.push({ action: actionFunctions.generic, time: timeline.totalDurationTO })
-    debug(timeline, createTimelineFromEditor.name)
+    debug(timeline)
     return timeline
 }
 

@@ -55,7 +55,7 @@ export function MeasureNode({
     }, [])
 
     useEffect(() => {
-        debug(`updating data of cell ${rowId},${colId} to ${ref.current?.value}`, MeasureNode.name)
+        debug(`updating data of cell ${rowId},${colId} to ${ref.current?.value}`)
         if (ref.current) {
             ref.current.value = notation2text(measure.notation_ || measure.notation)
             highlightOnChangedContent(ref.current)
@@ -76,7 +76,7 @@ export function MeasureNode({
     function storeChanges() {
         if (typeof measure.notation_ != 'undefined') {
             if (!ref.current) return
-            debug(`updating ${props.id} to ${notation2text(measure.notation_)}`, MeasureNode.name)
+            debug(`updating ${props.id} to ${notation2text(measure.notation_)}`)
             // measureData.notation = measureData.notation_
             const notationStr: string[] = parseNotationText(ref.current.value, validRegExpCell)
             const notation = notationStr.map((sym) => {

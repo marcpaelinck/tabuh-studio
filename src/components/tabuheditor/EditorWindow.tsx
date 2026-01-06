@@ -56,7 +56,7 @@ export default function EditorWindow({
     const pbAudioState = playbackState.audioState
 
     function flipExpanded(key: string) {
-        debug('flipping', EditorWindow.name)
+        debug('flipping')
         setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
     }
 
@@ -86,7 +86,7 @@ export default function EditorWindow({
             }
             newData.push(summary)
         })
-        debug(newData, EditorWindow.name)
+        debug(newData)
         setData(newData)
         const initExpandState = Object.fromEntries(newData.map((sysInfo) => [sysInfo.index, editorInitialExpandState]))
         setExpanded(initExpandState)
@@ -122,7 +122,7 @@ export default function EditorWindow({
             if (systemData.gotokey) {
                 const destination = newData.find((sysData) => sysData.uuid == systemData.gotokey)
                 if (destination) {
-                    debug(`found goto destination ${destination.uuid}`, EditorWindow.name)
+                    debug(`found goto destination ${destination.uuid}`)
                     {
                         systemData.goto = destination.label ? destination.label : `#${destination.id}`
                     }
@@ -136,7 +136,7 @@ export default function EditorWindow({
 
     // Handles user actions triggered with buttons in the panel header
     function summaryItemAction(fieldname: string, systemData: EditorSystemData, value?: string) {
-        debug(`processing ${fieldname}`, EditorWindow.name)
+        debug(`processing ${fieldname}`)
         // Used for insertion and update
         var newSystemData: EditorSystemData | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the measures.

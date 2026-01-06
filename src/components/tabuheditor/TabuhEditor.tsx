@@ -80,7 +80,7 @@ export function TabuhEditor({
 
     function expandAll(expand: boolean) {
         const newExpanded = _.mapValues(expanded, () => expand)
-        debug(newExpanded, TabuhEditor.name)
+        debug(newExpanded)
         setExpanded(newExpanded)
         setButtonIsExpand(!expand)
     }

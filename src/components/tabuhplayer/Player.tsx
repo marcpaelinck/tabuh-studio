@@ -1,28 +1,28 @@
+import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import * as Tone from 'tone'
 import { useAnimationEngine } from '../../hooks/useAnimation'
 import { useInstruments } from '../../hooks/useInstruments'
 import { useInterpretations } from '../../hooks/useInterpretations'
 import {
-    type Score,
-    type SVGInfo,
-    type MenuItemInfo,
-    type HighlightRange,
+    type ActionFunctions,
     type AnimationAction,
     type CursorAction,
+    type HighlightRange,
+    type MenuItemInfo,
     type SamplerAction,
-    type TimeLine,
+    type Score,
+    type SVGInfo,
     type TempoAction,
-    type ActionFunctions
+    type TimeLine
 } from '../../models/types'
-import { useState, type JSX, useMemo, useEffect, type RefObject, useRef, type Dispatch } from 'react'
-import * as Tone from 'tone'
 import { createTimeline } from '../../utils/score'
 //-------------------------CONTROLS--------------------------------------
-import { FaPlay, FaPause } from 'react-icons/fa'
+import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
-import { panggulDefaultOption } from './Animation'
 import { debug } from '../../utils/debugger'
+import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
@@ -105,7 +105,7 @@ export default function ScorePlayer({
         Tone.getTransport().cancel()
         Tone.getTransport().seconds = 0
 
-        debug(`Creating schedule for ${score?.title}`, ScorePlayer.name)
+        debug(`Creating schedule for ${score?.title}`)
 
         // tempo and instrument actions (notes)
         // Set the initial tempo to 60 (intro time)

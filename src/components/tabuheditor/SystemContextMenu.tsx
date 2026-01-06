@@ -139,7 +139,7 @@ export function SystemContextMenu({
                 }
                 // sliceIndex1 = systemData.id
                 // sliceIndex2 = systemData.id + 1
-                debug(systemData.label, SystemContextMenu.name)
+                debug(systemData.label)
                 return
             }
             case 'save': {
@@ -180,7 +180,7 @@ export function SystemContextMenu({
         <Menu
             onSelect={updateData}
             onClick={(e) => {
-                debug(systemData.label, SystemContextMenu.name)
+                debug(systemData.label)
                 e.stopPropagation()
                 whisperRef.current.close()
             }}>

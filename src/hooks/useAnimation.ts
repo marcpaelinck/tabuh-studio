@@ -1,5 +1,6 @@
-import * as Tone from 'tone'
 import { useCallback, type Dispatch, type RefObject } from 'react'
+import * as Tone from 'tone'
+import { animationConfig, colorRGB } from '../config/config'
 import type {
     AnimationAction,
     AnimationNote,
@@ -8,7 +9,6 @@ import type {
     MenuItemInfo,
     SVGInfo
 } from '../models/types'
-import { animationConfig, colorRGB } from '../config/config'
 import { debug } from '../utils/debugger'
 
 const moveToDuration = 500 // duration of the movement to the next key
@@ -58,7 +58,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
 
     if (action.currnotes.length > 0 && action.currnotes[0].isLast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
-        debug('last note', animatePanggul.name)
+        debug('last note')
         keyframes = [
             {
                 // Start where the previous animation ended: the moment the key is struck
@@ -132,7 +132,7 @@ function animatePanggul(action: AnimationAction, svgInfo: SVGInfo, pbSpeed: numb
             a.commitStyles() // Persist the final position of the animation
         } catch (exception) {
             // Happens when user switches intrument during animation: animation's target does not exist any more
-            debug('switching instrument during animation', animatePanggul.name)
+            debug('switching instrument during animation')
         }
         a.cancel()
     })

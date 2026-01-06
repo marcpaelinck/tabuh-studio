@@ -138,13 +138,13 @@ export const useKeyboardListener = (
                     return { sysUuid: '', sectionId: -1, s: sym, t: -1, d: -1 }
                 })
             )
-        debug(JSON.stringify(notation), useKeyboardListener.name)
+        debug(JSON.stringify(notation))
         target.dispatchEvent(new Event('change'))
     }
 
     function keyboardListener(event: KeyboardEvent<HTMLTextAreaElement>) {
         var changed = false
-        debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`, useKeyboardListener.name)
+        debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`)
         // Check that target exists
         if (!ref.current || event.target !== ref.current) return
         const target: ElementWithValueTracker = ref.current as ElementWithValueTracker
@@ -178,7 +178,7 @@ export const useKeyboardListener = (
         // Find a matching keyAction record and perform the corresponding key action if found
         for (const keyAction of keyActions) {
             if (match(eventRecord, keyAction)) {
-                debug('pass', useKeyboardListener.name)
+                debug('pass')
                 event.preventDefault()
 
                 if (keyAction.action == 'insert') {
@@ -192,8 +192,8 @@ export const useKeyboardListener = (
                         target.selectionStart += 1
                         target.selectionEnd = target.selectionStart
                         changed = true
-                        debug(`INSERT ${keyAction.value}`, useKeyboardListener.name)
-                    } else debug('unexpected null keyAction value(s)', useKeyboardListener.name)
+                        debug(`INSERT ${keyAction.value}`)
+                    } else debug('unexpected null keyAction value(s)')
                     break
                 }
                 if (keyAction.action == 'pop-left-char') {
@@ -203,10 +203,7 @@ export const useKeyboardListener = (
                         !keyAction.left || leftEnd <= 0 || matchValidChar(eventRecord.left.slice(0, leftEnd), -1)
                     if (!isValid) break
                     target.selectionStart -= 1
-                    debug(
-                        `REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`,
-                        useKeyboardListener.name
-                    )
+                    debug(`REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
                     target.setRangeText('')
                     changed = true
                     break
@@ -231,7 +228,7 @@ export const useKeyboardListener = (
                     if (deleteTarget) {
                         // Delete target only if the characters left and right of the cursor will remain valid.
                         if (!left || (matchValidChar(left, -1) && (!right || matchValidChar(right, 1)))) {
-                            debug(`${keyAction.action.toUpperCase()} ${deleteTarget}`, useKeyboardListener.name)
+                            debug(`${keyAction.action.toUpperCase()} ${deleteTarget}`)
                             target.selectionStart = selStart
                             target.selectionEnd = selEnd
                             target.setRangeText('')
@@ -241,7 +238,7 @@ export const useKeyboardListener = (
                     break
                 }
                 if (keyAction.action == 'ignore') {
-                    debug('IGNORE', useKeyboardListener.name)
+                    debug('IGNORE')
                     break
                 }
                 if (

@@ -23,12 +23,12 @@ export function StaffNode({
     systemData: EditorSystemData
     colWidths: number[]
 }) {
-    if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`, StaffNode.name)
+    if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`)
 
     const measureNodes = useMemo(
         () =>
             measures.map((measure: Measure, sidx: number) => {
-                debug(`useMemo: recreating measures of system ${sysUuid} ${position}`, StaffNode.name)
+                debug(`useMemo: recreating measures of system ${sysUuid} ${position}`)
                 const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
                 const validSymbols: string[] = getValidSymbols(position, true)
                 return (

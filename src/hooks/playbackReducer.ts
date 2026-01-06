@@ -33,9 +33,9 @@ async function asyncPlay() {
 export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
-            debug(`executing 'load'`, playbackReducer.name)
+            debug(`executing 'load'`)
             if (action.data && action.audiofunctions) {
-                debug(`loading data for sys ${action.data[0].id}`, playbackReducer.name)
+                debug(`loading data for sys ${action.data[0].id}`)
                 const timeLine = createTimelineFromEditor(action.data, {
                     play: action.audiofunctions.playInstrument,
                     animate: null,
@@ -49,7 +49,7 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             return { ...state, cursor: noCursor, audioState: 'nodata' }
         }
         case 'play': {
-            debug(`executing 'play'`, playbackReducer.name)
+            debug(`executing 'play'`)
             if (action.playbackType) {
                 asyncPlay()
                 return { ...state, audioState: 'playing', playbackType: action.playbackType }
@@ -58,20 +58,20 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             return state
         }
         case 'pause': {
-            debug(`executing 'pause'`, playbackReducer.name)
+            debug(`executing 'pause'`)
             Tone.getTransport().pause()
             return { ...state, audioState: 'paused' }
         }
         case 'stop': {
-            debug(`executing 'stop'`, playbackReducer.name)
+            debug(`executing 'stop'`)
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
             return { ...state, cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'cursor':
-            debug(`executing 'cursor'`, playbackReducer.name)
+            debug(`executing 'cursor'`)
             if (action.cursor) {
-                debug(`cursor action exists`, playbackReducer.name)
+                debug(`cursor action exists`)
                 return { ...state, cursor: action.cursor }
             }
             console.error('audio reducer: action is "cursor" but cursor attribute is missing.')

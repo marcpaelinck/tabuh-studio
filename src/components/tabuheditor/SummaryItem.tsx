@@ -91,7 +91,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     // Action performed on button click event and after field editing/selection.
     function buttonAction(event: any, action: string) {
         event.stopPropagation()
-        debug(`executing button action ${action}`, SummaryItem.name)
+        debug(`executing button action ${action}`)
         if (specs[item].hasfield) {
             setEditing(true)
             return
@@ -125,10 +125,10 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     function inputAction(event: any, action: string, value: string | undefined) {
         event.target.blur()
         event.stopPropagation()
-        debug(`warning is ${warning}`, SummaryItem.name)
+        debug(`warning is ${warning}`)
         if (action != 'cancel' && !(warning == null)) return
         const returnValue = value || inputRef.current?.value
-        debug(`executing field action ${action} value=${returnValue}`, SummaryItem.name)
+        debug(`executing field action ${action} value=${returnValue}`)
         setEditing(false)
         setWarning(null) // Can only reach this point if cancel was selected.
         if (action != 'cancel' && execute) execute(item, returnValue)
@@ -139,7 +139,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         switch (item) {
             case 'label': {
                 if (labels && value && Object.keys(labels).includes(value)) msg = 'This name is already in use'
-                debug(`labels=${JSON.stringify(Object.keys(labels || []))} value=${value}`, SummaryItem.name)
+                debug(`labels=${JSON.stringify(Object.keys(labels || []))} value=${value}`)
                 break
             }
             case 'delete': {
@@ -148,7 +148,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             }
             default:
         }
-        debug(`validate is ${msg}`, SummaryItem.name)
+        debug(`validate is ${msg}`)
         setWarning(msg)
         return msg == null
     }

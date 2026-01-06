@@ -38,9 +38,9 @@ export function PlaybackButtons({
 
     async function moveCursor(time: number, cAction: CursorAction) {
         playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
-        debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`, PlaybackButtons.name)
+        debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
         const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
-        debug(`scrolling ${currElement?.id} into view`, PlaybackButtons.name)
+        debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
@@ -55,7 +55,7 @@ export function PlaybackButtons({
             playback({ actionType: 'stop' })
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
-            debug(`playing sys seq=${sysUuid}`, PlaybackButtons.name)
+            debug(`playing sys seq=${sysUuid}`)
             // Load new data
             const index = data.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
@@ -71,7 +71,7 @@ export function PlaybackButtons({
     }
 
     function buttonColor(pbType: PlaybackType) {
-        if (hasCursor) debug(`button-sysidx=${sysUuid} has the cursor`, PlaybackButtons.name)
+        if (hasCursor) debug(`button-sysidx=${sysUuid} has the cursor`)
         return hasCursor && playbackType == pbType ? 'orange' : 'gray'
     }
 
