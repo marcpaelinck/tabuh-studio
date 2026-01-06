@@ -63,7 +63,7 @@ export function MeasureNode({
     }, [systemData])
 
     // Highlight the cell background if the content has been modified by the user.
-    const highlightOnChangedContent = (cell: HTMLTextAreaElement | null, initial: boolean = false) => {
+    const highlightOnChangedContent = (cell: HTMLTextAreaElement | null) => {
         if (!cell) return
         const changed = measure.notation_ && measure.notation_.map((jSym) => jSym.s).join('') != props.defaultValue
         const classes = ['bg-amber-100']
@@ -80,7 +80,7 @@ export function MeasureNode({
             // measureData.notation = measureData.notation_
             const notationStr: string[] = parseNotationText(ref.current.value, validRegExpCell)
             const notation = notationStr.map((sym) => {
-                return { sysId: systemData.id, sectionId: colId, s: sym, t: 0, d: 1 }
+                return { sysUuid: systemData.uuid, sectionId: colId, s: sym, t: 0, d: 1 }
             })
             navFunc.applyRules(notation, rowId, colId, true)
             const newSysData = { ...systemData }
@@ -103,7 +103,7 @@ export function MeasureNode({
                 keyboardListener(e)
                 highlightOnChangedContent(e.target as HTMLTextAreaElement)
             }}
-            onBlur={(e) => storeChanges()}
+            onBlur={() => storeChanges()}
             {...props}
         />
     )

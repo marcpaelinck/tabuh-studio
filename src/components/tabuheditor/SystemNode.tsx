@@ -157,32 +157,37 @@ export function SystemNode({
         updateSystemData(newSysData)
     }
 
-    const staffNodes = Object.entries(systemData.staffs).map(([position, measures], rowId) => {
-        if (systemData.index == 0) debug(`useMemo: recreating staffnodes of system ${systemUuid}`, SystemNode.name)
-        return (
-            <Row id={`ROW-${position}`}>
-                <Col id={`COL-POSITION`} span="auto">
-                    <Text as="div" className="w-40 h-5">
-                        {positionConfigs[position].name}
-                    </Text>
-                </Col>
-                <Col id={`COL-POSITION`} span="auto">
-                    <Checkbox
-                        defaultChecked={systemData.grouped.includes(position)}
-                        onChange={(_, checked) => updateGrouped(position, checked)}
-                    />
-                </Col>
-                <StaffNode
-                    sysUuid={systemUuid}
-                    position={position}
-                    rowId={rowId}
-                    measures={measures}
-                    systemData={systemData}
-                    colWidths={systemData.colWidths}
-                />
-            </Row>
-        )
-    })
+    const staffNodes = useMemo(
+        () =>
+            Object.entries(systemData.staffs).map(([position, measures], rowId) => {
+                if (systemData.index == 0)
+                    debug(`useMemo: recreating staffnodes of system ${systemUuid}`, SystemNode.name)
+                return (
+                    <Row id={`ROW-${position}`}>
+                        <Col id={`COL-POSITION`} span="auto">
+                            <Text as="div" className="w-40 h-5">
+                                {positionConfigs[position].name}
+                            </Text>
+                        </Col>
+                        <Col id={`COL-POSITION`} span="auto">
+                            <Checkbox
+                                defaultChecked={systemData.grouped.includes(position)}
+                                onChange={(_, checked) => updateGrouped(position, checked)}
+                            />
+                        </Col>
+                        <StaffNode
+                            sysUuid={systemUuid}
+                            position={position}
+                            rowId={rowId}
+                            measures={measures}
+                            systemData={systemData}
+                            colWidths={systemData.colWidths}
+                        />
+                    </Row>
+                )
+            }),
+        [systemData, visible]
+    )
 
     return (
         visible && (

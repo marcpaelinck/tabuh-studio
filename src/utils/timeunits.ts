@@ -1,5 +1,4 @@
 import { BaseNote, type BaseNoteTimeObj } from '../config/config'
-import * as Tone from 'tone'
 
 // Converts a note value (expressed in BaseNote units) to a TimeObject
 export const n2TO = (notevalue: number): BaseNoteTimeObj => new Object({ [BaseNote]: notevalue }) as BaseNoteTimeObj

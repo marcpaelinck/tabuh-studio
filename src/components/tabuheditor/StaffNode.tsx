@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Col } from 'rsuite'
 import type { EditorSystemData, Measure } from '../../models/types'
 import { getValidSymbols } from '../../utils/alphabet'
@@ -24,29 +25,33 @@ export function StaffNode({
 }) {
     if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`, StaffNode.name)
 
-    const measureNodes = measures.map((measure: Measure, sidx: number) => {
-        debug(`useMemo: recreating measures of system ${sysUuid} ${position}`, StaffNode.name)
-        const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
-        const validSymbols: string[] = getValidSymbols(position, true)
-        return (
-            <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
-                <MeasureNode
-                    key={`sys ${sysUuid} ${position} measure ${sidx}`}
-                    id={`sys ${sysUuid} ${position} measure ${sidx}`}
-                    position={position}
-                    rowId={rowId}
-                    colId={sidx}
-                    validSymbols={validSymbols}
-                    measureData={measure}
-                    systemData={systemData}
-                    defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
-                    style={{ width: width }}
-                    className={`balifont10 h-5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                    spellCheck="false"
-                />
-            </Col>
-        )
-    })
+    const measureNodes = useMemo(
+        () =>
+            measures.map((measure: Measure, sidx: number) => {
+                debug(`useMemo: recreating measures of system ${sysUuid} ${position}`, StaffNode.name)
+                const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
+                const validSymbols: string[] = getValidSymbols(position, true)
+                return (
+                    <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
+                        <MeasureNode
+                            key={`sys ${sysUuid} ${position} measure ${sidx}`}
+                            id={`sys ${sysUuid} ${position} measure ${sidx}`}
+                            position={position}
+                            rowId={rowId}
+                            colId={sidx}
+                            validSymbols={validSymbols}
+                            measureData={measure}
+                            systemData={systemData}
+                            defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
+                            style={{ width: width }}
+                            className={`balifont10 h-5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                            spellCheck="false"
+                        />
+                    </Col>
+                )
+            }),
+        [systemData]
+    )
 
     return <>{measureNodes}</>
 }

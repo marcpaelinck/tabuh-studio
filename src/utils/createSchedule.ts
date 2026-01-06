@@ -39,11 +39,9 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
     }
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
-    const bpm = 60
     var currTime: number = 0
     var sysStartTime: number = 0
     var maxStaffDuration: number = 0
-    var msg = ''
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
         Object.keys(positionConfigs).map((key) => [key, null])
     )
@@ -103,8 +101,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                         system.uuid == last.sysuuid &&
                         measureidx == last.section &&
                         position == last.position
-                    // if (actionFunctions.cursor && !same && position == 'KEMPLI') {
-                    if (actionFunctions.cursor && !same) {
+                    if (actionFunctions.cursor && !same && position == 'KEMPLI') {
                         timeline.cursoractions.push({
                             action: actionFunctions.cursor,
                             time: n2TO(currTime),

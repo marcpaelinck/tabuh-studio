@@ -29,8 +29,7 @@ export default function EditorWindow({
     score,
     expanded,
     setExpanded,
-    loading,
-    ...props
+    loading
 }: {
     score: Score
     expanded: Record<string, boolean>
@@ -97,7 +96,7 @@ export default function EditorWindow({
 
     function updatePointers(newData: EditorSystemData[]) {
         // Update fields that depend on pointers to another system
-        newData.map((systemData, idx) => {
+        newData.map((systemData) => {
             if (systemData.copyfromkey) {
                 const source = newData.find((sysData) => sysData.uuid == systemData.copyfromkey)
                 if (source && source.uuid != systemData.uuid)
@@ -258,88 +257,97 @@ export default function EditorWindow({
     }
 
     const systemIdPrefix = 'system-'
-    const systems = data.map((systemData, idx) => {
-        // Update the 'copyfrom' field with the source's label or id.
-        // This value can change due to user edits.
-        // if (systemData.copyfromkey) {
-        //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
-        //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
-        // }
-        // Structure:
-        // - Panel Header: contains context menu and System summary information
-        // - Panel content (visible when panel is expanded): System grid (SystemNode)
-        const execute = (fieldname: string, value?: string) => summaryItemAction(fieldname, systemData, value)
-        return (
-            <Accordion.Panel
-                id={`${systemIdPrefix}${systemData.uuid}`}
-                key={systemData.uuid}
-                // Panel Header
-                header={
-                    <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
-                        {/* Displays info about the System */}
-                        <Row id="row">
-                            <Col span={3} className="flex">
-                                <PlayBackButtons
-                                    data={data}
-                                    sysUuid={systemData.uuid}
-                                    systemIdPrefix={systemIdPrefix}
-                                    playback={playback}
-                                    playbackState={playbackState}
-                                    className="content-start"
-                                />
-                            </Col>
-                            <SCol span={2}>
-                                <SummaryItem item="id" sysData={systemData} />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="part" sysData={systemData} execute={execute} />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="new" sysData={systemData} execute={execute} />
-                                <SummaryItem
-                                    item="copy"
-                                    sysData={systemData}
-                                    options={systemSelectorOptions(systemData, true, false)}
-                                    execute={execute}
-                                />
-                                <SummaryItem
-                                    item="delete"
-                                    gototargets={gotoTargets}
-                                    sysData={systemData}
-                                    execute={execute}
-                                />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem
-                                    item="goto"
-                                    sysData={systemData}
-                                    options={systemSelectorOptions(systemData, false, true)}
-                                    execute={execute}
-                                />
-                            </SCol>
-                        </Row>
-                    </Grid>
-                }
-                expanded={expanded[systemData.uuid]}
-                onSelect={() => {
-                    flipExpanded(systemData.uuid)
-                }}>
-                {/* Panel content: visible when panel is expanded */}
+    const systems = useMemo(
+        () =>
+            data.map((systemData) => {
+                // Update the 'copyfrom' field with the source's label or id.
+                // This value can change due to user edits.
+                // if (systemData.copyfromkey) {
+                //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
+                //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+                // }
+                // Structure:
+                // - Panel Header: contains context menu and System summary information
+                // - Panel content (visible when panel is expanded): System grid (SystemNode)
+                const execute = (fieldname: string, value?: string) => summaryItemAction(fieldname, systemData, value)
+                return (
+                    <Accordion.Panel
+                        id={`${systemIdPrefix}${systemData.uuid}`}
+                        key={systemData.uuid}
+                        // Panel Header
+                        header={
+                            <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
+                                {/* Displays info about the System */}
+                                <Row id="row">
+                                    <Col span={3} className="flex">
+                                        <PlayBackButtons
+                                            data={data}
+                                            sysUuid={systemData.uuid}
+                                            systemIdPrefix={systemIdPrefix}
+                                            playback={playback}
+                                            playbackState={playbackState}
+                                            className="content-start"
+                                        />
+                                    </Col>
+                                    <SCol span={2}>
+                                        <SummaryItem item="id" sysData={systemData} />
+                                    </SCol>
+                                    <SCol span={4}>
+                                        <SummaryItem item="part" sysData={systemData} execute={execute} />
+                                    </SCol>
+                                    <SCol span={4}>
+                                        <SummaryItem
+                                            item="label"
+                                            labels={labels}
+                                            sysData={systemData}
+                                            execute={execute}
+                                        />
+                                    </SCol>
+                                    <SCol span={4}>
+                                        <SummaryItem item="new" sysData={systemData} execute={execute} />
+                                        <SummaryItem
+                                            item="copy"
+                                            sysData={systemData}
+                                            options={systemSelectorOptions(systemData, true, false)}
+                                            execute={execute}
+                                        />
+                                        <SummaryItem
+                                            item="delete"
+                                            gototargets={gotoTargets}
+                                            sysData={systemData}
+                                            execute={execute}
+                                        />
+                                    </SCol>
+                                    <SCol span={4}>
+                                        <SummaryItem
+                                            item="goto"
+                                            sysData={systemData}
+                                            options={systemSelectorOptions(systemData, false, true)}
+                                            execute={execute}
+                                        />
+                                    </SCol>
+                                </Row>
+                            </Grid>
+                        }
+                        expanded={expanded[systemData.uuid]}
+                        onSelect={() => {
+                            flipExpanded(systemData.uuid)
+                        }}>
+                        {/* Panel content: visible when panel is expanded */}
 
-                {expanded[systemData.uuid] && (
-                    <SystemNode
-                        systemData={systemData}
-                        updateSystemData={updateSystemData}
-                        playbackState={playbackState}
-                        visible={expanded[systemData.uuid]}
-                    />
-                )}
-            </Accordion.Panel>
-        )
-    })
+                        {expanded[systemData.uuid] && (
+                            <SystemNode
+                                systemData={systemData}
+                                updateSystemData={updateSystemData}
+                                playbackState={playbackState}
+                                visible={expanded[systemData.uuid]}
+                            />
+                        )}
+                    </Accordion.Panel>
+                )
+            }),
+        [data, expanded, playbackState]
+    )
 
     return (
         <AudioFunctions value={audioFunctions}>

@@ -1,11 +1,9 @@
-import { type Dispatch, type RefObject } from 'react'
-import { type NavigationAction } from '../config/config'
-import _ from 'lodash'
-import { debug } from '../utils/debugger'
-import { type KeyboardEvent } from 'react'
+import { type Dispatch, type KeyboardEvent, type RefObject } from 'react'
 import type { ElementWithValueTracker } from '../components/tabuheditor/_types'
+import { type NavigationAction } from '../config/config'
 import type { JsonSymbol } from '../models/types'
 import { symbolValidationUtils } from '../utils/alphabet'
+import { debug } from '../utils/debugger'
 
 type KeyType =
     | 'ArrowUp'
@@ -105,8 +103,7 @@ export const useKeyboardListener = (
     updateNotation: Dispatch<JsonSymbol[]>
 ) => {
     // Defined as hook in order to be able to use states, such as keyboard definitions, 'smart edit' or 'octavation on'.
-    const { validRegExpSymbol, validRegExpCell, validRegExpByLength, validKeystrokes } =
-        symbolValidationUtils(validSymbols)
+    const { validRegExpCell, validRegExpByLength, validKeystrokes } = symbolValidationUtils(validSymbols)
 
     // Checks for a matching valid symbol at the beginning (direction==1) or end (direction==-1) of a string.
     // Returns the length of the symbol if a match is found, null otherwise.
@@ -138,7 +135,7 @@ export const useKeyboardListener = (
         else
             updateNotation(
                 notation.map((sym) => {
-                    return { system: -1, section: -1, s: sym, t: -1, d: -1 }
+                    return { sysUuid: '', sectionId: -1, s: sym, t: -1, d: -1 }
                 })
             )
         debug(JSON.stringify(notation), useKeyboardListener.name)

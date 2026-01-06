@@ -1,6 +1,4 @@
-import _ from 'lodash'
 import type { JsonSymbol } from '../models/types'
-import { getValidSymbols, symbolValidationUtils } from '../utils/alphabet'
 
 // CASTING RULES
 const fromPolos: Record<string, Record<string, string>> = {
@@ -51,8 +49,6 @@ export function useRules() {
     // assuming that the measure is a basic (polos) melody.
     // measureId starts with 0
     function castNotation(notation: JsonSymbol[], position: string, measureId: number): JsonSymbol[] {
-        const validSymbols = getValidSymbols(position, true)
-        const { validRegExpCell } = symbolValidationUtils(validSymbols)
         const conversion: Record<string, string> = fromPolos[position] || {}
 
         var updatedNotation = notation
