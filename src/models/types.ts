@@ -130,7 +130,7 @@ export type EditorSystemData = {
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // uuid copied system
 }
-export type EditorCellCursor = { sysUuid: string; position: string; measure: number }
+export type EditorCellCursor = { sysUuid: string; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 

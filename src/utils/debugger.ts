@@ -8,6 +8,7 @@ const debugOn: Record<string, boolean> = {
     MeasureNode: true,
     NavigationCell: false,
     PlayBackButtons: false,
+    playbackReducer: true,
     registerComponent: false,
     ScorePlayer: false,
     StaffNode: true,
@@ -17,5 +18,5 @@ const debugOn: Record<string, boolean> = {
 }
 
 export const debug = (message: any, caller: string) => {
-    if (debugOn[caller]) console.log(message)
+    if (debugOn[caller]) console.log(`${caller}: ${message}`)
 }

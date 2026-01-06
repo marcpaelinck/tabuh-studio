@@ -11,6 +11,7 @@ import {
 } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import type { ReactElement } from 'rsuite/esm/internals/types'
 import { v4 as uuidv4 } from 'uuid'
 import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
@@ -41,7 +42,7 @@ export default function EditorWindow({
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
-    const audioFunctions: AudioFunctionsType = useMemo(() => Object.assign(defaultAudioFunc, { playInstrument }), [])
+    const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
 
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
@@ -50,6 +51,9 @@ export default function EditorWindow({
         audioState: 'nodata',
         playbackType: 'none'
     })
+    const pbCurrUuid = playbackState.cursor.sysUuid
+    const pbType = playbackState.playbackType
+    const pbAudioState = playbackState.audioState
 
     function flipExpanded(key: string) {
         setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
@@ -256,7 +260,84 @@ export default function EditorWindow({
         return options
     }
 
+    // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
+    // minimize rendering because it interferes badly with the audio playback functions.
+    // Thesse objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
     const systemIdPrefix = 'system-'
+    const systemHeaderButtons: Record<string, ReactElement> = useMemo(
+        () =>
+            Object.fromEntries(
+                data.map((systemData) => {
+                    const execute = (fieldname: string, value?: string) =>
+                        summaryItemAction(fieldname, systemData, value)
+                    return [
+                        systemData.uuid,
+                        <Col span={3} className="flex">
+                            <PlayBackButtons
+                                data={data}
+                                sysUuid={systemData.uuid}
+                                systemIdPrefix={systemIdPrefix}
+                                playback={playback}
+                                hasCursor={systemData.uuid == pbCurrUuid}
+                                playbackType={pbType}
+                                playbackAudioState={pbAudioState}
+                                // playbackState={playbackState}
+                                className="content-start"
+                            />
+                        </Col>
+                    ]
+                })
+            ),
+        [data, pbCurrUuid, pbType, pbAudioState]
+    )
+    const systemHeaderFields: Record<string, ReactElement> = useMemo(
+        () =>
+            Object.fromEntries(
+                data.map((systemData) => {
+                    const execute = (fieldname: string, value?: string) =>
+                        summaryItemAction(fieldname, systemData, value)
+                    return [
+                        systemData.uuid,
+                        <>
+                            <SCol span={2}>
+                                <SummaryItem item="id" sysData={systemData} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="part" sysData={systemData} execute={execute} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem item="new" sysData={systemData} execute={execute} />
+                                <SummaryItem
+                                    item="copy"
+                                    sysData={systemData}
+                                    options={systemSelectorOptions(systemData, true, false)}
+                                    execute={execute}
+                                />
+                                <SummaryItem
+                                    item="delete"
+                                    gototargets={gotoTargets}
+                                    sysData={systemData}
+                                    execute={execute}
+                                />
+                            </SCol>
+                            <SCol span={4}>
+                                <SummaryItem
+                                    item="goto"
+                                    sysData={systemData}
+                                    options={systemSelectorOptions(systemData, false, true)}
+                                    execute={execute}
+                                />
+                            </SCol>
+                        </>
+                    ]
+                })
+            ),
+        [data]
+    )
+
     const systems = useMemo(
         () =>
             data.map((systemData) => {
@@ -269,7 +350,6 @@ export default function EditorWindow({
                 // Structure:
                 // - Panel Header: contains context menu and System summary information
                 // - Panel content (visible when panel is expanded): System grid (SystemNode)
-                const execute = (fieldname: string, value?: string) => summaryItemAction(fieldname, systemData, value)
                 return (
                     <Accordion.Panel
                         id={`${systemIdPrefix}${systemData.uuid}`}
@@ -279,53 +359,8 @@ export default function EditorWindow({
                             <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
                                 {/* Displays info about the System */}
                                 <Row id="row">
-                                    <Col span={3} className="flex">
-                                        <PlayBackButtons
-                                            data={data}
-                                            sysUuid={systemData.uuid}
-                                            systemIdPrefix={systemIdPrefix}
-                                            playback={playback}
-                                            playbackState={playbackState}
-                                            className="content-start"
-                                        />
-                                    </Col>
-                                    <SCol span={2}>
-                                        <SummaryItem item="id" sysData={systemData} />
-                                    </SCol>
-                                    <SCol span={4}>
-                                        <SummaryItem item="part" sysData={systemData} execute={execute} />
-                                    </SCol>
-                                    <SCol span={4}>
-                                        <SummaryItem
-                                            item="label"
-                                            labels={labels}
-                                            sysData={systemData}
-                                            execute={execute}
-                                        />
-                                    </SCol>
-                                    <SCol span={4}>
-                                        <SummaryItem item="new" sysData={systemData} execute={execute} />
-                                        <SummaryItem
-                                            item="copy"
-                                            sysData={systemData}
-                                            options={systemSelectorOptions(systemData, true, false)}
-                                            execute={execute}
-                                        />
-                                        <SummaryItem
-                                            item="delete"
-                                            gototargets={gotoTargets}
-                                            sysData={systemData}
-                                            execute={execute}
-                                        />
-                                    </SCol>
-                                    <SCol span={4}>
-                                        <SummaryItem
-                                            item="goto"
-                                            sysData={systemData}
-                                            options={systemSelectorOptions(systemData, false, true)}
-                                            execute={execute}
-                                        />
-                                    </SCol>
+                                    {systemHeaderButtons[systemData.uuid]}
+                                    {systemHeaderFields[systemData.uuid]}
                                 </Row>
                             </Grid>
                         }

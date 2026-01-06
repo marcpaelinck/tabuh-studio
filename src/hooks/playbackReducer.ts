@@ -33,8 +33,9 @@ async function asyncPlay() {
 export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
+            debug(`executing 'load'`, playbackReducer.name)
             if (action.data && action.audiofunctions) {
-                debug(`loading data for sys ${action.data[0].id}`, 'audioReducer')
+                debug(`loading data for sys ${action.data[0].id}`, playbackReducer.name)
                 const timeLine = createTimelineFromEditor(action.data, {
                     play: action.audiofunctions.playInstrument,
                     animate: null,
@@ -48,27 +49,34 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             return { ...state, cursor: noCursor, audioState: 'nodata' }
         }
         case 'play': {
+            debug(`executing 'play'`, playbackReducer.name)
             if (action.playbackType) {
                 asyncPlay()
                 return { ...state, audioState: 'playing', playbackType: action.playbackType }
             }
             console.error('audio reducer: action is "play" but playback type is missing.')
-            return { ...state }
+            return state
         }
         case 'pause': {
+            debug(`executing 'pause'`, playbackReducer.name)
             Tone.getTransport().pause()
             return { ...state, audioState: 'paused' }
         }
         case 'stop': {
+            debug(`executing 'stop'`, playbackReducer.name)
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
             return { ...state, cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'cursor':
+            debug(`executing 'cursor'`, playbackReducer.name)
             if (action.cursor) {
+                debug(`cursor action exists`, playbackReducer.name)
                 return { ...state, cursor: action.cursor }
             }
             console.error('audio reducer: action is "cursor" but cursor attribute is missing.')
-            return { ...state }
+            return state
+        default:
+            return state
     }
 }

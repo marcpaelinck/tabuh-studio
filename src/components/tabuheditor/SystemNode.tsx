@@ -29,7 +29,7 @@ export function SystemNode({
     const systemUuid = systemData.uuid
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    const [highlightedCell, setHighlightedCell] = useState<EditorCellCursor>(noCursor)
+    const [highlightedMeasure, setHighlightedMeasure] = useState<EditorCellCursor>(noCursor)
     const { castNotation } = useRules()
 
     if (systemData.id == 1 || systemData.id == 13) debug(`(re-)rendering system ${systemUuid}`, SystemNode.name)
@@ -64,20 +64,20 @@ export function SystemNode({
         if (
             !grid.current ||
             _.isEmpty(grid.current.cells) ||
-            (highlightedCell == noCursor && playbackState.cursor.sysUuid != systemUuid)
+            (highlightedMeasure == noCursor && playbackState.cursor.sysUuid != systemUuid)
         ) {
             debug(`nothing to highlight (panel closed)`, SystemNode.name + 'Offset')
             return
         }
-        if (_.isEqual(playbackState.cursor, highlightedCell)) {
+        if (_.isEqual(playbackState.cursor, highlightedMeasure)) {
             // Return if the cell cursor hasn't moved: highlighting actions are on individual note symbol level,
             // but highlighting of symbols within a measure is not implemented (yet).
             return
         }
         // Remove highlight from current cells
-        if (!_.isEqual(highlightedCell, noCursor)) {
+        if (!_.isEqual(highlightedMeasure, noCursor)) {
             for (var row = 0; row <= grid.current.maxRowId; row++)
-                highlight(grid.current.cells[row][highlightedCell.measure].current, false)
+                highlight(grid.current.cells[row][highlightedMeasure.measure].current, false)
         }
         if (playbackState.cursor.sysUuid == systemUuid && playbackState.cursor != noCursor) {
             // Highlight cell
@@ -88,9 +88,9 @@ export function SystemNode({
             for (var row = 0; row <= grid.current.maxRowId; row++) {
                 highlight(grid.current.cells[row][playbackState.cursor.measure].current, true)
             }
-            setHighlightedCell(playbackState.cursor)
+            setHighlightedMeasure(playbackState.cursor)
         } else {
-            setHighlightedCell(noCursor)
+            setHighlightedMeasure(noCursor)
         }
     }, [playbackState])
 
