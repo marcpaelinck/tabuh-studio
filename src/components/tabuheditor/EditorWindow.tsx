@@ -20,7 +20,7 @@ import type { EditorSystemData, Score, Staffs } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
-import { PlayBackButtons } from './PlaybackButtons'
+import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
 
@@ -56,6 +56,7 @@ export default function EditorWindow({
     const pbAudioState = playbackState.audioState
 
     function flipExpanded(key: string) {
+        debug('flipping', EditorWindow.name)
         setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
     }
 
@@ -91,6 +92,14 @@ export default function EditorWindow({
         setExpanded(initExpandState)
         setProcessing(false)
     }, [score])
+
+    // Update the list of expanded panels which is maintained in te TabuhEditor.
+    // Keys (systems) might have been added or deleted.
+    useEffect(() => {
+        const allKeys = Object.fromEntries(data.map((sys) => [sys.uuid, false]))
+        const existingKeys = _.pick(expanded, Object.keys(allKeys))
+        setExpanded({ ...allKeys, ...existingKeys })
+    }, [data])
 
     function updateSystemData(sysData: EditorSystemData) {
         const sysIdx = sysData.index
@@ -273,7 +282,7 @@ export default function EditorWindow({
                     return [
                         systemData.uuid,
                         <Col span={3} className="flex">
-                            <PlayBackButtons
+                            <PlaybackButtons
                                 data={data}
                                 sysUuid={systemData.uuid}
                                 systemIdPrefix={systemIdPrefix}
@@ -281,7 +290,6 @@ export default function EditorWindow({
                                 hasCursor={systemData.uuid == pbCurrUuid}
                                 playbackType={pbType}
                                 playbackAudioState={pbAudioState}
-                                // playbackState={playbackState}
                                 className="content-start"
                             />
                         </Col>

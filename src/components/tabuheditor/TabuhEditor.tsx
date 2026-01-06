@@ -3,10 +3,8 @@ import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import SearchIcon from '@rsuite/icons/Search'
+import _ from 'lodash'
 import { useEffect, useState } from 'react'
-import { FaRegKeyboard } from 'react-icons/fa6'
-import { GiXylophone } from 'react-icons/gi'
-import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import {
     Box,
     Button,
@@ -17,7 +15,6 @@ import {
     IconButton,
     Input,
     InputGroup,
-    Nav,
     Sidebar,
     Sidenav,
     useMediaQuery,
@@ -25,16 +22,19 @@ import {
 } from 'rsuite'
 import { editorInitialExpandState } from '../../config/config'
 import { useScore } from '../../hooks/useScore'
+import { debug } from '../../utils/debugger'
 import EditorWindow from './EditorWindow'
-import Menu from './Menu'
+import { TabuhEditorMenu } from './TabuhEditorMenu'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 
-const NavHeader = ({ expanded }: { expanded: boolean }) => {
+export type KeyboardType = 'regular' | 'laras'
+
+const NavHeader = ({ expanded, ...rest }: { expanded: boolean }) => {
     if (!expanded) {
         return (
             <HStack justify="center">
                 {' '}
-                <img src={logo} className="h-10" alt="logo" />
+                <img src={logo} className="h-10 pl-0 pr-0" alt="logo" />
             </HStack>
         )
     }
@@ -63,25 +63,24 @@ export function TabuhEditor({
     tabuhDict: Record<string, string>
     loadingTabuhDict: boolean
 }) {
-    //DUMMIES
+    //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
-    const [activeKey, setActiveKey] = useState('1')
     const [isMobile] = useMediaQuery('(max-width: 768px)')
-    const isExpanded = sidenavExpanded && !isMobile
-    //END DUMMIES
+    const isExpandedSidenav = sidenavExpanded && !isMobile
+    //END NAVIGATION
     const [score, loadScore, loadingScore] = useScore(null)
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
-    const [keyboard, SetKeyboard] = useState<string>('regular')
-    var scoreList: string[] = Object.keys(tabuhDict)
+    const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     useEffect(() => {
         setLoading(loadingTabuhDict || loadingScore)
     }, [loadingTabuhDict, loadingScore])
 
     function expandAll(expand: boolean) {
-        const newExpanded = Object.fromEntries(Object.keys(sidenavExpanded).map((id) => [id, expand]))
+        const newExpanded = _.mapValues(expanded, () => expand)
+        debug(newExpanded, TabuhEditor.name)
         setExpanded(newExpanded)
         setButtonIsExpand(!expand)
     }
@@ -93,11 +92,6 @@ export function TabuhEditor({
             <Container id="header+content">
                 <Header id="header">
                     <HStack spacing={16} align="center" p="1rem">
-                        <Menu
-                            menuDisabled={loading}
-                            tabuhList={scoreList}
-                            scoreUpdater={(value: string) => loadScore(tabuhDict[value])}
-                        />
                         <Button
                             appearance="primary"
                             startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
@@ -119,42 +113,18 @@ export function TabuhEditor({
                     </Box>
                 </Content>
             </Container>
-            <Sidebar h="100%" width={isExpanded ? 260 : 56} collapsible>
-                <Sidenav expanded={isExpanded} defaultOpenKeys={[]} h="100%">
-                    <Sidenav.Header>
-                        <NavHeader expanded={isExpanded} />
+            <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
+                <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
+                    <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
+                        <NavHeader expanded={isExpandedSidenav} />
                     </Sidenav.Header>
                     <Sidenav.Body>
-                        <Nav activeKey={activeKey} onSelect={setActiveKey}>
-                            <Nav.Menu eventKey="1" title="File" icon={<IoFolderOpenOutline />}>
-                                <Nav.Item eventKey="file-open">Open...</Nav.Item>
-                                <Nav.Item eventKey="file-save">Save</Nav.Item>
-                                <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
-                            </Nav.Menu>
-                            <Nav.Menu eventKey="2" title="Instruments" icon={<GiXylophone />}>
-                                <Nav.Item eventKey="instruments-select">Select</Nav.Item>
-                            </Nav.Menu>
-                            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
-                                <Nav.Item
-                                    active={keyboard == 'regular'}
-                                    onSelect={() => SetKeyboard('regular')}
-                                    eventKey="keyboard-regular">
-                                    Regular
-                                </Nav.Item>
-                                <Nav.Item
-                                    active={keyboard == 'laras'}
-                                    onSelect={() => SetKeyboard('laras')}
-                                    eventKey="keyboard-laras">
-                                    Laras
-                                </Nav.Item>
-                            </Nav.Menu>
-
-                            <Nav.Menu eventKey="4" title="Settings" icon={<IoSettingsOutline />}>
-                                <Nav.Item eventKey="settings-instruments">Instrument definitions</Nav.Item>
-                                <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
-                                <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
-                            </Nav.Menu>
-                        </Nav>
+                        <TabuhEditorMenu
+                            keyboard={keyboard}
+                            loadScore={loadScore}
+                            setKeyboard={SetKeyboard}
+                            tabuhDict={tabuhDict}
+                        />
                     </Sidenav.Body>
                     <Sidenav.Footer>
                         <IconButton
@@ -162,7 +132,6 @@ export function TabuhEditor({
                             onClick={() => setSidenavExpanded(!sidenavExpanded)}
                             appearance="subtle"
                         />
-                        {/* <Sidenav.Toggle onToggle={setSidenavExpanded} /> */}
                     </Sidenav.Footer>
                 </Sidenav>
             </Sidebar>

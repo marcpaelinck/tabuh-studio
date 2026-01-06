@@ -4,7 +4,7 @@ import { readFile } from '../utils/filesystem'
 import { parseScore } from '../utils/score'
 
 // Loads and parses a score when a new tabuh (score title) is selected
-export const useScore = (initValue: Score | null): [Score, CallableFunction, boolean] => {
+export const useScore = (initValue: Score | null): [Score, (file: string) => void, boolean] => {
     const [fileName, setFileName] = useState<string | null>(null)
     const [score, setScore] = useState<Score | null>(initValue)
     const [isLoading, setIsLoading] = useState<boolean>(false)

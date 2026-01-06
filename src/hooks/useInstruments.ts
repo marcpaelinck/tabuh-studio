@@ -1,19 +1,19 @@
 import { useCallback, useMemo, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
-    AVERAGE_ATTACK_DELAY,
-    defaultOutroTime,
     alwaysFocusPositions,
+    AVERAGE_ATTACK_DELAY,
+    BaseNote,
+    defaultOutroTime,
     dimRateNonFocusedInstruments,
-    positionConfigs,
     NOTES,
-    SOUNDS_FOLDER,
-    BaseNote
+    positionConfigs,
+    SOUNDS_FOLDER
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import { millis2BaseNoteEquiv } from '../utils/timeunits'
 import type { SamplerAction } from '../models/types'
 import { debug } from '../utils/debugger'
+import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
     play: (time: number, action: SamplerAction, focus: string[]) => void
@@ -91,7 +91,7 @@ const createInstrument = (
                     : dimRateNonFocusedInstruments
             debug(
                 `focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`,
-                createInstrument.name
+                useInstruments.name
             )
             const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
             if (indices && samplers[position]) {
@@ -136,7 +136,7 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: 
     const playInstrument = useCallback((time: number, action: SamplerAction) => {
         debug(
             `playing ${action.position} ${action.cleanedSymbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`,
-            playInstrument.name
+            useInstruments.name
         )
         if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
         else {

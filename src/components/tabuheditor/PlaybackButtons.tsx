@@ -8,7 +8,7 @@ import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
-export function PlayBackButtons({
+export function PlaybackButtons({
     data,
     sysUuid,
     systemIdPrefix,
@@ -38,9 +38,9 @@ export function PlayBackButtons({
 
     async function moveCursor(time: number, cAction: CursorAction) {
         playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
-        debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`, PlayBackButtons.name)
+        debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`, PlaybackButtons.name)
         const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
-        debug(`scrolling ${currElement?.id} into view`, PlayBackButtons.name)
+        debug(`scrolling ${currElement?.id} into view`, PlaybackButtons.name)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
@@ -55,7 +55,7 @@ export function PlayBackButtons({
             playback({ actionType: 'stop' })
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
-            debug(`playing sys seq=${sysUuid}`, PlayBackButtons.name)
+            debug(`playing sys seq=${sysUuid}`, PlaybackButtons.name)
             // Load new data
             const index = data.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
@@ -71,7 +71,7 @@ export function PlayBackButtons({
     }
 
     function buttonColor(pbType: PlaybackType) {
-        if (hasCursor) debug(`button-sysidx=${sysUuid} has the cursor`, PlayBackButtons.name)
+        if (hasCursor) debug(`button-sysidx=${sysUuid} has the cursor`, PlaybackButtons.name)
         return hasCursor && playbackType == pbType ? 'orange' : 'gray'
     }
 
