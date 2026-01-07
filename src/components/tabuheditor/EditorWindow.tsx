@@ -184,11 +184,14 @@ export default function EditorWindow({
             }
             case 'copy': {
                 const source = data.find((sys) => sys.uuid == value)
+                debug(source)
                 if (!source) {
                     console.error(`copy system: could not find system ${value}`)
                     return
                 }
+                newSystemData = _.cloneDeep(source)
                 newSystemData.uuid = uuidv4()
+                newSystemData.part = ''
                 newSystemData.label = undefined
                 newSystemData.copyfromkey = source.uuid
                 // newSystemData.copyfrom = source.label || `#${source.index}`

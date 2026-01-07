@@ -1,8 +1,8 @@
 import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
-import { GiXylophone } from 'react-icons/gi'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Modal, Nav, SelectPicker } from 'rsuite'
+import TsGongIcon from '../../reacticons/TsGongIcon'
 import type { KeyboardType } from './TabuhEditor'
 
 type Action =
@@ -54,7 +54,7 @@ export function TabuhEditorMenu({ tabuhDict, loadScore, keyboard, setKeyboard }:
     }
 
     const selectNotation = (
-        <Modal open={activeKey == 'file-open'} onClose={() => setActiveKey(undefined)}>
+        <Modal size="xs" open={activeKey == 'file-open'} onClose={() => setActiveKey(undefined)}>
             <Modal.Header>
                 <Modal.Title>Open notation</Modal.Title>
             </Modal.Header>
@@ -71,7 +71,7 @@ export function TabuhEditorMenu({ tabuhDict, loadScore, keyboard, setKeyboard }:
                 <Nav.Item eventKey="file-save">Save</Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="2" title="Instruments" icon={<GiXylophone />}>
+            <Nav.Menu eventKey="2" title="Instruments" icon={<TsGongIcon height="1em" width="1em" color="black" />}>
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
             <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>

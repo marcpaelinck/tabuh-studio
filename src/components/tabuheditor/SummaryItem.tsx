@@ -3,12 +3,10 @@
 // such as editing a field name (e.g. `part` or `label`) or creating/copying a section. After the action is performed
 // the field will contain the result of the action (e.g. new field value or id/label of copied system).
 import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
-import { AiOutlineNumber, AiOutlinePieChart } from 'react-icons/ai'
+import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
-import { FcAddRow, FcDeleteRow } from 'react-icons/fc'
-import { IoArrowForwardOutline, IoPricetagOutline } from 'react-icons/io5'
+import { IoArrowForwardOutline } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
-import { PiCopySimpleLight } from 'react-icons/pi'
 import {
     Col,
     IconButton,
@@ -22,6 +20,11 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { EditorSystemData } from '../../models/types'
+import TsCopyIcon from '../../reacticons/TsCopyIcon'
+import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
+import TsLabelIcon from '../../reacticons/TsLabelIcon'
+import TsNewIcon from '../../reacticons/TsNewIcon'
+import TsPartIcon from '../../reacticons/TsPartIcon'
 import { debug } from '../../utils/debugger'
 
 // Col item formatted to contain summary items
@@ -55,26 +58,25 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     }
     const specs: Record<string, SpecType> = {
         id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id },
-        // '#83C4F9'#1C78E0
-        part: { icon: AiOutlinePieChart, iconcolor: '#1C78E0', action: 'edit', hasfield: true, fieldval: sysData.part },
+        part: { icon: TsPartIcon, iconcolor: '#1C78E0', action: 'edit', hasfield: true, fieldval: sysData.part },
         label: {
-            icon: IoPricetagOutline,
+            icon: TsLabelIcon,
             iconcolor: '#1C78E0',
             action: 'edit',
             hasfield: true,
             fieldval: sysData.label,
             textcolor: 'orange'
         },
-        new: { icon: FcAddRow, iconcolor: '#1C78E0', action: 'new', hasfield: false },
+        new: { icon: TsNewIcon, iconcolor: '#1C78E0', action: 'new', hasfield: false },
         copy: {
-            icon: PiCopySimpleLight,
+            icon: TsCopyIcon,
             iconcolor: '#1C78E0',
             action: 'copy',
             hasfield: true,
             fieldval: sysData.copyfrom,
             textcolor: 'blue'
         },
-        delete: { icon: FcDeleteRow, iconcolor: '#1C78E0', action: 'delete', hasfield: false },
+        delete: { icon: TsDeleteIcon, iconcolor: '#1C78E0', action: 'delete', hasfield: false },
         goto: {
             icon: IoArrowForwardOutline,
             iconcolor: '#1C78E0',
@@ -225,7 +227,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                         onClick={(event: MouseEvent<HTMLElement>) => {
                             buttonAction(event, specs[item].action)
                         }}
-                        className="p-0"
+                        className="pl-0 pr-1 pt-0 pb-0"
                     />
                 </Whisper>
             )}
