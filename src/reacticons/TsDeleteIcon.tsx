@@ -4,7 +4,7 @@ const TsDeleteIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg
         stroke="currentColor"
         fill="currentColor"
-        stroke-width="0"
+        strokeWidth="0"
         viewBox="0 0 188 188"
         version="1.1"
         id="svg1"
