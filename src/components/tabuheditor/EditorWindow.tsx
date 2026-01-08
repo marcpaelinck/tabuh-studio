@@ -280,8 +280,6 @@ export default function EditorWindow({
         () =>
             Object.fromEntries(
                 data.map((systemData) => {
-                    const execute = (fieldname: string, value?: string) =>
-                        summaryItemAction(fieldname, systemData, value)
                     return [
                         systemData.uuid,
                         <Col span={3} className="flex">

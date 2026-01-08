@@ -36,12 +36,16 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             debug(`executing 'load'`)
             if (action.data && action.audiofunctions) {
                 debug(`loading data for sys ${action.data[0].id}`)
-                const timeLine = createTimelineFromEditor(action.data, {
-                    play: action.audiofunctions.playInstrument,
-                    animate: null,
-                    cursor: action.audiofunctions.moveCursor,
-                    generic: action.audiofunctions.genericFunction
-                })
+                const timeLine = createTimelineFromEditor(
+                    action.data,
+                    {
+                        play: action.audiofunctions.playInstrument,
+                        animate: null,
+                        cursor: action.audiofunctions.moveCursor,
+                        generic: action.audiofunctions.genericFunction
+                    },
+                    true
+                )
                 scheduleTransport(timeLine)
                 return { ...state, audioState: 'stopped' }
             }

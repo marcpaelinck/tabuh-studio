@@ -12,7 +12,8 @@ import type {
 } from '../models/types'
 import { cleanSymbol } from './alphabet'
 import { debug } from './debugger'
-import { n2TO, TO2n } from './timeunits'
+import { defaultObject } from './objectUtils'
+import { n2TO } from './timeunits'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,
@@ -25,7 +26,12 @@ const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: 
 }
 
 // Creates a timeline to play back (parts of) the score in the editor
-export function createTimelineFromEditor(data: EditorSystemData[], actionFunctions: ActionFunctions): TimeLine {
+// useCache: if true, the unsaved (cached) user edits will be played back.
+export function createTimelineFromEditor(
+    data: EditorSystemData[],
+    actionFunctions: ActionFunctions,
+    useCache: boolean
+): TimeLine {
     const timeline: TimeLine = {
         totalDurationSec: 0,
         totalDurationTO: n2TO(0),
@@ -40,6 +46,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
     var currTime: number = 0
+    var currNoteStartTime: number = 0
     var sysStartTime: number = 0
     var maxStaffDuration: number = 0
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
@@ -53,11 +60,14 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
         maxStaffDuration = 0
         Object.entries(system.staffs).forEach(([position, measures]) => {
             currTime = sysStartTime
+            currNoteStartTime = sysStartTime
             measures.forEach((measure, measureidx) => {
                 const lastMeasure = lastSystem && measureidx == measures.length - 1
                 cursorPos = 0
-                measure.notation.forEach((symbol, symidx) => {
-                    const endOfPosition = lastMeasure && symidx == measure.notation.length - 1
+                var notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
+                if (!notation) notation = Array(4).fill(defaultObject('JsonSymbol'))
+                notation.forEach((symbol, symidx) => {
+                    const endOfPosition = lastMeasure && symidx == notation.length - 1
                     if (actionFunctions.play && (!isExtension(symbol.s) || endOfPosition)) {
                         // Encountered a new note symbol, a muting symbol or last symbol for this instrument position.
                         if (currNote[position]) {
@@ -65,10 +75,11 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                             // Add a basenote duration if the last symbol of the staff is an extension
                             const addDuration = isExtension(symbol.s) ? 1 : 0
                             // Update the current note's sampler action and save it to the timeline.
-                            currNote[position].duration = n2TO(currTime - TO2n(currNote[position].time) + addDuration)
+                            currNote[position].duration = n2TO(currTime - currNoteStartTime + addDuration)
                             currNote[position].isLast = endOfPosition && isExtension(symbol.s)
                             timeline.sampleractions.push(currNote[position])
                             currNote[position] = null
+                            currNoteStartTime = currTime
                         }
                         if (!isExtension(symbol.s) && !isMuting(symbol.s)) {
                             // Create a sampler action for the new note
@@ -78,7 +89,7 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                                 cleanedSymbol: cleanSymbol(symbol.s),
                                 bpm:
                                     measure.tempo[0] +
-                                    (symidx / measure.notation.length) * (measure.tempo[1] - measure.tempo[0]),
+                                    (symidx / notation.length) * (measure.tempo[1] - measure.tempo[0]),
                                 velocity: velocity,
                                 time: n2TO(currTime),
                                 duration: n2TO(1), // can be updated later
@@ -117,13 +128,13 @@ export function createTimelineFromEditor(data: EditorSystemData[], actionFunctio
                     currTime += 1
                 })
             })
+            maxStaffDuration = Math.max(currTime - sysStartTime, maxStaffDuration)
         })
-        maxStaffDuration = Math.max(currTime - sysStartTime, maxStaffDuration)
     })
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
     if (actionFunctions.generic)
         timeline.genericactions.push({ action: actionFunctions.generic, time: timeline.totalDurationTO })
-    debug(timeline)
+    debug(timeline, true)
     return timeline
 }
 

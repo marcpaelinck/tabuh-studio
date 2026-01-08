@@ -2,6 +2,8 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
+import type { JsonSymbol } from '../models/types'
+
 /**
  * Return the first key in `obj` whose value === `value` (strict equality).
  * Returns `undefined` when no matching value is found.
@@ -41,3 +43,14 @@ export function findKeyByPredicate<T>(
 }
 
 export default findKeyByValue
+
+export type DefaultObjectType = 'JsonSymbol'
+
+export function defaultObject(otype: DefaultObjectType, preset?: Object) {
+    switch (otype) {
+        case 'JsonSymbol': {
+            const pre = preset as JsonSymbol
+            return { sysUuid: '', sectionId: 0, s: pre && 's' in pre ? pre['s'] : '-', t: 0, d: 1 }
+        }
+    }
+}

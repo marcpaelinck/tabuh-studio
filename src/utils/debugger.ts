@@ -1,9 +1,9 @@
 import _ from 'lodash'
 
-//
+// Enable/disable the debug function for each module in the list below.
 const debugOn: Record<string, boolean> = {
-    createSchedule: false,
-    EditorWindow: true,
+    createSchedule: true,
+    EditorWindow: false,
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
@@ -18,18 +18,22 @@ const debugOn: Record<string, boolean> = {
     SummaryItem: false,
     TabuhEditor: false,
     useInstruments: false,
-    useKeyboardListener: false
+    useKeyboard: false,
+    useRules: false
 }
 
-// regex used to parse the call stack to determine the caller module
+// The RegExp constants are used to parse the call stack to determine the
+// module from which the debug function was called
 
 // Split stack in separate lines
 const regExpLineSplit: RegExp = /(.+)(?:[\n\r]+|$)/g
-// Parse a single line: JavaScriptCore (a.o. Firefox)
-const regExpJSC: RegExp = /([\w_\-\/<]+)@.+?([\w_\-]+)\.(?:ts|tsx|js)/g
-// Parse a single line: V8 (a.o. Chrome)
+// Parse a single line: V8 JavaScript engine (Chrome, Edge, Opera, Brave, Node.js, and Electron)
 const regExpV8: RegExp = / +at +([\w_\-]+).+?([\w_\-]+)\.(?:ts|tsx|js)/g
+// Parse a single line: SpiderMonkey engine (Firefox) and JavaScriptCore engine (Safari)
+const regExpJSC: RegExp = /([\w_\-\/<]+)@.+?([\w_\-]+)\.(?:ts|tsx|js)/g
 
+// Use this function in any module that requires debug logging to the console.
+// The name of the module should be added to the above list.
 export const debug = (message: any, raw: boolean = false) => {
     const stack = new Error().stack as string
     // Split in separate text lines
@@ -41,7 +45,7 @@ export const debug = (message: any, raw: boolean = false) => {
     // Validate result.
     var valid = true
     if (!trace || trace.length == 0 || trace[0].length < 3) {
-        console.log('debug: could not determine caller.')
+        console.log('debug: add the caller.')
         valid
     }
     // Next to the original string, parsing should return two captured values:

@@ -1,4 +1,5 @@
 import type { JsonSymbol } from '../models/types'
+// This hook contains the rules that are used for the automatic generation of notation for grouped staves.
 
 // CASTING RULES
 const fromPolos: Record<string, Record<string, string>> = {
@@ -30,10 +31,13 @@ const fromPolos: Record<string, Record<string, string>> = {
     DEFAULT: { 'o,': ' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', '-': '-', '.': '.' }
 }
 
-// POKOK RULES
+// POKOK RULES - the pokok instruments play a selection of the full notation.
+// Keep only the first note of a measure. Other notes will be translated to dashes (extension).
 const onlyFirstNote = ['JEGOGAN', 'CALUNG']
+// Keep only the odd numbered notes (1st, 3rd, etc.) of a measure. Other notes will be translated to dashes (extension).
 const onlyOddNotes = ['PENYACAH']
-const onlyEvenMeasures = ['JEGOGAN']
+// Only prcess even numbered measures
+const onlyOddMeasures = ['JEGOGAN']
 
 // Splits a symbol in a tone (pitch letter + octave character) and the rest (remaining characters).
 const splitTone = (symbol: string): string[] => {
@@ -53,19 +57,20 @@ export function useRules() {
 
         var updatedNotation = notation
         // Apply pokok rules
-        if (onlyEvenMeasures.includes(position) && (measureId + 1) % 2 == 0)
+        if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
+            // Clear even numbered measures. Note that measure numbering starts with 0.
             updatedNotation.forEach((sym) => {
                 sym.s = '-'
             })
-        // updatedNotation = updatedNotation.map((jsonSym) => {
-        //     return { ...jsonSym, ...{ s: '-' } }
-        // })
+        }
         if (onlyOddNotes.includes(position))
             updatedNotation.forEach((sym, idx) => {
+                // Remove even numbered notes.
                 if ((idx + 1) % 2 == 0) sym.s = '-'
             })
         if (onlyFirstNote.includes(position))
             updatedNotation.forEach((sym, idx) => {
+                // Remove all but first note.
                 if (idx > 0) sym.s = '-'
             })
 
