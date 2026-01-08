@@ -6,9 +6,9 @@ import { useInterpretations } from '../../hooks/useInterpretations'
 import {
     type ActionFunctions,
     type AnimationAction,
-    type CursorAction,
     type HighlightRange,
     type MenuItemInfo,
+    type PlayerCursorAction,
     type SamplerAction,
     type Score,
     type SVGInfo,
@@ -78,7 +78,7 @@ export default function ScorePlayer({
     const actionFunctions: ActionFunctions = {
         play: playInstrument,
         animate: animateInstrument,
-        cursor: animateNotation,
+        playercursor: animateNotation,
         generic: null
     }
 
@@ -121,7 +121,7 @@ export default function ScorePlayer({
             Tone.getTransport().schedule((time) => aAction.action(time, aAction), aAction.time)
         })
         // Schedule cursor actions
-        timeline.cursoractions.forEach((cAction: CursorAction) => {
+        timeline.playercursoractions.forEach((cAction: PlayerCursorAction) => {
             Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
         })
 

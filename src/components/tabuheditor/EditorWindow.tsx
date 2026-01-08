@@ -52,11 +52,11 @@ export default function EditorWindow({
         playbackType: 'none'
     })
     const pbCurrUuid = playbackState.cursor.sysUuid
+    debug(`playback state: ${JSON.stringify(playbackState)}`)
     const pbType = playbackState.playbackType
     const pbAudioState = playbackState.audioState
 
     function flipExpanded(key: string) {
-        debug('flipping')
         setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
     }
 

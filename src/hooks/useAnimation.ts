@@ -4,9 +4,9 @@ import { animationConfig, colorRGB } from '../config/config'
 import type {
     AnimationAction,
     AnimationNote,
-    CursorAction,
     HighlightRange,
     MenuItemInfo,
+    PlayerCursorAction,
     SVGInfo
 } from '../models/types'
 import { debug } from '../utils/debugger'
@@ -145,7 +145,7 @@ export const useAnimationEngine = (
     currentFocusRef: RefObject<string[]>,
     pbSpeedRef: RefObject<number>
 ) => {
-    async function highlightCurrentNote(cAction: CursorAction) {
+    async function highlightCurrentNote(cAction: PlayerCursorAction) {
         if (highlightFunctionRef.current) highlightFunctionRef.current({ line: cAction.line, range: cAction.range })
     }
 
@@ -187,7 +187,7 @@ export const useAnimationEngine = (
         [svgInfoRef.current, panggulOptionRef.current, currentFocusRef.current, pbSpeedRef.current]
     )
 
-    const animateNotation = useCallback((time: number, cAction: CursorAction) => {
+    const animateNotation = useCallback((time: number, cAction: PlayerCursorAction) => {
         // if (currentFocus.includes(cAction.position)) {
         if (currentFocusRef.current.length > 0 && currentFocusRef.current[0] === cAction.position) {
             Tone.getDraw().schedule(() => highlightCurrentNote(cAction), time)

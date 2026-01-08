@@ -3,7 +3,7 @@ import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../hooks/playbackReducer'
-import type { CursorAction, EditorSystemData } from '../../models/types'
+import type { PlayerCursorAction as EditorCursorAction, EditorSystemData } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
@@ -36,7 +36,7 @@ export function PlaybackButtons({
         playback({ actionType: 'cursor', cursor: noCursor })
     }
 
-    async function moveCursor(time: number, cAction: CursorAction) {
+    async function moveEditorCursor(time: number, cAction: EditorCursorAction) {
         playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
         debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
         const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
@@ -64,7 +64,7 @@ export function PlaybackButtons({
             playback({
                 actionType: 'load',
                 data: pbType == 'single' ? [data[index]] : data.slice(index, data.length),
-                audiofunctions: Object.assign(audio, { moveCursor, genericFunction: stopPlayback })
+                audiofunctions: Object.assign(audio, { moveEditorCursor, genericFunction: stopPlayback })
             })
             playback({ actionType: 'play', playbackType: pbType })
         }

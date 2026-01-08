@@ -41,12 +41,13 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
                     {
                         play: action.audiofunctions.playInstrument,
                         animate: null,
-                        cursor: action.audiofunctions.moveCursor,
+                        editorcursor: action.audiofunctions.moveEditorCursor,
                         generic: action.audiofunctions.genericFunction
                     },
                     true
                 )
                 scheduleTransport(timeLine)
+                debug({ ...state, audioState: 'stopped' }, true)
                 return { ...state, audioState: 'stopped' }
             }
             console.error('audio reducer: action is "load" but data or functions are missing.')
@@ -56,6 +57,7 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             debug(`executing 'play'`)
             if (action.playbackType) {
                 asyncPlay()
+                debug({ ...state, audioState: 'playing', playbackType: action.playbackType }, true)
                 return { ...state, audioState: 'playing', playbackType: action.playbackType }
             }
             console.error('audio reducer: action is "play" but playback type is missing.')
@@ -75,7 +77,8 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
         case 'cursor':
             debug(`executing 'cursor'`)
             if (action.cursor) {
-                debug(`cursor action exists`)
+                debug(`cursor action is ${JSON.stringify(action)}`)
+                debug({ ...state, cursor: action.cursor }, true)
                 return { ...state, cursor: action.cursor }
             }
             console.error('audio reducer: action is "cursor" but cursor attribute is missing.')

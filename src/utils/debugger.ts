@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 // Enable/disable the debug function for each module in the list below.
 const debugOn: Record<string, boolean> = {
-    createSchedule: true,
+    createSchedule: false,
     EditorWindow: false,
     Menu: false,
     MeasureNode: false,
@@ -35,7 +35,8 @@ const regExpJSC: RegExp = /([\w_\-\/<]+)@.+?([\w_\-]+)\.(?:ts|tsx|js)/g
 // Use this function in any module that requires debug logging to the console.
 // The name of the module should be added to the above list.
 export const debug = (message: any, raw: boolean = false) => {
-    const stack = new Error().stack as string
+    const stack = new Error('debug').stack as string
+    console.log(stack)
     // Split in separate text lines
     const linematches = [...stack?.matchAll(regExpLineSplit)].map((match) => match[1])
     // Try both formats. Parse the second (JSC) or third (V8) line which should contain information

@@ -122,7 +122,7 @@ export type EditorSystemData = {
     part: string
     positions: string[] // sorted list of positions ordered as displayed in the editor
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
-    staffs: Staffs
+    staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string
     goto?: string // label or id of system to which the goto points
@@ -137,7 +137,8 @@ export type EditorCellCursor = { sysUuid: string; measure: number }
 export type GenericFunction = (time: number) => void
 export type SamplerFunction = (time: number, action: SamplerAction) => void
 export type AnimationFunction = (time: number, action: AnimationAction) => void
-export type CursorFunction = (time: number, action: CursorAction) => void
+export type PlayerCursorFunction = (time: number, action: PlayerCursorAction) => void
+export type EditorCursorFunction = (time: number, action: EditorCursorAction) => void
 
 export type GenericAction = { action: GenericFunction; time: BaseNoteTimeObj }
 
@@ -178,8 +179,8 @@ export type AnimationAction = {
     timeuntilMs: number
 }
 
-export type CursorAction = {
-    action: CursorFunction
+export type PlayerCursorAction = {
+    action: PlayerCursorFunction
     time: BaseNoteTimeObj
     position: string
     section: number
@@ -189,13 +190,21 @@ export type CursorAction = {
     range: number[]
 }
 
+export type EditorCursorAction = {
+    action: EditorCursorFunction
+    time: BaseNoteTimeObj
+    section: number
+    sysuuid: string
+}
+
 export type TimeLine = {
     totalDurationSec: number
     totalDurationTO: BaseNoteTimeObj // Total duration expressed as BaseNote units
     tempoactions: TempoAction[]
     sampleractions: SamplerAction[]
     animationactions: AnimationAction[]
-    cursoractions: CursorAction[]
+    playercursoractions: PlayerCursorAction[]
+    editorcursoractions: EditorCursorAction[]
     genericactions: GenericAction[]
     initialBPM: number
     notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
@@ -205,6 +214,7 @@ export type TimeLine = {
 export type ActionFunctions = {
     play: SamplerFunction | null
     animate: AnimationFunction | null
-    cursor: CursorFunction | null
+    playercursor?: PlayerCursorFunction | null
+    editorcursor?: EditorCursorFunction | null
     generic: GenericFunction | null
 }

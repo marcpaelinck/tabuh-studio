@@ -113,7 +113,8 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
         tempoactions: [],
         sampleractions: [],
         animationactions: [],
-        cursoractions: [],
+        playercursoractions: [],
+        editorcursoractions: [],
         genericactions: [], // currently only used for final action when playback reaches end of schedule
         notation: {}
     }
@@ -215,7 +216,7 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
     })
 
     // Create cursor actions
-    if (actionFunctions.cursor) {
+    if (actionFunctions.playercursor) {
         Object.keys(positionNotation).forEach((position) => {
             timeline.notation[position] = []
             const symbols: JsonSymbol[] = positionNotation[position]
@@ -230,9 +231,9 @@ export function createTimeline(score: Score, actionFunctions: ActionFunctions): 
                 if (newSection) currentline += ' '
                 const range = [currentline.length, currentline.length + symbol.s.length]
                 currentline += symbol.s
-                if (!actionFunctions.cursor) return // redundant, this is just to avoid a ts error
-                timeline.cursoractions.push({
-                    action: actionFunctions.cursor,
+                if (!actionFunctions.playercursor) return // redundant, this is just to avoid a ts error
+                timeline.playercursoractions.push({
+                    action: actionFunctions.playercursor,
                     time: n2TO(symbol.t),
                     sysuuid: symbol.sysUuid,
                     section: symbol.sectionId,

@@ -3,9 +3,10 @@ import { positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     ActionFunctions,
-    CursorAction,
+    EditorCursorAction,
     EditorSystemData,
     GenericAction,
+    PlayerCursorAction,
     SamplerAction,
     TempoAction,
     TimeLine
@@ -13,7 +14,7 @@ import type {
 import { cleanSymbol } from './alphabet'
 import { debug } from './debugger'
 import { defaultObject } from './objectUtils'
-import { n2TO } from './timeunits'
+import { n2TO, TO2n } from './timeunits'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,
@@ -39,14 +40,14 @@ export function createTimelineFromEditor(
         tempoactions: [],
         sampleractions: [],
         animationactions: [],
-        cursoractions: [],
+        playercursoractions: [],
+        editorcursoractions: [],
         genericactions: [],
         notation: {}
     }
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
     var currTime: number = 0
-    var currNoteStartTime: number = 0
     var sysStartTime: number = 0
     var maxStaffDuration: number = 0
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
@@ -60,7 +61,6 @@ export function createTimelineFromEditor(
         maxStaffDuration = 0
         Object.entries(system.staffs).forEach(([position, measures]) => {
             currTime = sysStartTime
-            currNoteStartTime = sysStartTime
             measures.forEach((measure, measureidx) => {
                 const lastMeasure = lastSystem && measureidx == measures.length - 1
                 cursorPos = 0
@@ -75,11 +75,10 @@ export function createTimelineFromEditor(
                             // Add a basenote duration if the last symbol of the staff is an extension
                             const addDuration = isExtension(symbol.s) ? 1 : 0
                             // Update the current note's sampler action and save it to the timeline.
-                            currNote[position].duration = n2TO(currTime - currNoteStartTime + addDuration)
+                            currNote[position].duration = n2TO(currTime - TO2n(currNote[position].time) + addDuration)
                             currNote[position].isLast = endOfPosition && isExtension(symbol.s)
                             timeline.sampleractions.push(currNote[position])
                             currNote[position] = null
-                            currNoteStartTime = currTime
                         }
                         if (!isExtension(symbol.s) && !isMuting(symbol.s)) {
                             // Create a sampler action for the new note
@@ -101,20 +100,10 @@ export function createTimelineFromEditor(
                             }
                         }
                     }
-                    // Create cursor and tempo actions if the system-section combi differs
-                    // from the previous entry. Therefore we only one position (KEMPLI).
-                    const last =
-                        timeline.cursoractions.length > 0
-                            ? timeline.cursoractions[timeline.cursoractions.length - 1]
-                            : null
-                    const same =
-                        last != null &&
-                        system.uuid == last.sysuuid &&
-                        measureidx == last.section &&
-                        position == last.position
-                    if (actionFunctions.cursor && !same && position == 'KEMPLI') {
-                        timeline.cursoractions.push({
-                            action: actionFunctions.cursor,
+                    // Create a cursor action
+                    if (actionFunctions.playercursor) {
+                        timeline.playercursoractions.push({
+                            action: actionFunctions.playercursor,
                             time: n2TO(currTime),
                             sysuuid: system.uuid,
                             section: measureidx,
@@ -130,6 +119,30 @@ export function createTimelineFromEditor(
             })
             maxStaffDuration = Math.max(currTime - sysStartTime, maxStaffDuration)
         })
+        // Create editor cursor actions and tempo actions
+        // Select the staff with the most beats. This will ensure that an incomplete notation will be played correctly.
+        const longest = Object.entries(system.staffs).reduce(
+            (acc, [position, measures]) => (measures.length > acc.len ? { pos: position, len: measures.length } : acc),
+            { pos: '', len: 0 }
+        )
+        debug(`longest=${JSON.stringify(longest)}`)
+        if (actionFunctions.editorcursor && longest.pos != '') {
+            const measures = system.staffs[longest.pos]
+            var cursorTime = sysStartTime
+            for (var measureIdx = 0; measureIdx < longest.len; measureIdx++) {
+                timeline.editorcursoractions.push({
+                    action: actionFunctions.editorcursor,
+                    time: n2TO(cursorTime),
+                    sysuuid: system.uuid,
+                    section: measureIdx
+                })
+                cursorTime += Math.max(
+                    measures[measureIdx].notation.length,
+                    measures[measureIdx].notation_?.length || 0
+                )
+                debug(`cursorTime=${currTime}`)
+            }
+        }
     })
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
     if (actionFunctions.generic)
@@ -155,8 +168,13 @@ export function scheduleTransport(timeLine: TimeLine | null, pbSpeed: number = 1
         Tone.getTransport().schedule((time) => sAction.action(time, sAction), sAction.time)
     })
 
-    // Cursor actions
-    timeLine.cursoractions.forEach((cAction: CursorAction) => {
+    // Player Cursor actions
+    timeLine.playercursoractions.forEach((cAction: PlayerCursorAction) => {
+        Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
+    })
+
+    // Editor Cursor actions
+    timeLine.editorcursoractions.forEach((cAction: EditorCursorAction) => {
         Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
     })
 
