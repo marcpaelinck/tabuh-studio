@@ -113,7 +113,7 @@ export default function EditorWindow({
         data.forEach((sys) => {
             if (sys.part != currPart && !(sys.part in newPartColors)) {
                 debug(`adding ${sys.part} to color collection`)
-                const color = colorPalette[Object.keys(newPartColors).length]
+                const color = colorPalette[Object.keys(newPartColors).length % colorPalette.length]
                 newPartColors[sys.part] = color
                 currPart = sys.part
             }
@@ -390,8 +390,10 @@ export default function EditorWindow({
             return (
                 <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
                     <Row>
-                        <Col span={'auto'} background={partColor} className="w-3">
-                            <div className={`m-auto [writing-mode:vertical-rl]`} style={{ background: partColor }}>
+                        <Col span={'auto'} background={partColor} className="box items-center grow-[0.5]">
+                            <div
+                                className={`m-auto [writing-mode:vertical-rl] overflow-hidden`}
+                                style={{ background: partColor }}>
                                 {partName}
                             </div>
                         </Col>
