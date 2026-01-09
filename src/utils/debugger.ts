@@ -3,7 +3,7 @@ import _ from 'lodash'
 // Enable/disable the debug function for each module in the list below.
 const debugOn: Record<string, boolean> = {
     createSchedule: false,
-    EditorWindow: true,
+    EditorWindow: false,
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
