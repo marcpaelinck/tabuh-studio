@@ -1,5 +1,6 @@
 import { fileExists } from '../utils/filesystem'
-import { doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
+import { rgbToHex } from '../utils/measurements'
+import { colorRGB, doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
 
 export function soundFiles(notes: string[], fileTemplate: string): string[] {
     return notes.map(([tone, muting]) => fileTemplate.replace('{tone}', `${tone}`).replace('{muting}', `${muting}`))
@@ -32,6 +33,10 @@ async function sanityCheck() {
     if (logMessage) console.error(logMessage)
 }
 if (doSanityCheck) sanityCheck()
+
+export function colorHex() {
+    return Object.fromEntries(Object.entries(colorRGB).map(([key, rgb]) => [key, rgbToHex(rgb)]))
+}
 
 // const alphaToDict = () => {
 //     const entries: [string, any][] = Object.entries(instrumentConfigs).map(([pos, info]) => {

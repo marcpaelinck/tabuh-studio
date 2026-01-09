@@ -13,7 +13,7 @@ import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { v4 as uuidv4 } from 'uuid'
-import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
+import { editorInitialExpandState, editorSortingOrder, partColorPalette } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
 import { useInstruments } from '../../hooks/useInstruments'
 import type { EditorSystemData, Score, Staffs } from '../../models/types'
@@ -25,6 +25,9 @@ import { SCol, SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
+
+const colorPalette = Object.values(partColorPalette)
+// debug(colorPalette)
 
 export default function EditorWindow({
     score,
@@ -43,6 +46,7 @@ export default function EditorWindow({
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
+    const [partColors, setPartColors] = useState<Record<string, string>>({})
 
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
@@ -56,8 +60,12 @@ export default function EditorWindow({
     const pbType = playbackState.playbackType
     const pbAudioState = playbackState.audioState
 
-    function flipExpanded(key: string) {
-        setExpanded({ ...expanded, ...Object.fromEntries([[key, !expanded[key]]]) })
+    function flipExpanded(uuid: string) {
+        setExpanded({ ...expanded, ...Object.fromEntries([[uuid, !expanded[uuid]]]) })
+    }
+
+    function expandIfNotExpanded(uuid: string, expand: boolean) {
+        if (expanded[uuid] != expand) flipExpanded(uuid)
     }
 
     useEffect(() => {
@@ -99,6 +107,19 @@ export default function EditorWindow({
         const allKeys = Object.fromEntries(data.map((sys) => [sys.uuid, false]))
         const existingKeys = _.pick(expanded, Object.keys(allKeys))
         setExpanded({ ...allKeys, ...existingKeys })
+        // Set the colors for each part of the score
+        const newPartColors: Record<string, string> = {}
+        var currPart = ''
+        data.forEach((sys) => {
+            if (sys.part != currPart && !(sys.part in newPartColors)) {
+                debug(`adding ${sys.part} to color collection`)
+                const color = colorPalette[Object.keys(newPartColors).length]
+                newPartColors[sys.part] = color
+                currPart = sys.part
+            }
+            setPartColors(newPartColors)
+        })
+        debug(`part colors: ${JSON.stringify(newPartColors)}`)
     }, [data])
 
     function updateSystemData(sysData: EditorSystemData) {
@@ -273,7 +294,7 @@ export default function EditorWindow({
     }
 
     // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
-    // minimize rendering because it interferes badly with the audio playback functions.
+    // minimize rendering because it interferes with the audio playback functions.
     // Thesse objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
     const systemIdPrefix = 'system-'
     const systemHeaderButtons: Record<string, ReactElement> = useMemo(
@@ -290,6 +311,7 @@ export default function EditorWindow({
                                 playback={playback}
                                 hasCursor={systemData.uuid == pbCurrUuid}
                                 playbackType={pbType}
+                                expandIfNotExpanded={expandIfNotExpanded}
                                 playbackAudioState={pbAudioState}
                                 className="content-start"
                             />
@@ -347,51 +369,67 @@ export default function EditorWindow({
         [data]
     )
 
-    const systems = useMemo(
-        () =>
-            data.map((systemData) => {
-                // Update the 'copyfrom' field with the source's label or id.
-                // This value can change due to user edits.
-                // if (systemData.copyfromkey) {
-                //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
-                //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
-                // }
-                // Structure:
-                // - Panel Header: contains context menu and System summary information
-                // - Panel content (visible when panel is expanded): System grid (SystemNode)
-                return (
-                    <Accordion.Panel
-                        id={`${systemIdPrefix}${systemData.uuid}`}
-                        key={systemData.uuid}
-                        // Panel Header
-                        header={
-                            <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
-                                {/* Displays info about the System */}
-                                <Row id="row">
-                                    {systemHeaderButtons[systemData.uuid]}
-                                    {systemHeaderFields[systemData.uuid]}
-                                </Row>
-                            </Grid>
-                        }
-                        expanded={expanded[systemData.uuid]}
-                        onSelect={() => {
-                            flipExpanded(systemData.uuid)
-                        }}>
-                        {/* Panel content: visible when panel is expanded */}
+    const systems = useMemo(() => {
+        var currPartName = ''
+        var partName = ''
+        return data.map((systemData) => {
+            // Update the 'copyfrom' field with the source's label or id.
+            // This value can change due to user edits.
+            // if (systemData.copyfromkey) {
+            //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
+            //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
+            // }
+            // Structure:
+            // - Panel Header: contains context menu and System summary information
+            // - Panel content (visible when panel is expanded): System grid (SystemNode)
+            const partColor = systemData.part in partColors ? partColors[systemData.part] : undefined
+            if (systemData.part != currPartName) {
+                currPartName = systemData.part
+                partName = systemData.part
+            } else partName = ' '
+            return (
+                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
+                    <Row>
+                        <Col span={'auto'} background={partColor} className="w-3">
+                            <div className={`m-auto [writing-mode:vertical-rl]`} style={{ background: partColor }}>
+                                {partName}
+                            </div>
+                        </Col>
+                        <Col span={23}>
+                            <Accordion.Panel
+                                id={`${systemIdPrefix}${systemData.uuid}`}
+                                key={systemData.uuid}
+                                // Panel Header
+                                header={
+                                    <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
+                                        {/* Displays info about the System */}
+                                        <Row id="row">
+                                            {systemHeaderButtons[systemData.uuid]}
+                                            {systemHeaderFields[systemData.uuid]}
+                                        </Row>
+                                    </Grid>
+                                }
+                                expanded={expanded[systemData.uuid]}
+                                onSelect={() => {
+                                    flipExpanded(systemData.uuid)
+                                }}>
+                                {/* Panel content: visible when panel is expanded */}
 
-                        {expanded[systemData.uuid] && (
-                            <SystemNode
-                                systemData={systemData}
-                                updateSystemData={updateSystemData}
-                                playbackState={playbackState}
-                                visible={expanded[systemData.uuid]}
-                            />
-                        )}
-                    </Accordion.Panel>
-                )
-            }),
-        [data, expanded, playbackState]
-    )
+                                {expanded[systemData.uuid] && (
+                                    <SystemNode
+                                        systemData={systemData}
+                                        updateSystemData={updateSystemData}
+                                        playbackState={playbackState}
+                                        visible={expanded[systemData.uuid]}
+                                    />
+                                )}
+                            </Accordion.Panel>
+                        </Col>
+                    </Row>
+                </Grid>
+            )
+        })
+    }, [data, expanded, playbackState])
 
     return (
         <AudioFunctions value={audioFunctions}>

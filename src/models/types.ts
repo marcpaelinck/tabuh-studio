@@ -130,6 +130,9 @@ export type EditorSystemData = {
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // uuid copied system
 }
+
+export type EditorScore = { parts: Record<string, string>; systems: EditorSystemData[] }
+
 export type EditorCellCursor = { sysUuid: string; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
@@ -194,6 +197,7 @@ export type EditorCursorAction = {
     action: EditorCursorFunction
     time: BaseNoteTimeObj
     section: number
+    prevsysuuid: string | undefined
     sysuuid: string
 }
 

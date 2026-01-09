@@ -54,6 +54,22 @@ export const editorSortingOrder = [
     'KEMPLI'
 ]
 
+export const partColorPalette: Record<string, string> = {
+    Emerald: '#06d6a0',
+    'Sky Aqua': '#54c6eb',
+    'Lavender Grey': '#8a89c0',
+    'Rosy Taupe': '#cda2ab',
+    'Grey Olive': '#94958b',
+    'Pale Slate': '#b7b6c1',
+    Lavender: '#d5cfe1',
+    'Lavender Veil': '#eddfef',
+    'Dry Sage': '#cacaaa',
+    'Apricot Cream': '#eec584',
+    Tan: '#c8ab83',
+    'Dark Cyan': '#55868c',
+    'Smoky Rose': '#7f636e'
+}
+
 // PLAYER
 
 // List of playback speeds for selector
@@ -715,18 +731,6 @@ export const animationConfig: Record<string, Partial<Record<MutingType | ToneTyp
 }
 
 export const colorRGB: Record<string, number[]> = {
-    'l-green': [0, 255, 0],
-    'm-green': [0, 160, 0],
-    'd-green': [0, 80, 0],
-    'l-blue': [0, 0, 255],
-    'm-blue': [0, 0, 160],
-    'd-blue': [0, 0, 80],
-    'l-cyan': [0, 255, 255],
-    'm-cyan': [0, 160, 160],
-    'd-cyan': [0, 80, 80],
-    'l-magenta': [255, 0, 255],
-    'm-magenta': [160, 0, 160],
-    'd-magenta': [80, 0, 80],
     aliceblue: [240, 248, 255],
     antiquewhite: [250, 235, 215],
     aqua: [0, 255, 255],
@@ -873,5 +877,17 @@ export const colorRGB: Record<string, number[]> = {
     white: [255, 255, 255],
     whitesmoke: [245, 245, 245],
     yellow: [255, 255, 0],
-    yellowgreen: [154, 205, 50]
+    yellowgreen: [154, 205, 50],
+    'l-green': [0, 255, 0],
+    'm-green': [0, 160, 0],
+    'd-green': [0, 80, 0],
+    'l-blue': [0, 0, 255],
+    'm-blue': [0, 0, 160],
+    'd-blue': [0, 0, 80],
+    'l-cyan': [0, 255, 255],
+    'm-cyan': [0, 160, 160],
+    'd-cyan': [0, 80, 80],
+    'l-magenta': [255, 0, 255],
+    'm-magenta': [160, 0, 160],
+    'd-magenta': [80, 0, 80]
 }

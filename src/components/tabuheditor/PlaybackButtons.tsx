@@ -3,7 +3,7 @@ import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../hooks/playbackReducer'
-import type { PlayerCursorAction as EditorCursorAction, EditorSystemData } from '../../models/types'
+import type { EditorCursorAction, EditorSystemData } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
@@ -15,7 +15,7 @@ export function PlaybackButtons({
     hasCursor,
     playbackType,
     playbackAudioState,
-    // playbackState,
+    expandIfNotExpanded,
     playback,
     ...props
 }: {
@@ -26,6 +26,7 @@ export function PlaybackButtons({
     hasCursor: boolean
     playbackType: PlaybackType
     playbackAudioState: AudioState
+    expandIfNotExpanded: (uuid: string, expand: boolean) => void
     playback: (action: PlaybackAction) => void
 } & HTMLAttributes<HTMLDivElement>) {
     const audio: AudioFunctionsType = useContext(AudioFunctions)
@@ -37,6 +38,8 @@ export function PlaybackButtons({
     }
 
     async function moveEditorCursor(time: number, cAction: EditorCursorAction) {
+        if (cAction.prevsysuuid) expandIfNotExpanded(cAction.prevsysuuid, false)
+        expandIfNotExpanded(cAction.sysuuid, true)
         playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
         debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
         const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)

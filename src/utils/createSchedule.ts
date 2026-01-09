@@ -47,6 +47,7 @@ export function createTimelineFromEditor(
     }
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
+    var prevSystem: EditorSystemData | null = null
     var currTime: number = 0
     var sysStartTime: number = 0
     var maxStaffDuration: number = 0
@@ -54,8 +55,11 @@ export function createTimelineFromEditor(
         Object.keys(positionConfigs).map((key) => [key, null])
     )
     var cursorPos = 0
+    var sysidx = 0
+    const passcounter: Record<string, number> = {}
 
-    data.forEach((system, sysidx) => {
+    while (sysidx < data.length) {
+        const system = data[sysidx]
         const lastSystem = sysidx == data.length - 1
         sysStartTime += maxStaffDuration
         maxStaffDuration = 0
@@ -133,6 +137,7 @@ export function createTimelineFromEditor(
                 timeline.editorcursoractions.push({
                     action: actionFunctions.editorcursor,
                     time: n2TO(cursorTime),
+                    prevsysuuid: prevSystem?.uuid || undefined,
                     sysuuid: system.uuid,
                     section: measureIdx
                 })
@@ -143,7 +148,14 @@ export function createTimelineFromEditor(
                 debug(`cursorTime=${currTime}`)
             }
         }
-    })
+        prevSystem = system
+        if (system.gotokey) {
+            if (!(system.uuid in passcounter)) passcounter[system.uuid] = 1
+            else passcounter[system.uuid] += 1
+            if (passcounter[system.uuid] <= 2) sysidx = data.findIndex((sys) => sys.uuid == system.gotokey)
+            else sysidx += 1
+        } else sysidx += 1
+    }
     timeline.totalDurationTO = n2TO(sysStartTime + maxStaffDuration)
     if (actionFunctions.generic)
         timeline.genericactions.push({ action: actionFunctions.generic, time: timeline.totalDurationTO })

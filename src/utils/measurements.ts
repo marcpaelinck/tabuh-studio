@@ -1,3 +1,5 @@
+import _ from 'lodash'
+
 export function getTextWidthInPx(text: string, fontSize: number): number {
     const textField = document.createElement('span')
     document.body.appendChild(textField)
@@ -17,4 +19,12 @@ export function getTextWidthInPx(text: string, fontSize: number): number {
 
     document.body.removeChild(textField)
     return formattedWidth
+}
+
+export function rgbToHex(rgb: number[]): string {
+    const hexArray = _.map(rgb, (num: string) => {
+        const as16 = _.parseInt(num).toString(16)
+        return `${_.size(as16) === 1 ? '0' : ''}${as16}`
+    })
+    return `#${hexArray.join('')}`
 }
