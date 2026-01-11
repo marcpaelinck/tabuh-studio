@@ -131,7 +131,7 @@ export type EditorSystemData = {
     copyfromkey?: string // uuid copied system
 }
 
-export type EditorScore = { parts: Record<string, string>; systems: EditorSystemData[] }
+export type EditorScore = { parts: Record<string, string[]>; systems: EditorSystemData[] }
 
 export type EditorCellCursor = { sysUuid: string; measure: number }
 

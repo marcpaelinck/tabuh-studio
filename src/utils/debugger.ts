@@ -7,6 +7,7 @@ const debugOn: Record<string, boolean> = {
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
+    PartIndicator: false,
     PlaybackButtons: false,
     playbackReducer: false,
     registerComponent: false,
@@ -19,6 +20,7 @@ const debugOn: Record<string, boolean> = {
     TabuhEditor: false,
     useInstruments: false,
     useKeyboard: false,
+    usePartManager: false,
     useRules: false
 }
 
@@ -43,10 +45,8 @@ export const debug = (message: any, raw: boolean = false) => {
     var trace = [...linematches[1]?.matchAll(regExpJSC)]
     if (trace.length == 0) trace = [...linematches[2]?.matchAll(regExpV8)]
     // Validate result.
-    var valid = true
     if (!trace || trace.length == 0 || trace[0].length < 3) {
         console.log('debug: add the caller.')
-        valid
     }
     // Next to the original string, parsing should return two captured values:
     // the calling function and the name of its module.
@@ -55,11 +55,12 @@ export const debug = (message: any, raw: boolean = false) => {
     if (!(module in debugOn)) console.log(`debug: no entry for ${module}.`)
 
     if (debugOn[module]) {
-        if (raw) {
+        const callerTxt = module ? `${func} [${module}]` : ''
+        if (raw || typeof message == 'object') {
+            if (!raw) console.log(`${callerTxt}:`)
             console.log(message)
             return
         }
-        const callerTxt = module ? `${func} [${module}]` : ''
         var logText = message
         if (_.isArray(message) || _.isObject(message)) logText = JSON.stringify(message)
         console.log(`${callerTxt}: ${logText}`)

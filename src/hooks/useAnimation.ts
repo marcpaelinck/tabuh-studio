@@ -1,6 +1,6 @@
 import { useCallback, type Dispatch, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { animationConfig, colorRGB } from '../config/config'
+import { animationConfig, colorPalette, type ColorName } from '../config/config'
 import type {
     AnimationAction,
     AnimationNote,
@@ -21,14 +21,14 @@ const bezierStroke = 'cubic-bezier(.99,-0.01,1,.51)' // timing curve for stroke 
 // will then be selected from the list of colors, reusing the colors if positionSeq is larger than the number of
 // available colors.
 const getHighlightRGB = (note: AnimationNote, positionSeq: number = 0): number[] => {
-    const colors: string[] =
+    const colors: ColorName[] =
         animationConfig.highlight[note.tone] ||
         animationConfig.highlight[note.muting] ||
         Object.values(animationConfig.highlight)[0]
     if (!colors) return []
     var color_id = positionSeq % colors.length
-    var colorName: string = colors[color_id]
-    return colorRGB[colorName] || []
+    var colorName: ColorName = colors[color_id] as ColorName
+    return colorPalette[colorName].rgb || []
 }
 
 async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {

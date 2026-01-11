@@ -3,13 +3,13 @@ import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../hooks/playbackReducer'
-import type { EditorCursorAction, EditorSystemData } from '../../models/types'
+import type { EditorCursorAction, EditorScore } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
 export function PlaybackButtons({
-    data,
+    score,
     sysUuid,
     systemIdPrefix,
     hasCursor,
@@ -19,7 +19,7 @@ export function PlaybackButtons({
     playback,
     ...props
 }: {
-    data: EditorSystemData[]
+    score: EditorScore
     sysUuid: string
     systemIdPrefix: string
     // playbackState: PlaybackState
@@ -59,14 +59,14 @@ export function PlaybackButtons({
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
             debug(`playing sys seq=${sysUuid}`)
-            // Load new data
-            const index = data.findIndex((sysData) => sysData.uuid == sysUuid)
+            // Load new score
+            const index = score.systems.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
                 console.error(`no playback data found for system ${sysUuid}`)
             }
             playback({
                 actionType: 'load',
-                data: pbType == 'single' ? [data[index]] : data.slice(index, data.length),
+                data: pbType == 'single' ? [score.systems[index]] : score.systems.slice(index, score.systems.length),
                 audiofunctions: Object.assign(audio, { moveEditorCursor, genericFunction: stopPlayback })
             })
             playback({ actionType: 'play', playbackType: pbType })

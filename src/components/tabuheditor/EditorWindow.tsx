@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import {
+    Profiler,
     useEffect,
     useMemo,
     useReducer,
@@ -13,21 +14,21 @@ import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { v4 as uuidv4 } from 'uuid'
-import { editorInitialExpandState, editorSortingOrder, partColorPalette } from '../../config/config'
+import { editorInitialExpandState, editorSortingOrder } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
 import { useInstruments } from '../../hooks/useInstruments'
-import type { EditorSystemData, Score, Staffs } from '../../models/types'
+import { usePartManager } from '../../hooks/usePartManager'
+import type { EditorScore, EditorSystemData, Score, Staffs } from '../../models/types'
 import { debug } from '../../utils/debugger'
+import { defaultObject } from '../../utils/objectUtils'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
+import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
-
-const colorPalette = Object.values(partColorPalette)
-// debug(colorPalette)
 
 export default function EditorWindow({
     score,
@@ -40,13 +41,14 @@ export default function EditorWindow({
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
 } & HTMLAttributes<HTMLDivElement>) {
-    const [data, setData] = useState<EditorSystemData[]>([])
+    const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
     const [labels, setLabels] = useState<Record<string, EditorSystemData>>({})
     const [processing, setProcessing] = useState<boolean>(false)
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
-    const [partColors, setPartColors] = useState<Record<string, string>>({})
+    const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
+        usePartManager(editorScore)
 
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
@@ -56,7 +58,6 @@ export default function EditorWindow({
         playbackType: 'none'
     })
     const pbCurrUuid = playbackState.cursor.sysUuid
-    debug(`playback state: ${JSON.stringify(playbackState)}`)
     const pbType = playbackState.playbackType
     const pbAudioState = playbackState.audioState
 
@@ -71,8 +72,16 @@ export default function EditorWindow({
     useEffect(() => {
         // Convert new score to data record structure
         setProcessing(true)
-        const newData: EditorSystemData[] = []
+        const newScore: EditorScore = defaultObject('EditorScore')
+        var currentPart: string = ''
         score.systems.forEach((system, sysIdx) => {
+            // Update part information
+            if (system.part) currentPart = system.part
+            if (currentPart != '') {
+                if (!(currentPart in newScore.parts)) newScore.parts[currentPart] = []
+                newScore.parts[currentPart].push(system.uuid)
+            }
+
             const positions = Object.keys(system.sections[0].staves).toSorted(
                 (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
             )
@@ -82,21 +91,23 @@ export default function EditorWindow({
             const staffs: Staffs = Object.fromEntries(
                 positions.map((position) => [position, system.sections.map((section) => section.staves[position])])
             )
-            const summary: EditorSystemData = {
+            const systemData: EditorSystemData = {
                 index: sysIdx,
                 id: sysIdx + 1,
                 uuid: system.uuid,
-                part: system.part,
+                part: currentPart,
                 positions: positions,
                 grouped: [],
                 staffs: staffs,
                 colWidths: colWidths
             }
-            newData.push(summary)
+            newScore.systems.push(systemData)
         })
-        debug(newData)
-        setData(newData)
-        const initExpandState = Object.fromEntries(newData.map((sysInfo) => [sysInfo.index, editorInitialExpandState]))
+        setEditorScore(newScore)
+
+        const initExpandState = Object.fromEntries(
+            newScore.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
+        )
         setExpanded(initExpandState)
         setProcessing(false)
     }, [score])
@@ -104,35 +115,25 @@ export default function EditorWindow({
     // Update the list of expanded panels which is maintained in te TabuhEditor.
     // Keys (systems) might have been added or deleted.
     useEffect(() => {
-        const allKeys = Object.fromEntries(data.map((sys) => [sys.uuid, false]))
+        if (!editorScore) return
+        const allKeys = Object.fromEntries(editorScore.systems.map((sys) => [sys.uuid, false]))
         const existingKeys = _.pick(expanded, Object.keys(allKeys))
         setExpanded({ ...allKeys, ...existingKeys })
-        // Set the colors for each part of the score
-        const newPartColors: Record<string, string> = {}
-        var currPart = ''
-        data.forEach((sys) => {
-            if (sys.part != currPart && !(sys.part in newPartColors)) {
-                debug(`adding ${sys.part} to color collection`)
-                const color = colorPalette[Object.keys(newPartColors).length % colorPalette.length]
-                newPartColors[sys.part] = color
-                currPart = sys.part
-            }
-            setPartColors(newPartColors)
-        })
-        debug(`part colors: ${JSON.stringify(newPartColors)}`)
-    }, [data])
+    }, [editorScore])
 
     function updateSystemData(sysData: EditorSystemData) {
         const sysIdx = sysData.index
-        const newData = [...data.slice(0, sysIdx), sysData, ...data.slice(sysIdx + 1)]
-        setData(newData)
+        const newScore: EditorScore = { ...editorScore }
+        const systems = editorScore.systems
+        newScore.systems = [...systems.slice(0, sysIdx), sysData, ...systems.slice(sysIdx + 1)]
+        setEditorScore(newScore)
     }
 
-    function updatePointers(newData: EditorSystemData[]) {
+    function updatePointers(newSystemData: EditorSystemData[]) {
         // Update fields that depend on pointers to another system
-        newData.map((systemData) => {
+        newSystemData.map((systemData) => {
             if (systemData.copyfromkey) {
-                const source = newData.find((sysData) => sysData.uuid == systemData.copyfromkey)
+                const source = newSystemData.find((sysData) => sysData.uuid == systemData.copyfromkey)
                 if (source && source.uuid != systemData.uuid)
                     systemData.copyfrom = source.label ? source.label : `#${source.id}`
                 else {
@@ -141,7 +142,7 @@ export default function EditorWindow({
                 }
             } else systemData.copyfrom = undefined
             if (systemData.gotokey) {
-                const destination = newData.find((sysData) => sysData.uuid == systemData.gotokey)
+                const destination = newSystemData.find((sysData) => sysData.uuid == systemData.gotokey)
                 if (destination) {
                     debug(`found goto destination ${destination.uuid}`)
                     {
@@ -204,7 +205,7 @@ export default function EditorWindow({
                 break
             }
             case 'copy': {
-                const source = data.find((sys) => sys.uuid == value)
+                const source = editorScore.systems.find((sys) => sys.uuid == value)
                 debug(source)
                 if (!source) {
                     console.error(`copy system: could not find system ${value}`)
@@ -223,7 +224,7 @@ export default function EditorWindow({
                 if (!value) {
                     newSystemData.gotokey = undefined
                 } else {
-                    const destination = data.find((sys) => sys.uuid == value)
+                    const destination = editorScore.systems.find((sys) => sys.uuid == value)
                     if (!destination) {
                         console.error(`goto: could not find system ${value}`)
                         return
@@ -245,21 +246,21 @@ export default function EditorWindow({
         }
         // Replace, remove or insert system
         const newData = newSystemData
-            ? [...data.slice(0, sliceIndex1), newSystemData, ...data.slice(sliceIndex2)]
-            : [...data.slice(0, sliceIndex1), ...data.slice(sliceIndex2)]
+            ? [...editorScore.systems.slice(0, sliceIndex1), newSystemData, ...editorScore.systems.slice(sliceIndex2)]
+            : [...editorScore.systems.slice(0, sliceIndex1), ...editorScore.systems.slice(sliceIndex2)]
         // Update all system IDs
         newData.forEach((sysData, sysIdx) => {
             sysData.index = sysIdx
             sysData.id = sysIdx + 1
         })
         updatePointers(newData)
-        setData(newData)
+        setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
 
     // (Re-) number the system index and id values.
     // Should be performed at each render due to possible user actions (insert or delete system).
     const gotoTargets: string[] = []
-    data.forEach((systemData, sysIdx) => {
+    editorScore.systems.forEach((systemData, sysIdx) => {
         systemData.index = sysIdx
         systemData.id = systemData.index + 1
         if (systemData.gotokey) gotoTargets.push(systemData.gotokey)
@@ -276,7 +277,7 @@ export default function EditorWindow({
         const labelledUuid = labelOptions.map((entry) => entry.value)
         //
         // 2. List of non-labelled systems
-        const idOptions: InputOption<string>[] = data
+        const idOptions: InputOption<string>[] = editorScore.systems
             .filter((sysData) => !labelledUuid.includes(sysData.uuid))
             .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
         // Merge both lists
@@ -300,12 +301,12 @@ export default function EditorWindow({
     const systemHeaderButtons: Record<string, ReactElement> = useMemo(
         () =>
             Object.fromEntries(
-                data.map((systemData) => {
+                editorScore.systems.map((systemData) => {
                     return [
                         systemData.uuid,
-                        <Col span={3} className="flex">
+                        <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">
                             <PlaybackButtons
-                                data={data}
+                                score={editorScore}
                                 sysUuid={systemData.uuid}
                                 systemIdPrefix={systemIdPrefix}
                                 playback={playback}
@@ -319,12 +320,12 @@ export default function EditorWindow({
                     ]
                 })
             ),
-        [data, pbCurrUuid, pbType, pbAudioState]
+        [editorScore, pbCurrUuid, pbType, pbAudioState]
     )
     const systemHeaderFields: Record<string, ReactElement> = useMemo(
         () =>
             Object.fromEntries(
-                data.map((systemData) => {
+                editorScore.systems.map((systemData) => {
                     const execute = (fieldname: string, value?: string) =>
                         summaryItemAction(fieldname, systemData, value)
                     return [
@@ -332,9 +333,6 @@ export default function EditorWindow({
                         <>
                             <SCol span={2}>
                                 <SummaryItem item="id" sysData={systemData} />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="part" sysData={systemData} execute={execute} />
                             </SCol>
                             <SCol span={4}>
                                 <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
@@ -366,80 +364,85 @@ export default function EditorWindow({
                     ]
                 })
             ),
-        [data]
+        [editorScore]
     )
 
+    function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
+        // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
+    }
+
     const systems = useMemo(() => {
-        var currPartName = ''
-        var partName = ''
-        return data.map((systemData) => {
-            // Update the 'copyfrom' field with the source's label or id.
-            // This value can change due to user edits.
-            // if (systemData.copyfromkey) {
-            //     const source = data.find((sysData) => sysData.uuid == systemData.copyfromkey)
-            //     if (source) systemData.copyfrom = source.label ? source.label : `#${source.id}`
-            // }
+        // currPartName is used to determine the first system of the part so that the part name only appears once.
+        var rangePartName: string = ''
+        return editorScore.systems.map((systemData) => {
             // Structure:
             // - Panel Header: contains context menu and System summary information
             // - Panel content (visible when panel is expanded): System grid (SystemNode)
-            const partColor = systemData.part in partColors ? partColors[systemData.part] : undefined
-            if (systemData.part != currPartName) {
-                currPartName = systemData.part
-                partName = systemData.part
-            } else partName = ' '
+            const partName = getPartName(systemData.uuid)
+            const partColor = getPartColor(partName)
+            const firstOfRange = partName != rangePartName
+            if (firstOfRange) rangePartName = partName
             return (
-                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
-                    <Row>
-                        <Col span={'auto'} background={partColor} className="box items-center grow-[0.5]">
-                            <div
-                                className={`m-auto [writing-mode:vertical-rl] overflow-hidden`}
-                                style={{ background: partColor }}>
-                                {partName}
-                            </div>
-                        </Col>
-                        <Col span={23}>
-                            <Accordion.Panel
-                                id={`${systemIdPrefix}${systemData.uuid}`}
-                                key={systemData.uuid}
-                                // Panel Header
-                                header={
-                                    <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
-                                        {/* Displays info about the System */}
-                                        <Row id="row">
-                                            {systemHeaderButtons[systemData.uuid]}
-                                            {systemHeaderFields[systemData.uuid]}
-                                        </Row>
-                                    </Grid>
-                                }
-                                expanded={expanded[systemData.uuid]}
-                                onSelect={() => {
-                                    flipExpanded(systemData.uuid)
-                                }}>
-                                {/* Panel content: visible when panel is expanded */}
+                <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
+                    <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
+                        <Row>
+                            {/* Left margin containing the part name */}
+                            <PartIndicator
+                                uuid={systemData.uuid}
+                                partName={partName}
+                                partColor={partColor}
+                                firstOfRange={firstOfRange}
+                                selectionOn={selectionOn}
+                                toggleSelection={toggleSelection}
+                                extendSelection={extendSelection}
+                            />
+                            {/* Expandable panel containing a system */}
+                            <Col span={23}>
+                                <Accordion.Panel
+                                    id={`${systemIdPrefix}${systemData.uuid}`}
+                                    key={systemData.uuid}
+                                    // Panel Header
+                                    header={
+                                        <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
+                                            {/* Displays playback buttons and info about the System */}
+                                            <Row id="row">
+                                                {systemHeaderButtons[systemData.uuid]}
+                                                {systemHeaderFields[systemData.uuid]}
+                                            </Row>
+                                        </Grid>
+                                    }
+                                    expanded={expanded[systemData.uuid]}
+                                    onSelect={() => {
+                                        flipExpanded(systemData.uuid)
+                                    }}>
+                                    {/* Panel content: visible when panel is expanded */}
 
-                                {expanded[systemData.uuid] && (
-                                    <SystemNode
-                                        systemData={systemData}
-                                        updateSystemData={updateSystemData}
-                                        playbackState={playbackState}
-                                        visible={expanded[systemData.uuid]}
-                                    />
-                                )}
-                            </Accordion.Panel>
-                        </Col>
-                    </Row>
-                </Grid>
+                                    {expanded[systemData.uuid] && (
+                                        <SystemNode
+                                            systemData={systemData}
+                                            updateSystemData={updateSystemData}
+                                            playbackState={playbackState}
+                                            visible={expanded[systemData.uuid]}
+                                        />
+                                    )}
+                                </Accordion.Panel>
+                            </Col>
+                        </Row>
+                    </Grid>
+                </Profiler>
             )
         })
-    }, [data, expanded, playbackState])
+    }, [editorScore, expanded, playbackState, selectionOn, sysToPartLookup])
 
     return (
-        <AudioFunctions value={audioFunctions}>
-            {loading || processing ? (
-                <Placeholder.Grid rows={12} columns={6} />
-            ) : (
-                <Accordion className="w-full">{systems}</Accordion>
-            )}
-        </AudioFunctions>
+        <Profiler id="App" onRender={onRender}>
+            <AudioFunctions value={audioFunctions}>
+                {loading || processing ? (
+                    <Placeholder.Grid rows={12} columns={6} />
+                ) : (
+                    <Accordion className="w-full">{systems}</Accordion>
+                )}
+            </AudioFunctions>
+        </Profiler>
     )
 }

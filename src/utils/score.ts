@@ -25,13 +25,10 @@ export function parseScore(input: string): Score {
     // This function also calculates times in ms for each note, to be used by the animation.
     // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
     var currentTimeMs = defaultIntroTime
-    var currentPart = ''
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
     const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, score.systems[0].sections[0].tempo[0])
     score.systems.forEach((system, sysidx, systemArray) => {
         system.uuid = uuidv4()
-        if (system.part) currentPart = system.part
-        else system.part = currentPart
         system.starttime += introTimeBn
         system.sections.forEach((section, sectidx, sectionArray) => {
             section.starttime += introTimeBn

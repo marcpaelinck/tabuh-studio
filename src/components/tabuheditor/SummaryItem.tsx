@@ -24,7 +24,6 @@ import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
-import TsPartIcon from '../../reacticons/TsPartIcon'
 import { debug } from '../../utils/debugger'
 
 // Col item formatted to contain summary items
@@ -55,35 +54,59 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         hasfield: boolean
         fieldval?: string | number
         textcolor?: string
+        buttonTooltip?: string
+        fieldTooltip?: string
     }
     const specs: Record<string, SpecType> = {
-        id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id },
-        part: { icon: TsPartIcon, iconcolor: '#1C78E0', action: 'edit', hasfield: true, fieldval: sysData.part },
+        id: {
+            icon: AiOutlineNumber,
+            action: 'none',
+            hasfield: true,
+            fieldval: sysData.id,
+            fieldTooltip: 'Sequence id. This value may change if systems are added above this one.'
+        },
         label: {
             icon: TsLabelIcon,
             iconcolor: '#1C78E0',
             action: 'edit',
             hasfield: true,
             fieldval: sysData.label,
-            textcolor: 'orange'
+            textcolor: 'orange',
+            buttonTooltip: 'Add or remove a label. Use labels to copy systems and for `goto` instructions.'
         },
-        new: { icon: TsNewIcon, iconcolor: '#1C78E0', action: 'new', hasfield: false },
+        new: {
+            icon: TsNewIcon,
+            iconcolor: '#1C78E0',
+            action: 'new',
+            hasfield: false,
+            buttonTooltip: 'Create an empty system below this one.'
+        },
         copy: {
             icon: TsCopyIcon,
             iconcolor: '#1C78E0',
             action: 'copy',
             hasfield: true,
             fieldval: sysData.copyfrom,
-            textcolor: 'blue'
+            textcolor: 'blue',
+            buttonTooltip: 'Select a system that should be copied below this one.',
+            fieldTooltip: 'Label or number of the system from which this system was copied.'
         },
-        delete: { icon: TsDeleteIcon, iconcolor: '#1C78E0', action: 'delete', hasfield: false },
+        delete: {
+            icon: TsDeleteIcon,
+            iconcolor: '#1C78E0',
+            action: 'delete',
+            hasfield: false,
+            buttonTooltip: 'Delete this system (warning: can not be undone).'
+        },
         goto: {
             icon: IoArrowForwardOutline,
             iconcolor: '#1C78E0',
             action: 'goto',
             hasfield: true,
             fieldval: sysData.goto,
-            textcolor: 'green'
+            textcolor: 'green',
+            buttonTooltip: 'Add a `goto` instruction.',
+            fieldTooltip: sysData.goto ? `Go to ${sysData.goto}.` : undefined
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
@@ -220,22 +243,34 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                 summaryIcon
             ) : (
                 <Whisper placement="bottom" trigger={warning ? 'click' : 'none'} speaker={<Tooltip>{warning}</Tooltip>}>
-                    <IconButton
-                        size="sm"
-                        as={'span'}
-                        icon={summaryIcon}
-                        onClick={(event: MouseEvent<HTMLElement>) => {
-                            buttonAction(event, specs[item].action)
-                        }}
-                        className="pl-0 pr-1 pt-0 pb-0"
-                    />
+                    <Whisper
+                        trigger={specs[item].buttonTooltip ? 'hover' : 'none'}
+                        placement="autoVerticalStart"
+                        controlId={`control-id-Whisper`}
+                        speaker={<Tooltip>{specs[item].buttonTooltip || ''}</Tooltip>}>
+                        <IconButton
+                            size="sm"
+                            as={'span'}
+                            icon={summaryIcon}
+                            onClick={(event: MouseEvent<HTMLElement>) => {
+                                buttonAction(event, specs[item].action)
+                            }}
+                            className="pl-0 pr-1 pt-0 pb-0"
+                        />
+                    </Whisper>
                 </Whisper>
             )}
             {specs[item].hasfield ? (
                 <Whisper placement="bottom" open={warning != null} speaker={<Tooltip>{warning}</Tooltip>}>
-                    <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
-                        {editing ? inputMethod : `${specs[item].fieldval || ''}`}
-                    </span>
+                    <Whisper
+                        trigger={specs[item].fieldTooltip ? 'hover' : 'none'}
+                        placement="autoVerticalStart"
+                        controlId={`control-id-Whisper`}
+                        speaker={<Tooltip>{specs[item].fieldTooltip || ''}</Tooltip>}>
+                        <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
+                            {editing ? inputMethod : `${specs[item].fieldval || ''}`}
+                        </span>
+                    </Whisper>
                 </Whisper>
             ) : (
                 <></>
