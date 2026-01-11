@@ -19,6 +19,7 @@ import {
     type PickerHandle
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import type { EditorSystemData } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
@@ -168,7 +169,8 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                 break
             }
             case 'delete': {
-                if (gototargets?.includes(sysData.uuid)) msg = 'Goto labels are pointing to this system'
+                if (gototargets?.includes(sysData.uuid))
+                    msg = "Can't delete this system because one or more goto instructions point to this system."
                 break
             }
             default:
@@ -236,41 +238,47 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
 
     const SummaryIcon = specs[item].icon
     const summaryIcon = <SummaryIcon size="1.3rem" color={specs[item].iconcolor} />
+    const textWhisperRef = useRef<OverlayTriggerHandle>(null)
+
+    // Show message on warning. Note: currently warning is only set by field validation.
+    useEffect(() => {
+        if (warning) textWhisperRef.current?.open()
+        else textWhisperRef.current?.close()
+    }, [warning])
 
     return (
         <>
             {specs[item].action == 'none' ? (
                 summaryIcon
             ) : (
-                <Whisper placement="bottom" trigger={warning ? 'click' : 'none'} speaker={<Tooltip>{warning}</Tooltip>}>
-                    <Whisper
-                        trigger={specs[item].buttonTooltip ? 'hover' : 'none'}
-                        placement="autoVerticalStart"
-                        controlId={`control-id-Whisper`}
-                        speaker={<Tooltip>{specs[item].buttonTooltip || ''}</Tooltip>}>
-                        <IconButton
-                            size="sm"
-                            as={'span'}
-                            icon={summaryIcon}
-                            onClick={(event: MouseEvent<HTMLElement>) => {
-                                buttonAction(event, specs[item].action)
-                            }}
-                            className="pl-0 pr-1 pt-0 pb-0"
-                        />
-                    </Whisper>
+                <Whisper
+                    placement="autoVerticalStart"
+                    delay={3000}
+                    trigger={warning ? 'click' : specs[item].buttonTooltip ? 'hover' : 'none'}
+                    controlId={`control-id-Whisper`}
+                    speaker={<Tooltip>{warning ? warning : specs[item].buttonTooltip || ''}</Tooltip>}>
+                    <IconButton
+                        size="sm"
+                        as={'span'}
+                        icon={summaryIcon}
+                        onClick={(event: MouseEvent<HTMLElement>) => {
+                            buttonAction(event, specs[item].action)
+                        }}
+                        className="pl-0 pr-1 pt-0 pb-0"
+                    />
                 </Whisper>
             )}
             {specs[item].hasfield ? (
-                <Whisper placement="bottom" open={warning != null} speaker={<Tooltip>{warning}</Tooltip>}>
-                    <Whisper
-                        trigger={specs[item].fieldTooltip ? 'hover' : 'none'}
-                        placement="autoVerticalStart"
-                        controlId={`control-id-Whisper`}
-                        speaker={<Tooltip>{specs[item].fieldTooltip || ''}</Tooltip>}>
-                        <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
-                            {editing ? inputMethod : `${specs[item].fieldval || ''}`}
-                        </span>
-                    </Whisper>
+                <Whisper
+                    ref={textWhisperRef}
+                    delay={3000}
+                    trigger={specs[item].fieldTooltip ? 'hover' : 'none'}
+                    placement="autoVerticalStart"
+                    controlId={`control-id-Whisper`}
+                    speaker={<Tooltip>{warning ? warning : specs[item].fieldTooltip || ''}</Tooltip>}>
+                    <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
+                        {editing ? inputMethod : `${specs[item].fieldval || ''}`}
+                    </span>
                 </Whisper>
             ) : (
                 <></>
