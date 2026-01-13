@@ -58,3 +58,16 @@ export function defaultObject<T>(otype: DefaultType): T {
     // export function defaultObject(otype: DefaultType): JsonSymbol | EditorScore | undefined {
     return DefaultObjectFactory[otype]() as T
 }
+
+export function toOrdinal(val: number): string {
+    switch (val) {
+        case 1:
+            return `1st`
+        case 2:
+            return `2nd`
+        case 3:
+            return `3rd`
+        default:
+            return `${val}th`
+    }
+}

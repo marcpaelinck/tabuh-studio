@@ -2,6 +2,7 @@
 // This summary contains buttons optionally combined with a text field. The item type determines the button's action
 // such as editing a field name (e.g. `part` or `label`) or creating/copying a section. After the action is performed
 // the field will contain the result of the action (e.g. new field value or id/label of copied system).
+import _ from 'lodash'
 import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
@@ -20,12 +21,14 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import type { EditorSystemData } from '../../models/types'
+import type { EditorSystemData, GotoItem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import { debug } from '../../utils/debugger'
+import { toOrdinal } from '../../utils/objectUtils'
+import { FlowItemsForm } from './FlowItemsForm'
 
 // Col item formatted to contain summary items
 export function SCol({ ...props }: ColProps) {
@@ -38,7 +41,7 @@ interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: ItemType
     sysData: EditorSystemData
     labels?: Record<string, EditorSystemData>
-    gototargets?: string[] // list of uuid's of systems that occur in some 'gotokey' field
+    gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string>[]
 }
@@ -58,6 +61,32 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         buttonTooltip?: string
         fieldTooltip?: string
     }
+
+    // Auxiliary functions for the Goto, Iterate, Dynamics and Tempo tooltips.
+
+    function toOrdinals(values: number[] | undefined): string {
+        if (values) {
+            const ordinals = values.map((val) => toOrdinal(val))
+            if (ordinals.length > 1) return ordinals.slice(0, -1).join(', ') + ' & ' + _.last(ordinals)
+            else return ordinals.join('') // also takes care of empty array
+        } else return ''
+    }
+
+    function gotoText(goto: GotoItem, type: 'short' | 'long'): string {
+        if (type == 'short') return goto.targetdisplay
+        else {
+            const gotoInstr = "go to '" + goto.targetdisplay + "\'"
+            const passes = goto.passes ? 'after each ' + toOrdinals(goto.passes) : ''
+            const cycles = goto.cycle ? `of every ${goto.cycle}` : null
+            const pass = goto.passes
+                ? goto.passes.length > 1 || (goto.cycle && goto.cycle > 1)
+                    ? 'passes'
+                    : 'pass'
+                : ''
+            return _.compact([gotoInstr, passes, cycles, pass]).join(' ')
+        }
+    }
+
     const specs: Record<string, SpecType> = {
         id: {
             icon: AiOutlineNumber,
@@ -73,7 +102,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             hasfield: true,
             fieldval: sysData.label,
             textcolor: 'orange',
-            buttonTooltip: 'Add or remove a label. Use labels to copy systems and for `goto` instructions.'
+            buttonTooltip: 'Add or remove a label. Optionally labels to copy systems and for `goto` instructions.'
         },
         new: {
             icon: TsNewIcon,
@@ -104,10 +133,10 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             iconcolor: '#1C78E0',
             action: 'goto',
             hasfield: true,
-            fieldval: sysData.goto,
+            fieldval: sysData.goto?.map((goto) => gotoText(goto, 'short')).join('\n') || '',
             textcolor: 'green',
             buttonTooltip: 'Add a `goto` instruction.',
-            fieldTooltip: sysData.goto ? `Go to ${sysData.goto}.` : undefined
+            fieldTooltip: sysData.goto?.map((goto) => gotoText(goto, 'long')).join('\n') || ''
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
@@ -169,7 +198,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                 break
             }
             case 'delete': {
-                if (gototargets?.includes(sysData.uuid))
+                if (gototargets?.has(sysData.uuid))
                     msg = "Can't delete this system because one or more goto instructions point to this system."
                 break
             }
@@ -228,13 +257,21 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             defaultValue={specs[item].fieldval || ''}
             onClick={(e) => e.stopPropagation()}
             onChange={(val, e) => inputAction(e, 'save', val)}
-            placeholder={`system to ${specs[item].action}`}
+            placeholder={`${specs[item].action}`}
             width="100%"
         />
     )
 
+    const flowItemsForm = <FlowItemsForm gotoItems={sysData.goto || []} open={editing} setOpen={setEditing} />
+
     const inputMethod =
-        specs[item].action == 'edit' ? inputField : ['copy', 'goto'].includes(specs[item].action) ? inputPicker : null
+        specs[item].action == 'edit'
+            ? inputField
+            : specs[item].action == 'copy'
+              ? inputPicker
+              : specs[item].action == 'goto'
+                ? flowItemsForm
+                : null
 
     const SummaryIcon = specs[item].icon
     const summaryIcon = <SummaryIcon size="1.3rem" color={specs[item].iconcolor} />
@@ -253,7 +290,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             ) : (
                 <Whisper
                     placement="autoVerticalStart"
-                    delay={3000}
+                    delayClose={50}
                     trigger={warning ? 'click' : specs[item].buttonTooltip ? 'hover' : 'none'}
                     controlId={`control-id-Whisper`}
                     speaker={<Tooltip>{warning ? warning : specs[item].buttonTooltip || ''}</Tooltip>}>
@@ -271,11 +308,16 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             {specs[item].hasfield ? (
                 <Whisper
                     ref={textWhisperRef}
-                    delay={3000}
+                    delayClose={50}
                     trigger={specs[item].fieldTooltip ? 'hover' : 'none'}
                     placement="autoVerticalStart"
                     controlId={`control-id-Whisper`}
-                    speaker={<Tooltip>{warning ? warning : specs[item].fieldTooltip || ''}</Tooltip>}>
+                    speaker={
+                        // style whiteSpace:pre enables to use \n for new line
+                        <Tooltip className="whitespace-pre">
+                            {warning ? warning : specs[item].fieldTooltip || ''}
+                        </Tooltip>
+                    }>
                     <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
                         {editing ? inputMethod : `${specs[item].fieldval || ''}`}
                     </span>

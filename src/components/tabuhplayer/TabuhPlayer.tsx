@@ -1,13 +1,11 @@
-import Player from './Player'
-import Menu from './Menu'
-import Animation from './Animation'
-import { panggulDefaultOption } from './Animation'
-import { type HighlightRange, type MenuItemInfo, type SVGInfo } from '../../models/types'
-import { type TimeLine } from '../../models/types'
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
-import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import { positionConfigs } from '../../config/config'
 import { useScore } from '../../hooks/useScore'
+import { type HighlightRange, type MenuItemInfo, type SVGInfo, type TimeLine } from '../../models/types'
+import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
+import Animation, { panggulDefaultOption } from './Animation'
+import Menu from './Menu'
+import Player from './Player'
 
 export default function TabuhPlayer({
     tabuhDict,

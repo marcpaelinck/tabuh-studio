@@ -149,10 +149,12 @@ export function createTimelineFromEditor(
             }
         }
         prevSystem = system
-        if (system.gotokey) {
+        // TODO TEMPORARY DEFAULT ELABORATION OF GOTO. ADD GOTO LOGIC HERE.
+        if (system.goto && system.goto.length > 0) {
             if (!(system.uuid in passcounter)) passcounter[system.uuid] = 1
             else passcounter[system.uuid] += 1
-            if (passcounter[system.uuid] <= 2) sysidx = data.findIndex((sys) => sys.uuid == system.gotokey)
+            //@ts-ignore suppress incorrect warning 'system.goto might be undefined'.
+            if (passcounter[system.uuid] <= 2) sysidx = data.findIndex((sys) => sys.uuid == system.goto[0].targetuuid)
             else sysidx += 1
         } else sysidx += 1
     }

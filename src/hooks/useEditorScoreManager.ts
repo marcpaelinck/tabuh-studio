@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { editorSortingOrder } from '../config/config'
-import type { EditorScore, EditorSystemData, Score, Staffs } from '../models/types'
+import type { EditorScore, EditorSystemData, GotoItem, Measure, Score, Staffs } from '../models/types'
 import { debug } from '../utils/debugger'
 import { defaultObject } from '../utils/objectUtils'
 
@@ -34,6 +34,12 @@ export function useEditorScoreManager(score: Score) {
             const staffs: Staffs = Object.fromEntries(
                 positions.map((position) => [position, system.sections.map((section) => section.staves[position])])
             )
+            // Delete the notes attribute of measures. Need to review the new data format
+            Object.values(staffs).forEach((measures) =>
+                measures.forEach((measure) => {
+                    if ('notes' in measure) delete measure.notes
+                })
+            )
             const systemData: EditorSystemData = {
                 index: sysIdx,
                 id: sysIdx + 1,
@@ -48,7 +54,43 @@ export function useEditorScoreManager(score: Score) {
         })
         setEditorScore(newScore)
         setProcessing(false)
+        //TODO WRITE NEW LAYOUT TO CONSOLE
+        const copyScore = _.cloneDeep(newScore)
+        copyScore.systems.forEach((sys) =>
+            Object.keys(sys.staffs).forEach((key) => {
+                sys.staffs[key] = sys.staffs[key].map((measure) => {
+                    const m = measure as Measure
+                    return {
+                        starttime: m.notation[0].t,
+                        tempo: m.tempo,
+                        velocity: m.velocity,
+                        notation: m.notation.map((sym) => sym.s)
+                    }
+                })
+            })
+        )
+        console.log(copyScore)
     }, [score])
+
+    useEffect(() => {
+        // (Re-) number the system index and id values.
+        // Should be performed at each render due to possible user actions (insert or delete system).
+        const gotos: GotoItem[] = []
+        editorScore.systems.forEach((systemData, sysIdx) => {
+            systemData.index = sysIdx
+            systemData.id = systemData.index + 1
+            if (systemData.goto) gotos.push(...systemData.goto)
+        })
+        // Update the goto display values.
+        gotos.forEach((goto) => {
+            const target = editorScore.systems.find((sys) => sys.uuid == goto.targetuuid)
+            if (target) goto.targetdisplay = target.label || `# ${target.id}`
+            else {
+                goto.targetdisplay = 'target unknown'
+                console.error(`system ${goto} in goto instruction not found.`)
+            }
+        })
+    }, [editorScore])
 
     function updateSystem(sysData: EditorSystemData) {
         const sysIdx = sysData.index
@@ -70,17 +112,19 @@ export function useEditorScoreManager(score: Score) {
                     systemData.copyfromkey = undefined
                 }
             } else systemData.copyfrom = undefined
-            if (systemData.gotokey) {
-                const destination = newSystemData.find((sysData) => sysData.uuid == systemData.gotokey)
-                if (destination) {
-                    debug(`found goto destination ${destination.uuid}`)
-                    {
-                        systemData.goto = destination.label ? destination.label : `#${destination.id}`
+            if (systemData.goto) {
+                systemData.goto.forEach((goto) => {
+                    const destination = newSystemData.find((sysData) => sysData.uuid == goto.targetuuid)
+                    if (destination) {
+                        debug(`found goto destination ${destination.uuid}`)
+                        {
+                            goto.targetdisplay = destination.label ? destination.label : `#${destination.id}`
+                        }
+                    } else {
+                        goto.targetdisplay = 'Error: goto target not found.'
+                        console.error(`Error: goto target not found for ${systemData.uuid}.`)
                     }
-                } else {
-                    systemData.goto = undefined
-                    systemData.gotokey = undefined
-                }
+                })
             } else systemData.goto = undefined
         })
     }
@@ -128,7 +172,7 @@ export function useEditorScoreManager(score: Score) {
                 })
                 newSystemData.part = ''
                 newSystemData.label = undefined
-                newSystemData.gotokey = undefined
+                newSystemData.goto = undefined
                 newSystemData.uuid = uuidv4()
                 sliceIndex1 = systemData.index + 1 // Insert below current
                 break
@@ -151,14 +195,16 @@ export function useEditorScoreManager(score: Score) {
             }
             case 'goto':
                 if (!value) {
-                    newSystemData.gotokey = undefined
+                    newSystemData.goto = undefined
                 } else {
                     const destination = editorScore.systems.find((sys) => sys.uuid == value)
                     if (!destination) {
                         console.error(`goto: could not find system ${value}`)
                         return
                     }
-                    newSystemData.gotokey = destination.uuid
+                    if (!newSystemData.goto) newSystemData.goto = []
+                    // targetDisplay will be modified by the EditorScoreManager
+                    newSystemData.goto.push({ targetuuid: destination.uuid, targetdisplay: '' })
                 }
                 break
             case 'delete':
@@ -173,7 +219,7 @@ export function useEditorScoreManager(score: Score) {
                 // Unrecognized action
                 return
         }
-        // Replace, remove or insert system
+        // Update, remove or insert system
         const newData = newSystemData
             ? [...editorScore.systems.slice(0, sliceIndex1), newSystemData, ...editorScore.systems.slice(sliceIndex2)]
             : [...editorScore.systems.slice(0, sliceIndex1), ...editorScore.systems.slice(sliceIndex2)]

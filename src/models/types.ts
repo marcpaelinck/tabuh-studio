@@ -37,9 +37,19 @@ export type JsonSymbol = {
 export type Measure = {
     tempo: [number, number]
     velocity: [number, number]
-    notes: JsonNote[]
+    notes?: JsonNote[]
     notation: JsonSymbol[]
     notation_?: JsonSymbol[] // cache used to keep user edits that have not been saved yet
+}
+
+// Notation of one section for one instrument position
+//TODO: should replace measure in the future
+export type NewMeasure = {
+    starttime: number
+    tempo: [number, number]
+    velocity: [number, number]
+    notation: string[]
+    notation_?: string[] // cache used to keep user edits that have not been saved yet
 }
 
 // Subdivision of a system, typically spans one kempli beat
@@ -65,7 +75,14 @@ export type System = {
 
 export type Score = { title: string; composer: string; durationMs: number; systems: System[] }
 
-export type ScoreInfo = { title: string; instrumentgroup: string; file: string; notationversion: string; pdf: string }
+export type ScoreInfo = {
+    title: string
+    instrumentgroup: string
+    file: string
+    notationversion: string
+    pdf: string
+    format: 'old' | 'new'
+}
 
 // ANIMATION
 
@@ -113,7 +130,31 @@ export type TextCursorPosition = {
 export type HighlightRange = { line: number; range: number[] }
 
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
-export type Staffs = Record<string, Measure[]>
+export type Staffs = Record<string, Measure[] | NewMeasure[]>
+
+export interface FrequencyItem {
+    passes?: number[]
+    cycle?: number
+}
+
+export interface GotoItem extends FrequencyItem {
+    targetuuid: string
+    targetdisplay: string
+}
+
+export interface IterationItem extends FrequencyItem {
+    count: number
+}
+
+// For tempo and dynamics which can gradually increase over one or more measures
+export interface GradualItem {
+    isGradual: boolean
+    fromSection?: number
+    toSection: number
+    fromValue?: number
+    toValue: number
+    iterations?: number[]
+}
 
 export type EditorSystemData = {
     uuid: string // unique uuid, never changes
@@ -125,8 +166,10 @@ export type EditorSystemData = {
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string
-    goto?: string // label or id of system to which the goto points
-    gotokey?: string // uuid of system to which the goto points
+    iterate?: IterationItem
+    goto?: GotoItem[]
+    tempo?: GradualItem[]
+    dynamics?: GradualItem[]
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // uuid copied system
 }

@@ -72,13 +72,10 @@ export default function EditorWindow({
         setExpanded({ ...allKeys, ...existingKeys })
     }, [editorScore])
 
-    // (Re-) number the system index and id values.
-    // Should be performed at each render due to possible user actions (insert or delete system).
-    const gotoTargets: string[] = []
-    editorScore.systems.forEach((systemData, sysIdx) => {
-        systemData.index = sysIdx
-        systemData.id = systemData.index + 1
-        if (systemData.gotokey) gotoTargets.push(systemData.gotokey)
+    // gotoTargets will be used by the 'delete' SummaryItem button for validation.
+    var gotoTargets: Set<string> = new Set()
+    editorScore.systems.forEach((sys) => {
+        if (sys.goto) sys.goto.forEach((goto) => gotoTargets.add(goto.targetuuid))
     })
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
