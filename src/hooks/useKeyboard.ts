@@ -141,6 +141,7 @@ export const useKeyboardListener = (
         debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`)
         // Check that target exists
         if (!ref.current || event.target !== ref.current) return
+        if (['Deat'].includes(event.key)) return
         const target: ElementWithValueTracker = ref.current as ElementWithValueTracker
 
         if (event.key.length == 1 && !event.altKey && !event.ctrlKey) {
