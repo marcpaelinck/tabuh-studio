@@ -64,26 +64,29 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
 
     // Auxiliary functions for the Goto, Iterate, Dynamics and Tempo tooltips.
 
-    function toOrdinals(values: number[] | undefined): string {
+    function toText(values: number[] | undefined, ordinal: boolean = false): string {
         if (values) {
-            const ordinals = values.map((val) => toOrdinal(val))
-            if (ordinals.length > 1) return ordinals.slice(0, -1).join(', ') + ' & ' + _.last(ordinals)
-            else return ordinals.join('') // also takes care of empty array
+            var list = values.map((val) => `${val}`)
+            if (ordinal) list = values.map((val) => toOrdinal(val))
+            if (list.length > 1) return list.slice(0, -1).join(', ') + ' & ' + _.last(list)
+            else return list.join('') // also takes care of empty array
         } else return ''
     }
 
     function gotoText(goto: GotoItem, type: 'short' | 'long'): string {
         if (type == 'short') return goto.targetdisplay
-        else {
-            const gotoInstr = "go to '" + goto.targetdisplay + "\'"
-            const passes = goto.passes ? 'after each ' + toOrdinals(goto.passes) : ''
-            const cycles = goto.cycle ? `of every ${goto.cycle}` : null
-            const pass = goto.passes
-                ? goto.passes.length > 1 || (goto.cycle && goto.cycle > 1)
-                    ? 'passes'
-                    : 'pass'
-                : ''
-            return _.compact([gotoInstr, passes, cycles, pass]).join(' ')
+
+        const nbrOfPasses = !goto.passes ? 0 : goto.passes.length
+        const cycle = !goto.cycle ? 0 : goto.cycle
+        switch (true) {
+            case !nbrOfPasses && !cycle:
+                return `go to ${goto.targetdisplay}`
+            case nbrOfPasses && !cycle:
+                return `go to ${goto.targetdisplay} after ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(goto.passes)}`
+            case nbrOfPasses && cycle > 0 && cycle == Math.max(...(goto.passes || [0])):
+                return `go to ${goto.targetdisplay} after every ${toText(goto.passes, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+            default:
+                return `go to ${goto.targetdisplay} after ${toText(goto.passes, true)} of every ${goto.cycle} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
         }
     }
 
@@ -293,7 +296,10 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                     delayClose={50}
                     trigger={warning ? 'click' : specs[item].buttonTooltip ? 'hover' : 'none'}
                     controlId={`control-id-Whisper`}
-                    speaker={<Tooltip>{warning ? warning : specs[item].buttonTooltip || ''}</Tooltip>}>
+                    className="mytooltip"
+                    speaker={
+                        <Tooltip className="mytooltip">{warning ? warning : specs[item].buttonTooltip || ''}</Tooltip>
+                    }>
                     <IconButton
                         size="sm"
                         as={'span'}

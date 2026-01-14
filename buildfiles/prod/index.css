@@ -19,6 +19,10 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.rs-tooltip {
+    max-width: 100%;
+}
+
 .rs-btn-start-icon {
     /* Correct React Suite button not centered */
     margin-right: 0px;

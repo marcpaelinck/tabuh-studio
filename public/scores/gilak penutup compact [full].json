@@ -153,7 +153,8 @@
           { "starttime": 24, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 28, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 1,
       "id": 2,
@@ -307,7 +308,8 @@
           { "starttime": 56, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 60, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 2,
       "id": 3,
@@ -461,7 +463,8 @@
           { "starttime": 88, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 92, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 3,
       "id": 4,
@@ -625,7 +628,8 @@
           { "starttime": 280, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 284, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 4,
       "id": 5,
@@ -779,7 +783,8 @@
           { "starttime": 312, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 316, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 5,
       "id": 6,
@@ -932,7 +937,8 @@
           { "starttime": 344, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 348, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 6,
       "id": 7,
@@ -957,7 +963,7 @@
       "goto": [
         {"passes": [1, 2], "cycle": 3, "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
         {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"},
-        {"passes": [8], "targetuuid": "a1954761-4d4d-48c9-9887-ea4d890a31ed", "targetdisplay": "End"}
+        {"passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetdisplay": "End"}
       ],
       "staffs": {
         "UGAL": [
@@ -1090,166 +1096,14 @@
           { "starttime": 376, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 380, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
       "index": 7,
       "id": 8,
-      "uuid": "a1954761-4d4d-48c9-9887-ea4d890a31ed",
-      "part": "End",
-      "label": "End",
-      "positions": [
-        "UGAL",
-        "PEMADE_POLOS",
-        "PEMADE_SANGSIH",
-        "KANTILAN_POLOS",
-        "KANTILAN_SANGSIH",
-        "REYONG_1",
-        "REYONG_2",
-        "REYONG_3",
-        "REYONG_4",
-        "CALUNG",
-        "JEGOGAN",
-        "GONGS",
-        "KEMPLI"
-      ],
-      "grouped": [],
-      "staffs": {
-        "UGAL": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["i", "-", "-", "-"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["e", "-", "-", "-"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["u", "-", "-", "-"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["e", "-", "-", "-"]}
-        ],
-        "PEMADE_POLOS": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["a,", ".", "i", "."]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["a,", ".", "u,", "."]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["i", ".", "e", "."]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["o", ".", "i", "."]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["e", ".", "o", "."]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["u", ".", "u", "."]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["o", ".", "u", "."]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["u", ".", "o", "."]}
-        ],
-        "PEMADE_SANGSIH": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a,", ".", "u,"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e,", ".", "a,"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "o", ".", "i"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a,", ".", "o"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "i", ".", "e"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a", ".", "e"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e", ".", "a"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e", ".", "e"]}
-        ],
-        "KANTILAN_POLOS": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["a,", ".", "i", "."]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["a,", ".", "u,", "."]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["i", ".", "e", "."]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["o", ".", "i", "."]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["e", ".", "o", "."]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["u", ".", "u", "."]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["o", ".", "u", "."]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": ["u", ".", "o", "."]}
-        ],
-        "KANTILAN_SANGSIH": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a,", ".", "u,"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e,", ".", "a,"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "o", ".", "i"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a,", ".", "o"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "i", ".", "e"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "a", ".", "e"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e", ".", "a"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.83, 0.83], "notation": [".", "e", ".", "e"]}
-        ],
-        "REYONG_1": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]}
-        ],
-        "REYONG_2": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]}
-        ],
-        "REYONG_3": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]}
-        ],
-        "REYONG_4": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x", "x", "x", "x"]}
-        ],
-        "CALUNG": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a", "-", "-", "-"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a", "-", "-", "-"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["i", "-", "-", "-"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["e", "-", "-", "-"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["u", "-", "-", "-"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["e", "-", "-", "-"]}
-        ],
-        "JEGOGAN": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a", "-", "-", "-"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["e", "-", "-", "-"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]}
-        ],
-        "GONGS": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["G", "-", "-", "-"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["G", "-", "-", "-"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["P", "-", "-", "-"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["-", "-", "-", "-"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["P", "-", "-", "-"]}
-        ],
-        "KEMPLI": [
-          { "starttime": 1696, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1700, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1704, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1708, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1712, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1716, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1720, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
-          { "starttime": 1724, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
-        ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
-    {
-      "index": 8,
-      "id": 9,
       "uuid": "7a9cedb5-27ad-4981-9983-3553eac85411",
       "part": "End",
+      "label": "End",
       "positions": [
         "UGAL",
         "PEMADE_POLOS",
@@ -1397,10 +1251,11 @@
           { "starttime": 1752, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 1756, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
-      "index": 9,
-      "id": 10,
+      "index": 8,
+      "id": 9,
       "uuid": "6cae5a0b-70a4-45f7-90cd-ebf976c36efb",
       "part": "End",
       "positions": [
@@ -1550,10 +1405,11 @@
           { "starttime": 1784, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 1788, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
-      "index": 10,
-      "id": 11,
+      "index": 9,
+      "id": 10,
       "uuid": "cd1ada81-761f-48bc-aa05-0a6b50db8109",
       "part": "End",
       "positions": [
@@ -1703,10 +1559,11 @@
           { "starttime": 1816, "tempo": [58, 54], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]},
           { "starttime": 1820, "tempo": [54, 50], "velocity": [0.67, 0.67], "notation": ["x?", "-", "-", "-"]}
         ]},
-      "colwidths": [4, 4, 4, 4, 4, 4, 4, 4]},
+      "colWidths": [4, 4, 4, 4, 4, 4, 4, 4]
+    },
     {
-      "index": 11,
-      "id": 12,
+      "index": 10,
+      "id": 11,
       "uuid": "63efd5d2-7bc0-4ad0-ae48-dc9435edb508",
       "part": "End",
       "positions": [
@@ -1765,7 +1622,8 @@
         "KEMPLI": [
           { "starttime": 1824, "tempo": [50, 50], "velocity": [0.67, 0.67], "notation": ["x?"]}
         ]},
-      "colWidths": [1]}
+      "colWidths": [1]
+    }
   ],
   "parts": {
     "Unisono": [
