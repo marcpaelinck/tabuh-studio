@@ -1,4 +1,3 @@
-import type { JsonSymbol } from '../models/types'
 // This hook contains the rules that are used for the automatic generation of notation for grouped staves.
 
 // CASTING RULES
@@ -52,34 +51,32 @@ export function useRules() {
     // converts the notation to the position's range and polos/sangsih type,
     // assuming that the measure is a basic (polos) melody.
     // measureId starts with 0
-    function castNotation(notation: JsonSymbol[], position: string, measureId: number): JsonSymbol[] {
+    function castNotation(notation: string[], position: string, measureId: number): string[] {
         const conversion: Record<string, string> = fromPolos[position] || {}
 
         var updatedNotation = notation
         // Apply pokok rules
         if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
             // Clear even numbered measures. Note that measure numbering starts with 0.
-            updatedNotation.forEach((sym) => {
-                sym.s = '-'
-            })
+            updatedNotation = updatedNotation.map((_) => '-')
         }
         if (onlyOddNotes.includes(position))
-            updatedNotation.forEach((sym, idx) => {
+            updatedNotation = updatedNotation.map((sym, idx) =>
                 // Remove even numbered notes.
-                if ((idx + 1) % 2 == 0) sym.s = '-'
-            })
+                (idx + 1) % 2 == 0 ? '-' : sym
+            )
         if (onlyFirstNote.includes(position))
-            updatedNotation.forEach((sym, idx) => {
+            updatedNotation = updatedNotation.map((sym, idx) =>
                 // Remove all but first note.
-                if (idx > 0) sym.s = '-'
-            })
+                idx > 0 ? '-' : sym
+            )
 
         // Apply casting rules
-        const result = notation.map((jSymbol) => {
-            const [tone, rest] = splitTone(jSymbol.s)
+        const result = notation.map((symbol) => {
+            const [tone, rest] = splitTone(symbol)
             var cast = conversion[tone]
             const newSymbol = cast ? cast + rest : ' '
-            return { ...jSymbol, ...{ s: newSymbol } }
+            return newSymbol
         })
         return result
     }

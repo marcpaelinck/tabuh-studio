@@ -25,7 +25,7 @@ export default function Menu({
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreList: string[]
-    score: Score | null
+    score: Score | undefined
     scoreUpdater: Function
     focusUpdater: Function
     speedUpdater: Function

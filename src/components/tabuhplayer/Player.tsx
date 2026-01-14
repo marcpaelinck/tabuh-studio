@@ -35,7 +35,7 @@ export default function ScorePlayer({
     highlightFunctionRef,
     timelineUpdater
 }: {
-    score: Score
+    score: Score | undefined
     focus: string[]
     pbSpeed: number
     svgInfo: SVGInfo

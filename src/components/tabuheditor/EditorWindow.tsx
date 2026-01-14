@@ -9,7 +9,7 @@ import { playbackReducer } from '../../hooks/playbackReducer'
 import { useEditorScoreManager } from '../../hooks/useEditorScoreManager'
 import { useInstruments } from '../../hooks/useInstruments'
 import { usePartManager } from '../../hooks/usePartManager'
-import type { EditorSystemData, Score } from '../../models/types'
+import type { EditorScore, EditorSystem } from '../../models/types'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { PartIndicator } from './PartIndicator'
@@ -25,7 +25,7 @@ export default function EditorWindow({
     setExpanded,
     loading
 }: {
-    score: Score
+    score: EditorScore
     expanded: Record<string, boolean>
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
@@ -33,7 +33,7 @@ export default function EditorWindow({
     const focusRef: RefObject<string[]> = useRef<string[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
-    const { editorScore, labels, processing, updateSystem, executeItemAction } = useEditorScoreManager(score)
+    const { editorScore, labels, updateSystem, executeItemAction } = useEditorScoreManager(score)
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(editorScore)
 
@@ -80,7 +80,7 @@ export default function EditorWindow({
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
-    function systemSelectorOptions(self: EditorSystemData, includeSelf: boolean, includeNone: boolean) {
+    function systemSelectorOptions(self: EditorSystem, includeSelf: boolean, includeNone: boolean) {
         // List of labelled systems
         const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
             label: label,
@@ -249,7 +249,7 @@ export default function EditorWindow({
     return (
         <Profiler id="App" onRender={onRender}>
             <AudioFunctions value={audioFunctions}>
-                {loading || processing ? (
+                {loading ? (
                     <Placeholder.Grid rows={12} columns={6} />
                 ) : (
                     <Accordion className="w-full">{systems}</Accordion>

@@ -1,13 +1,13 @@
-import { VStack, Toggle, CustomProvider } from 'rsuite'
-import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import EditIcon from '@rsuite/icons/Edit'
-import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
+import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import { createContext, useState, type Dispatch } from 'react'
-import { FRAMESTYLE } from './config/config'
-import { useTabuhDict } from './hooks/useTabuhDict'
-import DebugWindow from './components/DebugWindow'
+import { CustomProvider, Toggle, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
+import DebugWindow from './components/DebugWindow'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
+import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
+import { FRAMESTYLE } from './config/config'
+import { useScoreList } from './hooks/useScoreList'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
@@ -16,7 +16,7 @@ export default function App() {
     const debugMode: boolean = false
 
     const [active, setActive] = useState<'editor' | 'player'>('player')
-    const [tabuhDict, loadingTabuhDict] = useTabuhDict({})
+    const { scoreList, loading: loadingScoreList } = useScoreList([])
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
 
     function debug(message: string) {
@@ -39,9 +39,9 @@ export default function App() {
                         {debugMode && <DebugWindow message={debugMessage} />}
                         <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
                             {active == 'player' ? (
-                                <TabuhPlayer tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                                <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
                             ) : (
-                                <TabuhEditor tabuhDict={tabuhDict} loadingTabuhDict={loadingTabuhDict} />
+                                <TabuhEditor scoreList={scoreList} loadingScoreList={loadingScoreList} />
                             )}
                         </div>
                     </VStack>

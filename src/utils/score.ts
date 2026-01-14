@@ -102,7 +102,7 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
 }
 
 // Creates a timeline object for the Player application
-export function createTimeline(score: Score, actionFunctions: ActionFunctions): TimeLine {
+export function createTimeline(score: Score | undefined, actionFunctions: ActionFunctions): TimeLine {
     // TimeLine will be used to create the Transport schedule
 
     if (!score || score == ({} as Score)) return {} as TimeLine

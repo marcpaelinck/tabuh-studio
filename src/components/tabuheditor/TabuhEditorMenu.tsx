@@ -2,6 +2,7 @@ import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Modal, Nav, SelectPicker } from 'rsuite'
+import type { ScoreInfo } from '../../models/types'
 import TsGongIcon from '../../reacticons/TsGongIcon'
 import type { KeyboardType } from './TabuhEditor'
 
@@ -20,18 +21,18 @@ type Action =
     | 'settings-colors'
 
 interface TabuhEditorMenuProps {
-    tabuhDict: Record<string, string>
-    loadScore: (file: string) => void
+    scoreList: ScoreInfo[]
+    loadScore: (scoreInfo: ScoreInfo | undefined) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
 }
 
 interface TabuhOption {
-    value: string
+    value: ScoreInfo
     label: string
 }
 
-export function TabuhEditorMenu({ tabuhDict, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
+export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [tabuhOptions, setTabuhOptions] = useState<TabuhOption[]>([])
 
@@ -40,16 +41,16 @@ export function TabuhEditorMenu({ tabuhDict, loadScore, keyboard, setKeyboard }:
 
     useEffect(() => {
         setTabuhOptions(
-            Object.entries(tabuhDict).map(([key, value]) => {
-                return { value: value, label: key }
+            scoreList.map((scoreInfo) => {
+                return { value: scoreInfo, label: scoreInfo.title }
             })
         )
-    }, [tabuhDict])
+    }, [scoreList])
 
-    function scoreSelected(file: string | undefined) {
+    function scoreSelected(scoreInfo: ScoreInfo | undefined) {
         setActiveKey(undefined)
-        if (file) {
-            loadScore(file)
+        if (scoreInfo) {
+            loadScore(scoreInfo)
         }
     }
 
@@ -58,7 +59,7 @@ export function TabuhEditorMenu({ tabuhDict, loadScore, keyboard, setKeyboard }:
             <Modal.Header>
                 <Modal.Title>Open notation</Modal.Title>
             </Modal.Header>
-            <SelectPicker data={tabuhOptions} onSelect={(file) => scoreSelected(file)} />
+            <SelectPicker data={tabuhOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
             <Modal.Body></Modal.Body>
         </Modal>
     )

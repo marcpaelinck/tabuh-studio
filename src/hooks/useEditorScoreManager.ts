@@ -1,75 +1,20 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { editorSortingOrder } from '../config/config'
-import type { EditorScore, EditorSystemData, GotoItem, Measure, Score, Staffs } from '../models/types'
+import type { EditorScore, EditorSystem, GotoItem } from '../models/types'
 import { debug } from '../utils/debugger'
 import { defaultObject } from '../utils/objectUtils'
 
-export function useEditorScoreManager(score: Score) {
-    const [processing, setProcessing] = useState<boolean>(false)
+export function useEditorScoreManager(score: EditorScore) {
     const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
-    const [labels, setLabels] = useState<Record<string, EditorSystemData>>({})
+    const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
     const [parts, setParts] = useState<Record<string, string[]>>({})
 
     useEffect(() => {
         // Convert new score to data record structure
-        setProcessing(true)
-        const newScore: EditorScore = defaultObject('EditorScore')
-        var currentPart: string = ''
-        score.systems.forEach((system, sysIdx) => {
-            // Update part information
-            if (system.part) currentPart = system.part
-            if (currentPart != '') {
-                if (!(currentPart in newScore.parts)) newScore.parts[currentPart] = []
-                newScore.parts[currentPart].push(system.uuid)
-            }
-
-            const positions = Object.keys(system.sections[0].staves).toSorted(
-                (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
-            )
-            const colWidths = system.sections.map((section) =>
-                Math.max(...Object.values(section.staves).map((measure) => measure.notation.length))
-            )
-            const staffs: Staffs = Object.fromEntries(
-                positions.map((position) => [position, system.sections.map((section) => section.staves[position])])
-            )
-            // Delete the notes attribute of measures. Need to review the new data format
-            Object.values(staffs).forEach((measures) =>
-                measures.forEach((measure) => {
-                    if ('notes' in measure) delete measure.notes
-                })
-            )
-            const systemData: EditorSystemData = {
-                index: sysIdx,
-                id: sysIdx + 1,
-                uuid: system.uuid,
-                part: currentPart,
-                positions: positions,
-                grouped: [],
-                staffs: staffs,
-                colWidths: colWidths
-            }
-            newScore.systems.push(systemData)
-        })
-        setEditorScore(newScore)
-        setProcessing(false)
+        setEditorScore(score)
         //TODO WRITE NEW LAYOUT TO CONSOLE
-        const copyScore = _.cloneDeep(newScore)
-        copyScore.systems.forEach((sys) =>
-            Object.keys(sys.staffs).forEach((key) => {
-                sys.staffs[key] = sys.staffs[key].map((measure) => {
-                    const m = measure as Measure
-                    return {
-                        starttime: m.notation[0].t,
-                        tempo: m.tempo,
-                        velocity: m.velocity,
-                        notation: m.notation.map((sym) => sym.s)
-                    }
-                })
-            })
-        )
-        console.log(copyScore)
+        console.log(score)
     }, [score])
 
     useEffect(() => {
@@ -92,7 +37,7 @@ export function useEditorScoreManager(score: Score) {
         })
     }, [editorScore])
 
-    function updateSystem(sysData: EditorSystemData) {
+    function updateSystem(sysData: EditorSystem) {
         const sysIdx = sysData.index
         const newScore: EditorScore = { ...editorScore }
         const systems = editorScore.systems
@@ -100,7 +45,7 @@ export function useEditorScoreManager(score: Score) {
         setEditorScore(newScore)
     }
 
-    function updatePointers(newSystemData: EditorSystemData[]) {
+    function updatePointers(newSystemData: EditorSystem[]) {
         // Update fields that depend on pointers to another system
         newSystemData.map((systemData) => {
             if (systemData.copyfromkey) {
@@ -130,10 +75,10 @@ export function useEditorScoreManager(score: Score) {
     }
 
     // Handles user actions triggered with buttons in the panel header
-    function executeItemAction(fieldname: string, systemData: EditorSystemData, value?: string) {
+    function executeItemAction(fieldname: string, systemData: EditorSystem, value?: string) {
         debug(`processing ${fieldname}`)
         // Used for insertion and update
-        var newSystemData: EditorSystemData | null = _.cloneDeep(systemData)
+        var newSystemData: EditorSystem | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the measures.
         Object.values(newSystemData.staffs).forEach((measures) => {
             measures.forEach((measure) => {
@@ -231,5 +176,5 @@ export function useEditorScoreManager(score: Score) {
         updatePointers(newData)
         setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
-    return { editorScore, labels, processing, updateSystem, setParts, executeItemAction }
+    return { editorScore, labels, updateSystem, setParts, executeItemAction }
 }

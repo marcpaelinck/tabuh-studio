@@ -1,24 +1,31 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { positionConfigs } from '../../config/config'
 import { useScore } from '../../hooks/useScore'
-import { type HighlightRange, type MenuItemInfo, type SVGInfo, type TimeLine } from '../../models/types'
+import {
+    type HighlightRange,
+    type MenuItemInfo,
+    type Score,
+    type ScoreInfo,
+    type SVGInfo,
+    type TimeLine
+} from '../../models/types'
 import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import Player from './Player'
 
 export default function TabuhPlayer({
-    tabuhDict,
-    loadingTabuhDict
+    scoreList,
+    loadingScoreList
 }: {
-    tabuhDict: Record<string, string>
-    loadingTabuhDict: boolean
+    scoreList: ScoreInfo[]
+    loadingScoreList: boolean
 }) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
-    const [score, loadScore, loadingScore] = useScore(null)
+    const { score, loadScore, isLoading: loadingScore } = useScore<Score | undefined>('old')
     const [selectedFocus, setSelectedFocus] = useState<string[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
@@ -26,15 +33,16 @@ export default function TabuhPlayer({
     const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
     const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
-    var scoreList: string[] = Object.keys(tabuhDict)
+    // TODO remove filter after adapting player code to new file format
+    var titleList: string[] = scoreList.filter((item) => item.format == 'old').map((item) => item.title)
 
     const timelineRef: RefObject<TimeLine | null> = useRef(null)
 
     // Disable menus when data is loading
     useEffect(() => {
-        setMenuDisabled('tabuh', loadingTabuhDict)
-        setMenuDisabled('focus', loadingTabuhDict || loadingScore || !score)
-    }, [loadingTabuhDict, loadingScore])
+        setMenuDisabled('tabuh', loadingScoreList)
+        setMenuDisabled('focus', loadingScoreList || loadingScore || !score)
+    }, [loadingScoreList, loadingScore])
 
     const updateFocus = (focus: string[]): void => {
         if (focus !== selectedFocus) {
@@ -45,7 +53,7 @@ export default function TabuhPlayer({
         }
     }
 
-    const updateScore = (value: string) => loadScore(tabuhDict[value])
+    const updateScore = (title: string) => loadScore(scoreList.find((item) => item.title == title))
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
@@ -65,7 +73,7 @@ export default function TabuhPlayer({
             <div className="pt-6 pl-6 pr-6">
                 <Menu
                     menuDisabled={menuDisabled}
-                    scoreList={scoreList}
+                    scoreList={titleList}
                     score={score}
                     scoreUpdater={updateScore}
                     focusUpdater={updateFocus}

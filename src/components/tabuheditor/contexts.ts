@@ -1,12 +1,6 @@
 import { createContext, type Context, type RefObject } from 'react'
 import type { NavigationAction } from '../../config/config'
-import type {
-    EditorCursorFunction,
-    EditorSystemData,
-    GenericFunction,
-    JsonSymbol,
-    SamplerAction
-} from '../../models/types'
+import type { EditorCursorFunction, EditorSystem, GenericFunction, SamplerAction } from '../../models/types'
 
 // Audio functions: used for playback from the editor interface
 export interface AudioFunctionsType {
@@ -25,8 +19,8 @@ export const AudioFunctions: Context<AudioFunctionsType> = createContext(default
 export interface NavigationFunctionsType {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
-    updateSystemData: (data: EditorSystemData) => void
-    applyRules: (notation: JsonSymbol[], rowId: number, colId: number, cached: boolean) => void
+    updateSystemData: (data: EditorSystem) => void
+    applyRules: (notation: string[], rowId: number, colId: number, cached: boolean) => void
 }
 
 // Navigation functions: used by the keyboard listener

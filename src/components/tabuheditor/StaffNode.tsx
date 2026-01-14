@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Col } from 'rsuite'
-import type { EditorSystemData, Measure } from '../../models/types'
+import type { EditorMeasure, EditorSystem } from '../../models/types'
 import { getValidSymbols } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'
@@ -19,15 +19,15 @@ export function StaffNode({
     sysUuid: string
     position: string
     rowId: number
-    measures: Measure[]
-    systemData: EditorSystemData
+    measures: EditorMeasure[]
+    systemData: EditorSystem
     colWidths: number[]
 }) {
     if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`)
 
     const measureNodes = useMemo(
         () =>
-            measures.map((measure: Measure, sidx: number) => {
+            measures.map((measure: EditorMeasure, sidx: number) => {
                 debug(`useMemo: recreating measures of system ${sysUuid} ${position}`)
                 const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
                 const validSymbols: string[] = getValidSymbols(position, true)
@@ -42,7 +42,7 @@ export function StaffNode({
                             validSymbols={validSymbols}
                             measureData={measure}
                             systemData={systemData}
-                            defaultValue={measure.notation.map((jSym) => jSym.s).join('')}
+                            defaultValue={measure.notation.map((symbol) => symbol).join('')}
                             style={{ width: width }}
                             className={`balifont10 h-5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             spellCheck="false"

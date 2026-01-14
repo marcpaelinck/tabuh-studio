@@ -21,7 +21,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import type { EditorSystemData, GotoItem } from '../../models/types'
+import type { EditorSystem, GotoItem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
@@ -39,8 +39,8 @@ type ItemType = 'id' | 'part' | 'label' | 'new' | 'copy' | 'delete' | 'goto'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: ItemType
-    sysData: EditorSystemData
-    labels?: Record<string, EditorSystemData>
+    sysData: EditorSystem
+    labels?: Record<string, EditorSystem>
     gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string>[]
@@ -133,7 +133,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             iconcolor: '#1C78E0',
             action: 'goto',
             hasfield: true,
-            fieldval: sysData.goto?.map((goto) => gotoText(goto, 'short')).join('\n') || '',
+            fieldval: sysData.goto?.map((goto: GotoItem) => gotoText(goto, 'short')).join('\n') || '',
             textcolor: 'green',
             buttonTooltip: 'Add a `goto` instruction.',
             fieldTooltip: sysData.goto?.map((goto) => gotoText(goto, 'long')).join('\n') || ''

@@ -22,6 +22,7 @@ import {
 } from 'rsuite'
 import { editorInitialExpandState } from '../../config/config'
 import { useScore } from '../../hooks/useScore'
+import type { EditorScore, ScoreInfo } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import EditorWindow from './EditorWindow'
 import { TabuhEditorMenu } from './TabuhEditorMenu'
@@ -56,27 +57,21 @@ const NavHeader = ({ expanded, ...rest }: { expanded: boolean }) => {
     )
 }
 
-export function TabuhEditor({
-    tabuhDict,
-    loadingTabuhDict
-}: {
-    tabuhDict: Record<string, string>
-    loadingTabuhDict: boolean
-}) {
+export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreInfo[]; loadingScoreList: boolean }) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     //END NAVIGATION
-    const [score, loadScore, loadingScore] = useScore(null)
+    const { score, loadScore, isLoading: loadingScore } = useScore<EditorScore>('new')
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     useEffect(() => {
-        setLoading(loadingTabuhDict || loadingScore)
-    }, [loadingTabuhDict, loadingScore])
+        setLoading(loadingScoreList || loadingScore)
+    }, [loadingScoreList, loadingScore])
 
     function expandAll(expand: boolean) {
         const newExpanded = _.mapValues(expanded, () => expand)
@@ -123,7 +118,7 @@ export function TabuhEditor({
                             keyboard={keyboard}
                             loadScore={loadScore}
                             setKeyboard={SetKeyboard}
-                            tabuhDict={tabuhDict}
+                            scoreList={scoreList}
                         />
                     </Sidenav.Body>
                     <Sidenav.Footer>

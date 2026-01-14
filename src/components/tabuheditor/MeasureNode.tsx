@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import type { NavigationAction } from '../../config/config'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
-import type { EditorSystemData, JsonSymbol, Measure } from '../../models/types'
+import type { EditorMeasure, EditorSystem } from '../../models/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import type { NavigationFunctionsType } from './contexts'
@@ -12,8 +12,8 @@ interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     rowId: number
     colId: number
     validSymbols: string[]
-    measureData: Measure
-    systemData: EditorSystemData
+    measureData: EditorMeasure
+    systemData: EditorSystem
 }
 
 // Creates a cell containing one measure: the notation of one beat for a single instrument position.
@@ -28,7 +28,7 @@ export function MeasureNode({
 }: NavigationCellProps) {
     const ref = useRef<HTMLTextAreaElement>(null)
     const navFunc: NavigationFunctionsType = useContext(NavigationFunctions)
-    const [measure, setMeasure] = useState<Measure>(measureData)
+    const [measure, setMeasure] = useState<EditorMeasure>(measureData)
     // Add a keyboard listener for this cell and pass the navigation function that moves the selection
     // from this cell to another cell within the grid (next, prev, up, down, etc.).
     const [keyboardListener] = useKeyboardListener(
@@ -40,8 +40,8 @@ export function MeasureNode({
     )
     const { validRegExpCell } = symbolValidationUtils(validSymbols)
 
-    function updateNotation(notation: JsonSymbol[]) {
-        const newMeasure: Measure = { ...measure }
+    function updateNotation(notation: string[]) {
+        const newMeasure: EditorMeasure = { ...measure }
         newMeasure.notation_ = notation
         setMeasure(newMeasure)
     }
@@ -50,7 +50,7 @@ export function MeasureNode({
         navFunc.register(rowId, colId, ref)
         // Edits are cached until the user saves their changes.
         // Display the cached value if previous edits have not yet been saved.
-        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.map((jSym) => jSym.s).join('')
+        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.map((symbol) => symbol).join('')
         highlightOnChangedContent(ref.current)
     }, [])
 
@@ -65,7 +65,7 @@ export function MeasureNode({
     // Highlight the cell background if the content has been modified by the user.
     const highlightOnChangedContent = (cell: HTMLTextAreaElement | null) => {
         if (!cell) return
-        const changed = measure.notation_ && measure.notation_.map((jSym) => jSym.s).join('') != props.defaultValue
+        const changed = measure.notation_ && measure.notation_.map((symbol) => symbol).join('') != props.defaultValue
         const classes = ['bg-amber-100']
         classes.forEach((value) => {
             if (changed && !cell.classList.contains(value)) cell.classList.add(value)

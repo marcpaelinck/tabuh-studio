@@ -4,7 +4,7 @@ import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
 import { positionConfigs, type NavigationAction } from '../../config/config'
 import { type PlaybackState } from '../../hooks/playbackReducer'
 import { useRules } from '../../hooks/useRules'
-import type { EditorCellCursor, EditorSystemData, JsonSymbol } from '../../models/types'
+import type { EditorCellCursor, EditorSystem } from '../../models/types'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { StaffNode } from './StaffNode'
@@ -20,9 +20,9 @@ export function SystemNode({
     visible,
     ...props
 }: {
-    systemData: EditorSystemData
+    systemData: EditorSystem
     playbackState: PlaybackState
-    updateSystemData: (data: EditorSystemData) => void
+    updateSystemData: (data: EditorSystem) => void
     visible: boolean
 }): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
@@ -129,7 +129,7 @@ export function SystemNode({
 
     // Fills the notation of the given measure (colId) for all grouped instruments
     // by casting the given notation for each instrument.
-    function applyRules(notation: JsonSymbol[], rowId: number, colId: number, cached: boolean) {
+    function applyRules(notation: string[], rowId: number, colId: number, cached: boolean) {
         // Input should currently come from Pemade polos part
         // TODO add a separate input field for grouped positions
         if (systemData.positions[rowId] != 'PEMADE_POLOS') return

@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { noCursor } from '../components/tabuheditor/_constants'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
-import type { EditorCellCursor, EditorSystemData } from '../models/types'
+import type { EditorCellCursor, EditorSystem } from '../models/types'
 import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { debug } from '../utils/debugger'
 
@@ -13,7 +13,7 @@ export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; 
 export type PlaybackAction = {
     actionType: ActionType
     playbackType?: PlaybackType
-    data?: EditorSystemData[]
+    data?: EditorSystem[]
     audiofunctions?: AudioFunctionsType
     cursor?: EditorCellCursor
 }

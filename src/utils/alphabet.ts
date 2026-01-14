@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { ignoreChars, positionConfigs } from '../config/config'
-import type { JsonSymbol } from '../models/types'
 
 export const getValidSymbols = (position: string, includeSilences: boolean = false): string[] => {
     const valids = Object.keys(positionConfigs[position].symbolToNoteNames)
@@ -64,8 +63,8 @@ export function symbolValidationUtils(validSymbols: string[]): ValidsReturnValue
     return { validRegExpSymbol, validRegExpCell, validRegExpByLength, validKeystrokes }
 }
 
-export function notation2text(notation: JsonSymbol[] | undefined): string {
-    if (notation) return notation.map((symbol) => symbol.s).join('')
+export function notation2text(notation: string[] | undefined): string {
+    if (notation) return notation.map((symbol) => symbol).join('')
     else return ''
 }
 

@@ -35,6 +35,7 @@ export type JsonSymbol = {
 
 // Notation of one section for one instrument position
 export type Measure = {
+    starttime: number
     tempo: [number, number]
     velocity: [number, number]
     notes?: JsonNote[]
@@ -43,8 +44,7 @@ export type Measure = {
 }
 
 // Notation of one section for one instrument position
-//TODO: should replace measure in the future
-export type NewMeasure = {
+export type EditorMeasure = {
     starttime: number
     tempo: [number, number]
     velocity: [number, number]
@@ -130,7 +130,7 @@ export type TextCursorPosition = {
 export type HighlightRange = { line: number; range: number[] }
 
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
-export type Staffs = Record<string, Measure[] | NewMeasure[]>
+export type Staffs = Record<string, EditorMeasure[]>
 
 export interface FrequencyItem {
     passes?: number[]
@@ -156,10 +156,11 @@ export interface GradualItem {
     iterations?: number[]
 }
 
-export type EditorSystemData = {
+export type EditorSystem = {
     uuid: string // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
+    starttime: number
     part: string
     positions: string[] // sorted list of positions ordered as displayed in the editor
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
@@ -174,7 +175,7 @@ export type EditorSystemData = {
     copyfromkey?: string // uuid copied system
 }
 
-export type EditorScore = { parts: Record<string, string[]>; systems: EditorSystemData[] }
+export type EditorScore = { title: string; composer: string; parts: Record<string, string[]>; systems: EditorSystem[] }
 
 export type EditorCellCursor = { sysUuid: string; measure: number }
 

@@ -1,7 +1,6 @@
 import { type Dispatch, type KeyboardEvent, type RefObject } from 'react'
 import type { ElementWithValueTracker } from '../components/tabuheditor/_types'
 import { type NavigationAction } from '../config/config'
-import type { JsonSymbol } from '../models/types'
 import { symbolValidationUtils } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 
@@ -100,7 +99,7 @@ export const useKeyboardListener = (
     ref: RefObject<HTMLTextAreaElement | null>,
     validSymbols: string[],
     navigate: (action: NavigationAction) => RefObject<HTMLTextAreaElement | null>,
-    updateNotation: Dispatch<JsonSymbol[]>
+    updateNotation: Dispatch<string[]>
 ) => {
     // Defined as hook in order to be able to use states, such as keyboard definitions, 'smart edit' or 'octavation on'.
     const { validRegExpCell, validRegExpByLength, validKeystrokes } = symbolValidationUtils(validSymbols)
@@ -132,12 +131,7 @@ export const useKeyboardListener = (
             // const notation = cellValue ? validRegExpCell.exec(cellValue) : []
             console.error(`${id}: invalid cell content: ${cellValue}. Valids are: ${validSymbols.join(' ')}`)
         if (notation.length == 0) updateNotation([])
-        else
-            updateNotation(
-                notation.map((sym) => {
-                    return { sysUuid: '', sectionId: -1, s: sym, t: -1, d: -1 }
-                })
-            )
+        else updateNotation(notation)
         debug(JSON.stringify(notation))
         target.dispatchEvent(new Event('change'))
     }
