@@ -5,6 +5,7 @@
       "id": 1,
       "uuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc",
       "part": "Unisono",
+      "label": "Unisono",
       "positions": [
         "UGAL",
         "PEMADE_POLOS",
@@ -174,6 +175,7 @@
         "KEMPLI"
       ],
       "grouped": [],
+      "goto": [{"passes": [3], "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetdisplay": "Transition"}],
       "staffs": {
         "UGAL": [
           { "starttime": 32, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
@@ -327,6 +329,7 @@
         "KEMPLI"
       ],
       "grouped": [],
+      "goto": [{"targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"}],
       "staffs": {
         "UGAL": [
           { "starttime": 64, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
@@ -464,6 +467,7 @@
       "id": 4,
       "uuid": "38657702-4ed8-43d7-b416-77bb94c08021",
       "part": "Transition",
+      "label": "Transition",
       "positions": [
         "UGAL",
         "PEMADE_POLOS",
@@ -627,6 +631,7 @@
       "id": 5,
       "uuid": "5dc4875d-9cb3-4c38-922e-14023afd0912",
       "part": "Kotekan",
+      "label": "Kotekan",
       "positions": [
         "UGAL",
         "PEMADE_POLOS",
@@ -949,6 +954,11 @@
         "KEMPLI"
       ],
       "grouped": [],
+      "goto": [
+        {"passes": [1, 2], "cycle": 3, "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
+        {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"},
+        {"passes": [8], "targetuuid": "a1954761-4d4d-48c9-9887-ea4d890a31ed", "targetdisplay": "End"}
+      ],
       "staffs": {
         "UGAL": [
           { "starttime": 352, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
@@ -1086,6 +1096,7 @@
       "id": 8,
       "uuid": "a1954761-4d4d-48c9-9887-ea4d890a31ed",
       "part": "End",
+      "label": "End",
       "positions": [
         "UGAL",
         "PEMADE_POLOS",
@@ -1754,9 +1765,7 @@
         "KEMPLI": [
           { "starttime": 1824, "tempo": [50, 50], "velocity": [0.67, 0.67], "notation": ["x?"]}
         ]},
-      "colWidths": [
-        1
-      ]}
+      "colWidths": [1]}
   ],
   "parts": {
     "Unisono": [
