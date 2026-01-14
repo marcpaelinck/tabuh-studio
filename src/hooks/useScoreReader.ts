@@ -127,7 +127,7 @@ function parseScoreNew(score: EditorScore): EditorScore {
 }
 
 // Loads and parses a score when a new tabuh (score title) is selected
-export function useScore<T = Score | EditorScore | undefined>(
+export function useScoreReader<T = Score | EditorScore | undefined>(
     format: 'old' | 'new'
 ): { score: T; loadScore: (scoreInfo: ScoreInfo | undefined) => void; isLoading: boolean } {
     const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)

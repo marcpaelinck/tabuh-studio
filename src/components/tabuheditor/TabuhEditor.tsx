@@ -21,7 +21,7 @@ import {
     VStack
 } from 'rsuite'
 import { editorInitialExpandState } from '../../config/config'
-import { useScore } from '../../hooks/useScore'
+import { useScoreReader } from '../../hooks/useScoreReader'
 import type { EditorScore, ScoreInfo } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import EditorWindow from './EditorWindow'
@@ -63,7 +63,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     //END NAVIGATION
-    const { score, loadScore, isLoading: loadingScore } = useScore<EditorScore>('new')
+    const { score, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)

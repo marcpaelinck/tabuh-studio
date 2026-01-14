@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { positionConfigs } from '../../config/config'
-import { useScore } from '../../hooks/useScore'
+import { useScoreReader } from '../../hooks/useScoreReader'
 import {
     type HighlightRange,
     type MenuItemInfo,
@@ -25,7 +25,7 @@ export default function TabuhPlayer({
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
-    const { score, loadScore, isLoading: loadingScore } = useScore<Score | undefined>('old')
+    const { score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old')
     const [selectedFocus, setSelectedFocus] = useState<string[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
