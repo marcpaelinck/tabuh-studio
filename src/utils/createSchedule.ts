@@ -4,7 +4,7 @@ import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     ActionFunctions,
     EditorCursorAction,
-    EditorSystemData,
+    EditorSystem,
     GenericAction,
     PlayerCursorAction,
     SamplerAction,
@@ -29,7 +29,7 @@ const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: 
 // Creates a timeline to play back (parts of) the score in the editor
 // useCache: if true, the unsaved (cached) user edits will be played back.
 export function createTimelineFromEditor(
-    data: EditorSystemData[],
+    data: EditorSystem[],
     actionFunctions: ActionFunctions,
     useCache: boolean
 ): TimeLine {
@@ -47,7 +47,7 @@ export function createTimelineFromEditor(
     }
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
-    var prevSystem: EditorSystemData | null = null
+    var prevSystem: EditorSystem | null = null
     var currTime: number = 0
     var sysStartTime: number = 0
     var maxStaffDuration: number = 0
@@ -72,24 +72,24 @@ export function createTimelineFromEditor(
                 if (!notation) notation = Array(4).fill(defaultObject('JsonSymbol'))
                 notation.forEach((symbol, symidx) => {
                     const endOfPosition = lastMeasure && symidx == notation.length - 1
-                    if (actionFunctions.play && (!isExtension(symbol.s) || endOfPosition)) {
+                    if (actionFunctions.play && (!isExtension(symbol) || endOfPosition)) {
                         // Encountered a new note symbol, a muting symbol or last symbol for this instrument position.
                         if (currNote[position]) {
                             // Need to close and save the currently 'playing' note.
                             // Add a basenote duration if the last symbol of the staff is an extension
-                            const addDuration = isExtension(symbol.s) ? 1 : 0
+                            const addDuration = isExtension(symbol) ? 1 : 0
                             // Update the current note's sampler action and save it to the timeline.
                             currNote[position].duration = n2TO(currTime - TO2n(currNote[position].time) + addDuration)
-                            currNote[position].isLast = endOfPosition && isExtension(symbol.s)
+                            currNote[position].isLast = endOfPosition && isExtension(symbol)
                             timeline.sampleractions.push(currNote[position])
                             currNote[position] = null
                         }
-                        if (!isExtension(symbol.s) && !isMuting(symbol.s)) {
+                        if (!isExtension(symbol) && !isMuting(symbol)) {
                             // Create a sampler action for the new note
                             currNote[position] = {
                                 action: actionFunctions.play,
                                 position: position,
-                                cleanedSymbol: cleanSymbol(symbol.s),
+                                cleanedSymbol: cleanSymbol(symbol),
                                 bpm:
                                     measure.tempo[0] +
                                     (symidx / notation.length) * (measure.tempo[1] - measure.tempo[0]),
@@ -112,12 +112,12 @@ export function createTimelineFromEditor(
                             sysuuid: system.uuid,
                             section: measureidx,
                             position: position,
-                            symbol: symbol.s,
+                            symbol: symbol,
                             line: 0,
-                            range: [cursorPos, cursorPos + symbol.s.length]
+                            range: [cursorPos, cursorPos + symbol.length]
                         })
                     }
-                    cursorPos += symbol.s.length
+                    cursorPos += symbol.length
                     currTime += 1
                 })
             })
