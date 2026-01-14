@@ -63,6 +63,7 @@ function parseScoreOld(score: Score): Score {
 function oldToNewFormat(score: Score): EditorScore {
     const newScore: EditorScore = defaultObject('EditorScore')
     var currentPart: string = ''
+    var positions: string[] = []
     score.systems.forEach((system, sysIdx) => {
         // Update part information
         if (system.part) currentPart = system.part
@@ -71,9 +72,12 @@ function oldToNewFormat(score: Score): EditorScore {
             newScore.parts[currentPart].push(system.uuid)
         }
 
-        const positions = Object.keys(system.sections[0].staves).toSorted(
-            (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
-        )
+        if (system.id == 1) {
+            positions = Object.keys(system.sections[0].staves).toSorted(
+                (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
+            )
+            newScore.positions = positions
+        }
         const colWidths = system.sections.map((section) =>
             Math.max(...Object.values(section.staves).map((measure) => measure.notation.length))
         )
@@ -102,7 +106,6 @@ function oldToNewFormat(score: Score): EditorScore {
             uuid: system.uuid,
             starttime: Object.values(staffs)[0][0].starttime,
             part: currentPart,
-            positions: positions,
             grouped: [],
             staffs: staffs,
             colWidths: colWidths

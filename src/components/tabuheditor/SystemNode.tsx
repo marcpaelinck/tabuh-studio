@@ -12,19 +12,23 @@ import { noCursor } from './_constants'
 import type { GridInfo } from './_types'
 import { NavigationFunctions, type NavigationFunctionsType } from './contexts'
 
+interface EditorSystemProps {
+    systemData: EditorSystem
+    positions: string[]
+    playbackState: PlaybackState
+    updateSystemData: (data: EditorSystem) => void
+    visible: boolean
+}
+
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
     systemData,
+    positions,
     playbackState,
     updateSystemData,
     visible,
     ...props
-}: {
-    systemData: EditorSystem
-    playbackState: PlaybackState
-    updateSystemData: (data: EditorSystem) => void
-    visible: boolean
-}): ReactNode {
+}: EditorSystemProps): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const systemUuid = systemData.uuid
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
@@ -132,9 +136,9 @@ export function SystemNode({
     function applyRules(notation: string[], rowId: number, colId: number, cached: boolean) {
         // Input should currently come from Pemade polos part
         // TODO add a separate input field for grouped positions
-        if (systemData.positions[rowId] != 'PEMADE_POLOS') return
+        if (positions[rowId] != 'PEMADE_POLOS') return
         const newSystemData = { ...systemData }
-        systemData.positions.forEach((position) => {
+        positions.forEach((position) => {
             if (!systemData.grouped.includes(position)) return
             const newNotation = castNotation(notation, position, colId)
             if (cached) newSystemData.staffs[position][colId].notation_ = newNotation

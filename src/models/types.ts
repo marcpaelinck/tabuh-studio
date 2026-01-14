@@ -162,7 +162,6 @@ export type EditorSystem = {
     index: number // row index, starts with 0, can change when data items are added / deleted
     starttime: number
     part: string
-    positions: string[] // sorted list of positions ordered as displayed in the editor
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
@@ -175,7 +174,13 @@ export type EditorSystem = {
     copyfromkey?: string // uuid copied system
 }
 
-export type EditorScore = { title: string; composer: string; parts: Record<string, string[]>; systems: EditorSystem[] }
+export type EditorScore = {
+    title: string
+    composer: string
+    parts: Record<string, string[]>
+    positions: string[] // sorted list of positions ordered as displayed in the editor
+    systems: EditorSystem[]
+}
 
 export type EditorCellCursor = { sysUuid: string; measure: number }
 

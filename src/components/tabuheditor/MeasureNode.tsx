@@ -78,10 +78,7 @@ export function MeasureNode({
             if (!ref.current) return
             debug(`updating ${props.id} to ${notation2text(measure.notation_)}`)
             // measureData.notation = measureData.notation_
-            const notationStr: string[] = parseNotationText(ref.current.value, validRegExpCell)
-            const notation = notationStr.map((sym) => {
-                return { sysUuid: systemData.uuid, sectionId: colId, s: sym, t: 0, d: 1 }
-            })
+            const notation: string[] = parseNotationText(ref.current.value, validRegExpCell)
             navFunc.applyRules(notation, rowId, colId, true)
             const newSysData = { ...systemData }
             newSysData.staffs[position][colId] = { ...measure }
