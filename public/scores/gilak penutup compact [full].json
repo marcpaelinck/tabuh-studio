@@ -184,7 +184,9 @@
       "uuid": "e153d0f1-2484-4479-8343-68c1d9075e32",
       "part": "Unisono",
             "grouped": [],
-      "goto": [{"passes": [3], "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetdisplay": "Transition"}],
+      "goto": [
+        {"passes": [3], "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetdisplay": "Transition"}
+      ],
       "staffs": {
         "UGAL": [
           { "starttime": 32, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
@@ -324,7 +326,10 @@
       "uuid": "ed411c50-976c-46b9-ac83-66ab4ef8663c",
       "part": "Unisono",
       "grouped": [],
-      "goto": [{"targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"}],
+      "goto": [
+        {"targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"},
+        {"passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetdisplay": "End"}
+      ],
       "staffs": {
         "UGAL": [
           { "starttime": 64, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
@@ -895,8 +900,7 @@
             "grouped": [],
       "goto": [
         {"passes": [1, 2], "cycle": 3, "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
-        {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"},
-        {"passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetdisplay": "End"}
+        {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"}
       ],
       "staffs": {
         "UGAL": [

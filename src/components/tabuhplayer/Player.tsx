@@ -9,6 +9,7 @@ import {
     type HighlightRange,
     type MenuItemInfo,
     type PlayerCursorAction,
+    type Position,
     type SamplerAction,
     type Score,
     type SVGInfo,
@@ -36,7 +37,7 @@ export default function ScorePlayer({
     timelineUpdater
 }: {
     score: Score | undefined
-    focus: string[]
+    focus: Position[]
     pbSpeed: number
     svgInfo: SVGInfo
     panggulOption: MenuItemInfo
@@ -57,7 +58,7 @@ export default function ScorePlayer({
         animation: null
     })
     const panggulOptionRef: RefObject<MenuItemInfo> = useRef<MenuItemInfo>(panggulDefaultOption)
-    const focusRef: RefObject<string[]> = useRef<string[]>([])
+    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
     const pbSpeedRef: RefObject<number> = useRef<number>(1)
     svgInfoRef.current = svgInfo
     panggulOptionRef.current = panggulOption

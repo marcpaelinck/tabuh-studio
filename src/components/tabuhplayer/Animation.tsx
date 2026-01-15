@@ -4,7 +4,14 @@ import { ReactSVG } from 'react-svg'
 import { Col, Grid, Loader, Row, Slider, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
-import type { AnimationData, HighlightRange, MenuItemInfo, NotationParagraph, SVGInfo } from '../../models/types'
+import type {
+    AnimationData,
+    HighlightRange,
+    MenuItemInfo,
+    NotationParagraph,
+    Position,
+    SVGInfo
+} from '../../models/types'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
@@ -17,7 +24,7 @@ import Selector from '../Selector'
 // (Animation can currently animate only one instrument at the same time)
 function positionToSvg(positions: string[]): string {
     const svgList: string[] = []
-    positions.forEach((pos: string) => svgList.push(positionConfigs[pos]?.svg_file))
+    positions.forEach((pos: string) => svgList.push(positionConfigs[pos as Position]?.svg_file))
     const uniqueList: string[] = [...new Set(svgList)]
     return uniqueList.length == 1 ? uniqueList[0] : ''
 }

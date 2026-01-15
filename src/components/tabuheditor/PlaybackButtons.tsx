@@ -22,7 +22,6 @@ export function PlaybackButtons({
     score: EditorScore
     sysUuid: string
     systemIdPrefix: string
-    // playbackState: PlaybackState
     hasCursor: boolean
     playbackType: PlaybackType
     playbackAudioState: AudioState
@@ -59,14 +58,16 @@ export function PlaybackButtons({
             playback({ actionType: 'cursor', cursor: noCursor })
         } else {
             debug(`playing sys seq=${sysUuid}`)
-            // Load new score
+            // Create a playback score
             const index = score.systems.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
                 console.error(`no playback data found for system ${sysUuid}`)
             }
             playback({
                 actionType: 'load',
-                data: pbType == 'single' ? [score.systems[index]] : score.systems.slice(index, score.systems.length),
+                playbackType: pbType,
+                data: score,
+                systemIndex: index,
                 audiofunctions: Object.assign(audio, { moveEditorCursor, genericFunction: stopPlayback })
             })
             playback({ actionType: 'play', playbackType: pbType })

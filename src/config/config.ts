@@ -1,4 +1,4 @@
-import type { Note } from '../models/types'
+import type { Note, Position } from '../models/types'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 
 // TAILWIND STYLES
@@ -23,11 +23,11 @@ export type ColorName = | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' |
 
 // THEME
 
-type Color = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'violet'
+type ThemeColor = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'violet'
 
-export const theme: Record<string, Color> = { main: 'blue', animation: 'green', player: 'orange' }
+export const theme: Record<string, ThemeColor> = { main: 'blue', animation: 'green', player: 'orange' }
 
-export const tsStyleSheet = () => {
+export const rsStyleSheet = () => {
     for (const sheet of document.styleSheets) {
         if (sheet.title === 'reactsuite-theme.less') {
             return sheet
@@ -85,7 +85,7 @@ export const partColorPalette: ColorName[] = [
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-export const defaultIntroTime: number = 0 // silence added before the beginning of the score in milliseconds
+export const defaultIntroTime: number = 2000 // silence added before the beginning of the score in milliseconds
 export const defaultOutroTime: number = 10000 // attenuation time added after the end of the score in milliseconds
 
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
@@ -266,7 +266,7 @@ export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1
 export const EXTENSION = ['-', ' ']
 export const MUTING = ['.']
 
-export const positionConfigs: Record<string, PositionConfig> = {
+export const positionConfigs: Record<Position, PositionConfig> = {
     GONGS: {
         name: 'Gongs',
         type: 'percussion', //TODO move type to instrument and grouping info

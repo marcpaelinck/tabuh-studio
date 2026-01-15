@@ -32,7 +32,7 @@ export function useEditorScoreManager(score: EditorScore) {
             if (target) goto.targetdisplay = target.label || `# ${target.id}`
             else {
                 goto.targetdisplay = 'target unknown'
-                console.error(`system ${goto} in goto instruction not found.`)
+                console.error(`system ${goto} of goto directive not found.`)
             }
         })
     }, [editorScore])

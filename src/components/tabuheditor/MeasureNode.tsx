@@ -1,14 +1,14 @@
 import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import type { NavigationAction } from '../../config/config'
 import { useKeyboardListener } from '../../hooks/useKeyboard'
-import type { EditorMeasure, EditorSystem } from '../../models/types'
+import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import type { NavigationFunctionsType } from './contexts'
 import { NavigationFunctions } from './contexts'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
-    position: string
+    position: Position
     rowId: number
     colId: number
     validSymbols: string[]

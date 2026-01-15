@@ -1,7 +1,8 @@
 import _ from 'lodash'
 import { ignoreChars, positionConfigs } from '../config/config'
+import type { Position } from '../models/types'
 
-export const getValidSymbols = (position: string, includeSilences: boolean = false): string[] => {
+export const getValidSymbols = (position: Position, includeSilences: boolean = false): string[] => {
     const valids = Object.keys(positionConfigs[position].symbolToNoteNames)
     if (includeSilences) valids.push.apply(valids, ['.', '-'])
     return valids

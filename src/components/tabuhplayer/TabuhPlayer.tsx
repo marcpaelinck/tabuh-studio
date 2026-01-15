@@ -4,6 +4,7 @@ import { useScoreReader } from '../../hooks/useScoreReader'
 import {
     type HighlightRange,
     type MenuItemInfo,
+    type Position,
     type Score,
     type ScoreInfo,
     type SVGInfo,
@@ -26,7 +27,7 @@ export default function TabuhPlayer({
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
     const { score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old')
-    const [selectedFocus, setSelectedFocus] = useState<string[]>([])
+    const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
@@ -44,7 +45,7 @@ export default function TabuhPlayer({
         setMenuDisabled('focus', loadingScoreList || loadingScore || !score)
     }, [loadingScoreList, loadingScore])
 
-    const updateFocus = (focus: string[]): void => {
+    const updateFocus = (focus: Position[]): void => {
         if (focus !== selectedFocus) {
             setSelectedFocus(focus)
             //TODO currently only displaying notation for the first focus position
@@ -58,7 +59,7 @@ export default function TabuhPlayer({
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
         const menuItems: MenuItemInfo[] = selectedFocus.map((position) => {
-            return { key: position, displayValue: positionConfigs[position].name, value: position }
+            return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
         })
         setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
         return [hideItem].concat(menuItems)

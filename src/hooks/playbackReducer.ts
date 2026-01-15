@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { noCursor } from '../components/tabuheditor/_constants'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
-import type { EditorCellCursor, EditorSystem } from '../models/types'
+import type { ActionFunctions, EditorCellCursor, EditorScore } from '../models/types'
 import { createTimelineFromEditor, scheduleTransport } from '../utils/createSchedule'
 import { debug } from '../utils/debugger'
 
@@ -13,11 +13,12 @@ export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; 
 export type PlaybackAction = {
     actionType: ActionType
     playbackType?: PlaybackType
-    data?: EditorSystem[]
+    data?: EditorScore
+    systemIndex?: number
     audiofunctions?: AudioFunctionsType
+    actionFunctions?: ActionFunctions
     cursor?: EditorCellCursor
 }
-
 async function asyncPlay() {
     if (Tone.getContext().state == 'suspended') {
         Tone.start()
@@ -35,17 +36,17 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
         case 'load': {
             debug(`executing 'load'`)
             if (action.data && action.audiofunctions) {
-                debug(`loading data for sys ${action.data[0].id}`)
-                const timeLine = createTimelineFromEditor(
-                    action.data,
-                    {
+                debug(`loading data for sys ${action.data.systems[0].id}`)
+                const loadAction = {
+                    ...action,
+                    actionFunctions: {
                         play: action.audiofunctions.playInstrument,
                         animate: null,
                         editorcursor: action.audiofunctions.moveEditorCursor,
                         generic: action.audiofunctions.genericFunction
-                    },
-                    true
-                )
+                    }
+                }
+                const timeLine = createTimelineFromEditor(loadAction, true)
                 scheduleTransport(timeLine)
                 debug({ ...state, audioState: 'stopped' }, true)
                 return { ...state, audioState: 'stopped' }

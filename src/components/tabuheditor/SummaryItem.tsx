@@ -202,7 +202,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             }
             case 'delete': {
                 if (gototargets?.has(sysData.uuid))
-                    msg = "Can't delete this system because one or more goto instructions point to this system."
+                    msg = "Can't delete this system because one or more goto directives point to this system."
                 break
             }
             default:

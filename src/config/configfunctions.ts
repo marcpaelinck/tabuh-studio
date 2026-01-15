@@ -1,3 +1,4 @@
+import type { Position } from '../models/types'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck, EXTENSION, MUTING, positionConfigs, SOUNDS_FOLDER } from './config'
 
@@ -24,9 +25,9 @@ async function sanityCheck() {
                 .map((note) => [instr, note])
         )
         .flat()
-    for (const [instr, note] of instrPitchStroke) {
-        const filename = positionConfigs[instr].sampletemplate.replace('{note}', note)
-        const found = instr in positionConfigs && (await fileExists(SOUNDS_FOLDER + filename))
+    for (const [position, note] of instrPitchStroke) {
+        const filename = positionConfigs[position as Position].sampletemplate.replace('{note}', note)
+        const found = position in positionConfigs && (await fileExists(SOUNDS_FOLDER + filename))
         if (!found) logMessage += `X ${filename} not found in ${SOUNDS_FOLDER}\n`
     }
     if (logMessage) console.error(logMessage)

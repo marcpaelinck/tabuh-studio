@@ -4,6 +4,23 @@ import type { BaseNoteTimeObj, MutingType, StrokeType, ToneType } from '../confi
 
 // INSTRUMENTS / AUDIO
 export type Instrument = { id: string; name: string; alphabet: string[] }
+export type Position =
+    | 'CALUNG'
+    | 'CENGCENG'
+    | 'GONGS'
+    | 'JEGOGAN'
+    | 'KANTILAN_POLOS'
+    | 'KANTILAN_SANGSIH'
+    | 'KEMPLI'
+    | 'KENDANG'
+    | 'PEMADE_POLOS'
+    | 'PEMADE_SANGSIH'
+    | 'PENYACAH'
+    | 'REYONG_1'
+    | 'REYONG_2'
+    | 'REYONG_3'
+    | 'REYONG_4'
+    | 'UGAL'
 
 // NOTATION
 
@@ -59,7 +76,7 @@ export type Section = {
     starttimeMs: number // start time in ms
     duration: number
     tempo: [number, number]
-    staves: { [position: string]: Measure } //TODO: rename to `measures`. Needs to be renamed in all input files too.
+    staves: Record<Position, Measure> //TODO: rename to `measures`. Needs to be renamed in all input files too.
 }
 
 // Subdivision of a score, typically spans one gongan
@@ -130,7 +147,7 @@ export type TextCursorPosition = {
 export type HighlightRange = { line: number; range: number[] }
 
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
-export type Staffs = Record<string, EditorMeasure[]>
+export type Staffs = Record<Position, EditorMeasure[]>
 
 export interface FrequencyItem {
     passes?: number[]
@@ -177,8 +194,8 @@ export type EditorSystem = {
 export type EditorScore = {
     title: string
     composer: string
-    parts: Record<string, string[]>
-    positions: string[] // sorted list of positions ordered as displayed in the editor
+    parts: Record<string, string[]> // <<part name>, <system uuid>[]>
+    positions: Position[] // sorted list of positions ordered as displayed in the editor
     systems: EditorSystem[]
 }
 
@@ -199,7 +216,7 @@ export type TempoAction = { time: BaseNoteTimeObj; bpm: Tone.Unit.NormalRange; d
 export interface SamplerAction {
     action: SamplerFunction
     time: BaseNoteTimeObj
-    position: string
+    position: Position
     cleanedSymbol: string
     bpm: number
     velocity: Tone.Unit.NormalRange
@@ -222,7 +239,7 @@ export type AnimationNote = {
 export type AnimationAction = {
     action: AnimationFunction
     time: BaseNoteTimeObj
-    position: string
+    position: Position
     prevsysUuid: string | null
     prevsection: number | null
     currnotes: AnimationNote[]
@@ -234,7 +251,7 @@ export type AnimationAction = {
 export type PlayerCursorAction = {
     action: PlayerCursorFunction
     time: BaseNoteTimeObj
-    position: string
+    position: Position
     section: number
     sysuuid: string
     symbol: string
@@ -260,7 +277,7 @@ export type TimeLine = {
     editorcursoractions: EditorCursorAction[]
     genericactions: GenericAction[]
     initialBPM: number
-    notation: { [position: string]: ReactElement<HTMLAttributes<HTMLParagraphElement>>[] }
+    notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
 }
 
 // functions that should be called when creating the Tone.Transport schedule

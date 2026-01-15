@@ -4,7 +4,7 @@ import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
 import { positionConfigs, type NavigationAction } from '../../config/config'
 import { type PlaybackState } from '../../hooks/playbackReducer'
 import { useRules } from '../../hooks/useRules'
-import type { EditorCellCursor, EditorSystem } from '../../models/types'
+import type { EditorCellCursor, EditorSystem, Position } from '../../models/types'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { StaffNode } from './StaffNode'
@@ -138,7 +138,8 @@ export function SystemNode({
         // TODO add a separate input field for grouped positions
         if (positions[rowId] != 'PEMADE_POLOS') return
         const newSystemData = { ...systemData }
-        positions.forEach((position) => {
+        positions.forEach((pos) => {
+            const position: Position = pos as Position
             if (!systemData.grouped.includes(position)) return
             const newNotation = castNotation(notation, position, colId)
             if (cached) newSystemData.staffs[position][colId].notation_ = newNotation
@@ -160,13 +161,14 @@ export function SystemNode({
 
     const staffNodes = useMemo(
         () =>
-            Object.entries(systemData.staffs).map(([position, measures], rowId) => {
+            Object.entries(systemData.staffs).map(([pos, measures], rowId) => {
+                const position: Position = pos as Position
                 if (systemData.index == 0) debug(`useMemo: recreating staffnodes of system ${systemUuid}`)
                 return (
                     <Row id={`ROW-${position}`}>
                         <Col id={`COL-POSITION`} span="auto">
                             <Text as="div" className="w-40 h-5">
-                                {positionConfigs[position].name}
+                                {positionConfigs[position as Position].name}
                             </Text>
                         </Col>
                         <Col id={`COL-POSITION`} span="auto">

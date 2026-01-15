@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Col } from 'rsuite'
-import type { EditorMeasure, EditorSystem } from '../../models/types'
+import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
 import { getValidSymbols } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'
@@ -17,7 +17,7 @@ export function StaffNode({
     colWidths
 }: {
     sysUuid: string
-    position: string
+    position: Position
     rowId: number
     measures: EditorMeasure[]
     systemData: EditorSystem

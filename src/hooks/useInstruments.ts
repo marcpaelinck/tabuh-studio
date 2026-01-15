@@ -11,16 +11,16 @@ import {
     SOUNDS_FOLDER
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import type { SamplerAction } from '../models/types'
+import type { Position, SamplerAction } from '../models/types'
 import { debug } from '../utils/debugger'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
-    play: (time: number, action: SamplerAction, focus: string[]) => void
+    play: (time: number, action: SamplerAction, focus: Position[]) => void
     mute: (time: number) => void
 }
 
-export type InstrumentSamplers = Record<string, InstrumentSampler>
+export type InstrumentSamplers = Record<Position, InstrumentSampler>
 
 // const pitchShift: Tone.PitchShift = new Tone.PitchShift({
 //   pitch: 0.0, // 1 unit equals 100 cents
@@ -63,7 +63,10 @@ const lookup = Object.fromEntries(
     Object.entries(positionConfigs).map(([position, config]) => {
         const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
         const indexToSample = Object.fromEntries(
-            noteList.map((note, index) => [NOTES[index], soundFile(note, positionConfigs[position].sampletemplate)])
+            noteList.map((note, index) => [
+                NOTES[index],
+                soundFile(note, positionConfigs[position as Position].sampletemplate)
+            ])
         )
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
         const symbolToIndices = Object.fromEntries(
@@ -77,8 +80,8 @@ const lookup = Object.fromEntries(
 )
 
 const createInstrument = (
-    position: string,
-    samplers: Record<string, Tone.Sampler | null>,
+    position: Position,
+    samplers: Record<Position, Tone.Sampler | null>,
     outroTime: number
 ): InstrumentSampler => {
     const sampler: Tone.Sampler | null = samplers[position]
@@ -110,7 +113,7 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: number = defaultOutroTime) => {
+export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime: number = defaultOutroTime) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -122,8 +125,11 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: 
 
     const instrumentSamplers: InstrumentSamplers = useMemo(() => {
         return Object.fromEntries(
-            Object.keys(positionConfigs).map((position) => [position, createInstrument(position, samplers, outroTime)])
-        )
+            Object.keys(positionConfigs).map((position) => [
+                position as Position,
+                createInstrument(position as Position, samplers, outroTime)
+            ])
+        ) as Record<Position, InstrumentSampler>
     }, [currentFocusRef])
 
     // Adds a small random deviation to the note attack time for a more realistic execution
@@ -142,7 +148,7 @@ export const useInstruments = (currentFocusRef: RefObject<string[]>, outroTime: 
 
     const muteAll = useCallback(
         (time: number) =>
-            Object.keys(instrumentSamplers).forEach((position) => instrumentSamplers[position].mute(time)),
+            Object.keys(instrumentSamplers).forEach((position) => instrumentSamplers[position as Position].mute(time)),
         [instrumentSamplers]
     )
 

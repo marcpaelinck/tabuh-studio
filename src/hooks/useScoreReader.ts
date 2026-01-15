@@ -8,6 +8,7 @@ import type {
     EditorSystem,
     JsonNote,
     JsonSymbol,
+    Position,
     Score,
     ScoreInfo,
     Staffs
@@ -76,16 +77,16 @@ function oldToNewFormat(score: Score): EditorScore {
             positions = Object.keys(system.sections[0].staves).toSorted(
                 (a, b) => editorSortingOrder.indexOf(a) - editorSortingOrder.indexOf(b)
             )
-            newScore.positions = positions
+            newScore.positions = positions as Position[]
         }
         const colWidths = system.sections.map((section) =>
             Math.max(...Object.values(section.staves).map((measure) => measure.notation.length))
         )
         const staffs: Staffs = Object.fromEntries(
             positions.map((position) => [
-                position,
+                position as Position,
                 system.sections.map((section) => {
-                    const measure = section.staves[position]
+                    const measure = section.staves[position as Position]
                     const editorMeasure: EditorMeasure = {
                         ..._.omit(measure, 'notation_'),
                         ...{ notation: measure.notation.map((sym) => sym.s) }
@@ -93,7 +94,7 @@ function oldToNewFormat(score: Score): EditorScore {
                     return editorMeasure
                 })
             ])
-        )
+        ) as Staffs
         // Delete the notes attribute of measures. Need to review the new data format
         Object.values(staffs).forEach((measures) =>
             measures.forEach((measure) => {

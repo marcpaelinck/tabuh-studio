@@ -9,7 +9,7 @@ import { playbackReducer } from '../../hooks/playbackReducer'
 import { useEditorScoreManager } from '../../hooks/useEditorScoreManager'
 import { useInstruments } from '../../hooks/useInstruments'
 import { usePartManager } from '../../hooks/usePartManager'
-import type { EditorScore, EditorSystem } from '../../models/types'
+import type { EditorScore, EditorSystem, Position } from '../../models/types'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { PartIndicator } from './PartIndicator'
@@ -30,7 +30,7 @@ export default function EditorWindow({
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
 } & HTMLAttributes<HTMLDivElement>) {
-    const focusRef: RefObject<string[]> = useRef<string[]>([])
+    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
     const { editorScore, labels, updateSystem, executeItemAction } = useEditorScoreManager(score)

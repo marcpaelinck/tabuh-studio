@@ -13,6 +13,7 @@ import {
     type JsonNote,
     type JsonSymbol,
     type Note,
+    type Position,
     type Score,
     type Section,
     type TimeLine
@@ -71,7 +72,7 @@ export function parseScore(input: string): Score {
 //   note_to_shCode[position] = Object.fromEntries(posConfigs.alphabet.map((char, index) => [char, posConfigs.notes[index]]))
 // }
 
-const note2AnimationNotes = (position: string, notationNote: JsonNote, ìsLast: boolean): AnimationNote[] => {
+const note2AnimationNotes = (position: Position, notationNote: JsonNote, ìsLast: boolean): AnimationNote[] => {
     if (!(position in positionConfigs)) return []
     const cleanedSymbol = cleanSymbol(notationNote.s)
     const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
@@ -116,7 +117,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
         playercursoractions: [],
         editorcursoractions: [],
         genericactions: [], // currently only used for final action when playback reaches end of schedule
-        notation: {}
+        notation: {} as Record<Position, any>
     }
     if (!score) return timeline
 
@@ -132,7 +133,8 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
 
             // Create sampler actions
             if (actionFunctions.play) {
-                for (const [position, measure] of Object.entries(section.staves)) {
+                for (const [pos, measure] of Object.entries(section.staves)) {
+                    const position = pos as Position
                     if (!(position in positionScore)) positionScore[position] = []
                     if (!(position in positionNotation)) positionNotation[position] = []
                     var sectionProgress: number = 0
@@ -170,7 +172,8 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
         timeline.genericactions.push({ action: actionFunctions.generic, time: n2TO(totalDurationInBaseNotes) })
 
     // Create animation actions
-    Object.keys(positionScore).forEach((position) => {
+    Object.keys(positionScore).forEach((pos) => {
+        const position = pos as Position
         const notes: JsonNote[] = positionScore[position]
         // Add an animation action for the displacement of the panggul
         // from the starting position to the first note
@@ -217,7 +220,8 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
 
     // Create cursor actions
     if (actionFunctions.playercursor) {
-        Object.keys(positionNotation).forEach((position) => {
+        Object.keys(positionNotation).forEach((pos) => {
+            const position = pos as Position
             timeline.notation[position] = []
             const symbols: JsonSymbol[] = positionNotation[position]
             let currentline: string = ''

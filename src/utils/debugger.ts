@@ -2,7 +2,7 @@ import _ from 'lodash'
 
 // Enable/disable the debug function for each module in the list below.
 const debugOn: Record<string, boolean> = {
-    createSchedule: false,
+    createSchedule: true,
     EditorWindow: false,
     Menu: false,
     MeasureNode: false,
@@ -16,7 +16,7 @@ const debugOn: Record<string, boolean> = {
     StaffNode: false,
     SystemContextMenu: false,
     SystemNode: false,
-    SummaryItem: true,
+    SummaryItem: false,
     TabuhEditor: false,
     useEditorScoreManager: false,
     useInstruments: false,
