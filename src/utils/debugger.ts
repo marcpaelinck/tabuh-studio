@@ -1,14 +1,15 @@
 import _ from 'lodash'
 
 // Enable/disable the debug function for each module in the list below.
-const debugOn: Record<string, boolean> = {
-    createSchedule: true,
+// Specify a function by setting the dict value to {functionName: true}
+const debugOn: Record<string, boolean | Record<string, boolean>> = {
+    createSchedule: false,
     EditorWindow: false,
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
     PartIndicator: false,
-    PlaybackButtons: false,
+    PlaybackButtons: { moveEditorCursor: true },
     playbackReducer: false,
     registerComponent: false,
     score: false,
@@ -55,7 +56,12 @@ export const debug = (message: any, raw: boolean = false) => {
     // Check if the module is in the above debugOn list
     if (!(module in debugOn)) console.log(`debug: no entry for ${module}.`)
 
-    if (debugOn[module]) {
+    if (
+        debugOn[module] == true ||
+        (typeof debugOn[module] == 'object' &&
+            // if func is async, its name will be followed by a digit.
+            (debugOn[module][func] == true || debugOn[module][func.slice(0, -1)] == true))
+    ) {
         const callerTxt = module ? `${func} [${module}]` : ''
         if (raw || typeof message == 'object') {
             if (!raw) console.log(`${callerTxt}:`)

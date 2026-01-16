@@ -57,6 +57,8 @@ export default function EditorWindow({
     }
 
     useEffect(() => {
+        // TODO this code should only run when a new score is loaded. It currently runs after each
+        // update of editorScore.
         const initExpandState = Object.fromEntries(
             editorScore.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )

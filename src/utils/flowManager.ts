@@ -42,7 +42,7 @@ const prioGoto = (goto: GotoItem): number => {
     return prio
 }
 
-// Lower prio number number goes first
+// Lower prio number goes first
 const compareGoto = (goto1: GotoItem, goto2: GotoItem): number => prioGoto(goto1) - prioGoto(goto2)
 
 // Returns functions that can be used to iterate throught the score in the correct sequence.

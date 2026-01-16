@@ -899,7 +899,7 @@
       "part": "Kotekan",
             "grouped": [],
       "goto": [
-        {"passes": [1, 2], "cycle": 3, "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
+        {"targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
         {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"}
       ],
       "staffs": {

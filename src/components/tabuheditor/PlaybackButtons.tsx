@@ -3,7 +3,7 @@ import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../hooks/playbackReducer'
-import type { EditorCursorAction, EditorScore } from '../../models/types'
+import type { EditorCursorAction, EditorScore, EditorSystem } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
@@ -36,13 +36,23 @@ export function PlaybackButtons({
         playback({ actionType: 'cursor', cursor: noCursor })
     }
 
-    async function moveEditorCursor(time: number, cAction: EditorCursorAction) {
-        if (cAction.prevsysuuid) expandIfNotExpanded(cAction.prevsysuuid, false)
-        expandIfNotExpanded(cAction.sysuuid, true)
+    function sys(uuid: string | undefined): EditorSystem | undefined {
+        return score.systems.find((sys) => sys.uuid == uuid)
+    }
+
+    function moveEditorCursor(time: number, cAction: EditorCursorAction) {
+        if (cAction.prevsysuuid && cAction.prevsysuuid != cAction.sysuuid) {
+            debug(`Close panel ${sys(cAction.prevsysuuid)?.id}, curr=${sys(cAction.sysuuid)?.id}`)
+            expandIfNotExpanded(cAction.prevsysuuid, false)
+        }
+        if (cAction.prevsysuuid != cAction.sysuuid) {
+            debug(`Open panel ${sys(cAction.sysuuid)?.id} prev=${sys(cAction.prevsysuuid)?.id}`)
+            expandIfNotExpanded(cAction.sysuuid, true)
+        }
         playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
-        debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
+        // debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
         const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
-        debug(`scrolling ${currElement?.id} into view`)
+        // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
