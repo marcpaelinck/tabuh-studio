@@ -217,7 +217,11 @@ export default function EditorWindow({
                                     key={systemData.uuid}
                                     // Panel Header
                                     header={
-                                        <Grid id="systemsummary" className="ml-0 pt-0 pb-0">
+                                        <Grid
+                                            id="systemsummary"
+                                            className="ml-0 pt-0 pb-0"
+                                            // Avoid expanding the panel when the user clicks on a header item.
+                                            onClick={(e) => e.stopPropagation()}>
                                             {/* Displays playback buttons and info about the System */}
                                             <Row id="row">
                                                 {systemHeaderButtons[systemData.uuid]}

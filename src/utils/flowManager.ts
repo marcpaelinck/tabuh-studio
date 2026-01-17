@@ -1,5 +1,5 @@
 // The FlowManager functions enable to run through the score in the correct sequence.
-// the functions take `iterate` and `goto` directives into account.
+// the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import _ from 'lodash'
 import type { PlaybackType } from '../hooks/playbackReducer'
@@ -17,7 +17,7 @@ interface flowInfoTable {
         system: EditorSystem
         maxSectIdx: number
         pass: number
-        iteration: number
+        loop: number
         gotos: GotoItem[] | undefined
     }
 }
@@ -45,7 +45,7 @@ const prioGoto = (goto: GotoItem): number => {
 // Lower prio number goes first
 const compareGoto = (goto1: GotoItem, goto2: GotoItem): number => prioGoto(goto1) - prioGoto(goto2)
 
-// Returns functions that can be used to iterate throught the score in the correct sequence.
+// Returns functions that can be used to run throught the score in the correct sequence.
 export function flowManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
     var cursor: FlowCursor | undefined = undefined
 
@@ -55,7 +55,7 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
             const gotos = system.goto?.sort(compareGoto)
-            return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, iteration: 0, gotos: gotos }]
+            return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, gotos: gotos }]
         })
     )
 
@@ -63,7 +63,7 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
 
     function resetFlow() {
         _.values(flowinfo).forEach((value) => {
-            value.iteration = 0
+            value.loop = 0
             value.pass = 0
         })
         cursor = undefined
@@ -114,13 +114,13 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
                 const gotoIdx = getGotoId(cursor.sysIdx)
                 if (gotoIdx == undefined && cursor.sysIdx >= score.systems.length - 1) return undefined
                 const nextSysIdx = gotoIdx != undefined ? gotoIdx : cursor.sysIdx + 1
-                // Update pass and iteration counters
-                if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].iteration += 1
+                // Update pass and loop counters
+                if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].loop += 1
                 else {
-                    // Reset iteration counter of the current system
-                    flowinfo[cursor.sysIdx].iteration = 0
+                    // Reset loop counter of the current system
+                    flowinfo[cursor.sysIdx].loop = 0
                     flowinfo[nextSysIdx].pass += 1
-                    flowinfo[nextSysIdx].iteration += 1
+                    flowinfo[nextSysIdx].loop += 1
                 }
                 cursor = {
                     sysIdx: nextSysIdx,

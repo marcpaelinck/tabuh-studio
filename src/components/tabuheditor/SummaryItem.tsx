@@ -56,13 +56,14 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         iconcolor?: string
         action: string
         hasfield: boolean
+        formtitle?: string // Title to display in editing mode
         fieldval?: string | number
         textcolor?: string
         buttonTooltip?: string
         fieldTooltip?: string
     }
 
-    // Auxiliary functions for the Goto, Iterate, Dynamics and Tempo tooltips.
+    // Auxiliary functions for the Goto, Loop, Dynamics and Tempo tooltips.
 
     function toText(values: number[] | undefined, ordinal: boolean = false): string {
         if (values) {
@@ -91,17 +92,11 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     }
 
     const specs: Record<string, SpecType> = {
-        id: {
-            icon: AiOutlineNumber,
-            action: 'none',
-            hasfield: true,
-            fieldval: sysData.id,
-            fieldTooltip: 'Sequence id. This value may change if systems are added above this one.'
-        },
+        id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id, fieldTooltip: sysData.uuid },
         label: {
             icon: TsLabelIcon,
             iconcolor: '#1C78E0',
-            action: 'edit',
+            action: 'editfield',
             hasfield: true,
             fieldval: sysData.label,
             textcolor: 'orange',
@@ -117,8 +112,9 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         copy: {
             icon: TsCopyIcon,
             iconcolor: '#1C78E0',
-            action: 'copy',
+            action: 'inputpicker',
             hasfield: true,
+            formtitle: 'copy',
             fieldval: sysData.copyfrom,
             textcolor: 'blue',
             buttonTooltip: 'Select a system that should be copied below this one.',
@@ -134,11 +130,12 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         goto: {
             icon: IoArrowForwardOutline,
             iconcolor: '#1C78E0',
-            action: 'goto',
+            action: 'gotoform',
             hasfield: true,
+            formtitle: `Go To and Loop for system # ${sysData.id}`,
             fieldval: sysData.goto?.map((goto: GotoItem) => gotoText(goto, 'short')).join('\n') || '',
             textcolor: 'green',
-            buttonTooltip: 'Add a `goto` instruction.',
+            buttonTooltip: 'Add a `goto` or `loop` instruction.',
             fieldTooltip: sysData.goto?.map((goto) => gotoText(goto, 'long')).join('\n') || ''
         }
     }
@@ -148,7 +145,6 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
 
     // Action performed on button click event and after field editing/selection.
     function buttonAction(event: any, action: string) {
-        event.stopPropagation()
         debug(`executing button action ${action}`)
         if (specs[item].hasfield) {
             setEditing(true)
@@ -182,7 +178,6 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
 
     function inputAction(event: any, action: string, value: string | undefined) {
         event.target.blur()
-        event.stopPropagation()
         debug(`warning is ${warning}`)
         if (action != 'cancel' && !(warning == null)) return
         const returnValue = value || inputRef.current?.value
@@ -238,13 +233,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
     // Input field for values whose action is 'edit'
     const inputField = (
         <InputGroup inside size="xs" {...props}>
-            <Input
-                ref={inputRef}
-                defaultValue={specs[item].fieldval || ''}
-                onClick={(e) => e.stopPropagation()}
-                onKeyUp={onEnter}
-                onChange={validate}
-            />
+            <Input ref={inputRef} defaultValue={specs[item].fieldval || ''} onKeyUp={onEnter} onChange={validate} />
             <InputGroup.Addon as="span">
                 <SaveCancelBtn action="cancel" />
                 <SaveCancelBtn action="save" />
@@ -258,21 +247,27 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
             ref={inputRef}
             data={options || []}
             defaultValue={specs[item].fieldval || ''}
-            onClick={(e) => e.stopPropagation()}
             onChange={(val, e) => inputAction(e, 'save', val)}
-            placeholder={`${specs[item].action}`}
+            placeholder={`${specs[item].formtitle}`}
             width="100%"
         />
     )
 
-    const flowItemsForm = <FlowItemsForm gotoItems={sysData.goto || []} open={editing} setOpen={setEditing} />
+    const flowItemsForm = (
+        <FlowItemsForm
+            gotoItems={sysData.goto || []}
+            title={`${specs[item].formtitle}`}
+            open={editing}
+            setOpen={setEditing}
+        />
+    )
 
     const inputMethod =
-        specs[item].action == 'edit'
+        specs[item].action == 'editfield'
             ? inputField
-            : specs[item].action == 'copy'
+            : specs[item].action == 'inputpicker'
               ? inputPicker
-              : specs[item].action == 'goto'
+              : specs[item].action == 'gotoform'
                 ? flowItemsForm
                 : null
 

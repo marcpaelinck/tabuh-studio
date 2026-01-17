@@ -1,40 +1,61 @@
-import { useState, type Dispatch } from 'react'
-import { Button, Drawer, Form, List, type FormControlProps, type FormProps } from 'rsuite'
+import { useEffect, useState, type Dispatch } from 'react'
+import { Button, Drawer, Form, List, type DividerProps, type FormControlProps, type FormProps } from 'rsuite'
 import type { GotoItem } from '../../models/types'
+import { debug } from '../../utils/debugger'
 
-interface GotoItemListType extends FormControlProps {
-    data: GotoItem[]
-    name: string
-    label: string
+interface GotoListType extends DividerProps {
+    value?: GotoItem[]
+    setSelected: Dispatch<GotoItem | null>
 }
 
-const GotoItemList = ({ data, name, label, ...props }: GotoItemListType) => (
-    <Form.Group controlId={name} {...props}>
-        <Form.Label>{label}</Form.Label>
-        <Form.Control name={name} {...props} />
+const GotoList = ({ value, setSelected }: GotoListType) => {
+    function handleClick(idx: number) {
+        setSelected((value || [])[idx])
+    }
+
+    return (
         <List>
-            {(data || []).map((item, idx) => (
+            {(value || []).map((val, idx) => (
                 <List.Item key={`goto-${idx}`}>
-                    <div>{item.targetdisplay}</div>
+                    <div
+                        onClick={() => {
+                            if (value) handleClick(idx)
+                        }}>
+                        {val.targetdisplay}
+                    </div>
                 </List.Item>
             ))}
         </List>
-    </Form.Group>
-)
-
-interface FormFieldType extends FormControlProps<Text> {
-    name: string
-    label: string
-    text: string
+    )
 }
 
-const FormField = ({ name, label, text, ...props }: FormFieldType) => (
-    <Form.Group controlId={name}>
+interface GotoItemListType extends FormControlProps {
+    value?: GotoItem[]
+    label: string
+    setSelected: Dispatch<GotoItem | undefined>
+}
+
+const GotoItemList = ({ label, value, setSelected, ...props }: GotoItemListType) => (
+    <Form.Group controlid={props.name} {...props}>
         <Form.Label>{label}</Form.Label>
-        <Form.Control name={name} {...props} />
-        {text && <Form.Text>{text}</Form.Text>}
+        <Form.Control accepter={GotoList} setSelected={setSelected} {...props} />
     </Form.Group>
 )
+
+interface GotoItemEditorProps extends FormControlProps<Text> {
+    item: GotoItem | undefined
+}
+
+const GotoItemEditor = ({ item, ...props }: GotoItemEditorProps) => {
+    useEffect(() => debug(`gotoItemEditor: ${JSON.stringify(props.value)}`), [props.value])
+    return (
+        <Form.Group controlId={props.name}>
+            <Form.Label>Target system</Form.Label>
+            <Form.Control {...props} />
+            {item?.targetdisplay && <Form.Text>{item.targetdisplay || ''}</Form.Text>}
+        </Form.Group>
+    )
+}
 
 interface FlowInputFormType extends FormProps {
     gotoItems: GotoItem[]
@@ -44,7 +65,17 @@ interface FlowInputFormType extends FormProps {
 }
 
 export function FlowItemsForm({ gotoItems, title, open, setOpen, ...props }: FlowInputFormType) {
-    const [formValue, setFormValue] = useState<Record<string, any>>({})
+    const [formValue, setFormValue] = useState<Record<string, any>>({ select: gotoItems, gotoItem: '' })
+    const [selectedItem, setSelectedItem] = useState<GotoItem | undefined>(undefined)
+
+    useEffect(() => {
+        const newFormValue = { ...formValue, gotoItem: selectedItem?.targetdisplay || '' }
+        setFormValue(newFormValue)
+    }, [selectedItem])
+
+    useEffect(() => {
+        debug(formValue)
+    }, [formValue])
 
     const handleClose = () => {
         setOpen(false)
@@ -60,14 +91,12 @@ export function FlowItemsForm({ gotoItems, title, open, setOpen, ...props }: Flo
                 <Drawer.Actions>
                     <Button
                         onClick={(e) => {
-                            e.stopPropagation()
                             setOpen(false)
                         }}>
                         Cancel
                     </Button>
                     <Button
                         onClick={(e) => {
-                            e.stopPropagation()
                             setOpen(false)
                         }}
                         appearance="primary">
@@ -77,13 +106,8 @@ export function FlowItemsForm({ gotoItems, title, open, setOpen, ...props }: Flo
             </Drawer.Header>
             <Drawer.Body>
                 <Form fluid onChange={setFormValue} formValue={formValue} {...props}>
-                    <GotoItemList
-                        name="select"
-                        label="ItemList"
-                        accepter={GotoItemList}
-                        data={gotoItems}
-                        errorPlacement="bottomStart"
-                    />
+                    <GotoItemList name="select" label="ItemList" setSelected={setSelectedItem} />
+                    <GotoItemEditor item={selectedItem} name="gotoItem" />
                 </Form>
             </Drawer.Body>
         </Drawer>

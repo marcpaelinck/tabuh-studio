@@ -5,11 +5,12 @@ import _ from 'lodash'
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     createSchedule: false,
     EditorWindow: false,
+    FlowItemsForm: true,
     Menu: false,
     MeasureNode: false,
     NavigationCell: false,
     PartIndicator: false,
-    PlaybackButtons: { moveEditorCursor: true },
+    PlaybackButtons: { moveEditorCursor: false },
     playbackReducer: false,
     registerComponent: false,
     score: false,

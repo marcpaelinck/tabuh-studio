@@ -159,7 +159,7 @@ export interface GotoItem extends FrequencyItem {
     targetdisplay: string
 }
 
-export interface IterationItem extends FrequencyItem {
+export interface LoopItem extends FrequencyItem {
     count: number
 }
 
@@ -170,7 +170,7 @@ export interface GradualItem {
     toSection: number
     fromValue?: number
     toValue: number
-    iterations?: number[]
+    loops?: number[]
 }
 
 export type EditorSystem = {
@@ -183,7 +183,7 @@ export type EditorSystem = {
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string
-    iterate?: IterationItem
+    loop?: LoopItem
     goto?: GotoItem[]
     tempo?: GradualItem[]
     dynamics?: GradualItem[]
