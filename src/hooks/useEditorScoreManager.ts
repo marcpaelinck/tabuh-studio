@@ -1,9 +1,60 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import type { EditorScore, EditorSystem, GotoItem } from '../models/types'
+import type { EditorScore, EditorSystem, FlowItem } from '../models/types'
 import { debug } from '../utils/debugger'
-import { defaultObject } from '../utils/objectUtils'
+import { defaultObject, toOrdinal } from '../utils/objectUtils'
+
+function toText(values: number[] | undefined, ordinal: boolean = false): string {
+    if (values) {
+        var list = values.map((val) => `${val}`)
+        if (ordinal) list = values.map((val) => toOrdinal(val))
+        if (list.length > 1) return list.slice(0, -1).join(', ') + ' & ' + _.last(list)
+        else return list.join('') // also takes care of empty array
+    } else return ''
+}
+
+export function flowItemTooltip(item: FlowItem, length: 'short' | 'long'): string {
+    const nbrOfPasses = !item.passes ? 0 : item.passes.length
+    const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
+    const sortedPasses = item.passes ? item.passes.sort() : []
+    const cycle = !item.cycle ? 0 : item.cycle
+    var instruction: string = ''
+    var passcondition: string = ''
+    var short: string = 'xx'
+    switch (item.type) {
+        case 'goto': {
+            short = item.targetname
+            instruction = `go to ${item.targetname}`
+            passcondition = 'after'
+            break
+        }
+        case 'loop': {
+            short = `${item.count}X`
+            instruction = `play ${item.count}X`
+            passcondition = 'on'
+            break
+        }
+    }
+    if (length == 'short') return short
+
+    switch (true) {
+        case !nbrOfPasses:
+            return instruction
+        case nbrOfPasses && !item.each:
+            return `${instruction} ${passcondition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}`
+        case nbrOfPasses && item.each && !cycle:
+            return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+        case nbrOfPasses && item.each && cycle > 0 && cycle == maxPassNr:
+            return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+        default:
+            return `${instruction} ${passcondition} ${toText(sortedPasses, true)} of every ${item.cycle} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+    }
+}
+
+function gotoItemTargetName(destination: EditorSystem) {
+    return destination.label ? destination.label : `#${destination.id}`
+}
 
 export function useEditorScoreManager(score: EditorScore) {
     const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
@@ -12,30 +63,40 @@ export function useEditorScoreManager(score: EditorScore) {
 
     useEffect(() => {
         // Convert new score to data record structure
+        debug('updating score')
         setEditorScore(score)
-        //TODO WRITE NEW LAYOUT TO CONSOLE
+        const labeldict = Object.fromEntries(
+            score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
+        )
+        setLabels(labeldict)
         console.log(score)
     }, [score])
 
     useEffect(() => {
         // (Re-) number the system index and id values.
         // Should be performed at each render due to possible user actions (insert or delete system).
-        const gotos: GotoItem[] = []
+        const flowitems: FlowItem[] = []
         editorScore.systems.forEach((systemData, sysIdx) => {
             systemData.index = sysIdx
             systemData.id = systemData.index + 1
-            if (systemData.goto) gotos.push(...systemData.goto)
+            if (systemData.flow) flowitems.push(...systemData.flow)
         })
         // Update the goto display values.
-        gotos.forEach((goto) => {
-            const target = editorScore.systems.find((sys) => sys.uuid == goto.targetuuid)
-            if (target) goto.targetdisplay = target.label || `# ${target.id}`
-            else {
-                goto.targetdisplay = 'target unknown'
-                console.error(`system ${goto} of goto directive not found.`)
+        debug('updating flow items')
+        flowitems.forEach((item) => {
+            if (item.type == 'goto') {
+                const target = editorScore.systems.find((sys) => sys.uuid == item.targetuuid)
+                if (target) item.targetname = target.label || `# ${target.id}`
+                else {
+                    item.targetname = 'target unknown'
+                    console.error(`system ${item} of goto directive not found.`)
+                }
+                item.tooltip = flowItemTooltip(item, 'long')
+                item.tooltipshort = flowItemTooltip(item, 'short')
             }
+            debug(`${item.tooltip} -- ${item.tooltipshort}`)
         })
-    }, [editorScore])
+    }, [score, editorScore])
 
     function updateSystem(sysData: EditorSystem) {
         const sysIdx = sysData.index
@@ -57,20 +118,26 @@ export function useEditorScoreManager(score: EditorScore) {
                     systemData.copyfromkey = undefined
                 }
             } else systemData.copyfrom = undefined
-            if (systemData.goto) {
-                systemData.goto.forEach((goto) => {
-                    const destination = newSystemData.find((sysData) => sysData.uuid == goto.targetuuid)
-                    if (destination) {
-                        debug(`found goto destination ${destination.uuid}`)
-                        {
-                            goto.targetdisplay = destination.label ? destination.label : `#${destination.id}`
+            if (systemData.flow) {
+                systemData.flow
+                    .filter((item) => item.type == 'goto')
+                    .forEach((goto) => {
+                        const destination = newSystemData.find((sysData) => sysData.uuid == goto.targetuuid)
+                        if (destination) {
+                            debug(`found goto destination ${destination.uuid}`)
+                            {
+                                goto.targetname = gotoItemTargetName(destination)
+                                goto.tooltip = flowItemTooltip(goto, 'long')
+                                goto.tooltipshort = flowItemTooltip(goto, 'short')
+                            }
+                        } else {
+                            goto.targetname = 'Error: goto target not found.'
+                            goto.tooltip = goto.targetname
+                            goto.tooltipshort = 'Error'
+                            console.error(`Error: goto target not found for ${systemData.uuid}.`)
                         }
-                    } else {
-                        goto.targetdisplay = 'Error: goto target not found.'
-                        console.error(`Error: goto target not found for ${systemData.uuid}.`)
-                    }
-                })
-            } else systemData.goto = undefined
+                    })
+            } else systemData.flow = undefined
         })
     }
 
@@ -89,10 +156,6 @@ export function useEditorScoreManager(score: EditorScore) {
         var sliceIndex1: number = systemData.index
         var sliceIndex2: number = systemData.index + 1
         switch (fieldname) {
-            case 'part':
-                // Modify the `part` field of the system
-                if (typeof value == 'string') newSystemData.part = value
-                break
             case 'label':
                 if (typeof value == 'string') {
                     // New label: add it to the list
@@ -115,9 +178,8 @@ export function useEditorScoreManager(score: EditorScore) {
                         measure.notation = []
                     })
                 })
-                newSystemData.part = ''
                 newSystemData.label = undefined
-                newSystemData.goto = undefined
+                newSystemData.flow = undefined
                 newSystemData.uuid = uuidv4()
                 sliceIndex1 = systemData.index + 1 // Insert below current
                 break
@@ -131,7 +193,6 @@ export function useEditorScoreManager(score: EditorScore) {
                 }
                 newSystemData = _.cloneDeep(source)
                 newSystemData.uuid = uuidv4()
-                newSystemData.part = ''
                 newSystemData.label = undefined
                 newSystemData.copyfromkey = source.uuid
                 // newSystemData.copyfrom = source.label || `#${source.index}`
@@ -140,16 +201,22 @@ export function useEditorScoreManager(score: EditorScore) {
             }
             case 'goto':
                 if (!value) {
-                    newSystemData.goto = undefined
+                    newSystemData.flow = undefined
                 } else {
                     const destination = editorScore.systems.find((sys) => sys.uuid == value)
                     if (!destination) {
                         console.error(`goto: could not find system ${value}`)
                         return
                     }
-                    if (!newSystemData.goto) newSystemData.goto = []
-                    // targetDisplay will be modified by the EditorScoreManager
-                    newSystemData.goto.push({ targetuuid: destination.uuid, targetdisplay: '' })
+                    if (!newSystemData.flow) newSystemData.flow = []
+                    // tooltips will be modified by the EditorScoreManager
+                    newSystemData.flow.push({
+                        type: 'goto',
+                        targetuuid: destination.uuid,
+                        tooltip: '',
+                        tooltipshort: '',
+                        targetname: ''
+                    })
                 }
                 break
             case 'delete':

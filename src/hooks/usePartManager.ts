@@ -12,22 +12,16 @@ export function usePartManager(score: EditorScore) {
     const [currSelection, setCurrSelection] = useState<string[]>([]) // List of uuids of currently selected systems
     const [partColors, setPartColors] = useState<Record<string, string>>({}) // Mapping part name -> color
 
-    // Create system to part lookup
-    const newSysToPart: Record<string, string> = {}
     useEffect(() => {
-        _.forIn(score.parts, (systems, part) => systems.forEach((uuid) => (newSysToPart[uuid] = part)))
-        setSysToPartLookup(newSysToPart)
-        debug(newSysToPart)
-        // Set the colors for each part of the score
+        // Create system to sys->part and part->color lookups
+        const newSysToPart: Record<string, string> = {}
         const newPartColors: Record<string, string> = {}
-        var currPart = ''
-        score.systems.forEach((sys) => {
-            if (sys.part != currPart && !(sys.part in newPartColors)) {
-                const color = partColorPalette[Object.keys(newPartColors).length % partColorPalette.length]
-                newPartColors[sys.part] = color
-                currPart = sys.part
-            }
+        _.forIn(score.parts, (systems, part) => {
+            systems.forEach((uuid) => (newSysToPart[uuid] = part))
+            const color = partColorPalette[Object.keys(newPartColors).length % partColorPalette.length]
+            newPartColors[part] = color
         })
+        setSysToPartLookup(newSysToPart)
         setPartColors(newPartColors)
         setCurrSelection([])
     }, [score])

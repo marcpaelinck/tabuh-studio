@@ -10,6 +10,7 @@ import { useEditorScoreManager } from '../../hooks/useEditorScoreManager'
 import { useInstruments } from '../../hooks/useInstruments'
 import { usePartManager } from '../../hooks/usePartManager'
 import type { EditorScore, EditorSystem, Position } from '../../models/types'
+import { debug } from '../../utils/debugger'
 import { noCursor } from './_constants'
 import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
 import { PartIndicator } from './PartIndicator'
@@ -77,7 +78,7 @@ export default function EditorWindow({
     // gotoTargets will be used by the 'delete' SummaryItem button for validation.
     var gotoTargets: Set<string> = new Set()
     editorScore.systems.forEach((sys) => {
-        if (sys.goto) sys.goto.forEach((goto) => gotoTargets.add(goto.targetuuid))
+        if (sys.flow) sys.flow.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
     })
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
@@ -88,6 +89,7 @@ export default function EditorWindow({
             label: label,
             value: sysData.uuid
         }))
+        debug(labels)
         const labelledUuid = labelOptions.map((entry) => entry.value)
         //
         // 2. List of non-labelled systems
@@ -168,9 +170,9 @@ export default function EditorWindow({
                             </SCol>
                             <SCol span={4}>
                                 <SummaryItem
-                                    item="goto"
+                                    item="goto_loop"
                                     sysData={systemData}
-                                    options={systemSelectorOptions(systemData, false, true)}
+                                    options={systemSelectorOptions(systemData, false, false)}
                                     execute={execute}
                                 />
                             </SCol>

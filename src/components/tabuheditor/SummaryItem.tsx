@@ -2,7 +2,6 @@
 // This summary contains buttons optionally combined with a text field. The item type determines the button's action
 // such as editing a field name (e.g. `part` or `label`) or creating/copying a section. After the action is performed
 // the field will contain the result of the action (e.g. new field value or id/label of copied system).
-import _ from 'lodash'
 import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
@@ -21,13 +20,12 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import type { EditorSystem, GotoItem } from '../../models/types'
+import type { EditorScore, EditorSystem, FlowItem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import { debug } from '../../utils/debugger'
-import { toOrdinal } from '../../utils/objectUtils'
 import { FlowItemsForm } from './FlowItemsForm'
 
 // Col item formatted to contain summary items
@@ -35,27 +33,40 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type ItemType = 'id' | 'part' | 'label' | 'new' | 'copy' | 'delete' | 'goto'
+type ItemType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'goto_loop' | 'tempo_dynamics'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: ItemType
     sysData: EditorSystem
+    score?: EditorScore
     labels?: Record<string, EditorSystem>
     gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string>[]
 }
 
-// This is a single summary item containing a button and a value field.
-// Depending on the item's specs, the button's action will optionally collect information
+// This Element displays a single System attribute. The element containing a button and/or a value field.
+// Depending on the value of the `action` property, the button's action will optionally collect information
 // from the user (e.g. new field value or label name of the system to copy)
 // and will then perform the `execute` function.
-export function SummaryItem({ item, sysData, labels, gototargets, execute, options, ...props }: SummaryItemProps) {
+export function SummaryItem({
+    item,
+    sysData,
+    score,
+    labels,
+    gototargets,
+    execute,
+    options,
+    ...props
+}: SummaryItemProps) {
+    // Specifications of the display mode and functionality of each SummaryItem type.
+    // See below for a detailed description of the properties of this interface.
+    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'gotoform' | 'none'
     interface SpecType {
         icon: IconType
         iconcolor?: string
-        action: string
-        hasfield: boolean
+        action: ActionType
+        hasfield?: boolean
         formtitle?: string // Title to display in editing mode
         fieldval?: string | number
         textcolor?: string
@@ -63,35 +74,19 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         fieldTooltip?: string
     }
 
-    // Auxiliary functions for the Goto, Loop, Dynamics and Tempo tooltips.
-
-    function toText(values: number[] | undefined, ordinal: boolean = false): string {
-        if (values) {
-            var list = values.map((val) => `${val}`)
-            if (ordinal) list = values.map((val) => toOrdinal(val))
-            if (list.length > 1) return list.slice(0, -1).join(', ') + ' & ' + _.last(list)
-            else return list.join('') // also takes care of empty array
-        } else return ''
-    }
-
-    function gotoText(goto: GotoItem, type: 'short' | 'long'): string {
-        if (type == 'short') return goto.targetdisplay
-
-        const nbrOfPasses = !goto.passes ? 0 : goto.passes.length
-        const cycle = !goto.cycle ? 0 : goto.cycle
-        switch (true) {
-            case !nbrOfPasses && !cycle:
-                return `go to ${goto.targetdisplay}`
-            case nbrOfPasses && !cycle:
-                return `go to ${goto.targetdisplay} after ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(goto.passes)}`
-            case nbrOfPasses && cycle > 0 && cycle == Math.max(...(goto.passes || [0])):
-                return `go to ${goto.targetdisplay} after every ${toText(goto.passes, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
-            default:
-                return `go to ${goto.targetdisplay} after ${toText(goto.passes, true)} of every ${goto.cycle} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
-        }
-    }
-
-    const specs: Record<string, SpecType> = {
+    // Specification of the items. Each item corresponds with an attribute of a System object and contains a button and/or a field.
+    // icon: button icon.
+    // iconcolor: button icon.
+    //action: button action. If the action's value is 'execute', the `execute` function is called immediately.
+    //        If the action's value is 'none', the item is only used to display a value.
+    //        Otherwise the action specifies the type of form that should be used to collect additional information from the user,
+    //        after which the 'execute' function is called.
+    //hasfield: If true, the item has a field next to the button with information about the System attribute.
+    //fieldval: Display value of the field.
+    //textcolor: Text color of the field.
+    //buttonTooltip: Tooltip text for the button.
+    //fieldTooltip: Tooltip text for the field.
+    const specs: Record<ItemType, SpecType> = {
         id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id, fieldTooltip: sysData.uuid },
         label: {
             icon: TsLabelIcon,
@@ -105,7 +100,7 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         new: {
             icon: TsNewIcon,
             iconcolor: '#1C78E0',
-            action: 'new',
+            action: 'execute',
             hasfield: false,
             buttonTooltip: 'Create an empty system below this one.'
         },
@@ -123,20 +118,47 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
         delete: {
             icon: TsDeleteIcon,
             iconcolor: '#1C78E0',
-            action: 'delete',
+            action: 'execute',
             hasfield: false,
             buttonTooltip: 'Delete this system (warning: can not be undone).'
         },
-        goto: {
+        goto_loop: {
             icon: IoArrowForwardOutline,
             iconcolor: '#1C78E0',
             action: 'gotoform',
             hasfield: true,
-            formtitle: `Go To and Loop for system # ${sysData.id}`,
-            fieldval: sysData.goto?.map((goto: GotoItem) => gotoText(goto, 'short')).join('\n') || '',
+            formtitle: `'Go To' & 'Loop': system # ${sysData.id}`,
+            fieldval:
+                sysData.flow
+                    ?.filter((item) => item.type == 'goto')
+                    .map((item) => item.targetname)
+                    .join('\n') || '',
             textcolor: 'green',
             buttonTooltip: 'Add a `goto` or `loop` instruction.',
-            fieldTooltip: sysData.goto?.map((goto) => gotoText(goto, 'long')).join('\n') || ''
+            fieldTooltip:
+                sysData.flow
+                    ?.filter((item) => ['goto', 'loop'].includes(item.type))
+                    ?.map((item) => item.tooltip)
+                    .join('\n') || ''
+        },
+        tempo_dynamics: {
+            icon: IoArrowForwardOutline,
+            iconcolor: '#1C78E0',
+            action: 'gotoform',
+            hasfield: true,
+            formtitle: `Tempo and Dynamics instructions for system # ${sysData.id}`,
+            fieldval:
+                sysData.flow
+                    ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
+                    .map((item: FlowItem) => item.tooltipshort)
+                    .join('\n') || '',
+            textcolor: 'green',
+            buttonTooltip: 'Add a `goto` or `loop` instruction.',
+            fieldTooltip:
+                sysData.flow
+                    ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
+                    .map((item) => item.tooltip)
+                    .join('\n') || ''
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
@@ -255,9 +277,10 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
 
     const flowItemsForm = (
         <FlowItemsForm
-            gotoItems={sysData.goto || []}
+            flowItems={sysData.flow || []}
             title={`${specs[item].formtitle}`}
             open={editing}
+            sysOptions={options || []}
             setOpen={setEditing}
         />
     )
@@ -320,7 +343,10 @@ export function SummaryItem({ item, sysData, labels, gototargets, execute, optio
                         </Tooltip>
                     }>
                     <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
-                        {editing ? inputMethod : `${specs[item].fieldval || ''}`}
+                        {editing ? inputMethod : null}
+                        {editing && ['editfield', 'inputpicker'].includes(specs[item].action)
+                            ? null
+                            : `${specs[item].fieldval || ''}`}
                     </span>
                 </Whisper>
             ) : (

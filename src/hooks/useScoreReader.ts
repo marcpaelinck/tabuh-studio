@@ -106,7 +106,6 @@ function oldToNewFormat(score: Score): EditorScore {
             id: sysIdx + 1,
             uuid: system.uuid,
             starttime: Object.values(staffs)[0][0].starttime,
-            part: currentPart,
             grouped: [],
             staffs: staffs,
             colWidths: colWidths

@@ -14,7 +14,7 @@ import type {
 } from '../models/types'
 import { cleanSymbol } from './alphabet'
 import { debug } from './debugger'
-import { flowManager, type FlowItem } from './flowManager'
+import { flowManager, type FlowStep } from './flowManager'
 import { defaultObject } from './objectUtils'
 import { n2TO, TO2n } from './timeunits'
 
@@ -59,7 +59,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
         Object.keys(positionConfigs).map((key) => [key, null])
     )
     const passcounter: Record<string, number> = {}
-    var current: FlowItem | undefined = nextInFlow()
+    var current: FlowStep | undefined = nextInFlow()
     // Keeps track of the longest measure duration in a section. All measures in a system should have
     // the same length but in case they don't, this value will be used to resync the following system.
     var maxMeasureDuration: number = 0

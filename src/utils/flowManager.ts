@@ -3,7 +3,7 @@
 // They also keep track of the 'current' tempo and dynamics.
 import _ from 'lodash'
 import type { PlaybackType } from '../hooks/playbackReducer'
-import type { EditorMeasure, EditorScore, EditorSystem, GotoItem, Position } from '../models/types'
+import type { EditorMeasure, EditorScore, EditorSystem, FlowItem, GotoItem, Position } from '../models/types'
 
 interface FlowCursor {
     sysIdx: number
@@ -12,17 +12,17 @@ interface FlowCursor {
     lastSection: boolean
 }
 
-interface flowInfoTable {
+interface FlowInfoTable {
     [idx: string]: {
         system: EditorSystem
         maxSectIdx: number
         pass: number
         loop: number
-        gotos: GotoItem[] | undefined
+        flowitems: FlowItem[] | undefined
     }
 }
 
-export interface FlowItem {
+export interface FlowStep {
     system: EditorSystem
     measures: Record<Position, EditorMeasure>
     positions: Position[]
@@ -33,12 +33,14 @@ export interface FlowItem {
 
 const prioGoto = (goto: GotoItem): number => {
     // prio 1: specific pass number(s) without cycle
-    // prio 2: pass number(s) with cycle
-    // prio 3: no pass/cycle specification
+    // prio 2: pass number(s) with `each` without cycle
+    // prio 3: pass number(s) with `each` and cycle
+    // prio 4: no pass/cycle specification
     var prio = 99
-    if (goto.passes != undefined && goto.cycle == undefined) prio = 1
-    else if (goto.passes != undefined && goto.cycle != undefined) prio = 2
-    else if (goto.passes == undefined && goto.cycle == undefined) prio = 3
+    if (goto.passes != undefined && !goto.each) prio = 1
+    else if (goto.passes != undefined && goto.each && goto.cycle == undefined) prio = 2
+    else if (goto.passes != undefined && goto.each && goto.cycle != undefined) prio = 3
+    else if (goto.passes == undefined && !goto.each && goto.cycle == undefined) prio = 4
     return prio
 }
 
@@ -50,12 +52,12 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
     var cursor: FlowCursor | undefined = undefined
 
     // Reset the cursor and create the lookup table
-    var flowinfo: flowInfoTable = Object.fromEntries(
+    var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system, idx) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
-            const gotos = system.goto?.sort(compareGoto)
-            return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, gotos: gotos }]
+            const gotos = system.flow?.filter((item) => item.type == 'goto')?.sort(compareGoto)
+            return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, flowitems: gotos }]
         })
     )
 
@@ -70,19 +72,21 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
     }
 
     function getGotoId(sysIdx: number): number | undefined {
-        const gotos = flowinfo![sysIdx].gotos
+        const gotos = flowinfo![sysIdx].flowitems?.filter((item) => item.type == 'goto')
         if (!gotos) return undefined
         const flow = flowinfo![sysIdx]
         for (const gotoItem of gotos) {
+            const maxPassNr = gotoItem.passes ? Math.max(...gotoItem.passes) : 0
+            const cycle = Math.max(gotoItem.cycle || 0, maxPassNr)
             const match =
-                (!gotoItem.cycle && (!gotoItem.passes || gotoItem.passes.includes(flow.pass))) ||
-                (gotoItem.cycle && gotoItem.passes && gotoItem.passes.includes(((flow.pass - 1) % gotoItem.cycle) + 1))
+                (!gotoItem.each && (!gotoItem.passes || gotoItem.passes.includes(flow.pass))) ||
+                (gotoItem.each && gotoItem.passes && gotoItem.passes.includes(((flow.pass - 1) % cycle) + 1))
             if (match) return uuidLookup[gotoItem.targetuuid]
         }
         return undefined
     }
 
-    function nextInFlow(): FlowItem | undefined {
+    function nextInFlow(): FlowStep | undefined {
         switch (true) {
             case flowinfo == undefined: {
                 console.error(`missing lookup table`)

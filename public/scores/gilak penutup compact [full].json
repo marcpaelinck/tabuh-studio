@@ -42,9 +42,8 @@
       "index": 0,
       "id": 1,
       "uuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc",
-      "part": "Unisono",
       "label": "Unisono",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           {"starttime": 0, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["u", "-", "-", "-"]},
@@ -182,10 +181,9 @@
       "index": 1,
       "id": 2,
       "uuid": "e153d0f1-2484-4479-8343-68c1d9075e32",
-      "part": "Unisono",
-            "grouped": [],
-      "goto": [
-        {"passes": [3], "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetdisplay": "Transition"}
+      "grouped": [],
+      "flow": [
+        {"type": "goto", "passes": [3], "each":true, "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetname": "Transition", "tooltip": "go to Transition after every 3rd pass", "tooltipshort": "Transition"}
       ],
       "staffs": {
         "UGAL": [
@@ -324,11 +322,10 @@
       "index": 2,
       "id": 3,
       "uuid": "ed411c50-976c-46b9-ac83-66ab4ef8663c",
-      "part": "Unisono",
-      "grouped": [],
-      "goto": [
-        {"targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"},
-        {"passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetdisplay": "End"}
+"grouped": [],
+      "flow": [
+        {"type": "goto", "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono", "tooltipshort": "Unisono"},
+        {"type": "goto", "passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetname": "End", "tooltip": "go to End after pass 8", "tooltipshort": "End"}
       ],
       "staffs": {
         "UGAL": [
@@ -467,9 +464,8 @@
       "index": 3,
       "id": 4,
       "uuid": "38657702-4ed8-43d7-b416-77bb94c08021",
-      "part": "Transition",
       "label": "Transition",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 256, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
@@ -617,9 +613,8 @@
       "index": 4,
       "id": 5,
       "uuid": "5dc4875d-9cb3-4c38-922e-14023afd0912",
-      "part": "Kotekan",
       "label": "Kotekan",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 288, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["u", "-", "-", "-"]},
@@ -757,8 +752,7 @@
       "index": 5,
       "id": 6,
       "uuid": "42cb71c3-79bf-486d-b10a-55e2f6033133",
-      "part": "Kotekan",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 320, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
@@ -896,11 +890,10 @@
       "index": 6,
       "id": 7,
       "uuid": "94335cbd-d7e7-4116-99ce-9ff5d0f0bdd0",
-      "part": "Kotekan",
-            "grouped": [],
-      "goto": [
-        {"targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetdisplay": "Kotekan"},
-        {"passes": [3], "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetdisplay": "Unisono"}
+      "grouped": [],
+      "flow": [
+        {"type": "goto", "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetname": "Kotekan", "tooltip": "go to Kotekan", "tooltipshort": "Kotekan"},
+        {"type": "goto", "passes": [3], "each":true, "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono after every 3rd pass", "tooltipshort": "Unisono"}
       ],
       "staffs": {
         "UGAL": [
@@ -1039,9 +1032,8 @@
       "index": 7,
       "id": 8,
       "uuid": "7a9cedb5-27ad-4981-9983-3553eac85411",
-      "part": "End",
       "label": "End",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 1728, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["u", "-", "-", "-"]},
@@ -1179,8 +1171,7 @@
       "index": 8,
       "id": 9,
       "uuid": "6cae5a0b-70a4-45f7-90cd-ebf976c36efb",
-      "part": "End",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 1760, "tempo": [80, 80], "velocity": [0.67, 0.67], "notation": ["o", "-", "-", "-"]},
@@ -1318,8 +1309,7 @@
       "index": 9,
       "id": 10,
       "uuid": "cd1ada81-761f-48bc-aa05-0a6b50db8109",
-      "part": "End",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 1792, "tempo": [80, 77], "velocity": [0.67, 0.67], "notation": ["a,", "-", "-", "-"]},
@@ -1457,8 +1447,7 @@
       "index": 10,
       "id": 11,
       "uuid": "63efd5d2-7bc0-4ad0-ae48-dc9435edb508",
-      "part": "End",
-            "grouped": [],
+      "grouped": [],
       "staffs": {
         "UGAL": [
           { "starttime": 1824, "tempo": [50, 50], "velocity": [0.67, 0.67], "notation": ["u"]}

@@ -149,28 +149,42 @@ export type HighlightRange = { line: number; range: number[] }
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
 export type Staffs = Record<Position, EditorMeasure[]>
 
-export interface FrequencyItem {
-    passes?: number[]
-    cycle?: number
+// PLAYBACK
+// Object containing instructions for creating a playback schedule.
+
+// Base class
+export interface PlaybackItem {
+    type: 'goto' | 'loop' | 'tempo' | 'dynamics'
+    seqId?: number
+    passes?: number[] // Pass numbers to which the item applies
+    each?: boolean //
+    cycle?: number // If `each` is true, each element n in the `passes` attribute stands for 'for every nth of <cycle> passes'.
+    tooltip: string
+    tooltipshort: string
 }
 
-export interface GotoItem extends FrequencyItem {
-    targetuuid: string
-    targetdisplay: string
+export interface GotoItem extends PlaybackItem {
+    type: 'goto'
+    targetuuid: string // next system to play back.
+    targetname: string
 }
 
-export interface LoopItem extends FrequencyItem {
+export interface LoopItem extends PlaybackItem {
+    type: 'loop'
     count: number
 }
 
-// For tempo and dynamics which can gradually increase over one or more measures
-export interface GradualItem {
+export type FlowItem = GotoItem | LoopItem
+
+// Tempo and dynamics (expression indicators)
+export interface ExpressionItem extends PlaybackItem {
+    type: 'tempo' | 'dynamics'
+    loops: number[]
     isGradual: boolean
     fromSection?: number
     toSection: number
     fromValue?: number
     toValue: number
-    loops?: number[]
 }
 
 export type EditorSystem = {
@@ -178,15 +192,14 @@ export type EditorSystem = {
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
     starttime: number
-    part: string
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string
     loop?: LoopItem
-    goto?: GotoItem[]
-    tempo?: GradualItem[]
-    dynamics?: GradualItem[]
+    flow?: FlowItem[]
+    tempo?: ExpressionItem[]
+    dynamics?: ExpressionItem[]
     copyfrom?: string // label or id of copied system
     copyfromkey?: string // uuid copied system
 }

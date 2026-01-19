@@ -4,7 +4,7 @@ import _ from 'lodash'
 // Specify a function by setting the dict value to {functionName: true}
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     createSchedule: false,
-    EditorWindow: false,
+    EditorWindow: true,
     FlowItemsForm: true,
     Menu: false,
     MeasureNode: false,
