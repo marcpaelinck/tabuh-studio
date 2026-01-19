@@ -277,7 +277,7 @@ export function SummaryItem({
 
     const flowItemsForm = (
         <FlowItemsForm
-            flowItems={sysData.flow || []}
+            systemData={sysData}
             title={`${specs[item].formtitle}`}
             open={editing}
             sysOptions={options || []}

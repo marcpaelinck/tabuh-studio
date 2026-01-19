@@ -6,11 +6,11 @@ import { Button, CheckPicker, Divider, Drawer, Form, IconButton, InputPicker, Li
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { ArrayType, BooleanType, NumberType, SchemaModel, StringType } from 'rsuite/Schema'
 import { flowItemTooltip } from '../../hooks/useEditorScoreManager'
-import type { FlowItem, GotoItem } from '../../models/types'
+import type { EditorSystem, FlowItem, GotoItem } from '../../models/types'
 import { debug } from '../../utils/debugger'
 
 const formModel = { type: 'type', targetuuid: 'targetuuid', passes: 'passes', each: 'each' }
-const newGoto: GotoItem = { type: 'goto', targetuuid: '', targetname: '', tooltip: '', tooltipshort: '' }
+const newGoto: GotoItem = { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' }
 
 const model = SchemaModel({
     type: StringType().isRequired(),
@@ -22,14 +22,19 @@ const model = SchemaModel({
 interface FlowElementListProps {
     label: string
     itemList: FlowItem[]
+    setItemList: Dispatch<FlowItem[]>
     selectedElement: number | undefined
-    setSelectedElement: Dispatch<number>
-    setDirty: Dispatch<boolean>
+    setSelectedElement: Dispatch<number | undefined>
 }
 
 // Editable list of flow items (goto and loop)
-// Part of a FlowItemsForm
-const FlowElementList = ({ label, itemList, selectedElement, setSelectedElement, setDirty }: FlowElementListProps) => {
+const FlowElementList = ({
+    label,
+    itemList,
+    selectedElement,
+    setSelectedElement,
+    setItemList
+}: FlowElementListProps) => {
     useEffect(() => {
         // Select first item if any
         if (itemList && itemList.length > 0) setSelectedElement(0)
@@ -38,41 +43,24 @@ const FlowElementList = ({ label, itemList, selectedElement, setSelectedElement,
     function handleAdd() {
         const newItem = { ...newGoto }
         newItem.seqId = itemList.length
-        itemList.push(newItem)
-        setDirty(true)
+        const newItemList = [...itemList, newItem]
+        setItemList(newItemList)
+        setSelectedElement(0)
     }
 
     function handleDelete() {
         if (!selectedElement) return
-        itemList.splice(selectedElement, 1)
-        setDirty(true)
+        const newItemList = [...itemList]
+        newItemList.splice(selectedElement, 1)
+        setItemList(newItemList)
+        setSelectedElement(undefined)
     }
-
-    const listElement = (
-        <List bordered divider={false} autoScroll className={'border-black w-full h-40'}>
-            {(itemList || []).map((val, idx) => {
-                if (!val) return
-                val.seqId = idx
-                return (
-                    <List.Item key={`goto-${idx}`} className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
-                        <div
-                            onClick={(e) => {
-                                debug(`clicked on element ${idx}`)
-                                setSelectedElement(idx)
-                            }}>
-                            {val.tooltip}
-                        </div>
-                    </List.Item>
-                )
-            })}
-        </List>
-    )
 
     return (
         <>
             <div>{label}</div>
             <List bordered divider={false} autoScroll className={'border-black w-full h-40'}>
-                {(itemList || []).map((val, idx) => {
+                {itemList.map((val, idx) => {
                     if (!val) return
                     val.seqId = idx
                     return (
@@ -81,7 +69,6 @@ const FlowElementList = ({ label, itemList, selectedElement, setSelectedElement,
                             className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
                             <div
                                 onClick={(e) => {
-                                    debug(`clicked on element ${idx}`)
                                     setSelectedElement(idx)
                                 }}>
                                 {val.tooltip}
@@ -96,28 +83,7 @@ const FlowElementList = ({ label, itemList, selectedElement, setSelectedElement,
     )
 }
 
-interface ItemListProps extends FormControlProps {
-    label: string
-    selectedElement: number | undefined
-    setSelectedElement: Dispatch<number>
-    setDirty: Dispatch<boolean>
-}
-
-// Form item: editable list
-const ItemList = ({ label, selectedElement, setSelectedElement, setDirty, ...props }: ItemListProps) => (
-    <Form.Stack fluid layout="vertical" className="w-full">
-        <Form.Group controlid={props.name} {...props}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Control
-                accepter={FlowElementList}
-                selectedItem={selectedElement}
-                setSelectedElement={setSelectedElement}
-                setDirty={setDirty}
-                {...props}
-            />
-        </Form.Group>
-    </Form.Stack>
-)
+// START OF FORM COMPONENTS
 
 interface PickerFieldProps
     extends FormControlProps, FormGroupProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
@@ -202,8 +168,8 @@ const ItemForm = ({ label, selectedElement, value, sysOptions, setDirty, ...prop
     )
 }
 
-interface FlowInputFormProps extends FormProps {
-    flowItems: FlowItem[]
+interface FlowItemFormProps extends FormProps {
+    systemData: EditorSystem
     title: string
     open: boolean
     sysOptions: InputOption<string>[]
@@ -213,12 +179,11 @@ interface FlowInputFormProps extends FormProps {
 // Main form Component
 // The form consists of a list of flow items and several input fields. The field values corresponds
 // with the properties of the selected items.
-export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...props }: FlowInputFormProps) {
-    const [itemList, setItemList] = useState<FlowItem[]>(flowItems)
-    const [formValue, setFormValue] = useState<Record<string, any>>({})
+export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ...props }: FlowItemFormProps) {
+    const [itemList, setItemList] = useState<FlowItem[]>(systemData.flow || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
+    const [formValue, setFormValue] = useState<Record<string, any>>({})
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
-    const [dirtyList, setDirtyList] = useState<boolean>(false)
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
 
@@ -232,13 +197,11 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
             each: selectedItem.each,
             passes: selectedItem.passes
         }
-        debug(newFormValue)
         setFormValue(newFormValue)
     }
 
     // Updates the selected list item with the form values
     function updateSelectedFromFields() {
-        debug(`BEFORE UPDATE=${JSON.stringify(selectedListElement)}`)
         if (!selectedListElement) return
         const selectedItem = itemList[selectedListElement] as GotoItem
         var newItem = {
@@ -255,15 +218,7 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
         }
         const newItemList = [...itemList]
         newItemList.splice(selectedListElement, 1, newItem)
-        debug(`AFTER UPDATE=${JSON.stringify(newItem)}`)
         setItemList(newItemList)
-    }
-
-    function updateList() {
-        debug(`Before update list=${JSON.stringify(itemList)}`)
-        const newItemList = { ...itemList }
-        debug(`After update list=${JSON.stringify(newItemList)}`)
-        setFormValue(newItemList)
     }
 
     // Populate fields from new selected item
@@ -273,11 +228,8 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
 
     // Populate fields from new selected item
     useEffect(() => {
-        if (dirtyList) {
-            updateList()
-            setDirtyList(false)
-        }
-    }, [dirtyList])
+        debug(`LIST UPDATED: ${JSON.stringify(itemList)}`)
+    }, [itemList])
 
     // Update item when user modifies a field
     useEffect(() => {
@@ -288,6 +240,7 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
     }, [dirtyForm])
 
     const handleSave = () => {
+        if (itemList) systemData.flow = itemList
         setOpen(false)
     }
 
@@ -317,7 +270,7 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
                     itemList={itemList}
                     selectedElement={selectedListElement}
                     setSelectedElement={setSelectedListElement}
-                    setDirty={setDirtyList}
+                    setItemList={setItemList}
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
                 <Form onChange={setFormValue} formValue={formValue} {...props}>

@@ -157,7 +157,8 @@ export interface PlaybackItem {
     type: 'goto' | 'loop' | 'tempo' | 'dynamics'
     seqId?: number
     passes?: number[] // Pass numbers for which the item applies
-    each?: boolean // If true, the item applies for every nth pass, e.g. every 3rd & 4th pass with cycle==4.
+    each?: boolean // undefined: no condition. false: item applies to listed passes only.
+    //  true: item applies to every nth pass (n in passes list), e.g. every 3rd & 4th pass.
     tooltip: string
     tooltipshort: string
 }

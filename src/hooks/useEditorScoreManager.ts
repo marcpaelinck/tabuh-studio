@@ -197,24 +197,7 @@ export function useEditorScoreManager(score: EditorScore) {
                 break
             }
             case 'goto':
-                if (!value) {
-                    newSystemData.flow = undefined
-                } else {
-                    const destination = editorScore.systems.find((sys) => sys.uuid == value)
-                    if (!destination) {
-                        console.error(`goto: could not find system ${value}`)
-                        return
-                    }
-                    if (!newSystemData.flow) newSystemData.flow = []
-                    // tooltips will be modified by the EditorScoreManager
-                    newSystemData.flow.push({
-                        type: 'goto',
-                        targetuuid: destination.uuid,
-                        tooltip: '',
-                        tooltipshort: '',
-                        targetname: ''
-                    })
-                }
+                // Changes to the system data have been performed by the FlowItemsForm
                 break
             case 'delete':
                 if (newSystemData.label) {
