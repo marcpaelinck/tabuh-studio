@@ -18,7 +18,6 @@ export function flowItemTooltip(item: FlowItem, length: 'short' | 'long'): strin
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
-    const cycle = !item.cycle ? 0 : item.cycle
     var instruction: string = ''
     var passcondition: string = ''
     var short: string = 'xx'
@@ -43,12 +42,10 @@ export function flowItemTooltip(item: FlowItem, length: 'short' | 'long'): strin
             return instruction
         case nbrOfPasses && !item.each:
             return `${instruction} ${passcondition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}`
-        case nbrOfPasses && item.each && !cycle:
-            return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
-        case nbrOfPasses && item.each && cycle > 0 && cycle == maxPassNr:
+        case nbrOfPasses && item.each:
             return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
         default:
-            return `${instruction} ${passcondition} ${toText(sortedPasses, true)} of every ${item.cycle} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+            return `Invalid combination: missing one or more pass numbers.`
     }
 }
 

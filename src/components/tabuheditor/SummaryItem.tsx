@@ -95,7 +95,7 @@ export function SummaryItem({
             hasfield: true,
             fieldval: sysData.label,
             textcolor: 'orange',
-            buttonTooltip: 'Add or remove a label. Optionally labels to copy systems and for `goto` instructions.'
+            buttonTooltip: 'Add or remove a label to mark a system for copying or for `goto` instructions.'
         },
         new: {
             icon: TsNewIcon,
@@ -127,7 +127,7 @@ export function SummaryItem({
             iconcolor: '#1C78E0',
             action: 'gotoform',
             hasfield: true,
-            formtitle: `'Go To' & 'Loop': system # ${sysData.id}`,
+            formtitle: `system # ${sysData.id}`,
             fieldval:
                 sysData.flow
                     ?.filter((item) => item.type == 'goto')

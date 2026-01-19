@@ -9,46 +9,80 @@ import { flowItemTooltip } from '../../hooks/useEditorScoreManager'
 import type { FlowItem, GotoItem } from '../../models/types'
 import { debug } from '../../utils/debugger'
 
-const formModel = { listitems: 'listitems', targetuuid: 'targetuuid', passes: 'passes', each: 'each', cycle: 'cycle' }
+const formModel = { type: 'type', targetuuid: 'targetuuid', passes: 'passes', each: 'each' }
+const newGoto: GotoItem = { type: 'goto', targetuuid: '', targetname: '', tooltip: '', tooltipshort: '' }
 
 const model = SchemaModel({
-    listitems: ArrayType(),
+    type: StringType().isRequired(),
     targetuuid: StringType().isRequired(),
-    passes: ArrayType().of(NumberType()).isRequired(),
-    each: BooleanType().isRequiredOrEmpty(),
-    cycle: NumberType().isRequiredOrEmpty()
+    passes: ArrayType().of(NumberType()).isRequiredOrEmpty(),
+    each: BooleanType().isRequiredOrEmpty()
 })
 
-interface GotoListProps {
-    value: Record<string, any>
-    selectedItem: GotoItem
-    setSelectedItem: Dispatch<GotoItem>
+interface FlowElementListProps {
+    label: string
+    itemList: FlowItem[]
+    selectedElement: number | undefined
+    setSelectedElement: Dispatch<number>
     setDirty: Dispatch<boolean>
 }
 
 // Editable list of flow items (goto and loop)
 // Part of a FlowItemsForm
-const GotoList = ({ value, selectedItem, setSelectedItem, setDirty }: GotoListProps) => {
-    const handleMinus = () => {
-        // if (!value) value.listitems.slice(0, -1)
+const FlowElementList = ({ label, itemList, selectedElement, setSelectedElement, setDirty }: FlowElementListProps) => {
+    useEffect(() => {
+        // Select first item if any
+        if (itemList && itemList.length > 0) setSelectedElement(0)
+    }, [])
+
+    function handleAdd() {
+        const newItem = { ...newGoto }
+        newItem.seqId = itemList.length
+        itemList.push(newItem)
+        setDirty(true)
     }
-    const handleAdd = () => {
-        // value.listitems
+
+    function handleDelete() {
+        if (!selectedElement) return
+        itemList.splice(selectedElement, 1)
+        setDirty(true)
     }
+
+    const listElement = (
+        <List bordered divider={false} autoScroll className={'border-black w-full h-40'}>
+            {(itemList || []).map((val, idx) => {
+                if (!val) return
+                val.seqId = idx
+                return (
+                    <List.Item key={`goto-${idx}`} className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
+                        <div
+                            onClick={(e) => {
+                                debug(`clicked on element ${idx}`)
+                                setSelectedElement(idx)
+                            }}>
+                            {val.tooltip}
+                        </div>
+                    </List.Item>
+                )
+            })}
+        </List>
+    )
 
     return (
         <>
+            <div>{label}</div>
             <List bordered divider={false} autoScroll className={'border-black w-full h-40'}>
-                {((value.listitems as GotoItem[]) || []).map((val, idx) => {
+                {(itemList || []).map((val, idx) => {
                     if (!val) return
                     val.seqId = idx
                     return (
                         <List.Item
                             key={`goto-${idx}`}
-                            className={idx == selectedItem?.seqId ? 'font-bold bg-amber-100' : ''}>
+                            className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
                             <div
                                 onClick={(e) => {
-                                    setSelectedItem(value.listitems[idx])
+                                    debug(`clicked on element ${idx}`)
+                                    setSelectedElement(idx)
                                 }}>
                                 {val.tooltip}
                             </div>
@@ -56,28 +90,28 @@ const GotoList = ({ value, selectedItem, setSelectedItem, setDirty }: GotoListPr
                     )
                 })}
             </List>
-            <IconButton onClick={handleAdd} icon={<PlusIcon />} />
-            <IconButton onClick={handleMinus} icon={<MinusIcon />} />{' '}
+            <IconButton onClick={() => handleAdd()} icon={<PlusIcon />} />
+            <IconButton onClick={() => handleDelete()} icon={<MinusIcon />} />{' '}
         </>
     )
 }
 
 interface ItemListProps extends FormControlProps {
     label: string
-    selectedItem: FlowItem | undefined
-    setSelectedItem: Dispatch<GotoItem>
+    selectedElement: number | undefined
+    setSelectedElement: Dispatch<number>
     setDirty: Dispatch<boolean>
 }
 
 // Form item: editable list
-const ItemList = ({ label, selectedItem, setSelectedItem, setDirty, ...props }: ItemListProps) => (
+const ItemList = ({ label, selectedElement, setSelectedElement, setDirty, ...props }: ItemListProps) => (
     <Form.Stack fluid layout="vertical" className="w-full">
         <Form.Group controlid={props.name} {...props}>
             <Form.Label>{label}</Form.Label>
             <Form.Control
-                accepter={GotoList}
-                selectedItem={selectedItem}
-                setSelectedItem={setSelectedItem}
+                accepter={FlowElementList}
+                selectedItem={selectedElement}
+                setSelectedElement={setSelectedElement}
                 setDirty={setDirty}
                 {...props}
             />
@@ -89,12 +123,12 @@ interface PickerFieldProps
     extends FormControlProps, FormGroupProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
     data: any
     label: string
-    selectedItem: FlowItem | undefined
+    selectedElement: number | undefined
     setDirty: Dispatch<boolean>
 }
 
 // Selection (single or multiple)
-const PickerField = ({ label, selectedItem, setDirty, ...props }: PickerFieldProps) => {
+const PickerField = ({ label, selectedElement, setDirty, ...props }: PickerFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
@@ -102,7 +136,7 @@ const PickerField = ({ label, selectedItem, setDirty, ...props }: PickerFieldPro
                 accepter={props.accepter || InputPicker}
                 cleanable={false}
                 onChange={() => setDirty(true)}
-                disabled={selectedItem == undefined}
+                disabled={selectedElement == undefined}
                 block
                 searchable={false}
                 className="w-60"
@@ -114,25 +148,25 @@ const PickerField = ({ label, selectedItem, setDirty, ...props }: PickerFieldPro
 
 interface ItemFormProps extends FormControlProps {
     label: string
-    selectedItem: FlowItem | undefined
+    selectedElement: number | undefined
     setDirty: Dispatch<boolean>
     value: Record<string, any>
     sysOptions: InputOption<string>[]
 }
 // Form that captures the details of the selected item
-const ItemForm = ({ label, selectedItem, value, sysOptions, setDirty, ...props }: ItemFormProps) => {
+const ItemForm = ({ label, selectedElement, value, sysOptions, setDirty, ...props }: ItemFormProps) => {
     return (
         <>
             <Form.Stack layout="horizontal">
                 <Form.Group controlId={`${props.name}-type`}>
                     <Form.Label className="w-40">Type</Form.Label>
-                    <Form.Text className="w-120 font-bold text-base">{selectedItem?.type}</Form.Text>
+                    <Form.Text className="w-120 font-bold text-base">{value.type}</Form.Text>
                 </Form.Group>
                 <PickerField
                     label="Target system"
                     name={formModel.targetuuid}
                     value={value.targetuuid}
-                    selectedItem={selectedItem}
+                    selectedElement={selectedElement}
                     setDirty={setDirty}
                     data={sysOptions || []}
                     placeholder={'System to go to'}
@@ -141,11 +175,11 @@ const ItemForm = ({ label, selectedItem, value, sysOptions, setDirty, ...props }
                     label="Condition"
                     name={formModel.each}
                     value={value.each}
-                    selectedItem={selectedItem}
+                    selectedElement={selectedElement}
                     setDirty={setDirty}
                     data={[
                         { label: 'none', value: undefined },
-                        { label: 'after pass nr ...', value: false },
+                        { label: 'after pass(es) nr ...', value: false },
                         { label: 'after every ...th pass', value: true }
                     ]}
                 />
@@ -155,11 +189,11 @@ const ItemForm = ({ label, selectedItem, value, sysOptions, setDirty, ...props }
                         label="Passes"
                         name={formModel.passes}
                         value={value.passes}
-                        selectedItem={selectedItem}
+                        selectedElement={selectedElement}
                         countable={false}
                         setDirty={setDirty}
-                        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((nr) => {
-                            return { label: `${nr}`, value: nr }
+                        data={new Array(20).fill(null).map((_, idx) => {
+                            return { label: `${idx + 1}`, value: idx + 1 }
                         })}
                     />
                 )}
@@ -180,8 +214,9 @@ interface FlowInputFormProps extends FormProps {
 // The form consists of a list of flow items and several input fields. The field values corresponds
 // with the properties of the selected items.
 export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...props }: FlowInputFormProps) {
-    const [formValue, setFormValue] = useState<Record<string, any>>({ listitems: [...flowItems] })
-    const [selectedItem, setSelectedItem] = useState<GotoItem | undefined>(undefined)
+    const [itemList, setItemList] = useState<FlowItem[]>(flowItems)
+    const [formValue, setFormValue] = useState<Record<string, any>>({})
+    const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
     const [dirtyList, setDirtyList] = useState<boolean>(false)
 
@@ -189,76 +224,71 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
 
     // Populates the forms fields with the values of the selected item
     function updateFieldsFromSelected() {
-        const newListItems = formValue.listitems?.map((item: GotoItem) => {
-            var newItem = { ...item, targetname: uuidToNameLookup[item.targetuuid] }
-            newItem = {
-                ...newItem,
-                tooltip: flowItemTooltip(newItem, 'long'),
-                tooltipshort: flowItemTooltip(newItem, 'short')
-            }
-            return newItem
-        })
+        if (selectedListElement == undefined) return
+        const selectedItem = itemList[selectedListElement] as GotoItem
         const newFormValue = {
-            listitems: newListItems,
-            targetuuid: selectedItem?.targetuuid || '',
-            each: selectedItem?.each,
-            passes: selectedItem?.passes,
-            cycle: selectedItem?.cycle
+            ...selectedItem,
+            targetuuid: selectedItem.targetuuid || '',
+            each: selectedItem.each,
+            passes: selectedItem.passes
         }
+        debug(newFormValue)
         setFormValue(newFormValue)
     }
 
     // Updates the selected list item with the form values
     function updateSelectedFromFields() {
-        const newListItems = formValue.listitems?.map((item: GotoItem) => {
-            debug(`BEFORE UPDATE=${JSON.stringify(selectedItem)}`)
-            const maxPassNr = formValue.passes ? Math.max(...formValue.passes) : 0
-            debug(`MAXPASSCOUNT=${maxPassNr}`)
-            if (!selectedItem || item.seqId != selectedItem.seqId) return { ...item }
-            var newItem = {
-                ...item,
-                targetuuid: formValue.targetuuid,
-                targetname: uuidToNameLookup[formValue.targetuuid],
-                passes: formValue.passes,
-                each: formValue.each,
-                cycle: formValue.each && formValue.cycles < maxPassNr ? maxPassNr : formValue.cycles
-            }
-            newItem = {
-                ...newItem,
-                tooltip: flowItemTooltip(newItem, 'long'),
-                tooltipshort: flowItemTooltip(newItem, 'short')
-            }
-            debug(`AFTER UPDATE=${JSON.stringify(newItem)}`)
-            return newItem
-        })
-        const newFormValue = { ...formValue, listitems: newListItems }
-        setFormValue(newFormValue)
+        debug(`BEFORE UPDATE=${JSON.stringify(selectedListElement)}`)
+        if (!selectedListElement) return
+        const selectedItem = itemList[selectedListElement] as GotoItem
+        var newItem = {
+            ...selectedItem,
+            targetuuid: formValue.targetuuid,
+            targetname: uuidToNameLookup[formValue.targetuuid],
+            passes: formValue.each == undefined ? undefined : formValue.passes,
+            each: formValue.each
+        }
+        newItem = {
+            ...newItem,
+            tooltip: flowItemTooltip(newItem, 'long'),
+            tooltipshort: flowItemTooltip(newItem, 'short')
+        }
+        const newItemList = [...itemList]
+        newItemList.splice(selectedListElement, 1, newItem)
+        debug(`AFTER UPDATE=${JSON.stringify(newItem)}`)
+        setItemList(newItemList)
+    }
+
+    function updateList() {
+        debug(`Before update list=${JSON.stringify(itemList)}`)
+        const newItemList = { ...itemList }
+        debug(`After update list=${JSON.stringify(newItemList)}`)
+        setFormValue(newItemList)
     }
 
     // Populate fields from new selected item
     useEffect(() => {
-        debug(`selected=${JSON.stringify(selectedItem)}`)
         updateFieldsFromSelected()
-    }, [selectedItem, dirtyList])
+    }, [selectedListElement])
+
+    // Populate fields from new selected item
+    useEffect(() => {
+        if (dirtyList) {
+            updateList()
+            setDirtyList(false)
+        }
+    }, [dirtyList])
 
     // Update item when user modifies a field
     useEffect(() => {
         if (dirtyForm) {
-            debug(`selected=${JSON.stringify(selectedItem)}`)
-            updateSelectedFromFields()
             setDirtyForm(false)
+            updateSelectedFromFields()
         }
     }, [dirtyForm])
 
-    // useEffect(() => {
-    //     debug(`formValue=${JSON.stringify(formValue)}`)
-    // }, [formValue, selectedItem])
-
-    const handleClose = () => {
+    const handleSave = () => {
         setOpen(false)
-    }
-    const handleOpen = () => {
-        setOpen(true)
     }
 
     return (
@@ -274,7 +304,7 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
                     </Button>
                     <Button
                         onClick={(e) => {
-                            setOpen(false)
+                            handleSave()
                         }}
                         appearance="primary">
                         Confirm
@@ -282,21 +312,20 @@ export function FlowItemsForm({ flowItems, title, open, sysOptions, setOpen, ...
                 </Drawer.Actions>
             </Drawer.Header>
             <Drawer.Body>
+                <FlowElementList
+                    label="Go To & Loop instructions"
+                    itemList={itemList}
+                    selectedElement={selectedListElement}
+                    setSelectedElement={setSelectedListElement}
+                    setDirty={setDirtyList}
+                />
+                <Divider color="#000" size="xs" spacing="lg" />
                 <Form onChange={setFormValue} formValue={formValue} {...props}>
-                    <ItemList
-                        name="listitems"
-                        label="Go To & Loop instructions"
-                        value={formValue}
-                        selectedItem={selectedItem}
-                        setSelectedItem={setSelectedItem}
-                        setDirty={setDirtyList}
-                    />
-                    <Divider color="#000" size="xs" spacing="lg" />
                     <ItemForm
                         name="goto-loop"
                         label="Go To & Loop instructions"
                         value={formValue}
-                        selectedItem={selectedItem}
+                        selectedElement={selectedListElement}
                         setDirty={setDirtyForm}
                         sysOptions={sysOptions}
                     />

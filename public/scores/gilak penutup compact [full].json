@@ -183,7 +183,7 @@
       "uuid": "e153d0f1-2484-4479-8343-68c1d9075e32",
       "grouped": [],
       "flow": [
-        {"type": "goto", "passes": [3], "each":true, "cycle": 3, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetname": "Transition", "tooltip": "go to Transition after every 3rd pass", "tooltipshort": "Transition"}
+        {"type": "goto", "passes": [3], "each":true, "targetuuid": "38657702-4ed8-43d7-b416-77bb94c08021", "targetname": "Transition", "tooltip": "go to Transition after every 3rd pass", "tooltipshort": "Transition"}
       ],
       "staffs": {
         "UGAL": [
@@ -325,7 +325,7 @@
 "grouped": [],
       "flow": [
         {"type": "goto", "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono", "tooltipshort": "Unisono"},
-        {"type": "goto", "passes": [8], "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetname": "End", "tooltip": "go to End after pass 8", "tooltipshort": "End"}
+        {"type": "goto", "passes": [8], "each":false, "targetuuid": "7a9cedb5-27ad-4981-9983-3553eac85411", "targetname": "End", "tooltip": "go to End after pass 8", "tooltipshort": "End"}
       ],
       "staffs": {
         "UGAL": [
@@ -893,7 +893,8 @@
       "grouped": [],
       "flow": [
         {"type": "goto", "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetname": "Kotekan", "tooltip": "go to Kotekan", "tooltipshort": "Kotekan"},
-        {"type": "goto", "passes": [3], "each":true, "cycle": 3, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono after every 3rd pass", "tooltipshort": "Unisono"}
+        {"type": "goto", "passes": [3], "each":true, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono after every 3rd pass", "tooltipshort": "Unisono"},
+	{"type":"goto","targetuuid":"","targetname":"","tooltip":"","tooltipshort":""}
       ],
       "staffs": {
         "UGAL": [

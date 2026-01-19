@@ -156,9 +156,8 @@ export type Staffs = Record<Position, EditorMeasure[]>
 export interface PlaybackItem {
     type: 'goto' | 'loop' | 'tempo' | 'dynamics'
     seqId?: number
-    passes?: number[] // Pass numbers to which the item applies
-    each?: boolean //
-    cycle?: number // If `each` is true, each element n in the `passes` attribute stands for 'for every nth of <cycle> passes'.
+    passes?: number[] // Pass numbers for which the item applies
+    each?: boolean // If true, the item applies for every nth pass, e.g. every 3rd & 4th pass with cycle==4.
     tooltip: string
     tooltipshort: string
 }

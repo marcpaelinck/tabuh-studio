@@ -32,15 +32,13 @@ export interface FlowStep {
 }
 
 const prioGoto = (goto: GotoItem): number => {
-    // prio 1: specific pass number(s) without cycle
-    // prio 2: pass number(s) with `each` without cycle
-    // prio 3: pass number(s) with `each` and cycle
-    // prio 4: no pass/cycle specification
+    // prio 1: specific pass number(s).
+    // prio 2: every nth pass number(s) (each==true)
+    // prio 3: no pass specification.
     var prio = 99
-    if (goto.passes != undefined && !goto.each) prio = 1
-    else if (goto.passes != undefined && goto.each && goto.cycle == undefined) prio = 2
-    else if (goto.passes != undefined && goto.each && goto.cycle != undefined) prio = 3
-    else if (goto.passes == undefined && !goto.each && goto.cycle == undefined) prio = 4
+    if (goto.passes != undefined && goto.passes.length > 0 && !goto.each) prio = 1
+    else if (goto.passes != undefined && goto.passes.length > 0 && goto.each) prio = 2
+    else if ((goto.passes == undefined || goto.passes.length == 0) && !goto.each) prio = 4
     return prio
 }
 
@@ -71,16 +69,24 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
         cursor = undefined
     }
 
+    // Returns the target uuid of a matching 'goto' instruction or undefined.
     function getGotoId(sysIdx: number): number | undefined {
         const gotos = flowinfo![sysIdx].flowitems?.filter((item) => item.type == 'goto')
         if (!gotos) return undefined
         const flow = flowinfo![sysIdx]
         for (const gotoItem of gotos) {
-            const maxPassNr = gotoItem.passes ? Math.max(...gotoItem.passes) : 0
-            const cycle = Math.max(gotoItem.cycle || 0, maxPassNr)
-            const match =
-                (!gotoItem.each && (!gotoItem.passes || gotoItem.passes.includes(flow.pass))) ||
-                (gotoItem.each && gotoItem.passes && gotoItem.passes.includes(((flow.pass - 1) % cycle) + 1))
+            var match = false
+            // if `each`==false or undefined: match=true if no passes are given or if flow.pass
+            //                                matches a pass in gotoItem.passes
+            // if `each`==true and one or more passes are given: match=true if flow.pass % maxPassNr
+            //                                matches a pass in gotoItem.passes
+            // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
+            if (!gotoItem.each)
+                match = !gotoItem.passes || gotoItem.passes.length == 0 || gotoItem.passes.includes(flow.pass)
+            else if (gotoItem.each && gotoItem.passes && gotoItem.passes.length > 0) {
+                const maxPassNr = Math.max(...gotoItem.passes)
+                match = gotoItem.each && gotoItem.passes && gotoItem.passes.includes(((flow.pass - 1) % maxPassNr) + 1)
+            }
             if (match) return uuidLookup[gotoItem.targetuuid]
         }
         return undefined
