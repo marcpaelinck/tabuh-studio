@@ -35,8 +35,10 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             break
         }
         case 'tempo': {
-            short = `${item.fromValue ? item.fromValue + '-' : ''}${item.toValue} BPM`
-            instruction = `tempo ${item.fromValue ? item.fromValue + '-' : ''}${item.toValue} BPM`
+            short = `${item.isGradual && item.fromValue && item.fromValue != item.toValue ? item.fromValue + '→' : ''}${item.toValue} BPM`
+            instruction =
+                `${item.isGradual && item.fromValue && item.fromValue != item.toValue ? item.fromValue + '→' : ''}${item.toValue} BPM, ` +
+                `beat ${item.isGradual && item.fromSection && item.fromSection != item.toSection ? item.fromSection + '→' : ''}${item.toSection}`
             passcondition = 'on'
             break
         }

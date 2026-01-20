@@ -14,17 +14,33 @@ import type {
     LoopItem
 } from '../../models/types'
 import { debug } from '../../utils/debugger'
-import ExecutionItemForm from './ExecutionItemForm'
+import ExecutionItemForm, { type FormValueType } from './ExecutionItemForm'
 
-type ExecutionItemDefault =
-    | ExecutionItem
-    | { type: ExecutionItemType | undefined; seqId: number | undefined; tooltip: string; tooltipshort: string }
+type ExecutionItemDefault = {
+    type?: ExecutionItemType
+    targetuuid?: string
+    targetname?: string
+    isGradual?: boolean
+    count?: number
+    seqId?: number
+    tooltip?: string
+    tooltipshort?: string
+    toValue?: number
+    toSection?: number
+}
 
 const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
     loop: { type: 'loop', count: 0, tooltip: 'loop', tooltipshort: '' },
-    tempo: { type: 'tempo', isGradual: false, toSection: -1, toValue: -1, tooltip: 'tempo', tooltipshort: '' },
-    dynamics: { type: 'dynamics', isGradual: false, toSection: -1, toValue: -1, tooltip: 'dynamics', tooltipshort: '' },
+    tempo: { type: 'tempo', isGradual: false, toSection: 1, toValue: undefined, tooltip: 'tempo', tooltipshort: '' },
+    dynamics: {
+        type: 'dynamics',
+        isGradual: false,
+        toSection: 1,
+        toValue: undefined,
+        tooltip: 'dynamics',
+        tooltipshort: ''
+    },
     new: { type: undefined, seqId: undefined, tooltip: 'specify type', tooltipshort: '' }
 }
 
@@ -95,10 +111,12 @@ const FlowElementList = ({
                                             w={224}
                                             placeholder="Select a type"
                                             onChange={(value) => {
+                                                debug(value)
                                                 if (value) {
-                                                    val.type = value
                                                     const newList = [...itemList]
                                                     newList.splice(idx, 1, defaultItem[value])
+                                                    debug(`${value} -----> ${JSON.stringify(defaultItem[value])}`)
+                                                    debug(newList)
                                                     setItemList(newList)
                                                 }
                                             }}
@@ -129,26 +147,29 @@ interface ExecutionFormProps extends FormProps {
 export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ...props }: ExecutionFormProps) {
     const [itemList, setItemList] = useState<ExecutionItemDefault[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
-    const [formValue, setFormValue] = useState<Record<string, any>>({})
+    const [formValue, setFormValue] = useState<FormValueType>({ type: '' })
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
+
+    useEffect(() => debug(`ITEMLIST=${JSON.stringify(itemList)}`), [itemList])
 
     // Populates the forms fields with the values of the selected item
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
-        var newFormValue: ExecutionItem = { ...selectedItem, each: selectedItem.each, passes: selectedItem.passes }
-        if (selectedItem.type == 'goto') (newFormValue as GotoItem).targetuuid = selectedItem.targetuuid || ''
-        if (selectedItem.type == 'loop') (newFormValue as LoopItem).count = selectedItem.count
+        var newFormValue: FormValueType = { ...selectedItem, each: selectedItem.each, passes: selectedItem.passes }
+        debug(`UPDATE FIELDS=${JSON.stringify(newFormValue)}`)
+        if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
+        if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
         if (selectedItem.type == 'tempo') {
-            newFormValue = newFormValue as ExpressionItem
             newFormValue.fromValue = selectedItem.fromValue
             newFormValue.toValue = selectedItem.toValue
             newFormValue.isGradual = selectedItem.isGradual
             newFormValue.fromSection = selectedItem.fromSection
             newFormValue.toSection = selectedItem.toSection
         }
+        debug(`UPDATE FIELDS2=${JSON.stringify(newFormValue)}`)
         setFormValue(newFormValue)
     }
 
@@ -192,12 +213,13 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
     // Populate fields from new selected item
     useEffect(() => {
         updateFieldsFromSelected()
-    }, [selectedListElement])
+    }, [selectedListElement, itemList])
 
     // Update item when user modifies a field
     useEffect(() => {
         if (dirtyForm) {
             setDirtyForm(false)
+            debug(formValue)
             updateSelectedFromFields()
         }
     }, [dirtyForm])
@@ -244,7 +266,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
                     setItemList={setItemList}
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
-                <Form onChange={setFormValue} formValue={formValue} {...props}>
+                <Form onChange={(val) => setFormValue(val as FormValueType)} formValue={formValue} {...props}>
                     {/* Details of the selected execution item */}
                     <ExecutionItemForm
                         type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
