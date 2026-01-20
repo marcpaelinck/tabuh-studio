@@ -1,10 +1,31 @@
 import { type Dispatch } from 'react'
-import type { CheckPickerProps, FormControlProps, FormGroupProps } from 'rsuite'
-import { ArrayType, BooleanType, CheckPicker, Form, InputPicker, NumberType, SchemaModel, StringType } from 'rsuite'
+import type { CheckPickerProps, FormControlProps, FormGroupProps, InputProps } from 'rsuite'
+import {
+    ArrayType,
+    BooleanType,
+    Checkbox,
+    CheckPicker,
+    Form,
+    InputPicker,
+    NumberType,
+    SchemaModel,
+    StringType
+} from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ExecutionItemType } from '../../models/types'
 
-const formModel = { type: 'type', targetuuid: 'targetuuid', count: 'count', passes: 'passes', each: 'each' }
+const formModel = {
+    type: 'type',
+    targetuuid: 'targetuuid',
+    count: 'count',
+    fromValue: 'fromValue',
+    toValue: 'toValue',
+    fromSection: 'fromSection',
+    toSection: 'toSection',
+    isGradual: 'isGradual',
+    passes: 'passes',
+    each: 'each'
+}
 const model = SchemaModel({
     type: StringType().isRequired(),
     targetuuid: StringType().isRequired(),
@@ -14,23 +35,27 @@ const model = SchemaModel({
 
 // GENERIC FIELD COMPONENTS
 
-interface PickerFieldProps
-    extends FormControlProps, FormGroupProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
-    data: any
-    label: string
-    selectedElement: number | undefined
+interface ExecutionBaseFieldProps extends Pick<FormGroupProps, 'controlId'>, Pick<FormControlProps, 'accepter'> {
+    label?: string
+    name?: string
+    formValue: Record<string, any>
     setDirty: Dispatch<boolean>
+    selectedElement: number | undefined
+}
+
+interface PickerFieldProps extends ExecutionBaseFieldProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
+    data: any
 }
 // Selection (single or multiple)
-const PickerField = ({ label, selectedElement, setDirty, ...props }: PickerFieldProps) => {
+const PickerField = ({ label, ...props }: PickerFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
                 accepter={props.accepter || InputPicker}
                 cleanable={false}
-                onChange={() => setDirty(true)}
-                disabled={selectedElement == undefined}
+                onChange={() => props.setDirty(true)}
+                disabled={props.selectedElement == undefined}
                 block
                 searchable={false}
                 className="w-60"
@@ -40,12 +65,7 @@ const PickerField = ({ label, selectedElement, setDirty, ...props }: PickerField
     )
 }
 
-interface InputFieldProps
-    extends FormControlProps, FormGroupProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
-    label: string
-    selectedElement: number | undefined
-    setDirty: Dispatch<boolean>
-}
+interface InputFieldProps extends ExecutionBaseFieldProps, Pick<InputProps, 'placeholder'> {}
 const InputField = ({ label, selectedElement, setDirty, ...props }: InputFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
@@ -60,92 +80,130 @@ const InputField = ({ label, selectedElement, setDirty, ...props }: InputFieldPr
     )
 }
 
+interface RangeFieldProps extends Omit<ExecutionBaseFieldProps, 'name'>, Omit<InputProps, 'name'> {
+    labels: string[]
+    names: string[]
+}
+const RangeField = ({ labels, names, selectedElement, setDirty, ...props }: RangeFieldProps) => {
+    return (
+        <Form.Stack layout="horizontal">
+            <Form.Group className="items-start h-8" controlId={props.controlId}>
+                <Form.Label className="w-40 h-2 pt-[0.5rem]">{labels[0]}</Form.Label>
+                <Form.Control
+                    onChange={() => setDirty(true)}
+                    name={names[0]}
+                    disabled={selectedElement == undefined}
+                    className="w-30"
+                />
+            </Form.Group>
+            <Form.Group className="items-start h-8" controlId={props.controlId}>
+                <Form.Label className="w-20 h-2 pt-[0.5rem]">{labels[1]}</Form.Label>
+                <Form.Control
+                    onChange={() => setDirty(true)}
+                    name={names[1]}
+                    disabled={selectedElement == undefined}
+                    className="w-30"
+                />
+            </Form.Group>
+        </Form.Stack>
+    )
+}
+
+interface CheckBoxProps extends ExecutionBaseFieldProps {}
+const CheckBox = ({ label, ...props }: CheckBoxProps) => {
+    return (
+        <Form.Group className="items-start h-8" controlId={props.controlId}>
+            <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+            <Form.Control
+                onChange={() => props.setDirty(true)}
+                accepter={Checkbox}
+                disabled={props.selectedElement == undefined}
+                className="w-60"
+                {...props}
+            />
+        </Form.Group>
+    )
+}
+
 // COMMON PART: CONDITION
 
-interface ConditionFormProps {
-    selectedElement: number | undefined
-    setDirty: Dispatch<boolean>
-    pbInfo: Record<string, any>
+interface ConditionFormProps extends Omit<ExecutionBaseFieldProps, 'label'> {
+    type: ExecutionItemType
 }
 // Form that captures the details of the selected item
-const ConditionForm = ({ selectedElement, pbInfo, setDirty, ...props }: ConditionFormProps) => {
+const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
+    const condition = type == 'goto' ? 'after' : 'on'
     return (
         <>
             <PickerField
                 label="Condition"
                 name={formModel.each}
-                selectedElement={selectedElement}
-                setDirty={setDirty}
                 data={[
                     { label: 'none', value: undefined },
-                    { label: 'after pass(es) nr ...', value: false },
-                    { label: 'after every ...th pass', value: true }
+                    { label: `${condition} pass(es) nr ... `, value: false },
+                    { label: `${condition} every ...th pass`, value: true }
                 ]}
+                {...props}
             />
-            {pbInfo.each != undefined && (
+            {props.formValue.each != undefined && (
                 <PickerField
                     accepter={CheckPicker}
                     label="Passes"
                     name={formModel.passes}
-                    selectedElement={selectedElement}
                     countable={false}
-                    setDirty={setDirty}
                     data={new Array(20).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }
                     })}
+                    {...props}
                 />
             )}
         </>
     )
 }
 
-interface GotoFormProps {
-    selectedElement: number | undefined
-    gotoInfo: Record<string, any>
+interface GotoFormProps extends ExecutionBaseFieldProps {
     sysOptions: InputOption<string>[]
-    setDirty: Dispatch<boolean>
 }
-const GoToForm = ({ selectedElement, gotoInfo, sysOptions, setDirty, ...props }: GotoFormProps) => {
+const GoToForm = ({ sysOptions, ...props }: GotoFormProps) => {
     return (
         <>
-            {' '}
-            <Form.Group controlId={`goto-subform`}>
-                <Form.Label className="w-40">Type</Form.Label>
-                <Form.Text className="w-120 font-bold text-base">go to</Form.Text>
-            </Form.Group>
             <PickerField
-                label="Target system"
                 name={formModel.targetuuid}
-                selectedElement={selectedElement}
-                setDirty={setDirty}
                 data={sysOptions || []}
                 placeholder={'System to go to'}
+                {...props}
             />
         </>
     )
 }
 
-interface LoopFormProps {
-    selectedElement: number | undefined
-    loopInfo: Record<string, any>
-    setDirty: Dispatch<boolean>
-}
-const LoopForm = ({ selectedElement, loopInfo, setDirty, ...props }: LoopFormProps) => {
+interface LoopFormProps extends ExecutionBaseFieldProps {}
+const LoopForm = ({ ...props }: LoopFormProps) => {
     return (
         <>
-            {' '}
-            <Form.Group controlId={`goto-subform`}>
-                <Form.Label className="w-40">Type</Form.Label>
-                <Form.Text className="w-120 font-bold text-base">loop</Form.Text>
-            </Form.Group>
-            <InputField
-                label="Loop count"
-                name={formModel.count}
-                itemInfo={loopInfo.count}
-                selectedElement={selectedElement}
-                setDirty={setDirty}
-                placeholder={'Iterations'}
-            />
+            <InputField label="Loop count" name={formModel.count} placeholder={'Iterations'} {...props} />
+        </>
+    )
+}
+
+interface ExpressionFormProps extends ExecutionBaseFieldProps {
+    selectedElement: number | undefined
+    setDirty: Dispatch<boolean>
+}
+const ExpressionForm = ({ ...props }: ExecutionBaseFieldProps) => {
+    return (
+        <>
+            <CheckBox label="Gradual" name={formModel.isGradual} {...props} />
+            {props.formValue.isGradual ? (
+                <InputField label="BPM" name={formModel.toValue} placeholder={'BPM value'} {...props} />
+            ) : (
+                <RangeField
+                    labels={['BPM from', 'to']}
+                    names={[formModel.fromValue, formModel.toValue]}
+                    placeholder={'BPM value'}
+                    {...props}
+                />
+            )}
         </>
     )
 }
@@ -153,7 +211,7 @@ const LoopForm = ({ selectedElement, loopInfo, setDirty, ...props }: LoopFormPro
 interface ExecutionItemFormProps {
     type: ExecutionItemType | undefined
     selectedElement: number | undefined
-    itemInfo: Record<string, any>
+    formValue: Record<string, any>
     sysOptions: InputOption<string>[]
     setDirty: Dispatch<boolean>
 }
@@ -161,29 +219,30 @@ interface ExecutionItemFormProps {
 export default function ExecutionItemForm({
     type,
     selectedElement,
-    itemInfo,
+    formValue,
     sysOptions,
-    setDirty,
-    ...props
+    setDirty
 }: ExecutionItemFormProps) {
-    const gotoForm = (
-        <GoToForm
-            selectedElement={selectedElement}
-            gotoInfo={itemInfo}
-            sysOptions={sysOptions}
-            setDirty={setDirty}
-            {...props}
-        />
-    )
-    const loopForm = <LoopForm selectedElement={selectedElement} loopInfo={itemInfo} setDirty={setDirty} {...props} />
-
+    // Properties that are passed down as {...props}
+    const baseProps: ExecutionBaseFieldProps = {
+        selectedElement: selectedElement,
+        formValue: formValue,
+        setDirty: setDirty
+    }
+    const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
+    const loopForm = <LoopForm {...baseProps} />
+    const gradualForm = <ExpressionForm {...baseProps} />
+    if (!type) return
     return (
         <Form.Stack layout="horizontal">
+            <Form.Group controlId={`goto-subform`}>
+                <Form.Label className="w-40">Type</Form.Label>
+                <Form.Text className="w-120 font-bold text-base">{type}</Form.Text>
+            </Form.Group>
             {type == 'goto' && gotoForm}
             {type == 'loop' && loopForm}
-            {type && (
-                <ConditionForm selectedElement={selectedElement} pbInfo={itemInfo} setDirty={setDirty} {...props} />
-            )}
+            {type == 'tempo' && gradualForm}
+            <ConditionForm type={type} {...baseProps} />
         </Form.Stack>
     )
 }

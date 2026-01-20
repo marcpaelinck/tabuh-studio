@@ -34,6 +34,12 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             passcondition = 'on'
             break
         }
+        case 'tempo': {
+            short = `${item.fromValue ? item.fromValue + '-' : ''}${item.toValue} BPM`
+            instruction = `tempo ${item.fromValue ? item.fromValue + '-' : ''}${item.toValue} BPM`
+            passcondition = 'on'
+            break
+        }
     }
     if (length == 'short') return short
 

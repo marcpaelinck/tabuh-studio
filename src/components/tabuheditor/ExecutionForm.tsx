@@ -5,7 +5,14 @@ import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, Form, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { executionItemTooltip } from '../../hooks/useEditorScoreManager'
-import type { EditorSystem, ExecutionItem, ExecutionItemType, GotoItem, LoopItem } from '../../models/types'
+import type {
+    EditorSystem,
+    ExecutionItem,
+    ExecutionItemType,
+    ExpressionItem,
+    GotoItem,
+    LoopItem
+} from '../../models/types'
 import { debug } from '../../utils/debugger'
 import ExecutionItemForm from './ExecutionItemForm'
 
@@ -131,9 +138,17 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
-        const newFormValue = { ...selectedItem, each: selectedItem.each, passes: selectedItem.passes }
+        var newFormValue: ExecutionItem = { ...selectedItem, each: selectedItem.each, passes: selectedItem.passes }
         if (selectedItem.type == 'goto') (newFormValue as GotoItem).targetuuid = selectedItem.targetuuid || ''
         if (selectedItem.type == 'loop') (newFormValue as LoopItem).count = selectedItem.count
+        if (selectedItem.type == 'tempo') {
+            newFormValue = newFormValue as ExpressionItem
+            newFormValue.fromValue = selectedItem.fromValue
+            newFormValue.toValue = selectedItem.toValue
+            newFormValue.isGradual = selectedItem.isGradual
+            newFormValue.fromSection = selectedItem.fromSection
+            newFormValue.toSection = selectedItem.toSection
+        }
         setFormValue(newFormValue)
     }
 
@@ -156,6 +171,14 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
             newItem = newItem as LoopItem
             newItem.count = formValue.count
         }
+        if (selectedItem.type == 'tempo') {
+            newItem = newItem as ExpressionItem
+            newItem.fromValue = formValue.fromValue
+            newItem.toValue = formValue.toValue
+            newItem.isGradual = formValue.isGradual
+            newItem.fromSection = formValue.fromSection
+            newItem.toSection = formValue.toSection
+        }
         newItem = {
             ...newItem,
             tooltip: executionItemTooltip(newItem, 'long'),
@@ -170,11 +193,6 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
     useEffect(() => {
         updateFieldsFromSelected()
     }, [selectedListElement])
-
-    // Populate fields from new selected item
-    useEffect(() => {
-        debug(`LIST UPDATED: ${JSON.stringify(itemList)}`)
-    }, [itemList])
 
     // Update item when user modifies a field
     useEffect(() => {
@@ -231,7 +249,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
                     <ExecutionItemForm
                         type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
                         selectedElement={selectedListElement}
-                        itemInfo={formValue}
+                        formValue={formValue}
                         sysOptions={sysOptions}
                         setDirty={setDirtyForm}
                     />
