@@ -893,8 +893,7 @@
       "grouped": [],
       "execution": [
         {"type": "goto", "targetuuid": "5dc4875d-9cb3-4c38-922e-14023afd0912", "targetname": "Kotekan", "tooltip": "go to Kotekan", "tooltipshort": "Kotekan"},
-        {"type": "goto", "passes": [3], "each":true, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono after every 3rd pass", "tooltipshort": "Unisono"},
-	{"type":"goto","targetuuid":"","targetname":"","tooltip":"","tooltipshort":""}
+        {"type": "goto", "passes": [3], "each":true, "targetuuid": "7da7b53e-01c8-47cc-8f44-67c8ecf8a5bc", "targetname": "Unisono", "tooltip": "go to Unisono after every 3rd pass", "tooltipshort": "Unisono"}
       ],
       "staffs": {
         "UGAL": [

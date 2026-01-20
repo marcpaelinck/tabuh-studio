@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import type { EditorScore, EditorSystem, ExecutionItem, FlowItem } from '../models/types'
+import type { EditorScore, EditorSystem, ExecutionItem } from '../models/types'
 import { debug } from '../utils/debugger'
 import { defaultObject, toOrdinal } from '../utils/objectUtils'
 
@@ -14,7 +14,7 @@ function toText(values: number[] | undefined, ordinal: boolean = false): string 
     } else return ''
 }
 
-export function executionItemTooltip(item: FlowItem, length: 'short' | 'long'): string {
+export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
