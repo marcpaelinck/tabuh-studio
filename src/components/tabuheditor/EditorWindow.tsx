@@ -78,7 +78,8 @@ export default function EditorWindow({
     // gotoTargets will be used by the 'delete' SummaryItem button for validation.
     var gotoTargets: Set<string> = new Set()
     editorScore.systems.forEach((sys) => {
-        if (sys.flow) sys.flow.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
+        if (sys.execution)
+            sys.execution.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
     })
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)

@@ -149,12 +149,14 @@ export type HighlightRange = { line: number; range: number[] }
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
 export type Staffs = Record<Position, EditorMeasure[]>
 
-// PLAYBACK
-// Object containing instructions for creating a playback schedule.
+// EXECUTION
+// Object containing execution instructions: used to create a playback schedule.
+
+export type ExecutionItemType = 'goto' | 'loop' | 'tempo' | 'dynamics'
 
 // Base class
-export interface PlaybackItem {
-    type: 'goto' | 'loop' | 'tempo' | 'dynamics'
+export interface ExecutionItemBase {
+    type: ExecutionItemType
     seqId?: number
     passes?: number[] // Pass numbers for which the item applies
     each?: boolean // undefined: no condition. false: item applies to listed passes only.
@@ -163,13 +165,13 @@ export interface PlaybackItem {
     tooltipshort: string
 }
 
-export interface GotoItem extends PlaybackItem {
+export interface GotoItem extends ExecutionItemBase {
     type: 'goto'
     targetuuid: string // next system to play back.
     targetname: string
 }
 
-export interface LoopItem extends PlaybackItem {
+export interface LoopItem extends ExecutionItemBase {
     type: 'loop'
     count: number
 }
@@ -177,15 +179,17 @@ export interface LoopItem extends PlaybackItem {
 export type FlowItem = GotoItem | LoopItem
 
 // Tempo and dynamics (expression indicators)
-export interface ExpressionItem extends PlaybackItem {
+export interface ExpressionItem extends ExecutionItemBase {
     type: 'tempo' | 'dynamics'
-    loops: number[]
+    loops?: number[]
     isGradual: boolean
     fromSection?: number
     toSection: number
     fromValue?: number
     toValue: number
 }
+
+export type ExecutionItem = GotoItem | LoopItem | ExpressionItem
 
 export type EditorSystem = {
     uuid: string // unique uuid, never changes
@@ -197,7 +201,7 @@ export type EditorSystem = {
     colWidths: number[]
     label?: string
     loop?: LoopItem
-    flow?: FlowItem[]
+    execution?: ExecutionItem[]
     tempo?: ExpressionItem[]
     dynamics?: ExpressionItem[]
     copyfrom?: string // label or id of copied system

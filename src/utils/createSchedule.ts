@@ -14,7 +14,7 @@ import type {
 } from '../models/types'
 import { cleanSymbol } from './alphabet'
 import { debug } from './debugger'
-import { flowManager, type FlowStep } from './flowManager'
+import { executionManager, type FlowStep } from './executionManager'
 import { defaultObject } from './objectUtils'
 import { n2TO, TO2n } from './timeunits'
 
@@ -51,7 +51,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
         notation: {} as Record<Position, any>
     }
 
-    const { nextInFlow, resetFlow } = flowManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
+    const { nextInFlow, resetFlow } = executionManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
     var prevSystem: EditorSystem | undefined = undefined

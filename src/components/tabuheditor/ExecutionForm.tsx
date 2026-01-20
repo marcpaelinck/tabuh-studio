@@ -1,33 +1,30 @@
 import MinusIcon from '@rsuite/icons/Minus'
 import PlusIcon from '@rsuite/icons/Plus'
 import { useEffect, useState, type Dispatch } from 'react'
-import type { CheckPickerProps, FormControlProps, FormGroupProps, FormProps } from 'rsuite'
-import { Button, CheckPicker, Divider, Drawer, Form, IconButton, InputPicker, List } from 'rsuite'
+import type { FormProps } from 'rsuite'
+import { Button, Divider, Drawer, Form, IconButton, List } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { ArrayType, BooleanType, NumberType, SchemaModel, StringType } from 'rsuite/Schema'
-import { flowItemTooltip } from '../../hooks/useEditorScoreManager'
-import type { EditorSystem, FlowItem, GotoItem } from '../../models/types'
+import { executionItemTooltip } from '../../hooks/useEditorScoreManager'
+import type { EditorSystem, ExecutionItem, ExecutionItemType, GotoItem } from '../../models/types'
 import { debug } from '../../utils/debugger'
+import ExecutionItemForm from './ExecutionItemForm'
 
-const formModel = { type: 'type', targetuuid: 'targetuuid', passes: 'passes', each: 'each' }
-const newGoto: GotoItem = { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' }
-
-const model = SchemaModel({
-    type: StringType().isRequired(),
-    targetuuid: StringType().isRequired(),
-    passes: ArrayType().of(NumberType()).isRequiredOrEmpty(),
-    each: BooleanType().isRequiredOrEmpty()
-})
+const defaultItem: Record<ExecutionItemType, ExecutionItem> = {
+    goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
+    loop: { type: 'loop', count: 0, tooltip: 'loop', tooltipshort: '' },
+    tempo: { type: 'tempo', isGradual: false, toSection: -1, toValue: -1, tooltip: 'tempo', tooltipshort: '' },
+    dynamics: { type: 'dynamics', isGradual: false, toSection: -1, toValue: -1, tooltip: 'dynamics', tooltipshort: '' }
+}
 
 interface FlowElementListProps {
     label: string
-    itemList: FlowItem[]
-    setItemList: Dispatch<FlowItem[]>
+    itemList: ExecutionItem[]
+    setItemList: Dispatch<ExecutionItem[]>
     selectedElement: number | undefined
     setSelectedElement: Dispatch<number | undefined>
 }
 
-// Editable list of flow items (goto and loop)
+// Editable list of execution items (goto, loop, tempo and dynamics)
 const FlowElementList = ({
     label,
     itemList,
@@ -41,7 +38,7 @@ const FlowElementList = ({
     }, [])
 
     function handleAdd() {
-        const newItem = { ...newGoto }
+        const newItem: ExecutionItem = { ...defaultItem.goto }
         newItem.seqId = itemList.length
         const newItemList = [...itemList, newItem]
         setItemList(newItemList)
@@ -65,7 +62,7 @@ const FlowElementList = ({
                     val.seqId = idx
                     return (
                         <List.Item
-                            key={`goto-${idx}`}
+                            key={`execution-${idx}`}
                             className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
                             <div
                                 onClick={(e) => {
@@ -83,92 +80,7 @@ const FlowElementList = ({
     )
 }
 
-// START OF FORM COMPONENTS
-
-interface PickerFieldProps
-    extends FormControlProps, FormGroupProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
-    data: any
-    label: string
-    selectedElement: number | undefined
-    setDirty: Dispatch<boolean>
-}
-
-// Selection (single or multiple)
-const PickerField = ({ label, selectedElement, setDirty, ...props }: PickerFieldProps) => {
-    return (
-        <Form.Group className="items-start h-8" controlId={props.controlId}>
-            <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
-            <Form.Control
-                accepter={props.accepter || InputPicker}
-                cleanable={false}
-                onChange={() => setDirty(true)}
-                disabled={selectedElement == undefined}
-                block
-                searchable={false}
-                className="w-60"
-                {...props}
-            />
-        </Form.Group>
-    )
-}
-
-interface ItemFormProps extends FormControlProps {
-    label: string
-    selectedElement: number | undefined
-    setDirty: Dispatch<boolean>
-    value: Record<string, any>
-    sysOptions: InputOption<string>[]
-}
-// Form that captures the details of the selected item
-const ItemForm = ({ label, selectedElement, value, sysOptions, setDirty, ...props }: ItemFormProps) => {
-    return (
-        <>
-            <Form.Stack layout="horizontal">
-                <Form.Group controlId={`${props.name}-type`}>
-                    <Form.Label className="w-40">Type</Form.Label>
-                    <Form.Text className="w-120 font-bold text-base">{value.type}</Form.Text>
-                </Form.Group>
-                <PickerField
-                    label="Target system"
-                    name={formModel.targetuuid}
-                    value={value.targetuuid}
-                    selectedElement={selectedElement}
-                    setDirty={setDirty}
-                    data={sysOptions || []}
-                    placeholder={'System to go to'}
-                />
-                <PickerField
-                    label="Condition"
-                    name={formModel.each}
-                    value={value.each}
-                    selectedElement={selectedElement}
-                    setDirty={setDirty}
-                    data={[
-                        { label: 'none', value: undefined },
-                        { label: 'after pass(es) nr ...', value: false },
-                        { label: 'after every ...th pass', value: true }
-                    ]}
-                />
-                {value.each != undefined && (
-                    <PickerField
-                        accepter={CheckPicker}
-                        label="Passes"
-                        name={formModel.passes}
-                        value={value.passes}
-                        selectedElement={selectedElement}
-                        countable={false}
-                        setDirty={setDirty}
-                        data={new Array(20).fill(null).map((_, idx) => {
-                            return { label: `${idx + 1}`, value: idx + 1 }
-                        })}
-                    />
-                )}
-            </Form.Stack>
-        </>
-    )
-}
-
-interface FlowItemFormProps extends FormProps {
+interface ExecutionFormProps extends FormProps {
     systemData: EditorSystem
     title: string
     open: boolean
@@ -179,8 +91,8 @@ interface FlowItemFormProps extends FormProps {
 // Main form Component
 // The form consists of a list of flow items and several input fields. The field values corresponds
 // with the properties of the selected items.
-export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ...props }: FlowItemFormProps) {
-    const [itemList, setItemList] = useState<FlowItem[]>(systemData.flow || [])
+export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ...props }: ExecutionFormProps) {
+    const [itemList, setItemList] = useState<ExecutionItem[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
     const [formValue, setFormValue] = useState<Record<string, any>>({})
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
@@ -213,8 +125,8 @@ export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ..
         }
         newItem = {
             ...newItem,
-            tooltip: flowItemTooltip(newItem, 'long'),
-            tooltipshort: flowItemTooltip(newItem, 'short')
+            tooltip: executionItemTooltip(newItem, 'long'),
+            tooltipshort: executionItemTooltip(newItem, 'short')
         }
         const newItemList = [...itemList]
         newItemList.splice(selectedListElement, 1, newItem)
@@ -240,7 +152,7 @@ export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ..
     }, [dirtyForm])
 
     const handleSave = () => {
-        if (itemList) systemData.flow = itemList
+        if (itemList) systemData.execution = itemList
         setOpen(false)
     }
 
@@ -265,6 +177,7 @@ export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ..
                 </Drawer.Actions>
             </Drawer.Header>
             <Drawer.Body>
+                {/* List of execution items */}
                 <FlowElementList
                     label="Go To & Loop instructions"
                     itemList={itemList}
@@ -274,13 +187,13 @@ export function FlowItemsForm({ systemData, title, open, sysOptions, setOpen, ..
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
                 <Form onChange={setFormValue} formValue={formValue} {...props}>
-                    <ItemForm
-                        name="goto-loop"
-                        label="Go To & Loop instructions"
-                        value={formValue}
+                    {/* Details of the selected execution item */}
+                    <ExecutionItemForm
+                        type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
                         selectedElement={selectedListElement}
-                        setDirty={setDirtyForm}
+                        itemInfo={formValue}
                         sysOptions={sysOptions}
+                        setDirty={setDirtyForm}
                     />
                 </Form>
             </Drawer.Body>

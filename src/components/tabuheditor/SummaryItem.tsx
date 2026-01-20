@@ -20,13 +20,13 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import type { EditorScore, EditorSystem, FlowItem } from '../../models/types'
+import type { EditorScore, EditorSystem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import { debug } from '../../utils/debugger'
-import { FlowItemsForm } from './FlowItemsForm'
+import { ExecutionForm } from './ExecutionForm'
 
 // Col item formatted to contain summary items
 export function SCol({ ...props }: ColProps) {
@@ -129,14 +129,14 @@ export function SummaryItem({
             hasfield: true,
             formtitle: `system # ${sysData.id}`,
             fieldval:
-                sysData.flow
+                sysData.execution
                     ?.filter((item) => item.type == 'goto')
                     .map((item) => item.targetname)
                     .join('\n') || '',
             textcolor: 'green',
             buttonTooltip: 'Add a `goto` or `loop` instruction.',
             fieldTooltip:
-                sysData.flow
+                sysData.execution
                     ?.filter((item) => ['goto', 'loop'].includes(item.type))
                     ?.map((item) => item.tooltip)
                     .join('\n') || ''
@@ -148,14 +148,14 @@ export function SummaryItem({
             hasfield: true,
             formtitle: `Tempo and Dynamics instructions for system # ${sysData.id}`,
             fieldval:
-                sysData.flow
+                sysData.execution
                     ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
-                    .map((item: FlowItem) => item.tooltipshort)
+                    .map((item) => item.tooltipshort)
                     .join('\n') || '',
             textcolor: 'green',
             buttonTooltip: 'Add a `goto` or `loop` instruction.',
             fieldTooltip:
-                sysData.flow
+                sysData.execution
                     ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
                     .map((item) => item.tooltip)
                     .join('\n') || ''
@@ -276,7 +276,7 @@ export function SummaryItem({
     )
 
     const flowItemsForm = (
-        <FlowItemsForm
+        <ExecutionForm
             systemData={sysData}
             title={`${specs[item].formtitle}`}
             open={editing}

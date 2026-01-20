@@ -46,7 +46,7 @@ const prioGoto = (goto: GotoItem): number => {
 const compareGoto = (goto1: GotoItem, goto2: GotoItem): number => prioGoto(goto1) - prioGoto(goto2)
 
 // Returns functions that can be used to run throught the score in the correct sequence.
-export function flowManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
+export function executionManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
     var cursor: FlowCursor | undefined = undefined
 
     // Reset the cursor and create the lookup table
@@ -54,7 +54,7 @@ export function flowManager(score: EditorScore, startIndex: number = 0, playback
         score.systems.map((system, idx) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
-            const gotos = system.flow?.filter((item) => item.type == 'goto')?.sort(compareGoto)
+            const gotos = system.execution?.filter((item) => item.type == 'goto')?.sort(compareGoto)
             return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, flowitems: gotos }]
         })
     )

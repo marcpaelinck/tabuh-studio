@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import type { EditorScore, EditorSystem, FlowItem } from '../models/types'
+import type { EditorScore, EditorSystem, ExecutionItem, FlowItem } from '../models/types'
 import { debug } from '../utils/debugger'
 import { defaultObject, toOrdinal } from '../utils/objectUtils'
 
@@ -14,7 +14,7 @@ function toText(values: number[] | undefined, ordinal: boolean = false): string 
     } else return ''
 }
 
-export function flowItemTooltip(item: FlowItem, length: 'short' | 'long'): string {
+export function executionItemTooltip(item: FlowItem, length: 'short' | 'long'): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
@@ -72,15 +72,15 @@ export function useEditorScoreManager(score: EditorScore) {
     useEffect(() => {
         // (Re-) number the system index and id values.
         // Should be performed at each render due to possible user actions (insert or delete system).
-        const flowitems: FlowItem[] = []
+        const executionitems: ExecutionItem[] = []
         editorScore.systems.forEach((systemData, sysIdx) => {
             systemData.index = sysIdx
             systemData.id = systemData.index + 1
-            if (systemData.flow) flowitems.push(...systemData.flow)
+            if (systemData.execution) executionitems.push(...systemData.execution)
         })
         // Update the goto display values.
         debug('updating flow items')
-        flowitems.forEach((item) => {
+        executionitems.forEach((item) => {
             if (item.type == 'goto') {
                 const target = editorScore.systems.find((sys) => sys.uuid == item.targetuuid)
                 if (target) item.targetname = target.label || `# ${target.id}`
@@ -88,8 +88,8 @@ export function useEditorScoreManager(score: EditorScore) {
                     item.targetname = 'target unknown'
                     console.error(`system ${item} of goto directive not found.`)
                 }
-                item.tooltip = flowItemTooltip(item, 'long')
-                item.tooltipshort = flowItemTooltip(item, 'short')
+                item.tooltip = executionItemTooltip(item, 'long')
+                item.tooltipshort = executionItemTooltip(item, 'short')
             }
             debug(`${item.tooltip} -- ${item.tooltipshort}`)
         })
@@ -115,8 +115,8 @@ export function useEditorScoreManager(score: EditorScore) {
                     systemData.copyfromkey = undefined
                 }
             } else systemData.copyfrom = undefined
-            if (systemData.flow) {
-                systemData.flow
+            if (systemData.execution) {
+                systemData.execution
                     .filter((item) => item.type == 'goto')
                     .forEach((goto) => {
                         const destination = newSystemData.find((sysData) => sysData.uuid == goto.targetuuid)
@@ -124,8 +124,8 @@ export function useEditorScoreManager(score: EditorScore) {
                             debug(`found goto destination ${destination.uuid}`)
                             {
                                 goto.targetname = gotoItemTargetName(destination)
-                                goto.tooltip = flowItemTooltip(goto, 'long')
-                                goto.tooltipshort = flowItemTooltip(goto, 'short')
+                                goto.tooltip = executionItemTooltip(goto, 'long')
+                                goto.tooltipshort = executionItemTooltip(goto, 'short')
                             }
                         } else {
                             goto.targetname = 'Error: goto target not found.'
@@ -134,7 +134,7 @@ export function useEditorScoreManager(score: EditorScore) {
                             console.error(`Error: goto target not found for ${systemData.uuid}.`)
                         }
                     })
-            } else systemData.flow = undefined
+            } else systemData.execution = undefined
         })
     }
 
@@ -176,7 +176,7 @@ export function useEditorScoreManager(score: EditorScore) {
                     })
                 })
                 newSystemData.label = undefined
-                newSystemData.flow = undefined
+                newSystemData.execution = undefined
                 newSystemData.uuid = uuidv4()
                 sliceIndex1 = systemData.index + 1 // Insert below current
                 break
