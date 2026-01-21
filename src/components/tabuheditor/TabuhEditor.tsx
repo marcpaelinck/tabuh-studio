@@ -64,6 +64,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const isExpandedSidenav = sidenavExpanded && !isMobile
     //END NAVIGATION
     const { score, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
+    const [unsavedScore, setUnsavedScore] = useState<EditorScore>()
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
@@ -100,6 +101,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
                             <EditorWindow
                                 id="editor window component"
                                 score={score}
+                                setScore={setUnsavedScore}
                                 expanded={expanded}
                                 setExpanded={setExpanded}
                                 loading={loading}

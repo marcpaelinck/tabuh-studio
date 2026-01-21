@@ -141,12 +141,13 @@ interface ExecutionFormProps extends FormProps {
     open: boolean
     sysOptions: InputOption<string>[]
     setOpen: Dispatch<boolean>
+    onSave: () => void
 }
 
 // Main form Component
 // The form consists of a list of flow items and several input fields. The field values corresponds
 // with the properties of the selected items.
-export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ...props }: ExecutionFormProps) {
+export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, onSave, ...props }: ExecutionFormProps) {
     const [itemList, setItemList] = useState<ExecutionItemDefault[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
     const [formValue, setFormValue] = useState<FormValueType>({ type: '' })
@@ -251,6 +252,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
             const validatedList = validate(itemList)
             if (validatedList) if (itemList) systemData.execution = validatedList
         }
+        onSave()
         setOpen(false)
     }
 

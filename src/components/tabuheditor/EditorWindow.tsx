@@ -20,17 +20,21 @@ import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
-export default function EditorWindow({
-    score,
-    expanded,
-    setExpanded,
-    loading
-}: {
+interface EditorWindowProps {
     score: EditorScore
     expanded: Record<string, boolean>
     loading: boolean
+    setScore: Dispatch<EditorScore>
     setExpanded: Dispatch<Record<string, boolean>>
-} & HTMLAttributes<HTMLDivElement>) {
+}
+
+export default function EditorWindow({
+    score,
+    expanded,
+    setScore,
+    setExpanded,
+    loading
+}: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const focusRef: RefObject<Position[]> = useRef<Position[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
@@ -64,6 +68,8 @@ export default function EditorWindow({
             editorScore.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )
         setExpanded(initExpandState)
+        setScore(editorScore)
+        debug('UPDATING SCORE')
     }, [editorScore])
 
     // Update the list of expanded panels which is maintained in te TabuhEditor.

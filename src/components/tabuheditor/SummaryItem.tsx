@@ -33,10 +33,10 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type ItemType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution'
+type EditorActionType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
-    item: ItemType
+    item: EditorActionType
     sysData: EditorSystem
     score?: EditorScore
     labels?: Record<string, EditorSystem>
@@ -86,7 +86,7 @@ export function SummaryItem({
     //textcolor: Text color of the field.
     //buttonTooltip: Tooltip text for the button.
     //fieldTooltip: Tooltip text for the field.
-    const specs: Record<ItemType, SpecType> = {
+    const specs: Record<EditorActionType, SpecType> = {
         id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id, fieldTooltip: sysData.uuid },
         label: {
             icon: TsLabelIcon,
@@ -146,6 +146,7 @@ export function SummaryItem({
             return
         }
         setEditing(false)
+        debug(`EXECUTING ${item}`)
         if (action != 'cancel' && validate() && execute) execute(item)
     }
 
@@ -255,6 +256,7 @@ export function SummaryItem({
             open={editing}
             sysOptions={options || []}
             setOpen={setEditing}
+            onSave={() => execute!('execution')}
         />
     )
 

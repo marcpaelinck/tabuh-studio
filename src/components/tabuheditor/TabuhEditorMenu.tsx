@@ -34,9 +34,14 @@ interface TabuhOption {
 
 export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
-    const [tabuhOptions, setTabuhOptions] = useState<TabuhOption[]>([])
+    const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
 
-    function performAction() {}
+    function performAction() {
+        switch (activeKey) {
+            case 'file-save': {
+            }
+        }
+    }
     useEffect(performAction, [activeKey])
 
     useEffect(() => {
@@ -59,7 +64,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
             <Modal.Header>
                 <Modal.Title>Open notation</Modal.Title>
             </Modal.Header>
-            <SelectPicker data={tabuhOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
+            <SelectPicker data={scoreListOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
             <Modal.Body></Modal.Body>
         </Modal>
     )

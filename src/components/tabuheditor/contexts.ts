@@ -1,6 +1,10 @@
 import { createContext, type Context, type RefObject } from 'react'
 import type { NavigationAction } from '../../config/config'
 import type { EditorCursorFunction, EditorSystem, GenericFunction, SamplerAction } from '../../models/types'
+// Score functions: modify / save score
+export interface ScoreFunctionsType {
+    saveScore: () => void
+}
 
 // Audio functions: used for playback from the editor interface
 export interface AudioFunctionsType {

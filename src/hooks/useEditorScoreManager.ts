@@ -216,7 +216,7 @@ export function useEditorScoreManager(score: EditorScore) {
                 sliceIndex1 = systemData.index + 1 // Copy after the current system
                 break
             }
-            case 'goto':
+            case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
                 break
             case 'delete':
@@ -240,6 +240,7 @@ export function useEditorScoreManager(score: EditorScore) {
             sysData.index = sysIdx
             sysData.id = sysIdx + 1
         })
+        debug('UPDATING SCORE by editorscoremanager')
         updatePointers(newData)
         setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
