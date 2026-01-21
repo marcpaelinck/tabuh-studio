@@ -18,33 +18,45 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
+    // Create components for the values to return.
     var instruction: string = ''
     var passcondition: string = ''
-    var short: string = 'xx'
+    var shortTooltip: string = ''
     switch (item.type) {
         case 'goto': {
-            short = item.targetname
+            shortTooltip = item.targetname
             instruction = `go to ${item.targetname}`
             passcondition = 'after'
             break
         }
         case 'loop': {
-            short = `${item.count}X`
+            shortTooltip = `${item.count}X`
             instruction = `play ${item.count}X`
             passcondition = 'on'
             break
         }
-        case 'tempo': {
-            short = `${item.isGradual && item.fromValue && item.fromValue != item.toValue ? item.fromValue + '→' : ''}${item.toValue} BPM`
+        case 'tempo':
+        case 'dynamics': {
+            const current = length == 'long' ? 'current ' : ''
+            const itemtype = length == 'long' ? `${item.type} ` : ''
+            if (item.type == 'tempo') {
+                const isGradual = item.isGradual && item.fromBPM != item.toBPM
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromBPM ? `${current}→` : item.fromBPM + '→') : ''}${item.toBPM} BPM`
+            } else {
+                const isGradual = item.isGradual && item.fromDynamics != item.toDynamics
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? 'Current →' : item.fromDynamics + '→') : ''}${item.toDynamics}`
+            }
+            const multipleSections = item.isGradual && item.fromSection != item.toSection
             instruction =
-                `${item.isGradual && item.fromValue && item.fromValue != item.toValue ? item.fromValue + '→' : ''}${item.toValue} BPM, ` +
-                `beat ${item.isGradual && item.fromSection && item.fromSection != item.toSection ? item.fromSection + '→' : ''}${item.toSection}`
+                shortTooltip +
+                ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.toSection}`
             passcondition = 'on'
             break
         }
     }
-    if (length == 'short') return short
+    if (length == 'short') return shortTooltip
 
+    // Compose the long tooltip version
     switch (true) {
         case !nbrOfPasses:
             return instruction

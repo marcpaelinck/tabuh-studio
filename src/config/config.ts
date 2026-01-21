@@ -35,6 +35,9 @@ export const rsStyleSheet = () => {
     }
 }
 
+// DYNAMICS
+export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
+
 // EDITOR
 
 export const editorFontSize = 14

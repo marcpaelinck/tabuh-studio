@@ -5,7 +5,6 @@
 import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
-import { IoArrowForwardOutline } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
 import {
     Col,
@@ -23,6 +22,7 @@ import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import type { EditorScore, EditorSystem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
+import TsExecutionIcon from '../../reacticons/TsExecutionIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import { debug } from '../../utils/debugger'
@@ -33,14 +33,14 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type ItemType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'goto_loop' | 'tempo_dynamics'
+type ItemType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: ItemType
     sysData: EditorSystem
     score?: EditorScore
     labels?: Record<string, EditorSystem>
-    gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field
+    gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field. Used for validation.
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string>[]
 }
@@ -61,7 +61,7 @@ export function SummaryItem({
 }: SummaryItemProps) {
     // Specifications of the display mode and functionality of each SummaryItem type.
     // See below for a detailed description of the properties of this interface.
-    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'gotoform' | 'none'
+    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'executionform' | 'none'
     interface SpecType {
         icon: IconType
         iconcolor?: string
@@ -122,43 +122,16 @@ export function SummaryItem({
             hasfield: false,
             buttonTooltip: 'Delete this system (warning: can not be undone).'
         },
-        goto_loop: {
-            icon: IoArrowForwardOutline,
+        execution: {
+            icon: TsExecutionIcon,
             iconcolor: '#1C78E0',
-            action: 'gotoform',
+            action: 'executionform',
             hasfield: true,
             formtitle: `system # ${sysData.id}`,
-            fieldval:
-                sysData.execution
-                    ?.filter((item) => item.type == 'goto')
-                    .map((item) => item.targetname)
-                    .join('\n') || '',
+            fieldval: sysData.execution?.map((item) => item.tooltipshort).join(' | ') || '',
             textcolor: 'green',
-            buttonTooltip: 'Add a `goto` or `loop` instruction.',
-            fieldTooltip:
-                sysData.execution
-                    ?.filter((item) => ['goto', 'loop'].includes(item.type))
-                    ?.map((item) => item.tooltip)
-                    .join('\n') || ''
-        },
-        tempo_dynamics: {
-            icon: IoArrowForwardOutline,
-            iconcolor: '#1C78E0',
-            action: 'gotoform',
-            hasfield: true,
-            formtitle: `Tempo and Dynamics instructions for system # ${sysData.id}`,
-            fieldval:
-                sysData.execution
-                    ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
-                    .map((item) => item.tooltipshort)
-                    .join('\n') || '',
-            textcolor: 'green',
-            buttonTooltip: 'Add a `goto` or `loop` instruction.',
-            fieldTooltip:
-                sysData.execution
-                    ?.filter((item) => ['tempo', 'dynamics'].includes(item.type))
-                    .map((item) => item.tooltip)
-                    .join('\n') || ''
+            buttonTooltip: 'Playing sequence, tempo & dynamics.',
+            fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
@@ -275,7 +248,7 @@ export function SummaryItem({
         />
     )
 
-    const flowItemsForm = (
+    const executionItemsForm = (
         <ExecutionForm
             systemData={sysData}
             title={`${specs[item].formtitle}`}
@@ -290,8 +263,8 @@ export function SummaryItem({
             ? inputField
             : specs[item].action == 'inputpicker'
               ? inputPicker
-              : specs[item].action == 'gotoform'
-                ? flowItemsForm
+              : specs[item].action == 'executionform'
+                ? executionItemsForm
                 : null
 
     const SummaryIcon = specs[item].icon

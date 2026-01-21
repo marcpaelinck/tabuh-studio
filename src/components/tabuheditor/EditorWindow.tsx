@@ -154,6 +154,14 @@ export default function EditorWindow({
                             <SCol span={4}>
                                 <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
                             </SCol>
+                            <SCol span={6}>
+                                <SummaryItem
+                                    item="execution"
+                                    sysData={systemData}
+                                    options={systemSelectorOptions(systemData, false, false)}
+                                    execute={execute}
+                                />
+                            </SCol>
                             <SCol span={4}>
                                 <SummaryItem item="new" sysData={systemData} execute={execute} />
                                 <SummaryItem
@@ -166,14 +174,6 @@ export default function EditorWindow({
                                     item="delete"
                                     gototargets={gotoTargets}
                                     sysData={systemData}
-                                    execute={execute}
-                                />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem
-                                    item="goto_loop"
-                                    sysData={systemData}
-                                    options={systemSelectorOptions(systemData, false, false)}
                                     execute={execute}
                                 />
                             </SCol>

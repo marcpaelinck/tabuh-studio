@@ -60,15 +60,6 @@ export type Measure = {
     notation_?: JsonSymbol[] // cache used to keep user edits that have not been saved yet
 }
 
-// Notation of one section for one instrument position
-export type EditorMeasure = {
-    starttime: number
-    tempo: [number, number]
-    velocity: [number, number]
-    notation: string[]
-    notation_?: string[] // cache used to keep user edits that have not been saved yet
-}
-
 // Subdivision of a system, typically spans one kempli beat
 export type Section = {
     id: number
@@ -99,6 +90,47 @@ export type ScoreInfo = {
     notationversion: string
     pdf: string
     format: 'old' | 'new'
+}
+
+// NEW SCORE OBJECT DEFINITIONS
+//TODO the following definitions will replace Score, System, Section and Measure
+// EDIT TABLE: contains system data in a format that can easily be displayed in the editor
+// Notation of one section for one instrument position
+export type EditorMeasure = {
+    starttime: number
+    tempo: [number, number]
+    velocity: [number, number]
+    notation: string[]
+    notation_?: string[] // cache used to keep user edits that have not been saved yet
+}
+
+// Notation of one instrument position within a System
+export type Staffs = Record<Position, EditorMeasure[]>
+
+// Subdivision of a score, typically spans one gongan
+export type EditorSystem = {
+    uuid: string // unique uuid, never changes
+    id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
+    index: number // row index, starts with 0, can change when data items are added / deleted
+    starttime: number
+    grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
+    staffs: Staffs // Contains the notation as a sequence of measures for each position.
+    colWidths: number[]
+    label?: string
+    loop?: LoopItem
+    execution?: ExecutionItem[]
+    tempo?: TempoItem[]
+    dynamics?: TempoItem[]
+    copyfrom?: string // label or id of copied system
+    copyfromkey?: string // uuid copied system
+}
+
+export type EditorScore = {
+    title: string
+    composer: string
+    parts: Record<string, string[]> // <<part name>, <system uuid>[]>
+    positions: Position[] // sorted list of positions ordered as displayed in the editor
+    systems: EditorSystem[]
 }
 
 // ANIMATION
@@ -146,18 +178,17 @@ export type TextCursorPosition = {
 
 export type HighlightRange = { line: number; range: number[] }
 
-// EDIT TABLE: contains system data in a format that can easily be displayed in the editor
-export type Staffs = Record<Position, EditorMeasure[]>
-
 // EXECUTION
-// Object containing execution instructions: used to create a playback schedule.
+// These objects contain information for playing the notation.
+// Flow instructions: determine the playing sequence (goto and loop).
+// Expression instructions: contain tempo and dynamics information.
 
 export type ExecutionItemType = 'goto' | 'loop' | 'tempo' | 'dynamics'
 
 // Base class
 export interface ExecutionItemBase {
     type: ExecutionItemType
-    seqId?: number
+    seqId?: number // Sequence in the list of Execution items. Used by the item editor.
     passes?: number[] // Pass numbers for which the item applies
     each?: boolean // undefined: no condition. false: item applies to listed passes only.
     //  true: item applies to every nth pass (n in passes list), e.g. every 3rd & 4th pass.
@@ -165,56 +196,44 @@ export interface ExecutionItemBase {
     tooltipshort: string
 }
 
+// Enables to deviate form the default playing sequence: indicates the next System.
 export interface GotoItem extends ExecutionItemBase {
     type: 'goto'
-    targetuuid: string // next system to play back.
-    targetname: string
+    targetuuid: string // next System to play.
+    targetname: string // Display name of the target System.
 }
 
+// Enables to repeat the current System.
 export interface LoopItem extends ExecutionItemBase {
     type: 'loop'
-    count: number
+    count: number // Total number of times to play the System consecutively.
+}
+
+export interface ExpressionItemBase extends ExecutionItemBase {
+    type: ExecutionItemType
+    loops?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
+    isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
+    fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
+    toSection: number // If isGradual==true: the gradual change should continue until the end of this section.
+} // Otherwise the gradual change should be effective immediately at the start of this section.
+
+export interface TempoItem extends ExpressionItemBase {
+    type: 'tempo'
+    fromBPM?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
+    toBPM: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+}
+
+export type DynamicsValue = 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff'
+
+export interface DynamicsItem extends ExpressionItemBase {
+    type: 'dynamics'
+    fromDynamics?: DynamicsValue // If isGradual==true: starting value for gradual change. Otherwise undefined.
+    toDynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
 }
 
 export type FlowItem = GotoItem | LoopItem
-
-// Tempo and dynamics (expression indicators)
-export interface ExpressionItem extends ExecutionItemBase {
-    type: 'tempo' | 'dynamics'
-    loops?: number[]
-    isGradual: boolean
-    fromSection?: number
-    toSection: number
-    fromValue?: number
-    toValue: number
-}
-
-export type ExecutionItem = GotoItem | LoopItem | ExpressionItem
-
-export type EditorSystem = {
-    uuid: string // unique uuid, never changes
-    id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
-    index: number // row index, starts with 0, can change when data items are added / deleted
-    starttime: number
-    grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
-    staffs: Staffs // Contains the notation as a sequence of measures for each position.
-    colWidths: number[]
-    label?: string
-    loop?: LoopItem
-    execution?: ExecutionItem[]
-    tempo?: ExpressionItem[]
-    dynamics?: ExpressionItem[]
-    copyfrom?: string // label or id of copied system
-    copyfromkey?: string // uuid copied system
-}
-
-export type EditorScore = {
-    title: string
-    composer: string
-    parts: Record<string, string[]> // <<part name>, <system uuid>[]>
-    positions: Position[] // sorted list of positions ordered as displayed in the editor
-    systems: EditorSystem[]
-}
+export type ExpressionItem = TempoItem | DynamicsItem
+export type ExecutionItem = FlowItem | ExpressionItem
 
 export type EditorCellCursor = { sysUuid: string; measure: number }
 

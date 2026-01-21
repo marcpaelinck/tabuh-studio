@@ -1,5 +1,5 @@
-import { type Dispatch } from 'react'
-import type { CheckPickerProps, FormControlProps, FormGroupProps, InputProps } from 'rsuite'
+import { type Dispatch, type ElementType } from 'react'
+import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps } from 'rsuite'
 import {
     ArrayType,
     BooleanType,
@@ -12,14 +12,17 @@ import {
     Toggle
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import { dynamicValues } from '../../config/config'
 import type { ExecutionItemType } from '../../models/types'
 
 export interface FormValueType {
     type: any
     targetuuid?: any
     count?: any
-    fromValue?: any
-    toValue?: any
+    fromBPM?: any
+    toBPM?: any
+    fromDynamics?: any
+    toDynamics?: any
     fromSection?: any
     toSection?: any
     isGradual?: any
@@ -32,8 +35,10 @@ const formFieldNames = {
     type: 'type',
     targetuuid: 'targetuuid',
     count: 'count',
-    fromValue: 'fromValue',
-    toValue: 'toValue',
+    fromBPM: 'fromBPM',
+    toBPM: 'toBPM',
+    fromDynamics: 'fromDynamics',
+    toDynamics: 'toDynamics',
     fromSection: 'fromSection',
     toSection: 'toSection',
     isGradual: 'isGradual',
@@ -95,10 +100,16 @@ const InputField = ({ label, selectedElement, setDirty, formValue, ...props }: I
     )
 }
 
-interface RangeFieldProps extends ExecutionBaseFieldProps, Omit<InputProps, 'name' | 'placeholder'> {
+interface RangeFieldProps
+    extends
+        ExecutionBaseFieldProps,
+        Pick<InputPickerProps, 'block' | 'cleanable' | 'searchable'>,
+        Omit<InputProps, 'name' | 'placeholder'> {
     labels: string[]
     names: string[]
     placeholders: string[]
+    data?: InputOption
+    accepter?: ElementType
 }
 const RangeField = ({
     labels,
@@ -117,8 +128,9 @@ const RangeField = ({
                     onChange={() => setDirty(true)}
                     name={names[0]}
                     disabled={selectedElement == undefined}
-                    className="w-20"
+                    className="w-24"
                     placeholder={placeholders[0]}
+                    {...props}
                 />
             </Form.Group>
             <Form.Group className="items-start h-8" controlId={props.controlId}>
@@ -127,8 +139,9 @@ const RangeField = ({
                     onChange={() => setDirty(true)}
                     name={names[1]}
                     disabled={selectedElement == undefined}
-                    className="w-20"
+                    className="w-24"
                     placeholder={placeholders[1]}
+                    {...props}
                 />
             </Form.Group>
         </Form.Stack>
@@ -190,6 +203,8 @@ const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
     )
 }
 
+// SPECIFIC PART: EXECUTION TYPES
+
 interface GotoFormProps extends ExecutionBaseFieldProps {
     sysOptions: InputOption<string>[]
 }
@@ -214,7 +229,7 @@ const LoopForm = ({ ...props }: ExecutionBaseFieldProps) => {
     )
 }
 
-const ExpressionForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
+const TempoForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
     return (
         <>
             <ToggleField label="Gradual" name={formFieldNames.isGradual} formValue={formValue} {...props} />
@@ -222,13 +237,13 @@ const ExpressionForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                 <>
                     <InputField
                         label="BPM"
-                        name={formFieldNames.toValue}
+                        name={formFieldNames.toBPM}
                         formValue={formValue}
                         placeholder={'BPM value'}
                         {...props}
                     />
                     <InputField
-                        label="Beat"
+                        label="Starting from beat"
                         name={formFieldNames.toSection}
                         formValue={formValue}
                         placeholder={'Beat number'}
@@ -240,12 +255,65 @@ const ExpressionForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                     <RangeField
                         labels={['BPM: from', 'to']}
                         formValue={formValue}
-                        names={[formFieldNames.fromValue, formFieldNames.toValue]}
+                        names={[formFieldNames.fromBPM, formFieldNames.toBPM]}
                         placeholders={['Current', '']}
                         {...props}
                     />
                     <RangeField
-                        labels={['Beats: from', 'to']}
+                        labels={['From beat', 'to']}
+                        formValue={formValue}
+                        names={[formFieldNames.fromSection, formFieldNames.toSection]}
+                        placeholders={['1', '']}
+                        {...props}
+                    />
+                </>
+            )}
+        </>
+    )
+}
+
+const DynamicsForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
+    return (
+        <>
+            <ToggleField label="Gradual" name={formFieldNames.isGradual} formValue={formValue} {...props} />
+            {!formValue.isGradual ? (
+                <>
+                    <PickerField
+                        label="Dynamics"
+                        formValue={formValue}
+                        name={formFieldNames.toDynamics}
+                        data={dynamicValues.map((dyn) => {
+                            return { label: dyn, value: dyn }
+                        })}
+                        placeholder={'Select...'}
+                        {...props}
+                    />
+                    <InputField
+                        label="Starting from beat"
+                        name={formFieldNames.toSection}
+                        formValue={formValue}
+                        placeholder={'Beat number'}
+                        {...props}
+                    />
+                </>
+            ) : (
+                <>
+                    <RangeField
+                        labels={['Dynamics: from', 'to']}
+                        formValue={formValue}
+                        names={[formFieldNames.fromDynamics, formFieldNames.toDynamics]}
+                        data={dynamicValues.map((dyn) => {
+                            return { label: dyn, value: dyn }
+                        })}
+                        accepter={InputPicker}
+                        placeholders={['Current', '']}
+                        block
+                        cleanable={true}
+                        searchable={false}
+                        {...props}
+                    />
+                    <RangeField
+                        labels={['From beat', 'to']}
                         formValue={formValue}
                         names={[formFieldNames.fromSection, formFieldNames.toSection]}
                         placeholders={['1', '']}
@@ -280,7 +348,8 @@ export default function ExecutionItemForm({
     }
     const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
     const loopForm = <LoopForm {...baseProps} />
-    const gradualForm = <ExpressionForm {...baseProps} />
+    const tempoForm = <TempoForm {...baseProps} />
+    const dynamicsForm = <DynamicsForm {...baseProps} />
     if (!type) return
     return (
         <Form.Stack layout="horizontal">
@@ -290,7 +359,8 @@ export default function ExecutionItemForm({
             </Form.Group>
             {type == 'goto' && gotoForm}
             {type == 'loop' && loopForm}
-            {type == 'tempo' && gradualForm}
+            {type == 'tempo' && tempoForm}
+            {type == 'dynamics' && dynamicsForm}
             <ConditionForm type={type} {...baseProps} />
         </Form.Stack>
     )

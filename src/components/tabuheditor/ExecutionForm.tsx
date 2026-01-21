@@ -6,12 +6,13 @@ import { Button, Divider, Drawer, Form, IconButton, List, SelectPicker } from 'r
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { executionItemTooltip } from '../../hooks/useEditorScoreManager'
 import type {
+    DynamicsItem,
     EditorSystem,
     ExecutionItem,
     ExecutionItemType,
-    ExpressionItem,
     GotoItem,
-    LoopItem
+    LoopItem,
+    TempoItem
 } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import ExecutionItemForm, { type FormValueType } from './ExecutionItemForm'
@@ -25,19 +26,20 @@ type ExecutionItemDefault = {
     seqId?: number
     tooltip?: string
     tooltipshort?: string
-    toValue?: number
+    toBPM?: number
+    toDynamics?: string
     toSection?: number
 }
 
 const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
     loop: { type: 'loop', count: 0, tooltip: 'loop', tooltipshort: '' },
-    tempo: { type: 'tempo', isGradual: false, toSection: 1, toValue: undefined, tooltip: 'tempo', tooltipshort: '' },
+    tempo: { type: 'tempo', isGradual: false, toSection: 1, toBPM: undefined, tooltip: 'tempo', tooltipshort: '' },
     dynamics: {
         type: 'dynamics',
         isGradual: false,
         toSection: 1,
-        toValue: undefined,
+        toDynamics: undefined,
         tooltip: 'dynamics',
         tooltipshort: ''
     },
@@ -98,7 +100,10 @@ const FlowElementList = ({
                         return (
                             <List.Item
                                 key={`execution-${idx}`}
-                                className={idx == selectedElement ? 'font-bold bg-amber-100' : ''}>
+                                className={
+                                    'h-9 pt-0 pb-0 items-center flex ' +
+                                    (idx == selectedElement ? 'font-bold bg-amber-100' : '')
+                                }>
                                 <div
                                     onClick={(e) => {
                                         setSelectedElement(idx)
@@ -111,12 +116,9 @@ const FlowElementList = ({
                                             w={224}
                                             placeholder="Select a type"
                                             onChange={(value) => {
-                                                debug(value)
                                                 if (value) {
                                                     const newList = [...itemList]
                                                     newList.splice(idx, 1, defaultItem[value])
-                                                    debug(`${value} -----> ${JSON.stringify(defaultItem[value])}`)
-                                                    debug(newList)
                                                     setItemList(newList)
                                                 }
                                             }}
@@ -163,8 +165,15 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
         if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
         if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
         if (selectedItem.type == 'tempo') {
-            newFormValue.fromValue = selectedItem.fromValue
-            newFormValue.toValue = selectedItem.toValue
+            newFormValue.fromBPM = selectedItem.fromBPM
+            newFormValue.toBPM = selectedItem.toBPM
+            newFormValue.isGradual = selectedItem.isGradual
+            newFormValue.fromSection = selectedItem.fromSection
+            newFormValue.toSection = selectedItem.toSection
+        }
+        if (selectedItem.type == 'dynamics') {
+            newFormValue.fromDynamics = selectedItem.fromDynamics
+            newFormValue.toDynamics = selectedItem.toDynamics
             newFormValue.isGradual = selectedItem.isGradual
             newFormValue.fromSection = selectedItem.fromSection
             newFormValue.toSection = selectedItem.toSection
@@ -175,27 +184,37 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
 
     // Updates the selected list item with the form values
     function updateSelectedFromFields() {
-        if (!selectedListElement) return
+        debug(`ITEMTYPE=${formValue.type}`)
+        if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
         var newItem: ExecutionItem = {
             ...selectedItem,
             passes: formValue.each == undefined ? undefined : formValue.passes,
             each: formValue.each
         }
-        debug(newItem.type)
+        debug(`EDITING`)
         if (selectedItem.type == 'goto') {
             newItem = newItem as GotoItem
             newItem.targetuuid = formValue.targetuuid || ''
             newItem.targetname = uuidToNameLookup[formValue.targetuuid]
+            debug(`TARGETUUID=${formValue.targetuuid} TARGETNAME=${uuidToNameLookup[formValue.targetuuid]}`)
         }
         if (selectedItem.type == 'loop') {
             newItem = newItem as LoopItem
             newItem.count = formValue.count
         }
         if (selectedItem.type == 'tempo') {
-            newItem = newItem as ExpressionItem
-            newItem.fromValue = formValue.fromValue
-            newItem.toValue = formValue.toValue
+            newItem = newItem as TempoItem
+            newItem.fromBPM = formValue.fromBPM
+            newItem.toBPM = formValue.toBPM
+            newItem.isGradual = formValue.isGradual
+            newItem.fromSection = formValue.fromSection
+            newItem.toSection = formValue.toSection
+        }
+        if (selectedItem.type == 'dynamics') {
+            newItem = newItem as DynamicsItem
+            newItem.fromDynamics = formValue.fromDynamics
+            newItem.toDynamics = formValue.toDynamics
             newItem.isGradual = formValue.isGradual
             newItem.fromSection = formValue.fromSection
             newItem.toSection = formValue.toSection
@@ -219,7 +238,6 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, ..
     useEffect(() => {
         if (dirtyForm) {
             setDirtyForm(false)
-            debug(formValue)
             updateSelectedFromFields()
         }
     }, [dirtyForm])
