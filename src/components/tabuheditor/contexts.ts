@@ -10,15 +10,17 @@ import type {
 // Score functions: modify / save score
 export interface ScoreFunctionsType {
     getEditorScore: () => EditorScore | undefined
-    updateEditorScore: (score: EditorScore) => void
+    updateScore: (system: EditorScore) => void
     updateSystem: (system: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
+    scoreToFormattedJson: (score: EditorScore) => string | undefined
 }
 export const defaultScoreFunc: ScoreFunctionsType = {
     getEditorScore: () => undefined,
-    updateEditorScore: () => {},
+    updateScore: () => {},
     updateSystem: () => {},
-    updateParts: () => {}
+    updateParts: () => {},
+    scoreToFormattedJson: () => undefined
 }
 
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
@@ -40,7 +42,6 @@ export const AudioFunctions: Context<AudioFunctionsType> = createContext(default
 export interface NavigationFunctionsType {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
-    updateSystemData: (data: EditorSystem) => void
     applyRules: (notation: string[], rowId: number, colId: number, cached: boolean) => void
 }
 
@@ -51,7 +52,6 @@ export const defaultNavFunc: NavigationFunctionsType = {
     navigate: (): RefObject<HTMLTextAreaElement | null> => {
         return { current: null }
     },
-    updateSystemData: () => {},
     applyRules: () => {}
 }
 export const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)

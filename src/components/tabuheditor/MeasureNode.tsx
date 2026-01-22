@@ -4,8 +4,8 @@ import { useKeyboardListener } from '../../hooks/useKeyboard'
 import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import type { NavigationFunctionsType } from './contexts'
-import { NavigationFunctions } from './contexts'
+import type { NavigationFunctionsType, ScoreFunctionsType } from './contexts'
+import { NavigationFunctions, ScoreFunctions } from './contexts'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     position: Position
@@ -39,6 +39,7 @@ export function MeasureNode({
         updateNotation
     )
     const { validRegExpCell } = symbolValidationUtils(validSymbols)
+    const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     function updateNotation(notation: string[]) {
         const newMeasure: EditorMeasure = { ...measure }
@@ -82,7 +83,7 @@ export function MeasureNode({
             navFunc.applyRules(notation, rowId, colId, true)
             const newSysData = { ...systemData }
             newSysData.staffs[position][colId] = { ...measure }
-            navFunc.updateSystemData(newSysData)
+            scoreFunc.updateSystem(newSysData)
         }
     }
 

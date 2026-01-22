@@ -265,7 +265,6 @@ export default function EditorWindow({
                                         <SystemNode
                                             systemData={systemData}
                                             positions={editorScore.positions}
-                                            updateSystemData={updateSystem}
                                             playbackState={playbackState}
                                             visible={expanded[systemData.uuid]}
                                         />

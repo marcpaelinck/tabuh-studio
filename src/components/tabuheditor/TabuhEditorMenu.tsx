@@ -1,10 +1,10 @@
+import _ from 'lodash'
 import { useContext, useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
-import { Modal, Nav, SelectPicker } from 'rsuite'
+import { Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
 import type { ScoreInfo } from '../../models/types'
 import TsGongIcon from '../../reacticons/TsGongIcon'
-import { debug } from '../../utils/debugger'
 import type { KeyboardType } from './TabuhEditor'
 import { ScoreFunctions, type ScoreFunctionsType } from './contexts'
 
@@ -22,6 +22,23 @@ type Action =
     | 'settings-keyboard'
     | 'settings-colors'
 
+// Temporary solution for saving scores manually
+const SimpleTextareaDialog = ({ payload }: { payload: { payload: string } }) => {
+    const [isOpen, setIsOpen] = useState(true)
+    return (
+        <Modal open={isOpen} onClose={() => setIsOpen(false)} className="h-100 w-200">
+            <Modal.Body>
+                <Textarea value={payload.payload} className="h-90 w-180" />
+            </Modal.Body>
+            <Modal.Footer>
+                <Button onClick={() => setIsOpen(false)} appearance="primary">
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    )
+}
+
 interface TabuhEditorMenuProps {
     scoreList: ScoreInfo[]
     loadScore: (scoreInfo: ScoreInfo | undefined) => void
@@ -38,11 +55,35 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
+    const dialog = useDialog()
+
+    const showTextInDialog = async (payload: string) => {
+        //@ts-ignore
+        await dialog.open(SimpleTextareaDialog, { payload })
+    }
 
     function performAction() {
         switch (activeKey) {
             case 'file-save': {
-                debug(scoreFunc.getEditorScore())
+                // Persist cached changes and empty caches
+                const score = scoreFunc.getEditorScore()
+                if (score) {
+                    score?.systems.forEach((sys) =>
+                        _.toPairs(sys.staffs).forEach(([_, measures]) =>
+                            measures.forEach((measure) => {
+                                if (measure.notation_ != undefined) {
+                                    measure.notation = measure.notation_
+                                    measure.notation_ = undefined
+                                }
+                            })
+                        )
+                    )
+                    const json = scoreFunc.scoreToFormattedJson(score)
+                    // console.log('SAVING SCORE:')
+                    // console.log(json)
+                    showTextInDialog(json || 'No text')
+                    scoreFunc.updateScore(score)
+                }
             }
         }
     }

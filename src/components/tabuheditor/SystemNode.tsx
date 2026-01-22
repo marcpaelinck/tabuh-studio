@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
 import { positionConfigs, type NavigationAction } from '../../config/config'
 import { type PlaybackState } from '../../hooks/playbackReducer'
@@ -10,31 +10,24 @@ import { debug } from '../../utils/debugger'
 import { StaffNode } from './StaffNode'
 import { noCursor } from './_constants'
 import type { GridInfo } from './_types'
-import { NavigationFunctions, type NavigationFunctionsType } from './contexts'
+import { NavigationFunctions, ScoreFunctions, type NavigationFunctionsType, type ScoreFunctionsType } from './contexts'
 
 interface EditorSystemProps {
     systemData: EditorSystem
     positions: string[]
     playbackState: PlaybackState
-    updateSystemData: (data: EditorSystem) => void
     visible: boolean
 }
 
 // Creates a grid containing the notation of one system/gongan.
-export function SystemNode({
-    systemData,
-    positions,
-    playbackState,
-    updateSystemData,
-    visible,
-    ...props
-}: EditorSystemProps): ReactNode {
+export function SystemNode({ systemData, positions, playbackState, visible, ...props }: EditorSystemProps): ReactNode {
     // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const systemUuid = systemData.uuid
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedMeasure, setHighlightedMeasure] = useState<EditorCellCursor>(noCursor)
     const { castNotation } = useRules()
+    const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     if (systemData.id == 1 || systemData.id == 13) debug(`(re-)rendering system ${systemUuid}`)
 
@@ -43,12 +36,7 @@ export function SystemNode({
     useEffect(() => debug(`recreating system ${systemUuid} due to change of data`), [systemData])
 
     const navigationFunctions: NavigationFunctionsType = useMemo(() => {
-        return {
-            register: registerComponent,
-            navigate: navigate,
-            updateSystemData: updateSystemData,
-            applyRules: applyRules
-        }
+        return { register: registerComponent, navigate: navigate, applyRules: applyRules }
     }, [])
 
     function highlight(cell: HTMLTextAreaElement | null, on: boolean) {
@@ -146,7 +134,7 @@ export function SystemNode({
             else newSystemData.staffs[position][colId].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
         })
-        updateSystemData(newSystemData)
+        scoreFunc.updateSystem(newSystemData)
     }
 
     function updateGrouped(position: string, isGrouped: boolean) {
@@ -156,7 +144,7 @@ export function SystemNode({
             const idx = newSysData.grouped.indexOf(position)
             if (idx > -1) newSysData.grouped.splice(idx, 1)
         }
-        updateSystemData(newSysData)
+        scoreFunc.updateSystem(newSysData)
     }
 
     const staffNodes = useMemo(

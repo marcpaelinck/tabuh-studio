@@ -66,9 +66,23 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const isExpandedSidenav = sidenavExpanded && !isMobile
     //END NAVIGATION
     const { score: importedScore, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
-    const { editorScore, getEditorScore, updateEditorScore, labels, updateSystem, updateParts, executeItemAction } =
-        useEditorScoreManager()
-    const scoreFunctions: ScoreFunctionsType = { getEditorScore, updateEditorScore, updateSystem, updateParts }
+    const {
+        editorScore,
+        getEditorScore,
+        updateScore,
+        labels,
+        updateSystem,
+        updateParts,
+        scoreToFormattedJson,
+        executeItemAction
+    } = useEditorScoreManager()
+    const scoreFunctions: ScoreFunctionsType = {
+        getEditorScore,
+        updateScore,
+        updateSystem,
+        updateParts,
+        scoreToFormattedJson
+    }
 
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
@@ -77,7 +91,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
 
     useEffect(() => {
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
-        if (importedScore) updateEditorScore(importedScore)
+        if (importedScore) updateScore(importedScore)
     }, [importedScore])
 
     useEffect(() => {

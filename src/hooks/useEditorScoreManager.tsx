@@ -69,6 +69,32 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     }
 }
 
+function scoreToFormattedJson(score: EditorScore): string {
+    const flatten = (key: string, value: any) => {
+        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key)) {
+            const json = value.map((meas: any) => JSON.stringify(meas))
+            return json
+        }
+        if (key == 'colWidths') {
+            const json = JSON.stringify(value)
+            return json
+        }
+        if (key == 'starttime') {
+            return undefined
+        }
+        return value
+    }
+    const json = JSON.stringify(score, flatten, 2)
+    return json
+        .replace(/"([\{\[])/g, '$1')
+        .replace(/([\}\]])"/g, '$1')
+        .replace(/\\"/g, '"')
+        .replace(/:(?! )/g, ': ')
+        .replace(/([\]\}\d"]),"/g, '$1, "')
+        .replace(/(true|false),(?![ \n\r])/g, '$1, ')
+        .replace(/([\d]),(?=\d)/g, '$1, ')
+}
+
 function gotoItemTargetName(destination: EditorSystem) {
     return destination.label ? destination.label : `#${destination.id}`
 }
@@ -77,7 +103,7 @@ export function useEditorScoreManager() {
     const [editorScore, setEditorScore] = useState<EditorScore | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
 
-    function updateEditorScore(score: EditorScore) {
+    function updateScore(score: EditorScore) {
         // Convert new score to data record structure
         debug(`updating score with title ${score.title}`)
         setEditorScore(score)
@@ -85,7 +111,6 @@ export function useEditorScoreManager() {
             score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
         )
         setLabels(labeldict)
-        console.log(score)
     }
 
     useEffect(() => {
@@ -257,5 +282,14 @@ export function useEditorScoreManager() {
         updatePointers(newData)
         setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
-    return { editorScore, getEditorScore, updateEditorScore, labels, updateSystem, updateParts, executeItemAction }
+    return {
+        editorScore,
+        getEditorScore,
+        updateScore,
+        labels,
+        updateSystem,
+        updateParts,
+        scoreToFormattedJson,
+        executeItemAction
+    }
 }
