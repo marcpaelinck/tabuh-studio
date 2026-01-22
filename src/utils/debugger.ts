@@ -2,6 +2,8 @@ import _ from 'lodash'
 
 // Enable/disable the debug function for each module in the list below.
 // Specify a function by setting the dict value to {functionName: true}
+
+const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     createSchedule: false,
     EditorWindow: false,
@@ -17,15 +19,16 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     score: false,
     ScorePlayer: false,
     StaffNode: false,
-    SystemContextMenu: false,
+    SystemContextMenu: true,
     SystemNode: false,
     SummaryItem: false,
     TabuhEditor: false,
-    TabuhEditorMenu: true,
+    TabuhEditorMenu: false,
     useEditorScoreManager: false,
     useInstruments: false,
     useKeyboard: false,
     usePartManager: false,
+    useScoreReader: false,
     useRules: false
 }
 
@@ -60,10 +63,11 @@ export const debug = (message: any, raw: boolean = false) => {
     if (!(module in debugOn)) console.log(`debug: no entry for ${module}.`)
 
     if (
-        debugOn[module] == true ||
-        (typeof debugOn[module] == 'object' &&
-            // if func is async, its name will be followed by a digit.
-            (debugOn[module][func] == true || debugOn[module][func.slice(0, -1)] == true))
+        mainSwitch &&
+        (debugOn[module] == true ||
+            (typeof debugOn[module] == 'object' &&
+                // if func is async, its name will be followed by a digit.
+                (debugOn[module][func] == true || debugOn[module][func.slice(0, -1)] == true)))
     ) {
         const callerTxt = module ? `${func} [${module}]` : ''
         if (raw || typeof message == 'object') {

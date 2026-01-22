@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import type { Dispatch, HTMLAttributes, RefObject } from 'react'
-import { Profiler, useEffect, useMemo, useReducer, useRef } from 'react'
+import { Profiler, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -23,7 +23,7 @@ interface EditorWindowProps {
     expanded: Record<string, boolean>
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
-    editorScore: EditorScore
+    editorScore: EditorScore | undefined
     labels: Record<string, EditorSystem>
     updateSystem: (sysData: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
@@ -45,6 +45,7 @@ export default function EditorWindow({
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(editorScore, updateParts)
+    const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
 
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
@@ -66,6 +67,7 @@ export default function EditorWindow({
     }
 
     useEffect(() => {
+        if (!editorScore) return
         // TODO this code should only run when a new score is loaded. It currently runs after each
         // update of editorScore.
         const initExpandState = Object.fromEntries(
@@ -82,18 +84,28 @@ export default function EditorWindow({
         const allKeys = Object.fromEntries(editorScore.systems.map((sys) => [sys.uuid, false]))
         const existingKeys = _.pick(expanded, Object.keys(allKeys))
         setExpanded({ ...allKeys, ...existingKeys })
+        // gotoTargets will be used by the 'delete' SummaryItem button for validation.
+        var newGotoTargets: Set<string> = new Set()
+        editorScore.systems.forEach((sys) => {
+            if (sys.execution)
+                sys.execution
+                    .filter((item) => item.type == 'goto')
+                    .forEach((goto) => newGotoTargets.add(goto.targetuuid))
+        })
+        setGotoTargets(newGotoTargets)
     }, [editorScore])
 
-    // gotoTargets will be used by the 'delete' SummaryItem button for validation.
-    var gotoTargets: Set<string> = new Set()
-    editorScore.systems.forEach((sys) => {
-        if (sys.execution)
-            sys.execution.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
-    })
+    // // gotoTargets will be used by the 'delete' SummaryItem button for validation.
+    // var gotoTargets: Set<string> = new Set()
+    // editorScore.systems.forEach((sys) => {
+    //     if (sys.execution)
+    //         sys.execution.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
+    // })
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
     function systemSelectorOptions(self: EditorSystem, includeSelf: boolean, includeNone: boolean) {
+        if (!editorScore) return []
         // List of labelled systems
         const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
             label: label,
@@ -119,86 +131,87 @@ export default function EditorWindow({
         return options
     }
 
+    debug(`Current score is title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
+
     // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
     // minimize rendering because it interferes with the audio playback functions.
     // Thesse objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
     const systemIdPrefix = 'system-'
-    const systemHeaderButtons: Record<string, ReactElement> = useMemo(
-        () =>
-            Object.fromEntries(
-                editorScore.systems.map((systemData) => {
-                    debug('updating editor window')
+    const systemHeaderButtons: Record<string, ReactElement> | undefined = useMemo(() => {
+        if (!editorScore) return
+        return Object.fromEntries(
+            editorScore.systems.map((systemData) => {
+                debug('updating editor window')
 
-                    return [
-                        systemData.uuid,
-                        <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">
-                            <PlaybackButtons
-                                score={editorScore}
-                                sysUuid={systemData.uuid}
-                                systemIdPrefix={systemIdPrefix}
-                                playback={playback}
-                                hasCursor={systemData.uuid == pbCurrUuid}
-                                playbackType={pbType}
-                                expandIfNotExpanded={expandIfNotExpanded}
-                                playbackAudioState={pbAudioState}
-                                className="content-start"
+                return [
+                    systemData.uuid,
+                    <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">
+                        <PlaybackButtons
+                            score={editorScore}
+                            sysUuid={systemData.uuid}
+                            systemIdPrefix={systemIdPrefix}
+                            playback={playback}
+                            hasCursor={systemData.uuid == pbCurrUuid}
+                            playbackType={pbType}
+                            expandIfNotExpanded={expandIfNotExpanded}
+                            playbackAudioState={pbAudioState}
+                            className="content-start"
+                        />
+                    </Col>
+                ]
+            })
+        )
+    }, [editorScore, pbCurrUuid, pbType, pbAudioState])
+    const systemHeaderFields: Record<string, ReactElement> | undefined = useMemo(() => {
+        if (!editorScore) return
+
+        return Object.fromEntries(
+            editorScore.systems.map((systemData) => {
+                const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
+                return [
+                    systemData.uuid,
+                    <>
+                        <SCol span={2}>
+                            <SummaryItem item="id" sysData={systemData} />
+                        </SCol>
+                        <SCol span={4}>
+                            <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
+                        </SCol>
+                        <SCol span={6}>
+                            <SummaryItem
+                                item="execution"
+                                sysData={systemData}
+                                options={systemSelectorOptions(systemData, false, false)}
+                                execute={execute}
                             />
-                        </Col>
-                    ]
-                })
-            ),
-        [editorScore, pbCurrUuid, pbType, pbAudioState]
-    )
-    const systemHeaderFields: Record<string, ReactElement> = useMemo(
-        () =>
-            Object.fromEntries(
-                editorScore.systems.map((systemData) => {
-                    const execute = (fieldname: string, value?: string) =>
-                        executeItemAction(fieldname, systemData, value)
-                    return [
-                        systemData.uuid,
-                        <>
-                            <SCol span={2}>
-                                <SummaryItem item="id" sysData={systemData} />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
-                            </SCol>
-                            <SCol span={6}>
-                                <SummaryItem
-                                    item="execution"
-                                    sysData={systemData}
-                                    options={systemSelectorOptions(systemData, false, false)}
-                                    execute={execute}
-                                />
-                            </SCol>
-                            <SCol span={4}>
-                                <SummaryItem item="new" sysData={systemData} execute={execute} />
-                                <SummaryItem
-                                    item="copy"
-                                    sysData={systemData}
-                                    options={systemSelectorOptions(systemData, true, false)}
-                                    execute={execute}
-                                />
-                                <SummaryItem
-                                    item="delete"
-                                    gototargets={gotoTargets}
-                                    sysData={systemData}
-                                    execute={execute}
-                                />
-                            </SCol>
-                        </>
-                    ]
-                })
-            ),
-        [editorScore]
-    )
+                        </SCol>
+                        <SCol span={4}>
+                            <SummaryItem item="new" sysData={systemData} execute={execute} />
+                            <SummaryItem
+                                item="copy"
+                                sysData={systemData}
+                                options={systemSelectorOptions(systemData, true, false)}
+                                execute={execute}
+                            />
+                            <SummaryItem
+                                item="delete"
+                                gototargets={gotoTargets}
+                                sysData={systemData}
+                                execute={execute}
+                            />
+                        </SCol>
+                    </>
+                ]
+            })
+        )
+    }, [editorScore])
 
     function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
         // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
     }
 
     const systems = useMemo(() => {
+        if (!editorScore || !systemHeaderButtons || !systemHeaderFields) return
         // currPartName is used to determine the first system of the part so that the part name only appears once.
         var rangePartName: string = ''
         return editorScore.systems.map((systemData) => {

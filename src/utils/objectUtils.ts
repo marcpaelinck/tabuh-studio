@@ -50,7 +50,7 @@ const DefaultObjectFactory = {
         return { sysUuid: '', sectionId: 0, s: '-', t: 0, d: 1 } as JsonSymbol
     },
     EditorScore: () => {
-        return { title: '', composer: '', positions: [], systems: [], parts: {} } as EditorScore
+        return { title: 'default', composer: '', positions: [], systems: [], parts: {} } as EditorScore
     }
 }
 

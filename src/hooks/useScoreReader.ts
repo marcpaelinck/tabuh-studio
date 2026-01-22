@@ -13,6 +13,7 @@ import type {
     ScoreInfo,
     Staffs
 } from '../models/types'
+import { debug } from '../utils/debugger'
 import { readFile } from '../utils/filesystem'
 import { defaultObject } from '../utils/objectUtils'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv } from '../utils/timeunits'
@@ -61,8 +62,12 @@ function parseScoreOld(score: Score): Score {
     return score
 }
 
-function oldToNewFormat(score: Score): EditorScore {
+function oldToNewFormat(score: Score): EditorScore | undefined {
+    if (!score) return undefined
+    debug(`score = ${JSON.stringify(score)}`)
     const newScore: EditorScore = defaultObject('EditorScore')
+    newScore.title = score.title
+    newScore.composer = score.composer
     var currentPart: string = ''
     var positions: string[] = []
     score.systems.forEach((system, sysIdx) => {

@@ -33,12 +33,19 @@ type ExecutionItemDefault = {
 
 const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
-    loop: { type: 'loop', count: 0, tooltip: 'loop', tooltipshort: '' },
-    tempo: { type: 'tempo', isGradual: false, toSection: 1, toBPM: undefined, tooltip: 'tempo', tooltipshort: '' },
+    loop: { type: 'loop', count: undefined, tooltip: 'loop', tooltipshort: '' },
+    tempo: {
+        type: 'tempo',
+        isGradual: undefined,
+        toSection: undefined,
+        toBPM: undefined,
+        tooltip: 'tempo',
+        tooltipshort: ''
+    },
     dynamics: {
         type: 'dynamics',
-        isGradual: false,
-        toSection: 1,
+        isGradual: undefined,
+        toSection: undefined,
         toDynamics: undefined,
         tooltip: 'dynamics',
         tooltipshort: ''
@@ -76,7 +83,7 @@ const FlowElementList = ({
     }
 
     function handleDelete() {
-        if (!selectedElement) return
+        if (selectedElement == undefined) return
         const newItemList = [...itemList]
         newItemList.splice(selectedElement, 1)
         setItemList(newItemList)

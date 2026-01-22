@@ -6,7 +6,7 @@ import { partColorPalette } from '../config/config'
 import type { EditorScore } from '../models/types'
 import { debug } from '../utils/debugger'
 
-export function usePartManager(score: EditorScore, updateParts: (parts: Record<string, string[]>) => void) {
+export function usePartManager(score: EditorScore | undefined, updateParts: (parts: Record<string, string[]>) => void) {
     const [selectionOn, setSelectionOn] = useState<boolean>(false) // Left mouse button is down: extends selection
     const [sysToPartLookup, setSysToPartLookup] = useState<Record<string, string>>({})
     const [currSelection, setCurrSelection] = useState<string[]>([]) // List of uuids of currently selected systems
@@ -21,6 +21,7 @@ export function usePartManager(score: EditorScore, updateParts: (parts: Record<s
     }, [currSelection])
 
     useEffect(() => {
+        if (!score) return
         // Create system to sys->part and part->color lookups
         const newSysToPart: Record<string, string> = {}
         const newPartColors: Record<string, string> = {}
@@ -30,6 +31,12 @@ export function usePartManager(score: EditorScore, updateParts: (parts: Record<s
             newPartColors[part] = color
         })
         // Avoid circular re-render caused by useEffect
+        // debug(
+        //     `EQUAL LOOKUP ${same(sysToPartLookup, newSysToPart)} ${JSON.stringify(sysToPartLookup)} AND ${JSON.stringify(newSysToPart)}`
+        // )
+        // debug(
+        //     `EQUAL PARTCOLORS ${same(partColors, newPartColors)} ${JSON.stringify(partColors)} AND ${JSON.stringify(newPartColors)}`
+        // )
         if (!same(sysToPartLookup, newSysToPart)) setSysToPartLookup(newSysToPart)
         if (!same(partColors, newPartColors)) setPartColors(newPartColors)
         setCurrSelection([])

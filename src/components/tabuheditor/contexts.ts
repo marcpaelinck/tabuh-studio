@@ -9,14 +9,12 @@ import type {
 } from '../../models/types'
 // Score functions: modify / save score
 export interface ScoreFunctionsType {
-    editorScore: EditorScore | undefined
     getEditorScore: () => EditorScore | undefined
     updateEditorScore: (score: EditorScore) => void
     updateSystem: (system: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
 }
 export const defaultScoreFunc: ScoreFunctionsType = {
-    editorScore: undefined,
     getEditorScore: () => undefined,
     updateEditorScore: () => {},
     updateSystem: () => {},

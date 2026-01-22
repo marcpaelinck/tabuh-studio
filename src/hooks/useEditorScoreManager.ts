@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { EditorScore, EditorSystem, ExecutionItem } from '../models/types'
 import { debug } from '../utils/debugger'
-import { defaultObject, toOrdinal } from '../utils/objectUtils'
+import { toOrdinal } from '../utils/objectUtils'
 
 function toText(values: number[] | undefined, ordinal: boolean = false): string {
     if (values) {
@@ -74,12 +74,12 @@ function gotoItemTargetName(destination: EditorSystem) {
 }
 
 export function useEditorScoreManager() {
-    const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
+    const [editorScore, setEditorScore] = useState<EditorScore | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
 
     function updateEditorScore(score: EditorScore) {
         // Convert new score to data record structure
-        debug('updating score')
+        debug(`updating score with title ${score.title}`)
         setEditorScore(score)
         const labeldict = Object.fromEntries(
             score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
@@ -91,6 +91,7 @@ export function useEditorScoreManager() {
     useEffect(() => {
         // (Re-) number the system index and id values.
         // Should be performed at each render due to possible user actions (insert or delete system).
+        if (!editorScore) return
         const executionitems: ExecutionItem[] = []
         editorScore.systems.forEach((systemData, sysIdx) => {
             systemData.index = sysIdx
@@ -119,6 +120,7 @@ export function useEditorScoreManager() {
     }
 
     function updateSystem(sysData: EditorSystem) {
+        if (!editorScore) return
         const sysIdx = sysData.index
         const newScore: EditorScore = { ...editorScore }
         const systems = editorScore.systems
@@ -127,6 +129,7 @@ export function useEditorScoreManager() {
     }
 
     function updateParts(parts: Record<string, string[]>) {
+        if (!editorScore) return
         const newScore: EditorScore = { ...editorScore }
         newScore.parts = { ...parts }
         setEditorScore(newScore)
@@ -169,6 +172,7 @@ export function useEditorScoreManager() {
 
     // Handles user actions triggered with buttons in the panel header
     function executeItemAction(fieldname: string, systemData: EditorSystem, value?: string) {
+        if (!editorScore) return
         debug(`processing ${fieldname}`)
         // Used for insertion and update
         var newSystemData: EditorSystem | null = _.cloneDeep(systemData)

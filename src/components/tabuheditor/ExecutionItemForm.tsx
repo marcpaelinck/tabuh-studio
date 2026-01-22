@@ -330,7 +330,7 @@ export default function ExecutionItemForm({
     sysOptions,
     setDirty
 }: ExecutionItemFormProps) {
-    // Properties that are passed down as {...props}
+    // Properties that will be passed down to each form type
     const baseProps: ExecutionBaseFieldProps = {
         selectedElement: selectedElement,
         formValue: formValue,

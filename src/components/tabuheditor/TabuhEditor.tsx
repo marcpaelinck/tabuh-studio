@@ -68,13 +68,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const { score: importedScore, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
     const { editorScore, getEditorScore, updateEditorScore, labels, updateSystem, updateParts, executeItemAction } =
         useEditorScoreManager()
-    const scoreFunctions: ScoreFunctionsType = {
-        editorScore,
-        getEditorScore,
-        updateEditorScore,
-        updateSystem,
-        updateParts
-    }
+    const scoreFunctions: ScoreFunctionsType = { getEditorScore, updateEditorScore, updateSystem, updateParts }
 
     const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
@@ -82,9 +76,13 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     useEffect(() => {
-        debug('updating imported score')
+        debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
         if (importedScore) updateEditorScore(importedScore)
     }, [importedScore])
+
+    useEffect(() => {
+        debug(`New editor score available, title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
+    }, [editorScore])
 
     useEffect(() => {
         setLoading(loadingScoreList || loadingScore)

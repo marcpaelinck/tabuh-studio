@@ -1,20 +1,20 @@
 {
-  "title":  "Gilak Penutup",
+  "title":  "Gilak Penutup (new)",
   "composer": "",
   "positions": [
-        "UGAL",
-        "PEMADE_POLOS",
-        "PEMADE_SANGSIH",
-        "KANTILAN_POLOS",
-        "KANTILAN_SANGSIH",
-        "REYONG_1",
-        "REYONG_2",
-        "REYONG_3",
-        "REYONG_4",
-        "CALUNG",
-        "JEGOGAN",
-        "GONGS",
-        "KEMPLI"
+ "UGAL",
+ "PEMADE_POLOS",
+ "PEMADE_SANGSIH",
+ "KANTILAN_POLOS",
+ "KANTILAN_SANGSIH",
+ "REYONG_1",
+ "REYONG_2",
+ "REYONG_3",
+ "REYONG_4",
+ "CALUNG",
+ "JEGOGAN",
+ "GONGS",
+ "KEMPLI"
       ],
   "parts": {
     "Unisono": [
