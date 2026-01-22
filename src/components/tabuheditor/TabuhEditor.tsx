@@ -71,6 +71,10 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     useEffect(() => {
+        debug('Temporary statement to avoid build error. Remove when UnsavedScore is being used')
+    }, [unsavedScore])
+
+    useEffect(() => {
         setLoading(loadingScoreList || loadingScore)
     }, [loadingScoreList, loadingScore])
 

@@ -13,6 +13,10 @@ export function usePartManager(score: EditorScore) {
     const [partColors, setPartColors] = useState<Record<string, string>>({}) // Mapping part name -> color
 
     useEffect(() => {
+        debug('Temporary statement to avoid build error. Remove when currSelection is being used')
+    }, [currSelection])
+
+    useEffect(() => {
         // Create system to sys->part and part->color lookups
         const newSysToPart: Record<string, string> = {}
         const newPartColors: Record<string, string> = {}

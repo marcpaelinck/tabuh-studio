@@ -257,7 +257,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     }
 
     return (
-        <Drawer open={open} onClose={() => setOpen(false)}>
+        <Drawer open={open} backdrop="static" onClose={() => setOpen(false)}>
             <Drawer.Header>
                 <Drawer.Title>{title}</Drawer.Title>
                 <Drawer.Actions>

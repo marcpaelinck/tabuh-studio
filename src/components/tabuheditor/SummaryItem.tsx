@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } fro
 import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
 import type { IconType } from 'react-icons/lib'
+import { RiPlayListFill } from 'react-icons/ri'
 import {
     Col,
     IconButton,
@@ -22,7 +23,6 @@ import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import type { EditorScore, EditorSystem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
-import TsExecutionIcon from '../../reacticons/TsExecutionIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import { debug } from '../../utils/debugger'
@@ -123,7 +123,7 @@ export function SummaryItem({
             buttonTooltip: 'Delete this system (warning: can not be undone).'
         },
         execution: {
-            icon: TsExecutionIcon,
+            icon: RiPlayListFill,
             iconcolor: '#1C78E0',
             action: 'executionform',
             hasfield: true,

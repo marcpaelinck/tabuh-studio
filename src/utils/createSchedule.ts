@@ -51,14 +51,13 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
         notation: {} as Record<Position, any>
     }
 
-    const { nextInFlow, resetFlow } = executionManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
+    const { nextInFlow } = executionManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
 
     const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
     var prevSystem: EditorSystem | undefined = undefined
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
         Object.keys(positionConfigs).map((key) => [key, null])
     )
-    const passcounter: Record<string, number> = {}
     var current: FlowStep | undefined = nextInFlow()
     // Keeps track of the longest measure duration in a section. All measures in a system should have
     // the same length but in case they don't, this value will be used to resync the following system.

@@ -16,7 +16,7 @@ function toText(values: number[] | undefined, ordinal: boolean = false): string 
 
 export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
-    const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
+    // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
     // Create components for the values to return.
     var instruction: string = ''
@@ -77,6 +77,10 @@ export function useEditorScoreManager(score: EditorScore) {
     const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
     const [parts, setParts] = useState<Record<string, string[]>>({})
+
+    useEffect(() => {
+        debug('Temporary statement to avoid build error. Remove when parts is being used')
+    }, [parts])
 
     useEffect(() => {
         // Convert new score to data record structure

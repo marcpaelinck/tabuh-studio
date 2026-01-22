@@ -1,16 +1,6 @@
 import { type Dispatch, type ElementType } from 'react'
 import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps } from 'rsuite'
-import {
-    ArrayType,
-    BooleanType,
-    CheckPicker,
-    Form,
-    InputPicker,
-    NumberType,
-    SchemaModel,
-    StringType,
-    Toggle
-} from 'rsuite'
+import { CheckPicker, Form, InputPicker, Toggle } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
 import type { ExecutionItemType } from '../../models/types'
@@ -46,12 +36,12 @@ const formFieldNames = {
     each: 'each',
     checkbox: 'checkbox'
 }
-const model = SchemaModel({
-    type: StringType().isRequired(),
-    targetuuid: StringType().isRequired(),
-    passes: ArrayType().of(NumberType()).isRequiredOrEmpty(),
-    each: BooleanType().isRequiredOrEmpty()
-})
+// const model = SchemaModel({
+//     type: StringType().isRequired(),
+//     targetuuid: StringType().isRequired(),
+//     passes: ArrayType().of(NumberType()).isRequiredOrEmpty(),
+//     each: BooleanType().isRequiredOrEmpty()
+// })
 
 // GENERIC FIELD COMPONENTS
 

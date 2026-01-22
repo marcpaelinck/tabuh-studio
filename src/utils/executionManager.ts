@@ -158,8 +158,5 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         return undefined
     }
 
-    // Detect endless loops
-    function checkLoops() {}
-
     return { nextInFlow, resetFlow }
 }
