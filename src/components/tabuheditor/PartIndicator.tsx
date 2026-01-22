@@ -47,7 +47,6 @@ export function PartIndicator({
     async function handleMouseUp(event: MouseEvent) {
         extendSelection(uuid)
         const newPartName = await dialog.prompt('part name:')
-        debug(newPartName)
         toggleSelection(false, newPartName)
     }
 

@@ -21,6 +21,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SystemNode: false,
     SummaryItem: false,
     TabuhEditor: false,
+    TabuhEditorMenu: true,
     useEditorScoreManager: false,
     useInstruments: false,
     useKeyboard: false,

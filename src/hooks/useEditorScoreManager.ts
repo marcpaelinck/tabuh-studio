@@ -73,16 +73,11 @@ function gotoItemTargetName(destination: EditorSystem) {
     return destination.label ? destination.label : `#${destination.id}`
 }
 
-export function useEditorScoreManager(score: EditorScore) {
+export function useEditorScoreManager() {
     const [editorScore, setEditorScore] = useState<EditorScore>(defaultObject('EditorScore'))
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
-    const [parts, setParts] = useState<Record<string, string[]>>({})
 
-    useEffect(() => {
-        debug('Temporary statement to avoid build error. Remove when parts is being used')
-    }, [parts])
-
-    useEffect(() => {
+    function updateEditorScore(score: EditorScore) {
         // Convert new score to data record structure
         debug('updating score')
         setEditorScore(score)
@@ -91,7 +86,7 @@ export function useEditorScoreManager(score: EditorScore) {
         )
         setLabels(labeldict)
         console.log(score)
-    }, [score])
+    }
 
     useEffect(() => {
         // (Re-) number the system index and id values.
@@ -117,13 +112,23 @@ export function useEditorScoreManager(score: EditorScore) {
             }
             debug(`${item.tooltip} -- ${item.tooltipshort}`)
         })
-    }, [score, editorScore])
+    }, [editorScore])
+
+    function getEditorScore() {
+        return editorScore
+    }
 
     function updateSystem(sysData: EditorSystem) {
         const sysIdx = sysData.index
         const newScore: EditorScore = { ...editorScore }
         const systems = editorScore.systems
         newScore.systems = [...systems.slice(0, sysIdx), sysData, ...systems.slice(sysIdx + 1)]
+        setEditorScore(newScore)
+    }
+
+    function updateParts(parts: Record<string, string[]>) {
+        const newScore: EditorScore = { ...editorScore }
+        newScore.parts = { ...parts }
         setEditorScore(newScore)
     }
 
@@ -248,5 +253,5 @@ export function useEditorScoreManager(score: EditorScore) {
         updatePointers(newData)
         setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
-    return { editorScore, labels, updateSystem, setParts, executeItemAction }
+    return { editorScore, getEditorScore, updateEditorScore, labels, updateSystem, updateParts, executeItemAction }
 }

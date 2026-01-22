@@ -6,11 +6,15 @@ import { partColorPalette } from '../config/config'
 import type { EditorScore } from '../models/types'
 import { debug } from '../utils/debugger'
 
-export function usePartManager(score: EditorScore) {
+export function usePartManager(score: EditorScore, updateParts: (parts: Record<string, string[]>) => void) {
     const [selectionOn, setSelectionOn] = useState<boolean>(false) // Left mouse button is down: extends selection
     const [sysToPartLookup, setSysToPartLookup] = useState<Record<string, string>>({})
     const [currSelection, setCurrSelection] = useState<string[]>([]) // List of uuids of currently selected systems
     const [partColors, setPartColors] = useState<Record<string, string>>({}) // Mapping part name -> color
+
+    function same(a: Record<string, string>, b: Record<string, string>) {
+        return _.keys(a).length == _.keys(b).length && _.keys(a).every((key) => a[key] == b[key])
+    }
 
     useEffect(() => {
         debug('Temporary statement to avoid build error. Remove when currSelection is being used')
@@ -25,10 +29,23 @@ export function usePartManager(score: EditorScore) {
             const color = partColorPalette[Object.keys(newPartColors).length % partColorPalette.length]
             newPartColors[part] = color
         })
-        setSysToPartLookup(newSysToPart)
-        setPartColors(newPartColors)
+        // Avoid circular re-render caused by useEffect
+        if (!same(sysToPartLookup, newSysToPart)) setSysToPartLookup(newSysToPart)
+        if (!same(partColors, newPartColors)) setPartColors(newPartColors)
         setCurrSelection([])
     }, [score])
+
+    useEffect(() => {
+        const newParts: Record<string, string[]> = _.reduce(
+            sysToPartLookup,
+            function (result, value, key) {
+                ;(result[value] || (result[value] = [])).push(key)
+                return result
+            },
+            {} as Record<string, string[]>
+        )
+        updateParts(newParts)
+    }, [sysToPartLookup])
 
     function updatePartColors(partName: string) {
         if (!(partName in partColors)) {

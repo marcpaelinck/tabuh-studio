@@ -6,7 +6,6 @@ import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { editorInitialExpandState } from '../../config/config'
 import { playbackReducer } from '../../hooks/playbackReducer'
-import { useEditorScoreManager } from '../../hooks/useEditorScoreManager'
 import { useInstruments } from '../../hooks/useInstruments'
 import { usePartManager } from '../../hooks/usePartManager'
 import type { EditorScore, EditorSystem, Position } from '../../models/types'
@@ -21,26 +20,31 @@ import { SystemNode } from './SystemNode'
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
 interface EditorWindowProps {
-    score: EditorScore
     expanded: Record<string, boolean>
     loading: boolean
-    setScore: Dispatch<EditorScore>
     setExpanded: Dispatch<Record<string, boolean>>
+    editorScore: EditorScore
+    labels: Record<string, EditorSystem>
+    updateSystem: (sysData: EditorSystem) => void
+    updateParts: (parts: Record<string, string[]>) => void
+    executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
 }
 
 export default function EditorWindow({
-    score,
     expanded,
-    setScore,
     setExpanded,
-    loading
+    loading,
+    editorScore,
+    labels,
+    updateSystem,
+    updateParts,
+    executeItemAction
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const focusRef: RefObject<Position[]> = useRef<Position[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
     const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
-    const { editorScore, labels, updateSystem, executeItemAction } = useEditorScoreManager(score)
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
-        usePartManager(editorScore)
+        usePartManager(editorScore, updateParts)
 
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
@@ -68,8 +72,7 @@ export default function EditorWindow({
             editorScore.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )
         setExpanded(initExpandState)
-        setScore(editorScore)
-        debug('UPDATING SCORE')
+        // setScore(editorScore)
     }, [editorScore])
 
     // Update the list of expanded panels which is maintained in te TabuhEditor.
@@ -96,7 +99,6 @@ export default function EditorWindow({
             label: label,
             value: sysData.uuid
         }))
-        debug(labels)
         const labelledUuid = labelOptions.map((entry) => entry.value)
         //
         // 2. List of non-labelled systems
@@ -125,6 +127,8 @@ export default function EditorWindow({
         () =>
             Object.fromEntries(
                 editorScore.systems.map((systemData) => {
+                    debug('updating editor window')
+
                     return [
                         systemData.uuid,
                         <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">

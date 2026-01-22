@@ -1,10 +1,12 @@
-import { useEffect, useState, type Dispatch } from 'react'
+import { useContext, useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Modal, Nav, SelectPicker } from 'rsuite'
 import type { ScoreInfo } from '../../models/types'
 import TsGongIcon from '../../reacticons/TsGongIcon'
+import { debug } from '../../utils/debugger'
 import type { KeyboardType } from './TabuhEditor'
+import { ScoreFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
     | '1'
@@ -35,10 +37,12 @@ interface TabuhOption {
 export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
+    const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     function performAction() {
         switch (activeKey) {
             case 'file-save': {
+                debug(scoreFunc.getEditorScore())
             }
         }
     }
