@@ -20,6 +20,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
+import { tsBlue } from '../../config/config'
 import type { EditorScore, EditorSystem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
@@ -90,7 +91,7 @@ export function SummaryItem({
         id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id, fieldTooltip: sysData.uuid },
         label: {
             icon: TsLabelIcon,
-            iconcolor: '#1C78E0',
+            iconcolor: tsBlue,
             action: 'editfield',
             hasfield: true,
             fieldval: sysData.label,
@@ -99,14 +100,14 @@ export function SummaryItem({
         },
         new: {
             icon: TsNewIcon,
-            iconcolor: '#1C78E0',
+            iconcolor: tsBlue,
             action: 'execute',
             hasfield: false,
             buttonTooltip: 'Create an empty system below this one.'
         },
         copy: {
             icon: TsCopyIcon,
-            iconcolor: '#1C78E0',
+            iconcolor: tsBlue,
             action: 'inputpicker',
             hasfield: true,
             formtitle: 'copy',
@@ -117,14 +118,14 @@ export function SummaryItem({
         },
         delete: {
             icon: TsDeleteIcon,
-            iconcolor: '#1C78E0',
+            iconcolor: tsBlue,
             action: 'execute',
             hasfield: false,
             buttonTooltip: 'Delete this system (warning: can not be undone).'
         },
         execution: {
             icon: RiPlayListFill,
-            iconcolor: '#1C78E0',
+            iconcolor: tsBlue,
             action: 'executionform',
             hasfield: true,
             formtitle: `system # ${sysData.id}`,

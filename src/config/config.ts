@@ -7,6 +7,8 @@ export const FRAMESTYLE = ' rounded-xl shadow-lg shadow-gray-400 border border-g
 
 // COLORS
 
+export const tsBlue = '#1C78E0'
+
 //prettier-ignore
 export type ColorName = | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' | 'azure' | 'beige' | 'bisque' | 'black' | 'blanchedalmond' | 'blue' | 'blueviolet' | 'brown' 
        | 'burlywood' | 'cadetblue' | 'chartreuse' | 'chocolate' | 'coral' | 'cornflowerblue' | 'cornsilk' | 'crimson' | 'cyan' | 'darkblue' | 'darkcyan' | 'darkgoldenrod'

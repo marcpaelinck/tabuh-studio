@@ -1,9 +1,11 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { type DashboardFunctionsType } from '../components/tabuheditor/contexts'
 import type { EditorScore, EditorSystem, ExecutionItem } from '../models/types'
 import { debug } from '../utils/debugger'
 import { toOrdinal } from '../utils/objectUtils'
+import { cycleValidation } from '../utils/scoreManagerUtils.ts/scoreValidation'
 
 function toText(values: number[] | undefined, ordinal: boolean = false): string {
     if (values) {
@@ -99,7 +101,7 @@ function gotoItemTargetName(destination: EditorSystem) {
     return destination.label ? destination.label : `#${destination.id}`
 }
 
-export function useEditorScoreManager() {
+export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType) {
     const [editorScore, setEditorScore] = useState<EditorScore | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
 
@@ -256,6 +258,9 @@ export function useEditorScoreManager() {
             }
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
+                if (!cycleValidation(editorScore))
+                    dashboardFunctions.setDashboardWarning('cycle', 'There is a cycle', 'error')
+                else dashboardFunctions.clearDashboardWarning('cycle')
                 break
             case 'delete':
                 if (newSystemData.label) {

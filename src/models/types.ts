@@ -22,6 +22,8 @@ export type Position =
     | 'REYONG_4'
     | 'UGAL'
 
+export type UUID = string
+
 // NOTATION
 
 export type Note = {
@@ -32,7 +34,7 @@ export type Note = {
 }
 
 export type JsonNote = {
-    sysUuid: string
+    sysUuid: UUID
     section: number
     s: string
     t: number // attack time in base notes
@@ -43,7 +45,7 @@ export type JsonNote = {
 
 // Used as
 export type JsonSymbol = {
-    sysUuid: string
+    sysUuid: UUID
     sectionId: number
     s: string
     t: number // attack time in base notes
@@ -109,7 +111,7 @@ export type Staffs = Record<Position, EditorMeasure[]>
 
 // Subdivision of a score, typically spans one gongan
 export type EditorSystem = {
-    uuid: string // unique uuid, never changes
+    uuid: UUID // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
     starttime: number
@@ -122,13 +124,13 @@ export type EditorSystem = {
     tempo?: TempoItem[]
     dynamics?: TempoItem[]
     copyfrom?: string // label or id of copied system
-    copyfromkey?: string // uuid copied system
+    copyfromkey?: UUID // uuid copied system
 }
 
 export type EditorScore = {
     title: string
     composer: string
-    parts: Record<string, string[]> // <<part name>, <system uuid>[]>
+    parts: Record<string, UUID[]> // <<part name>, <system uuid>[]>
     positions: Position[] // sorted list of positions ordered as displayed in the editor
     systems: EditorSystem[]
 }
@@ -199,7 +201,7 @@ export interface ExecutionItemBase {
 // Enables to deviate form the default playing sequence: indicates the next System.
 export interface GotoItem extends ExecutionItemBase {
     type: 'goto'
-    targetuuid: string // next System to play.
+    targetuuid: UUID // next System to play.
     targetname: string // Display name of the target System.
 }
 
@@ -235,7 +237,7 @@ export type FlowItem = GotoItem | LoopItem
 export type ExpressionItem = TempoItem | DynamicsItem
 export type ExecutionItem = FlowItem | ExpressionItem
 
-export type EditorCellCursor = { sysUuid: string; measure: number }
+export type EditorCellCursor = { sysUuid: UUID; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
@@ -261,7 +263,7 @@ export interface SamplerAction {
 }
 
 export type AnimationNote = {
-    sysUuid: string
+    sysUuid: UUID
     section: number
     time: BaseNoteTimeObj
     keyname: string
@@ -276,7 +278,7 @@ export type AnimationAction = {
     action: AnimationFunction
     time: BaseNoteTimeObj
     position: Position
-    prevsysUuid: string | null
+    prevsysUuid: UUID | null
     prevsection: number | null
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
@@ -299,8 +301,8 @@ export type EditorCursorAction = {
     action: EditorCursorFunction
     time: BaseNoteTimeObj
     section: number
-    prevsysuuid: string | undefined
-    sysuuid: string
+    prevsysuuid: UUID | undefined
+    sysuuid: UUID
 }
 
 export type TimeLine = {

@@ -7,6 +7,7 @@ import type {
     GenericFunction,
     SamplerAction
 } from '../../models/types'
+import type { Level, WarningType } from './Dashboard'
 // Score functions: modify / save score
 export interface ScoreFunctionsType {
     getEditorScore: () => EditorScore | undefined
@@ -22,8 +23,17 @@ export const defaultScoreFunc: ScoreFunctionsType = {
     updateParts: () => {},
     scoreToFormattedJson: () => undefined
 }
-
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
+
+export interface DashboardFunctionsType {
+    setDashboardWarning: (type: WarningType, tooltip: string, level?: Level) => void
+    clearDashboardWarning: (type: WarningType) => void
+}
+const defaultDashboardFunc = {
+    setDashboardWarning: (type: WarningType, tooltip: string, level?: Level) => {},
+    clearDashboardWarning: (type: WarningType) => {}
+}
+export const DashboardFunctions: Context<DashboardFunctionsType> = createContext(defaultDashboardFunc)
 
 // Audio functions: used for playback from the editor interface
 export interface AudioFunctionsType {
@@ -31,7 +41,6 @@ export interface AudioFunctionsType {
     moveEditorCursor: EditorCursorFunction
     genericFunction: GenericFunction
 }
-
 export const defaultAudioFunc: AudioFunctionsType = {
     playInstrument: () => {},
     moveEditorCursor: () => {},
@@ -44,7 +53,6 @@ export interface NavigationFunctionsType {
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
     applyRules: (notation: string[], rowId: number, colId: number, cached: boolean) => void
 }
-
 // Navigation functions: used by the keyboard listener
 // register is used to access individual cells while avoiding passing a ref which slows down the app.
 export const defaultNavFunc: NavigationFunctionsType = {

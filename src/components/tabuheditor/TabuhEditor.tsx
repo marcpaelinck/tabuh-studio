@@ -25,7 +25,10 @@ import { useEditorScoreManager } from '../../hooks/useEditorScoreManager'
 import { useScoreReader } from '../../hooks/useScoreReader'
 import type { EditorScore, ScoreInfo } from '../../models/types'
 import { debug } from '../../utils/debugger'
-import { ScoreFunctions, type ScoreFunctionsType } from './contexts'
+import { cycleValidation } from '../../utils/scoreManagerUtils.ts/scoreValidation'
+import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
+import { DashboardFunctions, ScoreFunctions } from './contexts'
+import { Dashboard, type DashboardValues, type Level, type WarningType } from './Dashboard'
 import EditorWindow from './EditorWindow'
 import { TabuhEditorMenu } from './TabuhEditorMenu'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
@@ -64,8 +67,13 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
-    //END NAVIGATION
+
+    //DASHBOARD WARNINGS
+    const dashboardInit: DashboardValues = { cycle: { visible: false, tooltip: '' } }
+    const [dashboardValues, setDashboardValues] = useState<DashboardValues>(dashboardInit)
+
     const { score: importedScore, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
+    const dashboardFunctions: DashboardFunctionsType = { setDashboardWarning, clearDashboardWarning }
     const {
         editorScore,
         getEditorScore,
@@ -75,7 +83,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         updateParts,
         scoreToFormattedJson,
         executeItemAction
-    } = useEditorScoreManager()
+    } = useEditorScoreManager(dashboardFunctions)
     const scoreFunctions: ScoreFunctionsType = {
         getEditorScore,
         updateScore,
@@ -89,9 +97,24 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
+    function setDashboardWarning(type: WarningType, tooltip: string, level?: Level) {
+        const newDashboardValue: DashboardValues = { ...dashboardValues }
+        newDashboardValue[type] = { visible: true, level: level, tooltip: tooltip }
+        setDashboardValues(newDashboardValue)
+    }
+    function clearDashboardWarning(type: WarningType) {
+        const newDashboardValue: DashboardValues = { ...dashboardValues }
+        newDashboardValue[type] = { visible: false, tooltip: '' }
+        setDashboardValues(newDashboardValue)
+    }
+
     useEffect(() => {
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
-        if (importedScore) updateScore(importedScore)
+        if (importedScore) {
+            updateScore(importedScore)
+            if (!cycleValidation(importedScore)) setDashboardWarning('cycle', 'There is a cycle', 'error')
+            else clearDashboardWarning('cycle')
+        }
     }, [importedScore])
 
     useEffect(() => {
@@ -111,59 +134,62 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
     return (
-        <ScoreFunctions value={scoreFunctions}>
-            <Container id="main" height="80vh">
-                <Container id="header+content">
-                    <Header id="header">
-                        <HStack spacing={16} align="center" p="1rem">
-                            <Button
-                                appearance="primary"
-                                startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
-                                onClick={() => expandAll(buttonIsExpand)}
-                            />
-                        </HStack>
-                    </Header>
-                    <Content id="content" px="1rem" className="h-9/10">
-                        <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                            {importedScore != null && (
-                                <EditorWindow
-                                    id="editor window component"
-                                    expanded={expanded}
-                                    setExpanded={setExpanded}
-                                    loading={loading}
-                                    editorScore={editorScore}
-                                    labels={labels}
-                                    updateSystem={updateSystem}
-                                    updateParts={updateParts}
-                                    executeItemAction={executeItemAction}
+        <DashboardFunctions value={dashboardFunctions}>
+            <ScoreFunctions value={scoreFunctions}>
+                <Container id="main" height="80vh">
+                    <Container id="header+content">
+                        <Header id="header">
+                            <HStack spacing={16} align="center" p="1rem">
+                                <Button
+                                    appearance="primary"
+                                    startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
+                                    onClick={() => expandAll(buttonIsExpand)}
                                 />
-                            )}
-                        </Box>
-                    </Content>
+                                <Dashboard values={dashboardValues} />
+                            </HStack>
+                        </Header>
+                        <Content id="content" px="1rem" className="h-9/10">
+                            <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
+                                {importedScore != null && (
+                                    <EditorWindow
+                                        id="editor window component"
+                                        expanded={expanded}
+                                        setExpanded={setExpanded}
+                                        loading={loading}
+                                        editorScore={editorScore}
+                                        labels={labels}
+                                        updateSystem={updateSystem}
+                                        updateParts={updateParts}
+                                        executeItemAction={executeItemAction}
+                                    />
+                                )}
+                            </Box>
+                        </Content>
+                    </Container>
+                    <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
+                        <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
+                            <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
+                                <NavHeader expanded={isExpandedSidenav} />
+                            </Sidenav.Header>
+                            <Sidenav.Body>
+                                <TabuhEditorMenu
+                                    keyboard={keyboard}
+                                    loadScore={loadScore}
+                                    setKeyboard={SetKeyboard}
+                                    scoreList={scoreList}
+                                />
+                            </Sidenav.Body>
+                            <Sidenav.Footer>
+                                <IconButton
+                                    icon={<ToggleIcon />}
+                                    onClick={() => setSidenavExpanded(!sidenavExpanded)}
+                                    appearance="subtle"
+                                />
+                            </Sidenav.Footer>
+                        </Sidenav>
+                    </Sidebar>
                 </Container>
-                <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
-                    <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
-                        <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
-                            <NavHeader expanded={isExpandedSidenav} />
-                        </Sidenav.Header>
-                        <Sidenav.Body>
-                            <TabuhEditorMenu
-                                keyboard={keyboard}
-                                loadScore={loadScore}
-                                setKeyboard={SetKeyboard}
-                                scoreList={scoreList}
-                            />
-                        </Sidenav.Body>
-                        <Sidenav.Footer>
-                            <IconButton
-                                icon={<ToggleIcon />}
-                                onClick={() => setSidenavExpanded(!sidenavExpanded)}
-                                appearance="subtle"
-                            />
-                        </Sidenav.Footer>
-                    </Sidenav>
-                </Sidebar>
-            </Container>
-        </ScoreFunctions>
+            </ScoreFunctions>
+        </DashboardFunctions>
     )
 }
