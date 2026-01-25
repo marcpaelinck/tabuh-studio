@@ -18,7 +18,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     playbackReducer: false,
     registerComponent: false,
     score: false,
-    scoreManagerUtils: false,
+    scoreManagerUtils: true,
     ScorePlayer: false,
     StaffNode: false,
     SystemContextMenu: false,

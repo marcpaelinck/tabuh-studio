@@ -33,7 +33,7 @@ function createTransitions(score: EditorScore): StateTransitionMatrix {
         if (gotos.length == 0) continue
 
         const systrans: Record<number, number>[] = []
-        transitions[shortId(system)] = systrans
+        transitions[getId(system)] = systrans
         // if (gotos.length == 0) {
         //     systrans.push({ 0: 1, 1: 1 })
         //     continue
@@ -73,20 +73,25 @@ function nextGoToState(currState: GoToState | undefined, uuid: UUID, transitions
     return newState
 }
 
-// The validator uses this (unique) ID instead of the uuid to make debug logging more readable
-function shortId(system: EditorSystem | undefined): string {
-    return system ? `#${system.id}` : 'undefined'
+// If _debug is set, replaces system uuid with id to generate readable debug logging.
+const _debug = false
+function getId(system: EditorSystem | undefined): string {
+    return system ? (_debug ? `#${system.id}` : system.uuid) : 'undefined'
 }
 
 // Uses the execution manager to iterate through the systems in playback sequence until the end of the score.
 // Updates the playback state accordingly. Returns false if a state is encountered more than once.
 // This is an indication of a closed cycle.
-function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix) {
+export interface ValidationResult {
+    isValid: boolean
+    message: string
+}
+function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix): ValidationResult {
     const states = new Set()
-    var uuid = shortId(score.systems[0])
+    var uuid = getId(score.systems[0])
     var gotoState: GoToState = nextGoToState(undefined, uuid, transitions)
     var state: State = {}
-    state[shortId(score.systems[0])] = gotoState
+    state[getId(score.systems[0])] = gotoState
     var jState: string = JSON.stringify(state)
     const { resetFlow, nextInFlow } = executionManager(score)
     resetFlow()
@@ -100,7 +105,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
     while (!loop && step && syscounter < 1000) {
         // Next in flow
         var beatcount = 0
-        while (step && shortId(step.system as EditorSystem) == uuid && beatcount < 500) {
+        while (step && getId(step.system as EditorSystem) == uuid && beatcount < 500) {
             // NextInFlow returns the next beat (section) so we need to iterate until we reach the next
             // system. Count helps to detect a cycle within a system (not likely to occur).
             // A maximum of 100 allow for a loop within a system.
@@ -108,7 +113,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
             beatcount += 1
         }
         if (step) debugvar.push(step.system.id)
-        uuid = shortId(step?.system)
+        uuid = getId(step?.system)
         if (!step || !(uuid in transitions)) continue
 
         debug(
@@ -136,12 +141,17 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
     // debug(states)
     debug(`LOOP=${loop}`)
     debug(JSON.stringify(debugvar))
-    return !loop
+    var message = ''
+    if (loop) {
+        message = `There is a cycle. Check goto instructions of system #${step?.system.id}.`
+    }
+
+    return { isValid: !loop, message: message }
 }
 
 // Detects the presence of a closed loop. Returns true if no loops were detected.
-export function cycleValidation(score: EditorScore) {
-    if (!score) return true
+export function cycleValidation(score: EditorScore, includeMessage: boolean = false): ValidationResult {
+    if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
     return simulatePlayback(score, transitions)
 }

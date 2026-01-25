@@ -112,7 +112,8 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
         if (importedScore) {
             updateScore(importedScore)
-            if (!cycleValidation(importedScore)) setDashboardWarning('cycle', undefined, 'error')
+            const validation = cycleValidation(importedScore, true)
+            if (!validation.isValid) dashboardFunctions.setDashboardWarning('cycle', validation.message, 'error')
             else clearDashboardWarning('cycle')
         }
     }, [importedScore])
