@@ -28,7 +28,7 @@ import { debug } from '../../utils/debugger'
 import { cycleValidation } from '../../utils/scoreManagerUtils.ts/scoreValidation'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions } from './contexts'
-import { Dashboard, type DashboardValues, type Level, type WarningType } from './Dashboard'
+import { Dashboard, type ComponentType, type DashboardValues, type Level } from './Dashboard'
 import EditorWindow from './EditorWindow'
 import { TabuhEditorMenu } from './TabuhEditorMenu'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
@@ -97,12 +97,12 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
-    function setDashboardWarning(type: WarningType, tooltip: string, level?: Level) {
+    function setDashboardWarning(type: ComponentType, tooltip?: string, level?: Level) {
         const newDashboardValue: DashboardValues = { ...dashboardValues }
         newDashboardValue[type] = { visible: true, level: level, tooltip: tooltip }
         setDashboardValues(newDashboardValue)
     }
-    function clearDashboardWarning(type: WarningType) {
+    function clearDashboardWarning(type: ComponentType) {
         const newDashboardValue: DashboardValues = { ...dashboardValues }
         newDashboardValue[type] = { visible: false, tooltip: '' }
         setDashboardValues(newDashboardValue)
@@ -112,7 +112,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
         if (importedScore) {
             updateScore(importedScore)
-            if (!cycleValidation(importedScore)) setDashboardWarning('cycle', 'There is a cycle', 'error')
+            if (!cycleValidation(importedScore)) setDashboardWarning('cycle', undefined, 'error')
             else clearDashboardWarning('cycle')
         }
     }, [importedScore])
