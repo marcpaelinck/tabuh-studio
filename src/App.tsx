@@ -7,7 +7,7 @@ import DebugWindow from './components/DebugWindow'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { FRAMESTYLE } from './config/config'
-import { useScoreList } from './hooks/useScoreList'
+import { useScoreList } from './hooksandmanagers/useScoreList'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 

@@ -4,7 +4,7 @@ import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, Form, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { executionItemTooltip } from '../../hooks/useEditorScoreManager'
+import { executionItemTooltip } from '../../hooksandmanagers/useEditorScoreManager'
 import type {
     DynamicsItem,
     EditorSystem,

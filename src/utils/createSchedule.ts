@@ -1,7 +1,8 @@
 import * as Tone from 'tone'
 import { positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
-import type { PlaybackAction } from '../hooks/playbackReducer'
+import { executionManager, type FlowStep } from '../hooksandmanagers/executionManager'
+import type { PlaybackAction } from '../hooksandmanagers/playbackReducer'
 import type {
     EditorCursorAction,
     EditorSystem,
@@ -14,7 +15,6 @@ import type {
 } from '../models/types'
 import { cleanSymbol } from './alphabet'
 import { debug } from './debugger'
-import { executionManager, type FlowStep } from './executionManager'
 import { defaultObject } from './objectUtils'
 import { n2TO, TO2n } from './timeunits'
 

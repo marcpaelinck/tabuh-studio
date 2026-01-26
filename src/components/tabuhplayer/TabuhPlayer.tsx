@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { positionConfigs } from '../../config/config'
-import { useScoreReader } from '../../hooks/useScoreReader'
+import { useScoreReader } from '../../hooksandmanagers/useScoreReader'
 import {
     type HighlightRange,
     type MenuItemInfo,
@@ -10,7 +10,7 @@ import {
     type SVGInfo,
     type TimeLine
 } from '../../models/types'
-import { speedDefaultOption } from '../../utils/selectorsUtils/selectorsUtils'
+import { speedDefaultOption } from '../../utils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import Player from './Player'

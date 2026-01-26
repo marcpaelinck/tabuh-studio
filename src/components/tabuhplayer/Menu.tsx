@@ -12,7 +12,7 @@ import {
     focusDefaultOption,
     speedDefaultOption,
     tabuhDefaultOption
-} from '../../utils/selectorsUtils/selectorsUtils'
+} from '../../utils/selectorsUtils'
 import Selector from '../Selector'
 
 export default function Menu({

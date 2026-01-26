@@ -2,8 +2,8 @@
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import _ from 'lodash'
-import type { PlaybackType } from '../hooks/playbackReducer'
 import type { EditorMeasure, EditorScore, EditorSystem, FlowItem, GotoItem, Position } from '../models/types'
+import type { PlaybackType } from './playbackReducer'
 
 interface FlowCursor {
     sysIdx: number

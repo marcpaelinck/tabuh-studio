@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import type { EditorScore, EditorSystem, UUID } from '../../models/types'
-import { debug } from '../debugger'
-import { executionManager, type FlowStep } from '../executionManager'
+import { executionManager, type FlowStep } from '../hooksandmanagers/executionManager'
+import type { EditorScore, EditorSystem, UUID } from '../models/types'
+import { debug } from './debugger'
 
 // CYCLE DETECTION
 

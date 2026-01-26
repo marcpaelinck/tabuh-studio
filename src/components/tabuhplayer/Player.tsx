@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { useAnimationEngine } from '../../hooks/useAnimation'
-import { useInstruments } from '../../hooks/useInstruments'
-import { useInterpretations } from '../../hooks/useInterpretations'
+import { useAnimationEngine } from '../../hooksandmanagers/useAnimation'
+import { useInstruments } from '../../hooksandmanagers/useInstruments'
+import { useInterpretations } from '../../hooksandmanagers/useInterpretations'
 import {
     type ActionFunctions,
     type AnimationAction,
