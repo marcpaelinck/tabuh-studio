@@ -1,8 +1,6 @@
 import * as Tone from 'tone'
 import { positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
-import { executionManager, type FlowStep } from '../hooksandmanagers/executionManager'
-import type { PlaybackAction } from '../hooksandmanagers/playbackReducer'
 import type {
     EditorCursorAction,
     EditorSystem,
@@ -13,10 +11,12 @@ import type {
     TempoAction,
     TimeLine
 } from '../models/types'
-import { cleanSymbol } from './alphabet'
-import { debug } from './debugger'
-import { defaultObject } from './objectUtils'
-import { n2TO, TO2n } from './timeunits'
+import { cleanSymbol } from '../utils/alphabet'
+import { debug } from '../utils/debugger'
+import { defaultObject } from '../utils/objectUtils'
+import { n2TO, TO2n } from '../utils/timeunits'
+import { executionManager, type FlowStep } from './executionManager'
+import type { PlaybackAction } from './playbackReducer'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
     time: number,

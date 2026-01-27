@@ -68,6 +68,7 @@ function oldToNewFormat(score: Score): EditorScore | undefined {
     const newScore: EditorScore = defaultObject('EditorScore')
     newScore.title = score.title
     newScore.composer = score.composer
+    newScore.uuid = uuidv4()
     var currentPart: string = ''
     var positions: string[] = []
     score.systems.forEach((system, sysIdx) => {
@@ -124,6 +125,7 @@ function parseScoreNew(score: EditorScore): EditorScore {
     // This function also calculates times in ms for each note, to be used by the animation.
     // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
+    if (!score.uuid) score.uuid = uuidv4()
     const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, Object.values(score.systems[0].staffs)[0][0].tempo)
     score.systems.forEach((system) => {
         system.starttime += introTimeBn

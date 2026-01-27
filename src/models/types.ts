@@ -128,6 +128,7 @@ export type EditorSystem = {
 }
 
 export type EditorScore = {
+    uuid: UUID
     title: string
     composer: string
     parts: Record<string, UUID[]> // <<part name>, <system uuid>[]>

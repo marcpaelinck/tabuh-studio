@@ -5,7 +5,7 @@ import { type DashboardFunctionsType } from '../components/tabuheditor/contexts'
 import type { EditorScore, EditorSystem, ExecutionItem } from '../models/types'
 import { debug } from '../utils/debugger'
 import { toOrdinal } from '../utils/objectUtils'
-import { cycleValidation } from '../utils/scoreValidation'
+import { cycleValidation } from './validationManager'
 
 function toText(values: number[] | undefined, ordinal: boolean = false): string {
     if (values) {
