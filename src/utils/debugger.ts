@@ -6,7 +6,7 @@ import _ from 'lodash'
 const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     createSchedule: false,
-    Dashboard: true,
+    Dashboard: false,
     EditorWindow: false,
     ExecutionForm: false,
     ExecutionItemForm: false,
@@ -23,7 +23,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SystemContextMenu: false,
     SystemNode: false,
     SummaryItem: false,
-    TabuhEditor: true,
+    TabuhEditor: false,
     TabuhEditorMenu: false,
     useEditorScoreManager: false,
     useInstruments: false,
