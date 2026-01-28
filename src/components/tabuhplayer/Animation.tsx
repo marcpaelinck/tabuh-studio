@@ -29,7 +29,8 @@ function positionToSvg(positions: string[]): string {
     return uniqueList.length == 1 ? uniqueList[0] : ''
 }
 
-// Returns the content of the data section of the SVG file
+// Returns the content of the data section of the SVG file.
+// This section contains the panggul positions for each instrument key.
 const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
     if (!svgElement) return { svg: null, panggul: null, x: null, y: null, animation: null }
     const panggul: SVGUseElement | null = svgElement?.querySelector('#helpinghand')

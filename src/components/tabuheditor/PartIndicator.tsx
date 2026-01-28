@@ -12,6 +12,8 @@ interface PartIndicatorProps extends ColProps {
     extendSelection: (uuid: string) => void
 }
 
+//TODO use range, see https://share.google/aimode/9rbRir0ZGpGNepSNg
+
 export function PartIndicator({
     uuid,
     partName,

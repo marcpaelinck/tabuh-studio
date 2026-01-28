@@ -6,7 +6,7 @@ import _ from 'lodash'
 const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     createSchedule: false,
-    Dashboard: false,
+    Dashboard: true,
     EditorWindow: false,
     ExecutionForm: false,
     ExecutionItemForm: false,
@@ -18,20 +18,20 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     playbackReducer: false,
     registerComponent: false,
     score: false,
-    scoreManagerUtils: true,
     ScorePlayer: false,
     StaffNode: false,
     SystemContextMenu: false,
     SystemNode: false,
     SummaryItem: false,
-    TabuhEditor: false,
+    TabuhEditor: true,
     TabuhEditorMenu: false,
     useEditorScoreManager: false,
     useInstruments: false,
     useKeyboard: false,
     usePartManager: false,
     useScoreReader: false,
-    useRules: false
+    useRules: false,
+    validationManager: false
 }
 
 // The RegExp constants are used to parse the call stack to determine the

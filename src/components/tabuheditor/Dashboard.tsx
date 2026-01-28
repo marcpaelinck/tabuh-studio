@@ -2,51 +2,67 @@
 // The icons give status information and warnings and can be switched on or off.
 
 import _ from 'lodash'
+import { BsFileEarmarkMusic } from 'react-icons/bs'
+import { IoReload } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
-import { TbInfinity } from 'react-icons/tb'
-import { Tooltip, Whisper } from 'rsuite'
-import { tsBlue } from '../../config/config'
+import { HStack, Tooltip, Whisper } from 'rsuite'
+import { debug } from '../../utils/debugger'
 
-export type ComponentType = 'cycle'
+export const componentNames = ['cycle', 'score']
+export type ComponentName = (typeof componentNames)[number]
+
+export type ComponentType = 'icon' | 'text'
 export type Level = 'info' | 'warning' | 'error'
-const defaultColor = tsBlue
+const defaultColor = 'black'
 const colors = { info: 'green', warning: 'amber', error: 'red' }
 
-interface DashboardValue {
+export interface DashboardComponentValues {
     visible: boolean
+    text?: string
     level?: Level
     tooltip?: string
 }
-export type DashboardValues = Record<ComponentType, DashboardValue>
+export type DashboardValues = Record<ComponentName, DashboardComponentValues>
 
 interface DashboardElementType {
+    type: ComponentType
     icon: IconType
     defaultTooltip: string
     color?: string
 }
 
-// ---------- DASHBOARD DEFINITION --------------
-const dashboardElements: Record<ComponentType, DashboardElementType> = {
-    cycle: { icon: TbInfinity, defaultTooltip: 'There is a cycle, check the goto instructions.' }
+// ---------- DASHBOARD DEFINITION AND DEFAULTS --------------
+const dashboardElements: Record<ComponentName, DashboardElementType> = {
+    score: { type: 'text', icon: BsFileEarmarkMusic, defaultTooltip: 'Score info' },
+    cycle: { type: 'icon', icon: IoReload, defaultTooltip: 'There is a cycle, check the goto instructions.' }
 }
-// ----------------------------------------------
+export const dashboardDefaults: DashboardValues = { score: { visible: false }, cycle: { visible: false } }
+// -----------------------------------------------------------
 
-interface ComponentProps extends DashboardValue {
-    name: ComponentType
+const erroranimation = { animation: 'ts-blink 2s linear infinite' }
+
+interface ComponentProps extends DashboardComponentValues {
+    name: ComponentName
 }
-function Component({ name, visible, level, tooltip }: ComponentProps) {
-    const Icon: IconType = dashboardElements[name].icon
+function Component({ name, visible, level, text, tooltip }: ComponentProps) {
+    const Icon = dashboardElements[name].icon
     const color = dashboardElements[name].color || (level ? colors[level] : defaultColor)
     const defaultTooltip = dashboardElements[name].defaultTooltip
+    debug(`${JSON.stringify({ name, visible, level, text, tooltip })}`)
     return (
         <>
             {visible && (
                 <Whisper
                     trigger="hover"
-                    placement="autoHorizontalStart"
+                    placement="autoVerticalStart"
                     controlId={`control-id-Whisper`}
-                    speaker={<Tooltip>{tooltip || defaultTooltip}</Tooltip>}>
-                    <Icon color={color} className="text-[2rem]" />
+                    className="mytooltip"
+                    // whitespace-pre-line interprets \n as new line
+                    speaker={<Tooltip className="whitespace-pre-line">{tooltip || defaultTooltip}</Tooltip>}>
+                    <HStack className="bg-gray-200 rounded-md p-1">
+                        <Icon color={color} className={`text-[1rem]`} style={level == 'error' ? erroranimation : {}} />
+                        {text && <div>{text}</div>}
+                    </HStack>
                 </Whisper>
             )}
         </>
@@ -57,17 +73,19 @@ export interface DashboardProps {
     values: DashboardValues
 }
 export function Dashboard({ values: dashboardValues }: DashboardProps) {
+    debug(dashboardValues)
     return (
-        <>
+        <HStack spacing={8}>
             {_.toPairs(dashboardValues).map(([name, values]) => (
                 <Component
                     key={name}
-                    name={name as ComponentType}
+                    name={name as ComponentName}
                     visible={values.visible}
+                    text={values.text}
                     level={values.level}
                     tooltip={values.tooltip}
                 />
             ))}
-        </>
+        </HStack>
     )
 }

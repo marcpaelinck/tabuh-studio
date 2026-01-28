@@ -259,8 +259,13 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
                 const validation = cycleValidation(editorScore)
-                if (!validation.isValid) dashboardFunctions.setDashboardWarning('cycle', validation.message, 'error')
-                else dashboardFunctions.clearDashboardWarning('cycle')
+                if (!validation.isValid)
+                    dashboardFunctions.setDashboardElement('cycle', {
+                        visible: true,
+                        tooltip: validation.message,
+                        level: 'error'
+                    })
+                else dashboardFunctions.clearDashboardElement('cycle')
                 break
             case 'delete':
                 if (newSystemData.label) {

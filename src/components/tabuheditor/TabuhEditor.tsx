@@ -28,7 +28,13 @@ import type { EditorScore, ScoreInfo } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions } from './contexts'
-import { Dashboard, type ComponentType, type DashboardValues, type Level } from './Dashboard'
+import {
+    Dashboard,
+    dashboardDefaults as defaultDashboardValues,
+    type ComponentName,
+    type DashboardComponentValues,
+    type DashboardValues
+} from './Dashboard'
 import EditorWindow from './EditorWindow'
 import { TabuhEditorMenu } from './TabuhEditorMenu'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
@@ -69,11 +75,13 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const isExpandedSidenav = sidenavExpanded && !isMobile
 
     //DASHBOARD WARNINGS
-    const dashboardInit: DashboardValues = { cycle: { visible: false, tooltip: '' } }
-    const [dashboardValues, setDashboardValues] = useState<DashboardValues>(dashboardInit)
+    const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
     const { score: importedScore, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
-    const dashboardFunctions: DashboardFunctionsType = { setDashboardWarning, clearDashboardWarning }
+    const dashboardFunctions: DashboardFunctionsType = {
+        setDashboardElement: setDashboardElement,
+        clearDashboardElement: clearDashboardElement
+    }
     const {
         editorScore,
         getEditorScore,
@@ -97,14 +105,15 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
-    function setDashboardWarning(type: ComponentType, tooltip?: string, level?: Level) {
+    function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
         const newDashboardValue: DashboardValues = { ...dashboardValues }
-        newDashboardValue[type] = { visible: true, level: level, tooltip: tooltip }
+        newDashboardValue[name] = { visible: true, level: value.level, text: value.text, tooltip: value.tooltip }
         setDashboardValues(newDashboardValue)
     }
-    function clearDashboardWarning(type: ComponentType) {
+    function clearDashboardElement(name: ComponentName) {
         const newDashboardValue: DashboardValues = { ...dashboardValues }
-        newDashboardValue[type] = { visible: false, tooltip: '' }
+        newDashboardValue[name] = { visible: false, tooltip: '' }
+        debug(`Dashboard=${JSON.stringify(newDashboardValue)}`)
         setDashboardValues(newDashboardValue)
     }
 
@@ -112,9 +121,18 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
         if (importedScore) {
             updateScore(importedScore)
+            // UPDATE DASHBOARD
+            const newDashboardValue: DashboardValues = { ...defaultDashboardValues }
             const validation = cycleValidation(importedScore, true)
-            if (!validation.isValid) dashboardFunctions.setDashboardWarning('cycle', validation.message, 'error')
-            else clearDashboardWarning('cycle')
+            if (!validation.isValid)
+                newDashboardValue['cycle'] = { visible: true, tooltip: validation.message, level: 'error' }
+            newDashboardValue['score'] = {
+                visible: true,
+                text: importedScore.title,
+                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}`
+            }
+            debug(`Dashboard values=${JSON.stringify(newDashboardValue)}`)
+            setDashboardValues(newDashboardValue)
         }
     }, [importedScore])
 

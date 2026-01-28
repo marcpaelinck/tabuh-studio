@@ -7,7 +7,7 @@ import type {
     GenericFunction,
     SamplerAction
 } from '../../models/types'
-import type { ComponentType, Level } from './Dashboard'
+import type { ComponentName, DashboardComponentValues } from './Dashboard'
 // Score functions: modify / save score
 export interface ScoreFunctionsType {
     getEditorScore: () => EditorScore | undefined
@@ -26,12 +26,12 @@ export const defaultScoreFunc: ScoreFunctionsType = {
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
 
 export interface DashboardFunctionsType {
-    setDashboardWarning: (type: ComponentType, message?: string, level?: Level) => void
-    clearDashboardWarning: (type: ComponentType) => void
+    setDashboardElement: (name: ComponentName, value: DashboardComponentValues) => void
+    clearDashboardElement: (type: ComponentName) => void
 }
 const defaultDashboardFunc = {
-    setDashboardWarning: (type: ComponentType, message?: string, level?: Level) => {},
-    clearDashboardWarning: (type: ComponentType) => {}
+    setDashboardElement: (name: ComponentName, value: DashboardComponentValues) => {},
+    clearDashboardElement: (type: ComponentName) => {}
 }
 export const DashboardFunctions: Context<DashboardFunctionsType> = createContext(defaultDashboardFunc)
 
