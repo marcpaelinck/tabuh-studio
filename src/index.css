@@ -56,8 +56,8 @@
 @font-face {
     font-family: 'BaliMusic5';
     src:
-        url('./fonts/BaliMusic5.woff2') format('woff2'),
-        url('./fonts/BaliMusic5.woff') format('woff');
+        url('/fonts/BaliMusic5.woff2') format('woff2'),
+        url('/fonts/BaliMusic5.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;

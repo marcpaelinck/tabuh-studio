@@ -5,10 +5,14 @@ import type {
     EditorScore,
     EditorSystem,
     GenericFunction,
-    SamplerAction
+    SamplerAction,
+    WpSessionReturnValue,
+    WpUserReturnValue
 } from '../../models/types'
 import type { ComponentName, DashboardComponentValues } from './Dashboard'
-// Score functions: modify / save score
+
+// SCORE FUNCTIONS
+// modify / save score
 export interface ScoreFunctionsType {
     getEditorScore: () => EditorScore | undefined
     updateScore: (system: EditorScore) => void
@@ -25,6 +29,8 @@ export const defaultScoreFunc: ScoreFunctionsType = {
 }
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
 
+// DASHBOARD FUNCTIONS
+// Update the status info above the notation frame
 export interface DashboardFunctionsType {
     setDashboardElement: (name: ComponentName, value: DashboardComponentValues) => void
     clearDashboardElement: (type: ComponentName) => void
@@ -35,7 +41,8 @@ const defaultDashboardFunc = {
 }
 export const DashboardFunctions: Context<DashboardFunctionsType> = createContext(defaultDashboardFunc)
 
-// Audio functions: used for playback from the editor interface
+// AUDIO FUNCTIONS
+// used for playback from the editor interface
 export interface AudioFunctionsType {
     playInstrument: (time: number, action: SamplerAction) => void
     moveEditorCursor: EditorCursorFunction
@@ -48,13 +55,14 @@ export const defaultAudioFunc: AudioFunctionsType = {
 }
 export const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
 
+// NAVIGATION FUNCTIONS
+// used by the keyboard listener
+// register is used to access individual cells while avoiding passing a ref which slows down the app.
 export interface NavigationFunctionsType {
     register: (row: number, col: number, element?: RefObject<HTMLTextAreaElement | null>) => void
     navigate: (action: NavigationAction, row: number, col: number) => RefObject<HTMLTextAreaElement | null>
     applyRules: (notation: string[], rowId: number, colId: number, cached: boolean) => void
 }
-// Navigation functions: used by the keyboard listener
-// register is used to access individual cells while avoiding passing a ref which slows down the app.
 export const defaultNavFunc: NavigationFunctionsType = {
     register: () => {},
     navigate: (): RefObject<HTMLTextAreaElement | null> => {
@@ -63,3 +71,22 @@ export const defaultNavFunc: NavigationFunctionsType = {
     applyRules: () => {}
 }
 export const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)
+
+// WORDPRESS API FUNCTIONS
+export interface WordPressApiType {
+    user: {
+        login: (username: string, password: string) => Promise<WpUserReturnValue>
+        logout: (nonce?: string) => Promise<WpUserReturnValue>
+        getUser: (nonce?: string) => Promise<WpUserReturnValue>
+    }
+    session: { getNonce: () => Promise<WpSessionReturnValue> }
+}
+export const defaultWpApiFunc: WordPressApiType = {
+    user: {
+        login: async (username: string, password: string) => new Promise(Object()),
+        logout: async () => new Promise(Object()),
+        getUser: async () => new Promise(Object())
+    },
+    session: { getNonce: async () => new Promise(Object()) }
+}
+export const WpApiFunctions: Context<WordPressApiType> = createContext(defaultWpApiFunc)

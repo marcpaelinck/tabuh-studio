@@ -206,10 +206,6 @@ export default function EditorWindow({
         )
     }, [editorScore])
 
-    function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
-        // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
-    }
-
     const systems = useMemo(() => {
         if (!editorScore || !systemHeaderButtons || !systemHeaderFields) return
         // currPartName is used to determine the first system of the part so that the part name only appears once.
@@ -277,6 +273,10 @@ export default function EditorWindow({
             )
         })
     }, [editorScore, expanded, playbackState, selectionOn, sysToPartLookup])
+
+    function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
+        // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
+    }
 
     return (
         <Profiler id="App" onRender={onRender}>

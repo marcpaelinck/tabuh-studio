@@ -2,17 +2,18 @@ import _ from 'lodash'
 import { useContext, useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
-import { Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
-import type { ScoreInfo } from '../../models/types'
+import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
+import type { EditorScore, ScoreInfo } from '../../models/types'
 import TsGongIcon from '../../reacticons/TsGongIcon'
 import type { KeyboardType } from './TabuhEditor'
-import { ScoreFunctions, type ScoreFunctionsType } from './contexts'
+import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
     | '1'
     | '2'
     | '3'
     | '4'
+    | 'login'
     | 'file-open'
     | 'file-import'
     | 'file-save'
@@ -54,21 +55,26 @@ interface TabuhOption {
 export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
+    const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
     const dialog = useDialog()
+    const wpFunc = useContext(WpApiFunctions)
 
     const showTextInDialog = async (payload: string) => {
         //@ts-ignore
         await dialog.open(SimpleTextareaDialog, { payload })
     }
 
-    function performAction() {
+    async function performAction() {
         switch (activeKey) {
+            case 'file-open':
+                setScoreSelector(true)
+                break
             case 'file-save': {
                 // Persist cached changes and empty caches
-                const score = scoreFunc.getEditorScore()
+                const score: EditorScore | undefined = { ...scoreFunc.getEditorScore() } as EditorScore
                 if (score) {
-                    score?.systems.forEach((sys) =>
+                    score.systems.forEach((sys) =>
                         _.toPairs(sys.staffs).forEach(([_, measures]) =>
                             measures.forEach((measure) => {
                                 if (measure.notation_ != undefined) {
@@ -79,15 +85,24 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
                         )
                     )
                     const json = scoreFunc.scoreToFormattedJson(score)
-                    // console.log('SAVING SCORE:')
-                    // console.log(json)
                     showTextInDialog(json || 'No text')
                     scoreFunc.updateScore(score)
                 }
+                break
+            }
+            case 'file-import':
+                break
+            case 'file-saveas': {
+                console.log(await wpFunc.user.getUser())
+                break
             }
         }
+        setActiveKey(undefined)
     }
-    useEffect(performAction, [activeKey])
+
+    useEffect(() => {
+        performAction()
+    }, [activeKey])
 
     useEffect(() => {
         setTabuhOptions(
@@ -98,19 +113,22 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     }, [scoreList])
 
     function scoreSelected(scoreInfo: ScoreInfo | undefined) {
-        setActiveKey(undefined)
+        setScoreSelector(false)
         if (scoreInfo) {
             loadScore(scoreInfo)
         }
     }
 
-    const selectNotation = (
-        <Modal size="xs" open={activeKey == 'file-open'} onClose={() => setActiveKey(undefined)}>
+    const selectNotationDialog = (
+        <Modal className="w-[20rem]" open={scoreSelector} onClose={() => setScoreSelector(false)}>
             <Modal.Header>
-                <Modal.Title>Open notation</Modal.Title>
+                <Modal.Title>Open notations</Modal.Title>
             </Modal.Header>
-            <SelectPicker data={scoreListOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
-            <Modal.Body></Modal.Body>
+            <Modal.Body>
+                <Box className="grid content-center">
+                    <SelectPicker block data={scoreListOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
+                </Box>
+            </Modal.Body>
         </Modal>
     )
 
@@ -141,7 +159,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
                 <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
                 <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
             </Nav.Menu>
-            {selectNotation}
+            {selectNotationDialog}
         </Nav>
     )
 }

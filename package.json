@@ -6,6 +6,7 @@
     "scripts": {
         "dev": "copy .\\buildfiles\\dev\\index.css .\\src /y & vite",
         "build": "copy .\\buildfiles\\prod\\index.css .\\src /y & tsc -b && vite build",
+        "wpbuild": "copy .\\buildfiles\\prod\\index.css .\\src /y & tsc -b && vite build && copy .\\dist\\assets\\*.* ..\\..\\WordPressProjects\\tabuh-studio-wp\\wp-content\\plugins\\tabuh-studio\\assets /y ",
         "lint": "eslint .",
         "preview": "vite preview"
     },
@@ -18,7 +19,7 @@
         "glob": "^11.0.3",
         "less-loader": "^12.3.0",
         "prettier": "^3.7.4",
-        "prettier-eslint": "^16.4.2",
+        "prettier-eslint": "^1.0.1",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
         "react-icons": "^5.5.0",

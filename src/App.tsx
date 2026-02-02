@@ -4,10 +4,12 @@ import { createContext, useState, type Dispatch } from 'react'
 import { CustomProvider, Toggle, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
 import DebugWindow from './components/DebugWindow'
+import { WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { FRAMESTYLE } from './config/config'
 import { useScoreList } from './hooksandmanagers/useScoreList'
+import { useWordpressApi } from './hooksandmanagers/useWordpressApi'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
@@ -18,6 +20,7 @@ export default function App() {
     const [active, setActive] = useState<'editor' | 'player'>('player')
     const { scoreList, loading: loadingScoreList } = useScoreList([])
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
+    const wpFunctions: WordPressApiType = useWordpressApi()
 
     function debug(message: string) {
         setDebugMessage(message)
@@ -37,13 +40,15 @@ export default function App() {
                             onChange={(checked) => setActive(checked ? 'player' : 'editor')}
                         />
                         {debugMode && <DebugWindow message={debugMessage} />}
-                        <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
-                            {active == 'player' ? (
-                                <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
-                            ) : (
-                                <TabuhEditor scoreList={scoreList} loadingScoreList={loadingScoreList} />
-                            )}
-                        </div>
+                        <WpApiFunctions value={wpFunctions}>
+                            <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
+                                {active == 'player' ? (
+                                    <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
+                                ) : (
+                                    <TabuhEditor scoreList={scoreList} loadingScoreList={loadingScoreList} />
+                                )}
+                            </div>
+                        </WpApiFunctions>
                     </VStack>
                 </DebugContext>
             </div>
