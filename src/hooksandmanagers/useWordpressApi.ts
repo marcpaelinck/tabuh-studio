@@ -17,18 +17,19 @@ export function useWordpressApi(): WordPressApiType {
         console.log(`NEW TABUHSETTINGS: ${JSON.stringify(wpTabuhSettings)}`)
     }, [wpTabuhSettings])
 
-    type ApiFunction = 'login' | 'logout' | 'user' | 'refresh_nonce'
+    type ApiFunction = 'user_login' | 'user_logout' | 'user_info' | 'session_getnonce'
     type Method = 'GET' | 'POST'
     interface FunctionProperties {
+        endpoint: string
         method: Method
         nonce: boolean
     }
 
     const apiMethod: Record<ApiFunction, FunctionProperties> = {
-        login: { method: 'POST', nonce: true },
-        logout: { method: 'GET', nonce: true },
-        user: { method: 'GET', nonce: true },
-        refresh_nonce: { method: 'GET', nonce: false }
+        user_login: { endpoint: 'user/login', method: 'POST', nonce: true },
+        user_logout: { endpoint: 'user/logout', method: 'GET', nonce: true },
+        user_info: { endpoint: 'user/info', method: 'GET', nonce: true },
+        session_getnonce: { endpoint: 'session/getnonce', method: 'GET', nonce: false }
     }
 
     // Generic function for a call to the tabuhstudio WordPress plugin API
@@ -49,47 +50,45 @@ export function useWordpressApi(): WordPressApiType {
         }
         callparameters.headers = headers
 
-        // var init: RequestInit =
-        //     apiMethod[func].method == 'GET'
-        //         ? {
-        //               method: apiMethod[func].method,
-        //               headers: { 'X-WP-Nonce': wpTabuhSettings.nonce },
-        //               credentials: 'same-origin'
-        //           }
-        //         : {
-        //               method: apiMethod[func].method,
-        //               headers: { 'X-WP-Nonce': wpTabuhSettings.nonce, 'Content-Type': 'application/json' },
-        //               body: JSON.stringify(body),
-        //               credentials: 'same-origin'
-        //           }
-        console.log(`REQUEST=${func} ${JSON.stringify(callparameters)}`)
-        const jsonResponse = await fetch(apiRootURL + '/tabuhstudio/v1/' + func, callparameters).then((result) =>
-            result.json()
-        )
+        // The actual call to the WP API
+        console.log(`REQUEST=${apiMethod[func].endpoint} ${JSON.stringify(callparameters)}`)
+        const jsonResponse = await fetch(
+            apiRootURL + '/tabuhstudio/v1/' + apiMethod[func].endpoint,
+            callparameters
+        ).then((result) => result.json())
 
-        if ('nonce' in jsonResponse && jsonResponse.nonce)
+        // Store the new nonce value as a state variable, so that it can be used with the next query.
+        // The nonce value changes when the user signs in or out.
+        if ('nonce' in jsonResponse && jsonResponse.nonce) {
+            console.log(`setting tabuh settings: ${JSON.stringify(wpTabuhSettings)}`)
             setWpTabuhSettings({ ...wpTabuhSettings, ...{ nonce: jsonResponse.nonce as string } })
+        }
+
         console.log(`${func} RESPONSE=${JSON.stringify(jsonResponse)}`)
         return jsonResponse
+    }
+
+    async function nonceCall(func: ApiFunction, body?: object, nonce?: string) {
+        return await getNonce().then((session) => apiCall(func, body, session.nonce))
+    }
+
+    // SESSION FUNCTION
+    async function getNonce() {
+        return await apiCall('session_getnonce')
     }
 
     // USER FUNCTIONS
     //
     async function login(username: string, password: string) {
-        return await apiCall('login', { username: username, password: password })
+        return await nonceCall('user_login', { username: username, password: password })
     }
 
-    async function logout(nonce?: string) {
-        return await apiCall('logout', undefined, nonce)
+    async function logout() {
+        return await nonceCall('user_logout')
     }
 
-    async function getUser(nonce?: string) {
-        return await apiCall('user', undefined, nonce)
-    }
-
-    // SESSION FUNCTIONS
-    async function getNonce() {
-        return await apiCall('refresh_nonce')
+    async function getUser() {
+        return await nonceCall('user_info')
     }
 
     return { user: { login, logout, getUser }, session: { getNonce } }

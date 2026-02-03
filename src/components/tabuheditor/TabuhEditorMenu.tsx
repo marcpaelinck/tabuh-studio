@@ -122,7 +122,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     const selectNotationDialog = (
         <Modal className="w-[20rem]" open={scoreSelector} onClose={() => setScoreSelector(false)}>
             <Modal.Header>
-                <Modal.Title>Open notations</Modal.Title>
+                <Modal.Title>Select a notation</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Box className="grid content-center">

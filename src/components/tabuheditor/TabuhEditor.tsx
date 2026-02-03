@@ -165,7 +165,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [user, setUser] = useState<WpUserRecord | undefined>(undefined)
-    const [initialize, setInitialize] = useState<boolean>(true)
+    // const [initialize, setInitialize] = useState<boolean>(true)
 
     //DASHBOARD WARNINGS
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
@@ -226,10 +226,10 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
 
     // Gets a new nonce from WP API, but only if the user is not logged in.
     // Not clear why this is necessary only then.
-    useEffect(() => {
-        if (!user && !initialize) wpFunc.session.getNonce()
-        setInitialize(false)
-    }, [user])
+    // useEffect(() => {
+    //     if (!user && !initialize) wpFunc.session.getNonce()
+    //     setInitialize(false)
+    // }, [user])
 
     useEffect(() => {
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
