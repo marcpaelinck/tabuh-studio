@@ -75,9 +75,9 @@ export const NavigationFunctions: Context<NavigationFunctionsType> = createConte
 // WORDPRESS API FUNCTIONS
 export interface WordPressApiType {
     user: {
-        login: (username: string, password: string) => Promise<WpUserReturnValue>
-        logout: (nonce?: string) => Promise<WpUserReturnValue>
-        getUser: (nonce?: string) => Promise<WpUserReturnValue>
+        login: (username: string, password: string, getNonce?: boolean) => Promise<WpUserReturnValue>
+        logout: (getNonce?: boolean) => Promise<WpUserReturnValue>
+        getUser: (getNonce?: boolean) => Promise<WpUserReturnValue>
     }
     session: { getNonce: () => Promise<WpSessionReturnValue> }
 }

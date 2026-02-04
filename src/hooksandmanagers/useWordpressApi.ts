@@ -68,8 +68,9 @@ export function useWordpressApi(): WordPressApiType {
         return jsonResponse
     }
 
-    async function nonceCall(func: ApiFunction, body?: object, nonce?: string) {
-        return await getNonce().then((session) => apiCall(func, body, session.nonce))
+    async function nonceCall(func: ApiFunction, body?: object, refreshNonce: boolean = false) {
+        if (refreshNonce) return await getNonce().then((session) => apiCall(func, body, session.nonce))
+        else return await apiCall(func, body)
     }
 
     // SESSION FUNCTION
@@ -79,16 +80,16 @@ export function useWordpressApi(): WordPressApiType {
 
     // USER FUNCTIONS
     //
-    async function login(username: string, password: string) {
-        return await nonceCall('user_login', { username: username, password: password })
+    async function login(username: string, password: string, refreshNonce?: boolean) {
+        return await nonceCall('user_login', { username: username, password: password }, refreshNonce)
     }
 
-    async function logout() {
-        return await nonceCall('user_logout')
+    async function logout(refreshNonce?: boolean) {
+        return await nonceCall('user_logout', undefined, refreshNonce)
     }
 
-    async function getUser() {
-        return await nonceCall('user_info')
+    async function getUser(refreshNonce?: boolean) {
+        return await nonceCall('user_info', undefined, refreshNonce)
     }
 
     return { user: { login, logout, getUser }, session: { getNonce } }

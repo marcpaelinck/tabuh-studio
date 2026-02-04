@@ -214,7 +214,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     // On initial render, check if a user is logged in and set state accordingly.
     useEffect(() => {
         const getUser = async () => {
-            const result = await wpFunc.user.getUser()
+            const result = await wpFunc.user.getUser(false)
             console.log(`CHECKING LOGGED IN USER=${JSON.stringify(result)}`)
             if (result && result['logged_in']) {
                 console.log('setting user')
