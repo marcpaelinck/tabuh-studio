@@ -1,5 +1,7 @@
 // This hook contains the rules that are used for the automatic generation of notation for grouped staves.
 
+import { debug } from '../utils/debugger'
+
 // CASTING RULES
 const fromPolos: Record<string, Record<string, string>> = {
     // prettier-ignore
@@ -54,25 +56,31 @@ export function useRules() {
     function castNotation(notation: string[], position: string, measureId: number): string[] {
         const conversion: Record<string, string> = fromPolos[position] || {}
 
-        var updatedNotation = notation
+        var updatedNotation = [...notation]
+
         // Apply pokok rules
         if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
             // Clear even numbered measures. Note that measure numbering starts with 0.
             updatedNotation = updatedNotation.map((_) => '-')
+            debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
         }
-        if (onlyOddNotes.includes(position))
+        if (onlyOddNotes.includes(position)) {
             updatedNotation = updatedNotation.map((sym, idx) =>
                 // Remove even numbered notes.
                 (idx + 1) % 2 == 0 ? '-' : sym
             )
-        if (onlyFirstNote.includes(position))
+            debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
+        }
+        if (onlyFirstNote.includes(position)) {
             updatedNotation = updatedNotation.map((sym, idx) =>
                 // Remove all but first note.
                 idx > 0 ? '-' : sym
             )
+            debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
+        }
 
         // Apply casting rules
-        const result = notation.map((symbol) => {
+        const result = updatedNotation.map((symbol) => {
             const [tone, rest] = splitTone(symbol)
             var cast = conversion[tone]
             const newSymbol = cast ? cast + rest : ' '

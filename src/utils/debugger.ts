@@ -29,9 +29,9 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     useEditorScoreManager: false,
     useInstruments: false,
     useKeyboard: false,
-    usePartManager: true,
-    useScoreReader: false,
+    usePartManager: false,
     useRules: false,
+    useScoreReader: false,
     validationManager: false
 }
 
