@@ -77,33 +77,38 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
                 // Persist cached changes and empty caches
                 const score: EditorScore | undefined = { ...scoreFunc.getEditorScore() } as EditorScore
                 if (score) {
-                    console.log(score)
-                    const json = scoreFunc.scoreToFormattedJson(score)
-                    if (activeKey == 'file-save' && json) {
-                        score.systems.forEach((sys) =>
-                            _.toPairs(sys.staffs).forEach(([pos, measures]) =>
-                                measures.forEach((measure, measidx) => {
-                                    if (sys.id == 1 && pos == 'UGAL' && measidx == 0)
-                                        console.log(
-                                            `MEASURE.NOTATION=${measure.notation}, MEASURE.NOTATION_=${measure.notation_}`
-                                        )
-                                    if (measure.notation_) measure.notation = measure.notation_
-                                    // delete measure.notation_
-                                })
-                            )
+                    const newScore = { ...score }
+                    newScore.systems.forEach((sys) =>
+                        _.toPairs(sys.staffs).forEach(([pos, measures]) =>
+                            measures.forEach((measure, measidx) => {
+                                if (sys.id == 1 && pos == 'UGAL' && measidx == 0)
+                                    console.log(
+                                        `MEASURE.NOTATION=${measure.notation}, MEASURE.NOTATION_=${measure.notation_}`
+                                    )
+                                if (measure.notation_) measure.notation = measure.notation_
+                                // delete measure.notation_
+                            })
                         )
-                        scoreFunc.updateScore(score)
-                        const response = await wpFunc.database.saveScore(score.uuid, score.title, json)
+                    )
+                    console.log(newScore)
+                    const json = scoreFunc.scoreToFormattedJson(newScore)
+                    if (activeKey == 'file-save') {
+                        var response = undefined
+                        if (json) response = await wpFunc.database.saveScore(newScore.uuid, newScore.title, json)
                         if (response && 'success' in response && response.success) {
-                            // Clear cache containing original notation values
+                            // Update score to reflect persisted changes
+                            scoreFunc.updateScore(newScore)
                         } else {
-                            dialog.alert('An error occurred: the notation was not saved.')
+                            dialog.alert(
+                                'An error occurred: the notation was not saved.\n' +
+                                    'If the error persists choose `Save As... and copy the text to a file.\n' +
+                                    'You will be able to upload it later.'
+                            )
                         }
                     } else {
                         showTextInDialog(json || 'No text')
                     }
                 }
-                break
                 break
             }
             case 'file-import':

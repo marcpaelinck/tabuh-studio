@@ -75,7 +75,7 @@ export function MeasureNode({
     }
 
     function cacheChanges() {
-        // Store the new notation value in the cache variable notation_
+        // Store the new notation value in the variable notation_
         debug(
             `check update for ${props.id} to ${measure.notation_} original=${measure.notation} current=${ref.current?.value}`,
             false,
