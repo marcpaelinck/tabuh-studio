@@ -15,6 +15,7 @@ export const debounce = <T extends (...args: unknown[]) => unknown>(
     }
 }
 
+// Adds an async wrapper around a sync function
 export async function emulateAsync<T>(returnValue: T): Promise<T> {
     return new Promise((resolve) =>
         setTimeout(() => {

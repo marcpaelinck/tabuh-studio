@@ -8,7 +8,6 @@ import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './compo
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { FRAMESTYLE } from './config/config'
-import { useScoreList } from './hooksandmanagers/useScoreList'
 import { useWordpressApi } from './hooksandmanagers/useWordpressApi'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
@@ -18,7 +17,6 @@ export default function App() {
     const debugMode: boolean = false
 
     const [active, setActive] = useState<'editor' | 'player'>('player')
-    const { scoreList, loading: loadingScoreList } = useScoreList([])
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
 
     // Use 'dummy' WordPress functions and files in development mode.
@@ -46,7 +44,7 @@ export default function App() {
                         <WpApiFunctions value={wpFunctions}>
                             <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
                                 {active == 'player' ? (
-                                    <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
+                                    <TabuhPlayer dataSource={dataSource} />
                                 ) : (
                                     <TabuhEditor dataSource={dataSource} />
                                 )}

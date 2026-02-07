@@ -6,7 +6,6 @@ import {
     type MenuItemInfo,
     type Position,
     type Score,
-    type ScoreInfo,
     type SVGInfo,
     type TimeLine
 } from '../../models/types'
@@ -15,18 +14,12 @@ import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import Player from './Player'
 
-export default function TabuhPlayer({
-    scoreList,
-    loadingScoreList
-}: {
-    scoreList: ScoreInfo[]
-    loadingScoreList: boolean
-}) {
+export default function TabuhPlayer({ dataSource }: { dataSource: 'database' | 'file' }) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
-    const { score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
+    const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
@@ -41,9 +34,9 @@ export default function TabuhPlayer({
 
     // Disable menus when data is loading
     useEffect(() => {
-        setMenuDisabled('tabuh', loadingScoreList)
-        setMenuDisabled('focus', loadingScoreList || loadingScore || !score)
-    }, [loadingScoreList, loadingScore])
+        setMenuDisabled('tabuh', loadingScore)
+        setMenuDisabled('focus', loadingScore || loadingScore || !score)
+    }, [loadingScore])
 
     const updateFocus = (focus: Position[]): void => {
         if (focus !== selectedFocus) {
