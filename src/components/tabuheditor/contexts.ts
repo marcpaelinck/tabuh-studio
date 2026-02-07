@@ -87,9 +87,18 @@ export interface WordPressApiType {
 }
 export const defaultWpApiFunc: WordPressApiType = {
     user: {
-        login: async (username: string, password: string) => new Promise(Object()),
-        logout: async () => new Promise(Object()),
-        getUser: async () => new Promise(Object())
+        login: async (username: string, password: string) =>
+            new Promise(() => {
+                return { logged_in: false, user: { user: { ID: -1, display_name: '' } }, nonce: '' }
+            }),
+        logout: async () =>
+            new Promise(() => {
+                return { logged_in: false, user: { user: { ID: -1, display_name: '' } }, nonce: '' }
+            }),
+        getUser: async () =>
+            new Promise(() => {
+                return { logged_in: true, user: { user: { ID: 1, display_name: 'Develop Mode' } }, nonce: '' }
+            })
     },
     database: {
         saveScore: async () => new Promise(Object()),

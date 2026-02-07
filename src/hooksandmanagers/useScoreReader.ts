@@ -137,7 +137,7 @@ function parseScoreNew(score: EditorScore): EditorScore {
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader<T = Score | EditorScore | undefined>(
     format: 'old' | 'new',
-    source: 'db' | 'file'
+    source: 'database' | 'file'
 ): { scoreList: ScoreInfo[]; score: T; loadScore: (scoreInfo: ScoreInfo | undefined) => void; isLoading: boolean } {
     const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)
     const [scoreList, setScoreList] = useState<ScoreInfo[]>([])
@@ -146,13 +146,13 @@ export function useScoreReader<T = Score | EditorScore | undefined>(
     const wpFunc = useContext(WpApiFunctions)
 
     useEffect(() => {
-        if (source == 'db') loadScoreFromDb()
+        if (source == 'database') loadScoreFromDb()
         else if (source == 'file') loadScoreFromFile()
         else console.error('useScoreReader: source for score is not `db` or `file`.')
     }, [scoreInfo])
 
     useEffect(() => {
-        if (source == 'db') loadScoreListFromDb()
+        if (source == 'database') loadScoreListFromDb()
         else if (source == 'file') loadScoreListFromFile()
         else console.error('useScoreReader: source for score list is not `db` or `file`.')
     }, [])

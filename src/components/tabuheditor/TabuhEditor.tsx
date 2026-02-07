@@ -158,8 +158,10 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
         </>
     )
 }
-
-export function TabuhEditor() {
+interface TabuhEditorProps {
+    dataSource: 'database' | 'file'
+}
+export function TabuhEditor({ dataSource }: TabuhEditorProps) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
@@ -175,7 +177,7 @@ export function TabuhEditor() {
         score: importedScore,
         loadScore,
         isLoading: loadingScore
-    } = useScoreReader<EditorScore>('new', 'db')
+    } = useScoreReader<EditorScore>('new', dataSource)
     const dashboardFunctions: DashboardFunctionsType = {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement

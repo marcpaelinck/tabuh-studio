@@ -21,8 +21,9 @@ export default function App() {
     const { scoreList, loading: loadingScoreList } = useScoreList([])
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
 
-    // Use 'dummy' WordPress functions in development mode.
+    // Use 'dummy' WordPress functions and files in development mode.
     const wpFunctions: WordPressApiType = import.meta.env.MODE == 'production' ? useWordpressApi() : defaultWpApiFunc
+    const dataSource = import.meta.env.MODE == 'production' ? 'database' : 'file'
 
     function debug(message: string) {
         setDebugMessage(message)
@@ -47,7 +48,7 @@ export default function App() {
                                 {active == 'player' ? (
                                     <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
                                 ) : (
-                                    <TabuhEditor />
+                                    <TabuhEditor dataSource={dataSource} />
                                 )}
                             </div>
                             <div id="phpdebug"></div>
