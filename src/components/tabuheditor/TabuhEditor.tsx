@@ -28,7 +28,7 @@ import { editorInitialExpandState } from '../../config/config'
 import { useEditorScoreManager } from '../../hooksandmanagers/useEditorScoreManager'
 import { useScoreReader } from '../../hooksandmanagers/useScoreReader'
 import { cycleValidation } from '../../hooksandmanagers/validationManager'
-import type { EditorScore, ScoreInfo, WpUserRecord } from '../../models/types'
+import type { EditorScore, WpUserRecord } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
@@ -159,7 +159,7 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
     )
 }
 
-export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreInfo[]; loadingScoreList: boolean }) {
+export function TabuhEditor() {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
@@ -170,7 +170,12 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     //DASHBOARD WARNINGS
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { score: importedScore, loadScore, isLoading: loadingScore } = useScoreReader<EditorScore>('new')
+    const {
+        scoreList,
+        score: importedScore,
+        loadScore,
+        isLoading: loadingScore
+    } = useScoreReader<EditorScore>('new', 'db')
     const dashboardFunctions: DashboardFunctionsType = {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
@@ -194,7 +199,6 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     }
     const wpFunc = useContext(WpApiFunctions)
 
-    const [loading, setLoading] = useState<boolean>(false)
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
@@ -211,10 +215,10 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         setDashboardValues(newDashboardValue)
     }
 
-    // On initial render, check if a user is logged in and set state accordingly.
+    // On initial render, check if the user is logged in to the WordPress site and set state accordingly.
     useEffect(() => {
         const getUser = async () => {
-            const result = await wpFunc.user.getUser(false)
+            const result = await wpFunc.user.getUser()
             console.log(`CHECKING LOGGED IN USER=${JSON.stringify(result)}`)
             if (result && result['logged_in']) {
                 console.log('setting user')
@@ -223,13 +227,6 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
         }
         getUser()
     }, [])
-
-    // Gets a new nonce from WP API, but only if the user is not logged in.
-    // Not clear why this is necessary only then.
-    // useEffect(() => {
-    //     if (!user && !initialize) wpFunc.session.getNonce()
-    //     setInitialize(false)
-    // }, [user])
 
     useEffect(() => {
         debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
@@ -243,7 +240,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
             newDashboardValue['score'] = {
                 visible: true,
                 text: importedScore.title,
-                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}`
+                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}\ncomposer: ${importedScore.uuid}`
             }
             debug(`Dashboard values=${JSON.stringify(newDashboardValue)}`)
             setDashboardValues(newDashboardValue)
@@ -253,10 +250,6 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
     useEffect(() => {
         debug(`New editor score available, title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
     }, [editorScore])
-
-    useEffect(() => {
-        setLoading(loadingScoreList || loadingScore)
-    }, [loadingScoreList, loadingScore])
 
     function expandAll(expand: boolean) {
         const newExpanded = _.mapValues(expanded, () => expand)
@@ -288,7 +281,7 @@ export function TabuhEditor({ scoreList, loadingScoreList }: { scoreList: ScoreI
                                         id="editor window component"
                                         expanded={expanded}
                                         setExpanded={setExpanded}
-                                        loading={loading}
+                                        loading={loadingScore}
                                         editorScore={editorScore}
                                         labels={labels}
                                         updateSystem={updateSystem}

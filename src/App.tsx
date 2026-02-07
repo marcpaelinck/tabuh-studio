@@ -4,7 +4,7 @@ import { createContext, useState, type Dispatch } from 'react'
 import { CustomProvider, Toggle, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
 import DebugWindow from './components/DebugWindow'
-import { WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
+import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { FRAMESTYLE } from './config/config'
@@ -20,7 +20,9 @@ export default function App() {
     const [active, setActive] = useState<'editor' | 'player'>('player')
     const { scoreList, loading: loadingScoreList } = useScoreList([])
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
-    const wpFunctions: WordPressApiType = useWordpressApi()
+
+    // Use 'dummy' WordPress functions in development mode.
+    const wpFunctions: WordPressApiType = import.meta.env.MODE == 'production' ? useWordpressApi() : defaultWpApiFunc
 
     function debug(message: string) {
         setDebugMessage(message)
@@ -45,9 +47,10 @@ export default function App() {
                                 {active == 'player' ? (
                                     <TabuhPlayer scoreList={scoreList} loadingScoreList={loadingScoreList} />
                                 ) : (
-                                    <TabuhEditor scoreList={scoreList} loadingScoreList={loadingScoreList} />
+                                    <TabuhEditor />
                                 )}
                             </div>
+                            <div id="phpdebug"></div>
                         </WpApiFunctions>
                     </VStack>
                 </DebugContext>

@@ -3,15 +3,16 @@ import _ from 'lodash'
 // Enable/disable the debug function for each module in the list below.
 // Specify a function by setting the dict value to {functionName: true}
 
-const mainSwitch = false // easily switch off all logging
+const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
+    UNKNOWN: false,
     createSchedule: false,
     Dashboard: false,
     EditorWindow: false,
     ExecutionForm: false,
     ExecutionItemForm: false,
     Menu: false,
-    MeasureNode: false,
+    MeasureNode: true,
     NavigationCell: false,
     PartIndicator: false,
     PlaybackButtons: { moveEditorCursor: false },
@@ -23,7 +24,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SystemContextMenu: false,
     SystemNode: false,
     SummaryItem: false,
-    TabuhEditor: false,
+    TabuhEditor: true,
     TabuhEditorMenu: false,
     useEditorScoreManager: false,
     useInstruments: false,
@@ -46,7 +47,8 @@ const regExpJSC: RegExp = /([\w_\-\/<]+)@.+?([\w_\-]+)\.(?:ts|tsx|js)/g
 
 // Use this function in any module that requires debug logging to the console.
 // The name of the module should be added to the above list.
-export const debug = (message: any, raw: boolean = false) => {
+//
+export const debug = (message: any, raw: boolean = false, caller?: string) => {
     if (!mainSwitch) return
 
     const stack = new Error('debug').stack as string
@@ -62,7 +64,11 @@ export const debug = (message: any, raw: boolean = false) => {
     }
     // Next to the original string, parsing should return two captured values:
     // the calling function and the name of its module.
-    const [func, module]: string[] = trace[0].slice(1, 3)
+    const [func, module]: string[] = caller
+        ? ['', caller]
+        : trace && trace.length >= 1 && trace[0].length >= 3 && trace[0].slice(1, 3)[1] != 'index'
+          ? trace[0].slice(1, 3)
+          : ['', 'UNKNOWN']
     // Check if the module is in the above debugOn list
     if (!(module in debugOn)) console.log(`debug: no entry for ${module}.`)
 

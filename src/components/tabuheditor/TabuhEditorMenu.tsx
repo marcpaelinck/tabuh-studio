@@ -60,6 +60,8 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     const dialog = useDialog()
     const wpFunc = useContext(WpApiFunctions)
 
+    useEffect(() => console.log(`SCORELIST=${JSON.stringify(scoreList)}`), [scoreList])
+
     const showTextInDialog = async (payload: string) => {
         //@ts-ignore
         await dialog.open(SimpleTextareaDialog, { payload })
@@ -70,32 +72,42 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
             case 'file-open':
                 setScoreSelector(true)
                 break
-            case 'file-save': {
+            case 'file-save':
+            case 'file-saveas': {
                 // Persist cached changes and empty caches
                 const score: EditorScore | undefined = { ...scoreFunc.getEditorScore() } as EditorScore
                 if (score) {
-                    score.systems.forEach((sys) =>
-                        _.toPairs(sys.staffs).forEach(([_, measures]) =>
-                            measures.forEach((measure) => {
-                                if (measure.notation_ != undefined) {
-                                    measure.notation = measure.notation_
-                                    measure.notation_ = undefined
-                                }
-                            })
-                        )
-                    )
+                    console.log(score)
                     const json = scoreFunc.scoreToFormattedJson(score)
-                    showTextInDialog(json || 'No text')
-                    scoreFunc.updateScore(score)
+                    if (activeKey == 'file-save' && json) {
+                        score.systems.forEach((sys) =>
+                            _.toPairs(sys.staffs).forEach(([pos, measures]) =>
+                                measures.forEach((measure, measidx) => {
+                                    if (sys.id == 1 && pos == 'UGAL' && measidx == 0)
+                                        console.log(
+                                            `MEASURE.NOTATION=${measure.notation}, MEASURE.NOTATION_=${measure.notation_}`
+                                        )
+                                    if (measure.notation_) measure.notation = measure.notation_
+                                    // delete measure.notation_
+                                })
+                            )
+                        )
+                        scoreFunc.updateScore(score)
+                        const response = await wpFunc.database.saveScore(score.uuid, score.title, json)
+                        if (response && 'success' in response && response.success) {
+                            // Clear cache containing original notation values
+                        } else {
+                            dialog.alert('An error occurred: the notation was not saved.')
+                        }
+                    } else {
+                        showTextInDialog(json || 'No text')
+                    }
                 }
+                break
                 break
             }
             case 'file-import':
                 break
-            case 'file-saveas': {
-                console.log(await wpFunc.user.getUser())
-                break
-            }
         }
         setActiveKey(undefined)
     }
@@ -115,6 +127,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     function scoreSelected(scoreInfo: ScoreInfo | undefined) {
         setScoreSelector(false)
         if (scoreInfo) {
+            console.log(`SCOREINFO=${JSON.stringify(scoreInfo)}`)
             loadScore(scoreInfo)
         }
     }

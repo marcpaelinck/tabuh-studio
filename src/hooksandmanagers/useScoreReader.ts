@@ -1,6 +1,7 @@
 import _ from 'lodash'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { WpApiFunctions } from '../components/tabuheditor/contexts'
 import { defaultIntroTime, editorSortingOrder } from '../config/config'
 import type {
     EditorMeasure,
@@ -135,38 +136,96 @@ function parseScoreNew(score: EditorScore): EditorScore {
 
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader<T = Score | EditorScore | undefined>(
-    format: 'old' | 'new'
-): { score: T; loadScore: (scoreInfo: ScoreInfo | undefined) => void; isLoading: boolean } {
+    format: 'old' | 'new',
+    source: 'db' | 'file'
+): { scoreList: ScoreInfo[]; score: T; loadScore: (scoreInfo: ScoreInfo | undefined) => void; isLoading: boolean } {
     const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)
+    const [scoreList, setScoreList] = useState<ScoreInfo[]>([])
     const [score, setScore] = useState<T>(undefined as T)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const wpFunc = useContext(WpApiFunctions)
+
+    useEffect(() => {
+        if (source == 'db') loadScoreFromDb()
+        else if (source == 'file') loadScoreFromFile()
+        else console.error('useScoreReader: source for score is not `db` or `file`.')
+    }, [scoreInfo])
+
+    useEffect(() => {
+        if (source == 'db') loadScoreListFromDb()
+        else if (source == 'file') loadScoreListFromFile()
+        else console.error('useScoreReader: source for score list is not `db` or `file`.')
+    }, [])
 
     function loadScore(scoreInfo: ScoreInfo | undefined) {
         setScoreinfo(scoreInfo)
     }
 
-    useEffect(() => {
-        const load = async () => {
-            if (scoreInfo) {
-                setIsLoading(true)
-                let jsonText = await readFile('scores/' + scoreInfo.file)
-                const json = JSON.parse(jsonText)
+    async function loadScoreFromFile() {
+        if (scoreInfo) {
+            setIsLoading(true)
+            let jsonText = await readFile('scores/' + scoreInfo.file)
+            const json = JSON.parse(jsonText)
+            if (!json) return
+
+            var newScore: Score | EditorScore | undefined = undefined
+
+            if (scoreInfo.format == 'old') {
+                newScore = parseScoreOld(json as Score)
+                if (format == 'new') newScore = oldToNewFormat(newScore)
+            } else if (format == 'new') {
+                newScore = parseScoreNew(json)
+            } else return
+            setScore(newScore as T)
+            console.log(newScore)
+            setIsLoading(false)
+        }
+    }
+
+    async function loadScoreFromDb() {
+        if (scoreInfo) {
+            setIsLoading(true)
+            let response = await wpFunc.database.getScore(scoreInfo.uuid)
+            if (
+                response &&
+                'success' in response &&
+                response.success &&
+                'result' in response &&
+                response.result.length > 0 &&
+                'notation' in response.result[0]
+            ) {
+                const json = JSON.parse(response.result[0].notation)
                 if (!json) return
 
                 var newScore: Score | EditorScore | undefined = undefined
 
-                if (scoreInfo.format == 'old') {
-                    newScore = parseScoreOld(json as Score)
-                    if (format == 'new') newScore = oldToNewFormat(newScore)
-                } else if (format == 'new') {
-                    newScore = parseScoreNew(json)
-                } else return
+                newScore = parseScoreNew(json)
                 setScore(newScore as T)
+                console.log(newScore)
                 setIsLoading(false)
             }
         }
-        load()
-    }, [scoreInfo])
+    }
 
-    return { score, loadScore, isLoading }
+    async function loadScoreListFromDb() {
+        setIsLoading(true)
+        const response = await wpFunc.database.getScoreList()
+        if (response && 'success' in response && response.success && 'result' in response) {
+            const newList = response.result.map((result) => {
+                return { ...result, ...{ instrumentgroup: 'gongkebyar' }, ...{ notationversion: 'new' } }
+            })
+            setScoreList(newList)
+        }
+        setIsLoading(false)
+    }
+
+    async function loadScoreListFromFile() {
+        setIsLoading(true)
+        const files = await readFile('scores/content.json')
+        const scoreInfo: ScoreInfo[] = JSON.parse(files)
+        setScoreList(scoreInfo)
+        setIsLoading(false)
+    }
+
+    return { scoreList, score, loadScore, isLoading }
 }

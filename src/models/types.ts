@@ -87,6 +87,7 @@ export type Score = { title: string; composer: string; durationMs: number; syste
 
 export type ScoreInfo = {
     title: string
+    uuid: string
     instrumentgroup: string
     file: string
     notationversion: string
@@ -341,4 +342,4 @@ export type WpUserRecord = {
 }
 
 export type WpUserReturnValue = { logged_in: boolean; user: WpUserRecord; nonce: string } | undefined
-export type WpSessionReturnValue = { nonce: string } | undefined
+export type WpDatabaseReturnValue = { success: boolean; result: any[]; nonce: string } | undefined

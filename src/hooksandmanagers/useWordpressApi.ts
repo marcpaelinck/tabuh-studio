@@ -1,5 +1,7 @@
+import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import type { WordPressApiType } from '../components/tabuheditor/contexts'
+import type { UUID } from '../models/types'
 
 // Will be passed by the Tabu Studio WordPress plugin
 interface WpApiSettings {
@@ -17,7 +19,7 @@ export function useWordpressApi(): WordPressApiType {
         console.log(`NEW TABUHSETTINGS: ${JSON.stringify(wpTabuhSettings)}`)
     }, [wpTabuhSettings])
 
-    type ApiFunction = 'user_login' | 'user_logout' | 'user_info' | 'session_getnonce'
+    type ApiFunction = 'user_login' | 'user_logout' | 'user_info' | 'db_score_save' | 'db_score_get' | 'db_score_list'
     type Method = 'GET' | 'POST'
     interface FunctionProperties {
         endpoint: string
@@ -29,33 +31,43 @@ export function useWordpressApi(): WordPressApiType {
         user_login: { endpoint: 'user/login', method: 'POST', nonce: true },
         user_logout: { endpoint: 'user/logout', method: 'GET', nonce: true },
         user_info: { endpoint: 'user/info', method: 'GET', nonce: true },
-        session_getnonce: { endpoint: 'session/getnonce', method: 'GET', nonce: false }
+        db_score_save: { endpoint: 'db/score/save', method: 'POST', nonce: true },
+        db_score_get: { endpoint: 'db/score/get', method: 'GET', nonce: true },
+        db_score_list: { endpoint: 'db/score/list', method: 'GET', nonce: true }
     }
 
     // Generic function for a call to the tabuhstudio WordPress plugin API
     async function apiCall(func: ApiFunction, body?: object, nonce?: string) {
         const callparameters: RequestInit = { method: apiMethod[func].method }
         callparameters.credentials = 'same-origin'
-        const headers: HeadersInit = {}
+        var headers: HeadersInit = {}
+        const params: URLSearchParams = new URLSearchParams()
+        var url = apiRootURL + '/tabuhstudio/v1/' + apiMethod[func].endpoint
 
         if (apiMethod[func].nonce) {
             headers['X-WP-Nonce'] = nonce || wpTabuhSettings.nonce
             callparameters.credentials = 'same-origin'
         }
-        if (apiMethod[func].method == 'POST') {
-            headers['Content-Type'] = 'application/json'
-            if (body) {
+        if (body) {
+            if (apiMethod[func].method == 'POST') {
+                // For POST calls, parameters are passed through the body
+                headers['Content-Type'] = 'application/json'
                 callparameters['body'] = JSON.stringify(body)
+            } else {
+                // For GET calls, parameters are passed as URL search parameters
+                console.log(`BODY=${JSON.stringify(body)}`)
+                _.toPairs(body).forEach(([name, value]) => params.append(name, value))
+                url += `?${params}`
             }
         }
         callparameters.headers = headers
 
         // The actual call to the WP API
         console.log(`REQUEST=${apiMethod[func].endpoint} ${JSON.stringify(callparameters)}`)
-        const jsonResponse = await fetch(
-            apiRootURL + '/tabuhstudio/v1/' + apiMethod[func].endpoint,
-            callparameters
-        ).then((result) => result.json())
+        const jsonResponse = await fetch(url, callparameters).then((result) => {
+            console.log(result)
+            return result.json()
+        })
 
         // Store the new nonce value as a state variable, so that it can be used with the next query.
         // The nonce value changes when the user signs in or out.
@@ -68,29 +80,33 @@ export function useWordpressApi(): WordPressApiType {
         return jsonResponse
     }
 
-    async function nonceCall(func: ApiFunction, body?: object, refreshNonce: boolean = false) {
-        if (refreshNonce) return await getNonce().then((session) => apiCall(func, body, session.nonce))
-        else return await apiCall(func, body)
-    }
-
-    // SESSION FUNCTION
-    async function getNonce() {
-        return await apiCall('session_getnonce')
-    }
-
     // USER FUNCTIONS
-    //
-    async function login(username: string, password: string, refreshNonce?: boolean) {
-        return await nonceCall('user_login', { username: username, password: password }, refreshNonce)
+
+    async function login(username: string, password: string) {
+        return await apiCall('user_login', { username: username, password: password })
     }
 
     async function logout(refreshNonce?: boolean) {
-        return await nonceCall('user_logout', undefined, refreshNonce)
+        return await apiCall('user_logout', undefined)
     }
 
     async function getUser(refreshNonce?: boolean) {
-        return await nonceCall('user_info', undefined, refreshNonce)
+        return await apiCall('user_info', undefined)
     }
 
-    return { user: { login, logout, getUser }, session: { getNonce } }
+    // DATABASE FUNCTIONS
+
+    async function saveScore(uuid: UUID, title: string, json: string) {
+        return await apiCall('db_score_save', { uuid: uuid, title: title, notation: json })
+    }
+
+    async function getScore(uuid: UUID) {
+        return await apiCall('db_score_get', { uuid: uuid })
+    }
+
+    async function getScoreList() {
+        return await apiCall('db_score_list')
+    }
+
+    return { user: { login, logout, getUser }, database: { saveScore, getScore, getScoreList } }
 }

@@ -74,17 +74,22 @@ export function MeasureNode({
         })
     }
 
-    function storeChanges() {
-        if (typeof measure.notation_ != 'undefined') {
-            if (!ref.current) return
-            debug(`updating ${props.id} to ${notation2text(measure.notation_)}`)
-            // measureData.notation = measureData.notation_
-            const notation: string[] = parseNotationText(ref.current.value, validRegExpCell)
-            navFunc.applyRules(notation, rowId, colId, true)
-            const newSysData = { ...systemData }
-            newSysData.staffs[position][colId] = { ...measure }
-            scoreFunc.updateSystem(newSysData)
-        }
+    function cacheChanges() {
+        // Store the new notation value in the cache variable notation_
+        debug(
+            `check update for ${props.id} to ${measure.notation_} original=${measure.notation} current=${ref.current?.value}`,
+            false,
+            'MeasureNode'
+        )
+        if (!ref.current || ref.current.value == measure.notation.join('')) return
+        debug(`updating!`, false, 'MeasureNode')
+        const newMeasure = { ...measure }
+        newMeasure.notation_ = parseNotationText(ref.current.value, validRegExpCell)
+        navFunc.applyRules(newMeasure.notation_, rowId, colId, true)
+        const newSysData = { ...systemData }
+        newSysData.staffs[position][colId] = { ...newMeasure }
+        console.log(newSysData)
+        scoreFunc.updateSystem(newSysData)
     }
 
     return (
@@ -101,7 +106,7 @@ export function MeasureNode({
                 keyboardListener(e)
                 highlightOnChangedContent(e.target as HTMLTextAreaElement)
             }}
-            onBlur={() => storeChanges()}
+            onBlur={() => cacheChanges()}
             {...props}
         />
     )

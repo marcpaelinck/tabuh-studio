@@ -6,7 +6,7 @@ import type {
     EditorSystem,
     GenericFunction,
     SamplerAction,
-    WpSessionReturnValue,
+    WpDatabaseReturnValue,
     WpUserReturnValue
 } from '../../models/types'
 import type { ComponentName, DashboardComponentValues } from './Dashboard'
@@ -75,11 +75,15 @@ export const NavigationFunctions: Context<NavigationFunctionsType> = createConte
 // WORDPRESS API FUNCTIONS
 export interface WordPressApiType {
     user: {
-        login: (username: string, password: string, getNonce?: boolean) => Promise<WpUserReturnValue>
-        logout: (getNonce?: boolean) => Promise<WpUserReturnValue>
-        getUser: (getNonce?: boolean) => Promise<WpUserReturnValue>
+        login: (username: string, password: string) => Promise<WpUserReturnValue>
+        logout: () => Promise<WpUserReturnValue>
+        getUser: () => Promise<WpUserReturnValue>
     }
-    session: { getNonce: () => Promise<WpSessionReturnValue> }
+    database: {
+        saveScore: (uuid: string, title: string, json: string) => Promise<WpDatabaseReturnValue>
+        getScore: (uuid: string) => Promise<WpDatabaseReturnValue>
+        getScoreList: () => Promise<WpDatabaseReturnValue>
+    }
 }
 export const defaultWpApiFunc: WordPressApiType = {
     user: {
@@ -87,6 +91,10 @@ export const defaultWpApiFunc: WordPressApiType = {
         logout: async () => new Promise(Object()),
         getUser: async () => new Promise(Object())
     },
-    session: { getNonce: async () => new Promise(Object()) }
+    database: {
+        saveScore: async () => new Promise(Object()),
+        getScore: async () => new Promise(Object()),
+        getScoreList: async () => new Promise(Object())
+    }
 }
 export const WpApiFunctions: Context<WordPressApiType> = createContext(defaultWpApiFunc)

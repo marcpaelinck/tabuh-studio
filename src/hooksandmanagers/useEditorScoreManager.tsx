@@ -71,10 +71,12 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     }
 }
 
-function scoreToFormattedJson(score: EditorScore): string {
+function scoreToFormattedJson(score: EditorScore, clearCache: boolean = true): string {
     const flatten = (key: string, value: any) => {
-        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key)) {
-            const json = value.map((meas: any) => JSON.stringify(meas))
+        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key) && value) {
+            const json = value.map((meas: any) => {
+                return JSON.stringify(meas)
+            })
             return json
         }
         if (key == 'colWidths') {
@@ -86,6 +88,12 @@ function scoreToFormattedJson(score: EditorScore): string {
         }
         return value
     }
+    if (clearCache) {
+        score.systems.forEach((sys) =>
+            _.toPairs(sys.staffs).forEach(([_, measures]) => measures.forEach((measure) => delete measure.notation_))
+        )
+    }
+
     const json = JSON.stringify(score, flatten, 2)
     return json
         .replace(/"([\{\[])/g, '$1')

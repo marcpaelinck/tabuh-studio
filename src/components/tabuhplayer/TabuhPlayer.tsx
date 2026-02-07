@@ -26,7 +26,7 @@ export default function TabuhPlayer({
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
-    const { score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old')
+    const { score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
