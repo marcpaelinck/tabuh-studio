@@ -9,6 +9,7 @@ import type {
     WpDatabaseReturnValue,
     WpUserReturnValue
 } from '../../models/types'
+import { emulateAsync } from '../../utils/async'
 import type { ComponentName, DashboardComponentValues } from './Dashboard'
 
 // SCORE FUNCTIONS
@@ -87,17 +88,23 @@ export interface WordPressApiType {
 }
 export const defaultWpApiFunc: WordPressApiType = {
     user: {
-        login: async (username: string, password: string) =>
-            new Promise(() => {
-                return { logged_in: false, user: { user: { ID: -1, display_name: '' } }, nonce: '' }
+        login: () =>
+            emulateAsync<WpUserReturnValue>({
+                logged_in: false,
+                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
+                nonce: ''
             }),
-        logout: async () =>
-            new Promise(() => {
-                return { logged_in: false, user: { user: { ID: -1, display_name: '' } }, nonce: '' }
+        logout: () =>
+            emulateAsync<WpUserReturnValue>({
+                logged_in: false,
+                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
+                nonce: ''
             }),
-        getUser: async () =>
-            new Promise(() => {
-                return { logged_in: true, user: { user: { ID: 1, display_name: 'Develop Mode' } }, nonce: '' }
+        getUser: () =>
+            emulateAsync<WpUserReturnValue>({
+                logged_in: true,
+                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
+                nonce: ''
             })
     },
     database: {

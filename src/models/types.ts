@@ -332,11 +332,11 @@ export type ActionFunctions = {
 // WordPress API
 export type WpUserRecord = {
     ID: string
-    user_login: string
-    user_nicename: string
-    user_email: string
-    user_registered: string
-    user_status: string
+    user_login?: string
+    user_nicename?: string
+    user_email?: string
+    user_registered?: string
+    user_status?: string
     display_name: string
     roles: string[]
 }

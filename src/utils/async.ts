@@ -14,3 +14,11 @@ export const debounce = <T extends (...args: unknown[]) => unknown>(
         }, delay)
     }
 }
+
+export async function emulateAsync<T>(returnValue: T): Promise<T> {
+    return new Promise((resolve) =>
+        setTimeout(() => {
+            resolve(returnValue)
+        }, 100)
+    )
+}
