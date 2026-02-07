@@ -27,7 +27,7 @@ import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export default function ScorePlayer({
+export function ScorePlayer({
     score,
     focus,
     pbSpeed,

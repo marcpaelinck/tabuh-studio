@@ -12,7 +12,7 @@ import {
 import { speedDefaultOption } from '../../utils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
-import Player from './Player'
+import { ScorePlayer } from './ScorePlayer'
 
 export default function TabuhPlayer({ dataSource }: { dataSource: 'database' | 'file' }) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
@@ -85,7 +85,7 @@ export default function TabuhPlayer({ dataSource }: { dataSource: 'database' | '
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <Player
+            <ScorePlayer
                 score={score}
                 focus={selectedFocus}
                 pbSpeed={playbackSpeed}

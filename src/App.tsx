@@ -6,7 +6,6 @@ import 'rsuite/dist/rsuite.css'
 import DebugWindow from './components/DebugWindow'
 import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
-import TabuhPlayer from './components/tabuhplayer/TabuhPlayer'
 import { FRAMESTYLE } from './config/config'
 import { useWordpressApi } from './hooksandmanagers/useWordpressApi'
 
@@ -43,11 +42,11 @@ export default function App() {
                         {debugMode && <DebugWindow message={debugMessage} />}
                         <WpApiFunctions value={wpFunctions}>
                             <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
-                                {active == 'player' ? (
+                                {/* {active == 'player' ? (
                                     <TabuhPlayer dataSource={dataSource} />
-                                ) : (
-                                    <TabuhEditor dataSource={dataSource} />
-                                )}
+                                ) : ( */}
+                                <TabuhEditor dataSource={dataSource} active={active} />
+                                {/* )} */}
                             </div>
                             <div id="phpdebug"></div>
                         </WpApiFunctions>

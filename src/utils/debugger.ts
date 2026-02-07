@@ -29,7 +29,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     useEditorScoreManager: false,
     useInstruments: false,
     useKeyboard: false,
-    usePartManager: false,
+    usePartManager: true,
     useScoreReader: false,
     useRules: false,
     validationManager: false

@@ -3,7 +3,7 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { partColorPalette } from '../config/config'
-import type { EditorScore } from '../models/types'
+import type { EditorScore, UUID } from '../models/types'
 import { debug } from '../utils/debugger'
 
 export function usePartManager(score: EditorScore | undefined, updateParts: (parts: Record<string, string[]>) => void) {
@@ -11,6 +11,7 @@ export function usePartManager(score: EditorScore | undefined, updateParts: (par
     const [sysToPartLookup, setSysToPartLookup] = useState<Record<string, string>>({})
     const [currSelection, setCurrSelection] = useState<string[]>([]) // List of uuids of currently selected systems
     const [partColors, setPartColors] = useState<Record<string, string>>({}) // Mapping part name -> color
+    const [scoreUuid, setScoreUuid] = useState<UUID>('') // Used to distinguish whether current score is updated or a new score is loaded.
 
     function same(a: Record<string, string>, b: Record<string, string>) {
         return _.keys(a).length == _.keys(b).length && _.keys(a).every((key) => a[key] == b[key])
@@ -21,7 +22,8 @@ export function usePartManager(score: EditorScore | undefined, updateParts: (par
     }, [currSelection])
 
     useEffect(() => {
-        if (!score) return
+        // Initialize colors when new score is selected.
+        if (!score || score.uuid == scoreUuid) return
         // Create system to sys->part and part->color lookups
         const newSysToPart: Record<string, string> = {}
         const newPartColors: Record<string, string> = {}
@@ -30,16 +32,10 @@ export function usePartManager(score: EditorScore | undefined, updateParts: (par
             const color = partColorPalette[Object.keys(newPartColors).length % partColorPalette.length]
             newPartColors[part] = color
         })
-        // Avoid circular re-render caused by useEffect
-        // debug(
-        //     `EQUAL LOOKUP ${same(sysToPartLookup, newSysToPart)} ${JSON.stringify(sysToPartLookup)} AND ${JSON.stringify(newSysToPart)}`
-        // )
-        // debug(
-        //     `EQUAL PARTCOLORS ${same(partColors, newPartColors)} ${JSON.stringify(partColors)} AND ${JSON.stringify(newPartColors)}`
-        // )
-        if (!same(sysToPartLookup, newSysToPart)) setSysToPartLookup(newSysToPart)
-        if (!same(partColors, newPartColors)) setPartColors(newPartColors)
+        setSysToPartLookup(newSysToPart)
+        setPartColors(newPartColors)
         setCurrSelection([])
+        setScoreUuid(score.uuid)
     }, [score])
 
     useEffect(() => {

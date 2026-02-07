@@ -30,6 +30,7 @@ import { useScoreReader } from '../../hooksandmanagers/useScoreReader'
 import { cycleValidation } from '../../hooksandmanagers/validationManager'
 import type { EditorScore, WpUserRecord } from '../../models/types'
 import { debug } from '../../utils/debugger'
+import TabuhPlayer from '../tabuhplayer/TabuhPlayer'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
 import {
@@ -62,6 +63,8 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
     const wpFunc = useContext(WpApiFunctions)
 
     const handleSubmit = async () => {
+        console.log(`logging`)
+        console.log(`login=${await wpFunc.user.login(formValue.username as string, formValue.password as string)}`)
         if (!formRef.current) return
         if (!formRef.current.check()) {
             console.error('Form Error')
@@ -160,8 +163,9 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
 }
 interface TabuhEditorProps {
     dataSource: 'database' | 'file'
+    active: 'editor' | 'player'
 }
-export function TabuhEditor({ dataSource }: TabuhEditorProps) {
+export function TabuhEditor({ dataSource, active }: TabuhEditorProps) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
@@ -278,7 +282,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
                         </Header>
                         <Content id="content" px="1rem" className="h-9/10">
                             <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                                {importedScore != null && (
+                                {importedScore != null && active == 'editor' && (
                                     <EditorWindow
                                         id="editor window component"
                                         expanded={expanded}
@@ -291,6 +295,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
                                         executeItemAction={executeItemAction}
                                     />
                                 )}
+                                {active == 'player' && <TabuhPlayer dataSource={dataSource} />}
                             </Box>
                         </Content>
                     </Container>
