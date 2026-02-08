@@ -3,7 +3,7 @@ import { noCursor } from '../components/tabuheditor/_constants'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import type { ActionFunctions, EditorCellCursor, EditorScore } from '../models/types'
 import { debug } from '../utils/debugger'
-import { createTimelineFromEditor, scheduleTransport } from './playbackManager'
+import { createPlaybackSchedule, createTimelineFromEditor } from './playbackManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
 export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor'
@@ -47,7 +47,7 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
                     }
                 }
                 const timeLine = createTimelineFromEditor(loadAction, true)
-                scheduleTransport(timeLine)
+                createPlaybackSchedule(timeLine)
                 debug({ ...state, audioState: 'stopped' }, true)
                 return { ...state, audioState: 'stopped' }
             }

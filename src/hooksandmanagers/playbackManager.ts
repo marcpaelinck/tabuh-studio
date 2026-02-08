@@ -149,7 +149,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
     return timeline
 }
 
-export function scheduleTransport(timeLine: TimeLine | undefined, pbSpeed: number = 1) {
+export function createPlaybackSchedule(timeLine: TimeLine | undefined, pbSpeed: number = 1) {
     // Creates the schedule for the Transport object.
     if (!timeLine) return
 

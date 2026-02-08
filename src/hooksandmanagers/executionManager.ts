@@ -2,7 +2,16 @@
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import _ from 'lodash'
-import type { EditorMeasure, EditorScore, EditorSystem, FlowItem, GotoItem, Position } from '../models/types'
+import type {
+    DynamicsItem,
+    EditorMeasure,
+    EditorScore,
+    EditorSystem,
+    ExecutionItem,
+    FlowItem,
+    Position,
+    TempoItem
+} from '../models/types'
 import type { PlaybackType } from './playbackReducer'
 
 interface FlowCursor {
@@ -19,6 +28,8 @@ interface FlowInfoTable {
         pass: number
         loop: number
         flowitems: FlowItem[] | undefined
+        tempoitems: TempoItem[] | undefined
+        dynamicsitems: DynamicsItem[] | undefined
     }
 }
 
@@ -31,19 +42,19 @@ export interface FlowStep {
     lastSection: boolean
 }
 
-const prioGoto = (goto: GotoItem): number => {
+const itemPriority = (item: ExecutionItem): number => {
     // prio 1: specific pass number(s).
     // prio 2: every nth pass number(s) (each==true)
     // prio 3: no pass specification.
     var prio = 99
-    if (goto.passes != undefined && goto.passes.length > 0 && !goto.each) prio = 1
-    else if (goto.passes != undefined && goto.passes.length > 0 && goto.each) prio = 2
-    else if ((goto.passes == undefined || goto.passes.length == 0) && !goto.each) prio = 4
+    if (item.passes != undefined && item.passes.length > 0 && !item.each) prio = 1
+    else if (item.passes != undefined && item.passes.length > 0 && item.each) prio = 2
+    else if ((item.passes == undefined || item.passes.length == 0) && !item.each) prio = 4
     return prio
 }
 
 // Lower prio number goes first
-const compareGoto = (goto1: GotoItem, goto2: GotoItem): number => prioGoto(goto1) - prioGoto(goto2)
+const compareItems = (item1: ExecutionItem, item2: ExecutionItem): number => itemPriority(item1) - itemPriority(item2)
 
 // Returns functions that can be used to run throught the score in the correct sequence.
 export function executionManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
@@ -54,8 +65,21 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         score.systems.map((system, idx) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
-            const gotos = system.execution?.filter((item) => item.type == 'goto')?.sort(compareGoto)
-            return [idx, { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, flowitems: gotos }]
+            const flowitems = system.execution?.filter((item) => item.type == 'goto')?.sort(compareItems)
+            const tempoitems = system.execution?.filter((item) => item.type == 'tempo')?.sort(compareItems)
+            const dynamicsitems = system.execution?.filter((item) => item.type == 'dynamics')?.sort(compareItems)
+            return [
+                idx,
+                {
+                    system: system,
+                    maxSectIdx: sectionCount - 1,
+                    pass: 0,
+                    loop: 0,
+                    flowitems: flowitems,
+                    tempoitems: tempoitems,
+                    dynamicsitems: dynamicsitems
+                }
+            ]
         })
     )
 

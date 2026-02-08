@@ -86,7 +86,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
                                         `MEASURE.NOTATION=${measure.notation}, MEASURE.NOTATION_=${measure.notation_}`
                                     )
                                 if (measure.notation_) measure.notation = measure.notation_
-                                // delete measure.notation_
+                                delete measure.notation_
                             })
                         )
                     )

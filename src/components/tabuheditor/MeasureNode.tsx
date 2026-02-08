@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import type { NavigationAction } from '../../config/config'
-import { useKeyboardListener } from '../../hooksandmanagers/useKeyboard'
+import { useKeyboardListener } from '../../hooksandmanagers/useKeyboardListener'
 import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'

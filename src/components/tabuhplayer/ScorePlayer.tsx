@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type Ref
 import * as Tone from 'tone'
 import { useAnimationEngine } from '../../hooksandmanagers/useAnimation'
 import { useInstruments } from '../../hooksandmanagers/useInstruments'
-import { useInterpretations } from '../../hooksandmanagers/useInterpretations'
 import {
     type ActionFunctions,
     type AnimationAction,
@@ -22,6 +21,7 @@ import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
+import { changeTempo } from '../../hooksandmanagers/interpretationManager'
 import { debug } from '../../utils/debugger'
 import { panggulDefaultOption } from './Animation'
 
@@ -67,7 +67,6 @@ export function ScorePlayer({
 
     // HOOKS
     const { playInstrument, muteAll } = useInstruments(focusRef)
-    const { changeTempo } = useInterpretations()
     const { animateInstrument, animateNotation } = useAnimationEngine(
         svgInfoRef,
         highlightFunctionRef,
