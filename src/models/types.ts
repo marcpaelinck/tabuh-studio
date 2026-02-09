@@ -219,12 +219,13 @@ export interface ExpressionItemBase extends ExecutionItemBase {
     isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
     fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
     toSection: number // If isGradual==true: the gradual change should continue until the end of this section.
-} // Otherwise the gradual change should be effective immediately at the start of this section.
+    // Otherwise the gradual change should be effective immediately at the start of this section.
+    fromValue?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
+    toValue: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+}
 
 export interface TempoItem extends ExpressionItemBase {
     type: 'tempo'
-    fromBPM?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
-    toBPM: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
 }
 
 export type DynamicsValue = 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff'
@@ -316,7 +317,6 @@ export type TimeLine = {
     playercursoractions: PlayerCursorAction[]
     editorcursoractions: EditorCursorAction[]
     genericactions: GenericAction[]
-    initialBPM: number
     notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
 }
 

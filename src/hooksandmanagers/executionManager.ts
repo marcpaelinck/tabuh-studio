@@ -2,41 +2,51 @@
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import _ from 'lodash'
+import type { BPM } from 'tone/build/esm/core/type/Units'
+import { defaultDynamics, defaultTempo } from '../config/config'
 import type {
-    DynamicsItem,
     EditorMeasure,
     EditorScore,
     EditorSystem,
     ExecutionItem,
-    FlowItem,
-    Position,
-    TempoItem
+    ExecutionItemType,
+    ExpressionItem,
+    GotoItem,
+    Position
 } from '../models/types'
+import { debug } from '../utils/debugger'
 import type { PlaybackType } from './playbackReducer'
 
+// Keeps track of the 'current' cursor position
 interface FlowCursor {
     sysIdx: number
     sectIdx: number
     lastSystem: boolean
     lastSection: boolean
+    tempo: BPM[]
+    dynamics: number[]
 }
 
+// Keeps track of pass and loop counters for each system. Also contains lists of
+// directives (goto, loop, tempo and dynamics), sorted by priority.
 interface FlowInfoTable {
     [idx: string]: {
         system: EditorSystem
         maxSectIdx: number
         pass: number
         loop: number
-        flowitems: FlowItem[] | undefined
-        tempoitems: TempoItem[] | undefined
-        dynamicsitems: DynamicsItem[] | undefined
+        executionItems: Record<ExecutionItemType, ExecutionItem[]>
     }
 }
 
+// Returned by function nextInFlow.
+// Contains detailed information corresponding with the current FlowCursor settings.
 export interface FlowStep {
     system: EditorSystem
     measures: Record<Position, EditorMeasure>
     positions: Position[]
+    tempo: BPM[]
+    dynamics: number[]
     sectionIdx: number // for future use
     lastSystem: boolean
     lastSection: boolean
@@ -65,20 +75,14 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         score.systems.map((system, idx) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
-            const flowitems = system.execution?.filter((item) => item.type == 'goto')?.sort(compareItems)
-            const tempoitems = system.execution?.filter((item) => item.type == 'tempo')?.sort(compareItems)
-            const dynamicsitems = system.execution?.filter((item) => item.type == 'dynamics')?.sort(compareItems)
+            const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
+            for (const type of ['goto', 'loop', 'tempo', 'dynamics'] as ExecutionItemType[]) {
+                executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
+                // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
+            }
             return [
                 idx,
-                {
-                    system: system,
-                    maxSectIdx: sectionCount - 1,
-                    pass: 0,
-                    loop: 0,
-                    flowitems: flowitems,
-                    tempoitems: tempoitems,
-                    dynamicsitems: dynamicsitems
-                }
+                { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, executionItems: executionItems }
             ]
         })
     )
@@ -93,27 +97,82 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         cursor = undefined
     }
 
-    // Returns the target uuid of a matching 'goto' instruction or undefined.
-    function getGotoId(sysIdx: number): number | undefined {
-        const gotos = flowinfo![sysIdx].flowitems?.filter((item) => item.type == 'goto')
-        if (!gotos) return undefined
+    // Returns the best matching 'goto', 'tempo' or 'dynamics' item for the current pass/loop count values
+    // or undefined if none was found.
+    function getExecutionItems(type: ExecutionItemType, sysIdx: number): ExecutionItem[] {
+        const matches: ExecutionItem[] = []
+        const items = flowinfo![sysIdx].executionItems[type]
         const flow = flowinfo![sysIdx]
-        for (const gotoItem of gotos) {
-            var match = false
+        for (const item of items) {
             // if `each`==false or undefined: match=true if no passes are given or if flow.pass
-            //                                matches a pass in gotoItem.passes
+            //                                matches a pass in item.passes
             // if `each`==true and one or more passes are given: match=true if flow.pass % maxPassNr
-            //                                matches a pass in gotoItem.passes
+            //                                matches a pass in item.passes
+            // The case `each`==true and item.passes==undefined or empty is invalid and should not return a match.
             // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
-            if (!gotoItem.each)
-                match = !gotoItem.passes || gotoItem.passes.length == 0 || gotoItem.passes.includes(flow.pass)
-            else if (gotoItem.each && gotoItem.passes && gotoItem.passes.length > 0) {
-                const maxPassNr = Math.max(...gotoItem.passes)
-                match = gotoItem.each && gotoItem.passes && gotoItem.passes.includes(((flow.pass - 1) % maxPassNr) + 1)
+            if (!item.each && (!item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)))
+                matches.push(item)
+            else if (item.each && item.passes && item.passes.length > 0) {
+                const maxPassNr = Math.max(...item.passes)
+                if (item.each && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
+                    // Matching item found
+                    matches.push(item)
+                }
             }
-            if (match) return uuidLookup[gotoItem.targetuuid]
         }
-        return undefined
+        return matches
+    }
+
+    function getNextSystemInFlow(sysIdx: number, lastSystem: boolean): number | undefined {
+        const flowItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
+        if (flowItems.length == 0) return lastSystem ? undefined : sysIdx + 1
+        return uuidLookup[flowItems[0].targetuuid]
+    }
+
+    function getExpressionValue(
+        type: 'tempo' | 'dynamics',
+        sysIdx: number,
+        sectIdx: number,
+        currentValue: number
+    ): number[] {
+        const matches = getExecutionItems(type, sysIdx)
+        // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
+        if (matches.length == 0) return [currentValue, currentValue]
+        // Find an item that matches the given section index.
+        const sectionNbr = sectIdx + 1 // Sections are numbered from 1
+        for (const item of matches) {
+            const exprItem = item as ExpressionItem
+            // debug(`exprItem=${JSON.stringify([exprItem])}, section=${sectionNbr}`)
+            if (!exprItem.isGradual) {
+                if (sectionNbr == exprItem.toSection) {
+                    // Non-gradual matching item found
+                    // debug(`EXPRESSION(${type}) NON-GRADUAL=${JSON.stringify([exprItem.toValue, exprItem.toValue])}`)
+                    return [exprItem.toValue, exprItem.toValue]
+                }
+            } else if (exprItem.fromSection && exprItem.fromSection <= sectionNbr && sectionNbr <= exprItem.toSection) {
+                // Gradual matching item found: determine start and end values for the given section.
+                if (undefined != exprItem.fromValue) {
+                    // Case 1: fromValue is given
+                    const totalSections = exprItem.toSection - exprItem.fromSection + 1
+                    const valueRange = exprItem.toValue - exprItem.fromValue
+                    const startValue = exprItem.fromValue + valueRange * ((sectionNbr - 1) / totalSections)
+                    const endValue = exprItem.fromValue + valueRange * (sectionNbr / totalSections)
+                    // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
+                    return [startValue, endValue]
+                } else {
+                    // Case 2: fromValue is undefined.
+                    const remainingSections = exprItem.toSection - sectionNbr + 1
+                    const fromValue = currentValue
+                    const valueRange = exprItem.toValue - fromValue
+                    const startValue = fromValue
+                    const endValue = fromValue + valueRange * (1 / remainingSections)
+                    // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
+                    return [startValue, endValue]
+                }
+            }
+        }
+        // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
+        return [currentValue, currentValue]
     }
 
     function nextInFlow(): FlowStep | undefined {
@@ -121,33 +180,41 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             case flowinfo == undefined: {
                 console.error(`missing lookup table`)
                 return undefined
-                break
             }
             case !cursor: {
                 // Start of playback sequence: return the first measure
+                const [sysIdx, sectIdx] = [startIndex, 0]
                 cursor = {
-                    sysIdx: startIndex,
-                    sectIdx: 0,
+                    sysIdx: sysIdx,
+                    sectIdx: sectIdx,
                     lastSystem: playbackType == 'single' || score.systems.length == 1,
-                    lastSection: flowinfo[0].maxSectIdx == 1
+                    lastSection: flowinfo[0].maxSectIdx == 1,
+                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, defaultTempo),
+                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, defaultDynamics)
                 }
+                flowinfo[sysIdx].pass += 1
+                flowinfo[sysIdx].loop += 1
                 break
             }
             case cursor!.sectIdx < flowinfo![cursor!.sysIdx].maxSectIdx: {
+                // Next section, same system
+                const [sysIdx, sectIdx] = [cursor.sysIdx, cursor.sectIdx + 1]
                 cursor = {
-                    sysIdx: cursor.sysIdx,
-                    sectIdx: cursor.sectIdx + 1,
+                    sysIdx: sysIdx,
+                    sectIdx: sectIdx,
                     lastSystem: cursor.lastSystem,
-                    lastSection: cursor!.sectIdx + 1 == flowinfo[cursor.sysIdx].maxSectIdx
+                    lastSection: sectIdx == flowinfo[sysIdx].maxSectIdx,
+                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, cursor.tempo[1]),
+                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, cursor.dynamics[1])
                 }
                 break
             }
             case cursor!.sectIdx >= flowinfo![cursor!.sysIdx].maxSectIdx: {
                 // Reached end of system. Determine next system.
                 if (playbackType == 'single') return undefined
-                const gotoIdx = getGotoId(cursor.sysIdx)
-                if (gotoIdx == undefined && cursor.sysIdx >= score.systems.length - 1) return undefined
-                const nextSysIdx = gotoIdx != undefined ? gotoIdx : cursor.sysIdx + 1
+                // Check if a goto item is applicable. Otherwise, take next system in sequence.
+                const nextSysIdx = getNextSystemInFlow(cursor.sysIdx, cursor.lastSystem)
+                if (nextSysIdx == undefined) return undefined
                 // Update pass and loop counters
                 if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].loop += 1
                 else {
@@ -156,11 +223,14 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     flowinfo[nextSysIdx].pass += 1
                     flowinfo[nextSysIdx].loop += 1
                 }
+                const [sysIdx, sectIdx] = [nextSysIdx, 0]
                 cursor = {
-                    sysIdx: nextSysIdx,
-                    sectIdx: 0,
-                    lastSystem: cursor.sysIdx == score.systems.length - 1,
-                    lastSection: cursor!.sectIdx + 1 == flowinfo[cursor.sysIdx].maxSectIdx
+                    sysIdx: sysIdx,
+                    sectIdx: sectIdx,
+                    lastSystem: sysIdx == score.systems.length - 1,
+                    lastSection: sectIdx == flowinfo[sysIdx].maxSectIdx,
+                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, cursor.tempo[1]),
+                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, cursor.dynamics[1])
                 }
                 break
             }
@@ -170,10 +240,13 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         if (cursor) {
             const system = score.systems[cursor.sysIdx]
             const measures = _.fromPairs(_.toPairs(system.staffs).map(([key, staff]) => [key, staff[cursor!.sectIdx]]))
+            debug(`CURSOR [pass=${flowinfo[cursor.sysIdx].pass}]: ${JSON.stringify(cursor)}`)
             return {
                 system: flowinfo[cursor.sysIdx].system,
                 measures: measures as Record<Position, EditorMeasure>,
                 positions: score.positions,
+                tempo: cursor.tempo,
+                dynamics: cursor.dynamics,
                 sectionIdx: cursor.sectIdx,
                 lastSystem: cursor.sysIdx == score.systems.length - 1 || playbackType == 'single',
                 lastSection: cursor.sectIdx == flowinfo[cursor.sysIdx].maxSectIdx

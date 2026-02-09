@@ -42,11 +42,11 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             const current = length == 'long' ? 'current ' : ''
             const itemtype = length == 'long' ? `${item.type} ` : ''
             if (item.type == 'tempo') {
-                const isGradual = item.isGradual && item.fromBPM != item.toBPM
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromBPM ? `${current}→` : item.fromBPM + '→') : ''}${item.toBPM} BPM`
+                const isGradual = item.isGradual && item.fromValue != item.toValue
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromValue ? `${current}→` : item.fromValue + '→') : ''}${item.toValue} BPM`
             } else {
                 const isGradual = item.isGradual && item.fromDynamics != item.toDynamics
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? 'Current →' : item.fromDynamics + '→') : ''}${item.toDynamics}`
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.toDynamics}`
             }
             const multipleSections = item.isGradual && item.fromSection != item.toSection
             instruction =

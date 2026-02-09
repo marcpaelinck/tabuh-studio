@@ -1,4 +1,5 @@
-import type { Note, Position } from '../models/types'
+import type { BPM } from 'tone/build/esm/core/type/Units'
+import type { DynamicsValue, Note, Position } from '../models/types'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 
 // TAILWIND STYLES
@@ -86,6 +87,17 @@ export const partColorPalette: ColorName[] = [
 ]
 
 // PLAYER
+
+export const defaultTempo: BPM = 60
+export const defaultDynamics: number = 0.67 // mf
+export const dynamicsToNumber: Record<DynamicsValue, number> = {
+    pp: 0.24,
+    p: 0.35,
+    mp: 0.5,
+    mf: 0.67,
+    f: 0.83,
+    ff: 1.0
+}
 
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]

@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import { positionConfigs } from '../config/config'
+import { defaultTempo, positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     EditorCursorAction,
@@ -41,7 +41,6 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
     const timeline: TimeLine = {
         totalDurationSec: 0,
         totalDurationTO: n2TO(0),
-        initialBPM: 60, // Update after BPM and velocity have been added to EditorSystemData
         tempoactions: [],
         sampleractions: [],
         animationactions: [],
@@ -53,7 +52,6 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
 
     const { nextInFlow } = executionManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
 
-    const velocity = 0.7 // Update after BPM and velocity have been added to EditorSystemData
     var prevSystem: EditorSystem | undefined = undefined
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
         Object.keys(positionConfigs).map((key) => [key, null])
@@ -83,7 +81,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
                         // Need to close and save the currently 'playing' note.
                         // Add a basenote duration if the last symbol of the staff is an extension
                         const addDuration = isExtension(symbol) ? 1 : 0
-                        // Update the current note's sampler action and save it to the timeline.
+                        // TODO: Update the current note's sampler action and save it to the timeline.
                         currNote[position].duration = n2TO(currTime - TO2n(currNote[position].time) + addDuration)
                         currNote[position].isLast = endOfPosition && isExtension(symbol)
                         timeline.sampleractions.push(currNote[position])
@@ -95,8 +93,12 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
                             action: pbAction.actionFunctions!.play,
                             position: position,
                             cleanedSymbol: cleanSymbol(symbol),
-                            bpm: measure.tempo[0] + (symidx / notation.length) * (measure.tempo[1] - measure.tempo[0]),
-                            velocity: velocity,
+                            bpm:
+                                current!.tempo[0] +
+                                (symidx / notation.length) * (current!.tempo[1] - current!.tempo[0]),
+                            velocity:
+                                current!.dynamics[0] +
+                                (symidx / notation.length) * (current!.dynamics[1] - current!.dynamics[0]),
                             time: n2TO(currTime),
                             duration: n2TO(1), // can be updated later
                             isLast: endOfPosition // can be updated later
@@ -107,6 +109,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
                         }
                     }
                 }
+                if (position == 'UGAL') debug(`CURRNOTE: ${JSON.stringify(currNote)}`)
                 // Create a cursor action
                 if (pbAction.actionFunctions!.playercursor) {
                     timeline.playercursoractions.push({
@@ -159,7 +162,7 @@ export function createPlaybackSchedule(timeLine: TimeLine | undefined, pbSpeed: 
 
     // Tempo and instrument actions (notes)
     // Set the initial tempo to 60 (intro time)
-    const tAction: TempoAction = { time: { '16n': 0 }, bpm: timeLine.initialBPM, duration: { '16n': 0 } }
+    const tAction: TempoAction = { time: { '16n': 0 }, bpm: defaultTempo, duration: { '16n': 0 } }
     Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
     timeLine.sampleractions.forEach((sAction: SamplerAction) => {
         Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)

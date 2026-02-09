@@ -1,25 +1,52 @@
 import { type Dispatch, type ElementType } from 'react'
 import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps } from 'rsuite'
-import { CheckPicker, Form, InputPicker, Toggle } from 'rsuite'
+import {
+    ArrayType,
+    BooleanType,
+    CheckPicker,
+    Form,
+    InputPicker,
+    NumberType,
+    SchemaModel,
+    StringType,
+    Toggle
+} from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
-import type { ExecutionItemType } from '../../models/types'
+import type { DynamicsValue, ExecutionItemType } from '../../models/types'
 
 export interface FormValueType {
-    type: any
-    targetuuid?: any
-    count?: any
-    fromBPM?: any
-    toBPM?: any
-    fromDynamics?: any
-    toDynamics?: any
-    fromSection?: any
-    toSection?: any
-    isGradual?: any
-    passes?: any
-    each?: any
+    type?: ExecutionItemType | ''
+    targetuuid?: string
+    count?: number
+    fromBPM?: number
+    toBPM?: number
+    fromDynamics?: DynamicsValue
+    toDynamics?: DynamicsValue
+    fromSection?: number
+    toSection?: number
+    isGradual?: boolean
+    passes?: number[]
+    each?: boolean
     checkbox?: any
 }
+
+const ifGradual = (value: any, data: FormValueType) => data.isGradual == true && value != undefined
+
+export const formModel = SchemaModel({
+    targetuuid: StringType().isRequired('This field is required.'),
+    count: NumberType().isInteger().isRequired(),
+    fromBPM: NumberType().isInteger().addRule(ifGradual, 'from value must be given.'),
+    toBPM: NumberType().isInteger().isRequired('value must be given'),
+    fromDynamics: StringType().addRule(ifGradual, 'from value must be given.'),
+    toDynamics: StringType().isRequired('value must be given'),
+    fromSection: NumberType().isInteger().addRule(ifGradual, 'from value must be given.'),
+    toSection: NumberType().isInteger().isRequired('section must be given'),
+    isGradual: BooleanType().isRequired(),
+    passes: ArrayType(),
+    each: BooleanType(),
+    checkbox: BooleanType()
+})
 
 const formFieldNames = {
     type: 'type',

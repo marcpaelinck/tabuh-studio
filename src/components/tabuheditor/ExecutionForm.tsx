@@ -4,6 +4,7 @@ import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, Form, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import { dynamicsToNumber } from '../../config/config'
 import { executionItemTooltip } from '../../hooksandmanagers/useEditorScoreManager'
 import type {
     DynamicsItem,
@@ -15,7 +16,7 @@ import type {
     TempoItem
 } from '../../models/types'
 import { debug } from '../../utils/debugger'
-import ExecutionItemForm, { type FormValueType } from './ExecutionItemForm'
+import ExecutionItemForm, { formModel, type FormValueType } from './ExecutionItemForm'
 
 type ExecutionItemDefault = {
     type?: ExecutionItemType
@@ -157,7 +158,7 @@ interface ExecutionFormProps extends FormProps {
 export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, onSave, ...props }: ExecutionFormProps) {
     const [itemList, setItemList] = useState<ExecutionItemDefault[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
-    const [formValue, setFormValue] = useState<FormValueType>({ type: '' })
+    const [formValue, setFormValue] = useState<FormValueType>({} as FormValueType)
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
@@ -173,8 +174,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
         if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
         if (selectedItem.type == 'tempo') {
-            newFormValue.fromBPM = selectedItem.fromBPM
-            newFormValue.toBPM = selectedItem.toBPM
+            newFormValue.fromBPM = selectedItem.fromValue
+            newFormValue.toBPM = selectedItem.toValue
             newFormValue.isGradual = selectedItem.isGradual
             newFormValue.fromSection = selectedItem.fromSection
             newFormValue.toSection = selectedItem.toSection
@@ -204,28 +205,30 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         if (selectedItem.type == 'goto') {
             newItem = newItem as GotoItem
             newItem.targetuuid = formValue.targetuuid || ''
-            newItem.targetname = uuidToNameLookup[formValue.targetuuid]
-            debug(`TARGETUUID=${formValue.targetuuid} TARGETNAME=${uuidToNameLookup[formValue.targetuuid]}`)
+            if (formValue.targetuuid) newItem.targetname = uuidToNameLookup[formValue.targetuuid]
         }
         if (selectedItem.type == 'loop') {
             newItem = newItem as LoopItem
-            newItem.count = formValue.count
+            if (formValue.count) newItem.count = formValue.count
         }
         if (selectedItem.type == 'tempo') {
             newItem = newItem as TempoItem
-            newItem.fromBPM = formValue.fromBPM
-            newItem.toBPM = formValue.toBPM
-            newItem.isGradual = formValue.isGradual
+            newItem.fromValue = formValue.fromBPM ? Number(formValue.fromBPM) : undefined
+            newItem.toValue = Number(formValue.toBPM)
+            newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
-            newItem.toSection = formValue.toSection
+            if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
+            debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.toValue}`)
         }
         if (selectedItem.type == 'dynamics') {
             newItem = newItem as DynamicsItem
             newItem.fromDynamics = formValue.fromDynamics
-            newItem.toDynamics = formValue.toDynamics
-            newItem.isGradual = formValue.isGradual
+            newItem.fromValue = newItem.fromDynamics ? dynamicsToNumber[newItem.fromDynamics] : undefined
+            if (formValue.toDynamics != undefined) newItem.toDynamics = formValue.toDynamics
+            newItem.toValue = dynamicsToNumber[newItem.toDynamics]
+            newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
-            newItem.toSection = formValue.toSection
+            if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
         }
         newItem = {
             ...newItem,
@@ -293,7 +296,11 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
                     setItemList={setItemList}
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
-                <Form onChange={(val) => setFormValue(val as FormValueType)} formValue={formValue} {...props}>
+                <Form
+                    model={formModel}
+                    onChange={(val) => setFormValue(val as FormValueType)}
+                    formValue={formValue}
+                    {...props}>
                     {/* Details of the selected execution item */}
                     <ExecutionItemForm
                         type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}

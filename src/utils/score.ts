@@ -110,7 +110,6 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
     const timeline: TimeLine = {
         totalDurationSec: 0,
         totalDurationTO: n2TO(0),
-        initialBPM: 60, // Update after BPM and velocity have been added to EditorSystemData
         tempoactions: [],
         sampleractions: [],
         animationactions: [],
