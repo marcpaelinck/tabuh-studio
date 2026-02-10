@@ -249,7 +249,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
             setDashboardElement('score', {
                 visible: true,
                 text: importedScore.title,
-                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}\ncomposer: ${importedScore.uuid}`
+                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}\nuuid: ${importedScore.uuid}`
             })
         }
     }, [importedScore])
