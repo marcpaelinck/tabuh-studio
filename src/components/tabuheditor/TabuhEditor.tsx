@@ -1,6 +1,7 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
+import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import _ from 'lodash'
 import { useContext, useEffect, useRef, useState, type Dispatch } from 'react'
@@ -8,19 +9,23 @@ import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Box,
     Button,
+    Col,
     Container,
     Content,
     Form,
+    Grid,
     Header,
     HStack,
     IconButton,
     Modal,
     PasswordInput,
     Popover,
+    Row,
     SchemaModel,
     Sidebar,
     Sidenav,
     StringType,
+    Toggle,
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
@@ -63,7 +68,6 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
     const wpFunc = useContext(WpApiFunctions)
 
     const handleSubmit = async () => {
-        console.log(`logging`)
         console.log(`login=${await wpFunc.user.login(formValue.username as string, formValue.password as string)}`)
         if (!formRef.current) return
         if (!formRef.current.check()) {
@@ -71,7 +75,7 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
             return
         }
         wpFunc.user.login(formValue.username as string, formValue.password as string).then((result) => {
-            console.log(`login=${JSON.stringify(result)}`)
+            // console.log(`login=${JSON.stringify(result)}`)
             if (result && !('error' in result) && 'user' in result) {
                 setUser(result.user)
                 setOpen(false)
@@ -163,14 +167,15 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
 }
 interface TabuhEditorProps {
     dataSource: 'database' | 'file'
-    active: 'editor' | 'player'
 }
-export function TabuhEditor({ dataSource, active }: TabuhEditorProps) {
+export function TabuhEditor({ dataSource }: TabuhEditorProps) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [user, setUser] = useState<WpUserRecord | undefined>(undefined)
+    const [active, setActive] = useState<'editor' | 'player'>('player')
+
     // const [initialize, setInitialize] = useState<boolean>(true)
 
     //DASHBOARD WARNINGS
@@ -210,15 +215,14 @@ export function TabuhEditor({ dataSource, active }: TabuhEditorProps) {
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
-        const newDashboardValue: DashboardValues = { ...dashboardValues }
-        newDashboardValue[name] = { visible: true, level: value.level, text: value.text, tooltip: value.tooltip }
-        setDashboardValues(newDashboardValue)
+        const newDashboardValues: DashboardValues = { ...dashboardValues }
+        newDashboardValues[name] = value
+        setDashboardValues(newDashboardValues)
     }
     function clearDashboardElement(name: ComponentName) {
-        const newDashboardValue: DashboardValues = { ...dashboardValues }
-        newDashboardValue[name] = { visible: false, tooltip: '' }
-        debug(`Dashboard=${JSON.stringify(newDashboardValue)}`)
-        setDashboardValues(newDashboardValue)
+        const newDashboardValues: DashboardValues = { ...dashboardValues }
+        newDashboardValues[name] = { visible: false }
+        setDashboardValues(newDashboardValues)
     }
 
     // On initial render, check if the user is logged in to the WordPress site and set state accordingly.
@@ -239,17 +243,14 @@ export function TabuhEditor({ dataSource, active }: TabuhEditorProps) {
         if (importedScore) {
             updateScore(importedScore)
             // UPDATE DASHBOARD
-            const newDashboardValue: DashboardValues = { ...defaultDashboardValues }
             const validation = cycleValidation(importedScore, true)
             if (!validation.isValid)
-                newDashboardValue['cycle'] = { visible: true, tooltip: validation.message, level: 'error' }
-            newDashboardValue['score'] = {
+                setDashboardElement('cycle', { visible: true, tooltip: validation.message, level: 'error' })
+            setDashboardElement('score', {
                 visible: true,
                 text: importedScore.title,
                 tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}\ncomposer: ${importedScore.uuid}`
-            }
-            debug(`Dashboard values=${JSON.stringify(newDashboardValue)}`)
-            setDashboardValues(newDashboardValue)
+            })
         }
     }, [importedScore])
 
@@ -270,15 +271,36 @@ export function TabuhEditor({ dataSource, active }: TabuhEditorProps) {
             <ScoreFunctions value={scoreFunctions}>
                 <Container id="main" height="80vh">
                     <Container id="header+content">
-                        <Header id="header">
-                            <HStack spacing={16} align="center" p="1rem">
-                                <Button
-                                    appearance="primary"
-                                    startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
-                                    onClick={() => expandAll(buttonIsExpand)}
-                                />
-                                <Dashboard values={dashboardValues} />
-                            </HStack>
+                        <Header id="header" className="flex">
+                            {/* <HStack spacing={16} align="center" p="1rem"> */}
+                            <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
+                                <Row align="middle">
+                                    <Col span={1} align="left">
+                                        <Button
+                                            appearance="primary"
+                                            startIcon={
+                                                buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />
+                                            }
+                                            size="sm"
+                                            onClick={() => expandAll(buttonIsExpand)}
+                                        />
+                                    </Col>
+                                    <Col span={22}>
+                                        <Dashboard values={dashboardValues} />
+                                    </Col>
+                                    <Col span={1}>
+                                        <Toggle
+                                            size={'lg'}
+                                            color="violet"
+                                            checkedChildren={<ExpandOutlineIcon />}
+                                            unCheckedChildren={<EditIcon />}
+                                            defaultChecked
+                                            onChange={(checked) => setActive(checked ? 'player' : 'editor')}
+                                        />
+                                    </Col>
+                                </Row>
+                            </Grid>
+                            {/* </HStack> */}
                         </Header>
                         <Content id="content" px="1rem" className="h-9/10">
                             <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>

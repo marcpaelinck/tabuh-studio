@@ -51,7 +51,7 @@ export function MeasureNode({
         navFunc.register(rowId, colId, ref)
         // Edits are cached until the user saves their changes.
         // Display the cached value if previous edits have not yet been saved.
-        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.map((symbol) => symbol).join('')
+        if (measure.notation_ && ref.current) ref.current.value = measure.notation_.join('')
         highlightOnChangedContent(ref.current)
     }, [])
 
@@ -66,7 +66,8 @@ export function MeasureNode({
     // Highlight the cell background if the content has been modified by the user.
     const highlightOnChangedContent = (cell: HTMLTextAreaElement | null) => {
         if (!cell) return
-        const changed = measure.notation_ && measure.notation_.map((symbol) => symbol).join('') != props.defaultValue
+        // const changed = measure.notation_ && measure.notation_.join('') != measure.notation.join('')
+        const changed = cell.value != measure.notation.join('')
         const classes = ['bg-amber-100']
         classes.forEach((value) => {
             if (changed && !cell.classList.contains(value)) cell.classList.add(value)
@@ -81,7 +82,7 @@ export function MeasureNode({
             false,
             'MeasureNode'
         )
-        if (!ref.current || ref.current.value == measure.notation.join('')) return
+        if (!ref.current) return
         debug(`updating!`, false, 'MeasureNode')
         const newMeasure = { ...measure }
         newMeasure.notation_ = parseNotationText(ref.current.value, validRegExpCell)

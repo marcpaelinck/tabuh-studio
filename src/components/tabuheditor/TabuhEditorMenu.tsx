@@ -60,7 +60,7 @@ export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }:
     const dialog = useDialog()
     const wpFunc = useContext(WpApiFunctions)
 
-    useEffect(() => console.log(`SCORELIST=${JSON.stringify(scoreList)}`), [scoreList])
+    // useEffect(() => console.log(`SCORELIST=${JSON.stringify(scoreList)}`), [scoreList])
 
     const showTextInDialog = async (payload: string) => {
         //@ts-ignore

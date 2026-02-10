@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
+import { useDialog } from 'rsuite'
 import { v4 as uuidv4 } from 'uuid'
 import { type DashboardFunctionsType } from '../components/tabuheditor/contexts'
 import type { EditorScore, EditorSystem, ExecutionItem } from '../models/types'
@@ -112,6 +113,8 @@ function gotoItemTargetName(destination: EditorSystem) {
 export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType) {
     const [editorScore, setEditorScore] = useState<EditorScore | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
+    const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
+    const dialog = useDialog()
 
     function updateScore(score: EditorScore) {
         // Convert new score to data record structure
@@ -124,6 +127,33 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
     }
 
     useEffect(() => {
+        if (indexedDb) return
+        // Create a temporary Indexed database in the browser that will always contain the
+        // latest version of the score currently being edited. To be used for recovery purposes.
+        // See https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+        const dbDeleteRequest: IDBOpenDBRequest = window.indexedDB.deleteDatabase('TabuhStudio')
+        dbDeleteRequest.onsuccess = (event) => {
+            const dbOpenRequest: IDBOpenDBRequest = window.indexedDB.open('TabuhStudio', 1)
+            dbOpenRequest.onupgradeneeded = (event) => {
+                // Save the IDBDatabase interface
+                const db = dbOpenRequest.result
+                // Create an objectStore for this database
+                debug('Creating object store')
+                db.createObjectStore('Score', { keyPath: 'uuid' })
+            }
+            dbOpenRequest.onsuccess = () => {
+                const db = dbOpenRequest.result
+                setIndexedDb(db)
+                // TODO replace this alert with an icon in the Dashboard.
+                dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'info' })
+            }
+            dbOpenRequest.onerror = () =>
+                // TODO replace this alert with an icon in the Dashboard.
+                dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'warning' })
+        }
+    }, [])
+
+    useEffect(() => {
         // (Re-) number the system index and id values.
         // Should be performed at each render due to possible user actions (insert or delete system).
         if (!editorScore) return
@@ -133,6 +163,26 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             systemData.id = systemData.index + 1
             if (systemData.execution) executionitems.push(...systemData.execution)
         })
+
+        // Store the score object in the browser's IDB Database, for recovery purposes.
+        if (indexedDb) {
+            const transaction = indexedDb.transaction('Score', 'readwrite')
+            const request = transaction.objectStore('Score').put(editorScore)
+            var dateStr = new Date().toString().replace(/ GMT.*$/, '')
+            request.onsuccess = () =>
+                dashboardFunctions.setDashboardElement('localCache', {
+                    visible: true,
+                    level: 'info',
+                    tooltip: `${dateStr}\nSaved to local cache`
+                })
+            request.onerror = () =>
+                dashboardFunctions.setDashboardElement('localCache', {
+                    visible: true,
+                    level: 'warning',
+                    tooltip: `${dateStr}\nCould not save the current status to local storage.`
+                })
+        } else dialog.alert('No score store.', { title: 'Warning' })
+
         // Update the goto display values.
         debug('updating flow items')
         executionitems.forEach((item) => {

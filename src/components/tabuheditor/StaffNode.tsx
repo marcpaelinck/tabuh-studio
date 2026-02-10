@@ -42,7 +42,7 @@ export function StaffNode({
                             validSymbols={validSymbols}
                             measureData={measure}
                             systemData={systemData}
-                            defaultValue={measure.notation.map((symbol) => symbol).join('')}
+                            defaultValue={measure.notation.join('')}
                             style={{ width: width }}
                             className={`balifont10 h-5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             spellCheck="false"
