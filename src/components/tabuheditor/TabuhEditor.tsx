@@ -3,6 +3,7 @@ import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
 import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
+import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
 import { useContext, useEffect, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
@@ -292,7 +293,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
                                         <Toggle
                                             size={'lg'}
                                             color="violet"
-                                            checkedChildren={<ExpandOutlineIcon />}
+                                            checkedChildren={<PlayOutlineIcon />}
                                             unCheckedChildren={<EditIcon />}
                                             defaultChecked
                                             onChange={(checked) => setActive(checked ? 'player' : 'editor')}
