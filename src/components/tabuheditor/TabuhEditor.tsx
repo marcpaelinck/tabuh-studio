@@ -244,7 +244,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
         if (importedScore) {
             updateScore(importedScore)
             // UPDATE DASHBOARD
-            const validation = cycleValidation(importedScore, true)
+            const validation = cycleValidation(importedScore)
             if (!validation.isValid)
                 setDashboardElement('cycle', { visible: true, tooltip: validation.message, level: 'error' })
             setDashboardElement('score', {

@@ -33,9 +33,9 @@ const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: 
 export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boolean): TimeLine | undefined {
     // Check that all necessary data is being passed
     debug(
-        `creating timeline ${pbAction.playbackType} totSystems=${pbAction.data?.systems.length} startAtIndex=${pbAction.systemIndex} functions OK: ${pbAction.actionFunctions != undefined}`
+        `creating timeline ${pbAction.playbackType} totSystems=${pbAction.score?.systems.length} startAtIndex=${pbAction.systemIndex} functions OK: ${pbAction.actionFunctions != undefined}`
     )
-    if (!(pbAction.playbackType && pbAction.data && pbAction.systemIndex != undefined && pbAction.actionFunctions))
+    if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined && pbAction.actionFunctions))
         return undefined
 
     const timeline: TimeLine = {
@@ -50,7 +50,7 @@ export function createTimelineFromEditor(pbAction: PlaybackAction, useCache: boo
         notation: {} as Record<Position, any>
     }
 
-    const { nextInFlow } = executionManager(pbAction.data, pbAction.systemIndex, pbAction.playbackType)
+    const { nextInFlow } = executionManager(pbAction.score, pbAction.systemIndex, pbAction.playbackType)
 
     var prevSystem: EditorSystem | undefined = undefined
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(

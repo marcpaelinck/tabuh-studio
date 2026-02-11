@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import type { Dispatch, HTMLAttributes, RefObject } from 'react'
 import { Profiler, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import { Accordion, Col, Grid, Placeholder, Row } from 'rsuite'
+import { Accordion, Col, Grid, Placeholder, Row, useDialog } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { editorInitialExpandState } from '../../config/config'
@@ -57,6 +57,14 @@ export default function EditorWindow({
     const pbCurrUuid = playbackState.cursor.sysUuid
     const pbType = playbackState.playbackType
     const pbAudioState = playbackState.audioState
+    const dialog = useDialog()
+
+    useEffect(() => {
+        if (playbackState.audioState == 'error') {
+            dialog.alert(playbackState.message || 'Playback is not possible, reason unknown.', { title: 'Warning' })
+            playback({ actionType: 'reseterror' })
+        }
+    }, [playbackState])
 
     function flipExpanded(uuid: string) {
         setExpanded({ ...expanded, ...Object.fromEntries([[uuid, !expanded[uuid]]]) })

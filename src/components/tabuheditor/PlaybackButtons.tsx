@@ -76,7 +76,7 @@ export function PlaybackButtons({
             playback({
                 actionType: 'load',
                 playbackType: pbType,
-                data: score,
+                score: score,
                 systemIndex: index,
                 audiofunctions: Object.assign(audio, { moveEditorCursor, genericFunction: stopPlayback })
             })

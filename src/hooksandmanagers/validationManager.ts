@@ -150,7 +150,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
 }
 
 // Detects the presence of a closed loop. Returns true if no loops were detected.
-export function cycleValidation(score: EditorScore, includeMessage: boolean = false): ValidationResult {
+export function cycleValidation(score: EditorScore): ValidationResult {
     if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
     return simulatePlayback(score, transitions)

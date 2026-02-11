@@ -4,21 +4,29 @@ import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import type { ActionFunctions, EditorCellCursor, EditorScore } from '../models/types'
 import { debug } from '../utils/debugger'
 import { createPlaybackSchedule, createTimelineFromEditor } from './playbackManager'
+import { cycleValidation } from './validationManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
-export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor'
-export type AudioState = 'nodata' | 'playing' | 'paused' | 'stopped'
+export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor' | 'reseterror'
+export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
 
-export type PlaybackState = { cursor: EditorCellCursor; audioState: AudioState; playbackType: PlaybackType }
+export type PlaybackState = {
+    cursor: EditorCellCursor
+    audioState: AudioState
+    playbackType: PlaybackType
+    message?: string
+}
 export type PlaybackAction = {
     actionType: ActionType
     playbackType?: PlaybackType
-    data?: EditorScore
+    score?: EditorScore
     systemIndex?: number
     audiofunctions?: AudioFunctionsType
     actionFunctions?: ActionFunctions
     cursor?: EditorCellCursor
 }
+// const dialog = useDialog()
+
 async function asyncPlay() {
     if (Tone.getContext().state == 'suspended') {
         Tone.start()
@@ -34,28 +42,38 @@ async function asyncPlay() {
 export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
-            debug(`executing 'load'`)
-            if (action.data && action.audiofunctions) {
-                debug(`loading data for sys ${action.data.systems[0].id}`)
-                const loadAction = {
-                    ...action,
-                    actionFunctions: {
-                        play: action.audiofunctions.playInstrument,
-                        animate: null,
-                        editorcursor: action.audiofunctions.moveEditorCursor,
-                        generic: action.audiofunctions.genericFunction
-                    }
-                }
-                const timeLine = createTimelineFromEditor(loadAction, true)
-                createPlaybackSchedule(timeLine)
-                debug({ ...state, audioState: 'stopped' }, true)
-                return { ...state, audioState: 'stopped' }
+            if (!action.score || !action.audiofunctions) {
+                console.error('audio reducer: action is "load" but data or functions are missing.')
+                return { ...state, cursor: noCursor, audioState: 'nodata' }
             }
-            console.error('audio reducer: action is "load" but data or functions are missing.')
-            return { ...state, cursor: noCursor, audioState: 'nodata' }
+
+            const validation = cycleValidation(action.score)
+            if (!validation.isValid) {
+                debug('validating')
+                // dialog.alert(validation.message, { title: 'Warning' })
+                return { ...state, cursor: noCursor, audioState: 'error', message: validation.message }
+            }
+
+            debug(`executing 'load'`)
+            debug(`loading data for sys ${action.score.systems[0].id}`)
+            const loadAction = {
+                ...action,
+                actionFunctions: {
+                    play: action.audiofunctions.playInstrument,
+                    animate: null,
+                    editorcursor: action.audiofunctions.moveEditorCursor,
+                    generic: action.audiofunctions.genericFunction
+                }
+            }
+
+            const timeLine = createTimelineFromEditor(loadAction, true)
+            createPlaybackSchedule(timeLine)
+            debug({ ...state, audioState: 'stopped' }, true)
+            return { ...state, audioState: 'stopped' }
         }
         case 'play': {
             debug(`executing 'play'`)
+            if (!['stopped', 'paused'].includes(state.audioState)) return { ...state }
             if (action.playbackType) {
                 asyncPlay()
                 debug({ ...state, audioState: 'playing', playbackType: action.playbackType }, true)
@@ -84,6 +102,10 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
             }
             console.error('audio reducer: action is "cursor" but cursor attribute is missing.')
             return state
+        case 'reseterror': {
+            debug(`resetting error`)
+            return { ...state, audioState: 'stopped', message: undefined }
+        }
         default:
             return state
     }
