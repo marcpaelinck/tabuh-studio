@@ -26,6 +26,8 @@ export type UUID = string
 
 // NOTATION
 
+type NoteSymbol = string
+
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
     octave: number | null // Scale always start with DING.
@@ -36,7 +38,7 @@ export type Note = {
 export type JsonNote = {
     sysUuid: UUID
     section: number
-    s: string
+    s: NoteSymbol
     t: number // attack time in base notes
     ms: number // attack time in ms
     d: number
@@ -47,7 +49,7 @@ export type JsonNote = {
 export type JsonSymbol = {
     sysUuid: UUID
     sectionId: number
-    s: string
+    s: NoteSymbol
     t: number // attack time in base notes
     d: number
 }
@@ -74,7 +76,7 @@ export type Section = {
 
 // Subdivision of a score, typically spans one gongan
 export type System = {
-    uuid: string // unique, fixed uuid.
+    uuid: UUID // unique, fixed uuid.
     id: number // // Sequence number, used as identification in the UI. Can change when systems are added/removed/sorted.
     gongan: number // ID from the `gamelan-notation` python application. Unused in this application.
     starttime: number // start time of first section
@@ -87,7 +89,7 @@ export type Score = { title: string; composer: string; durationMs: number; syste
 
 export type ScoreInfo = {
     title: string
-    uuid: string
+    uuid: UUID
     instrumentgroup: string
     file: string
     notationversion: string
@@ -258,7 +260,7 @@ export interface SamplerAction {
     action: SamplerFunction
     time: BaseNoteTimeObj
     position: Position
-    cleanedSymbol: string
+    cleanedSymbol: NoteSymbol
     bpm: number
     velocity: Tone.Unit.NormalRange
     duration: BaseNoteTimeObj
@@ -294,8 +296,8 @@ export type PlayerCursorAction = {
     time: BaseNoteTimeObj
     position: Position
     section: number
-    sysuuid: string
-    symbol: string
+    sysuuid: UUID
+    symbol: NoteSymbol
     line: number
     range: number[]
 }
