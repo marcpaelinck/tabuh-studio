@@ -1242,7 +1242,7 @@
                     "toSection": "3",
                     "toDynamics": "mf",
                     "toValue": 0.67,
-                    "tooltip": "dynamics current →mf beat 1→3",
+                    "tooltip": "dynamics →mf beat 1→3",
                     "tooltipshort": "→mf",
                     "seqId": 0,
                     "fromSection": "1"
