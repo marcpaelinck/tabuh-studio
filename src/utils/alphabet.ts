@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { ignoreChars, positionConfigs } from '../config/config'
-import type { Position } from '../models/types'
+import type { NoteSymbol, Position } from '../models/types'
 
 export const getValidSymbols = (position: Position, includeSilences: boolean = false): string[] => {
     const valids = Object.keys(positionConfigs[position].symbolToNoteNames)
@@ -74,4 +74,20 @@ export function parseNotationText(text: string, validRegExpCell: RegExp): string
     const notation = [...matches.map((el) => el[0])]
     if (text && notation.join('') != text) throw new Error(`invalid notation ${text}`)
     return notation
+}
+
+export function sortNotes(values: NoteSymbol[], ascending: boolean = true) {
+    const order = ['i,', 'o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i>', 'o>', 'e>', 'u>', 'a>']
+    const compare = (n1: string, n2: string) => {
+        n1 = n1.length == 1 ? n1 : n1[1] in [',', '<'] ? n1.slice(0, 2) : n1[0]
+        n2 = n1.length == 1 ? n2 : n2[1] in [',', '<'] ? n2.slice(0, 2) : n2[0]
+        if (!(n1 in order && n2 in order)) return 0
+        return ascending ? order.indexOf(n1) - order.indexOf(n2) : order.indexOf(n2) - order.indexOf(n1)
+    }
+    return values.sort(compare)
+}
+
+export function noteRange(position: Position, invert: boolean = false) {
+    const range = _.keys(positionConfigs[position].symbolToNoteNames).filter((sym) => /^[aeiou][,<]{0,1}$/.test(sym))
+    return sortNotes(range)
 }

@@ -3,7 +3,7 @@ import * as Tone from 'tone'
 import {
     alwaysFocusPositions,
     AVERAGE_ATTACK_DELAY,
-    BaseNote,
+    baseNoteSubdivision,
     defaultOutroTime,
     dimRateNonFocusedInstruments,
     NOTES,
@@ -100,7 +100,7 @@ const createInstrument = (
                 //TODO Do not extend the last note when looping from the last note.
                 if (action.isLast) {
                     //@ts-ignore
-                    duration[BaseNote] += millis2BaseNoteEquiv(outroTime, action.bpm)
+                    duration[baseNoteSubdivision] += millis2BaseNoteEquiv(outroTime, action.bpm)
                 }
                 try {
                     sampler?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)

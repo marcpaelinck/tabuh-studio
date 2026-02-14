@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
-import type { BaseNoteTimeObj, MutingType, StrokeType, ToneType } from '../config/config'
+import type { TimeObject } from 'tone/build/esm/core/type/Units'
+import type { MutingType, StrokeType, ToneType } from '../config/config'
 
 // INSTRUMENTS / AUDIO
 export type Instrument = { id: string; name: string; alphabet: string[] }
@@ -26,7 +27,10 @@ export type UUID = string
 
 // NOTATION
 
-type NoteSymbol = string
+export type NoteSymbol = string
+export type BPM = number
+export type TimeInBasenoteEquiv = number
+export type DurationInBasenoteEquiv = number
 
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
@@ -252,48 +256,48 @@ export type AnimationFunction = (time: number, action: AnimationAction) => void
 export type PlayerCursorFunction = (time: number, action: PlayerCursorAction) => void
 export type EditorCursorFunction = (time: number, action: EditorCursorAction) => void
 
-export type GenericAction = { action: GenericFunction; time: BaseNoteTimeObj }
+export type GenericAction = { action: GenericFunction; time: TimeObject }
 
-export type TempoAction = { time: BaseNoteTimeObj; bpm: Tone.Unit.NormalRange; duration: BaseNoteTimeObj }
+export type TempoAction = { time: TimeObject; bpm: Tone.Unit.NormalRange; duration: TimeObject }
 
 export interface SamplerAction {
     action: SamplerFunction
-    time: BaseNoteTimeObj
+    time: TimeObject
     position: Position
     cleanedSymbol: NoteSymbol
     bpm: number
     velocity: Tone.Unit.NormalRange
-    duration: BaseNoteTimeObj
+    duration: TimeObject
     isLast: boolean
 }
 
 export type AnimationNote = {
     sysUuid: UUID
     section: number
-    time: BaseNoteTimeObj
+    time: TimeObject
     keyname: string
     tone: ToneType
     stroke: StrokeType | null
     muting: MutingType
-    duration: BaseNoteTimeObj
+    duration: TimeObject
     isLast: boolean
 }
 
 export type AnimationAction = {
     action: AnimationFunction
-    time: BaseNoteTimeObj
+    time: TimeObject
     position: Position
     prevsysUuid: UUID | null
     prevsection: number | null
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
-    timeuntil: BaseNoteTimeObj
+    timeuntil: TimeObject
     timeuntilMs: number
 }
 
 export type PlayerCursorAction = {
     action: PlayerCursorFunction
-    time: BaseNoteTimeObj
+    time: TimeObject
     position: Position
     section: number
     sysuuid: UUID
@@ -304,7 +308,7 @@ export type PlayerCursorAction = {
 
 export type EditorCursorAction = {
     action: EditorCursorFunction
-    time: BaseNoteTimeObj
+    time: TimeObject
     section: number
     prevsysuuid: UUID | undefined
     sysuuid: UUID
@@ -312,7 +316,7 @@ export type EditorCursorAction = {
 
 export type TimeLine = {
     totalDurationSec: number
-    totalDurationTO: BaseNoteTimeObj // Total duration expressed as BaseNote units
+    totalDurationTO: TimeObject // Total duration expressed as BaseNote units
     tempoactions: TempoAction[]
     sampleractions: SamplerAction[]
     animationactions: AnimationAction[]

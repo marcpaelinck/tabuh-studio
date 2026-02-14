@@ -16,6 +16,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     MeasureNode: false,
     NavigationCell: false,
     PartIndicator: false,
+    patternManager: true,
     PlaybackButtons: { moveEditorCursor: false },
     playbackReducer: false,
     playbackManager: false,
