@@ -38,13 +38,13 @@ const patterns = {
         // The number of notes is fixed and the starting note is given in the notation. If the end of the instrument's range is reached before
         // the entire pattern could be generated, continuation symbols ('-') will be generated for the remaining pattern.
         {
-            number_of_notes: 8, // Minimum is 2. This number will be truncated if there are less notes until the the beginning/end of the instrument's range.
+            number_of_notes: 8, // Minimum is 2. If the instrument's range is exceeded, the remaining notes will be replaced by extension symbols.
             pattern_duration_in_millis: 120, // Total duration of the pattern.
-            note_duration_in_millis: 5000 // sustain time of the notes: the notes will overlap.
+            note_duration_in_millis: 5000 // sustain time of the notes: this will make the notes overlap.
         }
 }
 
-// Returns a list of triplets [note symbol, relative time in basenote units, duration in basenote units]
+// The function expects an object as argument.
 export interface CreatePatternArgs {
     time: TimeInBasenoteEquiv
     position: Position
@@ -52,6 +52,7 @@ export interface CreatePatternArgs {
     bpm: number
     velocity: Tone.Unit.NormalRange
 }
+// Structure of the return value.
 export interface PatternNoteAction {
     time: TimeObject
     duration: TimeObject
@@ -63,7 +64,7 @@ export interface PatternNoteAction {
 export function createPattern(args: CreatePatternArgs): PatternNoteAction[] {
     if (args.cleanedSymbol in positionConfigs[args.position].symbolToNoteNames) {
         // Valid note symbol
-        return doSingleNote(args)
+        return singleNoteAction(args)
     } else if (positionConfigs[args.position].validPatterns.includes(args.cleanedSymbol)) {
         // Valid pattern
         switch (true) {
@@ -71,32 +72,32 @@ export function createPattern(args: CreatePatternArgs): PatternNoteAction[] {
                 // TREMOLO PATTERN
                 debug(`${args.cleanedSymbol} is TREMOLO`)
                 // TODO implement Tremolo
-                return doTremolo(args)
+                return tremoloAction(args)
             }
             case args.cleanedSymbol.slice(-1) == ':': {
                 // ACCELERATING TREMOLO PATTERN
                 debug(`${args.cleanedSymbol} is ACCELERATING TREMOLO`)
                 // TODO implement Accelerating Tremolo
-                return doAcceleratingTremolo(args)
+                return AcceleratingTremoloAction(args)
             }
             case args.cleanedSymbol.slice(-1) == '[' || args.cleanedSymbol.slice(-1) == ']': {
                 debug(`${args.cleanedSymbol} is RAKE`)
                 // RAKE PATTERN
-                return doRake(args)
+                return rakeAction(args)
             }
             default: {
                 // Unhandled pattern
                 console.error(`Unexpected symbol ${args.cleanedSymbol} for ${args.position}`)
-                return doSilence(args)
+                return silenceAction(args)
             }
         }
     } else {
         console.error(`invalid symbol ${args.cleanedSymbol} for ${args.position}`)
-        return doSilence(args)
+        return silenceAction(args)
     }
 }
 
-function doSingleNote(args: CreatePatternArgs) {
+function singleNoteAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
@@ -109,7 +110,7 @@ function doSingleNote(args: CreatePatternArgs) {
     ]
 }
 
-function doSilence(args: CreatePatternArgs) {
+function silenceAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
@@ -122,7 +123,7 @@ function doSilence(args: CreatePatternArgs) {
     ]
 }
 
-function doTremolo(args: CreatePatternArgs) {
+function tremoloAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
@@ -135,7 +136,7 @@ function doTremolo(args: CreatePatternArgs) {
     ]
 }
 
-function doAcceleratingTremolo(args: CreatePatternArgs) {
+function AcceleratingTremoloAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
@@ -148,8 +149,7 @@ function doAcceleratingTremolo(args: CreatePatternArgs) {
     ]
 }
 
-// Create a RAKE pattern
-function doRake(args: CreatePatternArgs) {
+function rakeAction(args: CreatePatternArgs) {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
     const invert = args.cleanedSymbol.slice(-1) == '['
     const instrumentRange = _.concat(

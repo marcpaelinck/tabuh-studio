@@ -1,12 +1,7 @@
 import { createElement } from 'react'
+import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import { v4 as uuidv4 } from 'uuid'
-import {
-    defaultIntroTime,
-    defaultOutroTime,
-    noteConfigs,
-    positionConfigs,
-    type BasenoteTimeObj
-} from '../config/config'
+import { defaultIntroTime, defaultOutroTime, noteConfigs, positionConfigs } from '../config/config'
 import {
     type ActionFunctions,
     type AnimationNote,
@@ -195,7 +190,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                 const nextANotes: AnimationNote[] = currIsLast
                     ? []
                     : note2AnimationNotes(position, notes[index + 1], nextIsLast)
-                const timeUntil: BasenoteTimeObj = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
+                const timeUntil: TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
                 const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
                 const prevSystem = index > 0 ? notes[index - 1].sysUuid : null
                 const prevSection = index > 0 ? notes[index - 1].section : null

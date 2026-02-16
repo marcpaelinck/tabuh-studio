@@ -24,3 +24,6 @@ src/nocommit/*
 *.sln
 *.sw?
 public/icons/tabuh-studio_icon.png
+
+# Data backup
+public/oldscores

@@ -106,9 +106,6 @@ export type ScoreInfo = {
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
 // Notation of one section for one instrument position
 export type EditorMeasure = {
-    starttime: number
-    tempo: [number, number]
-    velocity: [number, number]
     notation: string[]
     notation_?: string[] // cache used to keep user edits that have not been saved yet
 }
@@ -121,7 +118,6 @@ export type EditorSystem = {
     uuid: UUID // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
-    starttime: number
     grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
@@ -138,6 +134,7 @@ export type EditorScore = {
     uuid: UUID
     title: string
     composer: string
+    instrumenttype: string
     parts: Record<string, UUID[]> // <<part name>, <system uuid>[]>
     positions: Position[] // sorted list of positions ordered as displayed in the editor
     systems: EditorSystem[]
@@ -240,6 +237,7 @@ export interface DynamicsItem extends ExpressionItemBase {
     type: 'dynamics'
     fromDynamics?: DynamicsValue // If isGradual==true: starting value for gradual change. Otherwise undefined.
     toDynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+    positions: Position[]
 }
 
 export type FlowItem = GotoItem | LoopItem

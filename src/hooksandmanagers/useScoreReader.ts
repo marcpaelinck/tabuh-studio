@@ -112,7 +112,6 @@ function oldToNewFormat(score: Score): EditorScore | undefined {
             index: sysIdx,
             id: sysIdx + 1,
             uuid: system.uuid,
-            starttime: Object.values(staffs)[0][0].starttime,
             grouped: [],
             staffs: staffs,
             colWidths: colWidths
@@ -223,7 +222,7 @@ export function useScoreReader<T = Score | EditorScore | undefined>(
         setIsLoading(true)
         const files = await readFile('scores/content.json')
         const scoreInfo: ScoreInfo[] = JSON.parse(files)
-        setScoreList(scoreInfo)
+        setScoreList(scoreInfo.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
         setIsLoading(false)
     }
 
