@@ -5,7 +5,7 @@ import { executionManager, type FlowStep } from './executionManager'
 
 // CYCLE DETECTION
 
-// Checks for cycles ('endless loops') caused by 'go to' instructions.
+// Checks for cycles ('endless cycles') caused by 'go to' instructions.
 // Creates a finite state machine. Detects cycle by iterating through the score using
 // the executionManager and checking if a state is encountered more than once.
 
@@ -46,7 +46,7 @@ function createTransitions(score: EditorScore): StateTransitionMatrix {
                 gototrans[0] = 1
                 gototrans[1] = 1
             } else {
-                for (var i = 0; i < Math.max(...goto.passes); i++) {
+                for (var i = 0; i <= Math.max(...goto.passes); i++) {
                     gototrans[i] = i + 1
                 }
                 if (!goto.each) {
@@ -74,7 +74,7 @@ function nextGoToState(currState: GoToState | undefined, uuid: UUID, transitions
 }
 
 // If _debug is set, replaces system uuid with id to generate readable debug logging.
-const _debug = false
+const _debug = true
 function getId(system: EditorSystem | undefined): string {
     return system ? (_debug ? `#${system.id}` : system.uuid) : 'undefined'
 }
@@ -96,19 +96,19 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
     const { resetFlow, nextInFlow } = executionManager(score)
     resetFlow()
 
-    var loop: boolean = false
+    var cycle: boolean = false
     var step: FlowStep | undefined = { system: { id: 0 } as EditorSystem } as FlowStep
     var syscounter = 0 // safety net
     var beatcount: number = 0
     const debugvar = []
 
-    while (!loop && step && syscounter < 1000) {
+    while (!cycle && step && syscounter < 1000) {
         // Next in flow
-        var beatcount = 0
+        beatcount = 0
         while (step && getId(step.system as EditorSystem) == uuid && beatcount < 500) {
             // NextInFlow returns the next beat (section) so we need to iterate until we reach the next
             // system. Count helps to detect a cycle within a system (not likely to occur).
-            // A maximum of 100 allow for a loop within a system.
+            // A maximum of 100 allow for a cycle within a system.
             step = nextInFlow()
             beatcount += 1
         }
@@ -117,9 +117,9 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
         if (!step || !(uuid in transitions)) continue
 
         debug(
-            `BEFORE STATE CHECK loop=${loop} beatcount=${beatcount} syscount=${syscounter} uuid=${uuid} state=${jState}`
+            `BEFORE STATE CHECK cycle=${cycle} beatcount=${beatcount} syscount=${syscounter} uuid=${uuid} state=${jState}`
         )
-        loop = beatcount >= 500
+        cycle = beatcount >= 500
         syscounter += 1
         // Reset the counter if it is cyclic
 
@@ -128,28 +128,28 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
         state[uuid] = gotoState
         jState = JSON.stringify(state)
         if (uuid in transitions) {
-            loop = states.has(jState)
-            debug(`VALIDATION loop=${loop} beatcount=${beatcount} syscount=${syscounter} uuid=${uuid} state=${jState}`)
+            cycle = states.has(jState)
+            debug(
+                `VALIDATION cycle=${cycle} beatcount=${beatcount} syscount=${syscounter} uuid=${uuid} state=${jState}`
+            )
             debug(states)
             states.add(jState)
         }
-        if (!loop) {
-        }
     }
-    loop = loop || syscounter >= 1000
-    // debug(`VALIDATION loop=${loop} beatcount=${beatcount} syscount=${syscounter} state=${jState}`)
+    cycle = cycle || syscounter >= 1000
+    // debug(`VALIDATION cycle=${cycle} beatcount=${beatcount} syscount=${syscounter} state=${jState}`)
     // debug(states)
-    debug(`LOOP=${loop}`)
+    debug(`CYCLE=${cycle}`)
     debug(JSON.stringify(debugvar))
     var message = ''
-    if (loop) {
+    if (cycle) {
         message = `There is a cycle. Check goto instructions of system #${step?.system.id}.`
     }
 
-    return { isValid: !loop, message: message }
+    return { isValid: !cycle, message: message }
 }
 
-// Detects the presence of a closed loop. Returns true if no loops were detected.
+// Detects the presence of a closed cycle. Returns true if no cycles were detected.
 export function cycleValidation(score: EditorScore): ValidationResult {
     if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
