@@ -74,7 +74,7 @@ function nextGoToState(currState: GoToState | undefined, uuid: UUID, transitions
 }
 
 // If _debug is set, replaces system uuid with id to generate readable debug logging.
-const _debug = true
+const _debug = false
 function getId(system: EditorSystem | undefined): string {
     return system ? (_debug ? `#${system.id}` : system.uuid) : 'undefined'
 }

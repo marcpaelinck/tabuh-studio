@@ -35,7 +35,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     usePartManager: false,
     useRules: false,
     useScoreReader: false,
-    validationManager: true
+    validationManager: false
 }
 
 // The RegExp constants are used to parse the call stack to determine the
