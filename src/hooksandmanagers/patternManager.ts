@@ -48,7 +48,7 @@ const patterns = {
 export interface CreatePatternArgs {
     time: TimeInBasenoteEquiv
     position: Position
-    cleanedSymbol: NoteSymbol
+    symbol: NoteSymbol
     bpm: number
     velocity: Tone.Unit.NormalRange
 }
@@ -57,42 +57,42 @@ export interface PatternNoteAction {
     time: TimeObject
     duration: TimeObject
     position: Position
-    cleanedSymbol: NoteSymbol
+    symbol: NoteSymbol
     bpm: number
     velocity: Tone.Unit.NormalRange
 }
 export function createPattern(args: CreatePatternArgs): PatternNoteAction[] {
-    if (args.cleanedSymbol in positionConfigs[args.position].symbolToNoteNames) {
+    if (args.symbol in positionConfigs[args.position].symbolToNoteNames) {
         // Valid note symbol
         return singleNoteAction(args)
-    } else if (positionConfigs[args.position].validPatterns.includes(args.cleanedSymbol)) {
+    } else if (positionConfigs[args.position].validPatterns.includes(args.symbol)) {
         // Valid pattern
         switch (true) {
-            case args.cleanedSymbol.slice(-1) == ';': {
+            case args.symbol.slice(-1) == ';': {
                 // TREMOLO PATTERN
-                debug(`${args.cleanedSymbol} is TREMOLO`)
+                debug(`${args.symbol} is TREMOLO`)
                 // TODO implement Tremolo
                 return tremoloAction(args)
             }
-            case args.cleanedSymbol.slice(-1) == ':': {
+            case args.symbol.slice(-1) == ':': {
                 // ACCELERATING TREMOLO PATTERN
-                debug(`${args.cleanedSymbol} is ACCELERATING TREMOLO`)
+                debug(`${args.symbol} is ACCELERATING TREMOLO`)
                 // TODO implement Accelerating Tremolo
                 return AcceleratingTremoloAction(args)
             }
-            case args.cleanedSymbol.slice(-1) == '[' || args.cleanedSymbol.slice(-1) == ']': {
-                debug(`${args.cleanedSymbol} is RAKE`)
+            case args.symbol.slice(-1) == '[' || args.symbol.slice(-1) == ']': {
+                debug(`${args.symbol} is RAKE`)
                 // RAKE PATTERN
                 return rakeAction(args)
             }
             default: {
                 // Unhandled pattern
-                console.error(`Unexpected symbol ${args.cleanedSymbol} for ${args.position}`)
+                console.error(`Unexpected symbol ${args.symbol} for ${args.position}`)
                 return silenceAction(args)
             }
         }
     } else {
-        console.error(`invalid symbol ${args.cleanedSymbol} for ${args.position}`)
+        console.error(`invalid symbol ${args.symbol} for ${args.position}`)
         return silenceAction(args)
     }
 }
@@ -103,7 +103,7 @@ function singleNoteAction(args: CreatePatternArgs) {
             time: n2TO(args.time),
             duration: n2TO(1),
             position: args.position,
-            cleanedSymbol: args.cleanedSymbol,
+            symbol: args.symbol,
             bpm: args.bpm,
             velocity: args.velocity
         }
@@ -116,7 +116,7 @@ function silenceAction(args: CreatePatternArgs) {
             time: n2TO(args.time),
             duration: n2TO(1),
             position: args.position,
-            cleanedSymbol: '.',
+            symbol: '.',
             bpm: args.bpm,
             velocity: args.velocity
         }
@@ -129,7 +129,7 @@ function tremoloAction(args: CreatePatternArgs) {
             time: n2TO(args.time),
             duration: n2TO(1),
             position: args.position,
-            cleanedSymbol: args.cleanedSymbol,
+            symbol: args.symbol,
             bpm: args.bpm,
             velocity: args.velocity
         }
@@ -142,7 +142,7 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
             time: n2TO(args.time),
             duration: n2TO(1),
             position: args.position,
-            cleanedSymbol: args.cleanedSymbol,
+            symbol: args.symbol,
             bpm: args.bpm,
             velocity: args.velocity
         }
@@ -151,13 +151,13 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
 
 function rakeAction(args: CreatePatternArgs) {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
-    const invert = args.cleanedSymbol.slice(-1) == '['
+    const invert = args.symbol.slice(-1) == '['
     const instrumentRange = _.concat(
         noteRange(args.position, invert),
         _.fill(Array(patterns.rake.number_of_notes), '-')
     )
     debug(`result: ${JSON.stringify(instrumentRange)}`)
-    const startIdx = instrumentRange.indexOf(args.cleanedSymbol.slice(0, -1))
+    const startIdx = instrumentRange.indexOf(args.symbol.slice(0, -1))
     const noteSpacing: DurationInBasenoteEquiv =
         patterns.rake.pattern_duration_in_millis / BaseNoteEquiv2Millis(patterns.rake.number_of_notes - 1, args.bpm)
     const noteDuration: DurationInBasenoteEquiv = millis2BaseNoteEquiv(patterns.rake.note_duration_in_millis, args.bpm)
@@ -169,7 +169,7 @@ function rakeAction(args: CreatePatternArgs) {
             time: n2TO(args.time + offset),
             duration: n2TO(noteDuration),
             position: args.position,
-            cleanedSymbol: instrumentRange[startIdx + i],
+            symbol: instrumentRange[startIdx + i],
             bpm: args.bpm,
             velocity: args.velocity
         })

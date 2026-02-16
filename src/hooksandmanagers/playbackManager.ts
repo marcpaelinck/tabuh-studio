@@ -109,7 +109,7 @@ export function createTimelineFromScore(
                         const patternNoteActions: PatternNoteAction[] = createPattern({
                             time: currTime,
                             position,
-                            cleanedSymbol: cleanSymbol(symbol),
+                            symbol: cleanSymbol(symbol),
                             bpm:
                                 current!.tempo[0] +
                                 (symidx / notation.length) * (current!.tempo[1] - current!.tempo[0]),

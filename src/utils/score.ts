@@ -144,7 +144,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                         timeline.sampleractions.push({
                             action: actionFunctions.play,
                             position: position,
-                            cleanedSymbol: cleanSymbol(note.s),
+                            symbol: cleanSymbol(note.s),
                             bpm: bpm,
                             velocity: velocity,
                             time: n2TO(note.t),

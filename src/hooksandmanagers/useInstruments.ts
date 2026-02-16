@@ -93,7 +93,7 @@ const createInstrument = (
                     ? 1
                     : dimRateNonFocusedInstruments
             debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
-            const indices = lookup[position].symbol2idxs[action.cleanedSymbol]
+            const indices = lookup[position].symbol2idxs[action.symbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = action.duration
                 // Extend the last note to allow the sound to attenuate
@@ -105,7 +105,7 @@ const createInstrument = (
                 try {
                     sampler?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
                 } catch {
-                    console.error(`ERROR: could not play sound ${action.position} ${action.cleanedSymbol} `)
+                    console.error(`ERROR: could not play sound ${action.position} ${action.symbol} `)
                 }
             }
         },
@@ -138,9 +138,9 @@ export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime
 
     const playInstrument = useCallback((time: number, action: SamplerAction) => {
         debug(
-            `playing ${action.position} ${action.cleanedSymbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
+            `playing ${action.position} ${action.symbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
         )
-        if (action.cleanedSymbol === '.') instrumentSamplers[action.position].mute(time)
+        if (action.symbol === '.') instrumentSamplers[action.position].mute(time)
         else {
             instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocusRef.current)
         }

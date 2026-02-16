@@ -262,7 +262,7 @@ export interface SamplerAction {
     action: SamplerFunction
     time: TimeObject
     position: Position
-    cleanedSymbol: NoteSymbol
+    symbol: NoteSymbol
     bpm: number
     velocity: Tone.Unit.NormalRange
     duration: TimeObject

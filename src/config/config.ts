@@ -368,7 +368,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]']
+                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     KANTILAN_SANGSIH: {
         name: 'Kantilan sangsih',
@@ -384,7 +385,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]']
+                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_POLOS: {
         name: 'Pemade polos',
@@ -400,7 +402,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]']
+                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_SANGSIH: {
         name: 'Pemade sangsih',
@@ -416,7 +419,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]']
+                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     UGAL: {
         name: 'Ugal',
@@ -432,7 +436,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]']
+                        'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     REYONG_1: {
         name: 'Reyong 1',
