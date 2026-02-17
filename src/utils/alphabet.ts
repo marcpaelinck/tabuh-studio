@@ -3,7 +3,10 @@ import { ignoreChars, positionConfigs } from '../config/config'
 import type { NoteSymbol, Position } from '../models/types'
 
 export const getValidSymbols = (position: Position, includeSilences: boolean = false): string[] => {
-    const valids = Object.keys(positionConfigs[position].symbolToNoteNames)
+    const valids = _.concat(
+        Object.keys(positionConfigs[position].symbolToNoteNames),
+        positionConfigs[position].validPatterns
+    )
     if (includeSilences) valids.push.apply(valids, ['.', '-'])
     return valids
 }

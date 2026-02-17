@@ -4,10 +4,10 @@ import _ from 'lodash'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import { positionConfigs } from '../config/config'
-import type { DurationInBasenoteEquiv, NoteSymbol, Position, TimeInBasenoteEquiv } from '../models/types'
+import type { DurationInBasenoteEquiv, NoteSymbol, Position, SamplerAction, TimeInBasenoteEquiv } from '../models/types'
 import { noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
-import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from '../utils/timeunits'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
 
 const patterns = {
     tremolo:
@@ -41,16 +41,19 @@ const patterns = {
             number_of_notes: 8, // Minimum is 2. If the instrument's range is exceeded, the remaining notes will be replaced by extension symbols.
             pattern_duration_in_millis: 120, // Total duration of the pattern.
             note_duration_in_millis: 5000 // sustain time of the notes: this will make the notes overlap.
-        }
+        },
+    gracenote: { duration: 0.4 }
 }
 
-// The function expects an object as argument.
 export interface CreatePatternArgs {
     time: TimeInBasenoteEquiv
     position: Position
+    prevsymbol: NoteSymbol | undefined
     symbol: NoteSymbol
+    nextsymbol: NoteSymbol | undefined
     bpm: number
     velocity: Tone.Unit.NormalRange
+    prevaction: SamplerAction | undefined
 }
 // Structure of the return value.
 export interface PatternNoteAction {
@@ -61,23 +64,30 @@ export interface PatternNoteAction {
     bpm: number
     velocity: Tone.Unit.NormalRange
 }
-export function createPattern(args: CreatePatternArgs): PatternNoteAction[] {
+// Function `createNoteActions` expects a `CreatePatternArgs` object as argument.
+// Arguments `prevsymbol` and `nextsymbol` are required because some patterns can consist of two consecutive symbols.
+// The 'grace note' pattern requires information about the next symbol to determine its octave.
+// WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
+export function createNoteActions(args: CreatePatternArgs): PatternNoteAction[] {
     if (args.symbol in positionConfigs[args.position].symbolToNoteNames) {
         // Valid note symbol
         return singleNoteAction(args)
     } else if (positionConfigs[args.position].validPatterns.includes(args.symbol)) {
         // Valid pattern
         switch (true) {
+            case ['I', 'O', 'E', 'U', 'A'].includes(args.symbol): {
+                // GRACE NOTE
+                debug(`${args.symbol} is TREMOLO`)
+                return gracenoteAction(args)
+            }
             case args.symbol.slice(-1) == ';': {
                 // TREMOLO PATTERN
                 debug(`${args.symbol} is TREMOLO`)
-                // TODO implement Tremolo
                 return tremoloAction(args)
             }
             case args.symbol.slice(-1) == ':': {
                 // ACCELERATING TREMOLO PATTERN
                 debug(`${args.symbol} is ACCELERATING TREMOLO`)
-                // TODO implement Accelerating Tremolo
                 return AcceleratingTremoloAction(args)
             }
             case args.symbol.slice(-1) == '[' || args.symbol.slice(-1) == ']': {
@@ -117,6 +127,48 @@ function silenceAction(args: CreatePatternArgs) {
             duration: n2TO(1),
             position: args.position,
             symbol: '.',
+            bpm: args.bpm,
+            velocity: args.velocity
+        }
+    ]
+}
+
+// A grace note doesn't increase the playback duration. Instead, its duration is subtracted
+// from the previous note's duration.
+// A grace notes doesn't have an octave modifier, so its octave is derived from the following note.
+function gracenoteAction(args: CreatePatternArgs) {
+    const isMelodic = (s: NoteSymbol) => s.length > 0 && ['i', 'o', 'e', 'u', 'a'].includes(s[0])
+
+    // Subtract the grace note's duration from the previous note action
+    if (args.prevaction) {
+        args.prevaction.duration = n2TO(TO2n(args.prevaction.duration) - patterns.gracenote.duration)
+    }
+
+    // Determine the correct octave for the grace note
+    const baseSymbol = args.symbol.toLowerCase()
+    var nearest = baseSymbol
+    if (isMelodic(nearest) && args.nextsymbol && isMelodic(args.nextsymbol)) {
+        const instrumentRange = _.concat(noteRange(args.position), _.fill(Array(patterns.rake.number_of_notes), '-'))
+        const nextSymbolIndex = instrumentRange.indexOf(args.nextsymbol)
+        var shortestDistance = 99
+        // Try different octavations and keep the value that is 'nearest' to the next note.
+        for (const tryNote of [baseSymbol + ',', baseSymbol, baseSymbol + '<']) {
+            if (instrumentRange.includes(tryNote)) {
+                const tryDistance = Math.abs(instrumentRange.indexOf(tryNote) - nextSymbolIndex)
+                if (tryDistance < shortestDistance) {
+                    nearest = tryNote
+                    shortestDistance = tryDistance
+                }
+            }
+        }
+    }
+    const graceSymbol: NoteSymbol = nearest
+    return [
+        {
+            time: n2TO(args.time - patterns.gracenote.duration),
+            duration: n2TO(patterns.gracenote.duration),
+            position: args.position,
+            symbol: graceSymbol,
             bpm: args.bpm,
             velocity: args.velocity
         }

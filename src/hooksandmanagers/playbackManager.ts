@@ -8,6 +8,7 @@
 // createPlaybackSchedule:
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
+import _ from 'lodash'
 import * as Tone from 'tone'
 import { defaultIntroTime, defaultOutroTime, defaultTempo, positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
@@ -15,6 +16,7 @@ import type {
     EditorCursorAction,
     EditorSystem,
     GenericAction,
+    NoteSymbol,
     PlayerCursorAction,
     Position,
     SamplerAction,
@@ -24,9 +26,9 @@ import type {
 import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { defaultObject } from '../utils/objectUtils'
-import { millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
+import { millis2BaseNoteEquiv, n2TO, TO2n, TOplusNumber, TOplusTO } from '../utils/timeunits'
 import { executionManager, type FlowStep } from './executionManager'
-import { createPattern, type PatternNoteAction } from './patternManager'
+import { createNoteActions, type PatternNoteAction } from './patternManager'
 import type { PlaybackAction } from './playbackReducer'
 
 const changeTempo: (time: number, action: TempoAction | SamplerAction, pbSpeed: number) => void = (
@@ -68,56 +70,79 @@ export function createTimelineFromScore(
 
     const { nextInFlow } = executionManager(pbAction.score, pbAction.systemIndex, pbAction.playbackType)
 
+    function nextSymbol(
+        notation: NoteSymbol[],
+        currIdx: number,
+        position: Position,
+        useCache: boolean
+    ): NoteSymbol | undefined {
+        if (currIdx + 1 < notation.length) return notation[currIdx + 1]
+        const nextStep = nextInFlow(true)
+        if (nextStep && position in nextStep.measures) {
+            const measure = nextStep.measures[position]
+            const notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
+            return notation.length > 0 ? notation[0] : undefined
+        }
+        return undefined
+    }
+
     var prevSystem: EditorSystem | undefined = undefined
     var currNote: Record<string, SamplerAction | null> = Object.fromEntries(
         Object.keys(positionConfigs).map((key) => [key, null])
     )
-    var current: FlowStep | undefined = nextInFlow()
-    if (!current) return timeline
+    var prevNote = { ...currNote }
+    var currentStep: FlowStep | undefined = nextInFlow()
+    if (!currentStep) return timeline
     // Keeps track of the longest measure duration in a section. All measures in a system should have
     // the same length but in case they don't, this value will be used to resync the following system.
     var maxMeasureDuration: number = 0
     // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
-    var sectionStartTime: number = millis2BaseNoteEquiv(intro, current.tempo[0])
-    debug(current)
+    var sectionStartTime: number = millis2BaseNoteEquiv(intro, currentStep.tempo[0])
+    debug(currentStep)
 
-    while (current) {
-        debug(current)
+    while (currentStep) {
+        debug(currentStep)
         maxMeasureDuration = 0
-        for (const position of current.positions) {
+        for (const position of currentStep.positions) {
             var currTime: number = sectionStartTime
             var cursorPos: number = 0
-            const measure = current.measures[position]
+            const measure = currentStep.measures[position]
             var notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
             if (!notation) notation = Array(4).fill(defaultObject('JsonSymbol'))
-            notation.forEach((symbol, symidx) => {
-                const endOfPosition = current!.lastSystem && current!.lastSection && symidx == notation.length - 1
-                if (pbAction.actionFunctions!.play && (!isExtension(symbol) || endOfPosition)) {
-                    // Encountered a new note symbol, a muting symbol or last symbol for this instrument position.
-                    if (currNote[position]) {
-                        // Need to close and save the currently 'playing' note.
-                        // Add a basenote duration if the last symbol of the staff is an extension
-                        const addDuration = isExtension(symbol) ? millis2BaseNoteEquiv(outro, current!.tempo[1]) : 0
-                        // TODO: Update the current note's sampler action and save it to the timeline.
-                        currNote[position].duration = n2TO(currTime - TO2n(currNote[position].time) + addDuration)
-                        currNote[position].isLast = endOfPosition && isExtension(symbol)
-                        timeline.sampleractions.push(currNote[position])
-                        currNote[position] = null
-                    }
-                    if (!isExtension(symbol) && !isMuting(symbol)) {
-                        // Convert potential patterns to individual notes.
-                        const patternNoteActions: PatternNoteAction[] = createPattern({
+            var prevSymbol: NoteSymbol | undefined = undefined
+
+            notation.forEach((symbol: NoteSymbol, symbolIdx) => {
+                var symbolDuration = 1 // This is the default duration for a note or silence
+                const endOfPosition =
+                    currentStep!.lastSystem && currentStep!.lastSection && symbolIdx == notation.length - 1
+
+                // CREATE SAMPLER ACTION
+
+                if (pbAction.actionFunctions!.play) {
+                    // Instead of this check, better to include the required action types in the function arguments
+                    if (isExtension(symbol)) {
+                        if (currNote[position])
+                            currNote[position].duration = TOplusNumber(currNote[position].duration, 1)
+                        symbolDuration = 1
+                    } else if (isMuting(symbol)) {
+                        symbolDuration = 1
+                    } else {
+                        // Convert potential patterns to individual note actions.
+                        const patternNoteActions: PatternNoteAction[] = createNoteActions({
                             time: currTime,
                             position,
+                            prevsymbol: prevSymbol,
                             symbol: cleanSymbol(symbol),
+                            nextsymbol: nextSymbol(notation, symbolIdx, position, useCache),
                             bpm:
-                                current!.tempo[0] +
-                                (symidx / notation.length) * (current!.tempo[1] - current!.tempo[0]),
+                                currentStep!.tempo[0] +
+                                (symbolIdx / notation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
                             velocity:
-                                current!.dynamics[0] +
-                                (symidx / notation.length) * (current!.dynamics[1] - current!.dynamics[0])
+                                currentStep!.dynamics[0] +
+                                (symbolIdx / notation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
+                            prevaction: _.last(timeline.sampleractions)
                         })
-                        // Create a sampler action for the new note
+                        // Create one or more sampler action(s) for the new note or pattern
                         patternNoteActions.forEach((noteAction: PatternNoteAction, idx) => {
                             const lastPatternNote = idx == patternNoteActions.length - 1
                             const finalNote = endOfPosition && lastPatternNote
@@ -125,29 +150,31 @@ export function createTimelineFromScore(
                                 ...noteAction,
                                 ...{ action: pbAction.actionFunctions!.play!, isLast: finalNote }
                             }
-                            // Do not finalize single notes or the last note of a pattern because it might be followed
-                            // by a continuation symbol. The note's duration will then need to be updated before it is saved.
-                            if (!lastPatternNote || finalNote) {
-                                // No more notes expected: save the action here and extend its duration
-                                currNote[position].duration = n2TO(
-                                    TO2n(currNote[position].time) + millis2BaseNoteEquiv(outro, current!.tempo[1])
+                            if (finalNote)
+                                // Extend the final note of the current position
+                                currNote[position].duration = TOplusNumber(
+                                    currNote[position].duration,
+                                    millis2BaseNoteEquiv(outro, currentStep!.tempo[1])
                                 )
-                                if (patternNoteActions.length > 1)
-                                    debug(`PATTERN=${JSON.stringify(currNote[position])}`)
-                                timeline.sampleractions.push(currNote[position])
-                                currNote[position] = null
-                            }
+                            if (patternNoteActions.length > 1) debug(`PATTERN=${JSON.stringify(currNote[position])}`)
+                            prevNote[position] = currNote[position]
+                            timeline.sampleractions.push(currNote[position])
+                            // }
                         })
+                        symbolDuration =
+                            TO2n(TOplusTO(currNote[position]!.time, currNote[position]!.duration)) - currTime
                     }
                 }
                 if (position == 'UGAL') debug(`CURRNOTE: ${JSON.stringify(currNote)}`)
-                // Create a cursor action
+
+                // CREATE ANIMATION CURSOR ACTION
+
                 if (pbAction.actionFunctions!.playercursor) {
                     timeline.playercursoractions.push({
                         action: pbAction.actionFunctions!.playercursor,
                         time: n2TO(currTime),
-                        sysuuid: current!.system.uuid,
-                        section: current!.sectionIdx,
+                        sysuuid: currentStep!.system.uuid,
+                        section: currentStep!.sectionIdx,
                         position: position,
                         symbol: symbol,
                         line: 0,
@@ -155,11 +182,14 @@ export function createTimelineFromScore(
                     })
                 }
                 cursorPos += symbol.length
-                currTime += 1
+                currTime += symbolDuration
+                prevSymbol = symbol
             })
             maxMeasureDuration = Math.max(currTime - sectionStartTime, maxMeasureDuration)
         }
-        // Create editor cursor actions and tempo actions.
+
+        // CREATE EDITOR CURSOR ACTIONS
+
         // Only one cursor action per system is needed.
         if (pbAction.actionFunctions.editorcursor) {
             var cursorTime = sectionStartTime
@@ -167,12 +197,12 @@ export function createTimelineFromScore(
                 action: pbAction.actionFunctions.editorcursor,
                 time: n2TO(cursorTime),
                 prevsysuuid: prevSystem?.uuid || undefined,
-                sysuuid: current.system.uuid,
-                section: current.sectionIdx
+                sysuuid: currentStep.system.uuid,
+                section: currentStep.sectionIdx
             })
         }
-        prevSystem = current.system
-        current = nextInFlow()
+        prevSystem = currentStep.system
+        currentStep = nextInFlow()
         sectionStartTime += maxMeasureDuration
     }
     // Determine the total playback duration

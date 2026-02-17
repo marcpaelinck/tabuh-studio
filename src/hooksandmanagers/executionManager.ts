@@ -175,7 +175,10 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         return [currentValue, currentValue]
     }
 
-    function nextInFlow(): FlowStep | undefined {
+    // Returns the next step in the execution flow
+    // peek: if true, state variables (cursor, pass and loop counters) will not be changed
+    function nextInFlow(peek: boolean = false): FlowStep | undefined {
+        var nextCursor: FlowCursor | undefined = undefined
         switch (true) {
             case flowinfo == undefined: {
                 console.error(`missing lookup table`)
@@ -184,7 +187,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             case !cursor: {
                 // Start of playback sequence: return the first measure
                 const [sysIdx, sectIdx] = [startIndex, 0]
-                cursor = {
+                nextCursor = {
                     sysIdx: sysIdx,
                     sectIdx: sectIdx,
                     lastSystem: playbackType == 'single' || score.systems.length == 1,
@@ -192,14 +195,17 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     tempo: getExpressionValue('tempo', sysIdx, sectIdx, defaultTempo),
                     dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, defaultDynamics)
                 }
-                flowinfo[sysIdx].pass += 1
-                flowinfo[sysIdx].loop += 1
+                if (!peek) {
+                    // Update pass and loop counters
+                    flowinfo[sysIdx].pass += 1
+                    flowinfo[sysIdx].loop += 1
+                }
                 break
             }
             case cursor!.sectIdx < flowinfo![cursor!.sysIdx].maxSectIdx: {
                 // Next section, same system
                 const [sysIdx, sectIdx] = [cursor.sysIdx, cursor.sectIdx + 1]
-                cursor = {
+                nextCursor = {
                     sysIdx: sysIdx,
                     sectIdx: sectIdx,
                     lastSystem: cursor.lastSystem,
@@ -218,13 +224,15 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 // Update pass and loop counters
                 if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].loop += 1
                 else {
-                    // Reset loop counter of the current system
-                    flowinfo[cursor.sysIdx].loop = 0
-                    flowinfo[nextSysIdx].pass += 1
-                    flowinfo[nextSysIdx].loop += 1
+                    if (!peek) {
+                        // Reset loop counter of the current system
+                        flowinfo[cursor.sysIdx].loop = 0
+                        flowinfo[nextSysIdx].pass += 1
+                        flowinfo[nextSysIdx].loop += 1
+                    }
                 }
                 const [sysIdx, sectIdx] = [nextSysIdx, 0]
-                cursor = {
+                nextCursor = {
                     sysIdx: sysIdx,
                     sectIdx: sectIdx,
                     lastSystem: sysIdx == score.systems.length - 1,
@@ -235,21 +243,26 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 break
             }
             default:
-                cursor = undefined
+                nextCursor = undefined
         }
-        if (cursor) {
-            const system = score.systems[cursor.sysIdx]
-            const measures = _.fromPairs(_.toPairs(system.staffs).map(([key, staff]) => [key, staff[cursor!.sectIdx]]))
-            debug(`CURSOR [pass=${flowinfo[cursor.sysIdx].pass}]: ${JSON.stringify(cursor)}`)
+        if (!peek) {
+            cursor = nextCursor
+        }
+        if (nextCursor) {
+            const system = score.systems[nextCursor.sysIdx]
+            const measures = _.fromPairs(
+                _.toPairs(system.staffs).map(([key, staff]) => [key, staff[nextCursor!.sectIdx]])
+            )
+            debug(`NEXTCURSOR [pass=${flowinfo[nextCursor.sysIdx].pass}]: ${JSON.stringify(nextCursor)}`)
             return {
-                system: flowinfo[cursor.sysIdx].system,
+                system: flowinfo[nextCursor.sysIdx].system,
                 measures: measures as Record<Position, EditorMeasure>,
                 positions: score.positions,
-                tempo: cursor.tempo,
-                dynamics: cursor.dynamics,
-                sectionIdx: cursor.sectIdx,
-                lastSystem: cursor.sysIdx == score.systems.length - 1 || playbackType == 'single',
-                lastSection: cursor.sectIdx == flowinfo[cursor.sysIdx].maxSectIdx
+                tempo: nextCursor.tempo,
+                dynamics: nextCursor.dynamics,
+                sectionIdx: nextCursor.sectIdx,
+                lastSystem: nextCursor.sysIdx == score.systems.length - 1 || playbackType == 'single',
+                lastSection: nextCursor.sectIdx == flowinfo[nextCursor.sysIdx].maxSectIdx
             }
         }
         return undefined
