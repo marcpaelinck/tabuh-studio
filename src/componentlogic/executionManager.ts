@@ -12,6 +12,7 @@ import type {
     ExecutionItemType,
     ExpressionItem,
     GotoItem,
+    LoopItem,
     Position
 } from '../models/types'
 import { debug } from '../utils/debugger'
@@ -97,7 +98,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         cursor = undefined
     }
 
-    // Returns the best matching 'goto', 'tempo' or 'dynamics' item for the current pass/loop count values
+    // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/loop count values
     // or undefined if none was found.
     function getExecutionItems(type: ExecutionItemType, sysIdx: number): ExecutionItem[] {
         const matches: ExecutionItem[] = []
@@ -123,10 +124,14 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         return matches
     }
 
-    function getNextSystemInFlow(sysIdx: number, lastSystem: boolean): number | undefined {
-        const flowItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
-        if (flowItems.length == 0) return lastSystem ? undefined : sysIdx + 1
-        return uuidLookup[flowItems[0].targetuuid]
+    function getNextSystemInFlow(sysIdx: number, flowInfo: FlowInfoTable, lastSystem: boolean): number | undefined {
+        const loopItems: LoopItem[] = getExecutionItems('loop', sysIdx) as LoopItem[]
+        if (loopItems.length > 0 && flowInfo[sysIdx].loop < loopItems[0].count) {
+            return sysIdx
+        }
+        const gotoItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
+        if (gotoItems.length == 0) return lastSystem ? undefined : sysIdx + 1
+        return uuidLookup[gotoItems[0].targetuuid]
     }
 
     function getExpressionValue(
@@ -218,8 +223,8 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             case cursor!.sectIdx >= flowinfo![cursor!.sysIdx].maxSectIdx: {
                 // Reached end of system. Determine next system.
                 if (playbackType == 'single') return undefined
-                // Check if a goto item is applicable. Otherwise, take next system in sequence.
-                const nextSysIdx = getNextSystemInFlow(cursor.sysIdx, cursor.lastSystem)
+                // Check if a goto or loop item is applicable. Otherwise, take next system in sequence.
+                const nextSysIdx = getNextSystemInFlow(cursor.sysIdx, flowinfo, cursor.lastSystem)
                 if (nextSysIdx == undefined) return undefined
                 // Update pass and loop counters
                 if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].loop += 1
