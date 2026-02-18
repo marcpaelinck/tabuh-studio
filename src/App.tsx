@@ -3,7 +3,7 @@ import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
 import { useWordpressApi } from './componentlogic/useWordpressApi'
 import DebugWindow from './components/DebugWindow'
-import { TabuhEditor } from './components/MainWindow'
+import { MainWindow } from './components/MainWindow'
 import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/editor/contexts'
 import { FRAMESTYLE } from './config/config'
 
@@ -42,7 +42,7 @@ export default function App() {
                                 {/* {active == 'player' ? (
                                     <TabuhPlayer dataSource={dataSource} />
                                 ) : ( */}
-                                <TabuhEditor dataSource={dataSource} />
+                                <MainWindow dataSource={dataSource} />
                                 {/* )} */}
                             </div>
                             <div id="phpdebug"></div>

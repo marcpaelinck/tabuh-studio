@@ -52,7 +52,7 @@ interface TabuhOption {
     label: string
 }
 
-export function TabuhEditorMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
+export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)

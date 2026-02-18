@@ -46,8 +46,8 @@ import {
     type DashboardValues
 } from './editor/Dashboard'
 import EditorWindow from './editor/EditorWindow'
-import { TabuhEditorMenu } from './MainMenu'
-import TabuhPlayer from './player/PlayerWindow'
+import { MainMenu } from './MainMenu'
+import PlayerWindow from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 
 export type KeyboardType = 'regular' | 'laras'
@@ -169,7 +169,7 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
 interface TabuhEditorProps {
     dataSource: 'database' | 'file'
 }
-export function TabuhEditor({ dataSource }: TabuhEditorProps) {
+export function MainWindow({ dataSource }: TabuhEditorProps) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
@@ -318,7 +318,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
                                         executeItemAction={executeItemAction}
                                     />
                                 )}
-                                {active == 'player' && <TabuhPlayer dataSource={dataSource} />}
+                                {active == 'player' && <PlayerWindow dataSource={dataSource} />}
                             </Box>
                         </Content>
                     </Container>
@@ -328,7 +328,7 @@ export function TabuhEditor({ dataSource }: TabuhEditorProps) {
                                 <NavHeader expanded={isExpandedSidenav} user={user} setUser={setUser} />
                             </Sidenav.Header>
                             <Sidenav.Body>
-                                <TabuhEditorMenu
+                                <MainMenu
                                     keyboard={keyboard}
                                     loadScore={loadScore}
                                     setKeyboard={SetKeyboard}

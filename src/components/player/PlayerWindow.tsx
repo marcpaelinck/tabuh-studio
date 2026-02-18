@@ -14,7 +14,7 @@ import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import { ScorePlayer } from './ScorePlayer'
 
-export default function TabuhPlayer({ dataSource }: { dataSource: 'database' | 'file' }) {
+export default function PlayerWindow({ dataSource }: { dataSource: 'database' | 'file' }) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
