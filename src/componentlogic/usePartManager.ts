@@ -13,10 +13,6 @@ export function usePartManager(score: EditorScore | undefined, updateParts: (par
     const [partColors, setPartColors] = useState<Record<string, string>>({}) // Mapping part name -> color
     const [scoreUuid, setScoreUuid] = useState<UUID>('') // Used to distinguish whether current score is updated or a new score is loaded.
 
-    function same(a: Record<string, string>, b: Record<string, string>) {
-        return _.keys(a).length == _.keys(b).length && _.keys(a).every((key) => a[key] == b[key])
-    }
-
     useEffect(() => {
         debug('Temporary statement to avoid build error. Remove when currSelection is being used')
     }, [currSelection])
