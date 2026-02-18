@@ -284,8 +284,16 @@ export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1
 
 // ALPHABET + SAMPLES
 //TODO separate alphabet info from samples info. Same for instrument type.
-export const EXTENSION = ['-', ' ']
-export const MUTING = ['.']
+export const MelodicNoteChars = ['i', 'o', 'e', 'r', 'u', 'a', 's']
+export const ExtensionChars = ['-', ' ']
+export const MutingChars = ['.']
+export const OctavationChars = [',', '<']
+//Patterns
+export const TremoloChars = [';']
+export const AcceleratingTremoloChars = [':']
+export const RakeUpChars = [']']
+export const RakeDownChars = ['[']
+export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S']
 
 export const positionConfigs: Record<Position, PositionConfig> = {
     GONGS: {

@@ -3,9 +3,20 @@
 import _ from 'lodash'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
-import { positionConfigs } from '../config/config'
+import {
+    AcceleratingTremoloChars,
+    ExtensionChars,
+    GraceNoteChars,
+    MelodicNoteChars,
+    MutingChars,
+    OctavationChars,
+    positionConfigs,
+    RakeDownChars,
+    RakeUpChars,
+    TremoloChars
+} from '../config/config'
 import type { DurationInBasenoteEquiv, NoteSymbol, Position, SamplerAction, TimeInBasenoteEquiv } from '../models/types'
-import { noteRange } from '../utils/alphabet'
+import { getValidSymbols, noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
 
@@ -13,7 +24,7 @@ const patterns = {
     tremolo:
         // TREMOLO
         // Repeated striking of the same note.
-        // notes_per_quarternote -  tremolo frequency (number of beats per time unit). Should be a divisor of base_note_time.
+        // notes_per_quarternote -  tremolo frequency (number of tremolo notes per base note).
         // The tremolo respects the note duration, i.e. a tremolo of one base note will last for `base_note_time` duration.
         // The duration of the tremolo can be extended by adding consecutive tremolo notes. This will not alter the tremolo frequency.
         // ACCELERATING TREMOLO
@@ -25,7 +36,7 @@ const patterns = {
         // accelerating_pattern - relative duration of the notes. Best used in a separate measure or at the end of a measure. See remark below.
         // accelerating_velocity - Relative velocity value (0-1) for each note. The number of values should match that of `accelerating_pattern`.
         {
-            notes_per_quarternote: 3,
+            notes_per_basenote: 3,
             accelerating_pattern: [48, 40, 32, 26, 22, 18, 14, 10, 10, 10, 10, 10],
             accelerating_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
         },
@@ -69,30 +80,27 @@ export interface PatternNoteAction {
 // The 'grace note' pattern requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
 export function createNoteActions(args: CreatePatternArgs): PatternNoteAction[] {
-    if (args.symbol in positionConfigs[args.position].symbolToNoteNames) {
+    if (getValidSymbols(args.position, true, false).includes(args.symbol)) {
         // Valid note symbol
         return singleNoteAction(args)
     } else if (positionConfigs[args.position].validPatterns.includes(args.symbol)) {
         // Valid pattern
         switch (true) {
-            case ['I', 'O', 'E', 'U', 'A'].includes(args.symbol): {
+            case GraceNoteChars.includes(args.symbol): {
                 // GRACE NOTE
                 debug(`${args.symbol} is TREMOLO`)
                 return gracenoteAction(args)
             }
-            case args.symbol.slice(-1) == ';': {
-                // TREMOLO PATTERN
+            case TremoloChars.includes(args.symbol.slice(-1)): {
                 debug(`${args.symbol} is TREMOLO`)
                 return tremoloAction(args)
             }
-            case args.symbol.slice(-1) == ':': {
-                // ACCELERATING TREMOLO PATTERN
+            case AcceleratingTremoloChars.includes(args.symbol.slice(-1)): {
                 debug(`${args.symbol} is ACCELERATING TREMOLO`)
                 return AcceleratingTremoloAction(args)
             }
-            case args.symbol.slice(-1) == '[' || args.symbol.slice(-1) == ']': {
+            case _.concat(RakeUpChars, RakeDownChars).includes(args.symbol.slice(-1)): {
                 debug(`${args.symbol} is RAKE`)
-                // RAKE PATTERN
                 return rakeAction(args)
             }
             default: {
@@ -126,18 +134,18 @@ function silenceAction(args: CreatePatternArgs) {
             time: n2TO(args.time),
             duration: n2TO(1),
             position: args.position,
-            symbol: '.',
+            symbol: MutingChars[0],
             bpm: args.bpm,
             velocity: args.velocity
         }
     ]
 }
 
-// A grace note doesn't increase the playback duration. Instead, its duration is subtracted
+// A grace note doesn't add to the playback duration. Instead, its duration is subtracted
 // from the previous note's duration.
 // A grace notes doesn't have an octave modifier, so its octave is derived from the following note.
 function gracenoteAction(args: CreatePatternArgs) {
-    const isMelodic = (s: NoteSymbol) => s.length > 0 && ['i', 'o', 'e', 'u', 'a'].includes(s[0])
+    const isMelodic = (s: NoteSymbol) => s.length > 0 && MelodicNoteChars.includes(s[0])
 
     // Subtract the grace note's duration from the previous note action
     if (args.prevaction) {
@@ -148,11 +156,18 @@ function gracenoteAction(args: CreatePatternArgs) {
     const baseSymbol = args.symbol.toLowerCase()
     var nearest = baseSymbol
     if (isMelodic(nearest) && args.nextsymbol && isMelodic(args.nextsymbol)) {
-        const instrumentRange = _.concat(noteRange(args.position), _.fill(Array(patterns.rake.number_of_notes), '-'))
+        const instrumentRange = _.concat(
+            noteRange(args.position),
+            _.fill(Array(patterns.rake.number_of_notes), ExtensionChars[0])
+        )
         const nextSymbolIndex = instrumentRange.indexOf(args.nextsymbol)
         var shortestDistance = 99
         // Try different octavations and keep the value that is 'nearest' to the next note.
-        for (const tryNote of [baseSymbol + ',', baseSymbol, baseSymbol + '<']) {
+        const octaveOptions = _.concat(
+            [baseSymbol],
+            OctavationChars.map((oct) => baseSymbol + oct)
+        )
+        for (const tryNote of octaveOptions) {
             if (instrumentRange.includes(tryNote)) {
                 const tryDistance = Math.abs(instrumentRange.indexOf(tryNote) - nextSymbolIndex)
                 if (tryDistance < shortestDistance) {
@@ -176,37 +191,70 @@ function gracenoteAction(args: CreatePatternArgs) {
 }
 
 function tremoloAction(args: CreatePatternArgs) {
-    return [
-        {
-            time: n2TO(args.time),
-            duration: n2TO(1),
+    // Skip if the previous symbol is also a tremolo note.
+    // In that case the pattern has already been created.
+    if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
+
+    const duration = 1 / patterns.tremolo.notes_per_basenote
+    const returnValue = []
+    const notes = [args.symbol.slice(0, -1)]
+    // Include the next symbol if it is also a tremolo note
+    if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char)))
+        notes.push(args.nextsymbol.slice(0, -1))
+    const totalNotes = notes.length * patterns.tremolo.notes_per_basenote
+
+    for (var count = 0; count < totalNotes; count++) {
+        // Alternate the note to be selected
+        const noteIdx = count % notes.length
+        returnValue.push({
+            time: n2TO(args.time + count * duration),
+            duration: n2TO(duration),
             position: args.position,
-            symbol: args.symbol,
+            symbol: notes[noteIdx],
             bpm: args.bpm,
             velocity: args.velocity
-        }
-    ]
+        })
+    }
+    return returnValue
 }
 
 function AcceleratingTremoloAction(args: CreatePatternArgs) {
-    return [
-        {
-            time: n2TO(args.time),
-            duration: n2TO(1),
+    // Skip if the previous symbol is also an accelerating tremolo note.
+    // In that case the pattern has already been created.
+    if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
+
+    const returnValue = []
+    const notes = [args.symbol.slice(0, -1)]
+    // Include the next symbol if it is also an accelerating tremolo note
+    if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char)))
+        notes.push(args.nextsymbol.slice(0, -1))
+    const totalNotes = notes.length * patterns.tremolo.accelerating_pattern.length
+
+    var time = args.time
+    for (var idx = 0; idx < totalNotes; idx++) {
+        // Alternate the note to be selected
+        const noteIdx = idx % notes.length
+        const duration = patterns.tremolo.accelerating_pattern[idx] / patterns.tremolo.accelerating_pattern[0]
+        const velocity = patterns.tremolo.accelerating_velocity[idx]
+        returnValue.push({
+            time: n2TO(time),
+            duration: n2TO(duration),
             position: args.position,
-            symbol: args.symbol,
+            symbol: notes[noteIdx],
             bpm: args.bpm,
-            velocity: args.velocity
-        }
-    ]
+            velocity: velocity
+        })
+        time += duration
+    }
+    return returnValue
 }
 
 function rakeAction(args: CreatePatternArgs) {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
-    const invert = args.symbol.slice(-1) == '['
+    const invert = RakeDownChars.includes(args.symbol.slice(-1))
     const instrumentRange = _.concat(
         noteRange(args.position, invert),
-        _.fill(Array(patterns.rake.number_of_notes), '-')
+        _.fill(Array(patterns.rake.number_of_notes), ExtensionChars[0])
     )
     debug(`result: ${JSON.stringify(instrumentRange)}`)
     const startIdx = instrumentRange.indexOf(args.symbol.slice(0, -1))

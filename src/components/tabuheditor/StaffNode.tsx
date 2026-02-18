@@ -30,7 +30,7 @@ export function StaffNode({
             measures.map((measure: EditorMeasure, sidx: number) => {
                 debug(`useMemo: recreating measures of system ${sysUuid} ${position}`)
                 const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
-                const validSymbols: string[] = getValidSymbols(position, true)
+                const validSymbols: string[] = getValidSymbols(position, true, true)
                 return (
                     <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
                         <MeasureNode
