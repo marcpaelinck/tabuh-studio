@@ -2,10 +2,10 @@ import type { HTMLAttributes, MouseEvent } from 'react'
 import { useContext, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
+import { noCursor } from '../../config/config'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../hooksandmanagers/playbackReducer'
 import type { EditorCursorAction, EditorScore, EditorSystem } from '../../models/types'
 import { debug } from '../../utils/debugger'
-import { noCursor } from './_constants'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
 
 export function PlaybackButtons({

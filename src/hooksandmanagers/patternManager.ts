@@ -34,7 +34,7 @@ const patterns = {
         // The rake pattern consists of a rapid sequence of unmuted notes played by sliding the panggul over the instrument's keys.
         // The pattern can be played both ways (up and down) and has a fixed duration in milliseconds. This means that the duration in base notes
         // depends on the tempo, making it very difficult to synchronize it with other notes or patterns. Therefore it is best to use the pattern
-        // at the end of a measure/section: the Playback Manager will take care of resynchronizing all positions at the start of the next section.
+        // at the end of a measure/section: the Playback Manager will take care of resynchronizing all positions at the start of the next measure.
         // The number of notes is fixed and the starting note is given in the notation. If the end of the instrument's range is reached before
         // the entire pattern could be generated, continuation symbols ('-') will be generated for the remaining pattern.
         {
@@ -46,14 +46,14 @@ const patterns = {
 }
 
 export interface CreatePatternArgs {
-    time: TimeInBasenoteEquiv
+    time: TimeInBasenoteEquiv // current time
     position: Position
-    prevsymbol: NoteSymbol | undefined
-    symbol: NoteSymbol
-    nextsymbol: NoteSymbol | undefined
-    bpm: number
-    velocity: Tone.Unit.NormalRange
-    prevaction: SamplerAction | undefined
+    prevsymbol: NoteSymbol | undefined // previous symbol in the notation
+    symbol: NoteSymbol // current symbol in the notation
+    nextsymbol: NoteSymbol | undefined // symbol following the current symbol
+    bpm: number // current tempo in BPM
+    velocity: Tone.Unit.NormalRange // current velocity
+    prevaction: SamplerAction | undefined // last action created for this position
 }
 // Structure of the return value.
 export interface PatternNoteAction {

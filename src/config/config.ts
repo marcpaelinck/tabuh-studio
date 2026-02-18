@@ -1,5 +1,5 @@
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
-import type { DynamicsValue, Note, Position } from '../models/types'
+import type { DynamicsValue, EditorCellCursor, Note, Position } from '../models/types'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 
 // TAILWIND STYLES
@@ -85,6 +85,7 @@ export const partColorPalette: ColorName[] = [
     'cornsilk',
     'khaki'
 ]
+export const noCursor: EditorCellCursor = { sysUuid: '', measure: -1 } // 'null' value for the playback cursor of the editor
 
 // PLAYER
 
