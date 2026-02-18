@@ -30,10 +30,10 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
+import { useEditorScoreManager } from '../../componentlogic/useEditorScoreManager'
+import { useScoreReader } from '../../componentlogic/useScoreReader'
+import { cycleValidation } from '../../componentlogic/validationManager'
 import { editorInitialExpandState } from '../../config/config'
-import { useEditorScoreManager } from '../../hooksandmanagers/useEditorScoreManager'
-import { useScoreReader } from '../../hooksandmanagers/useScoreReader'
-import { cycleValidation } from '../../hooksandmanagers/validationManager'
 import type { EditorScore, WpUserRecord } from '../../models/types'
 import { debug } from '../../utils/debugger'
 import TabuhPlayer from '../tabuhplayer/TabuhPlayer'

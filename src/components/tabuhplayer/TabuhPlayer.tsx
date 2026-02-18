@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import { useScoreReader } from '../../componentlogic/useScoreReader'
 import { positionConfigs } from '../../config/config'
-import { useScoreReader } from '../../hooksandmanagers/useScoreReader'
 import {
     type HighlightRange,
     type MenuItemInfo,

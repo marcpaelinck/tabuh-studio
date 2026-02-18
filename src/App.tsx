@@ -1,11 +1,11 @@
 import { createContext, useState, type Dispatch } from 'react'
 import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
+import { useWordpressApi } from './componentlogic/useWordpressApi'
 import DebugWindow from './components/DebugWindow'
 import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
 import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
 import { FRAMESTYLE } from './config/config'
-import { useWordpressApi } from './hooksandmanagers/useWordpressApi'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
