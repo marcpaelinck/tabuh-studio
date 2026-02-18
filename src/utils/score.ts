@@ -78,8 +78,8 @@ const note2AnimationNotes = (position: Position, notationNote: JsonNote, ìsLast
         const note: Note = noteConfigs[instrType][shCode]
         const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
         result.push({
-            sysUuid: notationNote.sysUuid,
-            section: notationNote.section,
+            // sysUuid: notationNote.sysUuid,
+            // section: notationNote.section,
             time: n2TO(notationNote.t),
             keyname: keyname,
             tone: note.tone,
@@ -176,8 +176,8 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                 action: actionFunctions.animate,
                 time: n2TO(0),
                 position: position,
-                prevsysUuid: null,
-                prevsection: null,
+                // prevsysUuid: null,
+                // prevsection: null,
                 currnotes: [],
                 nextnotes: note2AnimationNotes(position, notes[1], false),
                 timeuntil: n2TO(notes[1].t),
@@ -199,8 +199,8 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                     action: actionFunctions.animate,
                     time: n2TO(note.t),
                     position: position,
-                    prevsysUuid: prevSystem,
-                    prevsection: prevSection,
+                    // prevsysUuid: prevSystem,
+                    // prevsection: prevSection,
                     currnotes: aNotes,
                     nextnotes: nextANotes,
                     timeuntil: timeUntil,

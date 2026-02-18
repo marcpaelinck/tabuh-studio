@@ -270,8 +270,6 @@ export interface SamplerAction {
 }
 
 export type AnimationNote = {
-    sysUuid: UUID
-    section: number
     time: TimeObject
     keyname: string
     tone: ToneType
@@ -285,8 +283,6 @@ export type AnimationAction = {
     action: AnimationFunction
     time: TimeObject
     position: Position
-    prevsysUuid: UUID | null
-    prevsection: number | null
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
     timeuntil: TimeObject

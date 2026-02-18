@@ -56,6 +56,27 @@ const patterns = {
     gracenote: { duration: 0.4 }
 }
 
+type PatternType = 'SINGLENOTE' | 'TREMOLO' | 'TREMOLO_ACC' | 'GRACENOTE' | 'RAKE' | 'UNHANDLED' | 'INVALID'
+
+function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
+    switch (true) {
+        case getValidSymbols(position, true, false).includes(symbol):
+            return 'SINGLENOTE'
+        case !positionConfigs[position].validPatterns.includes(symbol):
+            return 'INVALID'
+        case GraceNoteChars.includes(symbol):
+            return 'GRACENOTE'
+        case TremoloChars.includes(symbol.slice(-1)):
+            return 'TREMOLO'
+        case AcceleratingTremoloChars.includes(symbol.slice(-1)):
+            return 'TREMOLO_ACC'
+        case _.concat(RakeUpChars, RakeDownChars).includes(symbol.slice(-1)):
+            return 'RAKE'
+        default:
+            return 'UNHANDLED'
+    }
+}
+
 export interface CreatePatternArgs {
     time: TimeInBasenoteEquiv // current time
     position: Position
@@ -80,38 +101,60 @@ export interface PatternNoteAction {
 // The 'grace note' pattern requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
 export function createNoteActions(args: CreatePatternArgs): PatternNoteAction[] {
-    if (getValidSymbols(args.position, true, false).includes(args.symbol)) {
-        // Valid note symbol
-        return singleNoteAction(args)
-    } else if (positionConfigs[args.position].validPatterns.includes(args.symbol)) {
-        // Valid pattern
-        switch (true) {
-            case GraceNoteChars.includes(args.symbol): {
-                // GRACE NOTE
-                debug(`${args.symbol} is TREMOLO`)
-                return gracenoteAction(args)
-            }
-            case TremoloChars.includes(args.symbol.slice(-1)): {
-                debug(`${args.symbol} is TREMOLO`)
-                return tremoloAction(args)
-            }
-            case AcceleratingTremoloChars.includes(args.symbol.slice(-1)): {
-                debug(`${args.symbol} is ACCELERATING TREMOLO`)
-                return AcceleratingTremoloAction(args)
-            }
-            case _.concat(RakeUpChars, RakeDownChars).includes(args.symbol.slice(-1)): {
-                debug(`${args.symbol} is RAKE`)
-                return rakeAction(args)
-            }
-            default: {
-                // Unhandled pattern
-                console.error(`Unexpected symbol ${args.symbol} for ${args.position}`)
-                return silenceAction(args)
-            }
+    const pattern = getPatternType(args.symbol, args.position)
+    debug(`${args.symbol} is ${pattern}`)
+
+    switch (pattern) {
+        case 'SINGLENOTE':
+            return singleNoteAction(args)
+        case 'GRACENOTE':
+            return gracenoteAction(args)
+        case 'TREMOLO':
+            return tremoloAction(args)
+        case 'TREMOLO_ACC':
+            return AcceleratingTremoloAction(args)
+        case 'RAKE':
+            return rakeAction(args)
+        case 'INVALID': {
+            console.error(`invalid pattern ${args.symbol} for ${args.position}`)
+            return silenceAction(args)
         }
-    } else {
-        console.error(`invalid symbol ${args.symbol} for ${args.position}`)
-        return silenceAction(args)
+        case 'UNHANDLED': {
+            console.error(`Unhandled pattern ${args.symbol} for ${args.position}`)
+            return silenceAction(args)
+        }
+        default: {
+            console.error(`Unexpected symbol ${args.symbol} for ${args.position}`)
+            return silenceAction(args)
+        }
+    }
+}
+
+export function getDurationInMillis(args: CreatePatternArgs): number {
+    const pattern = getPatternType(args.symbol, args.position)
+    switch (pattern) {
+        case 'SINGLENOTE':
+            return BaseNoteEquiv2Millis(1, args.bpm)
+        case 'GRACENOTE':
+            return 0
+        case 'TREMOLO':
+            return BaseNoteEquiv2Millis(1, args.bpm)
+        case 'TREMOLO_ACC':
+            const durationBn =
+                patterns.tremolo.accelerating_pattern.reduce((sum, n) => sum + n, 0) /
+                patterns.tremolo.accelerating_pattern[0]
+            return BaseNoteEquiv2Millis(durationBn, args.bpm)
+        case 'RAKE':
+            return patterns.rake.note_duration_in_millis
+        case 'INVALID': {
+            return BaseNoteEquiv2Millis(1, args.bpm)
+        }
+        case 'UNHANDLED': {
+            return BaseNoteEquiv2Millis(1, args.bpm)
+        }
+        default: {
+            return BaseNoteEquiv2Millis(1, args.bpm)
+        }
     }
 }
 
