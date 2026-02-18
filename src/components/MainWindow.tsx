@@ -30,24 +30,24 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
-import { useEditorScoreManager } from '../../componentlogic/useEditorScoreManager'
-import { useScoreReader } from '../../componentlogic/useScoreReader'
-import { cycleValidation } from '../../componentlogic/validationManager'
-import { editorInitialExpandState } from '../../config/config'
-import type { EditorScore, WpUserRecord } from '../../typing/types'
-import { debug } from '../../utils/debugger'
-import TabuhPlayer from '../tabuhplayer/TabuhPlayer'
-import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
-import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
+import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
+import { useScoreReader } from '../componentlogic/useScoreReader'
+import { cycleValidation } from '../componentlogic/validationManager'
+import { editorInitialExpandState } from '../config/config'
+import type { EditorScore, WpUserRecord } from '../typing/types'
+import { debug } from '../utils/debugger'
+import type { DashboardFunctionsType, ScoreFunctionsType } from './editor/contexts'
+import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './editor/contexts'
 import {
     Dashboard,
     dashboardDefaults as defaultDashboardValues,
     type ComponentName,
     type DashboardComponentValues,
     type DashboardValues
-} from './Dashboard'
-import EditorWindow from './EditorWindow'
-import { TabuhEditorMenu } from './TabuhEditorMenu'
+} from './editor/Dashboard'
+import EditorWindow from './editor/EditorWindow'
+import { TabuhEditorMenu } from './MainMenu'
+import TabuhPlayer from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 
 export type KeyboardType = 'regular' | 'laras'

@@ -1,5 +1,5 @@
 import { type Dispatch, type KeyboardEvent, type RefObject } from 'react'
-import type { ElementWithValueTracker } from '../components/tabuheditor/_types'
+import type { ElementWithValueTracker } from '../components/editor/_types'
 import { type NavigationAction } from '../config/config'
 import { symbolValidationUtils } from '../utils/alphabet'
 import { debug } from '../utils/debugger'

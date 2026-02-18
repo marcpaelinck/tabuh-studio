@@ -3,8 +3,8 @@ import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
 import { useWordpressApi } from './componentlogic/useWordpressApi'
 import DebugWindow from './components/DebugWindow'
-import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/tabuheditor/contexts'
-import { TabuhEditor } from './components/tabuheditor/TabuhEditor'
+import { TabuhEditor } from './components/MainWindow'
+import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/editor/contexts'
 import { FRAMESTYLE } from './config/config'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})
