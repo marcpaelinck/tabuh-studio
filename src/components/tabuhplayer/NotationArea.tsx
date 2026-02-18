@@ -3,7 +3,7 @@
 // notation while the corresponding notes are being played.
 
 import { useRef, type Dispatch, type RefObject } from 'react'
-import type { HighlightRange, NotationParagraph as NotationParagraph } from '../../models/types'
+import type { HighlightRange, NotationParagraph } from '../../typing/types'
 
 export default function NotationArea({
     notation,

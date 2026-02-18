@@ -15,7 +15,7 @@ import {
     RakeUpChars,
     TremoloChars
 } from '../config/config'
-import type { DurationInBasenoteEquiv, NoteSymbol, Position, SamplerAction, TimeInBasenoteEquiv } from '../models/types'
+import type { DurationInBasenoteEquiv, NoteSymbol, Position, SamplerAction, TimeInBasenoteEquiv } from '../typing/types'
 import { getValidSymbols, noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'

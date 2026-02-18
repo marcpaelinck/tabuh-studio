@@ -12,7 +12,7 @@ import {
     type Score,
     type Section,
     type TimeLine
-} from '../models/types'
+} from '../typing/types'
 import { cleanSymbol } from './alphabet'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO } from './timeunits'
 

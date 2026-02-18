@@ -34,7 +34,7 @@ import { useEditorScoreManager } from '../../componentlogic/useEditorScoreManage
 import { useScoreReader } from '../../componentlogic/useScoreReader'
 import { cycleValidation } from '../../componentlogic/validationManager'
 import { editorInitialExpandState } from '../../config/config'
-import type { EditorScore, WpUserRecord } from '../../models/types'
+import type { EditorScore, WpUserRecord } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import TabuhPlayer from '../tabuhplayer/TabuhPlayer'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'

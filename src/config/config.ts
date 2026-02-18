@@ -1,5 +1,5 @@
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
-import type { DynamicsValue, EditorCellCursor, Note, Position } from '../models/types'
+import type { DynamicsValue, EditorCellCursor, Note, Position } from '../typing/types'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 
 // TAILWIND STYLES

@@ -14,7 +14,7 @@ import type {
     GotoItem,
     LoopItem,
     Position
-} from '../models/types'
+} from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { PlaybackType } from './playbackReducer'
 

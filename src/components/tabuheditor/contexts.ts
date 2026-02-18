@@ -8,7 +8,7 @@ import type {
     SamplerAction,
     WpDatabaseReturnValue,
     WpUserReturnValue
-} from '../../models/types'
+} from '../../typing/types'
 import { emulateAsync } from '../../utils/async'
 import type { ComponentName, DashboardComponentValues } from './Dashboard'
 

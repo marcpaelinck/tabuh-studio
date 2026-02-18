@@ -1,5 +1,5 @@
 import { instrumentConfigs, type InstrumentConfig } from '../config/config'
-import type { MenuItemInfo, menuValueType, Score, Section, System } from '../models/types'
+import type { MenuItemInfo, menuValueType, Score, Section, System } from '../typing/types'
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.
 // The `value` field can be a list of values. This is useful if the menu item is an

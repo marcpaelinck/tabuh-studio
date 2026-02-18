@@ -13,7 +13,7 @@ import type {
     Score,
     ScoreInfo,
     Staffs
-} from '../models/types'
+} from '../typing/types'
 import { debug } from '../utils/debugger'
 import { readFile } from '../utils/filesystem'
 import { defaultObject } from '../utils/objectUtils'

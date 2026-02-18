@@ -3,7 +3,7 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { partColorPalette } from '../config/config'
-import type { EditorScore, UUID } from '../models/types'
+import type { EditorScore, UUID } from '../typing/types'
 import { debug } from '../utils/debugger'
 
 export function usePartManager(score: EditorScore | undefined, updateParts: (parts: Record<string, string[]>) => void) {

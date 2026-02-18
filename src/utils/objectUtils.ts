@@ -2,7 +2,7 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
-import type { EditorScore, JsonSymbol } from '../models/types'
+import type { EditorScore, JsonSymbol } from '../typing/types'
 
 /**
  * Return the first key in `obj` whose value === `value` (strict equality).

@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Col } from 'rsuite'
-import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
+import type { EditorMeasure, EditorSystem, Position } from '../../typing/types'
 import { getValidSymbols } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'

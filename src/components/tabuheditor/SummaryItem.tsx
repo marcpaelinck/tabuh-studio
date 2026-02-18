@@ -21,11 +21,11 @@ import {
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { tsBlue } from '../../config/config'
-import type { EditorScore, EditorSystem } from '../../models/types'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
+import type { EditorScore, EditorSystem } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { ExecutionForm } from './ExecutionForm'
 

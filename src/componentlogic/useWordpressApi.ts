@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import type { WordPressApiType } from '../components/tabuheditor/contexts'
-import type { UUID } from '../models/types'
+import type { UUID } from '../typing/types'
 
 // Will be passed by the Tabu Studio WordPress plugin
 interface WpApiSettings {

@@ -13,7 +13,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
-import type { DynamicsValue, ExecutionItemType } from '../../models/types'
+import type { DynamicsValue, ExecutionItemType } from '../../typing/types'
 
 export interface FormValueType {
     type?: ExecutionItemType | ''

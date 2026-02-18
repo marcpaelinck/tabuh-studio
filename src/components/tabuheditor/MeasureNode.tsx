@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import { useKeyboardListener } from '../../componentlogic/useKeyboardListener'
 import type { NavigationAction } from '../../config/config'
-import type { EditorMeasure, EditorSystem, Position } from '../../models/types'
+import type { EditorMeasure, EditorSystem, Position } from '../../typing/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import type { NavigationFunctionsType, ScoreFunctionsType } from './contexts'

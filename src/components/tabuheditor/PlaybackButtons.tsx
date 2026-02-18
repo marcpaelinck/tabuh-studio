@@ -4,7 +4,7 @@ import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoS
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../componentlogic/playbackReducer'
 import { noCursor } from '../../config/config'
-import type { EditorCursorAction, EditorScore, EditorSystem } from '../../models/types'
+import type { EditorCursorAction, EditorScore, EditorSystem } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { AudioFunctions, type AudioFunctionsType } from './contexts'
 

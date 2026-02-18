@@ -14,7 +14,7 @@ import {
     type SVGInfo,
     type TempoAction,
     type TimeLine
-} from '../../models/types'
+} from '../../typing/types'
 import { createTimeline } from '../../utils/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'

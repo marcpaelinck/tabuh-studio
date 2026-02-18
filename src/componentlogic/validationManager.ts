@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import type { EditorScore, EditorSystem, UUID } from '../models/types'
+import type { EditorScore, EditorSystem, UUID } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { executionManager, type FlowStep } from './executionManager'
 

@@ -1,5 +1,5 @@
 import * as Tone from 'tone'
-import type { SamplerAction, TempoAction } from '../models/types'
+import type { SamplerAction, TempoAction } from '../typing/types'
 
 export function changeTempo(time: number, action: TempoAction | SamplerAction, pbSpeed: number) {
     if (action.bpm != undefined) {

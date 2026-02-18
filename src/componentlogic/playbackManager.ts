@@ -22,7 +22,7 @@ import type {
     SamplerAction,
     TempoAction,
     TimeLine
-} from '../models/types'
+} from '../typing/types'
 import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { defaultObject } from '../utils/objectUtils'

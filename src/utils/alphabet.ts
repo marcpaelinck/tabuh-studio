@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { ExtensionChars, ignoreChars, MutingChars, positionConfigs } from '../config/config'
-import type { NoteSymbol, Position } from '../models/types'
+import type { NoteSymbol, Position } from '../typing/types'
 
 export const getValidSymbols = (
     position: Position,

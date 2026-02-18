@@ -11,12 +11,12 @@ import type {
     NotationParagraph,
     Position,
     SVGInfo
-} from '../../models/types'
+} from '../../typing/types'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
-import { type XCoordRecord, type YCoordRecord } from '../../models/types'
+import { type XCoordRecord, type YCoordRecord } from '../../typing/types'
 import Selector from '../Selector'
 
 // Returns the SVG filename for the given position if found.

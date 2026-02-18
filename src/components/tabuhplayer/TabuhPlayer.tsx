@@ -8,7 +8,7 @@ import {
     type Score,
     type SVGInfo,
     type TimeLine
-} from '../../models/types'
+} from '../../typing/types'
 import { speedDefaultOption } from '../../utils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'

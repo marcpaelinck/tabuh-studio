@@ -14,7 +14,7 @@ import type {
     GotoItem,
     LoopItem,
     TempoItem
-} from '../../models/types'
+} from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import ExecutionItemForm, { formModel, type FormValueType } from './ExecutionItemForm'
 

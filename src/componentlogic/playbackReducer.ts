@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
 import { type AudioFunctionsType } from '../components/tabuheditor/contexts'
 import { noCursor } from '../config/config'
-import type { ActionFunctions, EditorCellCursor, EditorScore } from '../models/types'
+import type { ActionFunctions, EditorCellCursor, EditorScore } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { createPlaybackSchedule, createTimelineFromScore } from './playbackManager'
 import { cycleValidation } from './validationManager'
