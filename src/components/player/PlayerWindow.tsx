@@ -14,13 +14,17 @@ import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import { ScorePlayer } from './ScorePlayer'
 
-export default function PlayerWindow({ dataSource }: { dataSource: 'database' | 'file' }) {
+interface PlayerWindowProps {
+    dataSource: 'database' | 'file'
+    selectedFocus: Position[]
+    setSelectedFocus: Dispatch<Position[]>
+}
+export default function PlayerWindow({ dataSource, selectedFocus, setSelectedFocus }: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
     const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
-    const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)

@@ -5,7 +5,7 @@ import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
-import { useContext, useEffect, useRef, useState, type Dispatch } from 'react'
+import { useContext, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Box,
@@ -30,11 +30,13 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
+import { playbackReducerFactory } from '../componentlogic/playbackReducer'
 import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
+import { useInstruments } from '../componentlogic/useInstruments'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
-import { editorInitialExpandState } from '../config/config'
-import type { ActionFunctions, EditorScore, WpUserRecord } from '../typing/types'
+import { editorInitialExpandState, noCursor } from '../config/config'
+import type { ActionFunctions, EditorScore, Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './editor/contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './editor/contexts'
@@ -165,10 +167,10 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
         </>
     )
 }
-interface TabuhEditorProps {
+interface MainWindowProps {
     dataSource: 'database' | 'file'
 }
-export function MainWindow({ dataSource }: TabuhEditorProps) {
+export function MainWindow({ dataSource }: MainWindowProps) {
     //NAVIGATION
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
@@ -220,6 +222,20 @@ export function MainWindow({ dataSource }: TabuhEditorProps) {
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
+
+    // PLAYBACK SETTINGS
+    const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
+    const playbackReducer = playbackReducerFactory(scheduleFunctions)
+    const [playbackState, playback] = useReducer(playbackReducer, {
+        cursor: noCursor,
+        audioState: 'nodata',
+        playbackType: 'none'
+    })
+    const { playInstrument } = useInstruments(selectedFocus, 0)
+    async function stopPlayback(time: number) {
+        playback({ actionType: 'stop' })
+    }
+    useEffect(() => setScheduleFunctions({ ...scheduleFunctions, play: playInstrument, generic: stopPlayback }), [])
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
         const newDashboardValues: DashboardValues = { ...dashboardValues }
@@ -324,9 +340,17 @@ export function MainWindow({ dataSource }: TabuhEditorProps) {
                                         executeItemAction={executeItemAction}
                                         scheduleFunctions={scheduleFunctions}
                                         setScheduleFunctions={setScheduleFunctions}
+                                        playbackState={playbackState}
+                                        playback={playback}
                                     />
                                 )}
-                                {active == 'player' && <PlayerWindow dataSource={dataSource} />}
+                                {active == 'player' && (
+                                    <PlayerWindow
+                                        dataSource={dataSource}
+                                        selectedFocus={selectedFocus}
+                                        setSelectedFocus={setSelectedFocus}
+                                    />
+                                )}
                             </Box>
                         </Content>
                     </Container>

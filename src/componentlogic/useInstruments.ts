@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type RefObject } from 'react'
+import { useCallback, useMemo } from 'react'
 import * as Tone from 'tone'
 import {
     alwaysFocusPositions,
@@ -113,7 +113,7 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime: number = defaultOutroTime) => {
+export const useInstruments = (currentFocus: Position[], outroTime: number = defaultOutroTime) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -121,7 +121,7 @@ export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime
 
     const samplers: Record<string, Tone.Sampler | null> = useMemo(() => {
         return createSamplers()
-    }, [currentFocusRef])
+    }, [])
 
     const instrumentSamplers: InstrumentSamplers = useMemo(() => {
         return Object.fromEntries(
@@ -130,7 +130,7 @@ export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime
                 createInstrument(position as Position, samplers, outroTime)
             ])
         ) as Record<Position, InstrumentSampler>
-    }, [currentFocusRef])
+    }, [])
 
     // Adds a small random deviation to the note attack time for a more realistic execution
     const random_attack_deviation = (time: number) =>
@@ -142,7 +142,7 @@ export const useInstruments = (currentFocusRef: RefObject<Position[]>, outroTime
         )
         if (action.symbol === '.') instrumentSamplers[action.position].mute(time)
         else {
-            instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocusRef.current)
+            instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus)
         }
     }, [])
 

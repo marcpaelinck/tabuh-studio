@@ -66,7 +66,7 @@ export function ScorePlayer({
     pbSpeedRef.current = pbSpeed
 
     // HOOKS
-    const { playInstrument, muteAll } = useInstruments(focusRef)
+    const { playInstrument, muteAll } = useInstruments(focus)
     const { animateInstrument, animateNotation } = useAnimationEngine(
         svgInfoRef,
         highlightFunctionRef,

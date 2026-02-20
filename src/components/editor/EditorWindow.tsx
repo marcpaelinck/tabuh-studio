@@ -1,14 +1,13 @@
 import _ from 'lodash'
-import type { Dispatch, HTMLAttributes, RefObject } from 'react'
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row, useDialog } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import { playbackReducerFactory } from '../../componentlogic/playbackReducer'
-import { useInstruments } from '../../componentlogic/useInstruments'
+import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { usePartManager } from '../../componentlogic/usePartManager'
-import { editorInitialExpandState, noCursor } from '../../config/config'
-import type { ActionFunctions, EditorCursorAction, EditorScore, EditorSystem, Position } from '../../typing/types'
+import { editorInitialExpandState } from '../../config/config'
+import type { ActionFunctions, EditorCursorAction, EditorScore, EditorSystem } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -28,6 +27,8 @@ interface EditorWindowProps {
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
     scheduleFunctions: ActionFunctions
     setScheduleFunctions: Dispatch<ActionFunctions>
+    playbackState: PlaybackState
+    playback: ActionDispatch<[action: PlaybackAction]>
 }
 
 export default function EditorWindow({
@@ -40,15 +41,13 @@ export default function EditorWindow({
     updateParts,
     executeItemAction,
     scheduleFunctions,
-    setScheduleFunctions
+    setScheduleFunctions,
+    playbackState,
+    playback
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(editorScore, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
-
-    // MOVE BLOCK TO MAINWINDOW
-    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
-    const { playInstrument } = useInstruments(focusRef, 0)
 
     function moveEditorCursor(time: number, cAction: EditorCursorAction) {
         const sys = (uuid: string | undefined): EditorSystem | undefined => {
@@ -69,31 +68,7 @@ export default function EditorWindow({
         // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
-    async function stopPlayback(time: number) {
-        playback({ actionType: 'stop' })
-        // playback({ actionType: 'cursor', cursor: noCursor })
-    }
-    useEffect(
-        () =>
-            setScheduleFunctions({
-                ...scheduleFunctions,
-                play: playInstrument,
-                editorcursor: moveEditorCursor,
-                generic: stopPlayback
-            }),
-        []
-    )
-
-    //TODO: playbackState was moved from individual SystemNode components to parent
-    // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
-
-    const playbackReducer = playbackReducerFactory(scheduleFunctions)
-    const [playbackState, playback] = useReducer(playbackReducer, {
-        cursor: noCursor,
-        audioState: 'nodata',
-        playbackType: 'none'
-    })
-    // END MOVE TO MAINWINDOW
+    useEffect(() => setScheduleFunctions({ ...scheduleFunctions, editorcursor: moveEditorCursor }), [])
 
     const pbCurrUuid = playbackState.cursor.sysUuid
     const pbType = playbackState.playbackType
