@@ -30,31 +30,6 @@ export function PlaybackButtons({
     const audio: PlaybackFunctionsType = useContext(PlaybackFunctions)
     const buttongroupRef = useRef<HTMLDivElement>(null)
 
-    // async function stopPlayback(time: number) {
-    //     playback({ actionType: 'stop' })
-    //     // playback({ actionType: 'cursor', cursor: noCursor })
-    // }
-
-    // function sys(uuid: string | undefined): EditorSystem | undefined {
-    //     return score.systems.find((sys) => sys.uuid == uuid)
-    // }
-
-    // function moveEditorCursor(time: number, cAction: EditorCursorAction) {
-    //     if (cAction.prevsysuuid && cAction.prevsysuuid != cAction.sysuuid) {
-    //         debug(`Close panel ${sys(cAction.prevsysuuid)?.id}, curr=${sys(cAction.sysuuid)?.id}`)
-    //         expandIfNotExpanded(cAction.prevsysuuid, false)
-    //     }
-    //     if (cAction.prevsysuuid != cAction.sysuuid) {
-    //         debug(`Open panel ${sys(cAction.sysuuid)?.id} prev=${sys(cAction.prevsysuuid)?.id}`)
-    //         expandIfNotExpanded(cAction.sysuuid, true)
-    //     }
-    //     playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
-    //     // debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
-    //     const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
-    //     // debug(`scrolling ${currElement?.id} into view`)
-    //     currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    // }
-
     function isDisabled(pbType: PlaybackType) {
         return playbackAudioState == 'playing' && playbackType != pbType
     }
