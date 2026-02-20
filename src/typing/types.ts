@@ -321,11 +321,11 @@ export type TimeLine = {
 }
 
 // functions that should be called when creating the Tone.Transport schedule
-export type ActionFunctions = {
+export interface ActionFunctions {
     play: SamplerFunction | null
     animate: AnimationFunction | null
-    playercursor?: PlayerCursorFunction | null
-    editorcursor?: EditorCursorFunction | null
+    playercursor: PlayerCursorFunction | null
+    editorcursor: EditorCursorFunction | null
     generic: GenericFunction | null
 }
 

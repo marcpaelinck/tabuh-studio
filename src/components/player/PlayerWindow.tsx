@@ -63,17 +63,15 @@ export default function PlayerWindow({ dataSource }: { dataSource: 'database' | 
     }
 
     return (
-        <div id="TabuhPlayer">
-            <div className="pt-6 pl-6 pr-6">
-                <Menu
-                    menuDisabled={menuDisabled}
-                    scoreList={titleList}
-                    score={score}
-                    scoreUpdater={updateScore}
-                    focusUpdater={updateFocus}
-                    speedUpdater={setPlaybackSpeed}
-                />
-            </div>
+        <div id="TabuhPlayer" className="pt-6 pl-6 pr-6">
+            <Menu
+                menuDisabled={menuDisabled}
+                scoreList={titleList}
+                score={score}
+                scoreUpdater={updateScore}
+                focusUpdater={updateFocus}
+                speedUpdater={setPlaybackSpeed}
+            />
             {selectedFocus.length > 0 && (
                 <Animation
                     focus={selectedFocus}

@@ -1,5 +1,4 @@
 import * as Tone from 'tone'
-import { type AudioFunctionsType } from '../components/editor/contexts'
 import { noCursor } from '../config/config'
 import type { ActionFunctions, EditorCellCursor, EditorScore } from '../typing/types'
 import { debug } from '../utils/debugger'
@@ -21,11 +20,18 @@ export type PlaybackAction = {
     playbackType?: PlaybackType
     score?: EditorScore
     systemIndex?: number
-    audiofunctions?: AudioFunctionsType
     actionFunctions?: ActionFunctions
     cursor?: EditorCellCursor
 }
 // const dialog = useDialog()
+
+const actionFunctions: ActionFunctions = {
+    play: null,
+    animate: null,
+    playercursor: null,
+    editorcursor: null,
+    generic: null
+}
 
 async function asyncPlay() {
     if (Tone.getContext().state == 'suspended') {
@@ -39,10 +45,16 @@ async function asyncPlay() {
     }
 }
 
-export function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
+// This function enables to pass the playbackScheduleFunctions to the playbackReducer.
+export function playbackReducerFactory(actionFunc: ActionFunctions) {
+    Object.assign(actionFunctions, actionFunc)
+    return playbackReducer
+}
+
+function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
         case 'load': {
-            if (!action.score || !action.audiofunctions) {
+            if (!action.score) {
                 console.error('audio reducer: action is "load" but data or functions are missing.')
                 return { ...state, cursor: noCursor, audioState: 'nodata' }
             }
@@ -56,15 +68,7 @@ export function playbackReducer(state: PlaybackState, action: PlaybackAction): P
 
             debug(`executing 'load'`)
             debug(`loading data for sys ${action.score.systems[0].id}`)
-            const loadAction = {
-                ...action,
-                actionFunctions: {
-                    play: action.audiofunctions.playInstrument,
-                    animate: null,
-                    editorcursor: action.audiofunctions.moveEditorCursor,
-                    generic: action.audiofunctions.genericFunction
-                }
-            }
+            const loadAction = { ...action, actionFunctions }
 
             const timeLine = createTimelineFromScore(loadAction, true, 0, 1000)
             createPlaybackSchedule(timeLine)

@@ -1,16 +1,16 @@
 import _ from 'lodash'
 import type { Dispatch, HTMLAttributes, RefObject } from 'react'
-import { Profiler, useEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row, useDialog } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import { playbackReducer } from '../../componentlogic/playbackReducer'
+import { playbackReducerFactory } from '../../componentlogic/playbackReducer'
 import { useInstruments } from '../../componentlogic/useInstruments'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState, noCursor } from '../../config/config'
-import type { EditorScore, EditorSystem, Position } from '../../typing/types'
+import type { ActionFunctions, EditorCursorAction, EditorScore, EditorSystem, Position } from '../../typing/types'
 import { debug } from '../../utils/debugger'
-import { AudioFunctions, defaultAudioFunc, type AudioFunctionsType } from './contexts'
+import { PlaybackFunctions, defaultPlaybackFunc, type PlaybackFunctionsType } from './contexts'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
@@ -27,6 +27,8 @@ interface EditorWindowProps {
     updateSystem: (sysData: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
+    scheduleFunctions: ActionFunctions
+    setScheduleFunctions: Dispatch<ActionFunctions>
 }
 
 export default function EditorWindow({
@@ -37,25 +39,68 @@ export default function EditorWindow({
     labels,
     updateSystem,
     updateParts,
-    executeItemAction
+    executeItemAction,
+    scheduleFunctions,
+    setScheduleFunctions
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
-    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
-    const { playInstrument } = useInstruments(focusRef, 0)
-    const audioFunctions: AudioFunctionsType = useMemo(() => ({ ...defaultAudioFunc, playInstrument }), [])
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(editorScore, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
 
+    // MOVE BLOCK TO MAINWINDOW
+    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
+    const { playInstrument } = useInstruments(focusRef, 0)
+    const playbackFunctions: PlaybackFunctionsType = useMemo(() => ({ ...defaultPlaybackFunc, playInstrument }), [])
+
+    function moveEditorCursor(time: number, cAction: EditorCursorAction) {
+        const sys = (uuid: string | undefined): EditorSystem | undefined => {
+            return editorScore?.systems.find((sys) => sys.uuid == uuid)
+        }
+
+        if (cAction.prevsysuuid && cAction.prevsysuuid != cAction.sysuuid) {
+            debug(`Close panel ${sys(cAction.prevsysuuid)?.id}, curr=${sys(cAction.sysuuid)?.id}`)
+            expandIfNotExpanded(cAction.prevsysuuid, false)
+        }
+        if (cAction.prevsysuuid != cAction.sysuuid) {
+            debug(`Open panel ${sys(cAction.sysuuid)?.id} prev=${sys(cAction.prevsysuuid)?.id}`)
+            expandIfNotExpanded(cAction.sysuuid, true)
+        }
+        playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
+        // debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
+        const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
+        // debug(`scrolling ${currElement?.id} into view`)
+        currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    async function stopPlayback(time: number) {
+        playback({ actionType: 'stop' })
+        // playback({ actionType: 'cursor', cursor: noCursor })
+    }
+    useEffect(
+        () =>
+            setScheduleFunctions({
+                ...scheduleFunctions,
+                play: playInstrument,
+                editorcursor: moveEditorCursor,
+                generic: stopPlayback
+            }),
+        []
+    )
+
     //TODO: playbackState was moved from individual SystemNode components to parent
     // This makes playback very unresponsive. Needs to be solved, possibly by using Ref in some way.
+
+    const playbackReducer = playbackReducerFactory(scheduleFunctions)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
         audioState: 'nodata',
         playbackType: 'none'
     })
+    // END MOVE TO MAINWINDOW
+
     const pbCurrUuid = playbackState.cursor.sysUuid
     const pbType = playbackState.playbackType
     const pbAudioState = playbackState.audioState
+
     const dialog = useDialog()
 
     useEffect(() => {
@@ -226,74 +271,70 @@ export default function EditorWindow({
             const firstOfRange = partName != rangePartName
             if (firstOfRange) rangePartName = partName
             return (
-                <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
-                    <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
-                        <Row>
-                            {/* Left margin containing the part name */}
-                            <PartIndicator
-                                uuid={systemData.uuid}
-                                partName={partName}
-                                partColor={partColor}
-                                firstOfRange={firstOfRange}
-                                selectionOn={selectionOn}
-                                toggleSelection={toggleSelection}
-                                extendSelection={extendSelection}
-                            />
-                            {/* Expandable panel containing a system */}
-                            <Col span={23}>
-                                <Accordion.Panel
-                                    id={`${systemIdPrefix}${systemData.uuid}`}
-                                    key={systemData.uuid}
-                                    // Panel Header
-                                    header={
-                                        <Grid
-                                            id="systemsummary"
-                                            className="ml-0 pt-0 pb-0"
-                                            // Avoid expanding the panel when the user clicks on a header item.
-                                            onClick={(e) => e.stopPropagation()}>
-                                            {/* Displays playback buttons and info about the System */}
-                                            <Row id="row">
-                                                {systemHeaderButtons[systemData.uuid]}
-                                                {systemHeaderFields[systemData.uuid]}
-                                            </Row>
-                                        </Grid>
-                                    }
-                                    expanded={expanded[systemData.uuid]}
-                                    onSelect={() => {
-                                        flipExpanded(systemData.uuid)
-                                    }}>
-                                    {/* Panel content: visible when panel is expanded */}
+                // <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
+                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
+                    <Row>
+                        {/* Left margin containing the part name */}
+                        <PartIndicator
+                            uuid={systemData.uuid}
+                            partName={partName}
+                            partColor={partColor}
+                            firstOfRange={firstOfRange}
+                            selectionOn={selectionOn}
+                            toggleSelection={toggleSelection}
+                            extendSelection={extendSelection}
+                        />
+                        {/* Expandable panel containing a system */}
+                        <Col span={23}>
+                            <Accordion.Panel
+                                id={`${systemIdPrefix}${systemData.uuid}`}
+                                key={systemData.uuid}
+                                // Panel Header
+                                header={
+                                    <Grid
+                                        id="systemsummary"
+                                        className="ml-0 pt-0 pb-0"
+                                        // Avoid expanding the panel when the user clicks on a header item.
+                                        onClick={(e) => e.stopPropagation()}>
+                                        {/* Displays playback buttons and info about the System */}
+                                        <Row id="row">
+                                            {systemHeaderButtons[systemData.uuid]}
+                                            {systemHeaderFields[systemData.uuid]}
+                                        </Row>
+                                    </Grid>
+                                }
+                                expanded={expanded[systemData.uuid]}
+                                onSelect={() => {
+                                    flipExpanded(systemData.uuid)
+                                }}>
+                                {/* Panel content: visible when panel is expanded */}
 
-                                    {expanded[systemData.uuid] && (
-                                        <SystemNode
-                                            systemData={systemData}
-                                            positions={editorScore.positions}
-                                            playbackState={playbackState}
-                                            visible={expanded[systemData.uuid]}
-                                        />
-                                    )}
-                                </Accordion.Panel>
-                            </Col>
-                        </Row>
-                    </Grid>
-                </Profiler>
+                                {expanded[systemData.uuid] && (
+                                    <SystemNode
+                                        systemData={systemData}
+                                        positions={editorScore.positions}
+                                        playbackState={playbackState}
+                                        visible={expanded[systemData.uuid]}
+                                    />
+                                )}
+                            </Accordion.Panel>
+                        </Col>
+                    </Row>
+                </Grid>
+                // </Profiler>
             )
         })
     }, [editorScore, expanded, playbackState, selectionOn, sysToPartLookup])
 
-    function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
-        // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
-    }
+    // function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
+    //     // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
+    // }
 
     return (
-        <Profiler id="App" onRender={onRender}>
-            <AudioFunctions value={audioFunctions}>
-                {loading ? (
-                    <Placeholder.Grid rows={12} columns={6} />
-                ) : (
-                    <Accordion className="w-full">{systems}</Accordion>
-                )}
-            </AudioFunctions>
-        </Profiler>
+        // <Profiler id="App" onRender={onRender}>
+        <PlaybackFunctions value={playbackFunctions}>
+            {loading ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion className="w-full">{systems}</Accordion>}
+        </PlaybackFunctions>
+        // </Profiler>
     )
 }

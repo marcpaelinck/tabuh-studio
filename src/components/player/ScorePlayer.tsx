@@ -45,10 +45,10 @@ export function ScorePlayer({
     timelineUpdater: Dispatch<TimeLine>
 }): JSX.Element {
     // STATE VARIABLES
-    const [audioStarted, setAudioStarted] = useState<AudioState>('false')
-    const [playing, setPlaying] = useState<boolean>(false)
-    const [progress, setProgress] = useState<number>(0)
-    const [totalDuration, setTotalDuration] = useState<number>(0)
+    const [audioStarted, setAudioStarted] = useState<AudioState>('false') // MOVE TO MAINWINDOW
+    const [playing, setPlaying] = useState<boolean>(false) // MOVE TO MAINWINDOW
+    const [progress, setProgress] = useState<number>(0) // MOVE TO MAINWINDOW
+    const [totalDuration, setTotalDuration] = useState<number>(0) // MOVE TO MAINWINDOW
 
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
@@ -79,6 +79,7 @@ export function ScorePlayer({
         play: playInstrument,
         animate: animateInstrument,
         playercursor: animateNotation,
+        editorcursor: null,
         generic: null
     }
 
@@ -126,8 +127,8 @@ export function ScorePlayer({
         })
 
         setTotalDuration(Math.round(score.durationMs / 1000))
-        //@ts-ignore unused `time` argument
-        Tone.getTransport().scheduleRepeat((time) => updateProgress(), '2hz', 0) //, timeline.totalDurationTO)
+        // Refresh progress bar 2x per second
+        Tone.getTransport().scheduleRepeat(() => updateProgress(), '2hz', 0)
     }
 
     function jumpToProgressTime(time: number | number[]) {
@@ -185,43 +186,35 @@ export function ScorePlayer({
     //-----------------------------------------------------------------------
 
     return (
-        <div className="flex flex-col justify-between">
-            <div className="max-width-200 gap-1 px-4 pt-3 pb-4 text-xs">
-                <div className="flex justify-center"></div>
-                <div className="flex w-full">
-                    <div className="flex w-full items-center gap-5 justify-center select-none">
-                        <div className="h-4 w-4 shrink-0">
-                            <button onClick={() => rewind()}>
-                                <FaBackwardFast color="orange" />
-                            </button>
-                        </div>
-                        <div className="h-4 w-4 shrink-0">
-                            <button onClick={() => playPause()}>
-                                {playing ? <FaPause color="orange" /> : <FaPlay color="orange" />}
-                            </button>
-                        </div>
-                        <span className="flex w-12 shrink-0 justify-center">
-                            <p>{toMmSs(progress)}</p>{' '}
-                        </span>
-                        <div className="flex w-full items-center ">
-                            <Slider
-                                progress
-                                className="flex w-full ts-theme-player"
-                                barClassName="flex w-full ts-theme-player"
-                                renderTooltip={(value) => (value ? toMmSs(value) : '')}
-                                min={0}
-                                max={totalDuration}
-                                value={progress}
-                                onChange={(val) => jumpToProgressTime(val)}
-                            />
-                        </div>
-                        <span className="flex w-12 shrink-0 justify-center">
-                            <p>{toMmSs(totalDuration)}</p>
-                        </span>
-                    </div>
-                </div>
+        <div className="px-4 pt-3 pb-4 flex w-full items-center gap-5 justify-center select-none">
+            <div className="h-4 w-4 shrink-0">
+                <button onClick={() => rewind()}>
+                    <FaBackwardFast color="orange" />
+                </button>
             </div>
-            <div></div>
+            <div className="h-4 w-4 shrink-0">
+                <button onClick={() => playPause()}>
+                    {playing ? <FaPause color="orange" /> : <FaPlay color="orange" />}
+                </button>
+            </div>
+            <span className="flex w-12 shrink-0 justify-center">
+                <p>{toMmSs(progress)}</p>
+            </span>
+            <div className="flex w-full items-center ">
+                <Slider
+                    progress
+                    className="flex w-full ts-theme-player"
+                    barClassName="flex w-full ts-theme-player"
+                    renderTooltip={(value) => (value ? toMmSs(value) : '')}
+                    min={0}
+                    max={totalDuration}
+                    value={progress}
+                    onChange={(val) => jumpToProgressTime(val)}
+                />
+            </div>
+            <span className="flex w-12 shrink-0 justify-center">
+                <p>{toMmSs(totalDuration)}</p>
+            </span>
         </div>
     )
 }

@@ -44,17 +44,17 @@ export const DashboardFunctions: Context<DashboardFunctionsType> = createContext
 
 // AUDIO FUNCTIONS
 // used for playback from the editor interface
-export interface AudioFunctionsType {
+export interface PlaybackFunctionsType {
     playInstrument: (time: number, action: SamplerAction) => void
     moveEditorCursor: EditorCursorFunction
     genericFunction: GenericFunction
 }
-export const defaultAudioFunc: AudioFunctionsType = {
+export const defaultPlaybackFunc: PlaybackFunctionsType = {
     playInstrument: () => {},
     moveEditorCursor: () => {},
     genericFunction: () => {}
 }
-export const AudioFunctions: Context<AudioFunctionsType> = createContext(defaultAudioFunc)
+export const PlaybackFunctions: Context<PlaybackFunctionsType> = createContext(defaultPlaybackFunc)
 
 // NAVIGATION FUNCTIONS
 // used by the keyboard listener

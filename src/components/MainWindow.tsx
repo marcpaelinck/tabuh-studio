@@ -34,7 +34,7 @@ import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState } from '../config/config'
-import type { EditorScore, WpUserRecord } from '../typing/types'
+import type { ActionFunctions, EditorScore, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './editor/contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './editor/contexts'
@@ -69,7 +69,6 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
     const wpFunc = useContext(WpApiFunctions)
 
     const handleSubmit = async () => {
-        console.log(`login=${await wpFunc.user.login(formValue.username as string, formValue.password as string)}`)
         if (!formRef.current) return
         if (!formRef.current.check()) {
             console.error('Form Error')
@@ -210,6 +209,13 @@ export function MainWindow({ dataSource }: TabuhEditorProps) {
         scoreToFormattedJson
     }
     const wpFunc = useContext(WpApiFunctions)
+    const [scheduleFunctions, setScheduleFunctions] = useState<ActionFunctions>({
+        play: null,
+        animate: null,
+        playercursor: null,
+        editorcursor: null,
+        generic: null
+    })
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
@@ -316,6 +322,8 @@ export function MainWindow({ dataSource }: TabuhEditorProps) {
                                         updateSystem={updateSystem}
                                         updateParts={updateParts}
                                         executeItemAction={executeItemAction}
+                                        scheduleFunctions={scheduleFunctions}
+                                        setScheduleFunctions={setScheduleFunctions}
                                     />
                                 )}
                                 {active == 'player' && <PlayerWindow dataSource={dataSource} />}

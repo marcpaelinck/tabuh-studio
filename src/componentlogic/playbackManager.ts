@@ -128,8 +128,9 @@ export function createTimelineFromScore(
     var sectionStartTimeMs: number = intro
 
     // This dict will be used to create animation actions
+    // @ts-ignore
     const samplerActionsByPos: Record<Position, SamplerAction[]> = Object.fromEntries(
-        _.keys(positionConfigs).map((key) => [])
+        _.keys(positionConfigs).map((key) => [key, []] as [Position, SamplerAction[]])
     )
 
     debug(currentStep)

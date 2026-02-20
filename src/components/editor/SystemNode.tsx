@@ -20,7 +20,6 @@ interface EditorSystemProps {
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({ systemData, positions, playbackState, visible, ...props }: EditorSystemProps): ReactNode {
-    // const audio: AudioFunctionsType = useContext(AudioFunctions)
     const systemUuid = systemData.uuid
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
