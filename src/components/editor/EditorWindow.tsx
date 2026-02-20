@@ -10,7 +10,6 @@ import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState, noCursor } from '../../config/config'
 import type { ActionFunctions, EditorCursorAction, EditorScore, EditorSystem, Position } from '../../typing/types'
 import { debug } from '../../utils/debugger'
-import { PlaybackFunctions, defaultPlaybackFunc, type PlaybackFunctionsType } from './contexts'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
@@ -50,7 +49,6 @@ export default function EditorWindow({
     // MOVE BLOCK TO MAINWINDOW
     const focusRef: RefObject<Position[]> = useRef<Position[]>([])
     const { playInstrument } = useInstruments(focusRef, 0)
-    const playbackFunctions: PlaybackFunctionsType = useMemo(() => ({ ...defaultPlaybackFunc, playInstrument }), [])
 
     function moveEditorCursor(time: number, cAction: EditorCursorAction) {
         const sys = (uuid: string | undefined): EditorSystem | undefined => {
@@ -332,9 +330,9 @@ export default function EditorWindow({
 
     return (
         // <Profiler id="App" onRender={onRender}>
-        <PlaybackFunctions value={playbackFunctions}>
+        <>
             {loading ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion className="w-full">{systems}</Accordion>}
-        </PlaybackFunctions>
+        </>
         // </Profiler>
     )
 }
