@@ -13,7 +13,7 @@ import {
     speedDefaultOption,
     tabuhDefaultOption
 } from '../../utils/selectorsUtils'
-import Selector from '../Selector'
+import Selector from './Selector'
 
 export default function Menu({
     menuDisabled,

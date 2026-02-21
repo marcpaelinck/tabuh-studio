@@ -1,16 +1,16 @@
 import { createContext, type Context, type RefObject } from 'react'
-import type { NavigationAction } from '../../config/config'
+import type { NavigationAction } from '../config/config'
 import type {
     EditorCursorFunction,
     EditorScore,
     EditorSystem,
     GenericFunction,
-    SamplerAction,
+    ScheduleSamplerAction,
     WpDatabaseReturnValue,
     WpUserReturnValue
-} from '../../typing/types'
-import { emulateAsync } from '../../utils/async'
-import type { ComponentName, DashboardComponentValues } from './Dashboard'
+} from '../typing/types'
+import { emulateAsync } from '../utils/async'
+import type { ComponentName, DashboardComponentValues } from './editor/Dashboard'
 
 // SCORE FUNCTIONS
 // modify / save score
@@ -45,7 +45,7 @@ export const DashboardFunctions: Context<DashboardFunctionsType> = createContext
 // AUDIO FUNCTIONS
 // used for playback from the editor interface
 export interface PlaybackFunctionsType {
-    playInstrument: (time: number, action: SamplerAction) => void
+    playInstrument: (time: number, action: ScheduleSamplerAction) => void
     moveEditorCursor: EditorCursorFunction
     genericFunction: GenericFunction
 }

@@ -7,7 +7,7 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
-import type { ActionFunctions, EditorCursorAction, EditorScore, EditorSystem } from '../../typing/types'
+import type { ActionFunctions, EditorScore, EditorSystem, ScheduleEditorCursorAction } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -49,7 +49,7 @@ export default function EditorWindow({
         usePartManager(editorScore, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
 
-    function moveEditorCursor(time: number, cAction: EditorCursorAction) {
+    function moveEditorCursor(time: number, cAction: ScheduleEditorCursorAction) {
         const sys = (uuid: string | undefined): EditorSystem | undefined => {
             return editorScore?.systems.find((sys) => sys.uuid == uuid)
         }

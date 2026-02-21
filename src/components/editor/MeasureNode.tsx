@@ -4,8 +4,8 @@ import type { NavigationAction } from '../../config/config'
 import type { EditorMeasure, EditorSystem, Position } from '../../typing/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import type { NavigationFunctionsType, ScoreFunctionsType } from './contexts'
-import { NavigationFunctions, ScoreFunctions } from './contexts'
+import type { NavigationFunctionsType, ScoreFunctionsType } from '../contexts'
+import { NavigationFunctions, ScoreFunctions } from '../contexts'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     position: Position

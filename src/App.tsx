@@ -4,7 +4,7 @@ import 'rsuite/dist/rsuite.css'
 import { useWordpressApi } from './componentlogic/useWordpressApi'
 import DebugWindow from './components/DebugWindow'
 import { MainWindow } from './components/MainWindow'
-import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/editor/contexts'
+import { defaultWpApiFunc, WpApiFunctions, type WordPressApiType } from './components/contexts'
 import { FRAMESTYLE } from './config/config'
 
 export const DebugContext = createContext<Dispatch<string>>(() => {})

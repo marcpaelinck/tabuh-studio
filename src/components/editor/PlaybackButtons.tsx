@@ -5,7 +5,7 @@ import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../componentlogic/playbackReducer'
 import type { EditorScore } from '../../typing/types'
 import { debug } from '../../utils/debugger'
-import { PlaybackFunctions, type PlaybackFunctionsType } from './contexts'
+import { PlaybackFunctions, type PlaybackFunctionsType } from '../contexts'
 
 export function PlaybackButtons({
     score,

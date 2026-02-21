@@ -249,16 +249,16 @@ export type EditorCellCursor = { sysUuid: UUID; measure: number }
 // SCORE PROCESSING AND TIMELINE CREATION
 
 export type GenericFunction = (time: number) => void
-export type SamplerFunction = (time: number, action: SamplerAction) => void
-export type AnimationFunction = (time: number, action: AnimationAction) => void
-export type PlayerCursorFunction = (time: number, action: PlayerCursorAction) => void
-export type EditorCursorFunction = (time: number, action: EditorCursorAction) => void
+export type SamplerFunction = (time: number, action: ScheduleSamplerAction) => void
+export type AnimationFunction = (time: number, action: ScheduleAnimationAction) => void
+export type PlayerCursorFunction = (time: number, action: SchedulePlayerCursorAction) => void
+export type EditorCursorFunction = (time: number, action: ScheduleEditorCursorAction) => void
 
 export type GenericAction = { action: GenericFunction; time: TimeObject }
 
 export type TempoAction = { time: TimeObject; bpm: Tone.Unit.NormalRange; duration: TimeObject }
 
-export interface SamplerAction {
+export interface ScheduleSamplerAction {
     action: SamplerFunction
     time: TimeObject
     position: Position
@@ -279,7 +279,7 @@ export type AnimationNote = {
     isLast: boolean
 }
 
-export type AnimationAction = {
+export type ScheduleAnimationAction = {
     action: AnimationFunction
     time: TimeObject
     position: Position
@@ -289,7 +289,7 @@ export type AnimationAction = {
     timeuntilMs: number
 }
 
-export type PlayerCursorAction = {
+export type SchedulePlayerCursorAction = {
     action: PlayerCursorFunction
     time: TimeObject
     position: Position
@@ -300,7 +300,7 @@ export type PlayerCursorAction = {
     range: number[]
 }
 
-export type EditorCursorAction = {
+export type ScheduleEditorCursorAction = {
     action: EditorCursorFunction
     time: TimeObject
     section: number
@@ -312,10 +312,10 @@ export type TimeLine = {
     totalDurationSec: number
     totalDurationTO: TimeObject // Total duration expressed as BaseNote units
     tempoactions: TempoAction[]
-    sampleractions: SamplerAction[]
-    animationactions: AnimationAction[]
-    playercursoractions: PlayerCursorAction[]
-    editorcursoractions: EditorCursorAction[]
+    sampleractions: ScheduleSamplerAction[]
+    animationactions: ScheduleAnimationAction[]
+    playercursoractions: SchedulePlayerCursorAction[]
+    editorcursoractions: ScheduleEditorCursorAction[]
     genericactions: GenericAction[]
     notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
 }

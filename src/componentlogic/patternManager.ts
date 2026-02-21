@@ -15,7 +15,13 @@ import {
     RakeUpChars,
     TremoloChars
 } from '../config/config'
-import type { DurationInBasenoteEquiv, NoteSymbol, Position, SamplerAction, TimeInBasenoteEquiv } from '../typing/types'
+import type {
+    DurationInBasenoteEquiv,
+    NoteSymbol,
+    Position,
+    ScheduleSamplerAction,
+    TimeInBasenoteEquiv
+} from '../typing/types'
 import { getValidSymbols, noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
@@ -85,7 +91,7 @@ export interface CreatePatternArgs {
     nextsymbol: NoteSymbol | undefined // symbol following the current symbol
     bpm: number // current tempo in BPM
     velocity: Tone.Unit.NormalRange // current velocity
-    prevaction: SamplerAction | undefined // last action created for this position
+    prevaction: ScheduleSamplerAction | undefined // last action created for this position
 }
 // Structure of the return value.
 export interface PatternNoteAction {

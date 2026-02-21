@@ -1,6 +1,6 @@
 import type { Dispatch, JSX } from 'react'
 import { Dropdown } from 'rsuite'
-import type { MenuItemInfo } from '../typing/types'
+import type { MenuItemInfo } from '../../typing/types'
 
 const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: Dispatch<MenuItemInfo>) => {
     return (

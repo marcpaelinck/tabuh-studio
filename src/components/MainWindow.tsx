@@ -38,8 +38,8 @@ import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor } from '../config/config'
 import type { ActionFunctions, EditorScore, Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
-import type { DashboardFunctionsType, ScoreFunctionsType } from './editor/contexts'
-import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './editor/contexts'
+import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
+import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
 import {
     Dashboard,
     dashboardDefaults as defaultDashboardValues,

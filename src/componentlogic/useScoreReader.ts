@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { WpApiFunctions } from '../components/editor/contexts'
+import { WpApiFunctions } from '../components/contexts'
 import { defaultIntroTime, editorSortingOrder } from '../config/config'
 import type {
     EditorMeasure,

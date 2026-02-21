@@ -12,7 +12,7 @@ import {
 import { speedDefaultOption } from '../../utils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
-import { ScorePlayer } from './ScorePlayer'
+import { ScorePlayer } from './Player'
 
 interface PlayerWindowProps {
     dataSource: 'database' | 'file'

@@ -17,7 +17,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
 import { type XCoordRecord, type YCoordRecord } from '../../typing/types'
-import Selector from '../Selector'
+import Selector from './Selector'
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.

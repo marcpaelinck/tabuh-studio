@@ -6,7 +6,7 @@ import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsui
 import TsGongIcon from '../reacticons/TsGongIcon'
 import type { EditorScore, ScoreInfo } from '../typing/types'
 import type { KeyboardType } from './MainWindow'
-import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './editor/contexts'
+import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
     | '1'

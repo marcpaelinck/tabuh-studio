@@ -7,9 +7,9 @@ import { noCursor, positionConfigs, type NavigationAction } from '../../config/c
 import type { EditorCellCursor, EditorSystem, Position } from '../../typing/types'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
+import { NavigationFunctions, ScoreFunctions, type NavigationFunctionsType, type ScoreFunctionsType } from '../contexts'
 import { StaffNode } from './StaffNode'
 import type { GridInfo } from './_types'
-import { NavigationFunctions, ScoreFunctions, type NavigationFunctionsType, type ScoreFunctionsType } from './contexts'
 
 interface EditorSystemProps {
     systemData: EditorSystem
