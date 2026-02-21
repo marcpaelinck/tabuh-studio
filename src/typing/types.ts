@@ -249,17 +249,17 @@ export type EditorCellCursor = { sysUuid: UUID; measure: number }
 // SCORE PROCESSING AND TIMELINE CREATION
 
 export type GenericFunction = (time: number) => void
-export type SamplerFunction = (time: number, action: ScheduleSamplerAction) => void
-export type AnimationFunction = (time: number, action: ScheduleAnimationAction) => void
-export type PlayerCursorFunction = (time: number, action: SchedulePlayerCursorAction) => void
-export type EditorCursorFunction = (time: number, action: ScheduleEditorCursorAction) => void
+export type SamplerFunction = (time: number, action: PlaybackSamplerAction) => void
+export type AnimationFunction = (time: number, action: PlaybackAnimationAction) => void
+export type PlayerCursorFunction = (time: number, action: PlaybackPlayerCursorAction) => void
+export type EditorCursorFunction = (time: number, action: PlaybackEditorCursorAction) => void
 
 export type GenericAction = { action: GenericFunction; time: TimeObject }
 
 export type TempoAction = { time: TimeObject; bpm: Tone.Unit.NormalRange; duration: TimeObject }
 
-export interface ScheduleSamplerAction {
-    action: SamplerFunction
+export interface PlaybackSamplerAction {
+    function: SamplerFunction
     time: TimeObject
     position: Position
     symbol: NoteSymbol
@@ -279,8 +279,8 @@ export type AnimationNote = {
     isLast: boolean
 }
 
-export type ScheduleAnimationAction = {
-    action: AnimationFunction
+export type PlaybackAnimationAction = {
+    function: AnimationFunction
     time: TimeObject
     position: Position
     currnotes: AnimationNote[]
@@ -289,8 +289,8 @@ export type ScheduleAnimationAction = {
     timeuntilMs: number
 }
 
-export type SchedulePlayerCursorAction = {
-    action: PlayerCursorFunction
+export type PlaybackPlayerCursorAction = {
+    function: PlayerCursorFunction
     time: TimeObject
     position: Position
     section: number
@@ -300,8 +300,8 @@ export type SchedulePlayerCursorAction = {
     range: number[]
 }
 
-export type ScheduleEditorCursorAction = {
-    action: EditorCursorFunction
+export type PlaybackEditorCursorAction = {
+    function: EditorCursorFunction
     time: TimeObject
     section: number
     prevsysuuid: UUID | undefined
@@ -312,16 +312,16 @@ export type TimeLine = {
     totalDurationSec: number
     totalDurationTO: TimeObject // Total duration expressed as BaseNote units
     tempoactions: TempoAction[]
-    sampleractions: ScheduleSamplerAction[]
-    animationactions: ScheduleAnimationAction[]
-    playercursoractions: SchedulePlayerCursorAction[]
-    editorcursoractions: ScheduleEditorCursorAction[]
+    sampleractions: PlaybackSamplerAction[]
+    animationactions: PlaybackAnimationAction[]
+    playercursoractions: PlaybackPlayerCursorAction[]
+    editorcursoractions: PlaybackEditorCursorAction[]
     genericactions: GenericAction[]
     notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
 }
 
 // functions that should be called when creating the Tone.Transport schedule
-export interface ActionFunctions {
+export interface PlaybackActionFunctions {
     play: SamplerFunction | null
     animate: AnimationFunction | null
     playercursor: PlayerCursorFunction | null

@@ -3,11 +3,11 @@ import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import { v4 as uuidv4 } from 'uuid'
 import { defaultIntroTime, defaultOutroTime, noteConfigs, positionConfigs } from '../config/config'
 import {
-    type ActionFunctions,
     type AnimationNote,
     type JsonNote,
     type JsonSymbol,
     type Note,
+    type PlaybackActionFunctions,
     type Position,
     type Score,
     type Section,
@@ -98,7 +98,7 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
 }
 
 // Creates a timeline object for the Player application
-export function createTimeline(score: Score | undefined, actionFunctions: ActionFunctions): TimeLine {
+export function createTimeline(score: Score | undefined, actionFunctions: PlaybackActionFunctions): TimeLine {
     // TimeLine will be used to create the Transport schedule
 
     if (!score || score == ({} as Score)) return {} as TimeLine
@@ -142,7 +142,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                         const bpm = getCurrentBPM(section, sectionProgress)
                         if (!actionFunctions.play) return // redundant, this is just to avoid a ts error
                         timeline.sampleractions.push({
-                            action: actionFunctions.play,
+                            function: actionFunctions.play,
                             position: position,
                             symbol: cleanSymbol(note.s),
                             bpm: bpm,
@@ -173,7 +173,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
         // from the starting position to the first note
         if (actionFunctions.animate) {
             timeline.animationactions.push({
-                action: actionFunctions.animate,
+                function: actionFunctions.animate,
                 time: n2TO(0),
                 position: position,
                 // prevsysUuid: null,
@@ -196,7 +196,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                 const prevSection = index > 0 ? notes[index - 1].section : null
                 if (!actionFunctions.animate) return // redundant, this is just to avoid a ts error
                 timeline.animationactions.push({
-                    action: actionFunctions.animate,
+                    function: actionFunctions.animate,
                     time: n2TO(note.t),
                     position: position,
                     // prevsysUuid: prevSystem,
@@ -231,7 +231,7 @@ export function createTimeline(score: Score | undefined, actionFunctions: Action
                 currentline += symbol.s
                 if (!actionFunctions.playercursor) return // redundant, this is just to avoid a ts error
                 timeline.playercursoractions.push({
-                    action: actionFunctions.playercursor,
+                    function: actionFunctions.playercursor,
                     time: n2TO(symbol.t),
                     sysuuid: symbol.sysUuid,
                     section: symbol.sectionId,

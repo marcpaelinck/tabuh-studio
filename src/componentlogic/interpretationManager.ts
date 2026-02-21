@@ -1,7 +1,7 @@
 import * as Tone from 'tone'
-import type { ScheduleSamplerAction, TempoAction } from '../typing/types'
+import type { PlaybackSamplerAction, TempoAction } from '../typing/types'
 
-export function changeTempo(time: number, action: TempoAction | ScheduleSamplerAction, pbSpeed: number) {
+export function changeTempo(time: number, action: TempoAction | PlaybackSamplerAction, pbSpeed: number) {
     if (action.bpm != undefined) {
         // if (action.bpm[0] !== Tone.getTransport().bpm.getValueAtTime(action.time) || action.bpm[1] !== Tone.getTransport().bpm.getValueAtTime(action.time)) {
         Tone.getTransport().bpm.setValueAtTime(action.bpm * pbSpeed, time)

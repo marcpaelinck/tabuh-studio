@@ -19,11 +19,11 @@ import type {
     GenericAction,
     Note,
     NoteSymbol,
+    PlaybackAnimationAction,
+    PlaybackEditorCursorAction,
+    PlaybackPlayerCursorAction,
+    PlaybackSamplerAction,
     Position,
-    ScheduleAnimationAction,
-    ScheduleEditorCursorAction,
-    SchedulePlayerCursorAction,
-    ScheduleSamplerAction,
     TempoAction,
     TimeLine
 } from '../typing/types'
@@ -35,7 +35,7 @@ import { executionManager, type FlowStep } from './executionManager'
 import { createNoteActions, type PatternNoteAction } from './patternManager'
 import type { PlaybackAction } from './playbackReducer'
 
-const changeTempo: (time: number, action: TempoAction | ScheduleSamplerAction, pbSpeed: number) => void = (
+const changeTempo: (time: number, action: TempoAction | PlaybackSamplerAction, pbSpeed: number) => void = (
     time: number,
     action: TempoAction,
     pbSpeed: number
@@ -45,7 +45,7 @@ const changeTempo: (time: number, action: TempoAction | ScheduleSamplerAction, p
     }
 }
 
-const samplerAction2AnimationNotes = (position: Position, action: ScheduleSamplerAction): AnimationNote[] => {
+const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
     if (!(position in positionConfigs)) return []
     const cleanedSymbol = cleanSymbol(action.symbol)
     const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
@@ -114,7 +114,7 @@ export function createTimelineFromScore(
     }
 
     var prevSystem: EditorSystem | undefined = undefined
-    var currNote: Record<string, ScheduleSamplerAction | null> = Object.fromEntries(
+    var currNote: Record<string, PlaybackSamplerAction | null> = Object.fromEntries(
         Object.keys(positionConfigs).map((key) => [key, null])
     )
     var prevNote = { ...currNote }
@@ -129,8 +129,8 @@ export function createTimelineFromScore(
 
     // This dict will be used to create animation actions
     // @ts-ignore
-    const samplerActionsByPos: Record<Position, ScheduleSamplerAction[]> = Object.fromEntries(
-        _.keys(positionConfigs).map((key) => [key, []] as [Position, ScheduleSamplerAction[]])
+    const samplerActionsByPos: Record<Position, PlaybackSamplerAction[]> = Object.fromEntries(
+        _.keys(positionConfigs).map((key) => [key, []] as [Position, PlaybackSamplerAction[]])
     )
 
     debug(currentStep)
@@ -184,7 +184,7 @@ export function createTimelineFromScore(
                             const finalNote = endOfPosition && lastPatternNote
                             currNote[position] = {
                                 ...noteAction,
-                                ...{ action: pbAction.actionFunctions!.play!, isLast: finalNote }
+                                ...{ function: pbAction.actionFunctions!.play!, isLast: finalNote }
                             }
                             if (finalNote)
                                 // Extend the final note of the current position
@@ -208,7 +208,7 @@ export function createTimelineFromScore(
 
                 if (pbAction.actionFunctions!.playercursor) {
                     timeline.playercursoractions.push({
-                        action: pbAction.actionFunctions!.playercursor,
+                        function: pbAction.actionFunctions!.playercursor,
                         time: n2TO(currTime),
                         sysuuid: currentStep!.system.uuid,
                         section: currentStep!.sectionIdx,
@@ -231,7 +231,7 @@ export function createTimelineFromScore(
         if (pbAction.actionFunctions.editorcursor) {
             var cursorTime = sectionStartTime
             timeline.editorcursoractions.push({
-                action: pbAction.actionFunctions.editorcursor,
+                function: pbAction.actionFunctions.editorcursor,
                 time: n2TO(cursorTime),
                 prevsysuuid: prevSystem?.uuid || undefined,
                 sysuuid: currentStep.system.uuid,
@@ -246,12 +246,12 @@ export function createTimelineFromScore(
 
     _.keys(samplerActionsByPos).forEach((pos) => {
         const position = pos as Position
-        const actions: ScheduleSamplerAction[] = samplerActionsByPos[position]
+        const actions: PlaybackSamplerAction[] = samplerActionsByPos[position]
         // Add an animation action for the displacement of the panggul
         // from the starting position to the first note
         if (pbAction.actionFunctions!.animate) {
             timeline.animationactions.push({
-                action: pbAction.actionFunctions!.animate,
+                function: pbAction.actionFunctions!.animate,
                 time: n2TO(0),
                 position: position,
                 currnotes: [],
@@ -273,7 +273,7 @@ export function createTimelineFromScore(
                     : To2Millis(nextAction!.time, nextAction!.bpm) - To2Millis(action!.time, action!.bpm)
                 if (!pbAction.actionFunctions!.animate) return // redundant, this is just to avoid a ts error
                 timeline.animationactions.push({
-                    action: pbAction.actionFunctions!.animate,
+                    function: pbAction.actionFunctions!.animate,
                     time: action.time,
                     position: position,
                     currnotes: aNotes,
@@ -307,24 +307,24 @@ export function createPlaybackSchedule(timeLine: TimeLine | undefined, pbSpeed: 
     // Set the initial tempo to 60 (intro time)
     const tAction: TempoAction = { time: { '16n': 0 }, bpm: defaultTempo, duration: { '16n': 0 } }
     Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
-    timeLine.sampleractions.forEach((action: ScheduleSamplerAction) => {
+    timeLine.sampleractions.forEach((action: PlaybackSamplerAction) => {
         Tone.getTransport().schedule((time) => changeTempo(time, action, pbSpeed), action.time)
-        Tone.getTransport().schedule((time) => action.action(time, action), action.time)
+        Tone.getTransport().schedule((time) => action.function(time, action), action.time)
     })
 
     // Animation actions
-    timeLine.animationactions.forEach((action: ScheduleAnimationAction) => {
-        Tone.getTransport().schedule((time) => action.action(time, action), action.time)
+    timeLine.animationactions.forEach((action: PlaybackAnimationAction) => {
+        Tone.getTransport().schedule((time) => action.function(time, action), action.time)
     })
 
     // Player Cursor actions
-    timeLine.playercursoractions.forEach((action: SchedulePlayerCursorAction) => {
-        Tone.getTransport().schedule((time) => action.action(time, action), action.time)
+    timeLine.playercursoractions.forEach((action: PlaybackPlayerCursorAction) => {
+        Tone.getTransport().schedule((time) => action.function(time, action), action.time)
     })
 
     // Editor Cursor actions
-    timeLine.editorcursoractions.forEach((action: ScheduleEditorCursorAction) => {
-        Tone.getTransport().schedule((time) => action.action(time, action), action.time)
+    timeLine.editorcursoractions.forEach((action: PlaybackEditorCursorAction) => {
+        Tone.getTransport().schedule((time) => action.function(time, action), action.time)
     })
 
     // Action for when end of schedule is reached

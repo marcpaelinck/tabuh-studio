@@ -3,13 +3,13 @@ import * as Tone from 'tone'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { useInstruments } from '../../componentlogic/useInstruments'
 import {
-    type ActionFunctions,
     type HighlightRange,
     type MenuItemInfo,
+    type PlaybackActionFunctions,
+    type PlaybackAnimationAction,
+    type PlaybackPlayerCursorAction,
+    type PlaybackSamplerAction,
     type Position,
-    type ScheduleAnimationAction,
-    type SchedulePlayerCursorAction,
-    type ScheduleSamplerAction,
     type Score,
     type SVGInfo,
     type TempoAction,
@@ -75,7 +75,7 @@ export function ScorePlayer({
         pbSpeedRef
     )
 
-    const actionFunctions: ActionFunctions = {
+    const actionFunctions: PlaybackActionFunctions = {
         play: playInstrument,
         animate: animateInstrument,
         playercursor: animateNotation,
@@ -113,17 +113,17 @@ export function ScorePlayer({
         const initialBpm = score.systems[0].sections[0].tempo[0]
         const tAction: TempoAction = { time: { '16n': 0 }, bpm: initialBpm, duration: { '16n': 0 } }
         Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
-        timeline.sampleractions.forEach((sAction: ScheduleSamplerAction) => {
+        timeline.sampleractions.forEach((sAction: PlaybackSamplerAction) => {
             Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)
-            Tone.getTransport().schedule((time) => sAction.action(time, sAction), sAction.time)
+            Tone.getTransport().schedule((time) => sAction.function(time, sAction), sAction.time)
         })
         // Schedule animation actions
-        timeline.animationactions.forEach((aAction: ScheduleAnimationAction) => {
-            Tone.getTransport().schedule((time) => aAction.action(time, aAction), aAction.time)
+        timeline.animationactions.forEach((aAction: PlaybackAnimationAction) => {
+            Tone.getTransport().schedule((time) => aAction.function(time, aAction), aAction.time)
         })
         // Schedule cursor actions
-        timeline.playercursoractions.forEach((cAction: SchedulePlayerCursorAction) => {
-            Tone.getTransport().schedule((time) => cAction.action(time, cAction), cAction.time)
+        timeline.playercursoractions.forEach((cAction: PlaybackPlayerCursorAction) => {
+            Tone.getTransport().schedule((time) => cAction.function(time, cAction), cAction.time)
         })
 
         setTotalDuration(Math.round(score.durationMs / 1000))

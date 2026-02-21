@@ -5,8 +5,8 @@ import type {
     AnimationNote,
     HighlightRange,
     MenuItemInfo,
-    ScheduleAnimationAction,
-    SchedulePlayerCursorAction,
+    PlaybackAnimationAction,
+    PlaybackPlayerCursorAction,
     SVGInfo
 } from '../typing/types'
 import { debug } from '../utils/debugger'
@@ -47,7 +47,7 @@ async function highlightNote(keyElement: Element, note: AnimationNote, positionI
     animation.play()
 }
 
-function animatePanggul(action: ScheduleAnimationAction, svgInfo: SVGInfo, pbSpeed: number) {
+function animatePanggul(action: PlaybackAnimationAction, svgInfo: SVGInfo, pbSpeed: number) {
     var keyframes, options
     if (!action || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !action.currnotes)
         return
@@ -145,13 +145,13 @@ export const useAnimationEngine = (
     currentFocusRef: RefObject<string[]>,
     pbSpeedRef: RefObject<number>
 ) => {
-    async function highlightCurrentNote(cAction: SchedulePlayerCursorAction) {
+    async function highlightCurrentNote(cAction: PlaybackPlayerCursorAction) {
         if (highlightFunctionRef.current) highlightFunctionRef.current({ line: cAction.line, range: cAction.range })
     }
 
     // For the use of Draw.schedule, see
     const animateInstrument = useCallback(
-        (time: number, aAction: ScheduleAnimationAction) => {
+        (time: number, aAction: PlaybackAnimationAction) => {
             if (currentFocusRef.current.includes(aAction.position)) {
                 if (svgInfoRef.current.svg && aAction.currnotes) {
                     // Hightighting animation
@@ -187,7 +187,7 @@ export const useAnimationEngine = (
         [svgInfoRef.current, panggulOptionRef.current, currentFocusRef.current, pbSpeedRef.current]
     )
 
-    const animateNotation = useCallback((time: number, cAction: SchedulePlayerCursorAction) => {
+    const animateNotation = useCallback((time: number, cAction: PlaybackPlayerCursorAction) => {
         // if (currentFocus.includes(cAction.position)) {
         if (currentFocusRef.current.length > 0 && currentFocusRef.current[0] === cAction.position) {
             Tone.getDraw().schedule(() => highlightCurrentNote(cAction), time)

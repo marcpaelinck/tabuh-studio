@@ -36,7 +36,7 @@ import { useInstruments } from '../componentlogic/useInstruments'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor } from '../config/config'
-import type { ActionFunctions, EditorScore, Position, WpUserRecord } from '../typing/types'
+import type { EditorScore, PlaybackActionFunctions, Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
@@ -211,7 +211,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         scoreToFormattedJson
     }
     const wpFunc = useContext(WpApiFunctions)
-    const [scheduleFunctions, setScheduleFunctions] = useState<ActionFunctions>({
+    const [scheduleFunctions, setScheduleFunctions] = useState<PlaybackActionFunctions>({
         play: null,
         animate: null,
         playercursor: null,

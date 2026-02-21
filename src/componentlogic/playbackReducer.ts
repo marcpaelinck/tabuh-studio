@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { ActionFunctions, EditorCellCursor, EditorScore } from '../typing/types'
+import type { EditorCellCursor, EditorScore, PlaybackActionFunctions } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { createPlaybackSchedule, createTimelineFromScore } from './playbackManager'
 import { cycleValidation } from './validationManager'
@@ -20,12 +20,12 @@ export type PlaybackAction = {
     playbackType?: PlaybackType
     score?: EditorScore
     systemIndex?: number
-    actionFunctions?: ActionFunctions
+    actionFunctions?: PlaybackActionFunctions
     cursor?: EditorCellCursor
 }
 // const dialog = useDialog()
 
-const actionFunctions: ActionFunctions = {
+const actionFunctions: PlaybackActionFunctions = {
     play: null,
     animate: null,
     playercursor: null,
@@ -46,7 +46,7 @@ async function asyncPlay() {
 }
 
 // This function enables to pass the playbackScheduleFunctions to the playbackReducer.
-export function playbackReducerFactory(actionFunc: ActionFunctions) {
+export function playbackReducerFactory(actionFunc: PlaybackActionFunctions) {
     Object.assign(actionFunctions, actionFunc)
     return playbackReducer
 }

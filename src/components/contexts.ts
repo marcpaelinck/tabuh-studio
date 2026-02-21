@@ -5,7 +5,7 @@ import type {
     EditorScore,
     EditorSystem,
     GenericFunction,
-    ScheduleSamplerAction,
+    PlaybackSamplerAction,
     WpDatabaseReturnValue,
     WpUserReturnValue
 } from '../typing/types'
@@ -45,7 +45,7 @@ export const DashboardFunctions: Context<DashboardFunctionsType> = createContext
 // AUDIO FUNCTIONS
 // used for playback from the editor interface
 export interface PlaybackFunctionsType {
-    playInstrument: (time: number, action: ScheduleSamplerAction) => void
+    playInstrument: (time: number, action: PlaybackSamplerAction) => void
     moveEditorCursor: EditorCursorFunction
     genericFunction: GenericFunction
 }

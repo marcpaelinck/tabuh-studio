@@ -18,8 +18,8 @@ import {
 import type {
     DurationInBasenoteEquiv,
     NoteSymbol,
+    PlaybackSamplerAction,
     Position,
-    ScheduleSamplerAction,
     TimeInBasenoteEquiv
 } from '../typing/types'
 import { getValidSymbols, noteRange } from '../utils/alphabet'
@@ -91,7 +91,7 @@ export interface CreatePatternArgs {
     nextsymbol: NoteSymbol | undefined // symbol following the current symbol
     bpm: number // current tempo in BPM
     velocity: Tone.Unit.NormalRange // current velocity
-    prevaction: ScheduleSamplerAction | undefined // last action created for this position
+    prevaction: PlaybackSamplerAction | undefined // last action created for this position
 }
 // Structure of the return value.
 export interface PatternNoteAction {

@@ -11,12 +11,12 @@ import {
     SOUNDS_FOLDER
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import type { Position, ScheduleSamplerAction } from '../typing/types'
+import type { PlaybackSamplerAction, Position } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
-    play: (time: number, action: ScheduleSamplerAction, focus: Position[]) => void
+    play: (time: number, action: PlaybackSamplerAction, focus: Position[]) => void
     mute: (time: number) => void
 }
 
@@ -87,7 +87,7 @@ const createInstrument = (
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
-        play: (time: number, action: ScheduleSamplerAction, currentFocus: string[]) => {
+        play: (time: number, action: PlaybackSamplerAction, currentFocus: string[]) => {
             const dimValue =
                 currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)
                     ? 1
@@ -136,7 +136,7 @@ export const useInstruments = (currentFocus: Position[], outroTime: number = def
     const random_attack_deviation = (time: number) =>
         time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
-    const playInstrument = useCallback((time: number, action: ScheduleSamplerAction) => {
+    const playInstrument = useCallback((time: number, action: PlaybackSamplerAction) => {
         debug(
             `playing ${action.position} ${action.symbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
         )
