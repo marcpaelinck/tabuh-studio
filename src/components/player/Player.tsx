@@ -5,14 +5,14 @@ import { useInstruments } from '../../componentlogic/useInstruments'
 import {
     type HighlightRange,
     type MenuItemInfo,
-    type PlaybackActionFunctions,
     type PlaybackAnimationAction,
+    type PlaybackCallbackFunctions,
     type PlaybackPlayerCursorAction,
     type PlaybackSamplerAction,
     type Position,
     type Score,
     type SVGInfo,
-    type TempoAction,
+    type TempoFunctionParameters,
     type TimeLine
 } from '../../typing/types'
 import { createTimeline } from '../../utils/score'
@@ -21,13 +21,13 @@ import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
-import { changeTempo } from '../../componentlogic/interpretationManager'
+import { defaultPlaybackFunctions } from '../../componentlogic/playbackManager'
 import { debug } from '../../utils/debugger'
 import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export function ScorePlayer({
+export function Player({
     score,
     focus,
     pbSpeed,
@@ -75,13 +75,8 @@ export function ScorePlayer({
         pbSpeedRef
     )
 
-    const actionFunctions: PlaybackActionFunctions = {
-        play: playInstrument,
-        animate: animateInstrument,
-        playercursor: animateNotation,
-        editorcursor: null,
-        generic: null
-    }
+    const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
+    Object.assign(actionFunctions, { play: playInstrument, animate: animateInstrument, playercursor: animateNotation })
 
     // MEMOS AND EFFECTS
     const timeline = useMemo<TimeLine>(() => createTimeline(score, actionFunctions), [score])
@@ -111,19 +106,22 @@ export function ScorePlayer({
         // tempo and instrument actions (notes)
         // Set the initial tempo to 60 (intro time)
         const initialBpm = score.systems[0].sections[0].tempo[0]
-        const tAction: TempoAction = { time: { '16n': 0 }, bpm: initialBpm, duration: { '16n': 0 } }
-        Tone.getTransport().schedule((time) => changeTempo(time, tAction, pbSpeed), tAction.time)
+        const params: TempoFunctionParameters = { bpm: initialBpm, pbSpeed }
+        Tone.getTransport().schedule((time) => actionFunctions.tempo(time, params), 0)
         timeline.sampleractions.forEach((sAction: PlaybackSamplerAction) => {
-            Tone.getTransport().schedule((time) => changeTempo(time, sAction, pbSpeed), sAction.time)
-            Tone.getTransport().schedule((time) => sAction.function(time, sAction), sAction.time)
+            Tone.getTransport().schedule(
+                (time) => actionFunctions.tempo(time, { bpm: sAction.params.bpm, pbSpeed }),
+                sAction.time
+            )
+            Tone.getTransport().schedule((time) => sAction.function(time, sAction.params), sAction.time)
         })
         // Schedule animation actions
         timeline.animationactions.forEach((aAction: PlaybackAnimationAction) => {
-            Tone.getTransport().schedule((time) => aAction.function(time, aAction), aAction.time)
+            Tone.getTransport().schedule((time) => aAction.function(time, aAction.params), aAction.time)
         })
         // Schedule cursor actions
         timeline.playercursoractions.forEach((cAction: PlaybackPlayerCursorAction) => {
-            Tone.getTransport().schedule((time) => cAction.function(time, cAction), cAction.time)
+            Tone.getTransport().schedule((time) => cAction.function(time, cAction.params), cAction.time)
         })
 
         setTotalDuration(Math.round(score.durationMs / 1000))

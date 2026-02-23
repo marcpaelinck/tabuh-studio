@@ -4,22 +4,32 @@ import { positionConfigs } from '../../config/config'
 import {
     type HighlightRange,
     type MenuItemInfo,
+    type PlaybackCallbackFunctions,
     type Position,
     type Score,
     type SVGInfo,
     type TimeLine
 } from '../../typing/types'
-import { speedDefaultOption } from '../../utils/selectorsUtils'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
-import { ScorePlayer } from './Player'
+import { Player } from './Player'
 
 interface PlayerWindowProps {
     dataSource: 'database' | 'file'
     selectedFocus: Position[]
     setSelectedFocus: Dispatch<Position[]>
+    playbackFunctions: PlaybackCallbackFunctions
+    setPlaybackFunctions: Dispatch<PlaybackCallbackFunctions>
+    playbackSpeed: number
+    setPlaybackSpeed: Dispatch<number>
 }
-export default function PlayerWindow({ dataSource, selectedFocus, setSelectedFocus }: PlayerWindowProps) {
+export default function PlayerWindow({
+    dataSource,
+    selectedFocus,
+    setSelectedFocus,
+    playbackSpeed,
+    setPlaybackSpeed
+}: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
@@ -27,7 +37,6 @@ export default function PlayerWindow({ dataSource, selectedFocus, setSelectedFoc
     const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
-    const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
     const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
     const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
@@ -87,7 +96,7 @@ export default function PlayerWindow({ dataSource, selectedFocus, setSelectedFoc
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <ScorePlayer
+            <Player
                 score={score}
                 focus={selectedFocus}
                 pbSpeed={playbackSpeed}

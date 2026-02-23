@@ -248,19 +248,21 @@ export type EditorCellCursor = { sysUuid: UUID; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
-export type GenericFunction = (time: number) => void
-export type SamplerFunction = (time: number, action: PlaybackSamplerAction) => void
-export type AnimationFunction = (time: number, action: PlaybackAnimationAction) => void
-export type PlayerCursorFunction = (time: number, action: PlaybackPlayerCursorAction) => void
-export type EditorCursorFunction = (time: number, action: PlaybackEditorCursorAction) => void
+export type GenericFunction = (time: number, params: {}) => void
+export type GenericAction = { time: TimeObject; function: GenericFunction; params: {} }
 
-export type GenericAction = { action: GenericFunction; time: TimeObject }
-
-export type TempoAction = { time: TimeObject; bpm: Tone.Unit.NormalRange; duration: TimeObject }
-
-export interface PlaybackSamplerAction {
-    function: SamplerFunction
+export interface TempoFunctionParameters {
+    bpm: Tone.Unit.NormalRange
+    pbSpeed: number
+}
+export type TempoFunction = (time: number, params: TempoFunctionParameters) => void
+export interface PlaybackTempoAction {
     time: TimeObject
+    function: TempoFunction
+    params: TempoFunctionParameters
+}
+
+export interface SamplerFunctionParameters {
     position: Position
     symbol: NoteSymbol
     bpm: number
@@ -268,8 +270,14 @@ export interface PlaybackSamplerAction {
     duration: TimeObject
     isLast: boolean
 }
+export type SamplerFunction = (time: number, params: SamplerFunctionParameters) => void
+export interface PlaybackSamplerAction {
+    time: TimeObject
+    function: SamplerFunction
+    params: SamplerFunctionParameters
+}
 
-export type AnimationNote = {
+export interface AnimationNote {
     time: TimeObject
     keyname: string
     tone: ToneType
@@ -278,20 +286,20 @@ export type AnimationNote = {
     duration: TimeObject
     isLast: boolean
 }
-
-export type PlaybackAnimationAction = {
-    function: AnimationFunction
-    time: TimeObject
+export interface AnimmationFunctionParameters {
     position: Position
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
     timeuntil: TimeObject
     timeuntilMs: number
 }
-
-export type PlaybackPlayerCursorAction = {
-    function: PlayerCursorFunction
+export type AnimationFunction = (time: number, params: AnimmationFunctionParameters) => void
+export interface PlaybackAnimationAction {
     time: TimeObject
+    function: AnimationFunction
+    params: AnimmationFunctionParameters
+}
+export interface PlayerCursorParameters {
     position: Position
     section: number
     sysuuid: UUID
@@ -299,34 +307,47 @@ export type PlaybackPlayerCursorAction = {
     line: number
     range: number[]
 }
-
-export type PlaybackEditorCursorAction = {
-    function: EditorCursorFunction
+export type PlayerCursorFunction = (time: number, params: PlayerCursorParameters) => void
+export type PlaybackPlayerCursorAction = {
     time: TimeObject
-    section: number
+    function: PlayerCursorFunction
+    params: PlayerCursorParameters
+}
+
+export interface EditorCursorParameters {
     prevsysuuid: UUID | undefined
     sysuuid: UUID
+    section: number
 }
+export type EditorCursorFunction = (time: number, params: EditorCursorParameters) => void
+export type PlaybackEditorCursorAction = {
+    time: TimeObject
+    function: EditorCursorFunction
+    params: EditorCursorParameters
+}
+
+// Callback functions used when creating a playback schedule in Tone.Transport
+export interface PlaybackCallbackFunctions {
+    tempo: TempoFunction
+    play: SamplerFunction
+    animate: AnimationFunction
+    playercursor: PlayerCursorFunction
+    editorcursor: EditorCursorFunction
+    generic: GenericFunction
+}
+
+// PLAYBACK SCHEDULING
 
 export type TimeLine = {
     totalDurationSec: number
     totalDurationTO: TimeObject // Total duration expressed as BaseNote units
-    tempoactions: TempoAction[]
+    tempoactions: PlaybackTempoAction[]
     sampleractions: PlaybackSamplerAction[]
     animationactions: PlaybackAnimationAction[]
     playercursoractions: PlaybackPlayerCursorAction[]
     editorcursoractions: PlaybackEditorCursorAction[]
     genericactions: GenericAction[]
     notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
-}
-
-// functions that should be called when creating the Tone.Transport schedule
-export interface PlaybackActionFunctions {
-    play: SamplerFunction | null
-    animate: AnimationFunction | null
-    playercursor: PlayerCursorFunction | null
-    editorcursor: EditorCursorFunction | null
-    generic: GenericFunction | null
 }
 
 // WordPress API

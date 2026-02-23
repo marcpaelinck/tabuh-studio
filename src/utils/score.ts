@@ -7,7 +7,7 @@ import {
     type JsonNote,
     type JsonSymbol,
     type Note,
-    type PlaybackActionFunctions,
+    type PlaybackCallbackFunctions,
     type Position,
     type Score,
     type Section,
@@ -98,7 +98,7 @@ const getCurrentBPM = (section: Section, relBNTime: number): number => {
 }
 
 // Creates a timeline object for the Player application
-export function createTimeline(score: Score | undefined, actionFunctions: PlaybackActionFunctions): TimeLine {
+export function createTimeline(score: Score | undefined, actionFunctions: PlaybackCallbackFunctions): TimeLine {
     // TimeLine will be used to create the Transport schedule
 
     if (!score || score == ({} as Score)) return {} as TimeLine
@@ -142,14 +142,16 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
                         const bpm = getCurrentBPM(section, sectionProgress)
                         if (!actionFunctions.play) return // redundant, this is just to avoid a ts error
                         timeline.sampleractions.push({
-                            function: actionFunctions.play,
-                            position: position,
-                            symbol: cleanSymbol(note.s),
-                            bpm: bpm,
-                            velocity: velocity,
                             time: n2TO(note.t),
-                            duration: n2TO(note.d || 1),
-                            isLast: sysidx == score.systems.length - 1 && secidx == system.sections.length - 1
+                            function: actionFunctions.play,
+                            params: {
+                                position: position,
+                                symbol: cleanSymbol(note.s),
+                                bpm: bpm,
+                                velocity: velocity,
+                                duration: n2TO(note.d || 1),
+                                isLast: sysidx == score.systems.length - 1 && secidx == system.sections.length - 1
+                            }
                         })
                         sectionProgress += note.d || 1
                     })
@@ -163,7 +165,11 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
         })
     })
     if (actionFunctions.generic)
-        timeline.genericactions.push({ action: actionFunctions.generic, time: n2TO(totalDurationInBaseNotes) })
+        timeline.genericactions.push({
+            time: n2TO(totalDurationInBaseNotes),
+            function: actionFunctions.generic,
+            params: {}
+        })
 
     // Create animation actions
     Object.keys(positionScore).forEach((pos) => {
@@ -175,13 +181,15 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
             timeline.animationactions.push({
                 function: actionFunctions.animate,
                 time: n2TO(0),
-                position: position,
-                // prevsysUuid: null,
-                // prevsection: null,
-                currnotes: [],
-                nextnotes: note2AnimationNotes(position, notes[1], false),
-                timeuntil: n2TO(notes[1].t),
-                timeuntilMs: notes[1].ms
+                params: {
+                    position: position,
+                    // prevsysUuid: null,
+                    // prevsection: null,
+                    currnotes: [],
+                    nextnotes: note2AnimationNotes(position, notes[1], false),
+                    timeuntil: n2TO(notes[1].t),
+                    timeuntilMs: notes[1].ms
+                }
             })
             notes.forEach((note, index) => {
                 const currIsLast: boolean = index == notes.length - 1
@@ -196,15 +204,17 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
                 const prevSection = index > 0 ? notes[index - 1].section : null
                 if (!actionFunctions.animate) return // redundant, this is just to avoid a ts error
                 timeline.animationactions.push({
-                    function: actionFunctions.animate,
                     time: n2TO(note.t),
-                    position: position,
-                    // prevsysUuid: prevSystem,
-                    // prevsection: prevSection,
-                    currnotes: aNotes,
-                    nextnotes: nextANotes,
-                    timeuntil: timeUntil,
-                    timeuntilMs: timeUntilMs
+                    function: actionFunctions.animate,
+                    params: {
+                        position: position,
+                        // prevsysUuid: prevSystem,
+                        // prevsection: prevSection,
+                        currnotes: aNotes,
+                        nextnotes: nextANotes,
+                        timeuntil: timeUntil,
+                        timeuntilMs: timeUntilMs
+                    }
                 })
                 // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
                 // debug(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
@@ -233,12 +243,14 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
                 timeline.playercursoractions.push({
                     function: actionFunctions.playercursor,
                     time: n2TO(symbol.t),
-                    sysuuid: symbol.sysUuid,
-                    section: symbol.sectionId,
-                    position: position,
-                    symbol: symbol.s,
-                    line: line,
-                    range: range
+                    params: {
+                        sysuuid: symbol.sysUuid,
+                        section: symbol.sectionId,
+                        position: position,
+                        symbol: symbol.s,
+                        line: line,
+                        range: range
+                    }
                 })
                 if (lastNoteOfSection) {
                     timeline.notation[position].push(

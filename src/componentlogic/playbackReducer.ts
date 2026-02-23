@@ -1,8 +1,8 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { EditorCellCursor, EditorScore, PlaybackActionFunctions } from '../typing/types'
+import type { EditorCellCursor, EditorScore, PlaybackCallbackFunctions } from '../typing/types'
 import { debug } from '../utils/debugger'
-import { createPlaybackSchedule, createTimelineFromScore } from './playbackManager'
+import { defaultPlaybackFunctions, type SchedulePlaybackParams } from './playbackManager'
 import { cycleValidation } from './validationManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
@@ -20,18 +20,22 @@ export type PlaybackAction = {
     playbackType?: PlaybackType
     score?: EditorScore
     systemIndex?: number
-    actionFunctions?: PlaybackActionFunctions
+    actionFunctions?: PlaybackCallbackFunctions
     cursor?: EditorCellCursor
+    intro?: number // silence before start of playback in ms
+    outro?: number // silence after end of playback in ms
 }
 // const dialog = useDialog()
 
-const actionFunctions: PlaybackActionFunctions = {
-    play: null,
-    animate: null,
-    playercursor: null,
-    editorcursor: null,
-    generic: null
+const playbackFunctions = {
+    actionFunctions: defaultPlaybackFunctions,
+    schedulePlayback: (parms: SchedulePlaybackParams) => {},
+    playbackSpeed: 1
 }
+
+// const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
+// var schedulePlayback: (parms: SchedulePlaybackParams) => void
+// var playbackSpeed: number
 
 async function asyncPlay() {
     if (Tone.getContext().state == 'suspended') {
@@ -46,8 +50,12 @@ async function asyncPlay() {
 }
 
 // This function enables to pass the playbackScheduleFunctions to the playbackReducer.
-export function playbackReducerFactory(actionFunc: PlaybackActionFunctions) {
-    Object.assign(actionFunctions, actionFunc)
+export function playbackReducerFactory(
+    actionFunc: PlaybackCallbackFunctions,
+    schedulePlayback: (parms: SchedulePlaybackParams) => void
+) {
+    playbackFunctions.actionFunctions = actionFunc
+    playbackFunctions.schedulePlayback = schedulePlayback
     return playbackReducer
 }
 
@@ -68,10 +76,9 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
 
             debug(`executing 'load'`)
             debug(`loading data for sys ${action.score.systems[0].id}`)
-            const loadAction = { ...action, actionFunctions }
+            const loadAction = { ...action, actionFunctions: playbackFunctions.actionFunctions }
 
-            const timeLine = createTimelineFromScore(loadAction, true, 0, 1000)
-            createPlaybackSchedule(timeLine)
+            playbackFunctions.schedulePlayback({ pbAction: loadAction, useCache: true, intro: 1000, outro: 2000 })
             debug({ ...state, audioState: 'stopped' }, true)
             return { ...state, audioState: 'stopped' }
         }

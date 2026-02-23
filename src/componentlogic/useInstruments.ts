@@ -11,12 +11,12 @@ import {
     SOUNDS_FOLDER
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import type { PlaybackSamplerAction, Position } from '../typing/types'
+import type { Position, SamplerFunctionParameters } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 
 export type InstrumentSampler = {
-    play: (time: number, action: PlaybackSamplerAction, focus: Position[]) => void
+    play: (time: number, params: SamplerFunctionParameters, focus: Position[]) => void
     mute: (time: number) => void
 }
 
@@ -87,25 +87,25 @@ const createInstrument = (
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
-        play: (time: number, action: PlaybackSamplerAction, currentFocus: string[]) => {
+        play: (time: number, params: SamplerFunctionParameters, currentFocus: string[]) => {
             const dimValue =
                 currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            debug(`focus=${JSON.stringify(currentFocus)} pos=${action.position}, dimvalue=${dimValue}`)
-            const indices = lookup[position].symbol2idxs[action.symbol]
+            debug(`focus=${JSON.stringify(currentFocus)} pos=${params.position}, dimvalue=${dimValue}`)
+            const indices = lookup[position].symbol2idxs[params.symbol]
             if (indices && samplers[position]) {
-                var duration: Tone.Unit.TimeObject = action.duration
+                var duration: Tone.Unit.TimeObject = params.duration
                 // Extend the last note to allow the sound to attenuate
                 //TODO Do not extend the last note when looping from the last note.
-                if (action.isLast) {
+                if (params.isLast) {
                     //@ts-ignore
-                    duration[baseNoteSubdivision] += millis2BaseNoteEquiv(outroTime, action.bpm)
+                    duration[baseNoteSubdivision] += millis2BaseNoteEquiv(outroTime, params.bpm)
                 }
                 try {
-                    sampler?.triggerAttackRelease(indices, duration, time, action.velocity * dimValue)
+                    sampler?.triggerAttackRelease(indices, duration, time, params.velocity * dimValue)
                 } catch {
-                    console.error(`ERROR: could not play sound ${action.position} ${action.symbol} `)
+                    console.error(`ERROR: could not play sound ${params.position} ${params.symbol} `)
                 }
             }
         },
@@ -136,13 +136,13 @@ export const useInstruments = (currentFocus: Position[], outroTime: number = def
     const random_attack_deviation = (time: number) =>
         time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
-    const playInstrument = useCallback((time: number, action: PlaybackSamplerAction) => {
+    const playInstrument = useCallback((time: number, params: SamplerFunctionParameters) => {
         debug(
-            `playing ${action.position} ${action.symbol} ${action.time['16n']} ${action.duration['16n']} ${action.velocity} ${time}`
+            `playing ${params.position} ${params.symbol} ${time} ${params.duration['16n']} ${params.velocity} ${time}`
         )
-        if (action.symbol === '.') instrumentSamplers[action.position].mute(time)
+        if (params.symbol === '.') instrumentSamplers[params.position].mute(time)
         else {
-            instrumentSamplers[action.position].play(random_attack_deviation(time), action, currentFocus)
+            instrumentSamplers[params.position].play(random_attack_deviation(time), params, currentFocus)
         }
     }, [])
 

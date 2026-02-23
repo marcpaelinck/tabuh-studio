@@ -7,7 +7,7 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
-import type { EditorScore, EditorSystem, PlaybackActionFunctions, PlaybackEditorCursorAction } from '../../typing/types'
+import type { EditorCursorParameters, EditorScore, EditorSystem, PlaybackCallbackFunctions } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -25,8 +25,8 @@ interface EditorWindowProps {
     updateSystem: (sysData: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
-    scheduleFunctions: PlaybackActionFunctions
-    setScheduleFunctions: Dispatch<PlaybackActionFunctions>
+    scheduleFunctions: PlaybackCallbackFunctions
+    setScheduleFunctions: Dispatch<PlaybackCallbackFunctions>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
 }
@@ -49,22 +49,22 @@ export default function EditorWindow({
         usePartManager(editorScore, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
 
-    function moveEditorCursor(time: number, cAction: PlaybackEditorCursorAction) {
+    function moveEditorCursor(time: number, params: EditorCursorParameters) {
         const sys = (uuid: string | undefined): EditorSystem | undefined => {
             return editorScore?.systems.find((sys) => sys.uuid == uuid)
         }
 
-        if (cAction.prevsysuuid && cAction.prevsysuuid != cAction.sysuuid) {
-            debug(`Close panel ${sys(cAction.prevsysuuid)?.id}, curr=${sys(cAction.sysuuid)?.id}`)
-            expandIfNotExpanded(cAction.prevsysuuid, false)
+        if (params.prevsysuuid && params.prevsysuuid != params.sysuuid) {
+            debug(`Close panel ${sys(params.prevsysuuid)?.id}, curr=${sys(params.sysuuid)?.id}`)
+            expandIfNotExpanded(params.prevsysuuid, false)
         }
-        if (cAction.prevsysuuid != cAction.sysuuid) {
-            debug(`Open panel ${sys(cAction.sysuuid)?.id} prev=${sys(cAction.prevsysuuid)?.id}`)
-            expandIfNotExpanded(cAction.sysuuid, true)
+        if (params.prevsysuuid != params.sysuuid) {
+            debug(`Open panel ${sys(params.sysuuid)?.id} prev=${sys(params.prevsysuuid)?.id}`)
+            expandIfNotExpanded(params.sysuuid, true)
         }
-        playback({ actionType: 'cursor', cursor: { sysUuid: cAction.sysuuid, measure: cAction.section } })
+        playback({ actionType: 'cursor', cursor: { sysUuid: params.sysuuid, measure: params.section } })
         // debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
-        const currElement = document.getElementById(`${systemIdPrefix}${cAction.sysuuid}`)
+        const currElement = document.getElementById(`${systemIdPrefix}${params.sysuuid}`)
         // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }

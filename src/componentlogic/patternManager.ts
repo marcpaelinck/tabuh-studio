@@ -2,7 +2,6 @@
 
 import _ from 'lodash'
 import * as Tone from 'tone'
-import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import {
     AcceleratingTremoloChars,
     ExtensionChars,
@@ -20,6 +19,8 @@ import type {
     NoteSymbol,
     PlaybackSamplerAction,
     Position,
+    SamplerFunction,
+    SamplerFunctionParameters,
     TimeInBasenoteEquiv
 } from '../typing/types'
 import { getValidSymbols, noteRange } from '../utils/alphabet'
@@ -84,6 +85,7 @@ function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
 }
 
 export interface CreatePatternArgs {
+    samplerFunction: SamplerFunction
     time: TimeInBasenoteEquiv // current time
     position: Position
     prevsymbol: NoteSymbol | undefined // previous symbol in the notation
@@ -93,20 +95,12 @@ export interface CreatePatternArgs {
     velocity: Tone.Unit.NormalRange // current velocity
     prevaction: PlaybackSamplerAction | undefined // last action created for this position
 }
-// Structure of the return value.
-export interface PatternNoteAction {
-    time: TimeObject
-    duration: TimeObject
-    position: Position
-    symbol: NoteSymbol
-    bpm: number
-    velocity: Tone.Unit.NormalRange
-}
+// Converts specific symbols that represent a sequence of notes to a list of PlaybackSamplerAction objects.
 // Function `createNoteActions` expects a `CreatePatternArgs` object as argument.
 // Arguments `prevsymbol` and `nextsymbol` are required because some patterns can consist of two consecutive symbols.
 // The 'grace note' pattern requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
-export function createNoteActions(args: CreatePatternArgs): PatternNoteAction[] {
+export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerAction[] {
     const pattern = getPatternType(args.symbol, args.position)
     debug(`${args.symbol} is ${pattern}`)
 
@@ -168,11 +162,14 @@ function singleNoteAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
-            duration: n2TO(1),
-            position: args.position,
-            symbol: args.symbol,
-            bpm: args.bpm,
-            velocity: args.velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(1),
+                position: args.position,
+                symbol: args.symbol,
+                bpm: args.bpm,
+                velocity: args.velocity
+            } as SamplerFunctionParameters
         }
     ]
 }
@@ -181,11 +178,14 @@ function silenceAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time),
-            duration: n2TO(1),
-            position: args.position,
-            symbol: MutingChars[0],
-            bpm: args.bpm,
-            velocity: args.velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(1),
+                position: args.position,
+                symbol: MutingChars[0],
+                bpm: args.bpm,
+                velocity: args.velocity
+            } as SamplerFunctionParameters
         }
     ]
 }
@@ -198,7 +198,7 @@ function gracenoteAction(args: CreatePatternArgs) {
 
     // Subtract the grace note's duration from the previous note action
     if (args.prevaction) {
-        args.prevaction.duration = n2TO(TO2n(args.prevaction.duration) - patterns.gracenote.duration)
+        args.prevaction.params.duration = n2TO(TO2n(args.prevaction.params.duration) - patterns.gracenote.duration)
     }
 
     // Determine the correct octave for the grace note
@@ -230,11 +230,14 @@ function gracenoteAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time - patterns.gracenote.duration),
-            duration: n2TO(patterns.gracenote.duration),
-            position: args.position,
-            symbol: graceSymbol,
-            bpm: args.bpm,
-            velocity: args.velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(patterns.gracenote.duration),
+                position: args.position,
+                symbol: graceSymbol,
+                bpm: args.bpm,
+                velocity: args.velocity
+            } as SamplerFunctionParameters
         }
     ]
 }
@@ -257,11 +260,14 @@ function tremoloAction(args: CreatePatternArgs) {
         const noteIdx = count % notes.length
         returnValue.push({
             time: n2TO(args.time + count * duration),
-            duration: n2TO(duration),
-            position: args.position,
-            symbol: notes[noteIdx],
-            bpm: args.bpm,
-            velocity: args.velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(duration),
+                position: args.position,
+                symbol: notes[noteIdx],
+                bpm: args.bpm,
+                velocity: args.velocity
+            } as SamplerFunctionParameters
         })
     }
     return returnValue
@@ -287,11 +293,14 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
         const velocity = patterns.tremolo.accelerating_velocity[idx]
         returnValue.push({
             time: n2TO(time),
-            duration: n2TO(duration),
-            position: args.position,
-            symbol: notes[noteIdx],
-            bpm: args.bpm,
-            velocity: velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(duration),
+                position: args.position,
+                symbol: notes[noteIdx],
+                bpm: args.bpm,
+                velocity: velocity
+            } as SamplerFunctionParameters
         })
         time += duration
     }
@@ -312,15 +321,18 @@ function rakeAction(args: CreatePatternArgs) {
     const noteDuration: DurationInBasenoteEquiv = millis2BaseNoteEquiv(patterns.rake.note_duration_in_millis, args.bpm)
     var offset = 0
     // Generate the pattern
-    const returnValue: PatternNoteAction[] = []
+    const returnValue: PlaybackSamplerAction[] = []
     for (var i = 0; i < patterns.rake.number_of_notes; i++) {
         returnValue.push({
             time: n2TO(args.time + offset),
-            duration: n2TO(noteDuration),
-            position: args.position,
-            symbol: instrumentRange[startIdx + i],
-            bpm: args.bpm,
-            velocity: args.velocity
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(noteDuration),
+                position: args.position,
+                symbol: instrumentRange[startIdx + i],
+                bpm: args.bpm,
+                velocity: args.velocity
+            } as SamplerFunctionParameters
         })
         offset += noteSpacing
     }

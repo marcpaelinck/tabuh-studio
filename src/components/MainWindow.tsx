@@ -30,13 +30,13 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
+import { usePlaybackManager } from '../componentlogic/playbackManager'
 import { playbackReducerFactory } from '../componentlogic/playbackReducer'
 import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
-import { useInstruments } from '../componentlogic/useInstruments'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor } from '../config/config'
-import type { EditorScore, PlaybackActionFunctions, Position, WpUserRecord } from '../typing/types'
+import type { EditorScore, Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
@@ -211,13 +211,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         scoreToFormattedJson
     }
     const wpFunc = useContext(WpApiFunctions)
-    const [scheduleFunctions, setScheduleFunctions] = useState<PlaybackActionFunctions>({
-        play: null,
-        animate: null,
-        playercursor: null,
-        editorcursor: null,
-        generic: null
-    })
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
@@ -225,17 +218,20 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     // PLAYBACK SETTINGS
     const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
-    const playbackReducer = playbackReducerFactory(scheduleFunctions)
+    const { playbackFunctions, setPlaybackFunctions, playbackSpeed, setPlaybackSpeed, schedulePlayback } =
+        usePlaybackManager(selectedFocus)
+    const playbackReducer = playbackReducerFactory(playbackFunctions, schedulePlayback)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
         audioState: 'nodata',
         playbackType: 'none'
     })
-    const { playInstrument } = useInstruments(selectedFocus, 0)
+
+    useEffect(() => setPlaybackFunctions({ ...playbackFunctions, generic: stopPlayback }), [])
+
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
     }
-    useEffect(() => setScheduleFunctions({ ...scheduleFunctions, play: playInstrument, generic: stopPlayback }), [])
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
         const newDashboardValues: DashboardValues = { ...dashboardValues }
@@ -338,8 +334,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                         updateSystem={updateSystem}
                                         updateParts={updateParts}
                                         executeItemAction={executeItemAction}
-                                        scheduleFunctions={scheduleFunctions}
-                                        setScheduleFunctions={setScheduleFunctions}
+                                        scheduleFunctions={playbackFunctions}
+                                        setScheduleFunctions={setPlaybackFunctions}
                                         playbackState={playbackState}
                                         playback={playback}
                                     />
@@ -349,6 +345,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                         dataSource={dataSource}
                                         selectedFocus={selectedFocus}
                                         setSelectedFocus={setSelectedFocus}
+                                        playbackFunctions={playbackFunctions}
+                                        setPlaybackFunctions={setPlaybackFunctions}
+                                        playbackSpeed={playbackSpeed}
+                                        setPlaybackSpeed={setPlaybackSpeed}
                                     />
                                 )}
                             </Box>
