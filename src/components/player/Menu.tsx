@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
-import type { MenuItemInfo, Score } from '../../typing/types'
+import type { EditorScore, MenuItemInfo } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,
@@ -19,14 +19,14 @@ export default function Menu({
     menuDisabled,
     scoreList,
     score,
-    scoreUpdater,
+    // scoreUpdater,
     focusUpdater,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreList: string[]
-    score: Score | undefined
-    scoreUpdater: Function
+    score: EditorScore | undefined
+    // scoreUpdater: Function
     focusUpdater: Function
     speedUpdater: Function
 }): JSX.Element {
@@ -64,7 +64,7 @@ export default function Menu({
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
         setSelectedTabuh(item)
-        scoreUpdater(item.value)
+        // scoreUpdater(item.value)
         onChangeFocusSelector(focusDefaultOption)
     }
 

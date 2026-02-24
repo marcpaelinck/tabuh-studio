@@ -1,34 +1,25 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import { useEffect, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { useAnimationEngine } from '../../componentlogic/useAnimation'
-import { useInstruments } from '../../componentlogic/useInstruments'
 import {
+    type EditorScore,
     type HighlightRange,
     type MenuItemInfo,
-    type PlaybackAnimationAction,
-    type PlaybackCallbackFunctions,
-    type PlaybackPlayerCursorAction,
-    type PlaybackSamplerAction,
     type Position,
-    type Score,
     type SVGInfo,
-    type TempoFunctionParameters,
     type TimeLine
 } from '../../typing/types'
-import { createTimeline } from '../../utils/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
-import { defaultPlaybackFunctions } from '../../componentlogic/playbackManager'
-import { debug } from '../../utils/debugger'
 import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
 export function Player({
     score,
+    totalDurationMs,
     focus,
     pbSpeed,
     svgInfo,
@@ -36,7 +27,8 @@ export function Player({
     highlightFunctionRef,
     timelineUpdater
 }: {
-    score: Score | undefined
+    score: EditorScore | undefined
+    totalDurationMs: number
     focus: Position[]
     pbSpeed: number
     svgInfo: SVGInfo
@@ -65,69 +57,69 @@ export function Player({
     focusRef.current = focus
     pbSpeedRef.current = pbSpeed
 
+    useEffect(() => setAudioStarted('false'), [score])
     // HOOKS
-    const { playInstrument, muteAll } = useInstruments(focus)
-    const { animateInstrument, animateNotation } = useAnimationEngine(
-        svgInfoRef,
-        highlightFunctionRef,
-        panggulOptionRef,
-        focusRef,
-        pbSpeedRef
-    )
+    // const { playInstrument, muteAll } = useInstruments(focus)
+    // const { animateInstrument, animateNotation } = useAnimationEngine(
+    //     svgInfoRef,
+    //     highlightFunctionRef,
+    //     panggulOptionRef,
+    //     focusRef,
+    //     pbSpeedRef
+    // )
 
-    const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
-    Object.assign(actionFunctions, { play: playInstrument, animate: animateInstrument, playercursor: animateNotation })
+    // const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
+    // Object.assign(actionFunctions, { play: playInstrument, animate: animateInstrument, playercursor: animateNotation })
 
     // MEMOS AND EFFECTS
-    const timeline = useMemo<TimeLine>(() => createTimeline(score, actionFunctions), [score])
 
-    useEffect(() => {
-        timelineUpdater(timeline)
-        createSchedule(timeline)
-        rewind()
-    }, [timeline])
+    // useEffect(() => {
+    //     timelineUpdater(timeline)
+    //     createSchedule(timeline)
+    //     rewind()
+    // }, [timeline])
 
     function updateProgress() {
         setProgress(Tone.getTransport().seconds)
         Tone.getTransport()
     }
 
-    function createSchedule(timeline: TimeLine | null) {
-        // Creates the schedule for the Transport object.
-        if (!timeline || !score) return
+    // function createSchedule(timeline: TimeLine | null) {
+    //     // Creates the schedule for the Transport object.
+    //     if (!timeline || !score) return
 
-        if (audioStarted) pause()
-        Tone.getTransport().stop()
-        Tone.getTransport().cancel()
-        Tone.getTransport().seconds = 0
+    //     if (audioStarted) pause()
+    //     Tone.getTransport().stop()
+    //     Tone.getTransport().cancel()
+    //     Tone.getTransport().seconds = 0
 
-        debug(`Creating schedule for ${score?.title}`)
+    //     debug(`Creating schedule for ${score?.title}`)
 
-        // tempo and instrument actions (notes)
-        // Set the initial tempo to 60 (intro time)
-        const initialBpm = score.systems[0].sections[0].tempo[0]
-        const params: TempoFunctionParameters = { bpm: initialBpm, pbSpeed }
-        Tone.getTransport().schedule((time) => actionFunctions.tempo(time, params), 0)
-        timeline.sampleractions.forEach((sAction: PlaybackSamplerAction) => {
-            Tone.getTransport().schedule(
-                (time) => actionFunctions.tempo(time, { bpm: sAction.params.bpm, pbSpeed }),
-                sAction.time
-            )
-            Tone.getTransport().schedule((time) => sAction.function(time, sAction.params), sAction.time)
-        })
-        // Schedule animation actions
-        timeline.animationactions.forEach((aAction: PlaybackAnimationAction) => {
-            Tone.getTransport().schedule((time) => aAction.function(time, aAction.params), aAction.time)
-        })
-        // Schedule cursor actions
-        timeline.playercursoractions.forEach((cAction: PlaybackPlayerCursorAction) => {
-            Tone.getTransport().schedule((time) => cAction.function(time, cAction.params), cAction.time)
-        })
+    //     // tempo and instrument actions (notes)
+    //     // Set the initial tempo to 60 (intro time)
+    //     const initialBpm = score.systems[0].sections[0].tempo[0]
+    //     const params: TempoFunctionParameters = { bpm: initialBpm, pbSpeed }
+    //     Tone.getTransport().schedule((time) => actionFunctions.tempo(time, params), 0)
+    //     timeline.sampleractions.forEach((sAction: PlaybackSamplerAction) => {
+    //         Tone.getTransport().schedule(
+    //             (time) => actionFunctions.tempo(time, { bpm: sAction.params.bpm, pbSpeed }),
+    //             sAction.time
+    //         )
+    //         Tone.getTransport().schedule((time) => sAction.function(time, sAction.params), sAction.time)
+    //     })
+    //     // Schedule animation actions
+    //     timeline.animationactions.forEach((aAction: PlaybackAnimationAction) => {
+    //         Tone.getTransport().schedule((time) => aAction.function(time, aAction.params), aAction.time)
+    //     })
+    //     // Schedule cursor actions
+    //     timeline.playercursoractions.forEach((cAction: PlaybackPlayerCursorAction) => {
+    //         Tone.getTransport().schedule((time) => cAction.function(time, cAction.params), cAction.time)
+    //     })
 
-        setTotalDuration(Math.round(score.durationMs / 1000))
-        // Refresh progress bar 2x per second
-        Tone.getTransport().scheduleRepeat(() => updateProgress(), '2hz', 0)
-    }
+    //     setTotalDuration(Math.round(totalDurationMs / 1000))
+    //     // Refresh progress bar 2x per second
+    //     Tone.getTransport().scheduleRepeat(() => updateProgress(), '2hz', 0)
+    // }
 
     function jumpToProgressTime(time: number | number[]) {
         const newTime = typeof time === 'number' ? time : time[1]
@@ -138,20 +130,19 @@ export function Player({
     }
 
     const play = () => {
-        muteAll(0)
+        // muteAll(0)
         if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
         setPlaying(true)
     }
 
     const pause = () => {
         Tone.getTransport().pause()
-        muteAll(Tone.getTransport().seconds)
+        // muteAll(Tone.getTransport().seconds)
         setPlaying(false)
     }
 
     async function playPause() {
-        if (!timeline) return
-
+        if (!score) return
         if (audioStarted === 'false') {
             Tone.start()
             setAudioStarted('wait')
@@ -166,7 +157,7 @@ export function Player({
     }
 
     function rewind() {
-        if (!timeline) return
+        if (!score) return
 
         Tone.getTransport().stop()
         Tone.getTransport().seconds = 0

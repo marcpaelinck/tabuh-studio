@@ -339,7 +339,7 @@ export interface PlaybackCallbackFunctions {
 // PLAYBACK SCHEDULING
 
 export type TimeLine = {
-    totalDurationSec: number
+    totalDurationMs: number
     totalDurationTO: TimeObject // Total duration expressed as BaseNote units
     tempoactions: PlaybackTempoAction[]
     sampleractions: PlaybackSamplerAction[]

@@ -43,7 +43,9 @@ import { useInstruments } from './useInstruments'
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
 export const defaultPlaybackFunctions: PlaybackCallbackFunctions = {
     tempo: (): void => {},
-    play: (): void => {},
+    play: (): void => {
+        debug('void player')
+    },
     animate: (): void => {},
     playercursor: (): void => {},
     editorcursor: (): void => {},
@@ -60,8 +62,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
     const [playbackFunctions, setPlaybackFunctions] = useState<PlaybackCallbackFunctions>(defaultPlaybackFunctions)
     const { playInstrument } = useInstruments(selectedFocus, 0)
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
+    const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
 
-    useEffect(() => setPlaybackFunctions({ ...playbackFunctions, tempo: changeTempo, play: playInstrument }), [])
+    useEffect(() => {
+        // Avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this is necessary.
+        // See MainWindow where setPlaybackFunctions is only called in an initial useEffect.
+        if (playbackFunctions.play === defaultPlaybackFunctions.play) {
+            setPlaybackFunctions({ ...playbackFunctions, tempo: changeTempo, play: playInstrument })
+            console.log('setting play function')
+        }
+    }, [playbackFunctions])
 
     function changeTempo(time: number, { bpm, pbSpeed }: TempoFunctionParameters): void {
         if (bpm != undefined) {
@@ -71,7 +81,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
         if (!(position in positionConfigs)) return []
-        if (!action) console.log(`samplerAction2AnimationNotes ${position} ${action}`)
+        if (!action) debug(`samplerAction2AnimationNotes ${position} ${action}`)
         const cleanedSymbol = cleanSymbol(action.params.symbol)
         const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
         const result: AnimationNote[] = []
@@ -103,13 +113,12 @@ export function usePlaybackManager(selectedFocus: Position[]) {
     ): TimeLine | undefined {
         // Check that all necessary data is being passed
         debug(
-            `creating timeline ${pbAction.playbackType} totSystems=${pbAction.score?.systems.length} startAtIndex=${pbAction.systemIndex} functions OK: ${pbAction.actionFunctions != undefined} in/out=${JSON.stringify([intro, outro])}`
+            `creating timeline ${pbAction.playbackType} totSystems=${pbAction.score?.systems.length} startAtIndex=${pbAction.systemIndex} in/out=${JSON.stringify([intro, outro])}`
         )
-        if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined && pbAction.actionFunctions))
-            return undefined
+        if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined)) return undefined
 
         const timeline: TimeLine = {
-            totalDurationSec: 0,
+            totalDurationMs: 0,
             totalDurationTO: n2TO(0),
             tempoactions: [],
             sampleractions: [],
@@ -201,17 +210,13 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                             velocity:
                                 currentStep!.dynamics[0] +
                                 (symbolIdx / notation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
-                            prevaction: _.last(timeline.sampleractions)
+                            prevaction: _.last(timeline.sampleractions),
+                            isLast: endOfPosition
                         })
                         // Create one or more sampler action(s) for the new note or pattern
                         patternNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
-                            const lastPatternNote = idx == patternNoteActions.length - 1
-                            const finalNote = endOfPosition && lastPatternNote
-                            currAction[position] = {
-                                ...noteAction,
-                                ...{ function: pbAction.actionFunctions!.play!, isLast: finalNote }
-                            }
-                            if (finalNote)
+                            currAction[position] = noteAction
+                            if (noteAction.params.isLast)
                                 // Extend the final note of the current position
                                 currAction[position].params.duration = TOplusNumber(
                                     currAction[position].params.duration,
@@ -221,7 +226,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                             prevNote[position] = currAction[position]
                             timeline.sampleractions.push(currAction[position])
                             samplerActionsByPos[position].push(currAction[position])
-                            // }
                         })
                         symbolDuration =
                             TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
@@ -231,7 +235,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     // CREATE ANIMATION CURSOR ACTION
 
                     timeline.playercursoractions.push({
-                        function: pbAction.actionFunctions!.playercursor,
+                        function: playbackFunctions.playercursor,
                         time: n2TO(currTime),
                         params: {
                             sysuuid: currentStep!.system.uuid,
@@ -252,18 +256,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // CREATE EDITOR CURSOR ACTIONS
 
             // Only one cursor action per system is needed.
-            if (pbAction.actionFunctions.editorcursor) {
-                var cursorTime = sectionStartTime
-                timeline.editorcursoractions.push({
-                    function: pbAction.actionFunctions.editorcursor,
-                    time: n2TO(cursorTime),
-                    params: {
-                        prevsysuuid: prevSystem?.uuid || undefined,
-                        sysuuid: currentStep.system.uuid,
-                        section: currentStep.sectionIdx
-                    }
-                })
-            }
+            var cursorTime = sectionStartTime
+            timeline.editorcursoractions.push({
+                function: playbackFunctions.editorcursor,
+                time: n2TO(cursorTime),
+                params: {
+                    prevsysuuid: prevSystem?.uuid || undefined,
+                    sysuuid: currentStep.system.uuid,
+                    section: currentStep.sectionIdx
+                }
+            })
             prevSystem = currentStep.system
             currentStep = nextInFlow()
             sectionStartTime += maxMeasureDuration
@@ -277,7 +279,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // from the starting position to the first note
             if (!actions || actions.length == 0) return
             timeline.animationactions.push({
-                function: pbAction.actionFunctions!.animate,
+                function: playbackFunctions.animate,
                 time: n2TO(0),
                 params: {
                     position: position,
@@ -299,10 +301,10 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 const timeUntilMs: number = currIsLast
                     ? outro
                     : To2Millis(nextAction!.time, nextAction!.params.bpm) - To2Millis(action!.time, action!.params.bpm)
-                if (!pbAction.actionFunctions!.animate) return // redundant, this is just to avoid a ts error
+
                 timeline.animationactions.push({
                     time: action.time,
-                    function: pbAction.actionFunctions!.animate,
+                    function: playbackFunctions.animate,
                     params: {
                         position: position,
                         currnotes: aNotes,
@@ -311,6 +313,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         timeuntilMs: timeUntilMs
                     }
                 })
+                timeline.totalDurationMs = Math.max(timeline.totalDurationMs, timeUntilMs + outro)
                 // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
                 // debug(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
             })
@@ -318,6 +321,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // Determine the total playback duration
         timeline.totalDurationTO = n2TO(sectionStartTime)
+        setTotalDurationMs(timeline.totalDurationMs)
         if (playbackFunctions.generic)
             timeline.genericactions.push({
                 function: playbackFunctions.generic,
@@ -380,5 +384,12 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         if (timeLine) createPlaybackSchedule(timeLine, playbackSpeed)
     }
 
-    return { playbackFunctions, setPlaybackFunctions, playbackSpeed, setPlaybackSpeed, schedulePlayback }
+    return {
+        playbackFunctions,
+        setPlaybackFunctions,
+        playbackSpeed,
+        setPlaybackSpeed,
+        schedulePlayback,
+        totalDurationMs
+    }
 }

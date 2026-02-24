@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
-import { useScoreReader } from '../../componentlogic/useScoreReader'
+import type { SchedulePlaybackParams } from '../../componentlogic/playbackManager'
 import { positionConfigs } from '../../config/config'
 import {
+    type EditorScore,
     type HighlightRange,
     type MenuItemInfo,
     type PlaybackCallbackFunctions,
     type Position,
-    type Score,
+    type ScoreInfo,
     type SVGInfo,
     type TimeLine
 } from '../../typing/types'
@@ -15,7 +16,11 @@ import Menu from './Menu'
 import { Player } from './Player'
 
 interface PlayerWindowProps {
+    scoreList: ScoreInfo[]
+    score: EditorScore | undefined
+    totalDurationMs: number
     dataSource: 'database' | 'file'
+    schedulePlayback: (params: SchedulePlaybackParams) => void
     selectedFocus: Position[]
     setSelectedFocus: Dispatch<Position[]>
     playbackFunctions: PlaybackCallbackFunctions
@@ -24,7 +29,11 @@ interface PlayerWindowProps {
     setPlaybackSpeed: Dispatch<number>
 }
 export default function PlayerWindow({
+    scoreList,
+    score,
+    totalDurationMs,
     dataSource,
+    schedulePlayback,
     selectedFocus,
     setSelectedFocus,
     playbackSpeed,
@@ -34,22 +43,36 @@ export default function PlayerWindow({
     const setMenuDisabled = (label: string, value: boolean) => {
         menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
     }
-    const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
+    // const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
     const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
     const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
-    // TODO remove filter after adapting player code to new file format
-    var titleList: string[] = scoreList.filter((item) => item.format == 'old').map((item) => item.title)
+    // HOOKS
+    // const { animateInstrument, animateNotation } = useAnimationEngine(
+    //     svgInfoRef,
+    //     highlightFunctionRef,
+    //     panggulOptionRef,
+    //     focusRef,
+    //     pbSpeedRef
+    // )
 
     const timelineRef: RefObject<TimeLine | null> = useRef(null)
 
+    useEffect(
+        () =>
+            schedulePlayback({
+                pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
+            }),
+        [score]
+    )
+
     // Disable menus when data is loading
-    useEffect(() => {
-        setMenuDisabled('tabuh', loadingScore)
-        setMenuDisabled('focus', loadingScore || loadingScore || !score)
-    }, [loadingScore])
+    // useEffect(() => {
+    //     setMenuDisabled('tabuh', loadingScore)
+    //     setMenuDisabled('focus', loadingScore || loadingScore || !score)
+    // }, [loadingScore])
 
     const updateFocus = (focus: Position[]): void => {
         if (focus !== selectedFocus) {
@@ -60,7 +83,7 @@ export default function PlayerWindow({
         }
     }
 
-    const updateScore = (title: string) => loadScore(scoreList.find((item) => item.title == title))
+    // const updateScore = (title: string) => loadScore(scoreList.find((item) => item.title == title))
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
@@ -79,9 +102,9 @@ export default function PlayerWindow({
         <div id="TabuhPlayer" className="pt-6 pl-6 pr-6">
             <Menu
                 menuDisabled={menuDisabled}
-                scoreList={titleList}
+                scoreList={scoreList.map((info) => info.title)}
                 score={score}
-                scoreUpdater={updateScore}
+                // scoreUpdater={updateScore}
                 focusUpdater={updateFocus}
                 speedUpdater={setPlaybackSpeed}
             />
@@ -98,6 +121,7 @@ export default function PlayerWindow({
             )}
             <Player
                 score={score}
+                totalDurationMs={totalDurationMs}
                 focus={selectedFocus}
                 pbSpeed={playbackSpeed}
                 svgInfo={svgInfo}

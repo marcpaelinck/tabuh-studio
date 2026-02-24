@@ -89,7 +89,6 @@ export function MeasureNode({
         navFunc.applyRules(newMeasure.notation_, rowId, colId, true)
         const newSysData = { ...systemData }
         newSysData.staffs[position][colId] = { ...newMeasure }
-        console.log(newSysData)
         scoreFunc.updateSystem(newSysData)
     }
 

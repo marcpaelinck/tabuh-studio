@@ -60,8 +60,6 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
     const dialog = useDialog()
     const wpFunc = useContext(WpApiFunctions)
 
-    // useEffect(() => console.log(`SCORELIST=${JSON.stringify(scoreList)}`), [scoreList])
-
     const showTextInDialog = async (payload: string) => {
         //@ts-ignore
         await dialog.open(SimpleTextareaDialog, { payload })

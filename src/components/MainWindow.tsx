@@ -77,7 +77,6 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
             return
         }
         wpFunc.user.login(formValue.username as string, formValue.password as string).then((result) => {
-            // console.log(`login=${JSON.stringify(result)}`)
             if (result && !('error' in result) && 'user' in result) {
                 setUser(result.user)
                 setOpen(false)
@@ -141,7 +140,6 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
                 onClick={async () => {
                     setLogoutMenu(false)
                     const result = await wpFunc.user.logout()
-                    console.log(`LOGOUT=${JSON.stringify(result)}`)
                     if (result && result['logged_in'] == false) setUser(undefined)
                 }}>
                 logout
@@ -218,8 +216,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     // PLAYBACK SETTINGS
     const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
-    const { playbackFunctions, setPlaybackFunctions, playbackSpeed, setPlaybackSpeed, schedulePlayback } =
-        usePlaybackManager(selectedFocus)
+    const {
+        playbackFunctions,
+        setPlaybackFunctions,
+        playbackSpeed,
+        setPlaybackSpeed,
+        schedulePlayback,
+        totalDurationMs
+    } = usePlaybackManager(selectedFocus)
     const playbackReducer = playbackReducerFactory(playbackFunctions, schedulePlayback)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -248,9 +252,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     useEffect(() => {
         const getUser = async () => {
             const result = await wpFunc.user.getUser()
-            console.log(`CHECKING LOGGED IN USER=${JSON.stringify(result)}`)
             if (result && result['logged_in']) {
-                console.log('setting user')
                 setUser(result?.user)
             }
         }
@@ -335,14 +337,18 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                         updateParts={updateParts}
                                         executeItemAction={executeItemAction}
                                         scheduleFunctions={playbackFunctions}
-                                        setScheduleFunctions={setPlaybackFunctions}
+                                        setPlaybackFunctions={setPlaybackFunctions}
                                         playbackState={playbackState}
                                         playback={playback}
                                     />
                                 )}
                                 {active == 'player' && (
                                     <PlayerWindow
+                                        scoreList={scoreList}
+                                        score={editorScore}
+                                        totalDurationMs={totalDurationMs}
                                         dataSource={dataSource}
+                                        schedulePlayback={schedulePlayback}
                                         selectedFocus={selectedFocus}
                                         setSelectedFocus={setSelectedFocus}
                                         playbackFunctions={playbackFunctions}

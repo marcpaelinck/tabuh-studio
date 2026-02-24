@@ -176,7 +176,6 @@ export function useScoreReader<T = Score | EditorScore | undefined>(
                 newScore = parseScoreNew(json)
             } else return
             setScore(newScore as T)
-            console.log(newScore)
             setIsLoading(false)
         }
     }
@@ -200,7 +199,6 @@ export function useScoreReader<T = Score | EditorScore | undefined>(
 
                 newScore = parseScoreNew(json)
                 setScore(newScore as T)
-                console.log(newScore)
                 setIsLoading(false)
             }
         }

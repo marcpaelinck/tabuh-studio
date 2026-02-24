@@ -26,7 +26,7 @@ interface EditorWindowProps {
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
     scheduleFunctions: PlaybackCallbackFunctions
-    setScheduleFunctions: Dispatch<PlaybackCallbackFunctions>
+    setPlaybackFunctions: Dispatch<PlaybackCallbackFunctions>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
 }
@@ -41,7 +41,7 @@ export default function EditorWindow({
     updateParts,
     executeItemAction,
     scheduleFunctions,
-    setScheduleFunctions,
+    setPlaybackFunctions,
     playbackState,
     playback
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
@@ -68,7 +68,7 @@ export default function EditorWindow({
         // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
-    useEffect(() => setScheduleFunctions({ ...scheduleFunctions, editorcursor: moveEditorCursor }), [])
+    useEffect(() => setPlaybackFunctions({ ...scheduleFunctions, editorcursor: moveEditorCursor }), [])
 
     const pbCurrUuid = playbackState.cursor.sysUuid
     const pbType = playbackState.playbackType
@@ -298,10 +298,6 @@ export default function EditorWindow({
             )
         })
     }, [editorScore, expanded, playbackState, selectionOn, sysToPartLookup])
-
-    // function onRender(id: string, phase: string, actualDuration: number, baseDuration: number) {
-    //     // console.log(`re-rendering id=${id} phase=${phase} duration(ms)=${actualDuration}`)
-    // }
 
     return (
         // <Profiler id="App" onRender={onRender}>

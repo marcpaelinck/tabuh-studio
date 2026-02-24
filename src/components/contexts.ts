@@ -1,14 +1,6 @@
 import { createContext, type Context, type RefObject } from 'react'
 import type { NavigationAction } from '../config/config'
-import type {
-    EditorCursorFunction,
-    EditorScore,
-    EditorSystem,
-    GenericFunction,
-    PlaybackSamplerAction,
-    WpDatabaseReturnValue,
-    WpUserReturnValue
-} from '../typing/types'
+import type { EditorScore, EditorSystem, WpDatabaseReturnValue, WpUserReturnValue } from '../typing/types'
 import { emulateAsync } from '../utils/async'
 import type { ComponentName, DashboardComponentValues } from './editor/Dashboard'
 
@@ -41,20 +33,6 @@ const defaultDashboardFunc = {
     clearDashboardElement: (type: ComponentName) => {}
 }
 export const DashboardFunctions: Context<DashboardFunctionsType> = createContext(defaultDashboardFunc)
-
-// AUDIO FUNCTIONS
-// used for playback from the editor interface
-export interface PlaybackFunctionsType {
-    playInstrument: (time: number, action: PlaybackSamplerAction) => void
-    moveEditorCursor: EditorCursorFunction
-    genericFunction: GenericFunction
-}
-export const defaultPlaybackFunc: PlaybackFunctionsType = {
-    playInstrument: () => {},
-    moveEditorCursor: () => {},
-    genericFunction: () => {}
-}
-export const PlaybackFunctions: Context<PlaybackFunctionsType> = createContext(defaultPlaybackFunc)
 
 // NAVIGATION FUNCTIONS
 // used by the keyboard listener

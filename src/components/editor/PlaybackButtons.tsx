@@ -1,11 +1,10 @@
 import type { HTMLAttributes, MouseEvent } from 'react'
-import { useContext, useRef } from 'react'
+import { useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
 import type { AudioState, PlaybackAction, PlaybackType } from '../../componentlogic/playbackReducer'
 import type { EditorScore } from '../../typing/types'
 import { debug } from '../../utils/debugger'
-import { PlaybackFunctions, type PlaybackFunctionsType } from '../contexts'
 
 export function PlaybackButtons({
     score,
@@ -27,7 +26,6 @@ export function PlaybackButtons({
     expandIfNotExpanded: (uuid: string, expand: boolean) => void
     playback: (action: PlaybackAction) => void
 } & HTMLAttributes<HTMLDivElement>) {
-    const audio: PlaybackFunctionsType = useContext(PlaybackFunctions)
     const buttongroupRef = useRef<HTMLDivElement>(null)
 
     function isDisabled(pbType: PlaybackType) {

@@ -93,7 +93,8 @@ export interface CreatePatternArgs {
     nextsymbol: NoteSymbol | undefined // symbol following the current symbol
     bpm: number // current tempo in BPM
     velocity: Tone.Unit.NormalRange // current velocity
-    prevaction: PlaybackSamplerAction | undefined // last action created for this position
+    prevaction: PlaybackSamplerAction | undefined // previous action created for this position
+    isLast: boolean // true if this is the last symbol in the current position's notation
 }
 // Converts specific symbols that represent a sequence of notes to a list of PlaybackSamplerAction objects.
 // Function `createNoteActions` expects a `CreatePatternArgs` object as argument.
@@ -168,7 +169,8 @@ function singleNoteAction(args: CreatePatternArgs) {
                 position: args.position,
                 symbol: args.symbol,
                 bpm: args.bpm,
-                velocity: args.velocity
+                velocity: args.velocity,
+                isLast: args.isLast
             } as SamplerFunctionParameters
         }
     ]
@@ -184,7 +186,8 @@ function silenceAction(args: CreatePatternArgs) {
                 position: args.position,
                 symbol: MutingChars[0],
                 bpm: args.bpm,
-                velocity: args.velocity
+                velocity: args.velocity,
+                isLast: args.isLast
             } as SamplerFunctionParameters
         }
     ]
@@ -236,7 +239,8 @@ function gracenoteAction(args: CreatePatternArgs) {
                 position: args.position,
                 symbol: graceSymbol,
                 bpm: args.bpm,
-                velocity: args.velocity
+                velocity: args.velocity,
+                isLast: args.isLast
             } as SamplerFunctionParameters
         }
     ]
@@ -266,7 +270,8 @@ function tremoloAction(args: CreatePatternArgs) {
                 position: args.position,
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
-                velocity: args.velocity
+                velocity: args.velocity,
+                isLast: args.isLast && count == totalNotes - 1
             } as SamplerFunctionParameters
         })
     }
@@ -299,7 +304,8 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
                 position: args.position,
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
-                velocity: velocity
+                velocity: velocity,
+                isLast: args.isLast && idx == totalNotes - 1
             } as SamplerFunctionParameters
         })
         time += duration
@@ -322,16 +328,17 @@ function rakeAction(args: CreatePatternArgs) {
     var offset = 0
     // Generate the pattern
     const returnValue: PlaybackSamplerAction[] = []
-    for (var i = 0; i < patterns.rake.number_of_notes; i++) {
+    for (var idx = 0; idx < patterns.rake.number_of_notes; idx++) {
         returnValue.push({
             time: n2TO(args.time + offset),
             function: args.samplerFunction,
             params: {
                 duration: n2TO(noteDuration),
                 position: args.position,
-                symbol: instrumentRange[startIdx + i],
+                symbol: instrumentRange[startIdx + idx],
                 bpm: args.bpm,
-                velocity: args.velocity
+                velocity: args.velocity,
+                isLast: args.isLast && idx == patterns.rake.number_of_notes - 1
             } as SamplerFunctionParameters
         })
         offset += noteSpacing
