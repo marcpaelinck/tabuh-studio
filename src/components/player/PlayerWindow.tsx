@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import { VStack } from 'rsuite'
 import type { SchedulePlaybackParams } from '../../componentlogic/playbackManager'
+import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
 import {
     type EditorScore,
-    type HighlightRange,
     type MenuItemInfo,
     type PlaybackCallbackFunctions,
     type Position,
     type ScoreInfo,
-    type SVGInfo,
     type TimeLine
 } from '../../typing/types'
 import Animation, { panggulDefaultOption } from './Animation'
@@ -16,26 +16,26 @@ import Menu from './Menu'
 import { Player } from './Player'
 
 interface PlayerWindowProps {
+    visible: boolean
     scoreList: ScoreInfo[]
     score: EditorScore | undefined
     totalDurationMs: number
-    dataSource: 'database' | 'file'
-    schedulePlayback: (params: SchedulePlaybackParams) => void
-    selectedFocus: Position[]
-    setSelectedFocus: Dispatch<Position[]>
-    playbackFunctions: PlaybackCallbackFunctions
-    setPlaybackFunctions: Dispatch<PlaybackCallbackFunctions>
+    schedulePlayback: (params: SchedulePlaybackParams) => TimeLine | undefined
+    focus: Position[]
+    setFocus: Dispatch<Position[]>
+    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackSpeed: number
     setPlaybackSpeed: Dispatch<number>
 }
 export default function PlayerWindow({
+    visible,
     scoreList,
     score,
     totalDurationMs,
-    dataSource,
     schedulePlayback,
-    selectedFocus,
-    setSelectedFocus,
+    focus,
+    setFocus,
+    updatePlaybackFunctions,
     playbackSpeed,
     setPlaybackSpeed
 }: PlayerWindowProps) {
@@ -45,28 +45,33 @@ export default function PlayerWindow({
     }
     // const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
-    const highlightFunctionRef = useRef<Dispatch<HighlightRange>>(() => {})
-    const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
-    const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
+    const [timeLine, setTimeLine] = useState<TimeLine | undefined>()
+
+    const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
+    const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
+
+    useEffect(() => {
+        focusRef.current = focus
+    }, [focus])
+    useEffect(() => {
+        playbackSpeedRef.current = playbackSpeed
+    }, [playbackSpeed])
 
     // HOOKS
-    // const { animateInstrument, animateNotation } = useAnimationEngine(
-    //     svgInfoRef,
-    //     highlightFunctionRef,
-    //     panggulOptionRef,
-    //     focusRef,
-    //     pbSpeedRef
-    // )
+    const { animateInstrument, svgInfo, setSvgInfo, panggulOption, setPanggulOption } = useAnimationEngine(
+        focusRef,
+        playbackSpeedRef
+    )
+    useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
     const timelineRef: RefObject<TimeLine | null> = useRef(null)
 
-    useEffect(
-        () =>
-            schedulePlayback({
-                pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
-            }),
-        [score]
-    )
+    useEffect(() => {
+        const timeLine: TimeLine | undefined = schedulePlayback({
+            pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
+        })
+        setTimeLine(timeLine)
+    }, [score])
 
     // Disable menus when data is loading
     // useEffect(() => {
@@ -74,12 +79,12 @@ export default function PlayerWindow({
     //     setMenuDisabled('focus', loadingScore || loadingScore || !score)
     // }, [loadingScore])
 
-    const updateFocus = (focus: Position[]): void => {
-        if (focus !== selectedFocus) {
-            setSelectedFocus(focus)
+    const updateFocus = (newFocus: Position[]): void => {
+        if (newFocus !== focus) {
+            setFocus(newFocus)
             //TODO currently only displaying notation for the first focus position
-            if (timelineRef.current?.notation && focus && focus[0] in timelineRef.current?.notation)
-                setNotationParas(timelineRef.current.notation[focus[0]])
+            if (timeLine && timeLine.notation && newFocus && newFocus[0] in timeLine.notation)
+                setNotationParas(timeLine.notation[newFocus[0]])
         }
     }
 
@@ -87,19 +92,19 @@ export default function PlayerWindow({
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
-        const menuItems: MenuItemInfo[] = selectedFocus.map((position) => {
+        const menuItems: MenuItemInfo[] = focus.map((position) => {
             return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
         })
         setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
         return [hideItem].concat(menuItems)
-    }, [selectedFocus])
+    }, [focus])
 
     const updateTimeline = (timeline: TimeLine): void => {
         timelineRef.current = timeline
     }
 
     return (
-        <div id="TabuhPlayer" className="pt-6 pl-6 pr-6">
+        <VStack id="TabuhPlayer" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
             <Menu
                 menuDisabled={menuDisabled}
                 scoreList={scoreList.map((info) => info.title)}
@@ -108,27 +113,18 @@ export default function PlayerWindow({
                 focusUpdater={updateFocus}
                 speedUpdater={setPlaybackSpeed}
             />
-            {selectedFocus.length > 0 && (
+            {focus.length > 0 && (
                 <Animation
-                    focus={selectedFocus}
+                    focus={focus}
                     notationElement={notationParas}
                     panggulMenuItems={panggulMenuItems}
                     panggulOption={panggulOption}
-                    highlightFunctionRef={highlightFunctionRef}
+                    updatePlaybackFunctions={updatePlaybackFunctions}
                     setPanggulOption={setPanggulOption}
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <Player
-                score={score}
-                totalDurationMs={totalDurationMs}
-                focus={selectedFocus}
-                pbSpeed={playbackSpeed}
-                svgInfo={svgInfo}
-                panggulOption={panggulOption}
-                highlightFunctionRef={highlightFunctionRef}
-                timelineUpdater={updateTimeline}
-            />
-        </div>
+            <Player score={score} totalDurationMs={totalDurationMs} />
+        </VStack>
     )
 }

@@ -6,9 +6,9 @@ import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type {
     AnimationData,
-    HighlightRange,
     MenuItemInfo,
     NotationParagraph,
+    PlaybackCallbackFunctions,
     Position,
     SVGInfo
 } from '../../typing/types'
@@ -48,23 +48,24 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 
 export const panggulDefaultOption: MenuItemInfo = { key: 'HIDE', displayValue: 'Hide', value: null }
 
+interface AnimationProps {
+    focus: Position[]
+    notationElement: NotationParagraph[] | null
+    panggulMenuItems: MenuItemInfo[]
+    panggulOption: MenuItemInfo
+    setPanggulOption: Dispatch<MenuItemInfo>
+    setSVGInfo: Dispatch<SVGInfo>
+    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
+}
 export default function Animation({
     focus,
     notationElement,
     panggulMenuItems,
-    highlightFunctionRef,
     panggulOption,
     setPanggulOption,
-    setSVGInfo
-}: {
-    focus: string[]
-    notationElement: NotationParagraph[] | null
-    panggulMenuItems: MenuItemInfo[]
-    panggulOption: MenuItemInfo
-    highlightFunctionRef: RefObject<Dispatch<HighlightRange>>
-    setPanggulOption: Dispatch<MenuItemInfo>
-    setSVGInfo: Dispatch<SVGInfo>
-}): JSX.Element {
+    setSVGInfo,
+    updatePlaybackFunctions
+}: AnimationProps): JSX.Element {
     const defaultSvgSize = 100 // percent
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
@@ -82,7 +83,7 @@ export default function Animation({
         setSvgSize({ width: `${size}%`, height: `${size}%` })
     }
 
-    async function setSvgStates(svg: SVGSVGElement) {
+    function setSvgStates(svg: SVGSVGElement) {
         if (svg) {
             svgInfoRef.current = retrieve_svg_data(svg)
             setSVGInfo(svgInfoRef.current)
@@ -109,7 +110,7 @@ export default function Animation({
     }
 
     return focus.length > 0 ? (
-        <div className="m-6">
+        <div className="m-6 w-full">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
                     <Col span="auto">
@@ -142,7 +143,8 @@ export default function Animation({
                         <NotationArea
                             notation={notationElement}
                             visible={notationVisible}
-                            highlightFunctionRef={highlightFunctionRef}
+                            focus={focus}
+                            updatePlaybackFunctions={updatePlaybackFunctions}
                         />
                     </div>
                 </Row>

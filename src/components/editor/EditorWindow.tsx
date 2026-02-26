@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useEffect, useMemo, useState } from 'react'
-import { Accordion, Col, Grid, Placeholder, Row, useDialog } from 'rsuite'
+import { Accordion, Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
@@ -17,6 +17,7 @@ import { SystemNode } from './SystemNode'
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
 interface EditorWindowProps {
+    visible: boolean
     expanded: Record<string, boolean>
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
@@ -26,12 +27,13 @@ interface EditorWindowProps {
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
     scheduleFunctions: PlaybackCallbackFunctions
-    setPlaybackFunctions: Dispatch<PlaybackCallbackFunctions>
+    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
 }
 
 export default function EditorWindow({
+    visible,
     expanded,
     setExpanded,
     loading,
@@ -41,7 +43,7 @@ export default function EditorWindow({
     updateParts,
     executeItemAction,
     scheduleFunctions,
-    setPlaybackFunctions,
+    updatePlaybackFunctions,
     playbackState,
     playback
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
@@ -68,7 +70,7 @@ export default function EditorWindow({
         // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
-    useEffect(() => setPlaybackFunctions({ ...scheduleFunctions, editorcursor: moveEditorCursor }), [])
+    useEffect(() => updatePlaybackFunctions({ editorcursor: moveEditorCursor }), [])
 
     const pbCurrUuid = playbackState.cursor.sysUuid
     const pbType = playbackState.playbackType
@@ -301,9 +303,9 @@ export default function EditorWindow({
 
     return (
         // <Profiler id="App" onRender={onRender}>
-        <>
+        <VStack id="editor box" visibility={visible ? 'visible' : 'collapse'}>
             {loading ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion className="w-full">{systems}</Accordion>}
-        </>
+        </VStack>
         // </Profiler>
     )
 }

@@ -2,22 +2,29 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the
 // notation while the corresponding notes are being played.
 
-import { useRef, type Dispatch, type RefObject } from 'react'
-import type { HighlightRange, NotationParagraph } from '../../typing/types'
+import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
+import * as Tone from 'tone'
+import type {
+    HighlightRange,
+    HilightRangeFunction,
+    NotationParagraph,
+    PlaybackCallbackFunctions,
+    PlayerCursorParameters,
+    Position
+} from '../../typing/types'
 
-export default function NotationArea({
-    notation,
-    visible,
-    highlightFunctionRef
-}: {
+interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    highlightFunctionRef: RefObject<Dispatch<HighlightRange>>
-}) {
+    focus: Position[]
+    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
+}
+
+export default function NotationArea({ notation, visible, focus, updatePlaybackFunctions }: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
     // Highlighting function: highlights the given range (line and character range)
-    const highlightFunction: Dispatch<HighlightRange> = (hlRange: HighlightRange) => {
+    const highlightCursor: HilightRangeFunction = (hlRange: HighlightRange) => {
         const para = textAreaRef.current?.children[hlRange.line]
         const para1 = textAreaRef.current?.childNodes[hlRange.line]
         // Note: the `container` parameter is not supported yet by all browsers
@@ -37,7 +44,14 @@ export default function NotationArea({
         }
     }
 
-    highlightFunctionRef.current = highlightFunction
+    const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {
+        // if (currentFocus.includes(cAction.position)) {
+        if (focus.length > 0 && focus[0] === params.position) {
+            Tone.getDraw().schedule(() => highlightCursor({ line: params.line, range: params.range }), time)
+        }
+    }, [])
+
+    useEffect(() => updatePlaybackFunctions({ playercursor: animateNotationCursor }), [])
 
     return (
         <>

@@ -215,15 +215,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
 
     // PLAYBACK SETTINGS
-    const [selectedFocus, setSelectedFocus] = useState<Position[]>([])
+    const [focus, setFocus] = useState<Position[]>([])
     const {
         playbackFunctions,
-        setPlaybackFunctions,
+        updatePlaybackFunctions,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
-    } = usePlaybackManager(selectedFocus)
+    } = usePlaybackManager(focus)
     const playbackReducer = playbackReducerFactory(playbackFunctions, schedulePlayback)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -231,7 +231,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         playbackType: 'none'
     })
 
-    useEffect(() => setPlaybackFunctions({ ...playbackFunctions, generic: stopPlayback }), [])
+    useEffect(() => updatePlaybackFunctions({ generic: stopPlayback }), [])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -324,39 +324,39 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             {/* </HStack> */}
                         </Header>
                         <Content id="content" px="1rem" className="h-9/10">
-                            <Box id="editor window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                                {importedScore != null && active == 'editor' && (
-                                    <EditorWindow
-                                        id="editor window component"
-                                        expanded={expanded}
-                                        setExpanded={setExpanded}
-                                        loading={loadingScore}
-                                        editorScore={editorScore}
-                                        labels={labels}
-                                        updateSystem={updateSystem}
-                                        updateParts={updateParts}
-                                        executeItemAction={executeItemAction}
-                                        scheduleFunctions={playbackFunctions}
-                                        setPlaybackFunctions={setPlaybackFunctions}
-                                        playbackState={playbackState}
-                                        playback={playback}
-                                    />
-                                )}
-                                {active == 'player' && (
-                                    <PlayerWindow
-                                        scoreList={scoreList}
-                                        score={editorScore}
-                                        totalDurationMs={totalDurationMs}
-                                        dataSource={dataSource}
-                                        schedulePlayback={schedulePlayback}
-                                        selectedFocus={selectedFocus}
-                                        setSelectedFocus={setSelectedFocus}
-                                        playbackFunctions={playbackFunctions}
-                                        setPlaybackFunctions={setPlaybackFunctions}
-                                        playbackSpeed={playbackSpeed}
-                                        setPlaybackSpeed={setPlaybackSpeed}
-                                    />
-                                )}
+                            <Box
+                                id="editor/player window box"
+                                className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
+                                {/* {importedScore != null && active == 'editor' && ( */}
+                                <EditorWindow
+                                    visible={active == 'editor'}
+                                    id="editor window component"
+                                    expanded={expanded}
+                                    setExpanded={setExpanded}
+                                    loading={loadingScore}
+                                    editorScore={editorScore}
+                                    labels={labels}
+                                    updateSystem={updateSystem}
+                                    updateParts={updateParts}
+                                    executeItemAction={executeItemAction}
+                                    scheduleFunctions={playbackFunctions}
+                                    updatePlaybackFunctions={updatePlaybackFunctions}
+                                    playbackState={playbackState}
+                                    playback={playback}
+                                />
+                                {/* )} */}
+                                <PlayerWindow
+                                    visible={active == 'player'}
+                                    scoreList={scoreList}
+                                    score={editorScore}
+                                    totalDurationMs={totalDurationMs}
+                                    schedulePlayback={schedulePlayback}
+                                    focus={focus}
+                                    setFocus={setFocus}
+                                    updatePlaybackFunctions={updatePlaybackFunctions}
+                                    playbackSpeed={playbackSpeed}
+                                    setPlaybackSpeed={setPlaybackSpeed}
+                                />
                             </Box>
                         </Content>
                     </Container>

@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { EditorCellCursor, EditorScore, PlaybackCallbackFunctions } from '../typing/types'
+import type { EditorCellCursor, EditorScore, PlaybackCallbackFunctions, TimeLine } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { defaultPlaybackFunctions, type SchedulePlaybackParams } from './playbackManager'
 import { cycleValidation } from './validationManager'
@@ -52,7 +52,7 @@ async function asyncPlay() {
 // This function enables to pass the playbackScheduleFunctions to the playbackReducer.
 export function playbackReducerFactory(
     actionFunc: PlaybackCallbackFunctions,
-    schedulePlayback: (parms: SchedulePlaybackParams) => void
+    schedulePlayback: (parms: SchedulePlaybackParams) => TimeLine | undefined
 ) {
     playbackFunctions.actionFunctions = actionFunc
     playbackFunctions.schedulePlayback = schedulePlayback

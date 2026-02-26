@@ -1,61 +1,25 @@
-import { useEffect, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import { useEffect, useState, type JSX } from 'react'
 import * as Tone from 'tone'
-import {
-    type EditorScore,
-    type HighlightRange,
-    type MenuItemInfo,
-    type Position,
-    type SVGInfo,
-    type TimeLine
-} from '../../typing/types'
+import { type EditorScore } from '../../typing/types'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
-import { panggulDefaultOption } from './Animation'
 
 type AudioState = 'false' | 'true' | 'wait'
 
 export function Player({
     score,
-    totalDurationMs,
-    focus,
-    pbSpeed,
-    svgInfo,
-    panggulOption,
-    highlightFunctionRef,
-    timelineUpdater
+    totalDurationMs
 }: {
     score: EditorScore | undefined
     totalDurationMs: number
-    focus: Position[]
-    pbSpeed: number
-    svgInfo: SVGInfo
-    panggulOption: MenuItemInfo
-    highlightFunctionRef: RefObject<Dispatch<HighlightRange>>
-    timelineUpdater: Dispatch<TimeLine>
 }): JSX.Element {
     // STATE VARIABLES
     const [audioStarted, setAudioStarted] = useState<AudioState>('false') // MOVE TO MAINWINDOW
     const [playing, setPlaying] = useState<boolean>(false) // MOVE TO MAINWINDOW
     const [progress, setProgress] = useState<number>(0) // MOVE TO MAINWINDOW
-    const [totalDuration, setTotalDuration] = useState<number>(0) // MOVE TO MAINWINDOW
-
-    const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
-        svg: null,
-        panggul: null,
-        x: null,
-        y: null,
-        animation: null
-    })
-    const panggulOptionRef: RefObject<MenuItemInfo> = useRef<MenuItemInfo>(panggulDefaultOption)
-    const focusRef: RefObject<Position[]> = useRef<Position[]>([])
-    const pbSpeedRef: RefObject<number> = useRef<number>(1)
-    svgInfoRef.current = svgInfo
-    panggulOptionRef.current = panggulOption
-    focusRef.current = focus
-    pbSpeedRef.current = pbSpeed
 
     useEffect(() => setAudioStarted('false'), [score])
     // HOOKS
@@ -196,13 +160,13 @@ export function Player({
                     barClassName="flex w-full ts-theme-player"
                     renderTooltip={(value) => (value ? toMmSs(value) : '')}
                     min={0}
-                    max={totalDuration}
+                    max={Math.ceil(totalDurationMs / 1000)}
                     value={progress}
                     onChange={(val) => jumpToProgressTime(val)}
                 />
             </div>
             <span className="flex w-12 shrink-0 justify-center">
-                <p>{toMmSs(totalDuration)}</p>
+                <p>{toMmSs(Math.ceil(totalDurationMs / 1000))}</p>
             </span>
         </div>
     )

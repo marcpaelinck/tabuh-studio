@@ -9,7 +9,7 @@
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
 import _ from 'lodash'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, positionConfigs } from '../config/config'
@@ -64,14 +64,15 @@ export function usePlaybackManager(selectedFocus: Position[]) {
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
 
+    const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
+        useRef<PlaybackCallbackFunctions>(defaultPlaybackFunctions)
+
     useEffect(() => {
         // Avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this is necessary.
         // See MainWindow where setPlaybackFunctions is only called in an initial useEffect.
-        if (playbackFunctions.play === defaultPlaybackFunctions.play) {
-            setPlaybackFunctions({ ...playbackFunctions, tempo: changeTempo, play: playInstrument })
-            console.log('setting play function')
-        }
-    }, [playbackFunctions])
+        updatePlaybackFunctions({ tempo: changeTempo, play: playInstrument })
+        debug('setting play function')
+    }, [])
 
     function changeTempo(time: number, { bpm, pbSpeed }: TempoFunctionParameters): void {
         if (bpm != undefined) {
@@ -79,6 +80,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         }
     }
 
+    // function updatePlaybackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
+    //     debug(`UPDATING PB FUNCTIONS ${Object.keys(functions)} new pbFunctions: }`)
+    //     debug({ ...playbackFunctions, ...functions })
+    //     setPlaybackFunctions({ ...playbackFunctions, ...functions })
+    // }
+    function updatePlaybackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
+        debug(`UPDATING PB FUNCTIONS ${Object.keys(functions)} new pbFunctions: }`)
+        debug({ ...pbFunctionsRef.current, ...functions })
+        pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
+    }
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
         if (!(position in positionConfigs)) return []
         if (!action) debug(`samplerAction2AnimationNotes ${position} ${action}`)
@@ -167,15 +178,14 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             _.keys(positionConfigs).map((key) => [key, []] as [Position, PlaybackSamplerAction[]])
         )
 
-        debug(currentStep)
-
         while (currentStep) {
-            debug(currentStep)
             maxMeasureDuration = 0
             for (const position of currentStep.positions) {
+                var currentTempo = 0
                 var currTime: number = sectionStartTime
                 var currTimeMs: number = sectionStartTimeMs
                 var cursorPos: number = 0
+                timeline.notation[position] = []
                 const measure = currentStep.measures[position]
                 var notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
                 if (!notation) notation = Array(4).fill(defaultObject('JsonSymbol'))
@@ -187,8 +197,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         currentStep!.lastSystem && currentStep!.lastSection && symbolIdx == notation.length - 1
 
                     // CREATE SAMPLER ACTION
-
-                    // Instead of this check, better to include the required action types in the function arguments
                     if (isExtension(symbol)) {
                         if (currAction[position])
                             currAction[position].params.duration = TOplusNumber(currAction[position].params.duration, 1)
@@ -198,7 +206,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     } else {
                         // Convert potential patterns to individual note actions.
                         const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
-                            samplerFunction: playbackFunctions.play,
+                            samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
                             position,
                             prevsymbol: prevSymbol,
@@ -222,7 +230,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                                     currAction[position].params.duration,
                                     millis2BaseNoteEquiv(outro, currentStep!.tempo[1])
                                 )
-                            if (patternNoteActions.length > 1) debug(`PATTERN=${JSON.stringify(currAction[position])}`)
                             prevNote[position] = currAction[position]
                             timeline.sampleractions.push(currAction[position])
                             samplerActionsByPos[position].push(currAction[position])
@@ -230,22 +237,59 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         symbolDuration =
                             TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
                     }
-                    if (position == 'UGAL') debug(`CURRNOTE: ${JSON.stringify(currAction)}`)
 
-                    // CREATE ANIMATION CURSOR ACTION
+                    // CREATE TEMPO ACTION
 
-                    timeline.playercursoractions.push({
-                        function: playbackFunctions.playercursor,
-                        time: n2TO(currTime),
-                        params: {
-                            sysuuid: currentStep!.system.uuid,
-                            section: currentStep!.sectionIdx,
-                            position: position,
-                            symbol: symbol,
-                            line: 0,
-                            range: [cursorPos, cursorPos + symbol.length]
-                        }
-                    })
+                    // const newTempo =
+                    //     currentStep!.tempo[0] +
+                    //     (symbolIdx / notation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0])
+                    // if (newTempo != currentTempo) {
+                    //     timeline.tempoactions.push({
+                    //         time: n2TO(currTime),
+                    //         function: pbFunctionsRef.current.tempo,
+                    //         params: { bpm: newTempo, pbSpeed: playbackSpeed }
+                    //     })
+                    //     currentTempo = newTempo
+                    // }
+                    // // CREATE ANIMATION CURSOR ACTION
+                    // const sysUuid = currentStep!.system.uuid
+                    // const sectionIdx = currentStep!.sectionIdx
+                    // const newSystem = currentStep!.system != prevSystem
+                    // const newSection = symbolIdx == 0
+                    // const lastNoteOfSection = symbolIdx == notation.length - 1
+
+                    // if (newSection) currentline += ' '
+                    // const range = [currentline.length, currentline.length + symbol.s.length]
+                    // currentline += symbol.s
+
+                    // timeline.playercursoractions.push({
+                    //     function: pbFunctionsRef.current.playercursor,
+                    //     time: n2TO(currTime),
+                    //     params: {
+                    //         sysuuid: currentStep!.system.uuid,
+                    //         section: currentStep!.sectionIdx,
+                    //         position: position,
+                    //         symbol: symbol,
+                    //         line: 0,
+                    //         range: [cursorPos, cursorPos + symbol.length]
+                    //     }
+                    // })
+                    // if (lastNoteOfSection) {
+                    //     timeline.notation[position].push(
+                    //         createElement(
+                    //             'p',
+                    //             {
+                    //                 key: line,
+                    //                 id: `notation-${line}`,
+                    //                 className: 'appearance-none p-[0px] m-0 text-sm/6 balifont'
+                    //             },
+                    //             currentline
+                    //         )
+                    //     )
+                    //     currentline = ''
+                    //     line++
+                    // }
+
                     cursorPos += symbol.length
                     currTime += symbolDuration
                     prevSymbol = symbol
@@ -258,7 +302,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // Only one cursor action per system is needed.
             var cursorTime = sectionStartTime
             timeline.editorcursoractions.push({
-                function: playbackFunctions.editorcursor,
+                function: pbFunctionsRef.current.editorcursor,
                 time: n2TO(cursorTime),
                 params: {
                     prevsysuuid: prevSystem?.uuid || undefined,
@@ -279,7 +323,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // from the starting position to the first note
             if (!actions || actions.length == 0) return
             timeline.animationactions.push({
-                function: playbackFunctions.animate,
+                function: pbFunctionsRef.current.animate,
                 time: n2TO(0),
                 params: {
                     position: position,
@@ -304,7 +348,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
                 timeline.animationactions.push({
                     time: action.time,
-                    function: playbackFunctions.animate,
+                    function: pbFunctionsRef.current.animate,
                     params: {
                         position: position,
                         currnotes: aNotes,
@@ -314,17 +358,15 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     }
                 })
                 timeline.totalDurationMs = Math.max(timeline.totalDurationMs, timeUntilMs + outro)
-                // if (timeline.animationactions[timeline.animationactions.length - 1].timeuntilMs < 0)
-                // debug(`${position} ${note.system}-${note.section} ${timeUntilMs} [${note.ms} ${notes[index + 1].ms}] [${note.t} ${notes[index + 1].t}] `)
             })
         })
 
         // Determine the total playback duration
         timeline.totalDurationTO = n2TO(sectionStartTime)
         setTotalDurationMs(timeline.totalDurationMs)
-        if (playbackFunctions.generic)
+        if (pbFunctionsRef.current.generic)
             timeline.genericactions.push({
-                function: playbackFunctions.generic,
+                function: pbFunctionsRef.current.generic,
                 time: timeline.totalDurationTO,
                 params: {}
             })
@@ -340,16 +382,20 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         Tone.getTransport().cancel()
         Tone.getTransport().seconds = 0
 
-        // Tempo and instrument actions (notes)
+        //Instrument sampler actions (notes)
+        timeLine.sampleractions.forEach((action: PlaybackSamplerAction) => {
+            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+        })
+
+        // Tempo actions
         // Set the initial tempo to 60 (intro time)
         const tAction: PlaybackTempoAction = {
             time: { '16n': 0 },
-            function: playbackFunctions.tempo,
+            function: pbFunctionsRef.current.tempo,
             params: { bpm: defaultTempo, pbSpeed: pbSpeed }
         }
         Tone.getTransport().schedule((time) => tAction.function(time, tAction.params), tAction.time)
-        timeLine.sampleractions.forEach((action: PlaybackSamplerAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+        timeLine.tempoactions.forEach((action: PlaybackTempoAction) => {
             Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
         })
 
@@ -379,14 +425,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         useCache = true,
         intro = defaultIntroTime,
         outro = defaultOutroTime
-    }: SchedulePlaybackParams) {
+    }: SchedulePlaybackParams): TimeLine | undefined {
         const timeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
         if (timeLine) createPlaybackSchedule(timeLine, playbackSpeed)
+        return timeLine
     }
 
     return {
         playbackFunctions,
         setPlaybackFunctions,
+        updatePlaybackFunctions,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,

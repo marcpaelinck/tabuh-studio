@@ -183,7 +183,11 @@ export type TextCursorPosition = {
     rightSymbol: SVGTSpanElement | null
 }
 
-export type HighlightRange = { line: number; range: number[] }
+export interface HighlightRange {
+    line: number
+    range: number[]
+}
+export type HilightRangeFunction = (hlRange: HighlightRange) => void
 
 // EXECUTION
 // These objects contain information for playing the notation.
