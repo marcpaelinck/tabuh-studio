@@ -40,9 +40,9 @@ export default function PlayerWindow({
     setPlaybackSpeed
 }: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
-    const setMenuDisabled = (label: string, value: boolean) => {
-        menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
-    }
+    // const setMenuDisabled = (label: string, value: boolean) => {
+    //     menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
+    // }
     // const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
     const [timeLine, setTimeLine] = useState<TimeLine | undefined>()
@@ -58,13 +58,11 @@ export default function PlayerWindow({
     }, [playbackSpeed])
 
     // HOOKS
-    const { animateInstrument, svgInfo, setSvgInfo, panggulOption, setPanggulOption } = useAnimationEngine(
+    const { animateInstrument, setSvgInfo, panggulOption, setPanggulOption } = useAnimationEngine(
         focusRef,
         playbackSpeedRef
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
-
-    const timelineRef: RefObject<TimeLine | null> = useRef(null)
 
     useEffect(() => {
         const timeLine: TimeLine | undefined = schedulePlayback({
@@ -99,9 +97,9 @@ export default function PlayerWindow({
         return [hideItem].concat(menuItems)
     }, [focus])
 
-    const updateTimeline = (timeline: TimeLine): void => {
-        timelineRef.current = timeline
-    }
+    // const updateTimeline = (timeline: TimeLine): void => {
+    //     timelineRef.current = timeline
+    // }
 
     return (
         <VStack id="TabuhPlayer" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>

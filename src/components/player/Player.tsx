@@ -43,10 +43,10 @@ export function Player({
     //     rewind()
     // }, [timeline])
 
-    function updateProgress() {
-        setProgress(Tone.getTransport().seconds)
-        Tone.getTransport()
-    }
+    // function updateProgress() {
+    //     setProgress(Tone.getTransport().seconds)
+    //     Tone.getTransport()
+    // }
 
     // function createSchedule(timeline: TimeLine | null) {
     //     // Creates the schedule for the Transport object.

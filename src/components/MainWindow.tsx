@@ -8,7 +8,6 @@ import _ from 'lodash'
 import { useContext, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
-    Box,
     Button,
     Col,
     Container,
@@ -291,7 +290,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
                 <Container id="main" height="80vh">
-                    <Container id="header+content">
+                    <Container id="header+content" className="flex w-full">
                         <Header id="header" className="flex">
                             {/* <HStack spacing={16} align="center" p="1rem"> */}
                             <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
@@ -324,7 +323,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             {/* </HStack> */}
                         </Header>
                         <Content id="content" px="1rem" className="h-9/10">
-                            <Box
+                            <div
                                 id="editor/player window box"
                                 className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
                                 {/* {importedScore != null && active == 'editor' && ( */}
@@ -357,7 +356,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                     playbackSpeed={playbackSpeed}
                                     setPlaybackSpeed={setPlaybackSpeed}
                                 />
-                            </Box>
+                            </div>
                         </Content>
                     </Container>
                     <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>

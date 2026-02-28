@@ -200,8 +200,6 @@ export function createTimeline(score: Score | undefined, actionFunctions: Playba
                     : note2AnimationNotes(position, notes[index + 1], nextIsLast)
                 const timeUntil: TimeObject = currIsLast ? n2TO(1000) : n2TO(notes[index + 1].t - note.t)
                 const timeUntilMs: number = currIsLast ? defaultOutroTime : notes[index + 1].ms - note.ms
-                const prevSystem = index > 0 ? notes[index - 1].sysUuid : null
-                const prevSection = index > 0 ? notes[index - 1].section : null
                 if (!actionFunctions.animate) return // redundant, this is just to avoid a ts error
                 timeline.animationactions.push({
                     time: n2TO(note.t),

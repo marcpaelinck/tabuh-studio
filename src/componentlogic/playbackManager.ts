@@ -36,7 +36,7 @@ import { defaultObject } from '../utils/objectUtils'
 import { speedDefaultOption } from '../utils/selectorsUtils'
 import { millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOminusTO, TOplusNumber, TOplusTO } from '../utils/timeunits'
 import { executionManager, type FlowStep } from './executionManager'
-import { createNoteActions } from './patternManager'
+import { createNoteActions, totalDuration } from './patternManager'
 import type { PlaybackAction } from './playbackReducer'
 import { useInstruments } from './useInstruments'
 
@@ -74,9 +74,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         debug('setting play function')
     }, [])
 
-    function changeTempo(time: number, { bpm, pbSpeed }: TempoFunctionParameters): void {
-        if (bpm != undefined) {
-            Tone.getTransport().bpm.setValueAtTime(bpm * pbSpeed, time)
+    function changeTempo(time: number, params: TempoFunctionParameters): void {
+        if (params.bpm != undefined) {
+            Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
         }
     }
 
@@ -170,20 +170,54 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
         var sectionStartTime: number = millis2BaseNoteEquiv(intro, currentStep.tempo[0])
-        var sectionStartTimeMs: number = intro
 
         // This dict will be used to create animation actions
         // @ts-ignore
         const samplerActionsByPos: Record<Position, PlaybackSamplerAction[]> = Object.fromEntries(
             _.keys(positionConfigs).map((key) => [key, []] as [Position, PlaybackSamplerAction[]])
         )
+        var currentTempo = 0
 
         while (currentStep) {
             maxMeasureDuration = 0
+
+            // CREATE TEMPO ACTION
+            // Gradual changes will be implemented by changing the tempo at the start of each symbol in the measure.
+            // first determine the max. measure length
+            const [startTempo, endTempo] = currentStep.tempo
+            const sectionDuration = Object.entries(currentStep.measures).reduce(
+                (maxDur, [position, measure]) =>
+                    Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
+                0
+            )
+            if (startTempo == endTempo) {
+                if (currentStep.tempo[0] != currentTempo) {
+                    // Immediate change
+                    const newTempo = startTempo
+                    timeline.tempoactions.push({
+                        time: n2TO(sectionStartTime),
+                        function: pbFunctionsRef.current.tempo,
+                        params: { bpm: newTempo, pbSpeed: playbackSpeed }
+                    })
+                    currentTempo = newTempo
+                }
+            } else {
+                // Gradual change
+                for (var t = 0; t < sectionDuration; t++) {
+                    const newTempo = startTempo + (t / sectionDuration) * (endTempo - startTempo)
+                    if (newTempo != currentTempo) {
+                        timeline.tempoactions.push({
+                            time: n2TO(sectionStartTime + t),
+                            function: pbFunctionsRef.current.tempo,
+                            params: { bpm: newTempo, pbSpeed: playbackSpeed }
+                        })
+                        currentTempo = newTempo
+                    }
+                }
+            }
+
             for (const position of currentStep.positions) {
-                var currentTempo = 0
                 var currTime: number = sectionStartTime
-                var currTimeMs: number = sectionStartTimeMs
                 var cursorPos: number = 0
                 timeline.notation[position] = []
                 const measure = currentStep.measures[position]
@@ -238,19 +272,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                             TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
                     }
 
-                    // CREATE TEMPO ACTION
-
-                    // const newTempo =
-                    //     currentStep!.tempo[0] +
-                    //     (symbolIdx / notation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0])
-                    // if (newTempo != currentTempo) {
-                    //     timeline.tempoactions.push({
-                    //         time: n2TO(currTime),
-                    //         function: pbFunctionsRef.current.tempo,
-                    //         params: { bpm: newTempo, pbSpeed: playbackSpeed }
-                    //     })
-                    //     currentTempo = newTempo
-                    // }
                     // // CREATE ANIMATION CURSOR ACTION
                     // const sysUuid = currentStep!.system.uuid
                     // const sectionIdx = currentStep!.sectionIdx

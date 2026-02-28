@@ -131,32 +131,44 @@ export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerActio
     }
 }
 
-export function getDurationInMillis(args: CreatePatternArgs): number {
-    const pattern = getPatternType(args.symbol, args.position)
+export function symbolDuration(
+    symbol: NoteSymbol,
+    position: Position,
+    bpm: number,
+    unit: 'millisecond' | 'basenote'
+): number {
+    const pattern = getPatternType(symbol, position)
     switch (pattern) {
         case 'SINGLENOTE':
-            return BaseNoteEquiv2Millis(1, args.bpm)
-        case 'GRACENOTE':
-            return 0
         case 'TREMOLO':
-            return BaseNoteEquiv2Millis(1, args.bpm)
+            return unit == 'basenote' ? 1 : BaseNoteEquiv2Millis(1, bpm)
         case 'TREMOLO_ACC':
             const durationBn =
                 patterns.tremolo.accelerating_pattern.reduce((sum, n) => sum + n, 0) /
                 patterns.tremolo.accelerating_pattern[0]
-            return BaseNoteEquiv2Millis(durationBn, args.bpm)
+            return unit == 'basenote' ? durationBn : BaseNoteEquiv2Millis(durationBn, bpm)
         case 'RAKE':
-            return patterns.rake.note_duration_in_millis
-        case 'INVALID': {
-            return BaseNoteEquiv2Millis(1, args.bpm)
-        }
-        case 'UNHANDLED': {
-            return BaseNoteEquiv2Millis(1, args.bpm)
-        }
-        default: {
-            return BaseNoteEquiv2Millis(1, args.bpm)
-        }
+            return (
+                unit == 'basenote'
+                    ? millis2BaseNoteEquiv(patterns.rake.pattern_duration_in_millis, bpm)
+                    : patterns.rake.pattern_duration_in_millis,
+                bpm
+            )
+        case 'GRACENOTE':
+        case 'INVALID':
+        case 'UNHANDLED':
+        default:
+            return 0
     }
+}
+
+export function totalDuration(
+    symbols: NoteSymbol[],
+    position: Position,
+    bpm: number,
+    unit: 'millisecond' | 'basenote'
+) {
+    return _.sum(symbols.map((sym) => symbolDuration(sym, position, bpm, unit)))
 }
 
 function singleNoteAction(args: CreatePatternArgs) {
