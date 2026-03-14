@@ -66,7 +66,7 @@ function createTransitions(score: EditorScore): StateTransitionMatrix {
 // Returns the next state given the current system uuid
 function nextGoToState(currState: GoToState | undefined, uuid: UUID, transitions: StateTransitionMatrix) {
     if (currState == undefined) return _.mapValues(transitions, (sysstatus) => sysstatus.map(() => 0)) as GoToState
-    const newState: GoToState = currState
+    const newState: GoToState = _.cloneDeep(currState)
     // resetCyclic==false: return next state
     // resetCyclic==true: Reset the current system's counter if it cyclic and has reached its maximum
     newState[uuid] = newState[uuid].map((state, idx) => transitions[uuid][idx][state])
@@ -150,8 +150,11 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
 }
 
 // Detects the presence of a closed cycle. Returns true if no cycles were detected.
-export function cycleValidation(score: EditorScore): ValidationResult {
+// updateScoreFlag: updates the .hasCycle flag of the score object.
+export function cycleValidation(score: EditorScore, updateScoreFlag: boolean = false): ValidationResult {
     if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
-    return simulatePlayback(score, transitions)
+    const validation = simulatePlayback(score, transitions)
+    if (updateScoreFlag) score.hasCycle = !validation.isValid
+    return validation
 }
