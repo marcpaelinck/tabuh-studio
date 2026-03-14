@@ -105,15 +105,18 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         const items = flowinfo![sysIdx].executionItems[type]
         const flow = flowinfo![sysIdx]
         for (const item of items) {
+            var loopMatches =
+                !('loops' in item) || !item.loops || item.loops.length == 0 || item.loops.includes(flow.loop)
+            if (!loopMatches) continue
             // if `each`==false or undefined: match=true if no passes are given or if flow.pass
             //                                matches a pass in item.passes
             // if `each`==true and one or more passes are given: match=true if flow.pass % maxPassNr
             //                                matches a pass in item.passes
             // The case `each`==true and item.passes==undefined or empty is invalid and should not return a match.
             // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
-            if (!item.each && (!item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)))
-                matches.push(item)
-            else if (item.each && item.passes && item.passes.length > 0) {
+            var passMatches = !item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)
+            if (!item.each && passMatches) matches.push(item)
+            else if (item.each && item.passes && item.passes.length > 0 && loopMatches) {
                 const maxPassNr = Math.max(...item.passes)
                 if (item.each && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
                     // Matching item found
@@ -160,8 +163,9 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     // Case 1: fromValue is given
                     const totalSections = exprItem.toSection - exprItem.fromSection + 1
                     const valueRange = exprItem.toValue - exprItem.fromValue
-                    const startValue = exprItem.fromValue + valueRange * ((sectionNbr - 1) / totalSections)
-                    const endValue = exprItem.fromValue + valueRange * (sectionNbr / totalSections)
+                    const startValue =
+                        exprItem.fromValue + valueRange * ((sectionNbr - exprItem.fromSection) / totalSections)
+                    const endValue = startValue + valueRange / totalSections
                     // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
                     return [startValue, endValue]
                 } else {
