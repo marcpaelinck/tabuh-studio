@@ -39,6 +39,7 @@ import { executionManager, type FlowStep } from './executionManager'
 import { createNoteActions, totalDuration } from './patternManager'
 import type { PlaybackAction } from './playbackReducer'
 import { useInstruments } from './useInstruments'
+import { cycleValidation } from './validationManager'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
 export const defaultPlaybackFunctions: PlaybackCallbackFunctions = {
@@ -127,6 +128,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             `creating timeline ${pbAction.playbackType} totSystems=${pbAction.score?.systems.length} startAtIndex=${pbAction.systemIndex} in/out=${JSON.stringify([intro, outro])}`
         )
         if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined)) return undefined
+
+        const validation = cycleValidation(pbAction.score, true)
+        if (!validation.isValid) return undefined
 
         const timeline: TimeLine = {
             totalDurationMs: 0,
@@ -231,6 +235,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         currentStep!.lastSystem && currentStep!.lastSection && symbolIdx == notation.length - 1
 
                     // CREATE SAMPLER ACTION
+
                     if (isExtension(symbol)) {
                         if (currAction[position])
                             currAction[position].params.duration = TOplusNumber(currAction[position].params.duration, 1)

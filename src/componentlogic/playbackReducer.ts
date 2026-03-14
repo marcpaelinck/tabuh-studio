@@ -67,7 +67,7 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
                 return { ...state, cursor: noCursor, audioState: 'nodata' }
             }
 
-            const validation = cycleValidation(action.score)
+            const validation = cycleValidation(action.score, true)
             if (!validation.isValid) {
                 debug('validating')
                 // dialog.alert(validation.message, { title: 'Warning' })

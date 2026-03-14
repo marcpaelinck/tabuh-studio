@@ -316,7 +316,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             }
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
-                const validation = cycleValidation(editorScore)
+                const validation = cycleValidation(editorScore, true)
                 if (!validation.isValid)
                     dashboardFunctions.setDashboardElement('cycle', {
                         visible: true,

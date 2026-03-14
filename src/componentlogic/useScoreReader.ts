@@ -126,6 +126,7 @@ function parseScoreNew(score: EditorScore): EditorScore {
     // Transport.getSecondsAtTime() doesn't seem to process tempo changes correctly.
     // TODO the following result will be incorrect if tempo[1] != tempo[0]
     if (!score.uuid) score.uuid = uuidv4()
+    if (score.hasCycle == undefined) score.hasCycle = false
     // const introTimeBn = millis2BaseNoteEquiv(defaultIntroTime, Object.values(score.systems[0].staffs)[0][0].tempo)
     // score.systems.forEach((system) => {
     //     system.starttime += introTimeBn
@@ -195,7 +196,7 @@ export function useScoreReader<T = Score | EditorScore | undefined>(
                 const json = JSON.parse(response.result[0].notation)
                 if (!json) return
 
-                var newScore: Score | EditorScore | undefined = undefined
+                var newScore: EditorScore | undefined = undefined
 
                 newScore = parseScoreNew(json)
                 setScore(newScore as T)

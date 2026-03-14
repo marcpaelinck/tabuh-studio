@@ -3,7 +3,7 @@ import _ from 'lodash'
 // Enable/disable the debug function for each module in the list below.
 // Specify a function by setting the dict value to {functionName: true}
 
-const mainSwitch = true // easily switch off all logging
+const mainSwitch = false // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     UNKNOWN: false,
     createSchedule: false,
@@ -19,7 +19,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     patternManager: false,
     PlaybackButtons: { moveEditorCursor: false },
     playbackReducer: false,
-    playbackManager: true,
+    playbackManager: false,
     PlayerWindow: false,
     registerComponent: false,
     score: false,
