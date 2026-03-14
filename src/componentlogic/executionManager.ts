@@ -73,7 +73,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
 
     // Reset the cursor and create the lookup table
     var flowinfo: FlowInfoTable = Object.fromEntries(
-        score.systems.map((system, idx) => {
+        score.systems.map((system) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
@@ -82,13 +82,15 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
             }
             return [
-                idx,
+                system.index,
                 { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, executionItems: executionItems }
             ]
         })
     )
 
-    var uuidLookup: Record<string, number> = Object.fromEntries(score.systems.map((system, idx) => [system.uuid, idx]))
+    var uuidLookup: Record<string, number> = Object.fromEntries(
+        score.systems.map((system) => [system.uuid, system.index])
+    )
 
     function resetFlow() {
         _.values(flowinfo).forEach((value) => {
@@ -106,7 +108,9 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         const flow = flowinfo![sysIdx]
         for (const item of items) {
             var loopMatches =
-                !('loops' in item) || !item.loops || item.loops.length == 0 || item.loops.includes(flow.loop)
+                item.type == 'loop'
+                    ? flow.loop <= item.count
+                    : !('loops' in item) || !item.loops || item.loops.length == 0 || item.loops.includes(flow.loop)
             if (!loopMatches) continue
             // if `each`==false or undefined: match=true if no passes are given or if flow.pass
             //                                matches a pass in item.passes
@@ -231,7 +235,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 const nextSysIdx = getNextSystemInFlow(cursor.sysIdx, flowinfo, cursor.lastSystem)
                 if (nextSysIdx == undefined) return undefined
                 // Update pass and loop counters
-                if (nextSysIdx == cursor.sysIdx) flowinfo[cursor.sysIdx].loop += 1
+                if (nextSysIdx == cursor.sysIdx && !peek) flowinfo[cursor.sysIdx].loop += 1
                 else {
                     if (!peek) {
                         // Reset loop counter of the current system
