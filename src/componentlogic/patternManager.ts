@@ -66,12 +66,13 @@ const patterns = {
 type PatternType = 'SINGLENOTE' | 'TREMOLO' | 'TREMOLO_ACC' | 'GRACENOTE' | 'RAKE' | 'UNHANDLED' | 'INVALID'
 
 function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
+    const validSymbols = getValidSymbols(position, true, false)
     switch (true) {
-        case getValidSymbols(position, true, false).includes(symbol):
+        case validSymbols.includes(symbol):
             return 'SINGLENOTE'
         case !positionConfigs[position].validPatterns.includes(symbol):
             return 'INVALID'
-        case GraceNoteChars.includes(symbol):
+        case symbol.length > 0 && GraceNoteChars.includes(symbol[0]) && validSymbols.includes(symbol.toLowerCase()):
             return 'GRACENOTE'
         case TremoloChars.includes(symbol.slice(-1)):
             return 'TREMOLO'
