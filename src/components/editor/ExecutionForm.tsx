@@ -16,7 +16,7 @@ import type {
     TempoItem
 } from '../../typing/types'
 import { debug } from '../../utils/debugger'
-import ExecutionItemForm, { formModel, type FormValueType } from './ExecutionItemForm'
+import ExecutionItemForm, { formModel, type FlowConditionType, type FormValueType } from './ExecutionItemForm'
 
 type ExecutionItemDefault = {
     type?: ExecutionItemType
@@ -169,7 +169,12 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
-        var newFormValue: FormValueType = { ...selectedItem, each: selectedItem.nthpass, passes: selectedItem.passes }
+        const conditions: FlowConditionType[] | undefined =
+            selectedItem.nthpass == undefined ? undefined : selectedItem.nthpass ? ['nthpass'] : ['pass']
+        if ('loops' in selectedItem && selectedItem.loops != undefined) {
+            conditions?.push('iteration')
+        }
+        var newFormValue: FormValueType = { ...selectedItem, conditions: conditions, passes: selectedItem.passes }
         debug(`UPDATE FIELDS=${JSON.stringify(newFormValue)}`)
         if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
         if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
@@ -198,8 +203,15 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         const selectedItem = itemList[selectedListElement] as ExecutionItem
         var newItem: ExecutionItem = {
             ...selectedItem,
-            passes: formValue.each == undefined ? undefined : formValue.passes,
-            nthpass: formValue.each
+            passes: formValue.conditions == undefined ? undefined : formValue.passes,
+            nthpass:
+                formValue.conditions == undefined
+                    ? undefined
+                    : formValue.conditions.includes('nthpass')
+                      ? true
+                      : formValue.conditions.includes('pass')
+                        ? false
+                        : undefined
         }
         debug(`EDITING`)
         if (selectedItem.type == 'goto') {
@@ -217,6 +229,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newItem.toValue = Number(formValue.toBPM)
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
+            if (formValue.conditions?.includes('iteration')) newItem.loops = formValue.loops || []
+            else newItem.loops = undefined
             if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
             debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.toValue}`)
         }
@@ -228,6 +242,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newItem.toValue = dynamicsToNumber[newItem.toDynamics]
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
+            if (formValue.conditions?.includes('iteration')) newItem.loops = formValue.loops || []
+            else newItem.loops = undefined
             if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
         }
         newItem = {

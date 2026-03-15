@@ -3,14 +3,14 @@ import _ from 'lodash'
 // Enable/disable the debug function for each module in the list below.
 // Specify a function by setting the dict value to {functionName: true}
 
-const mainSwitch = false // easily switch off all logging
+const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     UNKNOWN: false,
     createSchedule: false,
     Dashboard: false,
     EditorWindow: false,
-    ExecutionForm: false,
-    ExecutionItemForm: false,
+    ExecutionForm: true,
+    ExecutionItemForm: true,
     executionManager: false,
     Menu: false,
     MeasureNode: false,

@@ -1,5 +1,5 @@
 import { type Dispatch, type ElementType } from 'react'
-import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps } from 'rsuite'
+import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps, Option } from 'rsuite'
 import {
     ArrayType,
     BooleanType,
@@ -15,6 +15,8 @@ import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
 import type { DynamicsValue, ExecutionItemType } from '../../typing/types'
 
+export type FlowConditionType = 'pass' | 'nthpass' | 'iteration'
+
 export interface FormValueType {
     type?: ExecutionItemType | ''
     targetuuid?: string
@@ -28,7 +30,7 @@ export interface FormValueType {
     isGradual?: boolean
     passes?: number[]
     loops?: number[]
-    each?: boolean
+    conditions?: FlowConditionType[]
     checkbox?: any
 }
 
@@ -46,7 +48,7 @@ export const formModel = SchemaModel({
     isGradual: BooleanType().isRequired(),
     passes: ArrayType().of(NumberType()),
     loops: ArrayType().of(NumberType()),
-    each: BooleanType(),
+    conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration'])),
     checkbox: BooleanType()
 })
 
@@ -61,9 +63,9 @@ const formFieldNames = {
     fromSection: 'fromSection',
     toSection: 'toSection',
     isGradual: 'isGradual',
+    conditions: 'conditions',
     passes: 'passes',
-    loops: 'loops',
-    each: 'each',
+    iterations: 'iterations',
     checkbox: 'checkbox'
 }
 // const model = SchemaModel({
@@ -85,16 +87,20 @@ interface ExecutionBaseFieldProps extends Pick<FormGroupProps, 'controlId'>, Pic
 
 interface PickerFieldProps extends ExecutionBaseFieldProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
     data: any
+    onChange?: (event: Event) => void
 }
 // Selection (single or multiple)
-const PickerField = ({ label, selectedElement, setDirty, formValue, ...props }: PickerFieldProps) => {
+const PickerField = ({ label, selectedElement, setDirty, formValue, onChange, ...props }: PickerFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
                 accepter={props.accepter || InputPicker}
                 cleanable={false}
-                onChange={() => setDirty(true)}
+                onChange={(event: Event) => {
+                    if (onChange) onChange(event)
+                    setDirty(true)
+                }}
                 disabled={selectedElement == undefined}
                 block
                 searchable={false}
@@ -189,33 +195,64 @@ const ToggleField = ({ label, selectedElement, setDirty, formValue, ...props }: 
 
 // COMMON PART: CONDITION
 
+// CheckPicker with specific logic
+const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
+    // Ensures that only one the options `pass` or `nthpass` can be selected.
+    function doLogic(value: string[], option: Option<string>) {
+        if (option.value == 'pass') {
+            const idx = value.indexOf('nthpass')
+            if (idx >= 0) value.splice(idx, 1)
+        }
+        if (option.value == 'nthpass') {
+            const idx = value.indexOf('pass')
+            if (idx >= 0) value.splice(idx, 1)
+        }
+    }
+
+    return <CheckPicker groupBy="group" onSelect={(value, option) => doLogic(value, option)} {...props} />
+}
+
 interface ConditionFormProps extends ExecutionBaseFieldProps {
     type: ExecutionItemType
 }
 // Form that captures the details of the selected item
 const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
     const afterOn = type == 'goto' ? 'after' : 'on'
+    const options = [
+        { group: 'passes', label: `${afterOn} pass(es) nr ... `, value: 'pass' },
+        { group: 'passes', label: `${afterOn} every ...th pass`, value: 'nthpass' }
+    ]
+    if (['tempo', 'dynamics'].includes(type))
+        options.push({ group: 'loops', label: `${afterOn} iteration(s) nr ... `, value: 'iteration' })
+
     return (
         <>
             <PickerField
                 label="Condition"
-                name={formFieldNames.each}
-                // accepter={CheckPicker}
-                data={[
-                    { label: 'none', value: undefined },
-                    { label: `${afterOn} pass(es) nr ... `, value: false },
-                    { label: `${afterOn} every ...th pass`, value: true },
-                    { label: `${afterOn} iteration(s) nr ... `, value: false },
-                    { label: `${afterOn} every ...th iteration`, value: true }
-                ]}
+                name={formFieldNames.conditions}
+                accepter={ConditionPicker}
+                data={options}
                 {...props}
             />
-            {props.formValue.each != undefined && (
+            {props.formValue?.conditions?.some((value) => ['pass', 'nthpass'].includes(value)) && (
                 <PickerField
                     accepter={CheckPicker}
                     label="Passes"
                     name={formFieldNames.passes}
-                    // groupBy="group"
+                    onChange={(event: Event) => console.log(event)}
+                    countable={false}
+                    data={new Array(20).fill(null).map((_, idx) => {
+                        return { label: `${idx + 1}`, value: idx + 1 }
+                    })}
+                    {...props}
+                />
+            )}
+            {props.formValue?.conditions?.includes('iteration') && (
+                <PickerField
+                    accepter={CheckPicker}
+                    label="Iterations"
+                    name={formFieldNames.iterations}
+                    onChange={(event: Event) => console.log(event)}
                     countable={false}
                     data={new Array(20).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }
