@@ -209,7 +209,14 @@ const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
         }
     }
 
-    return <CheckPicker groupBy="group" onSelect={(value, option) => doLogic(value, option)} {...props} />
+    return (
+        <CheckPicker
+            countable={false}
+            groupBy="group"
+            onSelect={(value, option) => doLogic(value, option)}
+            {...props}
+        />
+    )
 }
 
 interface ConditionFormProps extends ExecutionBaseFieldProps {
