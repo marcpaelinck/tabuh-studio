@@ -27,7 +27,7 @@
             "index": 0,
             "label": "Regular",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "each": false, "tooltip": "go to END after pass 3", "tooltipshort": "END", "targetuuid": "d082116b-8f74-4aa8-87ba-089271b64965", "targetname": "END"},
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to END after pass 3", "tooltipshort": "END", "targetuuid": "d082116b-8f74-4aa8-87ba-089271b64965", "targetname": "END"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
                 {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mf beat 1", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
                 {"type": "tempo", "seqId": 3, "tooltip": "tempo 100 BPM beat 1", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0}
@@ -209,7 +209,7 @@
             "id": 8,
             "index": 7,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": true, "tooltip": "go to CC-SOLO after every 1st & 2nd passes", "tooltipshort": "CC-SOLO", "targetuuid": "5f5a37d9-32ed-4353-9a6b-ff8cf74fe06a", "targetname": "CC-SOLO"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": true, "tooltip": "go to CC-SOLO after every 1st & 2nd passes", "tooltipshort": "CC-SOLO", "targetuuid": "5f5a37d9-32ed-4353-9a6b-ff8cf74fe06a", "targetname": "CC-SOLO"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "o", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["u", "-", "u", "-"]}],
@@ -235,7 +235,7 @@
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to REGULAR after passes 1 & 2", "tooltipshort": "REGULAR", "targetuuid": "78b6de96-4363-4eed-b99a-234208982b03", "targetname": "REGULAR"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to REGULAR after passes 1 & 2", "tooltipshort": "REGULAR", "targetuuid": "78b6de96-4363-4eed-b99a-234208982b03", "targetname": "REGULAR"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "o", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["u", "-", "u", "-"]}],

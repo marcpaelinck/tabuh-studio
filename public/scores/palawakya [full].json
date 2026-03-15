@@ -649,7 +649,7 @@
             "id": 21,
             "index": 20,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to END2 after pass 2", "tooltipshort": "END2", "targetuuid": "56fcfedd-f943-4d36-b53c-3e044a3f4818", "targetname": "END2"},
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to END2 after pass 2", "tooltipshort": "END2", "targetuuid": "56fcfedd-f943-4d36-b53c-3e044a3f4818", "targetname": "END2"},
                 {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {

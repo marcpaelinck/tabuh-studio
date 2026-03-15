@@ -42,7 +42,7 @@
             "label": "Regular",
             "execution": [
                 {"type": "dynamics", "seqId": 0, "tooltip": "dynamics mf beat 1", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
-                {"type": "dynamics", "seqId": 1, "passes": [3], "each": true, "tooltip": "dynamics f beat 1 on every 3rd pass", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
+                {"type": "dynamics", "seqId": 1, "passes": [3], "nthpass": true, "tooltip": "dynamics f beat 1 on every 3rd pass", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
                 {"type": "tempo", "seqId": 2, "tooltip": "tempo 80 BPM beat 1", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 1, "toValue": 80.0}
             ],
             "staffs": {
@@ -68,7 +68,7 @@
             "id": 2,
             "index": 1,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "each": true, "tooltip": "go to TRANSITION after every 3rd pass", "tooltipshort": "TRANSITION", "targetuuid": "6932c55a-9799-4a56-855c-07a2c752a1c6", "targetname": "TRANSITION"}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": true, "tooltip": "go to TRANSITION after every 3rd pass", "tooltipshort": "TRANSITION", "targetuuid": "6932c55a-9799-4a56-855c-07a2c752a1c6", "targetname": "TRANSITION"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -94,8 +94,8 @@
             "index": 2,
             "execution": [
                 {"type": "goto", "seqId": 0, "tooltip": "go to REGULAR", "tooltipshort": "REGULAR", "targetuuid": "6deee814-02d2-4273-8427-874189d01ec7", "targetname": "REGULAR"},
-                {"type": "goto", "seqId": 1, "passes": [5], "each": false, "tooltip": "go to END after pass 5", "tooltipshort": "END", "targetuuid": "8d6160e4-3c4d-4772-9f84-e815df95cf42", "targetname": "END"},
-                {"type": "tempo", "seqId": 2, "passes": [5], "each": false, "tooltip": "tempo current \u219250 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 50.0}
+                {"type": "goto", "seqId": 1, "passes": [5], "nthpass": false, "tooltip": "go to END after pass 5", "tooltipshort": "END", "targetuuid": "8d6160e4-3c4d-4772-9f84-e815df95cf42", "targetname": "END"},
+                {"type": "tempo", "seqId": 2, "passes": [5], "nthpass": false, "tooltip": "tempo current \u219250 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 50.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -168,7 +168,7 @@
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [9], "each": false, "tooltip": "go to END after pass 9", "tooltipshort": "END", "targetuuid": "8d6160e4-3c4d-4772-9f84-e815df95cf42", "targetname": "END"}
+                {"type": "goto", "seqId": 0, "passes": [9], "nthpass": false, "tooltip": "go to END after pass 9", "tooltipshort": "END", "targetuuid": "8d6160e4-3c4d-4772-9f84-e815df95cf42", "targetname": "END"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -194,7 +194,7 @@
             "index": 6,
             "execution": [
                 {"type": "goto", "seqId": 0, "tooltip": "go to KOTEKAN", "tooltipshort": "KOTEKAN", "targetuuid": "b401a1ca-2f7c-423b-983a-0dacfaa573fc", "targetname": "KOTEKAN"},
-                {"type": "goto", "seqId": 1, "passes": [3], "each": true, "tooltip": "go to REGULAR after every 3rd pass", "tooltipshort": "REGULAR", "targetuuid": "6deee814-02d2-4273-8427-874189d01ec7", "targetname": "REGULAR"}
+                {"type": "goto", "seqId": 1, "passes": [3], "nthpass": true, "tooltip": "go to REGULAR after every 3rd pass", "tooltipshort": "REGULAR", "targetuuid": "6deee814-02d2-4273-8427-874189d01ec7", "targetname": "REGULAR"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],

@@ -300,7 +300,7 @@
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to END after pass 2", "tooltipshort": "END", "targetuuid": "15f1fee8-fed2-4d15-8e93-1eaf247196f9", "targetname": "END"}
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to END after pass 2", "tooltipshort": "END", "targetuuid": "15f1fee8-fed2-4d15-8e93-1eaf247196f9", "targetname": "END"}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["i", ".", "e", "."]}, {"notation": ["i", ".", "e", "."]}, {"notation": ["i", ".", "e", "."]}, {"notation": ["i", ".", "o", "."]}, {"notation": ["u", ".", "o", "."]}, {"notation": ["u", ".", "o", "."]}, {"notation": ["u", ".", "o", "."]}, {"notation": ["u", ".", "u", "."]}, {"notation": ["o", ".", "u", "."]}, {"notation": ["o", ".", "u", "."]}, {"notation": ["o", ".", "u", "."]}, {"notation": ["o", ".", "a", "."]}, {"notation": ["e", ".", "a", "."]}, {"notation": ["e", ".", "a", "."]}, {"notation": ["e", ".", "a", "."]}, {"notation": ["e", ".", "e", "."]}],

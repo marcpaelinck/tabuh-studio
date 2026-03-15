@@ -169,7 +169,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
-        var newFormValue: FormValueType = { ...selectedItem, each: selectedItem.each, passes: selectedItem.passes }
+        var newFormValue: FormValueType = { ...selectedItem, each: selectedItem.nthpass, passes: selectedItem.passes }
         debug(`UPDATE FIELDS=${JSON.stringify(newFormValue)}`)
         if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
         if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
@@ -199,7 +199,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         var newItem: ExecutionItem = {
             ...selectedItem,
             passes: formValue.each == undefined ? undefined : formValue.passes,
-            each: formValue.each
+            nthpass: formValue.each
         }
         debug(`EDITING`)
         if (selectedItem.type == 'goto') {

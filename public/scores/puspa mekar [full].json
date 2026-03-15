@@ -102,8 +102,8 @@
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 8X", "tooltipshort": "8X", "count": 8},
                 {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 4", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 4, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 2, "passes": [1, 2], "each": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "loops": [7], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "tempo", "seqId": 3, "passes": [3], "each": false, "tooltip": "tempo 75 BPM beat 1 on pass 3", "tooltipshort": "75 BPM", "loops": [8], "isGradual": false, "toSection": 1, "toValue": 75.0}
+                {"type": "dynamics", "seqId": 2, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "loops": [7], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "tempo", "seqId": 3, "passes": [3], "nthpass": false, "tooltip": "tempo 75 BPM beat 1 on pass 3", "tooltipshort": "75 BPM", "loops": [8], "isGradual": false, "toSection": 1, "toValue": 75.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -124,8 +124,8 @@
             "id": 3,
             "index": 2,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "each": false, "tooltip": "go to K_END after pass 3", "tooltipshort": "K_END", "targetuuid": "6f2f1dad-12de-4b58-af0c-9774c469ca64", "targetname": "K_END"},
-                {"type": "tempo", "seqId": 1, "passes": [3], "each": false, "tooltip": "tempo 50 BPM beat 1 on pass 3", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 1, "toValue": 50.0}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to K_END after pass 3", "tooltipshort": "K_END", "targetuuid": "6f2f1dad-12de-4b58-af0c-9774c469ca64", "targetname": "K_END"},
+                {"type": "tempo", "seqId": 1, "passes": [3], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 3", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 1, "toValue": 50.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "u", "-"]}],
@@ -188,7 +188,7 @@
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to P1 after passes 1 & 2", "tooltipshort": "P1", "targetuuid": "35a22c93-d572-4617-86b2-e1bcb6d93a84", "targetname": "P1"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to P1 after passes 1 & 2", "tooltipshort": "P1", "targetuuid": "35a22c93-d572-4617-86b2-e1bcb6d93a84", "targetname": "P1"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}],
@@ -559,7 +559,7 @@
             "id": 25,
             "index": 24,
             "execution": [
-                {"type": "tempo", "seqId": 0, "passes": [2], "each": false, "tooltip": "tempo 130 BPM beat 6 on pass 2", "tooltipshort": "130 BPM", "isGradual": false, "toSection": 6, "toValue": 130.0}
+                {"type": "tempo", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "tempo 130 BPM beat 6 on pass 2", "tooltipshort": "130 BPM", "isGradual": false, "toSection": 6, "toValue": 130.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}],

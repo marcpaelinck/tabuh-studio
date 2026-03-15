@@ -397,7 +397,7 @@
             "id": 15,
             "index": 14,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to PEPESON after pass 1", "tooltipshort": "PEPESON", "targetuuid": "6574dda2-e23a-47fb-a70c-1ff6a46d203a", "targetname": "PEPESON"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PEPESON after pass 1", "tooltipshort": "PEPESON", "targetuuid": "6574dda2-e23a-47fb-a70c-1ff6a46d203a", "targetname": "PEPESON"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "i", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
@@ -590,8 +590,8 @@
             "id": 23,
             "index": 22,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to PENGAWAK after pass 1", "tooltipshort": "PENGAWAK", "targetuuid": "4b5762f5-4941-4f48-a18e-9c898dc6ac4c", "targetname": "PENGAWAK"},
-                {"type": "tempo", "seqId": 1, "passes": [1], "each": false, "tooltip": "tempo 80 BPM beat 2 on pass 1", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 2, "toValue": 80.0}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PENGAWAK after pass 1", "tooltipshort": "PENGAWAK", "targetuuid": "4b5762f5-4941-4f48-a18e-9c898dc6ac4c", "targetname": "PENGAWAK"},
+                {"type": "tempo", "seqId": 1, "passes": [1], "nthpass": false, "tooltip": "tempo 80 BPM beat 2 on pass 1", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 2, "toValue": 80.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", ".", "a,", "-", "-", "-", "i", "-"]}, {"notation": ["o", ".", "a,", "-", "-", "-", "i", "-"]}, {"notation": ["o", ".", "a,", "-", "-", "-", "i", "-"]}, {"notation": [".", "u,", "-", "a,", "i", "-", "o", "-"]}],
@@ -847,7 +847,7 @@
             "id": 34,
             "index": 33,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGIPUK after passes 1 & 2", "tooltipshort": "PENGIPUK", "targetuuid": "3ac60c26-9384-448b-8f09-6bebbe916b81", "targetname": "PENGIPUK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGIPUK after passes 1 & 2", "tooltipshort": "PENGIPUK", "targetuuid": "3ac60c26-9384-448b-8f09-6bebbe916b81", "targetname": "PENGIPUK"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u,", "u,", ".", "a,"]}, {"notation": [".", "a,", "i", "i"]}, {"notation": [".", "a,", ".", "a,"]}, {"notation": ["i", "a,", ".", "a,"]}, {"notation": ["i", "-", "o", "e"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "o/", "."]}, {"notation": [".", ".", ".", "."]}],

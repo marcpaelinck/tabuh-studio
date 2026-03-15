@@ -27,6 +27,7 @@ export interface FormValueType {
     toSection?: number
     isGradual?: boolean
     passes?: number[]
+    loops?: number[]
     each?: boolean
     checkbox?: any
 }
@@ -43,7 +44,8 @@ export const formModel = SchemaModel({
     fromSection: NumberType().isInteger().addRule(ifGradual, 'from value must be given.'),
     toSection: NumberType().isInteger().isRequired('section must be given'),
     isGradual: BooleanType().isRequired(),
-    passes: ArrayType(),
+    passes: ArrayType().of(NumberType()),
+    loops: ArrayType().of(NumberType()),
     each: BooleanType(),
     checkbox: BooleanType()
 })
@@ -60,6 +62,7 @@ const formFieldNames = {
     toSection: 'toSection',
     isGradual: 'isGradual',
     passes: 'passes',
+    loops: 'loops',
     each: 'each',
     checkbox: 'checkbox'
 }
@@ -191,16 +194,19 @@ interface ConditionFormProps extends ExecutionBaseFieldProps {
 }
 // Form that captures the details of the selected item
 const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
-    const condition = type == 'goto' ? 'after' : 'on'
+    const afterOn = type == 'goto' ? 'after' : 'on'
     return (
         <>
             <PickerField
                 label="Condition"
                 name={formFieldNames.each}
+                // accepter={CheckPicker}
                 data={[
                     { label: 'none', value: undefined },
-                    { label: `${condition} pass(es) nr ... `, value: false },
-                    { label: `${condition} every ...th pass`, value: true }
+                    { label: `${afterOn} pass(es) nr ... `, value: false },
+                    { label: `${afterOn} every ...th pass`, value: true },
+                    { label: `${afterOn} iteration(s) nr ... `, value: false },
+                    { label: `${afterOn} every ...th iteration`, value: true }
                 ]}
                 {...props}
             />
@@ -209,6 +215,7 @@ const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
                     accepter={CheckPicker}
                     label="Passes"
                     name={formFieldNames.passes}
+                    // groupBy="group"
                     countable={false}
                     data={new Array(20).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }

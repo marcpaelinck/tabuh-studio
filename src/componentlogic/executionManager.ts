@@ -58,9 +58,9 @@ const itemPriority = (item: ExecutionItem): number => {
     // prio 2: every nth pass number(s) (each==true)
     // prio 3: no pass specification.
     var prio = 99
-    if (item.passes != undefined && item.passes.length > 0 && !item.each) prio = 1
-    else if (item.passes != undefined && item.passes.length > 0 && item.each) prio = 2
-    else if ((item.passes == undefined || item.passes.length == 0) && !item.each) prio = 4
+    if (item.passes != undefined && item.passes.length > 0 && !item.nthpass) prio = 1
+    else if (item.passes != undefined && item.passes.length > 0 && item.nthpass) prio = 2
+    else if ((item.passes == undefined || item.passes.length == 0) && !item.nthpass) prio = 4
     return prio
 }
 
@@ -119,10 +119,10 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             // The case `each`==true and item.passes==undefined or empty is invalid and should not return a match.
             // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
             var passMatches = !item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)
-            if (!item.each && passMatches) matches.push(item)
-            else if (item.each && item.passes && item.passes.length > 0 && loopMatches) {
+            if (!item.nthpass && passMatches) matches.push(item)
+            else if (item.nthpass && item.passes && item.passes.length > 0 && loopMatches) {
                 const maxPassNr = Math.max(...item.passes)
-                if (item.each && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
+                if (item.nthpass && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
                     // Matching item found
                     matches.push(item)
                 }

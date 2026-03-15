@@ -105,8 +105,8 @@
             "index": 1,
             "label": "Kawitan",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to KAWITAN_TAIL after pass 2", "tooltipshort": "KAWITAN_TAIL", "targetuuid": "dcd1ae50-ca8d-48af-a13c-0ae1dcd3d752", "targetname": "KAWITAN_TAIL"},
-                {"type": "goto", "seqId": 1, "passes": [4], "each": false, "tooltip": "go to KAWITAN_FINAL after pass 4", "tooltipshort": "KAWITAN_FINAL", "targetuuid": "64167a44-3e54-4d2c-8278-66b5cb03c350", "targetname": "KAWITAN_FINAL"}
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to KAWITAN_TAIL after pass 2", "tooltipshort": "KAWITAN_TAIL", "targetuuid": "dcd1ae50-ca8d-48af-a13c-0ae1dcd3d752", "targetname": "KAWITAN_TAIL"},
+                {"type": "goto", "seqId": 1, "passes": [4], "nthpass": false, "tooltip": "go to KAWITAN_FINAL after pass 4", "tooltipshort": "KAWITAN_FINAL", "targetuuid": "64167a44-3e54-4d2c-8278-66b5cb03c350", "targetname": "KAWITAN_FINAL"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a,", "i"]}],
@@ -149,7 +149,7 @@
             "index": 3,
             "label": "Kawitan_Tail",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to TROMPONG_PENYALIT after pass 1", "tooltipshort": "TROMPONG_PENYALIT", "targetuuid": "8c63d9ff-1025-473f-879a-2b865bbb176e", "targetname": "TROMPONG_PENYALIT"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to TROMPONG_PENYALIT after pass 1", "tooltipshort": "TROMPONG_PENYALIT", "targetuuid": "8c63d9ff-1025-473f-879a-2b865bbb176e", "targetname": "TROMPONG_PENYALIT"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-"]}, {"notation": ["o", "a,"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}, {"notation": ["i", "-"]}, {"notation": ["e", "i"]}, {"notation": ["e", "-"]}, {"notation": ["O", "i", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -275,7 +275,7 @@
             "index": 9,
             "label": "Pengawak",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [6, 12], "each": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "f85d1afb-12d3-45c6-bb9e-3969e0c78d71", "targetname": "PENGAWAK_ANGSEL2"}
+                {"type": "goto", "seqId": 0, "passes": [6, 12], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "f85d1afb-12d3-45c6-bb9e-3969e0c78d71", "targetname": "PENGAWAK_ANGSEL2"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -297,7 +297,7 @@
             "index": 10,
             "label": "Pengawak",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2, 4], "each": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 2 & 4", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "f85d1afb-12d3-45c6-bb9e-3969e0c78d71", "targetname": "PENGAWAK_ANGSEL2"},
+                {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 2 & 4", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "f85d1afb-12d3-45c6-bb9e-3969e0c78d71", "targetname": "PENGAWAK_ANGSEL2"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
                 {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
                 {"type": "dynamics", "seqId": 3, "tooltip": "dynamics ff beat 5", "tooltipshort": "ff", "loops": [3], "isGradual": false, "toSection": 5, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -321,7 +321,7 @@
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "0d57857c-f794-4f9a-be27-61f916b15c65", "targetname": "PENGAWAK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "0d57857c-f794-4f9a-be27-61f916b15c65", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -425,10 +425,10 @@
             "id": 17,
             "index": 16,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to TRANSITION_TO_PENGECET after pass 2", "tooltipshort": "TRANSITION_TO_PENGECET", "targetuuid": "04b0c182-885e-4bbb-804f-be2248a42b3c", "targetname": "TRANSITION_TO_PENGECET"},
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to TRANSITION_TO_PENGECET after pass 2", "tooltipshort": "TRANSITION_TO_PENGECET", "targetuuid": "04b0c182-885e-4bbb-804f-be2248a42b3c", "targetname": "TRANSITION_TO_PENGECET"},
                 {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 2, "passes": [2], "each": false, "tooltip": "dynamics f\u2192mf beat 1\u21921 on pass 2", "tooltipshort": "f\u2192mf", "isGradual": true, "toSection": 1, "fromValue": 0.83, "toValue": 0.67, "fromDynamics": "f", "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "tempo", "seqId": 3, "passes": [2], "each": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0}
+                {"type": "dynamics", "seqId": 2, "passes": [2], "nthpass": false, "tooltip": "dynamics f\u2192mf beat 1\u21921 on pass 2", "tooltipshort": "f\u2192mf", "isGradual": true, "toSection": 1, "fromValue": 0.83, "toValue": 0.67, "fromDynamics": "f", "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "tempo", "seqId": 3, "passes": [2], "nthpass": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
@@ -596,7 +596,7 @@
             "id": 25,
             "index": 24,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "each": false, "tooltip": "go to TRANSITION_TO_BATEL1 after pass 3", "tooltipshort": "TRANSITION_TO_BATEL1", "targetuuid": "1251b2bf-25e8-4728-966d-b0d9bb8f130d", "targetname": "TRANSITION_TO_BATEL1"}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to TRANSITION_TO_BATEL1 after pass 3", "tooltipshort": "TRANSITION_TO_BATEL1", "targetuuid": "1251b2bf-25e8-4728-966d-b0d9bb8f130d", "targetname": "TRANSITION_TO_BATEL1"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
@@ -674,7 +674,7 @@
             "id": 29,
             "index": 28,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "35e59a7e-a524-47e9-b783-bbedcfc52f57", "targetname": "PENGECET"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "35e59a7e-a524-47e9-b783-bbedcfc52f57", "targetname": "PENGECET"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
@@ -842,7 +842,7 @@
             "index": 36,
             "label": "Pengecet_Repeat",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2, 4], "each": false, "tooltip": "go to PENGECET_ANGSEL after passes 2 & 4", "tooltipshort": "PENGECET_ANGSEL", "targetuuid": "2bb20187-faf6-4c00-a8c8-db8afaa23880", "targetname": "PENGECET_ANGSEL"},
+                {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGECET_ANGSEL after passes 2 & 4", "tooltipshort": "PENGECET_ANGSEL", "targetuuid": "2bb20187-faf6-4c00-a8c8-db8afaa23880", "targetname": "PENGECET_ANGSEL"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
                 {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mf beat 1", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
@@ -865,7 +865,7 @@
             "id": 38,
             "index": 37,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGECET_REPEAT after passes 1 & 2", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "5d385552-f155-42c8-a370-aa77d4d5c4ec", "targetname": "PENGECET_REPEAT"},
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after passes 1 & 2", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "5d385552-f155-42c8-a370-aa77d4d5c4ec", "targetname": "PENGECET_REPEAT"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2}
             ],
             "staffs": {
@@ -951,7 +951,7 @@
             "id": 42,
             "index": 41,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to PENGECET_REPEAT after pass 1", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "5d385552-f155-42c8-a370-aa77d4d5c4ec", "targetname": "PENGECET_REPEAT"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after pass 1", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "5d385552-f155-42c8-a370-aa77d4d5c4ec", "targetname": "PENGECET_REPEAT"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "-", "u,", "-"]}, {"notation": ["-", "-", "e,", "-"]}, {"notation": ["a,", "a,", "-", "u,"]}, {"notation": ["e,", "-", "o,", "-"]}, {"notation": ["e,", "e,", "-", "u,"]}, {"notation": ["a,", "-", "e,", "e,"]}, {"notation": ["-", "u,", "a,", "-"]}, {"notation": ["-", "-", "-", "-"]}],

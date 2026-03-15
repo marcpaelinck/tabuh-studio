@@ -510,8 +510,8 @@
             "index": 21,
             "label": "Pengawak",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [5], "each": false, "tooltip": "go to TRANSITION after pass 5", "tooltipshort": "TRANSITION", "targetuuid": "535a0939-5423-4449-af83-b93f67b109bf", "targetname": "TRANSITION"},
-                {"type": "tempo", "seqId": 1, "passes": [5], "each": false, "tooltip": "tempo current \u219275 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219275 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 75.0}
+                {"type": "goto", "seqId": 0, "passes": [5], "nthpass": false, "tooltip": "go to TRANSITION after pass 5", "tooltipshort": "TRANSITION", "targetuuid": "535a0939-5423-4449-af83-b93f67b109bf", "targetname": "TRANSITION"},
+                {"type": "tempo", "seqId": 1, "passes": [5], "nthpass": false, "tooltip": "tempo current \u219275 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219275 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 75.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["I", "o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", ".", "e"]}, {"notation": ["o", "-", "a,", "."]}, {"notation": ["i", "a,", ".", "i"]}],
@@ -830,7 +830,7 @@
             "id": 37,
             "index": 36,
             "execution": [
-                {"type": "tempo", "seqId": 0, "passes": [4], "each": false, "tooltip": "tempo current \u219280 BPM beat 5\u21928 on pass 4", "tooltipshort": "\u219280 BPM", "isGradual": true, "fromSection": 5, "toSection": 8, "toValue": 80.0}
+                {"type": "tempo", "seqId": 0, "passes": [4], "nthpass": false, "tooltip": "tempo current \u219280 BPM beat 5\u21928 on pass 4", "tooltipshort": "\u219280 BPM", "isGradual": true, "fromSection": 5, "toSection": 8, "toValue": 80.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "i", "o"]}],
@@ -931,8 +931,8 @@
             "id": 42,
             "index": 41,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [4], "each": false, "tooltip": "go to END after pass 4", "tooltipshort": "END", "targetuuid": "f084ddba-af0b-4c3e-b126-1c73f31e2bfa", "targetname": "END"},
-                {"type": "tempo", "seqId": 1, "passes": [4], "each": false, "tooltip": "tempo current \u219245 BPM beat 1\u21928 on pass 4", "tooltipshort": "\u219245 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 45.0}
+                {"type": "goto", "seqId": 0, "passes": [4], "nthpass": false, "tooltip": "go to END after pass 4", "tooltipshort": "END", "targetuuid": "f084ddba-af0b-4c3e-b126-1c73f31e2bfa", "targetname": "END"},
+                {"type": "tempo", "seqId": 1, "passes": [4], "nthpass": false, "tooltip": "tempo current \u219245 BPM beat 1\u21928 on pass 4", "tooltipshort": "\u219245 BPM", "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 45.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "o", "-"]}],

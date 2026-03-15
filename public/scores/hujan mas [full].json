@@ -604,7 +604,7 @@
             "id": 21,
             "index": 20,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to LOOP8 after passes 1 & 2", "tooltipshort": "LOOP8", "targetuuid": "57144f80-cc5c-4bd9-a6cb-79128be4951f", "targetname": "LOOP8"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to LOOP8 after passes 1 & 2", "tooltipshort": "LOOP8", "targetuuid": "57144f80-cc5c-4bd9-a6cb-79128be4951f", "targetname": "LOOP8"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -657,7 +657,7 @@
             "index": 22,
             "label": "Loop9",
             "execution": [
-                {"type": "dynamics", "seqId": 0, "passes": [3], "each": false, "tooltip": "dynamics f beat 1 on pass 3", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "dynamics f beat 1 on pass 3", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -709,7 +709,7 @@
             "id": 25,
             "index": 24,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to LOOP9 after passes 1 & 2", "tooltipshort": "LOOP9", "targetuuid": "5daddeca-38db-49ca-a4ab-e737a77369e4", "targetname": "LOOP9"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to LOOP9 after passes 1 & 2", "tooltipshort": "LOOP9", "targetuuid": "5daddeca-38db-49ca-a4ab-e737a77369e4", "targetname": "LOOP9"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}],

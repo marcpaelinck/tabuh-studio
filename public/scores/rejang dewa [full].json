@@ -163,7 +163,7 @@
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "a9f9bc53-cc81-4250-93bf-5e16749b6eec", "targetname": "PENGAWAK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "a9f9bc53-cc81-4250-93bf-5e16749b6eec", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "-", "-", "a,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "e", "-", "-", "-"]}],
@@ -302,7 +302,7 @@
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "tempo", "seqId": 0, "passes": [4], "each": false, "tooltip": "tempo 80 BPM beat 1 on pass 4", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 1, "toValue": 80.0}
+                {"type": "tempo", "seqId": 0, "passes": [4], "nthpass": false, "tooltip": "tempo 80 BPM beat 1 on pass 4", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 1, "toValue": 80.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["o", "-", "o", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["i", "-", "i", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["i", "-", "i", "-"]}],
@@ -326,8 +326,8 @@
             "id": 13,
             "index": 12,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "each": false, "tooltip": "go to PENGECET after passes 1, 2 & 3", "tooltipshort": "PENGECET", "targetuuid": "5a5c91e7-97a1-4b16-a1bc-fdc5404ed9d5", "targetname": "PENGECET"},
-                {"type": "tempo", "seqId": 1, "passes": [4], "each": false, "tooltip": "tempo 50 BPM beat 1 on pass 4", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 1, "toValue": 50.0}
+                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to PENGECET after passes 1, 2 & 3", "tooltipshort": "PENGECET", "targetuuid": "5a5c91e7-97a1-4b16-a1bc-fdc5404ed9d5", "targetname": "PENGECET"},
+                {"type": "tempo", "seqId": 1, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 4", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 1, "toValue": 50.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "a,", "-"]}, {"notation": ["u,", "-", "u,", "-"]}, {"notation": ["e,", "-", "e,", "-"]}, {"notation": ["u,", "-", "u,", "-"]}, {"notation": ["a,", "-", "a,", "-"]}, {"notation": ["i", "-", "i", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["i", "-", "i", "-"]}],

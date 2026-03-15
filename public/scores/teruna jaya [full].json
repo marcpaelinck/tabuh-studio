@@ -350,8 +350,8 @@
             "id": 11,
             "index": 10,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to INTRO1 after passes 1 & 2", "tooltipshort": "INTRO1", "targetuuid": "727dd36d-adac-40ab-acf0-8161e6967230", "targetname": "INTRO1"},
-                {"type": "goto", "seqId": 1, "passes": [3], "each": false, "tooltip": "go to BATEL1 after pass 3", "tooltipshort": "BATEL1", "targetuuid": "663bca42-4827-4e21-beb4-ffc9cef613fa", "targetname": "BATEL1"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to INTRO1 after passes 1 & 2", "tooltipshort": "INTRO1", "targetuuid": "727dd36d-adac-40ab-acf0-8161e6967230", "targetname": "INTRO1"},
+                {"type": "goto", "seqId": 1, "passes": [3], "nthpass": false, "tooltip": "go to BATEL1 after pass 3", "tooltipshort": "BATEL1", "targetuuid": "663bca42-4827-4e21-beb4-ffc9cef613fa", "targetname": "BATEL1"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],

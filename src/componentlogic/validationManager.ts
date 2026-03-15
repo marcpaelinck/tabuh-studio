@@ -49,7 +49,7 @@ function createTransitions(score: EditorScore): StateTransitionMatrix {
                 for (var i = 0; i <= Math.max(...goto.passes); i++) {
                     gototrans[i] = i + 1
                 }
-                if (!goto.each) {
+                if (!goto.nthpass) {
                     gototrans[i] = i
                 } else {
                     gototrans[i] = 0

@@ -221,9 +221,9 @@
             "id": 10,
             "index": 9,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to SONG_START after pass 1", "tooltipshort": "SONG_START", "targetuuid": "96295e96-c7f7-4afc-8c73-38ae5e2fed91", "targetname": "SONG_START"},
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to SONG_START after pass 1", "tooltipshort": "SONG_START", "targetuuid": "96295e96-c7f7-4afc-8c73-38ae5e2fed91", "targetname": "SONG_START"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "tempo", "seqId": 2, "passes": [2], "each": false, "tooltip": "tempo 30 BPM beat 1 on pass 2", "tooltipshort": "30 BPM", "loops": [3], "isGradual": false, "toSection": 1, "toValue": 30.0}
+                {"type": "tempo", "seqId": 2, "passes": [2], "nthpass": false, "tooltip": "tempo 30 BPM beat 1 on pass 2", "tooltipshort": "30 BPM", "loops": [3], "isGradual": false, "toSection": 1, "toValue": 30.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "i", "o"]}, {"notation": ["e", "u", "e", "u"]}, {"notation": ["e", "-", "o", "u"]}, {"notation": ["e", "-", "o", "-"]}],
@@ -291,10 +291,10 @@
             "id": 13,
             "index": 12,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "each": false, "tooltip": "go to CHORUS after passes 1, 2 & 3", "tooltipshort": "CHORUS", "targetuuid": "96761bff-6719-41a2-ab6e-6aea802ab619", "targetname": "CHORUS"},
+                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to CHORUS after passes 1, 2 & 3", "tooltipshort": "CHORUS", "targetuuid": "96761bff-6719-41a2-ab6e-6aea802ab619", "targetname": "CHORUS"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-                {"type": "tempo", "seqId": 2, "passes": [4], "each": false, "tooltip": "tempo 65 BPM beat 1 on pass 4", "tooltipshort": "65 BPM", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 65.0},
-                {"type": "tempo", "seqId": 3, "passes": [4], "each": false, "tooltip": "tempo 50 BPM beat 1 on pass 4", "tooltipshort": "50 BPM", "loops": [2], "isGradual": false, "toSection": 1, "toValue": 50.0}
+                {"type": "tempo", "seqId": 2, "passes": [4], "nthpass": false, "tooltip": "tempo 65 BPM beat 1 on pass 4", "tooltipshort": "65 BPM", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 65.0},
+                {"type": "tempo", "seqId": 3, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 4", "tooltipshort": "50 BPM", "loops": [2], "isGradual": false, "toSection": 1, "toValue": 50.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "-", "i", "i", "-", "i", "-"]}, {"notation": ["-", "-", "i", "-", "a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o", "o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-", "u", "-", "o", "-"]}, {"notation": ["e", "-", "-", "e", "u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-", "a,", "-", "o", "-"]}],

@@ -105,8 +105,8 @@
             "index": 1,
             "label": "Kawitan",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to KAWITAN_TAIL after pass 2", "tooltipshort": "KAWITAN_TAIL", "targetuuid": "2564b581-74cd-417b-b5cc-432f66bda8be", "targetname": "KAWITAN_TAIL"},
-                {"type": "goto", "seqId": 1, "passes": [4], "each": false, "tooltip": "go to KAWITAN_FINAL after pass 4", "tooltipshort": "KAWITAN_FINAL", "targetuuid": "0134c7da-796f-4096-9390-69c2ad748fde", "targetname": "KAWITAN_FINAL"}
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to KAWITAN_TAIL after pass 2", "tooltipshort": "KAWITAN_TAIL", "targetuuid": "2564b581-74cd-417b-b5cc-432f66bda8be", "targetname": "KAWITAN_TAIL"},
+                {"type": "goto", "seqId": 1, "passes": [4], "nthpass": false, "tooltip": "go to KAWITAN_FINAL after pass 4", "tooltipshort": "KAWITAN_FINAL", "targetuuid": "0134c7da-796f-4096-9390-69c2ad748fde", "targetname": "KAWITAN_FINAL"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a,", "i"]}],
@@ -149,7 +149,7 @@
             "index": 3,
             "label": "Kawitan_Tail",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to ugal_PENYALIT after pass 1", "tooltipshort": "ugal_PENYALIT", "targetuuid": "56953722-54bd-4a14-a6b2-efc18958324c", "targetname": "ugal_PENYALIT"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to ugal_PENYALIT after pass 1", "tooltipshort": "ugal_PENYALIT", "targetuuid": "56953722-54bd-4a14-a6b2-efc18958324c", "targetname": "ugal_PENYALIT"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-"]}, {"notation": ["o", "a,"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}, {"notation": ["i", "-"]}, {"notation": ["e", "i"]}, {"notation": ["e", "-"]}, {"notation": ["O", "i", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -209,11 +209,11 @@
             "id": 7,
             "index": 6,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [5], "each": false, "tooltip": "go to PENGAWAK_TAIL after pass 5", "tooltipshort": "PENGAWAK_TAIL", "targetuuid": "4a2b3984-4585-4c81-83a5-04bfc70550ef", "targetname": "PENGAWAK_TAIL"},
+                {"type": "goto", "seqId": 0, "passes": [5], "nthpass": false, "tooltip": "go to PENGAWAK_TAIL after pass 5", "tooltipshort": "PENGAWAK_TAIL", "targetuuid": "4a2b3984-4585-4c81-83a5-04bfc70550ef", "targetname": "PENGAWAK_TAIL"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 6X", "tooltipshort": "6X", "count": 6},
-                {"type": "dynamics", "seqId": 2, "passes": [5], "each": false, "tooltip": "dynamics mp beat 1 on pass 5", "tooltipshort": "mp", "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "tempo", "seqId": 3, "passes": [4], "each": false, "tooltip": "tempo 60 BPM beat 1 on pass 4", "tooltipshort": "60 BPM", "isGradual": false, "toSection": 1, "toValue": 60.0},
-                {"type": "tempo", "seqId": 4, "passes": [5], "each": false, "tooltip": "tempo 45 BPM beat 1 on pass 5", "tooltipshort": "45 BPM", "isGradual": false, "toSection": 1, "toValue": 45.0}
+                {"type": "dynamics", "seqId": 2, "passes": [5], "nthpass": false, "tooltip": "dynamics mp beat 1 on pass 5", "tooltipshort": "mp", "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "tempo", "seqId": 3, "passes": [4], "nthpass": false, "tooltip": "tempo 60 BPM beat 1 on pass 4", "tooltipshort": "60 BPM", "isGradual": false, "toSection": 1, "toValue": 60.0},
+                {"type": "tempo", "seqId": 4, "passes": [5], "nthpass": false, "tooltip": "tempo 45 BPM beat 1 on pass 5", "tooltipshort": "45 BPM", "isGradual": false, "toSection": 1, "toValue": 45.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["a", "-"]}, {"notation": ["u", "-"]}, {"notation": ["o", "-"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
@@ -235,7 +235,7 @@
             "index": 7,
             "label": "Pengawak_Tail",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [6, 12], "each": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"}
+                {"type": "goto", "seqId": 0, "passes": [6, 12], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-"]}, {"notation": ["O", "e", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -277,7 +277,7 @@
             "id": 10,
             "index": 9,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [6, 12], "each": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"}
+                {"type": "goto", "seqId": 0, "passes": [6, 12], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -299,10 +299,10 @@
             "index": 10,
             "label": "Pengawak",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [6, 12], "each": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"},
+                {"type": "goto", "seqId": 0, "passes": [6, 12], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "8c721453-abe3-4e9e-9db1-b6bae5136aa0", "targetname": "PENGAWAK_ANGSEL2"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "dynamics", "seqId": 2, "passes": [1, 4, 7, 10], "each": false, "tooltip": "dynamics mp beat 1 on passes 1, 4, 7 & 10", "tooltipshort": "mp", "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 3, "passes": [3, 6, 9, 12], "each": false, "tooltip": "dynamics ff beat 5 on passes 3, 6, 9 & 12", "tooltipshort": "ff", "isGradual": false, "toSection": 5, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 2, "passes": [1, 4, 7, 10], "nthpass": false, "tooltip": "dynamics mp beat 1 on passes 1, 4, 7 & 10", "tooltipshort": "mp", "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3, "passes": [3, 6, 9, 12], "nthpass": false, "tooltip": "dynamics ff beat 5 on passes 3, 6, 9 & 12", "tooltipshort": "ff", "isGradual": false, "toSection": 5, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -323,7 +323,7 @@
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "3c1a5da1-8811-4242-a6dc-fd1265522b56", "targetname": "PENGAWAK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "3c1a5da1-8811-4242-a6dc-fd1265522b56", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -427,10 +427,10 @@
             "id": 17,
             "index": 16,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2], "each": false, "tooltip": "go to TRANSITION_TO_PENGECET after pass 2", "tooltipshort": "TRANSITION_TO_PENGECET", "targetuuid": "c9e1fd35-87da-4e1d-a58c-26313412b42a", "targetname": "TRANSITION_TO_PENGECET"},
-                {"type": "dynamics", "seqId": 1, "passes": [2], "each": false, "tooltip": "dynamics mf beat 1 on pass 2", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 0, "passes": [2], "nthpass": false, "tooltip": "go to TRANSITION_TO_PENGECET after pass 2", "tooltipshort": "TRANSITION_TO_PENGECET", "targetuuid": "c9e1fd35-87da-4e1d-a58c-26313412b42a", "targetname": "TRANSITION_TO_PENGECET"},
+                {"type": "dynamics", "seqId": 1, "passes": [2], "nthpass": false, "tooltip": "dynamics mf beat 1 on pass 2", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
                 {"type": "dynamics", "seqId": 2, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "tempo", "seqId": 3, "passes": [2], "each": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0}
+                {"type": "tempo", "seqId": 3, "passes": [2], "nthpass": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
@@ -516,8 +516,8 @@
             "index": 20,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "tempo", "seqId": 1, "passes": [2], "each": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0},
-                {"type": "tempo", "seqId": 2, "passes": [3], "each": false, "tooltip": "tempo 90 BPM beat 1 on pass 3", "tooltipshort": "90 BPM", "isGradual": false, "toSection": 1, "toValue": 90.0}
+                {"type": "tempo", "seqId": 1, "passes": [2], "nthpass": false, "tooltip": "tempo 100 BPM beat 1 on pass 2", "tooltipshort": "100 BPM", "isGradual": false, "toSection": 1, "toValue": 100.0},
+                {"type": "tempo", "seqId": 2, "passes": [3], "nthpass": false, "tooltip": "tempo 90 BPM beat 1 on pass 3", "tooltipshort": "90 BPM", "isGradual": false, "toSection": 1, "toValue": 90.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -598,7 +598,7 @@
             "id": 25,
             "index": 24,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "each": false, "tooltip": "go to TRANSITION_TO_BATEL1 after pass 3", "tooltipshort": "TRANSITION_TO_BATEL1", "targetuuid": "68efe55c-9822-479e-bb9e-2491946d5086", "targetname": "TRANSITION_TO_BATEL1"}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to TRANSITION_TO_BATEL1 after pass 3", "tooltipshort": "TRANSITION_TO_BATEL1", "targetuuid": "68efe55c-9822-479e-bb9e-2491946d5086", "targetname": "TRANSITION_TO_BATEL1"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
@@ -676,7 +676,7 @@
             "id": 29,
             "index": 28,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "each": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "2e916bb0-d981-471b-bcb0-d925b96844d1", "targetname": "PENGECET"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "2e916bb0-d981-471b-bcb0-d925b96844d1", "targetname": "PENGECET"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
@@ -844,7 +844,7 @@
             "index": 36,
             "label": "Pengecet_Repeat",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [4, 8], "each": false, "tooltip": "go to PENGECET_ANGSEL after passes 4 & 8", "tooltipshort": "PENGECET_ANGSEL", "targetuuid": "e16e01dd-8ba1-49d7-a023-569ea9c08724", "targetname": "PENGECET_ANGSEL"},
+                {"type": "goto", "seqId": 0, "passes": [4, 8], "nthpass": false, "tooltip": "go to PENGECET_ANGSEL after passes 4 & 8", "tooltipshort": "PENGECET_ANGSEL", "targetuuid": "e16e01dd-8ba1-49d7-a023-569ea9c08724", "targetname": "PENGECET_ANGSEL"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
                 {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mf beat 1", "tooltipshort": "mf", "isGradual": false, "toSection": 1, "toValue": 0.67, "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
@@ -867,7 +867,7 @@
             "id": 38,
             "index": 37,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2, 4], "each": false, "tooltip": "go to PENGECET_REPEAT after passes 2 & 4", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "b4a1311e-3730-4cb0-9e3e-049c52952e28", "targetname": "PENGECET_REPEAT"},
+                {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after passes 2 & 4", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "b4a1311e-3730-4cb0-9e3e-049c52952e28", "targetname": "PENGECET_REPEAT"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2}
             ],
             "staffs": {
@@ -953,7 +953,7 @@
             "id": 42,
             "index": 41,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "each": false, "tooltip": "go to PENGECET_REPEAT after pass 1", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "b4a1311e-3730-4cb0-9e3e-049c52952e28", "targetname": "PENGECET_REPEAT"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after pass 1", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "b4a1311e-3730-4cb0-9e3e-049c52952e28", "targetname": "PENGECET_REPEAT"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "u,", "-"]}, {"notation": ["-", "-", "e,", "-"]}, {"notation": ["a,", "a,", "-", "u,"]}, {"notation": ["e,", "-", "o,", "-"]}, {"notation": ["e,", "e,", "-", "u,"]}, {"notation": ["a,", "-", "e,", "e,"]}, {"notation": ["-", "u,", "a,", "-"]}, {"notation": ["-", "-", "-", "-"]}],

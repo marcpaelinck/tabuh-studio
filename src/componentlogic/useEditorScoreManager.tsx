@@ -63,9 +63,9 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     switch (true) {
         case !nbrOfPasses:
             return instruction
-        case nbrOfPasses && !item.each:
+        case nbrOfPasses && !item.nthpass:
             return `${instruction} ${passcondition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}`
-        case nbrOfPasses && item.each:
+        case nbrOfPasses && item.nthpass:
             return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
         default:
             return `Invalid combination: missing one or more pass numbers.`

@@ -656,7 +656,7 @@
             "index": 25,
             "label": "Pengecet2",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2, 3, 4], "each": false, "tooltip": "go to PENGECET2 after passes 1, 2, 3 & 4", "tooltipshort": "PENGECET2", "targetuuid": "8b0237e7-c054-48d2-aa68-cbd05abe8018", "targetname": "PENGECET2"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2, 3, 4], "nthpass": false, "tooltip": "go to PENGECET2 after passes 1, 2, 3 & 4", "tooltipshort": "PENGECET2", "targetuuid": "8b0237e7-c054-48d2-aa68-cbd05abe8018", "targetname": "PENGECET2"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
