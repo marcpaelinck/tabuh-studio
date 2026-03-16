@@ -154,26 +154,38 @@ interface ExecutionFormProps extends FormProps {
 
 // Main form Component
 // The form consists of a list of flow items and several input fields. The field values corresponds
-// with the properties of the selected items.
+// with the properties of the selected list item.
 export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, onSave, ...props }: ExecutionFormProps) {
     const [itemList, setItemList] = useState<ExecutionItemDefault[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
     const [formValue, setFormValue] = useState<FormValueType>({} as FormValueType)
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
+    const [loop, setLoop] = useState<number | undefined>(undefined) // loop value if a loop item occurs in the itemList
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
 
     useEffect(() => debug(`ITEMLIST=${JSON.stringify(itemList)}`), [itemList])
 
+    // Set the loop state value
+    useEffect(() => {
+        const loopElement = itemList.find((el) => el.type == 'loop')
+        if (loopElement) {
+            setLoop(loopElement.count)
+        } else {
+            setLoop(undefined)
+        }
+    }, itemList)
+
     // Populates the forms fields with the values of the selected item
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
         const selectedItem = itemList[selectedListElement] as ExecutionItem
-        const conditions: FlowConditionType[] | undefined =
-            selectedItem.nthpass == undefined ? undefined : selectedItem.nthpass ? ['nthpass'] : ['pass']
+        var conditions: FlowConditionType[] = []
+        if (selectedItem.nthpass != undefined) conditions.push(selectedItem.nthpass ? 'nthpass' : 'pass')
         if ('loops' in selectedItem && selectedItem.loops != undefined) {
-            conditions?.push('iteration')
+            conditions.push('iteration')
         }
+        // if (conditions.length == 0) conditions = undefined
         var newFormValue: FormValueType = { ...selectedItem, conditions: conditions, passes: selectedItem.passes }
         debug(`UPDATE FIELDS=${JSON.stringify(newFormValue)}`)
         if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
@@ -203,15 +215,14 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         const selectedItem = itemList[selectedListElement] as ExecutionItem
         var newItem: ExecutionItem = {
             ...selectedItem,
-            passes: formValue.conditions == undefined ? undefined : formValue.passes,
-            nthpass:
-                formValue.conditions == undefined
-                    ? undefined
-                    : formValue.conditions.includes('nthpass')
-                      ? true
-                      : formValue.conditions.includes('pass')
-                        ? false
-                        : undefined
+            passes: formValue.conditions?.some((val) => ['pass', 'nthpass'].includes(val))
+                ? formValue.passes || []
+                : undefined,
+            nthpass: formValue.conditions?.includes('nthpass')
+                ? true
+                : formValue.conditions?.includes('pass')
+                  ? false
+                  : undefined
         }
         debug(`EDITING`)
         if (selectedItem.type == 'goto') {
@@ -324,6 +335,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
                         formValue={formValue}
                         sysOptions={sysOptions}
                         setDirty={setDirtyForm}
+                        loop={loop}
                     />
                 </Form>
             </Drawer.Body>

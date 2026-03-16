@@ -1,4 +1,4 @@
-import { type Dispatch, type ElementType } from 'react'
+import { useState, type Dispatch, type ElementType } from 'react'
 import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps, Option } from 'rsuite'
 import {
     ArrayType,
@@ -30,7 +30,7 @@ export interface FormValueType {
     isGradual?: boolean
     passes?: number[]
     loops?: number[]
-    conditions?: FlowConditionType[]
+    conditions: FlowConditionType[]
     checkbox?: any
 }
 
@@ -82,10 +82,12 @@ interface ExecutionBaseFieldProps extends Pick<FormGroupProps, 'controlId'>, Pic
     name?: string
     formValue: FormValueType
     setDirty: Dispatch<boolean>
+    loop: number | undefined
     selectedElement: number | undefined
 }
 
-interface PickerFieldProps extends ExecutionBaseFieldProps, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
+interface PickerFieldProps
+    extends Omit<ExecutionBaseFieldProps, 'loop'>, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
     data: any
     onChange?: (event: Event) => void
 }
@@ -180,7 +182,6 @@ const ToggleField = ({ label, selectedElement, setDirty, formValue, ...props }: 
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
-                // checked={checkedRef.current}
                 accepter={Toggle}
                 onChange={() => {
                     setDirty(true)
@@ -197,15 +198,21 @@ const ToggleField = ({ label, selectedElement, setDirty, formValue, ...props }: 
 
 // CheckPicker with specific logic
 const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
-    // Ensures that only one the options `pass` or `nthpass` can be selected.
-    function doLogic(value: string[], option: Option<string>) {
+    const [value, setValue] = useState<string[]>(props.value || [])
+
+    // useEffect(() => debug(`SET VALUE TO ${JSON.stringify(value)}`), value)
+
+    // Ensures that at most one the options `pass` or `nthpass` can be selected.
+    function doLogic(currValue: string[], option: Option<string>) {
         if (option.value == 'pass') {
-            const idx = value.indexOf('nthpass')
-            if (idx >= 0) value.splice(idx, 1)
+            const idx = currValue.indexOf('nthpass')
+            // if (idx >= 0) setValue(currValue.toSpliced(idx, 1))
+            if (idx >= 0) currValue.splice(idx, 1)
         }
         if (option.value == 'nthpass') {
-            const idx = value.indexOf('pass')
-            if (idx >= 0) value.splice(idx, 1)
+            const idx = currValue.indexOf('pass')
+            // if (idx >= 0) setValue(currValue.toSpliced(idx, 1))
+            if (idx >= 0) currValue.splice(idx, 1)
         }
     }
 
@@ -214,6 +221,8 @@ const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
             countable={false}
             groupBy="group"
             onSelect={(value, option) => doLogic(value, option)}
+            value={value}
+            onChange={setValue}
             {...props}
         />
     )
@@ -221,16 +230,17 @@ const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
 
 interface ConditionFormProps extends ExecutionBaseFieldProps {
     type: ExecutionItemType
+    loop: number | undefined
 }
 // Form that captures the details of the selected item
-const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
+const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
     const afterOn = type == 'goto' ? 'after' : 'on'
     const options = [
         { group: 'passes', label: `${afterOn} pass(es) nr ... `, value: 'pass' },
         { group: 'passes', label: `${afterOn} every ...th pass`, value: 'nthpass' }
     ]
-    if (['tempo', 'dynamics'].includes(type))
-        options.push({ group: 'loops', label: `${afterOn} iteration(s) nr ... `, value: 'iteration' })
+    if (['tempo', 'dynamics'].includes(type) && loop)
+        options.push({ group: 'loop', label: `${afterOn} iteration(s) nr ... `, value: 'iteration' })
 
     return (
         <>
@@ -239,6 +249,7 @@ const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
                 name={formFieldNames.conditions}
                 accepter={ConditionPicker}
                 data={options}
+                placeholder={'None'}
                 {...props}
             />
             {props.formValue?.conditions?.some((value) => ['pass', 'nthpass'].includes(value)) && (
@@ -261,7 +272,7 @@ const ConditionForm = ({ type, ...props }: ConditionFormProps) => {
                     name={formFieldNames.iterations}
                     onChange={(event: Event) => console.log(event)}
                     countable={false}
-                    data={new Array(20).fill(null).map((_, idx) => {
+                    data={new Array(loop).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }
                     })}
                     {...props}
@@ -399,6 +410,7 @@ interface ExecutionItemFormProps {
     formValue: FormValueType
     sysOptions: InputOption<string>[]
     setDirty: Dispatch<boolean>
+    loop: number | undefined
 }
 // Contains the details of a specific Execution item.
 export default function ExecutionItemForm({
@@ -406,14 +418,11 @@ export default function ExecutionItemForm({
     selectedElement,
     formValue,
     sysOptions,
-    setDirty
+    setDirty,
+    loop
 }: ExecutionItemFormProps) {
     // Properties that will be passed down to each form type
-    const baseProps: ExecutionBaseFieldProps = {
-        selectedElement: selectedElement,
-        formValue: formValue,
-        setDirty: setDirty
-    }
+    const baseProps: ExecutionBaseFieldProps = { selectedElement, formValue, setDirty, loop }
     const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
     const loopForm = <LoopForm {...baseProps} />
     const tempoForm = <TempoForm {...baseProps} />
