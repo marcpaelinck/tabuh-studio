@@ -21,21 +21,22 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
+    const sortedIterations = 'loops' in item && item.loops ? item.loops.sort() : []
     // Create components for the values to return.
     var instruction: string = ''
-    var passcondition: string = ''
+    var preposition: string = ''
     var shortTooltip: string = ''
     switch (item.type) {
         case 'goto': {
             shortTooltip = item.targetname
             instruction = `go to ${item.targetname}`
-            passcondition = 'after'
+            preposition = 'after'
             break
         }
         case 'loop': {
             shortTooltip = `${item.count}X`
             instruction = `play ${item.count}X`
-            passcondition = 'on'
+            preposition = 'on'
             break
         }
         case 'tempo':
@@ -53,20 +54,27 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             instruction =
                 shortTooltip +
                 ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.toSection}`
-            passcondition = 'on'
+            preposition = 'on'
             break
         }
     }
     if (length == 'short') return shortTooltip
 
+    var loopcondition = ''
+    var andloopcondition = ''
+    if (sortedIterations.length > 0) {
+        const loopcond = `${toText(sortedIterations, true)} ${sortedIterations.length > 1 ? 'iterations' : 'iteration'}`
+        loopcondition = ' ' + preposition + ' ' + loopcond
+        andloopcondition = ', ' + loopcond
+    }
     // Compose the long tooltip version
     switch (true) {
         case !nbrOfPasses:
-            return instruction
+            return `${instruction}${loopcondition}`
         case nbrOfPasses && !item.nthpass:
-            return `${instruction} ${passcondition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}`
+            return `${instruction} ${preposition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}${andloopcondition}`
         case nbrOfPasses && item.nthpass:
-            return `${instruction} ${passcondition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}`
+            return `${instruction} ${preposition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}${andloopcondition}`
         default:
             return `Invalid combination: missing one or more pass numbers.`
     }

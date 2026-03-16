@@ -65,7 +65,7 @@ const formFieldNames = {
     isGradual: 'isGradual',
     conditions: 'conditions',
     passes: 'passes',
-    iterations: 'iterations',
+    loops: 'loops',
     checkbox: 'checkbox'
 }
 // const model = SchemaModel({
@@ -269,7 +269,7 @@ const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
                 <PickerField
                     accepter={CheckPicker}
                     label="Iterations"
-                    name={formFieldNames.iterations}
+                    name={formFieldNames.loops}
                     onChange={(event: Event) => console.log(event)}
                     countable={false}
                     data={new Array(loop).fill(null).map((_, idx) => {
