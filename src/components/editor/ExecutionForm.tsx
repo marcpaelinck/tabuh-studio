@@ -182,7 +182,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         const selectedItem = itemList[selectedListElement] as ExecutionItem
         var conditions: FlowConditionType[] = []
         if (selectedItem.nthpass != undefined) conditions.push(selectedItem.nthpass ? 'nthpass' : 'pass')
-        if ('loops' in selectedItem && selectedItem.loops != undefined) {
+        if ('iterations' in selectedItem && selectedItem.iterations != undefined) {
             conditions.push('iteration')
         }
         // if (conditions.length == 0) conditions = undefined
@@ -240,8 +240,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newItem.toValue = Number(formValue.toBPM)
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
-            if (formValue.conditions?.includes('iteration')) newItem.loops = formValue.loops || []
-            else newItem.loops = undefined
+            if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
+            else newItem.iterations = undefined
             if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
             debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.toValue}`)
         }
@@ -253,8 +253,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newItem.toValue = dynamicsToNumber[newItem.toDynamics]
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
-            if (formValue.conditions?.includes('iteration')) newItem.loops = formValue.loops || []
-            else newItem.loops = undefined
+            if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
+            else newItem.iterations = undefined
             if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
         }
         newItem = {

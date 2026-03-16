@@ -21,7 +21,7 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
-    const sortedIterations = 'loops' in item && item.loops ? item.loops.sort() : []
+    const sortedIterations = 'iterations' in item && item.iterations ? item.iterations.sort() : []
     // Create components for the values to return.
     var instruction: string = ''
     var preposition: string = ''

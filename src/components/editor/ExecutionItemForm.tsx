@@ -29,7 +29,7 @@ export interface FormValueType {
     toSection?: number
     isGradual?: boolean
     passes?: number[]
-    loops?: number[]
+    iterations?: number[]
     conditions: FlowConditionType[]
     checkbox?: any
 }
@@ -47,7 +47,7 @@ export const formModel = SchemaModel({
     toSection: NumberType().isInteger().isRequired('section must be given'),
     isGradual: BooleanType().isRequired(),
     passes: ArrayType().of(NumberType()),
-    loops: ArrayType().of(NumberType()),
+    iterations: ArrayType().of(NumberType()),
     conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration'])),
     checkbox: BooleanType()
 })
@@ -65,7 +65,7 @@ const formFieldNames = {
     isGradual: 'isGradual',
     conditions: 'conditions',
     passes: 'passes',
-    loops: 'loops',
+    iterations: 'iterations',
     checkbox: 'checkbox'
 }
 // const model = SchemaModel({
@@ -269,7 +269,7 @@ const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
                 <PickerField
                     accepter={CheckPicker}
                     label="Iterations"
-                    name={formFieldNames.loops}
+                    name={formFieldNames.iterations}
                     onChange={(event: Event) => console.log(event)}
                     countable={false}
                     data={new Array(loop).fill(null).map((_, idx) => {

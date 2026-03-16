@@ -110,7 +110,10 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             var loopMatches =
                 item.type == 'loop'
                     ? flow.loop <= item.count
-                    : !('loops' in item) || !item.loops || item.loops.length == 0 || item.loops.includes(flow.loop)
+                    : !('iterations' in item) ||
+                      !item.iterations ||
+                      item.iterations.length == 0 ||
+                      item.iterations.includes(flow.loop)
             if (!loopMatches) continue
             // if `each`==false or undefined: match=true if no passes are given or if flow.pass
             //                                matches a pass in item.passes

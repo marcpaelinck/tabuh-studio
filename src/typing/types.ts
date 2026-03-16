@@ -223,7 +223,7 @@ export interface LoopItem extends ExecutionItemBase {
 
 export interface ExpressionItemBase extends ExecutionItemBase {
     type: ExecutionItemType
-    loops?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
+    iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
     isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
     fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
     toSection: number // If isGradual==true: the gradual change should continue until the end of this section.
