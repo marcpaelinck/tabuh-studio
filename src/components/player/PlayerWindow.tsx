@@ -55,12 +55,7 @@ export default function PlayerWindow({
     playbackState
 }: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
-    // const setMenuDisabled = (label: string, value: boolean) => {
-    //     menuDisabled.current = Object.assign(menuDisabled.current, Object.fromEntries([[label, value]]))
-    // }
-    // const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
-    // const [timeLine, setTimeLine] = useState<TimeLine | undefined>()
 
     const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
@@ -79,19 +74,6 @@ export default function PlayerWindow({
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
-    // useEffect(() => {
-    //     const timeLine: TimeLine | undefined = schedulePlayback({
-    //         pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
-    //     })
-    //     setTimeLine(timeLine)
-    // }, [score])
-
-    // Disable menus when data is loading
-    // useEffect(() => {
-    //     setMenuDisabled('tabuh', loadingScore)
-    //     setMenuDisabled('focus', loadingScore || loadingScore || !score)
-    // }, [loadingScore])
-
     const updateFocus = (newFocus: Position[]): void => {
         if (newFocus !== focus) {
             setFocus(newFocus)
@@ -101,8 +83,6 @@ export default function PlayerWindow({
         }
     }
 
-    // const updateScore = (title: string) => loadScore(scoreList.find((item) => item.title == title))
-
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         const hideItem: MenuItemInfo = panggulDefaultOption
         const menuItems: MenuItemInfo[] = focus.map((position) => {
@@ -111,10 +91,6 @@ export default function PlayerWindow({
         setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
         return [hideItem].concat(menuItems)
     }, [focus])
-
-    // const updateTimeline = (timeline: TimeLine): void => {
-    //     timelineRef.current = timeline
-    // }
 
     return (
         <VStack id="TabuhPlayer" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>

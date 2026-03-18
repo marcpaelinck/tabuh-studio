@@ -7,8 +7,6 @@ import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 
-type AudioState = 'false' | 'true' | 'wait'
-
 interface PlayerProps {
     score: EditorScore | undefined
     totalDurationMs: number
