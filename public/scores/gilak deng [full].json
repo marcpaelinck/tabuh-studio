@@ -25,8 +25,8 @@
             "label": "Regular_Gongan",
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "loops": [4], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "iterations": [4], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
                 {"type": "tempo", "seqId": 3, "tooltip": "tempo 120 BPM beat 1", "tooltipshort": "120 BPM", "isGradual": false, "toSection": 1, "toValue": 120.0}
             ],
             "staffs": {
@@ -96,10 +96,10 @@
             "execution": [
                 {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to END after pass 3", "tooltipshort": "END", "targetuuid": "c4f7c1ac-81e8-4a37-b53b-51ea75b1f0b6", "targetname": "END"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "dynamics", "seqId": 3, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "loops": [4], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "tempo", "seqId": 4, "passes": [3], "nthpass": false, "tooltip": "tempo 80 BPM beat 1 on pass 3", "tooltipshort": "80 BPM", "loops": [3], "isGradual": false, "toSection": 1, "toValue": 80.0},
-                {"type": "tempo", "seqId": 5, "passes": [3], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 3", "tooltipshort": "50 BPM", "loops": [4], "isGradual": false, "toSection": 1, "toValue": 50.0}
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "dynamics", "seqId": 3, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "iterations": [4], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "tempo", "seqId": 4, "passes": [3], "nthpass": false, "tooltip": "tempo 80 BPM beat 1 on pass 3", "tooltipshort": "80 BPM", "iterations": [3], "isGradual": false, "toSection": 1, "toValue": 80.0},
+                {"type": "tempo", "seqId": 5, "passes": [3], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 3", "tooltipshort": "50 BPM", "iterations": [4], "isGradual": false, "toSection": 1, "toValue": 50.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],

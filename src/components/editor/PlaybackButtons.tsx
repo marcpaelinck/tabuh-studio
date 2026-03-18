@@ -44,8 +44,15 @@ export function PlaybackButtons({
             if (index < 0) {
                 console.error(`no playback data found for system ${sysUuid}`)
             }
-            playback({ actionType: 'load', playbackType: pbType, score: score, systemIndex: index })
-            playback({ actionType: 'play', playbackType: pbType })
+            playback({
+                actionType: 'play',
+                playbackType: pbType,
+                score: score,
+                systemIndex: index,
+                intro: 2000,
+                outro: 5000
+            })
+            // playback({ actionType: 'play', playbackType: pbType })
         }
     }
 

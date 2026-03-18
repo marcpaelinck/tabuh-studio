@@ -898,8 +898,8 @@
             "index": 35,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "loops": [1, 3], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "loops": [2, 4], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "iterations": [1, 3], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "iterations": [2, 4], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}],

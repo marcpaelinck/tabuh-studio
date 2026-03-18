@@ -23,10 +23,8 @@ interface EditorWindowProps {
     setExpanded: Dispatch<Record<string, boolean>>
     editorScore: EditorScore | undefined
     labels: Record<string, EditorSystem>
-    updateSystem: (sysData: EditorSystem) => void
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
-    scheduleFunctions: PlaybackCallbackFunctions
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
@@ -39,10 +37,8 @@ export default function EditorWindow({
     loading,
     editorScore,
     labels,
-    updateSystem,
     updateParts,
     executeItemAction,
-    scheduleFunctions,
     updatePlaybackFunctions,
     playbackState,
     playback
@@ -80,7 +76,9 @@ export default function EditorWindow({
 
     useEffect(() => {
         if (playbackState.audioState == 'error') {
-            dialog.alert(playbackState.message || 'Playback is not possible, reason unknown.', { title: 'Warning' })
+            dialog.alert(playbackState.message || 'Playback is not possible, the score contains an error.', {
+                title: 'Warning'
+            })
             playback({ actionType: 'reseterror' })
         }
     }, [playbackState])

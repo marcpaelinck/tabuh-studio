@@ -125,7 +125,6 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
     const dialog = useDialog()
 
     function updateScore(score: EditorScore) {
-        // Convert new score to data record structure
         debug(`updating score with title ${score.title}`)
         setEditorScore(score)
         const labeldict = Object.fromEntries(
@@ -174,6 +173,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
 
         // Store the score object in the browser's IDB Database, for recovery purposes.
         if (indexedDb) {
+            dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'info' })
             const transaction = indexedDb.transaction('Score', 'readwrite')
             const request = transaction.objectStore('Score').put(editorScore)
             var dateStr = new Date().toString().replace(/ GMT.*$/, '')
@@ -189,7 +189,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
                     level: 'warning',
                     tooltip: `${dateStr}\nCould not save the current status to local storage.`
                 })
-        } else dialog.alert('No score store.', { title: 'Warning' })
+        } else dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'warning' })
 
         // Update the goto display values.
         debug('updating flow items')

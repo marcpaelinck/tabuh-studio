@@ -29,9 +29,9 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
-import { usePlaybackManager } from '../componentlogic/playbackManager'
 import { playbackReducerFactory } from '../componentlogic/playbackReducer'
 import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
+import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor } from '../config/config'
@@ -181,7 +181,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const {
         scoreList,
-        score: importedScore,
+        loadedScore: importedScore,
         loadScore,
         isLoading: loadingScore
     } = useScoreReader<EditorScore>('new', dataSource)

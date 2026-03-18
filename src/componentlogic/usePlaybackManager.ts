@@ -42,7 +42,7 @@ import { useInstruments } from './useInstruments'
 import { cycleValidation } from './validationManager'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
-export const defaultPlaybackFunctions: PlaybackCallbackFunctions = {
+export const defaultCallbackFunctions: PlaybackCallbackFunctions = {
     tempo: (): void => {},
     play: (): void => {
         debug('void player')
@@ -60,18 +60,17 @@ export interface SchedulePlaybackParams {
 }
 
 export function usePlaybackManager(selectedFocus: Position[]) {
-    const [playbackFunctions, setPlaybackFunctions] = useState<PlaybackCallbackFunctions>(defaultPlaybackFunctions)
     const { playInstrument } = useInstruments(selectedFocus, 0)
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
+    const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
 
+    // Use a ref object to avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this happens.
     const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
-        useRef<PlaybackCallbackFunctions>(defaultPlaybackFunctions)
+        useRef<PlaybackCallbackFunctions>(defaultCallbackFunctions)
 
     useEffect(() => {
-        // Avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this is necessary.
-        // See MainWindow where setPlaybackFunctions is only called in an initial useEffect.
-        updatePlaybackFunctions({ tempo: changeTempo, play: playInstrument })
+        updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument })
         debug('setting play function')
     }, [])
 
@@ -81,12 +80,8 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         }
     }
 
-    // function updatePlaybackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
-    //     debug(`UPDATING PB FUNCTIONS ${Object.keys(functions)} new pbFunctions: }`)
-    //     debug({ ...playbackFunctions, ...functions })
-    //     setPlaybackFunctions({ ...playbackFunctions, ...functions })
-    // }
-    function updatePlaybackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
+    // The
+    function updatePlaybackCallbackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
         debug(`UPDATING PB FUNCTIONS ${Object.keys(functions)} new pbFunctions: }`)
         debug({ ...pbFunctionsRef.current, ...functions })
         pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
@@ -451,16 +446,18 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         useCache = true,
         intro = defaultIntroTime,
         outro = defaultOutroTime
-    }: SchedulePlaybackParams): TimeLine | undefined {
+    }: SchedulePlaybackParams): void {
         const timeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
-        if (timeLine) createPlaybackSchedule(timeLine, playbackSpeed)
-        return timeLine
+        if (timeLine) {
+            createPlaybackSchedule(timeLine, playbackSpeed)
+            setTimeline(timeLine)
+        }
     }
 
     return {
-        playbackFunctions,
-        setPlaybackFunctions,
-        updatePlaybackFunctions,
+        timeLine,
+        // playbackFunctions,
+        updatePlaybackCallbackFunctions,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,

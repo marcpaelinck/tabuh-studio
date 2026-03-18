@@ -1,12 +1,12 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { EditorCellCursor, EditorScore, PlaybackCallbackFunctions, TimeLine } from '../typing/types'
+import type { EditorCellCursor, EditorScore } from '../typing/types'
 import { debug } from '../utils/debugger'
-import { defaultPlaybackFunctions, type SchedulePlaybackParams } from './playbackManager'
+import { type SchedulePlaybackParams } from './usePlaybackManager'
 import { cycleValidation } from './validationManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
-export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor' | 'reseterror'
+export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor' | 'reset' | 'reseterror'
 export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
 
 export type PlaybackState = {
@@ -20,18 +20,14 @@ export type PlaybackAction = {
     playbackType?: PlaybackType
     score?: EditorScore
     systemIndex?: number
-    actionFunctions?: PlaybackCallbackFunctions
+    // actionFunctions?: PlaybackCallbackFunctions
     cursor?: EditorCellCursor
     intro?: number // silence before start of playback in ms
     outro?: number // silence after end of playback in ms
 }
 // const dialog = useDialog()
 
-const playbackFunctions = {
-    actionFunctions: defaultPlaybackFunctions,
-    schedulePlayback: (parms: SchedulePlaybackParams) => {},
-    playbackSpeed: 1
-}
+const playbackFunctions = { schedulePlayback: (parms: SchedulePlaybackParams) => {}, playbackSpeed: 1 }
 
 // const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
 // var schedulePlayback: (parms: SchedulePlaybackParams) => void
@@ -51,45 +47,52 @@ async function asyncPlay() {
 
 // This function enables to pass the playbackScheduleFunctions to the playbackReducer.
 export function playbackReducerFactory(
-    actionFunc: PlaybackCallbackFunctions,
-    schedulePlayback: (parms: SchedulePlaybackParams) => TimeLine | undefined
+    // actionFunc: PlaybackCallbackFunctions,
+    schedulePlayback: (parms: SchedulePlaybackParams) => void
 ) {
-    playbackFunctions.actionFunctions = actionFunc
+    // playbackFunctions.actionFunctions = actionFunc
     playbackFunctions.schedulePlayback = schedulePlayback
     return playbackReducer
 }
 
+function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
+    if (!action.score) {
+        console.error('audio reducer: action is "load" but data or functions are missing.')
+        return { ...state, cursor: noCursor, audioState: 'nodata' }
+    }
+
+    const validation = cycleValidation(action.score, true)
+    if (!validation.isValid) {
+        debug('validating')
+        // dialog.alert(validation.message, { title: 'Warning' })
+        return { ...state, cursor: noCursor, audioState: 'error', message: validation.message }
+    }
+
+    debug(`executing 'load'`)
+    debug(`loading data for sys ${action.score.systems[0].id}`)
+    // const loadAction = { ...action }
+
+    playbackFunctions.schedulePlayback({ pbAction: action, useCache: true })
+    debug({ ...state, audioState: 'stopped' }, true)
+    return { ...state, audioState: 'stopped' }
+}
+
 function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
-        case 'load': {
-            if (!action.score) {
-                console.error('audio reducer: action is "load" but data or functions are missing.')
-                return { ...state, cursor: noCursor, audioState: 'nodata' }
-            }
-
-            const validation = cycleValidation(action.score, true)
-            if (!validation.isValid) {
-                debug('validating')
-                // dialog.alert(validation.message, { title: 'Warning' })
-                return { ...state, cursor: noCursor, audioState: 'error', message: validation.message }
-            }
-
-            debug(`executing 'load'`)
-            debug(`loading data for sys ${action.score.systems[0].id}`)
-            const loadAction = { ...action, actionFunctions: playbackFunctions.actionFunctions }
-
-            playbackFunctions.schedulePlayback({ pbAction: loadAction, useCache: true, intro: 1000, outro: 2000 })
-            debug({ ...state, audioState: 'stopped' }, true)
-            return { ...state, audioState: 'stopped' }
+        case 'reset': {
+            return { cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'play': {
             debug(`executing 'play'`)
+            if (state.audioState == 'nodata' || (action.playbackType && action.score))
+                // New playback action: create a playback schedule
+                state = loadData(state, { ...action, actionType: 'load' })
             if (!['stopped', 'paused'].includes(state.audioState)) return { ...state }
-            if (action.playbackType) {
-                asyncPlay()
-                debug({ ...state, audioState: 'playing', playbackType: action.playbackType }, true)
-                return { ...state, audioState: 'playing', playbackType: action.playbackType }
-            }
+            // if (action.playbackType) {
+            asyncPlay()
+            debug({ ...state, audioState: 'playing' }, true)
+            return { ...state, audioState: 'playing' }
+            // }
             console.error('audio reducer: action is "play" but playback type is missing.')
             return state
         }

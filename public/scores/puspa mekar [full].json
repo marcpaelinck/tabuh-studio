@@ -101,9 +101,9 @@
             "label": "P1",
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 8X", "tooltipshort": "8X", "count": 8},
-                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 4", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 4, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 2, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "loops": [7], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "tempo", "seqId": 3, "passes": [3], "nthpass": false, "tooltip": "tempo 75 BPM beat 1 on pass 3", "tooltipshort": "75 BPM", "loops": [8], "isGradual": false, "toSection": 1, "toValue": 75.0}
+                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 4", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "toSection": 4, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 2, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f beat 1 on passes 1 & 2", "tooltipshort": "f", "iterations": [7], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "tempo", "seqId": 3, "passes": [3], "nthpass": false, "tooltip": "tempo 75 BPM beat 1 on pass 3", "tooltipshort": "75 BPM", "iterations": [8], "isGradual": false, "toSection": 1, "toValue": 75.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -147,8 +147,8 @@
             "index": 3,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 6X", "tooltipshort": "6X", "count": 6},
-                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 4", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 4, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "loops": [5], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics mp beat 4", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "toSection": 4, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "iterations": [5], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}],

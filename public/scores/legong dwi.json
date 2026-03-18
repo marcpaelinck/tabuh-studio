@@ -614,9 +614,9 @@
             "index": 26,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "tempo", "seqId": 1, "tooltip": "tempo current \u2192110 BPM beat 1\u21924", "tooltipshort": "\u2192110 BPM", "loops": [1], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 110.0},
-                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192135 BPM beat 1\u21924", "tooltipshort": "\u2192135 BPM", "loops": [2], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 135.0},
-                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192160 BPM beat 1\u21924", "tooltipshort": "\u2192160 BPM", "loops": [3], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 160.0}
+                {"type": "tempo", "seqId": 1, "tooltip": "tempo current \u2192110 BPM beat 1\u21924", "tooltipshort": "\u2192110 BPM", "iterations": [1], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 110.0},
+                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192135 BPM beat 1\u21924", "tooltipshort": "\u2192135 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 135.0},
+                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192160 BPM beat 1\u21924", "tooltipshort": "\u2192160 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 160.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
@@ -638,10 +638,10 @@
             "index": 27,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "tempo", "seqId": 1, "tooltip": "tempo 80.0\u2192100 BPM beat 1\u21924", "tooltipshort": "80.0\u2192100 BPM", "loops": [1], "isGradual": true, "fromSection": 1, "toSection": 4, "fromValue": 80.0, "toValue": 100.0},
-                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192120 BPM beat 1\u21924", "tooltipshort": "\u2192120 BPM", "loops": [2], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 120.0},
-                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192140 BPM beat 1\u21924", "tooltipshort": "\u2192140 BPM", "loops": [3], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 140.0},
-                {"type": "tempo", "seqId": 4, "tooltip": "tempo current \u2192160 BPM beat 1\u21924", "tooltipshort": "\u2192160 BPM", "loops": [4], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 160.0}
+                {"type": "tempo", "seqId": 1, "tooltip": "tempo 80.0\u2192100 BPM beat 1\u21924", "tooltipshort": "80.0\u2192100 BPM", "iterations": [1], "isGradual": true, "fromSection": 1, "toSection": 4, "fromValue": 80.0, "toValue": 100.0},
+                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192120 BPM beat 1\u21924", "tooltipshort": "\u2192120 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 120.0},
+                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192140 BPM beat 1\u21924", "tooltipshort": "\u2192140 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 140.0},
+                {"type": "tempo", "seqId": 4, "tooltip": "tempo current \u2192160 BPM beat 1\u21924", "tooltipshort": "\u2192160 BPM", "iterations": [4], "isGradual": true, "fromSection": 1, "toSection": 4, "toValue": 160.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -725,10 +725,10 @@
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 16X", "tooltipshort": "16X", "count": 16},
                 {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["JEGOGAN"]},
-                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192145 BPM beat 1\u21928", "tooltipshort": "\u2192145 BPM", "loops": [13], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 145.0},
-                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192127 BPM beat 1\u21928", "tooltipshort": "\u2192127 BPM", "loops": [14], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 127.0},
-                {"type": "tempo", "seqId": 4, "tooltip": "tempo current \u2192110 BPM beat 1\u21928", "tooltipshort": "\u2192110 BPM", "loops": [15], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 110.0},
-                {"type": "tempo", "seqId": 5, "tooltip": "tempo current \u2192100 BPM beat 1\u21928", "tooltipshort": "\u2192100 BPM", "loops": [16], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 100.0}
+                {"type": "tempo", "seqId": 2, "tooltip": "tempo current \u2192145 BPM beat 1\u21928", "tooltipshort": "\u2192145 BPM", "iterations": [13], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 145.0},
+                {"type": "tempo", "seqId": 3, "tooltip": "tempo current \u2192127 BPM beat 1\u21928", "tooltipshort": "\u2192127 BPM", "iterations": [14], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 127.0},
+                {"type": "tempo", "seqId": 4, "tooltip": "tempo current \u2192110 BPM beat 1\u21928", "tooltipshort": "\u2192110 BPM", "iterations": [15], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 110.0},
+                {"type": "tempo", "seqId": 5, "tooltip": "tempo current \u2192100 BPM beat 1\u21928", "tooltipshort": "\u2192100 BPM", "iterations": [16], "isGradual": true, "fromSection": 1, "toSection": 8, "toValue": 100.0}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],

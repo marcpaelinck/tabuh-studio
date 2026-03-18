@@ -210,7 +210,7 @@
             "index": 6,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "tempo", "seqId": 1, "tooltip": "tempo 60 BPM beat 1", "tooltipshort": "60 BPM", "loops": [4], "isGradual": false, "toSection": 1, "toValue": 60.0}
+                {"type": "tempo", "seqId": 1, "tooltip": "tempo 60 BPM beat 1", "tooltipshort": "60 BPM", "iterations": [4], "isGradual": false, "toSection": 1, "toValue": 60.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["a", "-"]}, {"notation": ["u", "-"]}, {"notation": ["o", "-"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
@@ -299,8 +299,8 @@
             "execution": [
                 {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 2 & 4", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "f85d1afb-12d3-45c6-bb9e-3969e0c78d71", "targetname": "PENGAWAK_ANGSEL2"},
                 {"type": "loop", "seqId": 1, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "loops": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 3, "tooltip": "dynamics ff beat 5", "tooltipshort": "ff", "loops": [3], "isGradual": false, "toSection": 5, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3, "tooltip": "dynamics ff beat 5", "tooltipshort": "ff", "iterations": [3], "isGradual": false, "toSection": 5, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -404,7 +404,7 @@
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
                 {"type": "dynamics", "seqId": 1, "tooltip": "dynamics ff beat 6", "tooltipshort": "ff", "isGradual": false, "toSection": 6, "toValue": 1.0, "toDynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics ff\u2192mf beat 1\u21921", "tooltipshort": "ff\u2192mf", "loops": [2], "isGradual": true, "toSection": 1, "fromValue": 1.0, "toValue": 0.67, "fromDynamics": "ff", "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics ff\u2192mf beat 1\u21921", "tooltipshort": "ff\u2192mf", "iterations": [2], "isGradual": true, "toSection": 1, "fromValue": 1.0, "toValue": 0.67, "fromDynamics": "ff", "toDynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "o/", "o", "-"]}, {"notation": ["o", "i", "o", "e"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "u"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "u,"]}, {"notation": ["a,", "i"]}],
@@ -514,8 +514,8 @@
             "index": 20,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "tempo", "seqId": 1, "tooltip": "tempo 100 BPM beat 1", "tooltipshort": "100 BPM", "loops": [2], "isGradual": false, "toSection": 1, "toValue": 100.0},
-                {"type": "tempo", "seqId": 2, "tooltip": "tempo 90 BPM beat 1", "tooltipshort": "90 BPM", "loops": [3], "isGradual": false, "toSection": 1, "toValue": 90.0}
+                {"type": "tempo", "seqId": 1, "tooltip": "tempo 100 BPM beat 1", "tooltipshort": "100 BPM", "iterations": [2], "isGradual": false, "toSection": 1, "toValue": 100.0},
+                {"type": "tempo", "seqId": 2, "tooltip": "tempo 90 BPM beat 1", "tooltipshort": "90 BPM", "iterations": [3], "isGradual": false, "toSection": 1, "toValue": 90.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],

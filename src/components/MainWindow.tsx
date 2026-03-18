@@ -29,13 +29,13 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
-import { usePlaybackManager } from '../componentlogic/playbackManager'
 import { playbackReducerFactory } from '../componentlogic/playbackReducer'
 import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
+import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor } from '../config/config'
-import type { EditorScore, Position, WpUserRecord } from '../typing/types'
+import type { Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
@@ -180,12 +180,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     //DASHBOARD WARNINGS
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const {
-        scoreList,
-        score: importedScore,
-        loadScore,
-        isLoading: loadingScore
-    } = useScoreReader<EditorScore>('new', dataSource)
+    const { scoreList, loadedScore, loadScore, isLoading: loadingScore } = useScoreReader(dataSource)
     const dashboardFunctions: DashboardFunctionsType = {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
@@ -216,21 +211,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     // PLAYBACK SETTINGS
     const [focus, setFocus] = useState<Position[]>([])
     const {
-        playbackFunctions,
-        updatePlaybackFunctions,
+        timeLine,
+        updatePlaybackCallbackFunctions,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
     } = usePlaybackManager(focus)
-    const playbackReducer = playbackReducerFactory(playbackFunctions, schedulePlayback)
+    const playbackReducer = playbackReducerFactory(schedulePlayback)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
         audioState: 'nodata',
         playbackType: 'none'
     })
 
-    useEffect(() => updatePlaybackFunctions({ generic: stopPlayback }), [])
+    useEffect(() => updatePlaybackCallbackFunctions({ generic: stopPlayback }), [])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -259,20 +254,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }, [])
 
     useEffect(() => {
-        debug(`New score imported, title=${importedScore?.title} with ${importedScore?.systems.length} systems`)
-        if (importedScore) {
-            updateScore(importedScore)
+        debug(`New score imported, title=${loadedScore?.title} with ${loadedScore?.systems.length} systems`)
+        if (loadedScore) {
+            updateScore(loadedScore)
             // UPDATE DASHBOARD
-            const validation = cycleValidation(importedScore, true)
+            const validation = cycleValidation(loadedScore, true)
             if (!validation.isValid)
                 setDashboardElement('cycle', { visible: true, tooltip: validation.message, level: 'error' })
             setDashboardElement('score', {
                 visible: true,
-                text: importedScore.title,
-                tooltip: `title: ${importedScore.title}\ncomposer: ${importedScore.composer}\nuuid: ${importedScore.uuid}`
+                text: loadedScore.title,
+                tooltip: `title: ${loadedScore.title}\ncomposer: ${loadedScore.composer}\nuuid: ${loadedScore.uuid}`
             })
         }
-    }, [importedScore])
+        playback({ actionType: 'reset' })
+    }, [loadedScore])
 
     useEffect(() => {
         debug(`New editor score available, title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
@@ -335,11 +331,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                     loading={loadingScore}
                                     editorScore={editorScore}
                                     labels={labels}
-                                    updateSystem={updateSystem}
                                     updateParts={updateParts}
                                     executeItemAction={executeItemAction}
-                                    scheduleFunctions={playbackFunctions}
-                                    updatePlaybackFunctions={updatePlaybackFunctions}
+                                    updatePlaybackFunctions={updatePlaybackCallbackFunctions}
                                     playbackState={playbackState}
                                     playback={playback}
                                 />
@@ -349,12 +343,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                     scoreList={scoreList}
                                     score={editorScore}
                                     totalDurationMs={totalDurationMs}
-                                    schedulePlayback={schedulePlayback}
+                                    timeLine={timeLine}
+                                    // schedulePlayback={schedulePlayback}
                                     focus={focus}
                                     setFocus={setFocus}
-                                    updatePlaybackFunctions={updatePlaybackFunctions}
+                                    updatePlaybackFunctions={updatePlaybackCallbackFunctions}
                                     playbackSpeed={playbackSpeed}
                                     setPlaybackSpeed={setPlaybackSpeed}
+                                    playbackState={playbackState}
+                                    playback={playback}
                                 />
                             </div>
                         </Content>

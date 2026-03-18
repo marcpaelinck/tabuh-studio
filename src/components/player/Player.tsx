@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from 'react'
+import { useEffect, useState, type ActionDispatch, type JSX } from 'react'
 import * as Tone from 'tone'
 import { type EditorScore } from '../../typing/types'
 //-------------------------CONTROLS--------------------------------------
@@ -6,84 +6,24 @@ import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
+import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 
 type AudioState = 'false' | 'true' | 'wait'
 
-export function Player({
-    score,
-    totalDurationMs
-}: {
+interface PlayerProps {
     score: EditorScore | undefined
     totalDurationMs: number
-}): JSX.Element {
+    playback: ActionDispatch<[action: PlaybackAction]>
+    playbackState: PlaybackState
+}
+
+export function Player({ score, totalDurationMs, playback, playbackState }: PlayerProps): JSX.Element {
     // STATE VARIABLES
     const [audioStarted, setAudioStarted] = useState<AudioState>('false') // MOVE TO MAINWINDOW
-    const [playing, setPlaying] = useState<boolean>(false) // MOVE TO MAINWINDOW
+    // const [playing, setPlaying] = useState<boolean>(false) // MOVE TO MAINWINDOW
     const [progress, setProgress] = useState<number>(0) // MOVE TO MAINWINDOW
 
     useEffect(() => setAudioStarted('false'), [score])
-    // HOOKS
-    // const { playInstrument, muteAll } = useInstruments(focus)
-    // const { animateInstrument, animateNotation } = useAnimationEngine(
-    //     svgInfoRef,
-    //     highlightFunctionRef,
-    //     panggulOptionRef,
-    //     focusRef,
-    //     pbSpeedRef
-    // )
-
-    // const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
-    // Object.assign(actionFunctions, { play: playInstrument, animate: animateInstrument, playercursor: animateNotation })
-
-    // MEMOS AND EFFECTS
-
-    // useEffect(() => {
-    //     timelineUpdater(timeline)
-    //     createSchedule(timeline)
-    //     rewind()
-    // }, [timeline])
-
-    // function updateProgress() {
-    //     setProgress(Tone.getTransport().seconds)
-    //     Tone.getTransport()
-    // }
-
-    // function createSchedule(timeline: TimeLine | null) {
-    //     // Creates the schedule for the Transport object.
-    //     if (!timeline || !score) return
-
-    //     if (audioStarted) pause()
-    //     Tone.getTransport().stop()
-    //     Tone.getTransport().cancel()
-    //     Tone.getTransport().seconds = 0
-
-    //     debug(`Creating schedule for ${score?.title}`)
-
-    //     // tempo and instrument actions (notes)
-    //     // Set the initial tempo to 60 (intro time)
-    //     const initialBpm = score.systems[0].sections[0].tempo[0]
-    //     const params: TempoFunctionParameters = { bpm: initialBpm, pbSpeed }
-    //     Tone.getTransport().schedule((time) => actionFunctions.tempo(time, params), 0)
-    //     timeline.sampleractions.forEach((sAction: PlaybackSamplerAction) => {
-    //         Tone.getTransport().schedule(
-    //             (time) => actionFunctions.tempo(time, { bpm: sAction.params.bpm, pbSpeed }),
-    //             sAction.time
-    //         )
-    //         Tone.getTransport().schedule((time) => sAction.function(time, sAction.params), sAction.time)
-    //     })
-    //     // Schedule animation actions
-    //     timeline.animationactions.forEach((aAction: PlaybackAnimationAction) => {
-    //         Tone.getTransport().schedule((time) => aAction.function(time, aAction.params), aAction.time)
-    //     })
-    //     // Schedule cursor actions
-    //     timeline.playercursoractions.forEach((cAction: PlaybackPlayerCursorAction) => {
-    //         Tone.getTransport().schedule((time) => cAction.function(time, cAction.params), cAction.time)
-    //     })
-
-    //     setTotalDuration(Math.round(totalDurationMs / 1000))
-    //     // Refresh progress bar 2x per second
-    //     Tone.getTransport().scheduleRepeat(() => updateProgress(), '2hz', 0)
-    // }
 
     function jumpToProgressTime(time: number | number[]) {
         const newTime = typeof time === 'number' ? time : time[1]
@@ -93,30 +33,52 @@ export function Player({
         setProgress(newTime)
     }
 
-    const play = () => {
-        // muteAll(0)
-        if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
-        setPlaying(true)
-    }
+    // const play = () => {
+    //     // muteAll(0)
+    //     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
+    //     setPlaying(true)
+    // }
 
-    const pause = () => {
-        Tone.getTransport().pause()
-        // muteAll(Tone.getTransport().seconds)
-        setPlaying(false)
-    }
+    // const pause = () => {
+    //     Tone.getTransport().pause()
+    // muteAll(Tone.getTransport().seconds)
+    // setPlaying(false)
+    // }
 
-    async function playPause() {
-        if (!score) return
-        if (audioStarted === 'false') {
-            Tone.start()
-            setAudioStarted('wait')
-            await Tone.loaded()
-            // logSamplersLoaded()
-            setAudioStarted('true')
-            play()
-        } else {
-            if (playing) pause()
-            else play()
+    // async function playPause() {
+    //     if (!score) return
+    //     if (audioStarted === 'false') {
+    //         Tone.start()
+    //         setAudioStarted('wait')
+    //         await Tone.loaded()
+    //         // logSamplersLoaded()
+    //         setAudioStarted('true')
+    //         play()
+    //     } else {
+    //         if (playing) pause()
+    //         else play()
+    //     }
+    // }
+
+    function playPause() {
+        switch (playbackState.audioState) {
+            case 'nodata':
+                playback({
+                    actionType: 'play',
+                    playbackType: 'multiple',
+                    score: score,
+                    systemIndex: 0,
+                    intro: 2000,
+                    outro: 5000
+                })
+                break
+            case 'playing':
+                playback({ actionType: 'pause' })
+                break
+            case 'paused':
+                playback({ actionType: 'play' })
+                break
+            default:
         }
     }
 
@@ -126,7 +88,7 @@ export function Player({
         Tone.getTransport().stop()
         Tone.getTransport().seconds = 0
         setProgress(0)
-        pause()
+        playback({ actionType: 'pause' })
     }
 
     //-------------------------CONTROLS--------------------------------------
@@ -147,7 +109,7 @@ export function Player({
             </div>
             <div className="h-4 w-4 shrink-0">
                 <button onClick={() => playPause()}>
-                    {playing ? <FaPause color="orange" /> : <FaPlay color="orange" />}
+                    {playbackState.audioState == 'playing' ? <FaPause color="orange" /> : <FaPlay color="orange" />}
                 </button>
             </div>
             <span className="flex w-12 shrink-0 justify-center">

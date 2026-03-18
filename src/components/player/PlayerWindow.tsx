@@ -1,6 +1,15 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import {
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type ActionDispatch,
+    type Dispatch,
+    type JSX,
+    type RefObject
+} from 'react'
 import { VStack } from 'rsuite'
-import type { SchedulePlaybackParams } from '../../componentlogic/playbackManager'
+import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
 import {
@@ -20,24 +29,28 @@ interface PlayerWindowProps {
     scoreList: ScoreInfo[]
     score: EditorScore | undefined
     totalDurationMs: number
-    schedulePlayback: (params: SchedulePlaybackParams) => TimeLine | undefined
+    timeLine: TimeLine | undefined
     focus: Position[]
     setFocus: Dispatch<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackSpeed: number
     setPlaybackSpeed: Dispatch<number>
+    playback: ActionDispatch<[action: PlaybackAction]>
+    playbackState: PlaybackState
 }
 export default function PlayerWindow({
     visible,
     scoreList,
     score,
     totalDurationMs,
-    schedulePlayback,
+    timeLine,
     focus,
     setFocus,
     updatePlaybackFunctions,
     playbackSpeed,
-    setPlaybackSpeed
+    setPlaybackSpeed,
+    playback,
+    playbackState
 }: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     // const setMenuDisabled = (label: string, value: boolean) => {
@@ -45,7 +58,7 @@ export default function PlayerWindow({
     // }
     // const { scoreList, score, loadScore, isLoading: loadingScore } = useScoreReader<Score | undefined>('old', 'file')
     const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
-    const [timeLine, setTimeLine] = useState<TimeLine | undefined>()
+    // const [timeLine, setTimeLine] = useState<TimeLine | undefined>()
 
     const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
@@ -64,12 +77,12 @@ export default function PlayerWindow({
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
-    useEffect(() => {
-        const timeLine: TimeLine | undefined = schedulePlayback({
-            pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
-        })
-        setTimeLine(timeLine)
-    }, [score])
+    // useEffect(() => {
+    //     const timeLine: TimeLine | undefined = schedulePlayback({
+    //         pbAction: { actionType: 'load', playbackType: 'multiple', systemIndex: 0, score: score }
+    //     })
+    //     setTimeLine(timeLine)
+    // }, [score])
 
     // Disable menus when data is loading
     // useEffect(() => {
@@ -122,7 +135,7 @@ export default function PlayerWindow({
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <Player score={score} totalDurationMs={totalDurationMs} />
+            <Player score={score} totalDurationMs={totalDurationMs} playback={playback} playbackState={playbackState} />
         </VStack>
     )
 }
