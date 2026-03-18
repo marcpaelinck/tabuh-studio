@@ -50,6 +50,7 @@ export const defaultCallbackFunctions: PlaybackCallbackFunctions = {
     animate: (): void => {},
     playercursor: (): void => {},
     editorcursor: (): void => {},
+    progress: (): void => {},
     generic: (): void => {}
 }
 export interface SchedulePlaybackParams {
@@ -64,13 +65,14 @@ export function usePlaybackManager(selectedFocus: Position[]) {
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
+    const [playbackProgress, setPlaybackProgress] = useState<number>(0)
 
     // Use a ref object to avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this happens.
     const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
         useRef<PlaybackCallbackFunctions>(defaultCallbackFunctions)
 
     useEffect(() => {
-        updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument })
+        updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
         debug('setting play function')
     }, [])
 
@@ -78,6 +80,11 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         if (params.bpm != undefined) {
             Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
         }
+    }
+
+    function updateProgress() {
+        setPlaybackProgress(Tone.getTransport().seconds)
+        Tone.getTransport()
     }
 
     // The
@@ -439,6 +446,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         timeLine.genericactions.forEach((action: GenericAction) => {
             Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
         })
+
+        // Schedule a progress counter
+        Tone.getTransport().scheduleRepeat((time) => updateProgress(), '2hz', 0)
     }
 
     function schedulePlayback({
@@ -456,8 +466,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
     return {
         timeLine,
-        // playbackFunctions,
         updatePlaybackCallbackFunctions,
+        playbackProgress,
+        setPlaybackProgress,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,

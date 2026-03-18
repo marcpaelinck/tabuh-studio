@@ -6,7 +6,16 @@ import { type SchedulePlaybackParams } from './usePlaybackManager'
 import { cycleValidation } from './validationManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
-export type ActionType = 'load' | 'play' | 'pause' | 'stop' | 'cursor' | 'reset' | 'reseterror'
+export type ActionType =
+    | 'load'
+    | 'play'
+    | 'pause'
+    | 'stop'
+    | 'rewind'
+    | 'jumptotime'
+    | 'cursor'
+    | 'clear'
+    | 'reseterror'
 export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
 
 export type PlaybackState = {
@@ -20,14 +29,18 @@ export type PlaybackAction = {
     playbackType?: PlaybackType
     score?: EditorScore
     systemIndex?: number
-    // actionFunctions?: PlaybackCallbackFunctions
+    seconds?: number
     cursor?: EditorCellCursor
     intro?: number // silence before start of playback in ms
     outro?: number // silence after end of playback in ms
 }
 // const dialog = useDialog()
 
-const playbackFunctions = { schedulePlayback: (parms: SchedulePlaybackParams) => {}, playbackSpeed: 1 }
+const playbackFunctions = {
+    schedulePlayback: (parms: SchedulePlaybackParams) => {},
+    setPlaybackProgress: (seconds: number) => {},
+    playbackSpeed: 1
+}
 
 // const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
 // var schedulePlayback: (parms: SchedulePlaybackParams) => void
@@ -48,10 +61,12 @@ async function asyncPlay() {
 // This function enables to pass the playbackScheduleFunctions to the playbackReducer.
 export function playbackReducerFactory(
     // actionFunc: PlaybackCallbackFunctions,
-    schedulePlayback: (parms: SchedulePlaybackParams) => void
+    schedulePlayback: (parms: SchedulePlaybackParams) => void,
+    setPlaybackProgress: (seconds: number) => void
 ) {
     // playbackFunctions.actionFunctions = actionFunc
     playbackFunctions.schedulePlayback = schedulePlayback
+    playbackFunctions.setPlaybackProgress = setPlaybackProgress
     return playbackReducer
 }
 
@@ -79,7 +94,7 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
 
 function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {
     switch (action.actionType) {
-        case 'reset': {
+        case 'clear': {
             return { cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'play': {
@@ -107,6 +122,20 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
             Tone.getTransport().seconds = 0
             return { ...state, cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
+        case 'rewind': {
+            if (!['playing', 'paused'].includes(state.audioState)) return { ...state }
+            Tone.getTransport().stop()
+            Tone.getTransport().seconds = 0
+            playbackFunctions.setPlaybackProgress(0)
+            return { ...state, audioState: 'paused' }
+        }
+        case 'jumptotime':
+            if (!action.seconds || !['playing', 'paused'].includes(state.audioState)) return { ...state }
+            Tone.getTransport().stop()
+            Tone.getTransport().seconds = action.seconds
+            Tone.getTransport().start()
+            playbackFunctions.setPlaybackProgress(action.seconds)
+            return { ...state }
         case 'cursor':
             debug(`executing 'cursor'`)
             if (action.cursor) {

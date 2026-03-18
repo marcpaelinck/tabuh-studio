@@ -33,6 +33,7 @@ interface PlayerWindowProps {
     focus: Position[]
     setFocus: Dispatch<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
+    playbackProgress: number
     playbackSpeed: number
     setPlaybackSpeed: Dispatch<number>
     playback: ActionDispatch<[action: PlaybackAction]>
@@ -47,6 +48,7 @@ export default function PlayerWindow({
     focus,
     setFocus,
     updatePlaybackFunctions,
+    playbackProgress,
     playbackSpeed,
     setPlaybackSpeed,
     playback,
@@ -135,7 +137,13 @@ export default function PlayerWindow({
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <Player score={score} totalDurationMs={totalDurationMs} playback={playback} playbackState={playbackState} />
+            <Player
+                score={score}
+                totalDurationMs={totalDurationMs}
+                playback={playback}
+                playbackState={playbackState}
+                playbackProgress={playbackProgress}
+            />
         </VStack>
     )
 }

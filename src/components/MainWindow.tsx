@@ -213,12 +213,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const {
         timeLine,
         updatePlaybackCallbackFunctions,
+        playbackProgress,
+        setPlaybackProgress,
         playbackSpeed,
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
     } = usePlaybackManager(focus)
-    const playbackReducer = playbackReducerFactory(schedulePlayback)
+    const playbackReducer = playbackReducerFactory(schedulePlayback, setPlaybackProgress)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
         audioState: 'nodata',
@@ -267,7 +269,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 tooltip: `title: ${loadedScore.title}\ncomposer: ${loadedScore.composer}\nuuid: ${loadedScore.uuid}`
             })
         }
-        playback({ actionType: 'reset' })
+        playback({ actionType: 'clear' })
     }, [loadedScore])
 
     useEffect(() => {
@@ -344,10 +346,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                     score={editorScore}
                                     totalDurationMs={totalDurationMs}
                                     timeLine={timeLine}
-                                    // schedulePlayback={schedulePlayback}
                                     focus={focus}
                                     setFocus={setFocus}
                                     updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+                                    playbackProgress={playbackProgress}
                                     playbackSpeed={playbackSpeed}
                                     setPlaybackSpeed={setPlaybackSpeed}
                                     playbackState={playbackState}

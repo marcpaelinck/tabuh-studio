@@ -331,6 +331,9 @@ export type PlaybackEditorCursorAction = {
     params: EditorCursorParameters
 }
 
+export type ProgressFunction = (time: number, params: {}) => void
+export type PlaybackProgressFunctionAction = { time: TimeObject; function: ProgressFunction; params: {} }
+
 // Callback functions used when creating a playback schedule in Tone.Transport
 export interface PlaybackCallbackFunctions {
     tempo: TempoFunction
@@ -338,6 +341,7 @@ export interface PlaybackCallbackFunctions {
     animate: AnimationFunction
     playercursor: PlayerCursorFunction
     editorcursor: EditorCursorFunction
+    progress: ProgressFunction
     generic: GenericFunction
 }
 

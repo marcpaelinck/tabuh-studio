@@ -1,5 +1,4 @@
-import { useEffect, useState, type ActionDispatch, type JSX } from 'react'
-import * as Tone from 'tone'
+import { type ActionDispatch, type JSX } from 'react'
 import { type EditorScore } from '../../typing/types'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
@@ -15,51 +14,16 @@ interface PlayerProps {
     totalDurationMs: number
     playback: ActionDispatch<[action: PlaybackAction]>
     playbackState: PlaybackState
+    playbackProgress: number
 }
 
-export function Player({ score, totalDurationMs, playback, playbackState }: PlayerProps): JSX.Element {
-    // STATE VARIABLES
-    const [audioStarted, setAudioStarted] = useState<AudioState>('false') // MOVE TO MAINWINDOW
-    // const [playing, setPlaying] = useState<boolean>(false) // MOVE TO MAINWINDOW
-    const [progress, setProgress] = useState<number>(0) // MOVE TO MAINWINDOW
-
-    useEffect(() => setAudioStarted('false'), [score])
-
-    function jumpToProgressTime(time: number | number[]) {
-        const newTime = typeof time === 'number' ? time : time[1]
-        Tone.getTransport().stop()
-        Tone.getTransport().seconds = newTime
-        Tone.getTransport().start()
-        setProgress(newTime)
-    }
-
-    // const play = () => {
-    //     // muteAll(0)
-    //     if (Tone.getTransport().state !== 'started') Tone.getTransport().start()
-    //     setPlaying(true)
-    // }
-
-    // const pause = () => {
-    //     Tone.getTransport().pause()
-    // muteAll(Tone.getTransport().seconds)
-    // setPlaying(false)
-    // }
-
-    // async function playPause() {
-    //     if (!score) return
-    //     if (audioStarted === 'false') {
-    //         Tone.start()
-    //         setAudioStarted('wait')
-    //         await Tone.loaded()
-    //         // logSamplersLoaded()
-    //         setAudioStarted('true')
-    //         play()
-    //     } else {
-    //         if (playing) pause()
-    //         else play()
-    //     }
-    // }
-
+export function Player({
+    score,
+    totalDurationMs,
+    playback,
+    playbackState,
+    playbackProgress
+}: PlayerProps): JSX.Element {
     function playPause() {
         switch (playbackState.audioState) {
             case 'nodata':
@@ -82,15 +46,6 @@ export function Player({ score, totalDurationMs, playback, playbackState }: Play
         }
     }
 
-    function rewind() {
-        if (!score) return
-
-        Tone.getTransport().stop()
-        Tone.getTransport().seconds = 0
-        setProgress(0)
-        playback({ actionType: 'pause' })
-    }
-
     //-------------------------CONTROLS--------------------------------------
     const toMmSs = (time: number): string => {
         const minutes = Math.floor(time / 60)
@@ -103,7 +58,7 @@ export function Player({ score, totalDurationMs, playback, playbackState }: Play
     return (
         <div className="px-4 pt-3 pb-4 flex w-full items-center gap-5 justify-center select-none">
             <div className="h-4 w-4 shrink-0">
-                <button onClick={() => rewind()}>
+                <button onClick={() => playback({ actionType: 'rewind' })}>
                     <FaBackwardFast color="orange" />
                 </button>
             </div>
@@ -113,7 +68,7 @@ export function Player({ score, totalDurationMs, playback, playbackState }: Play
                 </button>
             </div>
             <span className="flex w-12 shrink-0 justify-center">
-                <p>{toMmSs(progress)}</p>
+                <p>{toMmSs(playbackProgress)}</p>
             </span>
             <div className="flex w-full items-center ">
                 <Slider
@@ -123,8 +78,8 @@ export function Player({ score, totalDurationMs, playback, playbackState }: Play
                     renderTooltip={(value) => (value ? toMmSs(value) : '')}
                     min={0}
                     max={Math.ceil(totalDurationMs / 1000)}
-                    value={progress}
-                    onChange={(val) => jumpToProgressTime(val)}
+                    value={playbackProgress}
+                    onChange={(val) => playback({ actionType: 'jumptotime', seconds: val })}
                 />
             </div>
             <span className="flex w-12 shrink-0 justify-center">
