@@ -1,5 +1,5 @@
 {
-    "uuid": "ecefd145-2a81-42cf-afdd-008174da3f06",
+    "uuid": "b4f7423e-b461-4d03-8de6-034953711667",
     "title": "Rejang Dewa",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -19,29 +19,29 @@
     ],
     "parts": {
         "reyong intro": [
-            "80a8f067-6f57-4bee-8900-48a048917c73",
-            "f7a73d3c-bb25-40da-a07a-6e8bd4227d9e"
+            "cb949c11-5596-477d-b738-43ef2dd95e7c",
+            "6e5802f8-f50c-4cbb-9038-b825875ca1d5"
         ],
         "pengawak": [
-            "a9f9bc53-cc81-4250-93bf-5e16749b6eec",
-            "8357eba5-99fb-45cb-acb2-2c7b685bd7f3",
-            "d6faeeb0-5877-4044-9da9-b8cb4f89863c",
-            "5afb4856-5268-4edd-b0b6-d98a56a0b691",
-            "d9ee32ba-3d29-4429-8ddf-38b8cbc69162"
+            "5cc55eac-eb97-444e-9ece-3991d82e2cb9",
+            "87729409-85f7-472a-97c7-a3ecba747a17",
+            "6ccbbe28-8794-4351-9186-86a01f251be0",
+            "e75c3ecb-c18f-4856-86ca-bf1c1abb63b0",
+            "6ed067d3-f8bd-4963-8731-3b8958331658"
         ],
         "pengecet": [
-            "5a5c91e7-97a1-4b16-a1bc-fdc5404ed9d5",
-            "356bb9de-d438-4b8a-a1d0-ee9e13a3a372",
-            "08bae4ae-b947-4899-b041-ef20a3188f51",
-            "e1c43dda-61e0-44c6-8f68-2e2e542b6626",
-            "3b47332d-2b5b-4fea-bc21-2d4518ecce97",
-            "023ae027-ac05-4508-b29e-57701671259d",
-            "158900c3-b766-46ec-b54b-029e7bdfc518"
+            "005651a0-d72d-4d77-95db-9dee43d9357b",
+            "ea8f9673-60d0-4c0d-990a-17d0685047db",
+            "dc61808d-ab5c-4718-8e47-c7859709929a",
+            "c71383e3-37ea-473a-8c67-e0f2b5ac0d7d",
+            "9524bf61-83e8-4bf7-a229-5241e68d68b0",
+            "ae794cfb-b691-415c-bc6d-289577068f23",
+            "13c6120e-a48b-479c-b980-e04ddbeb757f"
         ]
     },
     "systems": [
         {
-            "uuid": "80a8f067-6f57-4bee-8900-48a048917c73",
+            "uuid": "cb949c11-5596-477d-b738-43ef2dd95e7c",
             "id": 1,
             "index": 0,
             "execution": [
@@ -65,7 +65,7 @@
             "grouped": []
         },
         {
-            "uuid": "f7a73d3c-bb25-40da-a07a-6e8bd4227d9e",
+            "uuid": "6e5802f8-f50c-4cbb-9038-b825875ca1d5",
             "id": 2,
             "index": 1,
             "execution": [
@@ -89,7 +89,7 @@
             "grouped": []
         },
         {
-            "uuid": "a9f9bc53-cc81-4250-93bf-5e16749b6eec",
+            "uuid": "5cc55eac-eb97-444e-9ece-3991d82e2cb9",
             "id": 3,
             "index": 2,
             "label": "Pengawak",
@@ -115,7 +115,7 @@
             "grouped": []
         },
         {
-            "uuid": "8357eba5-99fb-45cb-acb2-2c7b685bd7f3",
+            "uuid": "87729409-85f7-472a-97c7-a3ecba747a17",
             "id": 4,
             "index": 3,
             "execution": [],
@@ -137,7 +137,7 @@
             "grouped": []
         },
         {
-            "uuid": "d6faeeb0-5877-4044-9da9-b8cb4f89863c",
+            "uuid": "6ccbbe28-8794-4351-9186-86a01f251be0",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -159,11 +159,11 @@
             "grouped": []
         },
         {
-            "uuid": "5afb4856-5268-4edd-b0b6-d98a56a0b691",
+            "uuid": "e75c3ecb-c18f-4856-86ca-bf1c1abb63b0",
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "a9f9bc53-cc81-4250-93bf-5e16749b6eec", "targetname": "PENGAWAK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "5cc55eac-eb97-444e-9ece-3991d82e2cb9", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "-", "-", "a,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "e", "-", "-", "-"]}],
@@ -183,7 +183,7 @@
             "grouped": []
         },
         {
-            "uuid": "d9ee32ba-3d29-4429-8ddf-38b8cbc69162",
+            "uuid": "6ed067d3-f8bd-4963-8731-3b8958331658",
             "id": 7,
             "index": 6,
             "execution": [
@@ -207,7 +207,7 @@
             "grouped": []
         },
         {
-            "uuid": "5a5c91e7-97a1-4b16-a1bc-fdc5404ed9d5",
+            "uuid": "005651a0-d72d-4d77-95db-9dee43d9357b",
             "id": 8,
             "index": 7,
             "label": "Pengecet",
@@ -232,7 +232,7 @@
             "grouped": []
         },
         {
-            "uuid": "356bb9de-d438-4b8a-a1d0-ee9e13a3a372",
+            "uuid": "ea8f9673-60d0-4c0d-990a-17d0685047db",
             "id": 9,
             "index": 8,
             "execution": [],
@@ -254,7 +254,7 @@
             "grouped": []
         },
         {
-            "uuid": "08bae4ae-b947-4899-b041-ef20a3188f51",
+            "uuid": "dc61808d-ab5c-4718-8e47-c7859709929a",
             "id": 10,
             "index": 9,
             "execution": [],
@@ -276,7 +276,7 @@
             "grouped": []
         },
         {
-            "uuid": "e1c43dda-61e0-44c6-8f68-2e2e542b6626",
+            "uuid": "c71383e3-37ea-473a-8c67-e0f2b5ac0d7d",
             "id": 11,
             "index": 10,
             "execution": [],
@@ -298,7 +298,7 @@
             "grouped": []
         },
         {
-            "uuid": "3b47332d-2b5b-4fea-bc21-2d4518ecce97",
+            "uuid": "9524bf61-83e8-4bf7-a229-5241e68d68b0",
             "id": 12,
             "index": 11,
             "execution": [
@@ -322,11 +322,11 @@
             "grouped": []
         },
         {
-            "uuid": "023ae027-ac05-4508-b29e-57701671259d",
+            "uuid": "ae794cfb-b691-415c-bc6d-289577068f23",
             "id": 13,
             "index": 12,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to PENGECET after passes 1, 2 & 3", "tooltipshort": "PENGECET", "targetuuid": "5a5c91e7-97a1-4b16-a1bc-fdc5404ed9d5", "targetname": "PENGECET"},
+                {"type": "goto", "seqId": 0, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to PENGECET after passes 1, 2 & 3", "tooltipshort": "PENGECET", "targetuuid": "005651a0-d72d-4d77-95db-9dee43d9357b", "targetname": "PENGECET"},
                 {"type": "tempo", "seqId": 1, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM beat 1 on pass 4", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 1, "toValue": 50.0}
             ],
             "staffs": {
@@ -347,7 +347,7 @@
             "grouped": []
         },
         {
-            "uuid": "158900c3-b766-46ec-b54b-029e7bdfc518",
+            "uuid": "13c6120e-a48b-479c-b980-e04ddbeb757f",
             "id": 14,
             "index": 13,
             "execution": [],

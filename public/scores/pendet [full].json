@@ -1,5 +1,5 @@
 {
-    "uuid": "22749eb3-3b95-4ff9-beaa-90356e788f73",
+    "uuid": "545fbb3f-df53-4516-9a92-d4354db0d92d",
     "title": "Pendet",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -20,39 +20,39 @@
     ],
     "parts": {
         "kawitan": [
-            "dee6c769-1aef-431a-b27f-5ac5f8f49df2",
-            "ae537d15-f762-4aa5-b205-0d642dc1dfcc",
-            "3723d363-4cee-4aca-9613-f460512c6b0f",
-            "8deb0a82-b637-49ef-8e88-89e7eae67c32"
+            "0a1fae15-0941-461c-addc-a7ed952fb2b6",
+            "fc83c47d-5bc9-4300-9ec7-6357fdb99a26",
+            "a6a1d3a7-ecdd-4193-8bc9-457cf39df931",
+            "68c686c6-1245-42d3-8548-475c7aa4e4d6"
         ],
         "pengawak": [
-            "fa400e2f-cb26-4a22-a4dc-48beb8e67a09",
-            "a13b6efb-dd69-45c8-a8e1-1c616937fa1f",
-            "5c546a5c-f881-4cec-ac94-814cf6f802e2",
-            "86323f45-602a-45eb-abb0-c6ad5bcb5f7e",
-            "b4867055-16ff-4ce0-b065-cf92d39df781",
-            "c4c4d0b4-751b-42fc-be19-89c90a06f5db",
-            "b2c6fe85-0b78-45a1-bbe3-5a8cb399da90",
-            "8c1bb1b4-2f96-47ec-83cc-bb6ecae5723f",
-            "4cf107ff-b668-40af-917f-5e21e61349f8",
-            "c568b127-df05-4df3-a5fb-ed07426c7516",
-            "3e47dd03-7335-4653-b39f-9941be604a01",
-            "b51d3e71-8a46-4955-b0d8-8926e29e6ffb"
+            "77584269-3acb-4486-8b53-3b611c8b1343",
+            "c8b06c81-ed16-4951-964e-18f9c67fa676",
+            "fc178800-4254-4204-bddc-2574833067e1",
+            "cb0e7210-defe-4237-8e0b-1334fca4e5de",
+            "a0cf6acf-2e94-44ff-9170-46e82896b601",
+            "9912068c-e60e-4e67-8d77-bda8c69c350d",
+            "a11a36cd-6971-4761-89c5-8fa48fbfa7cd",
+            "38d9aee7-a612-4135-8168-9f48d7b998f4",
+            "0e06ece4-0bb0-4b5e-b92c-3bbf569fce9e",
+            "888d0568-99d0-4356-9715-389f6471d0b8",
+            "20e4a2e7-9064-42a1-850f-c96511defc6f",
+            "be2f2980-9e9a-4252-9b12-3b5da704df27"
         ],
         "pengecet": [
-            "9746d730-6851-4c87-a597-fc3a095281e8",
-            "1bade2b8-12e9-4a1d-9455-27b3918959fd",
-            "24fa282d-0598-4f0b-8a0a-ad5c0d373db3",
-            "db40fdd9-9575-4989-b489-3931a949ce57",
-            "8b0237e7-c054-48d2-aa68-cbd05abe8018",
-            "b2e83507-f069-4fa9-b248-da2e685c7a18",
-            "b57fc0cd-46f2-439f-b0f0-cf6f6a12a897",
-            "990f69cd-b1b7-4491-b367-f5213db11137"
+            "f9ebc902-76ec-41f9-b403-d3b8ff86328f",
+            "e352faff-258e-450b-af3e-e7dc67c9c7b0",
+            "c8b528c5-ce16-493a-bc9a-0b6e5ebe2e41",
+            "499a4583-476e-482e-b147-d08c52e8d2c2",
+            "af17822c-3471-4b60-938d-bcd7eb255552",
+            "1a33d9a0-feff-47be-a42b-0db07187673a",
+            "6818c2de-f367-4317-ae73-997ac38dc017",
+            "393c3882-1515-45b5-a4f1-8ba390cb3f8b"
         ]
     },
     "systems": [
         {
-            "uuid": "46bfe239-874d-40ad-b978-3d4892ea8bde",
+            "uuid": "1eafe444-aa50-4126-85f0-b8fb2be6a0b6",
             "id": 1,
             "index": 0,
             "execution": [
@@ -77,7 +77,7 @@
             "grouped": []
         },
         {
-            "uuid": "20884187-f9ca-4f0e-b0bd-811da429f99b",
+            "uuid": "00af5909-dff8-4f78-b8c4-ae49bc2ec961",
             "id": 2,
             "index": 1,
             "execution": [
@@ -102,7 +102,7 @@
             "grouped": []
         },
         {
-            "uuid": "2bdca30b-3f90-4173-ba20-01536ad48bd8",
+            "uuid": "0ef83901-a144-415f-a273-56752fd05f24",
             "id": 3,
             "index": 2,
             "execution": [
@@ -127,7 +127,7 @@
             "grouped": []
         },
         {
-            "uuid": "c6588dc0-42b9-4cae-93ec-a2f43b963086",
+            "uuid": "fee89eb2-6816-49ae-a7b2-4f339a8f34f8",
             "id": 4,
             "index": 3,
             "execution": [
@@ -152,7 +152,7 @@
             "grouped": []
         },
         {
-            "uuid": "59a8c7b3-718a-4276-ba46-88a61d2369fa",
+            "uuid": "e1863448-336c-45d7-85c8-c47625d5c4ef",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -175,7 +175,7 @@
             "grouped": []
         },
         {
-            "uuid": "dee6c769-1aef-431a-b27f-5ac5f8f49df2",
+            "uuid": "0a1fae15-0941-461c-addc-a7ed952fb2b6",
             "id": 6,
             "index": 5,
             "execution": [
@@ -200,7 +200,7 @@
             "grouped": []
         },
         {
-            "uuid": "ae537d15-f762-4aa5-b205-0d642dc1dfcc",
+            "uuid": "fc83c47d-5bc9-4300-9ec7-6357fdb99a26",
             "id": 7,
             "index": 6,
             "execution": [
@@ -225,7 +225,7 @@
             "grouped": []
         },
         {
-            "uuid": "3723d363-4cee-4aca-9613-f460512c6b0f",
+            "uuid": "a6a1d3a7-ecdd-4193-8bc9-457cf39df931",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -248,7 +248,7 @@
             "grouped": []
         },
         {
-            "uuid": "8deb0a82-b637-49ef-8e88-89e7eae67c32",
+            "uuid": "68c686c6-1245-42d3-8548-475c7aa4e4d6",
             "id": 9,
             "index": 8,
             "execution": [
@@ -273,7 +273,7 @@
             "grouped": []
         },
         {
-            "uuid": "fa400e2f-cb26-4a22-a4dc-48beb8e67a09",
+            "uuid": "77584269-3acb-4486-8b53-3b611c8b1343",
             "id": 10,
             "index": 9,
             "execution": [
@@ -298,7 +298,7 @@
             "grouped": []
         },
         {
-            "uuid": "a13b6efb-dd69-45c8-a8e1-1c616937fa1f",
+            "uuid": "c8b06c81-ed16-4951-964e-18f9c67fa676",
             "id": 11,
             "index": 10,
             "execution": [],
@@ -321,7 +321,7 @@
             "grouped": []
         },
         {
-            "uuid": "5c546a5c-f881-4cec-ac94-814cf6f802e2",
+            "uuid": "fc178800-4254-4204-bddc-2574833067e1",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -344,7 +344,7 @@
             "grouped": []
         },
         {
-            "uuid": "86323f45-602a-45eb-abb0-c6ad5bcb5f7e",
+            "uuid": "cb0e7210-defe-4237-8e0b-1334fca4e5de",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -367,7 +367,7 @@
             "grouped": []
         },
         {
-            "uuid": "b4867055-16ff-4ce0-b065-cf92d39df781",
+            "uuid": "a0cf6acf-2e94-44ff-9170-46e82896b601",
             "id": 14,
             "index": 13,
             "execution": [],
@@ -390,7 +390,7 @@
             "grouped": []
         },
         {
-            "uuid": "c4c4d0b4-751b-42fc-be19-89c90a06f5db",
+            "uuid": "9912068c-e60e-4e67-8d77-bda8c69c350d",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -413,7 +413,7 @@
             "grouped": []
         },
         {
-            "uuid": "b2c6fe85-0b78-45a1-bbe3-5a8cb399da90",
+            "uuid": "a11a36cd-6971-4761-89c5-8fa48fbfa7cd",
             "id": 16,
             "index": 15,
             "execution": [],
@@ -436,7 +436,7 @@
             "grouped": []
         },
         {
-            "uuid": "8c1bb1b4-2f96-47ec-83cc-bb6ecae5723f",
+            "uuid": "38d9aee7-a612-4135-8168-9f48d7b998f4",
             "id": 17,
             "index": 16,
             "execution": [],
@@ -459,7 +459,7 @@
             "grouped": []
         },
         {
-            "uuid": "4cf107ff-b668-40af-917f-5e21e61349f8",
+            "uuid": "0e06ece4-0bb0-4b5e-b92c-3bbf569fce9e",
             "id": 18,
             "index": 17,
             "execution": [
@@ -484,7 +484,7 @@
             "grouped": []
         },
         {
-            "uuid": "c568b127-df05-4df3-a5fb-ed07426c7516",
+            "uuid": "888d0568-99d0-4356-9715-389f6471d0b8",
             "id": 19,
             "index": 18,
             "execution": [],
@@ -507,7 +507,7 @@
             "grouped": []
         },
         {
-            "uuid": "3e47dd03-7335-4653-b39f-9941be604a01",
+            "uuid": "20e4a2e7-9064-42a1-850f-c96511defc6f",
             "id": 20,
             "index": 19,
             "execution": [
@@ -532,7 +532,7 @@
             "grouped": []
         },
         {
-            "uuid": "b51d3e71-8a46-4955-b0d8-8926e29e6ffb",
+            "uuid": "be2f2980-9e9a-4252-9b12-3b5da704df27",
             "id": 21,
             "index": 20,
             "execution": [
@@ -557,7 +557,7 @@
             "grouped": []
         },
         {
-            "uuid": "9746d730-6851-4c87-a597-fc3a095281e8",
+            "uuid": "f9ebc902-76ec-41f9-b403-d3b8ff86328f",
             "id": 22,
             "index": 21,
             "execution": [],
@@ -580,7 +580,7 @@
             "grouped": []
         },
         {
-            "uuid": "1bade2b8-12e9-4a1d-9455-27b3918959fd",
+            "uuid": "e352faff-258e-450b-af3e-e7dc67c9c7b0",
             "id": 23,
             "index": 22,
             "execution": [
@@ -605,7 +605,7 @@
             "grouped": []
         },
         {
-            "uuid": "24fa282d-0598-4f0b-8a0a-ad5c0d373db3",
+            "uuid": "c8b528c5-ce16-493a-bc9a-0b6e5ebe2e41",
             "id": 24,
             "index": 23,
             "execution": [],
@@ -628,7 +628,7 @@
             "grouped": []
         },
         {
-            "uuid": "db40fdd9-9575-4989-b489-3931a949ce57",
+            "uuid": "499a4583-476e-482e-b147-d08c52e8d2c2",
             "id": 25,
             "index": 24,
             "execution": [],
@@ -651,12 +651,12 @@
             "grouped": []
         },
         {
-            "uuid": "8b0237e7-c054-48d2-aa68-cbd05abe8018",
+            "uuid": "af17822c-3471-4b60-938d-bcd7eb255552",
             "id": 26,
             "index": 25,
             "label": "Pengecet2",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2, 3, 4], "nthpass": false, "tooltip": "go to PENGECET2 after passes 1, 2, 3 & 4", "tooltipshort": "PENGECET2", "targetuuid": "8b0237e7-c054-48d2-aa68-cbd05abe8018", "targetname": "PENGECET2"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2, 3, 4], "nthpass": false, "tooltip": "go to PENGECET2 after passes 1, 2, 3 & 4", "tooltipshort": "PENGECET2", "targetuuid": "af17822c-3471-4b60-938d-bcd7eb255552", "targetname": "PENGECET2"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -677,7 +677,7 @@
             "grouped": []
         },
         {
-            "uuid": "b2e83507-f069-4fa9-b248-da2e685c7a18",
+            "uuid": "1a33d9a0-feff-47be-a42b-0db07187673a",
             "id": 27,
             "index": 26,
             "execution": [
@@ -702,7 +702,7 @@
             "grouped": []
         },
         {
-            "uuid": "b57fc0cd-46f2-439f-b0f0-cf6f6a12a897",
+            "uuid": "6818c2de-f367-4317-ae73-997ac38dc017",
             "id": 28,
             "index": 27,
             "execution": [
@@ -728,7 +728,7 @@
             "grouped": []
         },
         {
-            "uuid": "990f69cd-b1b7-4491-b367-f5213db11137",
+            "uuid": "393c3882-1515-45b5-a4f1-8ba390cb3f8b",
             "id": 29,
             "index": 28,
             "execution": [],

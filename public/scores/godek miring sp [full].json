@@ -1,5 +1,5 @@
 {
-    "uuid": "174a6b51-e8b4-42de-98a2-ada085b69be9",
+    "uuid": "7c262ae3-b56a-417d-b966-7981597ba578",
     "title": "Godek Miring SP",
     "composer": "",
     "instrumenttype": "SEMAR_PAGULINGAN",
@@ -16,30 +16,30 @@
     ],
     "parts": {
         "kawitan": [
-            "c85492e2-bb6f-4a15-88b6-659ef9aa1ab1",
-            "ebacad4a-fc4f-4d1f-a6c7-d022665ead9c",
-            "abae7848-02ca-4d79-b054-054b9a3937b9",
-            "ba8a3184-687e-4036-ad07-8e573e469779",
-            "9f945197-c29d-4090-8235-b2dbd7733a91"
+            "7b82cd00-5e4f-4b2f-9d3a-d4204ac19f4d",
+            "ecb38ff6-b0ca-4bd9-919e-639387f2b214",
+            "b788d1a5-1f63-4646-85f4-fe8f20d3fe48",
+            "b7e4dbe5-e8b2-4d48-9fdb-a353683ecd73",
+            "7360f0ee-8b92-4dd7-a880-e89d842a647c"
         ],
         "pengawak": [
-            "1d03a5f8-fd3e-47cd-84b3-cc72a46a14c9",
-            "cc6bb8c1-6c5f-47bf-a1d8-e98aab7592f2",
-            "f81bff53-602f-45cb-855b-59f9d5cae4a7",
-            "3cfc277f-f172-40b1-8164-e4b243f54826",
-            "f7850175-1474-4b9a-8094-bb19c8ffb32d"
+            "2fc935d5-94a9-42f2-b047-e4ab328ea1fd",
+            "274ddaee-4348-4929-9fe2-761c13a9faed",
+            "86d45f46-55bc-4a64-bd81-cd3f36584e7a",
+            "cee104e3-d8ce-4216-b4b6-216395e7bd8f",
+            "09cd754e-27e9-4448-96c1-6477c581d71c"
         ],
         "pengecet": [
-            "4c93b2ed-8a99-424a-9b51-0f664ca2f845",
-            "c5543284-d866-4a8a-a292-9e4e112f4e23",
-            "42e53bf8-1710-48b7-a040-40ada6db6cc6",
-            "aaf53ec9-b7c4-433b-a955-bd5d86d724b8",
-            "91e279e0-4efc-4008-8639-3dfec9041377"
+            "0d2d27ee-eb3d-40ac-bf9d-bac5b5c352b6",
+            "aae18bdf-402b-470e-b44d-bc48d8a54222",
+            "2b650416-a167-4b04-b04c-5df752bab1cd",
+            "b4622dca-c9a0-4fbc-a1c8-be30843d01a8",
+            "2d890d3d-9320-493d-a0f6-de3edae65fe6"
         ]
     },
     "systems": [
         {
-            "uuid": "d62b992a-4e1f-46e5-a430-76f8ae227e4a",
+            "uuid": "38d2788d-a18e-4d57-b3d1-4f8ecc4564c2",
             "id": 1,
             "index": 0,
             "execution": [
@@ -60,12 +60,12 @@
             "grouped": []
         },
         {
-            "uuid": "c85492e2-bb6f-4a15-88b6-659ef9aa1ab1",
+            "uuid": "7b82cd00-5e4f-4b2f-9d3a-d4204ac19f4d",
             "id": 2,
             "index": 1,
             "label": "Kawitan",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to TRANSITION_TO_PENGAWAK after pass 3", "tooltipshort": "TRANSITION_TO_PENGAWAK", "targetuuid": "abae7848-02ca-4d79-b054-054b9a3937b9", "targetname": "TRANSITION_TO_PENGAWAK"}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to TRANSITION_TO_PENGAWAK after pass 3", "tooltipshort": "TRANSITION_TO_PENGAWAK", "targetuuid": "b788d1a5-1f63-4646-85f4-fe8f20d3fe48", "targetname": "TRANSITION_TO_PENGAWAK"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}],
@@ -82,11 +82,11 @@
             "grouped": []
         },
         {
-            "uuid": "ebacad4a-fc4f-4d1f-a6c7-d022665ead9c",
+            "uuid": "ecb38ff6-b0ca-4bd9-919e-639387f2b214",
             "id": 3,
             "index": 2,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to KAWITAN after passes 1 & 2", "tooltipshort": "KAWITAN", "targetuuid": "c85492e2-bb6f-4a15-88b6-659ef9aa1ab1", "targetname": "KAWITAN"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to KAWITAN after passes 1 & 2", "tooltipshort": "KAWITAN", "targetuuid": "7b82cd00-5e4f-4b2f-9d3a-d4204ac19f4d", "targetname": "KAWITAN"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
@@ -103,7 +103,7 @@
             "grouped": []
         },
         {
-            "uuid": "abae7848-02ca-4d79-b054-054b9a3937b9",
+            "uuid": "b788d1a5-1f63-4646-85f4-fe8f20d3fe48",
             "id": 4,
             "index": 3,
             "label": "Transition_To_Pengawak",
@@ -125,7 +125,7 @@
             "grouped": []
         },
         {
-            "uuid": "ba8a3184-687e-4036-ad07-8e573e469779",
+            "uuid": "b7e4dbe5-e8b2-4d48-9fdb-a353683ecd73",
             "id": 5,
             "index": 4,
             "execution": [
@@ -146,7 +146,7 @@
             "grouped": []
         },
         {
-            "uuid": "9f945197-c29d-4090-8235-b2dbd7733a91",
+            "uuid": "7360f0ee-8b92-4dd7-a880-e89d842a647c",
             "id": 6,
             "index": 5,
             "execution": [
@@ -167,7 +167,7 @@
             "grouped": []
         },
         {
-            "uuid": "1d03a5f8-fd3e-47cd-84b3-cc72a46a14c9",
+            "uuid": "2fc935d5-94a9-42f2-b047-e4ab328ea1fd",
             "id": 7,
             "index": 6,
             "label": "Pengawak",
@@ -189,7 +189,7 @@
             "grouped": []
         },
         {
-            "uuid": "cc6bb8c1-6c5f-47bf-a1d8-e98aab7592f2",
+            "uuid": "274ddaee-4348-4929-9fe2-761c13a9faed",
             "id": 8,
             "index": 7,
             "execution": [
@@ -210,11 +210,11 @@
             "grouped": []
         },
         {
-            "uuid": "f81bff53-602f-45cb-855b-59f9d5cae4a7",
+            "uuid": "86d45f46-55bc-4a64-bd81-cd3f36584e7a",
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "1d03a5f8-fd3e-47cd-84b3-cc72a46a14c9", "targetname": "PENGAWAK"},
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "2fc935d5-94a9-42f2-b047-e4ab328ea1fd", "targetname": "PENGAWAK"},
                 {"type": "tempo", "seqId": 1, "passes": [1, 2], "nthpass": false, "tooltip": "tempo 50 BPM beat 7 on passes 1 & 2", "tooltipshort": "50 BPM", "isGradual": false, "toSection": 7, "toValue": 50.0},
                 {"type": "tempo", "seqId": 2, "passes": [3], "nthpass": false, "tooltip": "tempo 120 BPM beat 4 on pass 3", "tooltipshort": "120 BPM", "isGradual": false, "toSection": 4, "toValue": 120.0}
             ],
@@ -233,7 +233,7 @@
             "grouped": []
         },
         {
-            "uuid": "3cfc277f-f172-40b1-8164-e4b243f54826",
+            "uuid": "cee104e3-d8ce-4216-b4b6-216395e7bd8f",
             "id": 10,
             "index": 9,
             "execution": [
@@ -255,7 +255,7 @@
             "grouped": []
         },
         {
-            "uuid": "f7850175-1474-4b9a-8094-bb19c8ffb32d",
+            "uuid": "09cd754e-27e9-4448-96c1-6477c581d71c",
             "id": 11,
             "index": 10,
             "execution": [
@@ -276,12 +276,12 @@
             "grouped": []
         },
         {
-            "uuid": "4c93b2ed-8a99-424a-9b51-0f664ca2f845",
+            "uuid": "0d2d27ee-eb3d-40ac-bf9d-bac5b5c352b6",
             "id": 12,
             "index": 11,
             "label": "Pengecet",
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to FINAL after pass 3", "tooltipshort": "FINAL", "targetuuid": "42e53bf8-1710-48b7-a040-40ada6db6cc6", "targetname": "FINAL"}
+                {"type": "goto", "seqId": 0, "passes": [3], "nthpass": false, "tooltip": "go to FINAL after pass 3", "tooltipshort": "FINAL", "targetuuid": "2b650416-a167-4b04-b04c-5df752bab1cd", "targetname": "FINAL"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "a,", "-"]}, {"notation": ["i", "-", "u,", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["-", "-", "a,", "-"]}, {"notation": ["-", "-", "i", "-"]}, {"notation": ["a,", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["-", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}],
@@ -298,11 +298,11 @@
             "grouped": []
         },
         {
-            "uuid": "c5543284-d866-4a8a-a292-9e4e112f4e23",
+            "uuid": "aae18bdf-402b-470e-b44d-bc48d8a54222",
             "id": 13,
             "index": 12,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "4c93b2ed-8a99-424a-9b51-0f664ca2f845", "targetname": "PENGECET"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "0d2d27ee-eb3d-40ac-bf9d-bac5b5c352b6", "targetname": "PENGECET"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["-", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -319,7 +319,7 @@
             "grouped": []
         },
         {
-            "uuid": "42e53bf8-1710-48b7-a040-40ada6db6cc6",
+            "uuid": "2b650416-a167-4b04-b04c-5df752bab1cd",
             "id": 14,
             "index": 13,
             "label": "Final",
@@ -339,7 +339,7 @@
             "grouped": []
         },
         {
-            "uuid": "aaf53ec9-b7c4-433b-a955-bd5d86d724b8",
+            "uuid": "b4622dca-c9a0-4fbc-a1c8-be30843d01a8",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -358,7 +358,7 @@
             "grouped": []
         },
         {
-            "uuid": "91e279e0-4efc-4008-8639-3dfec9041377",
+            "uuid": "2d890d3d-9320-493d-a0f6-de3edae65fe6",
             "id": 16,
             "index": 15,
             "execution": [

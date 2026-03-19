@@ -1,5 +1,5 @@
 {
-    "uuid": "6054e965-71f3-4c99-a50f-889cfc12cf9c",
+    "uuid": "75bb33ec-c3b6-4e3f-8264-1d4075973ed4",
     "title": "Cendrawasih",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -20,51 +20,51 @@
     ],
     "parts": {
         "pepeson": [
-            "6574dda2-e23a-47fb-a70c-1ff6a46d203a",
-            "245023a3-d705-4605-acbe-00603b5a4691",
-            "d5e71c91-f410-49b5-b53a-96e871eacbbe",
-            "26e1d8b0-7a1b-42f5-beff-93fd3a84be5a",
-            "37f8a679-25e1-475c-b5f2-1d45d447cb8d",
-            "b9d6f43d-f68f-49bf-a9fd-6241dde12cdd",
-            "44e3fed2-c64e-4d05-b7ca-901c4741509a",
-            "9b95ec18-b780-4a6c-be84-fe758b07c475",
-            "e0e03b76-00ad-4414-b562-ff53209d3df3",
-            "c60dde22-1fc7-434d-b93e-ab5dc894454e"
+            "93bcee97-a639-422f-b50b-e5ca0e9fd1c5",
+            "5cb5b0f4-b1d7-4472-817d-e84e52621920",
+            "9ce27f65-3519-4fca-b4bc-7d6ee5d7a54f",
+            "bdeb3dd1-bb03-4102-9074-c9c6058497a2",
+            "edaf5f92-308e-4e36-9b25-3afb09594c84",
+            "3ea8f319-8a16-4474-a386-2df6c8978f3f",
+            "0437f904-6ebe-4743-a448-0a12370fd8c1",
+            "4f3ee45e-7479-4226-b72d-8b606fb9a0a4",
+            "2d1834a7-5f57-47a3-aeba-3ea283c53df3",
+            "1747a4e4-c740-4872-bcba-e8ac1d8eeb1c"
         ],
         "pengawak": [
-            "4b5762f5-4941-4f48-a18e-9c898dc6ac4c",
-            "fa98d84b-1d95-4523-914c-5cc31355dbce",
-            "3d1ec213-28e9-42de-9013-9e0b513cb7b9",
-            "97ab784c-7a2c-48d4-b49a-4423f6ce1ab7",
-            "2459a27a-0e65-4b0d-a0be-92f702aa4ace",
-            "2a3c91c9-4d49-463f-b4ed-3de90987c93f",
-            "ba7e23ec-9b75-44ac-bb29-cbe88e3b0fd5"
+            "618d92a8-2ea1-423b-802c-9bf955f70dd6",
+            "8072a793-b894-4da2-bda7-b08a317c45e8",
+            "6ab90096-bdbb-47bc-9d32-d9e68150e2e5",
+            "492a8e5d-47c2-4f14-97f5-af095c32e5b6",
+            "337f18ea-028d-41ab-b7ec-fe37d461f7b5",
+            "803ddaf1-e19e-4677-b89d-6c60fb2b1827",
+            "3a7c2a34-b017-46f5-ad1f-e7a2307d3df5"
         ],
         "pengipuk": [
-            "c70374a5-7dfe-4400-99b1-93640f845e0a",
-            "f06b7495-ead8-4665-bdef-673b7307738e",
-            "df213b45-17df-46bc-9fef-f5e27eb8975a",
-            "3ac60c26-9384-448b-8f09-6bebbe916b81",
-            "3da81861-0519-49b5-a5ab-4885d8997b84",
-            "6c14498d-5b14-4976-bda6-28c70104d1f7",
-            "0a92dfbc-f163-436d-9d29-b132b3263c5f",
-            "dcc78cca-fad2-4408-a641-48463325cbad",
-            "2306fbf0-aebb-4959-ae58-a248e48858d3",
-            "042a422a-92b1-457f-9563-807a409a8c2f",
-            "fadca97a-d8af-40cd-b2e6-c8bb8b3e8185",
-            "09145039-f8ad-4af3-a792-cc2e22a4d4fd"
+            "c875aade-3815-4832-ad37-3f150e7e59b5",
+            "0923dfa1-77b5-4241-bd3a-26e43053ffa0",
+            "cd55ea70-635a-41b1-baff-d43051d25489",
+            "e07d48f2-0257-413a-9923-c94c39bd05f4",
+            "50c7030a-b900-4646-9e74-04b34bdb866e",
+            "22d90826-3262-4be9-842b-50f8ad96fcdc",
+            "58d7d807-cfef-4c62-99c2-5a2bcdd726fb",
+            "1f8117dd-33de-4873-bbd4-60fe2b3fe72a",
+            "f28799f0-2a69-4294-9444-66452fe04747",
+            "ee49fec5-8efa-4440-a802-7011c9724d46",
+            "a1992b30-0169-40cd-9a7b-c9fed3554d0b",
+            "451ec170-edfa-42bc-b3f6-4148db3bafcd"
         ],
         "batel": [
-            "fcfc038a-e8f6-4ca7-886a-d5b1ffd6437e",
-            "9bff5674-3f2d-4b5f-a124-a232f962be71",
-            "fef58435-c798-4c5d-967b-a5152a4a2c84",
-            "4b4ce4a5-247d-4528-9c55-6a475ed23dd6",
-            "dacfb3d9-491a-44b4-ab07-db1df96d2cf3"
+            "ba56684e-410f-4007-a7ed-130100521d57",
+            "86aa39fe-b68e-400d-a19e-089b09e861ce",
+            "f9b9e5ac-2e73-4a94-a39f-4a14dc4ccab0",
+            "2a53857f-1c0a-446a-bdf4-61dd0e4cccd7",
+            "088bff02-c63f-4ae7-9eb0-9699efa4beb5"
         ]
     },
     "systems": [
         {
-            "uuid": "31abc33a-2fd0-4c8d-9401-919a29f1daa0",
+            "uuid": "853ce421-1692-46ac-ae18-e8882c5210b6",
             "id": 1,
             "index": 0,
             "execution": [
@@ -89,7 +89,7 @@
             "grouped": []
         },
         {
-            "uuid": "7f539473-12af-48f4-b599-d01cd0426dc4",
+            "uuid": "ec5c238a-a294-4862-8375-ce5a7605254d",
             "id": 2,
             "index": 1,
             "execution": [],
@@ -112,7 +112,7 @@
             "grouped": []
         },
         {
-            "uuid": "f407ad94-90f7-49d3-98c4-d3520bf1dc3c",
+            "uuid": "bff711c0-4e8c-46d8-ad2c-0164d3ebe4ca",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -135,7 +135,7 @@
             "grouped": []
         },
         {
-            "uuid": "bd87d8da-65d6-4468-8915-a1a18b71f49f",
+            "uuid": "a9dc3738-1ce2-4507-bdc4-58dd3bd57fdb",
             "id": 4,
             "index": 3,
             "execution": [],
@@ -158,7 +158,7 @@
             "grouped": []
         },
         {
-            "uuid": "4bf16560-6228-4389-8a91-c131abc70d54",
+            "uuid": "271b72ad-8101-47ef-ac89-0317f3da6a0c",
             "id": 5,
             "index": 4,
             "execution": [
@@ -183,7 +183,7 @@
             "grouped": []
         },
         {
-            "uuid": "0bc488fd-d6d7-41c9-9f46-08482aa10dbb",
+            "uuid": "1a8de8fd-1f8a-4304-b01e-7e929e8e223e",
             "id": 6,
             "index": 5,
             "execution": [
@@ -208,7 +208,7 @@
             "grouped": []
         },
         {
-            "uuid": "6574dda2-e23a-47fb-a70c-1ff6a46d203a",
+            "uuid": "93bcee97-a639-422f-b50b-e5ca0e9fd1c5",
             "id": 7,
             "index": 6,
             "label": "Pepeson",
@@ -232,7 +232,7 @@
             "grouped": []
         },
         {
-            "uuid": "245023a3-d705-4605-acbe-00603b5a4691",
+            "uuid": "5cb5b0f4-b1d7-4472-817d-e84e52621920",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -255,7 +255,7 @@
             "grouped": []
         },
         {
-            "uuid": "d5e71c91-f410-49b5-b53a-96e871eacbbe",
+            "uuid": "9ce27f65-3519-4fca-b4bc-7d6ee5d7a54f",
             "id": 9,
             "index": 8,
             "execution": [],
@@ -278,7 +278,7 @@
             "grouped": []
         },
         {
-            "uuid": "26e1d8b0-7a1b-42f5-beff-93fd3a84be5a",
+            "uuid": "bdeb3dd1-bb03-4102-9074-c9c6058497a2",
             "id": 10,
             "index": 9,
             "execution": [],
@@ -301,7 +301,7 @@
             "grouped": []
         },
         {
-            "uuid": "37f8a679-25e1-475c-b5f2-1d45d447cb8d",
+            "uuid": "edaf5f92-308e-4e36-9b25-3afb09594c84",
             "id": 11,
             "index": 10,
             "execution": [],
@@ -324,7 +324,7 @@
             "grouped": []
         },
         {
-            "uuid": "b9d6f43d-f68f-49bf-a9fd-6241dde12cdd",
+            "uuid": "3ea8f319-8a16-4474-a386-2df6c8978f3f",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -347,7 +347,7 @@
             "grouped": []
         },
         {
-            "uuid": "44e3fed2-c64e-4d05-b7ca-901c4741509a",
+            "uuid": "0437f904-6ebe-4743-a448-0a12370fd8c1",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -370,7 +370,7 @@
             "grouped": []
         },
         {
-            "uuid": "9b95ec18-b780-4a6c-be84-fe758b07c475",
+            "uuid": "4f3ee45e-7479-4226-b72d-8b606fb9a0a4",
             "id": 14,
             "index": 13,
             "execution": [],
@@ -393,11 +393,11 @@
             "grouped": []
         },
         {
-            "uuid": "e0e03b76-00ad-4414-b562-ff53209d3df3",
+            "uuid": "2d1834a7-5f57-47a3-aeba-3ea283c53df3",
             "id": 15,
             "index": 14,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PEPESON after pass 1", "tooltipshort": "PEPESON", "targetuuid": "6574dda2-e23a-47fb-a70c-1ff6a46d203a", "targetname": "PEPESON"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PEPESON after pass 1", "tooltipshort": "PEPESON", "targetuuid": "93bcee97-a639-422f-b50b-e5ca0e9fd1c5", "targetname": "PEPESON"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "i", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
@@ -418,7 +418,7 @@
             "grouped": []
         },
         {
-            "uuid": "c60dde22-1fc7-434d-b93e-ab5dc894454e",
+            "uuid": "1747a4e4-c740-4872-bcba-e8ac1d8eeb1c",
             "id": 16,
             "index": 15,
             "execution": [
@@ -444,7 +444,7 @@
             "grouped": []
         },
         {
-            "uuid": "4b5762f5-4941-4f48-a18e-9c898dc6ac4c",
+            "uuid": "618d92a8-2ea1-423b-802c-9bf955f70dd6",
             "id": 17,
             "index": 16,
             "label": "Pengawak",
@@ -471,7 +471,7 @@
             "grouped": []
         },
         {
-            "uuid": "fa98d84b-1d95-4523-914c-5cc31355dbce",
+            "uuid": "8072a793-b894-4da2-bda7-b08a317c45e8",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -494,7 +494,7 @@
             "grouped": []
         },
         {
-            "uuid": "3d1ec213-28e9-42de-9013-9e0b513cb7b9",
+            "uuid": "6ab90096-bdbb-47bc-9d32-d9e68150e2e5",
             "id": 19,
             "index": 18,
             "execution": [],
@@ -517,7 +517,7 @@
             "grouped": []
         },
         {
-            "uuid": "97ab784c-7a2c-48d4-b49a-4423f6ce1ab7",
+            "uuid": "492a8e5d-47c2-4f14-97f5-af095c32e5b6",
             "id": 20,
             "index": 19,
             "execution": [],
@@ -540,7 +540,7 @@
             "grouped": []
         },
         {
-            "uuid": "2459a27a-0e65-4b0d-a0be-92f702aa4ace",
+            "uuid": "337f18ea-028d-41ab-b7ec-fe37d461f7b5",
             "id": 21,
             "index": 20,
             "execution": [],
@@ -563,7 +563,7 @@
             "grouped": []
         },
         {
-            "uuid": "2a3c91c9-4d49-463f-b4ed-3de90987c93f",
+            "uuid": "803ddaf1-e19e-4677-b89d-6c60fb2b1827",
             "id": 22,
             "index": 21,
             "execution": [],
@@ -586,11 +586,11 @@
             "grouped": []
         },
         {
-            "uuid": "ba7e23ec-9b75-44ac-bb29-cbe88e3b0fd5",
+            "uuid": "3a7c2a34-b017-46f5-ad1f-e7a2307d3df5",
             "id": 23,
             "index": 22,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PENGAWAK after pass 1", "tooltipshort": "PENGAWAK", "targetuuid": "4b5762f5-4941-4f48-a18e-9c898dc6ac4c", "targetname": "PENGAWAK"},
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to PENGAWAK after pass 1", "tooltipshort": "PENGAWAK", "targetuuid": "618d92a8-2ea1-423b-802c-9bf955f70dd6", "targetname": "PENGAWAK"},
                 {"type": "tempo", "seqId": 1, "passes": [1], "nthpass": false, "tooltip": "tempo 80 BPM beat 2 on pass 1", "tooltipshort": "80 BPM", "isGradual": false, "toSection": 2, "toValue": 80.0}
             ],
             "staffs": {
@@ -612,7 +612,7 @@
             "grouped": []
         },
         {
-            "uuid": "c70374a5-7dfe-4400-99b1-93640f845e0a",
+            "uuid": "c875aade-3815-4832-ad37-3f150e7e59b5",
             "id": 24,
             "index": 23,
             "execution": [],
@@ -635,7 +635,7 @@
             "grouped": []
         },
         {
-            "uuid": "f06b7495-ead8-4665-bdef-673b7307738e",
+            "uuid": "0923dfa1-77b5-4241-bd3a-26e43053ffa0",
             "id": 25,
             "index": 24,
             "execution": [],
@@ -658,7 +658,7 @@
             "grouped": []
         },
         {
-            "uuid": "df213b45-17df-46bc-9fef-f5e27eb8975a",
+            "uuid": "cd55ea70-635a-41b1-baff-d43051d25489",
             "id": 26,
             "index": 25,
             "execution": [],
@@ -681,7 +681,7 @@
             "grouped": []
         },
         {
-            "uuid": "3ac60c26-9384-448b-8f09-6bebbe916b81",
+            "uuid": "e07d48f2-0257-413a-9923-c94c39bd05f4",
             "id": 27,
             "index": 26,
             "label": "Pengipuk",
@@ -705,7 +705,7 @@
             "grouped": []
         },
         {
-            "uuid": "3da81861-0519-49b5-a5ab-4885d8997b84",
+            "uuid": "50c7030a-b900-4646-9e74-04b34bdb866e",
             "id": 28,
             "index": 27,
             "execution": [],
@@ -728,7 +728,7 @@
             "grouped": []
         },
         {
-            "uuid": "6c14498d-5b14-4976-bda6-28c70104d1f7",
+            "uuid": "22d90826-3262-4be9-842b-50f8ad96fcdc",
             "id": 29,
             "index": 28,
             "execution": [],
@@ -751,7 +751,7 @@
             "grouped": []
         },
         {
-            "uuid": "0a92dfbc-f163-436d-9d29-b132b3263c5f",
+            "uuid": "58d7d807-cfef-4c62-99c2-5a2bcdd726fb",
             "id": 30,
             "index": 29,
             "execution": [],
@@ -774,7 +774,7 @@
             "grouped": []
         },
         {
-            "uuid": "dcc78cca-fad2-4408-a641-48463325cbad",
+            "uuid": "1f8117dd-33de-4873-bbd4-60fe2b3fe72a",
             "id": 31,
             "index": 30,
             "execution": [],
@@ -797,7 +797,7 @@
             "grouped": []
         },
         {
-            "uuid": "2306fbf0-aebb-4959-ae58-a248e48858d3",
+            "uuid": "f28799f0-2a69-4294-9444-66452fe04747",
             "id": 32,
             "index": 31,
             "execution": [],
@@ -820,7 +820,7 @@
             "grouped": []
         },
         {
-            "uuid": "042a422a-92b1-457f-9563-807a409a8c2f",
+            "uuid": "ee49fec5-8efa-4440-a802-7011c9724d46",
             "id": 33,
             "index": 32,
             "execution": [],
@@ -843,11 +843,11 @@
             "grouped": []
         },
         {
-            "uuid": "fadca97a-d8af-40cd-b2e6-c8bb8b3e8185",
+            "uuid": "a1992b30-0169-40cd-9a7b-c9fed3554d0b",
             "id": 34,
             "index": 33,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGIPUK after passes 1 & 2", "tooltipshort": "PENGIPUK", "targetuuid": "3ac60c26-9384-448b-8f09-6bebbe916b81", "targetname": "PENGIPUK"}
+                {"type": "goto", "seqId": 0, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGIPUK after passes 1 & 2", "tooltipshort": "PENGIPUK", "targetuuid": "e07d48f2-0257-413a-9923-c94c39bd05f4", "targetname": "PENGIPUK"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u,", "u,", ".", "a,"]}, {"notation": [".", "a,", "i", "i"]}, {"notation": [".", "a,", ".", "a,"]}, {"notation": ["i", "a,", ".", "a,"]}, {"notation": ["i", "-", "o", "e"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "o/", "."]}, {"notation": [".", ".", ".", "."]}],
@@ -868,7 +868,7 @@
             "grouped": []
         },
         {
-            "uuid": "09145039-f8ad-4af3-a792-cc2e22a4d4fd",
+            "uuid": "451ec170-edfa-42bc-b3f6-4148db3bafcd",
             "id": 35,
             "index": 34,
             "execution": [
@@ -893,13 +893,13 @@
             "grouped": []
         },
         {
-            "uuid": "fcfc038a-e8f6-4ca7-886a-d5b1ffd6437e",
+            "uuid": "ba56684e-410f-4007-a7ed-130100521d57",
             "id": 36,
             "index": 35,
             "execution": [
                 {"type": "loop", "seqId": 0, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1", "tooltipshort": "f", "iterations": [1, 3], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1", "tooltipshort": "mp", "iterations": [2, 4], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+                {"type": "dynamics", "seqId": 1, "tooltip": "dynamics f beat 1 on 1st & 3rd iterations", "tooltipshort": "f", "iterations": [1, 3], "isGradual": false, "toSection": 1, "toValue": 0.83, "toDynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+                {"type": "dynamics", "seqId": 2, "tooltip": "dynamics mp beat 1 on 2nd & 4th iterations", "tooltipshort": "mp", "iterations": [2, 4], "isGradual": false, "toSection": 1, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}],
@@ -920,7 +920,7 @@
             "grouped": []
         },
         {
-            "uuid": "9bff5674-3f2d-4b5f-a124-a232f962be71",
+            "uuid": "86aa39fe-b68e-400d-a19e-089b09e861ce",
             "id": 37,
             "index": 36,
             "execution": [
@@ -947,7 +947,7 @@
             "grouped": []
         },
         {
-            "uuid": "fef58435-c798-4c5d-967b-a5152a4a2c84",
+            "uuid": "f9b9e5ac-2e73-4a94-a39f-4a14dc4ccab0",
             "id": 38,
             "index": 37,
             "execution": [
@@ -972,7 +972,7 @@
             "grouped": []
         },
         {
-            "uuid": "4b4ce4a5-247d-4528-9c55-6a475ed23dd6",
+            "uuid": "2a53857f-1c0a-446a-bdf4-61dd0e4cccd7",
             "id": 39,
             "index": 38,
             "execution": [
@@ -997,7 +997,7 @@
             "grouped": []
         },
         {
-            "uuid": "dacfb3d9-491a-44b4-ab07-db1df96d2cf3",
+            "uuid": "088bff02-c63f-4ae7-9eb0-9699efa4beb5",
             "id": 40,
             "index": 39,
             "execution": [],

@@ -1,5 +1,5 @@
 {
-    "uuid": "ffbb43a7-7d7a-469e-930d-2a6a2e20fa5f",
+    "uuid": "5bf78f80-c346-4c43-8943-5579aa639834",
     "title": "Bapang Selisir GK",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -17,7 +17,7 @@
     "parts": {},
     "systems": [
         {
-            "uuid": "dfd54a44-ba29-411b-8814-939b56d940bb",
+            "uuid": "221584e6-2c5e-46f8-a423-4f51b8dba756",
             "id": 1,
             "index": 0,
             "execution": [
@@ -38,7 +38,7 @@
             "grouped": []
         },
         {
-            "uuid": "041f3f11-88d9-4801-adac-2f21411ee698",
+            "uuid": "9dd2e2dc-e46d-4ca8-83bc-afd9e00ec573",
             "id": 2,
             "index": 1,
             "label": "Kawitan",
@@ -62,7 +62,7 @@
             "grouped": []
         },
         {
-            "uuid": "3f02420d-1041-45d6-935a-00c46f4f4f2a",
+            "uuid": "05841b7d-3211-4fdd-9b69-acc3bac6a9a0",
             "id": 3,
             "index": 2,
             "execution": [
@@ -83,11 +83,11 @@
             "grouped": []
         },
         {
-            "uuid": "129cf0a0-3b57-47c0-87dd-8e369768397d",
+            "uuid": "03aa4233-5b08-4b8c-b6ea-33954200fd2e",
             "id": 4,
             "index": 3,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to KAWITAN2 after passes 2 & 4", "tooltipshort": "KAWITAN2", "targetuuid": "9a4aab24-c7ef-408e-8d7b-931bf528b0d2", "targetname": "KAWITAN2"},
+                {"type": "goto", "seqId": 0, "passes": [2, 4], "nthpass": false, "tooltip": "go to KAWITAN2 after passes 2 & 4", "tooltipshort": "KAWITAN2", "targetuuid": "006e627f-a134-4b52-a921-27dc902f2656", "targetname": "KAWITAN2"},
                 {"type": "dynamics", "seqId": 1, "passes": [1, 3], "nthpass": false, "tooltip": "dynamics mp beat 5 on passes 1 & 3", "tooltipshort": "mp", "isGradual": false, "toSection": 5, "toValue": 0.51, "toDynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]}
             ],
             "staffs": {
@@ -105,11 +105,11 @@
             "grouped": []
         },
         {
-            "uuid": "d3ced985-6b1e-4bbe-a3dc-b698bd0ab7d3",
+            "uuid": "d2f05eeb-da2c-437f-a79a-10051f168814",
             "id": 5,
             "index": 4,
             "execution": [
-                {"type": "goto", "seqId": 0, "tooltip": "go to KAWITAN", "tooltipshort": "KAWITAN", "targetuuid": "041f3f11-88d9-4801-adac-2f21411ee698", "targetname": "KAWITAN"}
+                {"type": "goto", "seqId": 0, "tooltip": "go to KAWITAN", "tooltipshort": "KAWITAN", "targetuuid": "9dd2e2dc-e46d-4ca8-83bc-afd9e00ec573", "targetname": "KAWITAN"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "o", "e"]}],
@@ -126,7 +126,7 @@
             "grouped": []
         },
         {
-            "uuid": "9a4aab24-c7ef-408e-8d7b-931bf528b0d2",
+            "uuid": "006e627f-a134-4b52-a921-27dc902f2656",
             "id": 6,
             "index": 5,
             "label": "Kawitan2",
@@ -148,7 +148,7 @@
             "grouped": []
         },
         {
-            "uuid": "faf02206-f6e8-4882-b8e0-0d812b272aae",
+            "uuid": "8e26ad8b-dce7-486f-b2f9-bc8de5e46770",
             "id": 7,
             "index": 6,
             "execution": [],
@@ -167,7 +167,7 @@
             "grouped": []
         },
         {
-            "uuid": "993bfff8-ed19-499b-ad3b-aab6d144bcc5",
+            "uuid": "e595287c-035a-40d0-9558-bc3db9abb91b",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -186,11 +186,11 @@
             "grouped": []
         },
         {
-            "uuid": "1336ba8c-2242-4042-a0e2-fd491031195e",
+            "uuid": "1836fb4a-78fb-4619-ab8b-731226932975",
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN after pass 1", "tooltipshort": "KAWITAN", "targetuuid": "041f3f11-88d9-4801-adac-2f21411ee698", "targetname": "KAWITAN"}
+                {"type": "goto", "seqId": 0, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN after pass 1", "tooltipshort": "KAWITAN", "targetuuid": "9dd2e2dc-e46d-4ca8-83bc-afd9e00ec573", "targetname": "KAWITAN"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", ".", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
@@ -207,7 +207,7 @@
             "grouped": []
         },
         {
-            "uuid": "0c6ee47c-cf30-4511-98e3-f98afd48b1ee",
+            "uuid": "2b85f2e8-32b3-4aa1-b627-e02927d95d9d",
             "id": 10,
             "index": 9,
             "execution": [
@@ -231,7 +231,7 @@
             "grouped": []
         },
         {
-            "uuid": "91840a37-534c-490b-9894-e50b4d44368f",
+            "uuid": "0ad0e09f-40b5-49a9-9cc3-af3cb119c6a5",
             "id": 11,
             "index": 10,
             "execution": [],
