@@ -26,8 +26,8 @@ src/nocommit/*
 public/icons/tabuh-studio_icon.png
 
 # Input data
-#public/scores/*
-#public/sounds/*
+public/scores/*
+public/sounds/*
 
 # Data backup
 public/oldscores

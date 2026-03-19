@@ -17,6 +17,19 @@ function toText(values: number[] | undefined, ordinal: boolean = false): string 
     } else return ''
 }
 
+function getSeqId(item: ExecutionItem) {
+    const typeSeq = { loop: 1000, tempo: 2000, dynamics: 3000, wait: 4000, goto: 5000 }[item.type]
+    const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.toSection : 0)
+    const passesSeq = 10 * (_.min(item.passes) || 0)
+    const iterSeq = 'iterations' in item ? _.min(item.iterations) || 0 : 0
+    return typeSeq + beatSeq + passesSeq + iterSeq
+}
+
+// Formats a floating point value as int if the decimals are all 0
+function fmtFloat(value: number): number {
+    return value == Math.floor(value) ? Math.floor(value) : value
+}
+
 export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
@@ -26,6 +39,7 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     var instruction: string = ''
     var preposition: string = ''
     var shortTooltip: string = ''
+    item.seqId = getSeqId(item)
     switch (item.type) {
         case 'goto': {
             shortTooltip = item.targetname
@@ -37,6 +51,12 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             shortTooltip = `${item.count}X`
             instruction = `play ${item.count}X`
             preposition = 'on'
+            break
+        }
+        case 'wait': {
+            shortTooltip = `${item.seconds} sec.`
+            instruction = `wait ${fmtFloat(item.seconds)} ${item.seconds > 1 ? 'seconds' : 'second'}`
+            preposition = 'after'
             break
         }
         case 'tempo':
@@ -162,6 +182,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
 
     useEffect(() => {
         // (Re-) number the system index and id values.
+        // Re-create and order the execution list
         // Should be performed at each render due to possible user actions (insert or delete system).
         if (!editorScore) return
         const executionitems: ExecutionItem[] = []
@@ -324,6 +345,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             }
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
+                if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
                 const validation = cycleValidation(editorScore, true)
                 if (!validation.isValid)
                     dashboardFunctions.setDashboardElement('cycle', {

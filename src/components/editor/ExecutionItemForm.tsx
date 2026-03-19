@@ -18,7 +18,7 @@ import type { DynamicsValue, ExecutionItemType } from '../../typing/types'
 export type FlowConditionType = 'pass' | 'nthpass' | 'iteration'
 
 export interface FormValueType {
-    type?: ExecutionItemType | ''
+    type: ExecutionItemType | ''
     targetuuid?: string
     count?: number
     fromBPM?: number
@@ -34,18 +34,30 @@ export interface FormValueType {
     checkbox?: any
 }
 
-const ifGradual = (value: any, data: FormValueType) => data.isGradual == true && value != undefined
+const requiredIfGoto = (value: any, data: FormValueType) => data.type == 'goto' && value != undefined
+const requiredIfLoop = (value: any, data: FormValueType) => data.type == 'loop' && value != undefined
+const requiredIfWait = (value: any, data: FormValueType) => data.type == 'wait' && value != undefined
+const requiredIfTempo = (value: any, data: FormValueType) => data.type == 'tempo' && value != undefined
+const requiredIfDynamics = (value: any, data: FormValueType) => data.type == 'dynamics' && value != undefined
+const requiredIfExpression = (value: any, data: FormValueType) =>
+    (data.type == 'tempo' || data.type == 'dynamics') && value != undefined
+const requiredIfGradual = (value: any, data: FormValueType) => data.isGradual == true && value != undefined
+const requiredIfGradualTempo = (value: any, data: FormValueType) =>
+    data.type == 'tempo' && data.isGradual == true && value != undefined
+const requiredIfGradualDynamics = (value: any, data: FormValueType) =>
+    data.type == 'dynamics' && data.isGradual == true && value != undefined
 
 export const formModel = SchemaModel({
-    targetuuid: StringType().isRequired('This field is required.'),
-    count: NumberType().isInteger().isRequired(),
-    fromBPM: NumberType().isInteger().addRule(ifGradual, 'from value must be given.'),
-    toBPM: NumberType().isInteger().isRequired('value must be given'),
-    fromDynamics: StringType().addRule(ifGradual, 'from value must be given.'),
-    toDynamics: StringType().isRequired('value must be given'),
-    fromSection: NumberType().isInteger().addRule(ifGradual, 'from value must be given.'),
-    toSection: NumberType().isInteger().isRequired('section must be given'),
-    isGradual: BooleanType().isRequired(),
+    targetuuid: StringType().addRule(requiredIfGoto, 'This field is required.'),
+    count: NumberType('Enter a number').isInteger().addRule(requiredIfLoop, 'This field is required.'),
+    seconds: NumberType().isInteger().addRule(requiredIfWait, 'This field is required.'),
+    fromBPM: NumberType().isInteger().addRule(requiredIfGradualTempo, 'from value must be given.'),
+    toBPM: NumberType().isInteger().addRule(requiredIfTempo, 'value must be given'),
+    fromDynamics: StringType().addRule(requiredIfGradualDynamics, 'from value must be given.'),
+    toDynamics: StringType().addRule(requiredIfDynamics, 'value must be given'),
+    fromSection: NumberType().isInteger().addRule(requiredIfGradual, 'from value must be given.'),
+    toSection: NumberType().isInteger().addRule(requiredIfExpression, 'section must be given'),
+    isGradual: BooleanType(),
     passes: ArrayType().of(NumberType()),
     iterations: ArrayType().of(NumberType()),
     conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration'])),
@@ -56,6 +68,7 @@ const formFieldNames = {
     type: 'type',
     targetuuid: 'targetuuid',
     count: 'count',
+    seconds: 'seconds',
     fromBPM: 'fromBPM',
     toBPM: 'toBPM',
     fromDynamics: 'fromDynamics',
@@ -234,7 +247,7 @@ interface ConditionFormProps extends ExecutionBaseFieldProps {
 }
 // Form that captures the details of the selected item
 const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
-    const afterOn = type == 'goto' ? 'after' : 'on'
+    const afterOn = ['goto', 'wait'].includes(type) ? 'after' : 'on'
     const options = [
         { group: 'passes', label: `${afterOn} pass(es) nr ... `, value: 'pass' },
         { group: 'passes', label: `${afterOn} every ...th pass`, value: 'nthpass' }
@@ -300,10 +313,30 @@ const GoToForm = ({ sysOptions, ...props }: GotoFormProps) => {
     )
 }
 
-const LoopForm = ({ ...props }: ExecutionBaseFieldProps) => {
+const LoopForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
     return (
         <>
-            <InputField label="Loop count" name={formFieldNames.count} placeholder={'Iterations'} {...props} />
+            <InputField
+                label="Loop count"
+                name={formFieldNames.count}
+                formValue={formValue}
+                placeholder={'Iterations'}
+                {...props}
+            />
+        </>
+    )
+}
+
+const WaitForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
+    return (
+        <>
+            <InputField
+                label="Seconds"
+                name={formFieldNames.seconds}
+                formValue={formValue}
+                placeholder={'Seconds'}
+                {...props}
+            />
         </>
     )
 }
@@ -425,6 +458,7 @@ export default function ExecutionItemForm({
     const baseProps: ExecutionBaseFieldProps = { selectedElement, formValue, setDirty, loop }
     const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
     const loopForm = <LoopForm {...baseProps} />
+    const waitForm = <WaitForm {...baseProps} />
     const tempoForm = <TempoForm {...baseProps} />
     const dynamicsForm = <DynamicsForm {...baseProps} />
     if (!type) return
@@ -436,6 +470,7 @@ export default function ExecutionItemForm({
             </Form.Group>
             {type == 'goto' && gotoForm}
             {type == 'loop' && loopForm}
+            {type == 'wait' && waitForm}
             {type == 'tempo' && tempoForm}
             {type == 'dynamics' && dynamicsForm}
             <ConditionForm type={type} {...baseProps} />

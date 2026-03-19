@@ -19,7 +19,6 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     patternManager: false,
     PlaybackButtons: { moveEditorCursor: false },
     playbackReducer: false,
-    playbackManager: false,
     PlayerWindow: false,
     registerComponent: false,
     score: false,
@@ -34,6 +33,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     useInstruments: false,
     useKeyboard: false,
     usePartManager: false,
+    usePlaybackManager: false,
     useRules: false,
     useScoreReader: false,
     validationManager: false

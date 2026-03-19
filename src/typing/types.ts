@@ -195,12 +195,12 @@ export type HilightRangeFunction = (hlRange: HighlightRange) => void
 // Flow instructions: determine the playing sequence (goto and loop).
 // Expression instructions: contain tempo and dynamics information.
 
-export type ExecutionItemType = 'goto' | 'loop' | 'tempo' | 'dynamics'
+export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics'
 
 // Base class
 export interface ExecutionItemBase {
     type: ExecutionItemType
-    seqId?: number // Sequence in the list of Execution items. Used by the item editor.
+    seqId: number // Sequence in the list of Execution items. Used by the item editor.
     passes?: number[] // Pass numbers for which the item applies
     nthpass?: boolean // undefined: no condition. false: item applies to listed passes only.
     //  true: item applies to every nth pass (n in passes list), e.g. every 3rd & 4th pass.
@@ -219,6 +219,12 @@ export interface GotoItem extends ExecutionItemBase {
 export interface LoopItem extends ExecutionItemBase {
     type: 'loop'
     count: number // Total number of times to play the System consecutively.
+}
+
+// Enables to repeat the current System.
+export interface WaitItem extends ExecutionItemBase {
+    type: 'wait'
+    seconds: number // Number of seconds to wait after playing the System. Rounded off to 1/4 of a second.
 }
 
 export interface ExpressionItemBase extends ExecutionItemBase {
@@ -245,7 +251,7 @@ export interface DynamicsItem extends ExpressionItemBase {
     positions: Position[]
 }
 
-export type FlowItem = GotoItem | LoopItem
+export type FlowItem = GotoItem | LoopItem | WaitItem
 export type ExpressionItem = TempoItem | DynamicsItem
 export type ExecutionItem = FlowItem | ExpressionItem
 
