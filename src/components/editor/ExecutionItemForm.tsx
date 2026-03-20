@@ -35,56 +35,71 @@ export interface FormValueType {
     conditions: FlowConditionType[]
 }
 
-const requiredIfGoto = (value: any, data: FormValueType) => data.type == 'goto' && value != undefined
-const requiredIfLoop = (value: any, data: FormValueType) => {
-    console.log(data.type)
-    console.log(value)
-    return data.type != 'loop' || value != undefined
-}
-const requiredIfWait = (value: any, data: FormValueType) => data.type == 'wait' && value != undefined
-const requiredIfTempo = (value: any, data: FormValueType) => data.type == 'tempo' && value != undefined
-const requiredIfDynamics = (value: any, data: FormValueType) => data.type == 'dynamics' && value != undefined
-const requiredIfExpression = (value: any, data: FormValueType) =>
-    (data.type == 'tempo' || data.type == 'dynamics') && value != undefined
-const requiredIfGradual = (value: any, data: FormValueType) => data.isGradual == true && value != undefined
-const requiredIfGradualTempo = (value: any, data: FormValueType) =>
-    data.type == 'tempo' && data.isGradual == true && value != undefined
-const requiredIfGradualDynamics = (value: any, data: FormValueType) =>
-    data.type == 'dynamics' && data.isGradual == true && value != undefined
-
 // Auxiliary function for the form schema model.
-// Enables to make a field's 'required' status depend on the value of other fields in the form.
+// Enables to set a field requirement that depend on the value of other fields in the form.
 // E.g. field 'seconds' is required if field 'type' has the value 'wait'.
 // Returns a validation function that can be passed to a when clause.
-// conditions: field->value pairs that describe the condition(s) for the current field to be required.
+// conditions: field->value pairs.
+//             - The requirement is active if each field has the given value (AND).
+//             - If the value is an array, the field can have any of the listed values (OR).
+//             - If the field itself is an array, it should contain the value, or one of its
+//               elements if value is an array.
+// requirement: requirement for the field being checked: currently 'isRequired' or 'notEmpty' (array).
 // RequiredType: the current field's required type.
-const requiredIf = (conditions: Record<string, any>, RequiredType: CallableFunction, message?: string) => {
-    const doCheck = (schema: any, conditions: Record<string, any>, ExpectedType: CallableFunction) => {
-        const cond = Object.entries(conditions).reduce((aggr, [field, val]) => {
-            const { value } = schema[field]
-            return aggr && value == val
-        }, true)
-        return cond ? ExpectedType().isRequired(message || 'This field is required') : NumberType()
+const If = (
+    ifAll: { [field: string]: any | any[] },
+    requirement: 'isRequired' | 'notEmpty',
+    RequiredType: CallableFunction,
+    message?: string
+) => {
+    function compare(a: any, b: any) {
+        if (Array.isArray(b)) {
+            return b.some((bval) => (Array.isArray(a) ? a.includes(bval) : a == b))
+        } else return Array.isArray(a) ? a.includes(b) : a == b
     }
-    return (schema: any) => doCheck(schema, conditions, RequiredType)
+    function doCheck(schema: any, ifAll: Record<string, any>, RequiredType: CallableFunction) {
+        const cond = Object.entries(ifAll).reduce((aggr, [field, val]) => {
+            const { value } = schema[field]
+            return aggr && compare(value, val)
+        }, true)
+        switch (requirement) {
+            case 'isRequired':
+                return cond ? RequiredType().isRequired(message || '${name} is required') : RequiredType()
+            case 'notEmpty':
+                return cond ? RequiredType().minLength(1, message || 'Select at least one value') : RequiredType()
+            default:
+                return false
+        }
+    }
+    return (schema: any) => doCheck(schema, ifAll, RequiredType)
 }
 
 export const formModel = SchemaModel({
     type: StringType().isOneOf(['goto', 'loop', 'wait', 'tempo', 'dynamics']).isRequired(),
-    targetuuid: StringType().addRule(requiredIfGoto, 'This field is required.'),
+    targetuuid: StringType().when(If({ type: 'goto' }, 'isRequired', StringType)),
     count: NumberType()
-        .when(requiredIf({ type: 'loop' }, NumberType))
+        .when(If({ type: 'loop' }, 'isRequired', NumberType))
         .isInteger(),
-    seconds: NumberType().when(requiredIf({ type: 'wait' }, NumberType)),
-    fromBPM: NumberType().isInteger().addRule(requiredIfGradualTempo, 'from value must be given.'),
-    toBPM: NumberType().isInteger().addRule(requiredIfTempo, 'value must be given'),
-    fromDynamics: StringType().addRule(requiredIfGradualDynamics, 'from value must be given.'),
-    toDynamics: StringType().addRule(requiredIfDynamics, 'value must be given'),
-    fromSection: NumberType().isInteger().addRule(requiredIfGradual, 'from value must be given.'),
-    toSection: NumberType().isInteger().addRule(requiredIfExpression, 'section must be given'),
-    isGradual: BooleanType(),
-    passes: ArrayType().of(NumberType()),
-    iterations: ArrayType().of(NumberType()),
+    seconds: NumberType().when(If({ type: 'wait' }, 'isRequired', NumberType)),
+    fromBPM: NumberType().isInteger(),
+    toBPM: NumberType()
+        .isInteger()
+        .when(If({ type: 'tempo' }, 'isRequired', NumberType)),
+    fromDynamics: StringType(),
+    toDynamics: StringType().when(If({ type: 'dynamics' }, 'isRequired', StringType)),
+    fromSection: NumberType()
+        .isInteger()
+        .when(If({ isGradual: true }, 'isRequired', NumberType)),
+    toSection: NumberType()
+        .isInteger()
+        .when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', NumberType)),
+    isGradual: BooleanType().when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', BooleanType)),
+    passes: ArrayType()
+        .of(NumberType())
+        .when(If({ conditions: ['pass', 'nthpass'] }, 'notEmpty', ArrayType)),
+    iterations: ArrayType()
+        .of(NumberType())
+        .when(If({ conditions: ['iteration'] }, 'notEmpty', ArrayType)),
     conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration']))
 })
 
