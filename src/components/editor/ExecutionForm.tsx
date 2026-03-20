@@ -1,8 +1,8 @@
 import MinusIcon from '@rsuite/icons/Minus'
 import PlusIcon from '@rsuite/icons/Plus'
-import { useEffect, useRef, useState, type Dispatch } from 'react'
+import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
-import { Button, Divider, Drawer, Form, IconButton, List, SelectPicker } from 'rsuite'
+import { Button, Divider, Drawer, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { executionItemTooltip } from '../../componentlogic/useEditorScoreManager'
 import { dynamicsToNumber } from '../../config/config'
@@ -36,7 +36,7 @@ type ExecutionItemDefault = {
 const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
     loop: { type: 'loop', count: undefined, tooltip: 'loop', tooltipshort: '' },
-    wait: { type: 'wait', seconds: 0 },
+    wait: { type: 'wait', seconds: 0, tooltip: 'wait', tooltipshort: '' },
     tempo: {
         type: 'tempo',
         isGradual: undefined,
@@ -164,7 +164,6 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     const [formValue, setFormValue] = useState<FormValueType>({} as FormValueType)
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
     const [loop, setLoop] = useState<number | undefined>(undefined) // loop value if a loop item occurs in the itemList
-    const formRef = useRef<any>(undefined)
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
 
@@ -281,9 +280,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     useEffect(() => {
         if (dirtyForm) {
             setDirtyForm(false)
-            console.log(formRef.current?.check())
-            if (formRef.current?.check()) updateSelectedFromFields()
-            else formRef.current?.cleanErrors()
+            updateSelectedFromFields()
         }
     }, [dirtyForm])
 
@@ -330,22 +327,20 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
                     setItemList={setItemList}
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
-                <Form
-                    ref={formRef}
+                <ExecutionItemForm
                     model={formModel}
-                    onChange={(val) => setFormValue(val as FormValueType)}
+                    // onChange={(val) => {
+                    //     setFormValue(val as FormValueType)
+                    //     setDirtyForm(true)
+                    // }}
                     formValue={formValue}
-                    {...props}>
-                    {/* Details of the selected execution item */}
-                    <ExecutionItemForm
-                        type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
-                        selectedElement={selectedListElement}
-                        formValue={formValue}
-                        sysOptions={sysOptions}
-                        setDirty={setDirtyForm}
-                        loop={loop}
-                    />
-                </Form>
+                    type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
+                    selectedElement={selectedListElement}
+                    sysOptions={sysOptions}
+                    setDirty={setDirtyForm}
+                    setFormValue={setFormValue}
+                    loop={loop}
+                />
             </Drawer.Body>
         </Drawer>
     )

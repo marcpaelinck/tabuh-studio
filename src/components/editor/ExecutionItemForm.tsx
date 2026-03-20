@@ -1,4 +1,5 @@
-import { useState, type Dispatch, type ElementType } from 'react'
+import _ from 'lodash'
+import { useRef, useState, type Dispatch, type ElementType, type SyntheticEvent } from 'react'
 import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps, Option } from 'rsuite'
 import {
     ArrayType,
@@ -21,6 +22,7 @@ export interface FormValueType {
     type: ExecutionItemType | ''
     targetuuid?: string
     count?: number
+    seconds?: number
     fromBPM?: number
     toBPM?: number
     fromDynamics?: DynamicsValue
@@ -31,11 +33,14 @@ export interface FormValueType {
     passes?: number[]
     iterations?: number[]
     conditions: FlowConditionType[]
-    checkbox?: any
 }
 
 const requiredIfGoto = (value: any, data: FormValueType) => data.type == 'goto' && value != undefined
-const requiredIfLoop = (value: any, data: FormValueType) => data.type == 'loop' && value != undefined
+const requiredIfLoop = (value: any, data: FormValueType) => {
+    console.log(data.type)
+    console.log(value)
+    return data.type != 'loop' || value != undefined
+}
 const requiredIfWait = (value: any, data: FormValueType) => data.type == 'wait' && value != undefined
 const requiredIfTempo = (value: any, data: FormValueType) => data.type == 'tempo' && value != undefined
 const requiredIfDynamics = (value: any, data: FormValueType) => data.type == 'dynamics' && value != undefined
@@ -47,10 +52,30 @@ const requiredIfGradualTempo = (value: any, data: FormValueType) =>
 const requiredIfGradualDynamics = (value: any, data: FormValueType) =>
     data.type == 'dynamics' && data.isGradual == true && value != undefined
 
+// Auxiliary function for the form schema model.
+// Enables to make a field's 'required' status depend on the value of other fields in the form.
+// E.g. field 'seconds' is required if field 'type' has the value 'wait'.
+// Returns a validation function that can be passed to a when clause.
+// conditions: field->value pairs that describe the condition(s) for the current field to be required.
+// RequiredType: the current field's required type.
+const requiredIf = (conditions: Record<string, any>, RequiredType: CallableFunction, message?: string) => {
+    const doCheck = (schema: any, conditions: Record<string, any>, ExpectedType: CallableFunction) => {
+        const cond = Object.entries(conditions).reduce((aggr, [field, val]) => {
+            const { value } = schema[field]
+            return aggr && value == val
+        }, true)
+        return cond ? ExpectedType().isRequired(message || 'This field is required') : NumberType()
+    }
+    return (schema: any) => doCheck(schema, conditions, RequiredType)
+}
+
 export const formModel = SchemaModel({
+    type: StringType().isOneOf(['goto', 'loop', 'wait', 'tempo', 'dynamics']).isRequired(),
     targetuuid: StringType().addRule(requiredIfGoto, 'This field is required.'),
-    count: NumberType('Enter a number').isInteger().addRule(requiredIfLoop, 'This field is required.'),
-    seconds: NumberType().isInteger().addRule(requiredIfWait, 'This field is required.'),
+    count: NumberType()
+        .when(requiredIf({ type: 'loop' }, NumberType))
+        .isInteger(),
+    seconds: NumberType().when(requiredIf({ type: 'wait' }, NumberType)),
     fromBPM: NumberType().isInteger().addRule(requiredIfGradualTempo, 'from value must be given.'),
     toBPM: NumberType().isInteger().addRule(requiredIfTempo, 'value must be given'),
     fromDynamics: StringType().addRule(requiredIfGradualDynamics, 'from value must be given.'),
@@ -60,8 +85,7 @@ export const formModel = SchemaModel({
     isGradual: BooleanType(),
     passes: ArrayType().of(NumberType()),
     iterations: ArrayType().of(NumberType()),
-    conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration'])),
-    checkbox: BooleanType()
+    conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration']))
 })
 
 const formFieldNames = {
@@ -78,15 +102,25 @@ const formFieldNames = {
     isGradual: 'isGradual',
     conditions: 'conditions',
     passes: 'passes',
-    iterations: 'iterations',
-    checkbox: 'checkbox'
+    iterations: 'iterations'
 }
-// const model = SchemaModel({
-//     type: StringType().isRequired(),
-//     targetuuid: StringType().isRequired(),
-//     passes: ArrayType().of(NumberType()).isRequiredOrEmpty(),
-//     each: BooleanType().isRequiredOrEmpty()
-// })
+
+const emptyForm = {
+    type: '',
+    targetuuid: undefined,
+    count: undefined,
+    seconds: undefined,
+    fromBPM: undefined,
+    toBPM: undefined,
+    fromDynamics: undefined,
+    toDynamics: undefined,
+    fromSection: undefined,
+    toSection: undefined,
+    isGradual: undefined,
+    conditions: undefined,
+    passes: undefined,
+    iterations: undefined
+}
 
 // GENERIC FIELD COMPONENTS
 
@@ -94,7 +128,7 @@ interface ExecutionBaseFieldProps extends Pick<FormGroupProps, 'controlId'>, Pic
     label?: string
     name?: string
     formValue: FormValueType
-    setDirty: Dispatch<boolean>
+    setValueChanged: (formValue: FormValueType, event: SyntheticEvent<Element, Event> | undefined) => void
     loop: number | undefined
     selectedElement: number | undefined
 }
@@ -105,17 +139,13 @@ interface PickerFieldProps
     onChange?: (event: Event) => void
 }
 // Selection (single or multiple)
-const PickerField = ({ label, selectedElement, setDirty, formValue, onChange, ...props }: PickerFieldProps) => {
+const PickerField = ({ label, selectedElement, setValueChanged, formValue, onChange, ...props }: PickerFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
                 accepter={props.accepter || InputPicker}
                 cleanable={false}
-                onChange={(event: Event) => {
-                    if (onChange) onChange(event)
-                    setDirty(true)
-                }}
                 disabled={selectedElement == undefined}
                 block
                 searchable={false}
@@ -127,12 +157,12 @@ const PickerField = ({ label, selectedElement, setDirty, formValue, onChange, ..
 }
 
 interface InputFieldProps extends ExecutionBaseFieldProps, Pick<InputProps, 'placeholder'> {}
-const InputField = ({ label, selectedElement, setDirty, formValue, ...props }: InputFieldProps) => {
+const InputField = ({ label, selectedElement, setValueChanged, formValue, ...props }: InputFieldProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
-                onChange={() => setDirty(true)}
+                // onChange={setValueChanged}
                 disabled={selectedElement == undefined}
                 className="w-60"
                 {...props}
@@ -157,7 +187,7 @@ const RangeField = ({
     names,
     placeholders,
     selectedElement,
-    setDirty,
+    setValueChanged,
     formValue,
     ...props
 }: RangeFieldProps) => {
@@ -166,7 +196,7 @@ const RangeField = ({
             <Form.Group className="items-start h-8" controlId={props.controlId}>
                 <Form.Label className="w-40 h-2 pt-[0.5rem]">{labels[0]}</Form.Label>
                 <Form.Control
-                    onChange={() => setDirty(true)}
+                    // onChange={setValueChanged}
                     name={names[0]}
                     disabled={selectedElement == undefined}
                     className="w-24"
@@ -177,7 +207,7 @@ const RangeField = ({
             <Form.Group className="items-start h-8" controlId={props.controlId}>
                 <Form.Label className="w-5 h-2 pt-[0.5rem]">{labels[1]}</Form.Label>
                 <Form.Control
-                    onChange={() => setDirty(true)}
+                    // onChange={setValueChanged}
                     name={names[1]}
                     disabled={selectedElement == undefined}
                     className="w-24"
@@ -190,15 +220,13 @@ const RangeField = ({
 }
 
 interface CheckBoxProps extends ExecutionBaseFieldProps {}
-const ToggleField = ({ label, selectedElement, setDirty, formValue, ...props }: CheckBoxProps) => {
+const ToggleField = ({ label, selectedElement, setValueChanged, formValue, ...props }: CheckBoxProps) => {
     return (
         <Form.Group className="items-start h-8" controlId={props.controlId}>
             <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
             <Form.Control
                 accepter={Toggle}
-                onChange={() => {
-                    setDirty(true)
-                }}
+                // onChange={setValueChanged}
                 disabled={selectedElement == undefined}
                 className="w-60"
                 {...props}
@@ -443,7 +471,10 @@ interface ExecutionItemFormProps {
     formValue: FormValueType
     sysOptions: InputOption<string>[]
     setDirty: Dispatch<boolean>
+    setFormValue: Dispatch<FormValueType>
     loop: number | undefined
+    model: any
+    // onChange: (value: Record<string, any>, event?: SyntheticEvent) => void
 }
 // Contains the details of a specific Execution item.
 export default function ExecutionItemForm({
@@ -452,28 +483,51 @@ export default function ExecutionItemForm({
     formValue,
     sysOptions,
     setDirty,
-    loop
+    setFormValue,
+    loop,
+    model
+    // onChange
 }: ExecutionItemFormProps) {
     // Properties that will be passed down to each form type
-    const baseProps: ExecutionBaseFieldProps = { selectedElement, formValue, setDirty, loop }
+    const formRef = useRef<any>(null)
+
+    function isValid(formValue: FormValueType) {
+        const checkResult = formModel.check(Object.assign(emptyForm, formValue))
+        console.log(checkResult)
+        const returnValue = !_.values(checkResult).some((val) => val.hasError)
+        return returnValue
+    }
+
+    function setValueChanged(value: Record<string, any>, event: SyntheticEvent<Element, Event> | undefined) {
+        const newValue = value as FormValueType
+        setFormValue(newValue)
+        if (isValid(newValue)) {
+            setDirty(true)
+        }
+    }
+
+    const baseProps: ExecutionBaseFieldProps = { selectedElement, formValue, setValueChanged, loop }
     const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
     const loopForm = <LoopForm {...baseProps} />
     const waitForm = <WaitForm {...baseProps} />
     const tempoForm = <TempoForm {...baseProps} />
     const dynamicsForm = <DynamicsForm {...baseProps} />
     if (!type) return
+
     return (
-        <Form.Stack layout="horizontal">
-            <Form.Group controlId={`goto-subform`}>
-                <Form.Label className="w-40">Type</Form.Label>
-                <Form.Text className="w-120 font-bold text-base">{type}</Form.Text>
-            </Form.Group>
-            {type == 'goto' && gotoForm}
-            {type == 'loop' && loopForm}
-            {type == 'wait' && waitForm}
-            {type == 'tempo' && tempoForm}
-            {type == 'dynamics' && dynamicsForm}
-            <ConditionForm type={type} {...baseProps} />
-        </Form.Stack>
+        <Form ref={formRef} model={model} onChange={setValueChanged} formValue={formValue}>
+            <Form.Stack layout="horizontal">
+                <Form.Group controlId={`goto-subform`}>
+                    <Form.Label className="w-40">Type</Form.Label>
+                    <Form.Text className="w-120 font-bold text-base">{type}</Form.Text>
+                </Form.Group>
+                {type == 'goto' && gotoForm}
+                {type == 'loop' && loopForm}
+                {type == 'wait' && waitForm}
+                {type == 'tempo' && tempoForm}
+                {type == 'dynamics' && dynamicsForm}
+                <ConditionForm type={type} {...baseProps} />
+            </Form.Stack>
+        </Form>
     )
 }
