@@ -82,7 +82,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
     useEffect(() => {
         updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
-        debug('setting play function')
     }, [])
 
     function changeTempo(time: number, params: TempoFunctionParameters): void {
@@ -98,8 +97,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
     // The
     function updatePlaybackCallbackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
-        debug(`UPDATING PB FUNCTIONS ${Object.keys(functions)} new pbFunctions: }`)
-        debug({ ...pbFunctionsRef.current, ...functions })
         pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
     }
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
@@ -178,6 +175,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             Object.keys(positionConfigs).map((key) => [key, null])
         )
         var prevNote = { ...currAction }
+        var prevStep: FlowStep | undefined = undefined
         var currentStep: FlowStep | undefined = nextInFlow()
         if (!currentStep) return timeline
         // Keeps track of the longest measure duration in a section. All measures in a system should have
@@ -233,7 +231,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             }
 
             for (const position of currentStep.positions) {
-                var currTime: number = sectionStartTime + currentStep.waitBnEquivBefore
+                var currTime: number = sectionStartTime
                 var cursorPos: number = 0
                 timeline.notation[position] = []
                 const measure = currentStep.measures[position]
@@ -348,9 +346,11 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     section: currentStep.sectionIdx
                 }
             })
+            const waitAfterBnEquiv = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+            sectionStartTime += maxMeasureDuration + waitAfterBnEquiv
             prevSystem = currentStep.system
+            prevStep = currentStep
             currentStep = nextInFlow()
-            sectionStartTime += maxMeasureDuration
         }
         // CREATE ANIMATION ACTIONS
 
@@ -408,7 +408,12 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 time: timeline.totalDurationTO,
                 params: {}
             })
-        debug(timeline, true)
+        // debug(timeline, true)
+        debug(
+            Object.fromEntries(
+                Object.entries(timeline).map(([key, value]) => [key, Array.isArray(value) ? value.length : value])
+            )
+        )
         return timeline
     }
 

@@ -17,18 +17,7 @@ import type {
     WaitItem
 } from '../typing/types'
 import { debug } from '../utils/debugger'
-import { millis2BaseNoteEquiv } from '../utils/timeunits'
 import type { PlaybackType } from './playbackReducer'
-
-// Keeps track of the 'current' cursor position
-interface FlowCursor {
-    sysIdx: number // Index of the current system (numbering starts at 0)
-    sectIdx: number // Index of the current section (numbering starts at 0)
-    lastSystem: boolean // True if this is the last system of the score
-    lastSection: boolean // True if this is the last section of the current system
-    tempo: BPM[] // Start and end tempo of the current section in BPM
-    dynamics: number[] // Start and end relative dynamics of the current section ( value 0...1)
-}
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
@@ -42,21 +31,29 @@ interface FlowInfoTable {
     }
 }
 
+// Keeps track of the 'current' cursor position
+interface FlowCursor {
+    systemIdx: number // Index of the current system (numbering starts at 0)
+    sectionIdx: number // Index of the current section (numbering starts at 0)
+    newSystem: boolean // True if this system is different than that of the previous step
+    systemStart: boolean // True if this the first beat of the system
+    lastSection: boolean // True if this is the last section of the current system
+}
+
 // Returned by function nextInFlow.
 // Contains detailed information corresponding with the current FlowCursor settings.
 export interface FlowStep {
     system: EditorSystem
+    systemIdx: number
+    sectionIdx: number // for future use
     measures: Record<Position, EditorMeasure>
     positions: Position[]
     tempo: BPM[]
     dynamics: number[]
-    sectionIdx: number // for future use
     lastSystem: boolean
     lastSection: boolean
     waitMsBefore: number // Delay before the start of the current section in milliseconds
-    waitBnEquivBefore: number // Same, in Base Note Equivalents
-    // waitMsAfter: number // Delay after the end of the current section in milliseconds
-    // waitBnEquivAfter: number // Same, in Base Note Equivalents
+    waitMsAfter: number // Delay after the end of the current section in milliseconds
 }
 
 const itemPriority = (item: ExecutionItem): number => {
@@ -75,9 +72,9 @@ const compareItems = (item1: ExecutionItem, item2: ExecutionItem): number => ite
 
 // Returns functions that can be used to run throught the score in the correct sequence.
 export function executionManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
-    var cursor: FlowCursor | undefined = undefined
+    var currentStep: FlowStep | undefined = undefined
 
-    // Reset the cursor and create the lookup table
+    // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
@@ -103,7 +100,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             value.loop = 0
             value.pass = 0
         })
-        cursor = undefined
+        currentStep = undefined
     }
 
     // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/loop count values
@@ -205,101 +202,96 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
     // Returns the next step in the execution flow
     // peek: if true, state variables (cursor, pass and loop counters) will not be changed
     function nextInFlow(peek: boolean = false): FlowStep | undefined {
-        var nextCursor: FlowCursor | undefined = undefined
-        // If we reached the end of a system, determine if the system has a WAIT flow item
-        // and set the waiting time before the start of the next cursor item accordingly.
-        const lastSection = cursor && cursor.lastSection ? true : false
-        const waitMsBeforeNext = lastSection ? getWaitTimeMsAfter(cursor?.sysIdx || 0) : 0
-        const waitBnEquivBeforeNext =
-            cursor && lastSection ? millis2BaseNoteEquiv(waitMsBeforeNext, cursor.tempo[1]) : 0
-
+        const next: FlowCursor = {
+            systemIdx: -1,
+            sectionIdx: -1,
+            newSystem: false,
+            systemStart: false,
+            lastSection: false
+        }
         switch (true) {
             case flowinfo == undefined: {
                 console.error(`missing lookup table`)
                 return undefined
             }
-            case !cursor: {
+            case !currentStep: {
                 // Start of playback sequence: return the first measure
-                const [sysIdx, sectIdx] = [startIndex, 0]
-                nextCursor = {
-                    sysIdx: sysIdx,
-                    sectIdx: sectIdx,
-                    lastSystem: playbackType == 'single' || score.systems.length == 1,
-                    lastSection: flowinfo[0].maxSectIdx == 0,
-                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, defaultTempo),
-                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, defaultDynamics)
-                }
-                if (!peek) {
-                    // Update pass and loop counters
-                    flowinfo[sysIdx].pass += 1
-                    flowinfo[sysIdx].loop += 1
-                }
+                _.assign(next, {
+                    systemIdx: startIndex,
+                    sectionIdx: 0,
+                    newSystem: true,
+                    systemStart: true,
+                    lastSection: flowinfo![startIndex].maxSectIdx == 0
+                })
                 break
             }
-            case cursor!.sectIdx < flowinfo![cursor!.sysIdx].maxSectIdx: {
+            case currentStep!.sectionIdx < flowinfo![currentStep!.systemIdx].maxSectIdx: {
                 // Next section, same system
-                const [sysIdx, sectIdx] = [cursor.sysIdx, cursor.sectIdx + 1]
-                nextCursor = {
-                    sysIdx: sysIdx,
-                    sectIdx: sectIdx,
-                    lastSystem: cursor.lastSystem,
-                    lastSection: sectIdx == flowinfo[sysIdx].maxSectIdx,
-                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, cursor.tempo[1]),
-                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, cursor.dynamics[1])
-                }
+                _.assign(next, {
+                    systemIdx: currentStep.systemIdx,
+                    sectionIdx: currentStep.sectionIdx + 1,
+                    newSystem: false,
+                    systemStart: false,
+                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep!.systemIdx].maxSectIdx
+                })
                 break
             }
-            case cursor!.sectIdx >= flowinfo![cursor!.sysIdx].maxSectIdx: {
+            case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
                 // Reached end of system. Determine next system.
                 if (playbackType == 'single') return undefined
                 // Check if a goto or loop item is applicable. Otherwise, take next system in sequence.
-                const nextSysIdx = getNextSystemInFlow(cursor.sysIdx, flowinfo, cursor.lastSystem)
+                const nextSysIdx = getNextSystemInFlow(currentStep.systemIdx, flowinfo, currentStep.lastSystem)
                 if (nextSysIdx == undefined) return undefined
-                // Update pass and loop counters
-                if (nextSysIdx == cursor.sysIdx && !peek) flowinfo[cursor.sysIdx].loop += 1
-                else {
-                    if (!peek) {
-                        // Reset loop counter of the current system
-                        flowinfo[cursor.sysIdx].loop = 0
-                        flowinfo[nextSysIdx].pass += 1
-                        flowinfo[nextSysIdx].loop += 1
-                    }
-                }
-                const [sysIdx, sectIdx] = [nextSysIdx, 0]
-                nextCursor = {
-                    sysIdx: sysIdx,
-                    sectIdx: sectIdx,
-                    lastSystem: sysIdx == score.systems.length - 1,
-                    lastSection: sectIdx == flowinfo[sysIdx].maxSectIdx,
-                    tempo: getExpressionValue('tempo', sysIdx, sectIdx, cursor.tempo[1]),
-                    dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, cursor.dynamics[1])
-                }
+                _.assign(next, {
+                    systemIdx: nextSysIdx,
+                    sectionIdx: 0,
+                    newSystem: currentStep.systemIdx != nextSysIdx,
+                    systemStart: true,
+                    lastSection: currentStep.sectionIdx + 1 == 0
+                })
                 break
             }
             default:
-                nextCursor = undefined
+                break
         }
-        if (!peek) {
-            cursor = nextCursor
-        }
-        if (nextCursor) {
-            const system = score.systems[nextCursor.sysIdx]
+        if (next.systemIdx >= 0 && next.sectionIdx >= 0) {
+            debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
+            const nextSystem = flowinfo[next.systemIdx].system
             const measures = _.fromPairs(
-                _.toPairs(system.staffs).map(([key, staff]) => [key, staff[nextCursor!.sectIdx]])
-            )
-            debug(`NEXTCURSOR [pass=${flowinfo[nextCursor.sysIdx].pass}]: ${JSON.stringify(nextCursor)}`)
-            return {
-                system: flowinfo[nextCursor.sysIdx].system,
-                measures: measures as Record<Position, EditorMeasure>,
+                _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
+            ) as Record<Position, EditorMeasure>
+
+            const nextStep = {
+                system: nextSystem,
+                systemIdx: nextSystem.index,
+                sectionIdx: next.sectionIdx,
+                measures: measures,
                 positions: score.positions,
-                tempo: nextCursor.tempo,
-                dynamics: nextCursor.dynamics,
-                sectionIdx: nextCursor.sectIdx,
-                lastSystem: nextCursor.sysIdx == score.systems.length - 1 || playbackType == 'single',
-                lastSection: nextCursor.sectIdx == flowinfo[nextCursor.sysIdx].maxSectIdx,
-                waitMsBefore: waitMsBeforeNext,
-                waitBnEquivBefore: waitBnEquivBeforeNext
+                tempo: getExpressionValue(
+                    'tempo',
+                    next.systemIdx,
+                    next.sectionIdx,
+                    currentStep?.tempo[1] || defaultTempo
+                ),
+                dynamics: getExpressionValue(
+                    'dynamics',
+                    next.systemIdx,
+                    next.sectionIdx,
+                    currentStep?.dynamics[1] || defaultDynamics
+                ),
+                lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
+                lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
+                waitMsBefore: currentStep?.lastSection ? getWaitTimeMsAfter(currentStep?.systemIdx || 0) : 0,
+                waitMsAfter: next.newSystem ? getWaitTimeMsAfter(next.systemIdx) : 0
             }
+            if (!peek) {
+                // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
+                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
+                if (next.newSystem) flowinfo[next.systemIdx].pass += 1
+                if (next.systemStart) flowinfo[next.systemIdx].loop += 1
+                currentStep = nextStep
+            }
+            return nextStep
         }
         return undefined
     }
