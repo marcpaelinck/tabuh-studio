@@ -281,8 +281,8 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 ),
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
                 lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
-                waitMsBefore: currentStep?.lastSection ? getWaitTimeMsAfter(currentStep?.systemIdx || 0) : 0,
-                waitMsAfter: next.newSystem ? getWaitTimeMsAfter(next.systemIdx) : 0
+                waitMsBefore: next.newSystem ? getWaitTimeMsAfter(currentStep?.systemIdx || 0) : 0,
+                waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0
             }
             if (!peek) {
                 // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
