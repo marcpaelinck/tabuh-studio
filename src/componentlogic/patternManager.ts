@@ -183,7 +183,8 @@ function singleNoteAction(args: CreatePatternArgs) {
                 symbol: args.symbol,
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast
+                isLast: args.isLast,
+                isLastOfPattern: true
             } as SamplerFunctionParameters
         }
     ]
@@ -200,7 +201,8 @@ function silenceAction(args: CreatePatternArgs) {
                 symbol: MutingChars[0],
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast
+                isLast: args.isLast,
+                isLastOfPattern: true
             } as SamplerFunctionParameters
         }
     ]
@@ -253,7 +255,8 @@ function gracenoteAction(args: CreatePatternArgs) {
                 symbol: graceSymbol,
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast
+                isLast: args.isLast,
+                isLastOfPattern: true
             } as SamplerFunctionParameters
         }
     ]
@@ -284,7 +287,8 @@ function tremoloAction(args: CreatePatternArgs) {
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast && count == totalNotes - 1
+                isLast: args.isLast && count == totalNotes - 1,
+                isLastOfPattern: count == totalNotes - 1
             } as SamplerFunctionParameters
         })
     }
@@ -318,7 +322,8 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: velocity,
-                isLast: args.isLast && idx == totalNotes - 1
+                isLast: args.isLast && idx == totalNotes - 1,
+                isLastOfPattern: idx == totalNotes - 1
             } as SamplerFunctionParameters
         })
         time += duration
@@ -351,7 +356,8 @@ function rakeAction(args: CreatePatternArgs) {
                 symbol: instrumentRange[startIdx + idx],
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast && idx == patterns.rake.number_of_notes - 1
+                isLast: args.isLast && idx == patterns.rake.number_of_notes - 1,
+                isLastOfPattern: idx == patterns.rake.number_of_notes - 1
             } as SamplerFunctionParameters
         })
         offset += noteSpacing

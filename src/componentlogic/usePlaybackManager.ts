@@ -241,14 +241,22 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
                     var symbolDuration = 1 // This is the default duration for a note or silence
-                    const endOfPosition =
-                        currentStep!.lastSystem && currentStep!.lastSection && symbolIdx == notation.length - 1
+                    const endOfMeasure = symbolIdx == notation.length - 1
+                    const endOfPosition = currentStep!.lastSystem && currentStep!.lastSection && endOfMeasure
 
                     // CREATE SAMPLER ACTION
 
                     if (isExtension(symbol)) {
-                        if (currAction[position])
+                        // Extend the last note of the current position with one basenote duration
+                        if (currAction[position]) {
                             currAction[position].params.duration = TOplusNumber(currAction[position].params.duration, 1)
+                            if (endOfMeasure && currentStep!.waitMsAfter)
+                                // Extend the last note of the section with wait time if it is indicated in the score.
+                                currAction[position].params.duration = TOplusNumber(
+                                    currAction[position].params.duration,
+                                    millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+                                )
+                        }
                         symbolDuration = 1
                     } else if (isMuting(symbol)) {
                         symbolDuration = 1
@@ -273,8 +281,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         // Create one or more sampler action(s) for the new note or pattern
                         patternNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
                             currAction[position] = noteAction
+                            if (endOfMeasure && noteAction.params.isLastOfPattern && currentStep!.waitMsAfter) {
+                                // Extend the last note of the section with wait time if it is indicated in the score.
+                                currAction[position].params.duration = TOplusNumber(
+                                    currAction[position].params.duration,
+                                    millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+                                )
+                                debug(`ADDING WAIT TIME FOR ${position}`)
+                            }
                             if (noteAction.params.isLast)
-                                // Extend the final note of the current position
+                                // Extend the final note of the current position with outro time
                                 currAction[position].params.duration = TOplusNumber(
                                     currAction[position].params.duration,
                                     millis2BaseNoteEquiv(outro, currentStep!.tempo[1])

@@ -52,7 +52,6 @@ export interface FlowStep {
     dynamics: number[]
     lastSystem: boolean
     lastSection: boolean
-    waitMsBefore: number // Delay before the start of the current section in milliseconds
     waitMsAfter: number // Delay after the end of the current section in milliseconds
 }
 

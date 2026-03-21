@@ -280,6 +280,7 @@ export interface SamplerFunctionParameters {
     velocity: Tone.Unit.NormalRange
     duration: TimeObject
     isLast: boolean
+    isLastOfPattern: boolean
 }
 export type SamplerFunction = (time: number, params: SamplerFunctionParameters) => void
 export interface PlaybackSamplerAction {
