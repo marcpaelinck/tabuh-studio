@@ -34,7 +34,16 @@ import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { defaultObject } from '../utils/objectUtils'
 import { speedDefaultOption } from '../utils/selectorsUtils'
-import { millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOminusTO, TOplusNumber, TOplusTO } from '../utils/timeunits'
+import {
+    BaseNoteEquiv2Millis,
+    millis2BaseNoteEquiv,
+    n2TO,
+    To2Millis,
+    TO2n,
+    TOminusTO,
+    TOplusNumber,
+    TOplusTO
+} from '../utils/timeunits'
 import { executionManager, type FlowStep } from './executionManager'
 import { createNoteActions, totalDuration } from './patternManager'
 import type { PlaybackAction } from './playbackReducer'
@@ -196,6 +205,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
                 0
             )
+            timeline.totalDurationMs += BaseNoteEquiv2Millis(sectionDuration, currentStep.tempo)
             if (startTempo == endTempo) {
                 if (currentStep.tempo[0] != currentTempo) {
                     // Immediate change
@@ -223,7 +233,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             }
 
             for (const position of currentStep.positions) {
-                var currTime: number = sectionStartTime
+                var currTime: number = sectionStartTime + currentStep.waitBnEquivBefore
                 var cursorPos: number = 0
                 timeline.notation[position] = []
                 const measure = currentStep.measures[position]
@@ -385,11 +395,11 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         timeuntilMs: timeUntilMs
                     }
                 })
-                timeline.totalDurationMs = Math.max(timeline.totalDurationMs, timeUntilMs + outro)
             })
         })
 
         // Determine the total playback duration
+        timeline.totalDurationMs = timeline.totalDurationMs + outro
         timeline.totalDurationTO = n2TO(sectionStartTime)
         setTotalDurationMs(timeline.totalDurationMs)
         if (pbFunctionsRef.current.generic)

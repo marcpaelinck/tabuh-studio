@@ -30,7 +30,7 @@ export const millis2BaseNoteEquiv = (milliseconds: number, bpm: [number, number]
 // Converts BaseNote equivalents to milliseconds based on the average bpm
 // In Tone.js the tempo in BPM is defined as the number of quarter notes per minute.
 // so we need to convert from BaseNote units to quarter note units by multiplying with 4/baseNoteValue
-export const BaseNoteEquiv2Millis = (bnEquiv: number, bpm: [number, number] | number) => {
+export const BaseNoteEquiv2Millis = (bnEquiv: number, bpm: number[] | number) => {
     const avgBpm: number = Array.isArray(bpm) ? (bpm[0] + bpm[1]) / 2 : bpm
     return (60 * 1000 * bnEquiv) / ((baseNoteValue / 4) * avgBpm)
 }

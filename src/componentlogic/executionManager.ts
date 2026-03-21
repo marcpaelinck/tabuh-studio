@@ -13,19 +13,21 @@ import type {
     ExpressionItem,
     GotoItem,
     LoopItem,
-    Position
+    Position,
+    WaitItem
 } from '../typing/types'
 import { debug } from '../utils/debugger'
+import { millis2BaseNoteEquiv } from '../utils/timeunits'
 import type { PlaybackType } from './playbackReducer'
 
 // Keeps track of the 'current' cursor position
 interface FlowCursor {
-    sysIdx: number
-    sectIdx: number
-    lastSystem: boolean
-    lastSection: boolean
-    tempo: BPM[]
-    dynamics: number[]
+    sysIdx: number // Index of the current system (numbering starts at 0)
+    sectIdx: number // Index of the current section (numbering starts at 0)
+    lastSystem: boolean // True if this is the last system of the score
+    lastSection: boolean // True if this is the last section of the current system
+    tempo: BPM[] // Start and end tempo of the current section in BPM
+    dynamics: number[] // Start and end relative dynamics of the current section ( value 0...1)
 }
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
@@ -51,6 +53,10 @@ export interface FlowStep {
     sectionIdx: number // for future use
     lastSystem: boolean
     lastSection: boolean
+    waitMsBefore: number // Delay before the start of the current section in milliseconds
+    waitBnEquivBefore: number // Same, in Base Note Equivalents
+    // waitMsAfter: number // Delay after the end of the current section in milliseconds
+    // waitBnEquivAfter: number // Same, in Base Note Equivalents
 }
 
 const itemPriority = (item: ExecutionItem): number => {
@@ -77,7 +83,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos].length
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
-            for (const type of ['goto', 'loop', 'tempo', 'dynamics'] as ExecutionItemType[]) {
+            for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
                 // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
             }
@@ -144,6 +150,11 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         return uuidLookup[gotoItems[0].targetuuid]
     }
 
+    function getWaitTimeMsAfter(sysIdx: number): number {
+        const waitItems: WaitItem[] = getExecutionItems('wait', sysIdx) as WaitItem[]
+        return waitItems.reduce((subtotal, item) => subtotal + item.seconds * 1000, 0)
+    }
+
     function getExpressionValue(
         type: 'tempo' | 'dynamics',
         sysIdx: number,
@@ -195,6 +206,13 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
     // peek: if true, state variables (cursor, pass and loop counters) will not be changed
     function nextInFlow(peek: boolean = false): FlowStep | undefined {
         var nextCursor: FlowCursor | undefined = undefined
+        // If we reached the end of a system, determine if the system has a WAIT flow item
+        // and set the waiting time before the start of the next cursor item accordingly.
+        const lastSection = cursor && cursor.lastSection ? true : false
+        const waitMsBeforeNext = lastSection ? getWaitTimeMsAfter(cursor?.sysIdx || 0) : 0
+        const waitBnEquivBeforeNext =
+            cursor && lastSection ? millis2BaseNoteEquiv(waitMsBeforeNext, cursor.tempo[1]) : 0
+
         switch (true) {
             case flowinfo == undefined: {
                 console.error(`missing lookup table`)
@@ -207,7 +225,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     sysIdx: sysIdx,
                     sectIdx: sectIdx,
                     lastSystem: playbackType == 'single' || score.systems.length == 1,
-                    lastSection: flowinfo[0].maxSectIdx == 1,
+                    lastSection: flowinfo[0].maxSectIdx == 0,
                     tempo: getExpressionValue('tempo', sysIdx, sectIdx, defaultTempo),
                     dynamics: getExpressionValue('dynamics', sysIdx, sectIdx, defaultDynamics)
                 }
@@ -278,7 +296,9 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 dynamics: nextCursor.dynamics,
                 sectionIdx: nextCursor.sectIdx,
                 lastSystem: nextCursor.sysIdx == score.systems.length - 1 || playbackType == 'single',
-                lastSection: nextCursor.sectIdx == flowinfo[nextCursor.sysIdx].maxSectIdx
+                lastSection: nextCursor.sectIdx == flowinfo[nextCursor.sysIdx].maxSectIdx,
+                waitMsBefore: waitMsBeforeNext,
+                waitBnEquivBefore: waitBnEquivBeforeNext
             }
         }
         return undefined
