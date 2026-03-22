@@ -507,9 +507,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
         // prettier-ignore
-        symbolToNoteNames: {u: ['DUNG1'], 'a,': ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 'u<': ['DUNG2'], 
-                           'u/': ['DUNG1_ABBR'], 'a,/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'], 'u</': ['DUNG2_ABBR'],
-                           'u?': ['DUNG1_MUTED'], 'a,?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 'u<?': ['DUNG2_MUTED'],
+        symbolToNoteNames: {u: ['DUNG1'], 'a': ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 'u<': ['DUNG2'], 
+                           'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'], 'u</': ['DUNG2_ABBR'],
+                           'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 'u<?': ['DUNG2_MUTED'],
                             b: ['DONG2', 'DUNG2'], 'b/': ['DONG2_ABBR', 'DUNG2_ABBR'], 'b?': ['DONG2_MUTED', 'DUNG2_MUTED'], 
                             x: ['XDENG2'], 'x/': ['XDENG2_MUTED']
         },

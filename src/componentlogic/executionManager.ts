@@ -36,12 +36,12 @@ interface FlowCursor {
     systemIdx: number // Index of the current system (numbering starts at 0)
     sectionIdx: number // Index of the current section (numbering starts at 0)
     newSystem: boolean // True if this system is different than that of the previous step
-    systemStart: boolean // True if this the first beat of the system
+    systemStart: boolean // True if this is the first section of the system
     lastSection: boolean // True if this is the last section of the current system
 }
 
 // Returned by function nextInFlow.
-// Contains detailed information corresponding with the current FlowCursor settings.
+// Contains information about the FlowCursor's current system.
 export interface FlowStep {
     system: EditorSystem
     systemIdx: number
@@ -200,7 +200,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
 
     // Returns the next step in the execution flow
     // peek: if true, state variables (cursor, pass and loop counters) will not be changed
-    function nextInFlow(peek: boolean = false): FlowStep | undefined {
+    function nextStepInFlow(peek: boolean = false): FlowStep | undefined {
         const next: FlowCursor = {
             systemIdx: -1,
             sectionIdx: -1,
@@ -221,7 +221,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     newSystem: true,
                     systemStart: true,
                     lastSection: flowinfo![startIndex].maxSectIdx == 0
-                })
+                } as FlowCursor)
                 break
             }
             case currentStep!.sectionIdx < flowinfo![currentStep!.systemIdx].maxSectIdx: {
@@ -231,8 +231,8 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     sectionIdx: currentStep.sectionIdx + 1,
                     newSystem: false,
                     systemStart: false,
-                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep!.systemIdx].maxSectIdx
-                })
+                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep.systemIdx].maxSectIdx
+                } as FlowCursor)
                 break
             }
             case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
@@ -246,8 +246,8 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                     sectionIdx: 0,
                     newSystem: currentStep.systemIdx != nextSysIdx,
                     systemStart: true,
-                    lastSection: currentStep.sectionIdx + 1 == 0
-                })
+                    lastSection: flowinfo![nextSysIdx].maxSectIdx == 0
+                } as FlowCursor)
                 break
             }
             default:
@@ -280,9 +280,12 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 ),
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
                 lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
-                waitMsBefore: next.newSystem ? getWaitTimeMsAfter(currentStep?.systemIdx || 0) : 0,
                 waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0
             }
+            if (nextStep.waitMsAfter && !peek)
+                console.log(
+                    `WAITTIME SYSTEM ${nextStep.systemIdx} SECTION ${nextStep.sectionIdx} IS ${nextStep.waitMsAfter} Ms`
+                )
             if (!peek) {
                 // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
                 if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
@@ -295,5 +298,5 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
         return undefined
     }
 
-    return { nextInFlow, resetFlow }
+    return { nextInFlow: nextStepInFlow, resetFlow }
 }

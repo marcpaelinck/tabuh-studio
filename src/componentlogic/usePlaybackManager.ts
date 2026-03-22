@@ -183,6 +183,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
         var sectionStartTime: number = millis2BaseNoteEquiv(intro, currentStep.tempo[0])
+        debug(`Intro=${sectionStartTime}`)
 
         // This dict will be used to create animation actions
         // @ts-ignore
@@ -245,21 +246,25 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     const endOfPosition = currentStep!.lastSystem && currentStep!.lastSection && endOfMeasure
 
                     // CREATE SAMPLER ACTION
-
+                    // Determine the default duration for a single base note.
+                    // Add the given delay time if we reached the last note of the measure.
+                    symbolDuration =
+                        1 +
+                        (endOfMeasure && currentStep!.waitMsAfter
+                            ? millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+                            : 0)
                     if (isExtension(symbol)) {
-                        // Extend the last note of the current position with one basenote duration
+                        // Extend the last note of the current position with one basenote duration.
+                        // Add the given delay time if we reached the last note of the measure.
                         if (currAction[position]) {
-                            currAction[position].params.duration = TOplusNumber(currAction[position].params.duration, 1)
-                            if (endOfMeasure && currentStep!.waitMsAfter)
-                                // Extend the last note of the section with wait time if it is indicated in the score.
-                                currAction[position].params.duration = TOplusNumber(
-                                    currAction[position].params.duration,
-                                    millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
-                                )
+                            currAction[position].params.duration = TOplusNumber(
+                                currAction[position].params.duration,
+                                symbolDuration
+                            )
                         }
-                        symbolDuration = 1
                     } else if (isMuting(symbol)) {
-                        symbolDuration = 1
+                        // No further action.
+                        // Default duration will be added to current time without extending the last note.
                     } else {
                         // Convert potential patterns to individual note actions.
                         const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
@@ -287,7 +292,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                                     currAction[position].params.duration,
                                     millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
                                 )
-                                debug(`ADDING WAIT TIME FOR ${position}`)
                             }
                             if (noteAction.params.isLast)
                                 // Extend the final note of the current position with outro time
@@ -362,8 +366,12 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     section: currentStep.sectionIdx
                 }
             })
-            const waitAfterBnEquiv = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
-            sectionStartTime += maxMeasureDuration + waitAfterBnEquiv
+            // const waitAfterBnEquiv = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+            // if (currentStep.waitMsAfter)
+            // debug(
+            //     `cursorTime=${cursorTime} sectionStart=${sectionStartTime} maxMeasureDuration=${maxMeasureDuration} WAITTIME SYSTEM ${currentStep.systemIdx} SECTION ${currentStep.systemIdx} IS ${waitAfterBnEquiv} Basenotes WITH TEMPO ${currentStep!.tempo[1]}`
+            // )
+            sectionStartTime += maxMeasureDuration
             prevSystem = currentStep.system
             prevStep = currentStep
             currentStep = nextInFlow()
@@ -424,12 +432,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 time: timeline.totalDurationTO,
                 params: {}
             })
-        // debug(timeline, true)
-        debug(
-            Object.fromEntries(
-                Object.entries(timeline).map(([key, value]) => [key, Array.isArray(value) ? value.length : value])
-            )
-        )
+        debug(timeline, true)
         return timeline
     }
 
