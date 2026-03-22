@@ -76,6 +76,11 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
         return { ...state, cursor: noCursor, audioState: 'nodata' }
     }
 
+    if (!action.playbackType) {
+        console.error('audio reducer: action is "load" playback type is missing.')
+        return { ...state, cursor: noCursor, audioState: 'nodata' }
+    }
+
     const validation = cycleValidation(action.score, true)
     if (!validation.isValid) {
         debug('validating')
@@ -88,8 +93,8 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
     // const loadAction = { ...action }
 
     playbackFunctions.schedulePlayback({ pbAction: action, useCache: true })
-    debug({ ...state, audioState: 'stopped' }, true)
-    return { ...state, audioState: 'stopped' }
+    debug({ ...state, playbackType: action.playbackType, audioState: 'stopped' }, true)
+    return { ...state, playbackType: action.playbackType, audioState: 'stopped' }
 }
 
 function playbackReducer(state: PlaybackState, action: PlaybackAction): PlaybackState {

@@ -282,10 +282,6 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
                 lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
                 waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0
             }
-            if (nextStep.waitMsAfter && !peek)
-                console.log(
-                    `WAITTIME SYSTEM ${nextStep.systemIdx} SECTION ${nextStep.sectionIdx} IS ${nextStep.waitMsAfter} Ms`
-                )
             if (!peek) {
                 // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
                 if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
