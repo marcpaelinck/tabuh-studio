@@ -150,7 +150,7 @@ export type PositionConfig = {
 // The following characters should be ignored when sending a note to a Sampler.
 // TODO This is a temporary solution to avoid having to double the length of each
 // alphabet for these rarely used modifiers.
-export const ignoreChars: string[] = ['_', '='] // half and quarter base note duration.
+export const ignoreChars: string[] = [] // half and quarter base note duration.
 
 // Translates shorthand codes used in instrumentConfigs to Note records.
 // The stroke is used for the animation.
@@ -289,11 +289,13 @@ export const ExtensionChars = ['-', ' ']
 export const MutingChars = ['.']
 export const OctavationChars = [',', '<']
 //Patterns
+export const HalfDurationChars = ['_']
 export const TremoloChars = [';']
 export const AcceleratingTremoloChars = [':']
 export const RakeUpChars = [']']
 export const RakeDownChars = ['[']
 export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S']
+export const NorotChars = ['n', 'N']
 
 export const positionConfigs: Record<Position, PositionConfig> = {
     GONGS: {
@@ -374,10 +376,14 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         // prettier-ignore
-        validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+        validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     KANTILAN_SANGSIH: {
@@ -391,10 +397,14 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         // prettier-ignore
-        validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+        validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_POLOS: {
@@ -408,10 +418,14 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         // prettier-ignore
-        validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+        validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_SANGSIH: {
@@ -425,10 +439,14 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         // prettier-ignore
-        validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+        validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     UGAL: {
@@ -442,10 +460,14 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         // prettier-ignore
-        validPatterns: ['o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+        validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     REYONG_1: {
@@ -463,8 +485,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             x: ['XDUNG0'], 'x/': ['XDUNG0_MUTED']
         },
         // prettier-ignore
-        validPatterns: ['e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 
-                        'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:']
+        validPatterns: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_',
+                        'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_',
+                        'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 
+                        'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na']
     },
     REYONG_2: {
         name: 'Reyong 2',
@@ -480,8 +506,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             x: ['XDONG1'], 'x/': ['XDONG1_MUTED']
         },
         // prettier-ignore
-        validPatterns: ['u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 
-                        'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:']
+        validPatterns: ['u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_',
+                        'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_',
+                        'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 
+                        'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na']
     },
     REYONG_3: {
         name: 'Reyong 3',
@@ -497,8 +527,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             x: ['XDANG1'], 'x/': ['XDANG1_MUTED']
         },
         // prettier-ignore
-        validPatterns: ['o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
-                        'o:', 'e:', 'u:', 'a:', 'i<:', 'o<:', 'e<:']
+        validPatterns: ['o_', 'e_', 'u_', 'a_', 'i<_', 'o<_', 'e<_',
+                        'o/_', 'e/_', 'u/_', 'a/_', 'i</_', 'o</_', 'e</_',
+                        'o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
+                        'o:', 'e:', 'u:', 'a:', 'i<:', 'o<:', 'e<:',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na']
     },
     REYONG_4: {
         name: 'Reyong 4',
@@ -514,8 +548,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             x: ['XDENG2'], 'x/': ['XDENG2_MUTED']
         },
         // prettier-ignore
-        validPatterns: ['u;', 'a;', 'i<;', 'o<;', 'e<;', 'u<;', 
-                        'u:', 'a:', 'i<:', 'o<:', 'e<:', 'u<:']
+        validPatterns: ['u_', 'a_', 'i<_', 'o<_', 'e<_', 'u<_',
+                        'u/_', 'a/_', 'i</_', 'o</_', 'e</_', 'u</_',
+                        'u;', 'a;', 'i<;', 'o<;', 'e<;', 'u<;', 
+                        'u:', 'a:', 'i<:', 'o<:', 'e<:', 'u<:',
+                        'ni', 'no', 'ne', 'nu', 'na',
+                        'Ni', 'No', 'Ne', 'Nu', 'Na']
     }
 }
 

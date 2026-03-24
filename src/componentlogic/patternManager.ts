@@ -6,6 +6,7 @@ import {
     AcceleratingTremoloChars,
     ExtensionChars,
     GraceNoteChars,
+    HalfDurationChars,
     MelodicNoteChars,
     MutingChars,
     OctavationChars,
@@ -63,13 +64,24 @@ const patterns = {
     gracenote: { duration: 0.4 }
 }
 
-type PatternType = 'SINGLENOTE' | 'TREMOLO' | 'TREMOLO_ACC' | 'GRACENOTE' | 'RAKE' | 'UNHANDLED' | 'INVALID'
+type PatternType =
+    | 'SINGLENOTE'
+    | 'HALF_DURATION'
+    | 'TREMOLO'
+    | 'TREMOLO_ACC'
+    | 'GRACENOTE'
+    | 'RAKE'
+    | 'NOROT'
+    | 'UNHANDLED'
+    | 'INVALID'
 
 function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
     const validSymbols = getValidSymbols(position, true, false)
     switch (true) {
         case validSymbols.includes(symbol):
             return 'SINGLENOTE'
+        case HalfDurationChars.some((char) => symbol.endsWith(char)):
+            return 'HALF_DURATION'
         case !positionConfigs[position].validPatterns.includes(symbol):
             return 'INVALID'
         case symbol.length > 0 && GraceNoteChars.includes(symbol[0]) && validSymbols.includes(symbol.toLowerCase()):
@@ -109,6 +121,8 @@ export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerActio
     switch (pattern) {
         case 'SINGLENOTE':
             return singleNoteAction(args)
+        case 'HALF_DURATION':
+            return halfDurationAction(args)
         case 'GRACENOTE':
             return gracenoteAction(args)
         case 'TREMOLO':
@@ -143,6 +157,8 @@ export function symbolDuration(
         case 'SINGLENOTE':
         case 'TREMOLO':
             return unit == 'basenote' ? 1 : BaseNoteEquiv2Millis(1, bpm)
+        case 'HALF_DURATION':
+            return unit == 'basenote' ? 0.5 : BaseNoteEquiv2Millis(0.5, bpm)
         case 'TREMOLO_ACC':
             const durationBn =
                 patterns.tremolo.accelerating_pattern.reduce((sum, n) => sum + n, 0) /
@@ -181,6 +197,24 @@ function singleNoteAction(args: CreatePatternArgs) {
                 duration: n2TO(1),
                 position: args.position,
                 symbol: args.symbol,
+                bpm: args.bpm,
+                velocity: args.velocity,
+                isLast: args.isLast,
+                isLastOfPattern: true
+            } as SamplerFunctionParameters
+        }
+    ]
+}
+
+function halfDurationAction(args: CreatePatternArgs) {
+    return [
+        {
+            time: n2TO(args.time),
+            function: args.samplerFunction,
+            params: {
+                duration: n2TO(0.5),
+                position: args.position,
+                symbol: args.symbol.substring(0, args.symbol.length - 1),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
