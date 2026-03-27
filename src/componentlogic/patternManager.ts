@@ -9,6 +9,7 @@ import {
     HalfDurationChars,
     MelodicNoteChars,
     MutingChars,
+    NorotChars,
     OctavationChars,
     positionConfigs,
     RakeDownChars,
@@ -61,6 +62,9 @@ const patterns = {
             pattern_duration_in_millis: 120, // Total duration of the pattern.
             note_duration_in_millis: 5000 // sustain time of the notes: this will make the notes overlap.
         },
+    norot: { duration: 4 },
+    // NOROT: a single norot symbol stands for half an 8-note norot pattern. The patternManager logic will determine which part of the pattern
+    //        should be created. See Tenzer, Gamelan Gong Keybar, p. 215ff.
     gracenote: { duration: 0.4 }
 }
 
@@ -92,6 +96,8 @@ function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
             return 'TREMOLO_ACC'
         case _.concat(RakeUpChars, RakeDownChars).includes(symbol.slice(-1)):
             return 'RAKE'
+        case NorotChars.some((char) => symbol.startsWith(char)):
+            return 'NOROT'
         default:
             return 'UNHANDLED'
     }
@@ -131,6 +137,8 @@ export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerActio
             return AcceleratingTremoloAction(args)
         case 'RAKE':
             return rakeAction(args)
+        case 'NOROT':
+            return norotAction(args)
         case 'INVALID': {
             console.error(`invalid pattern ${args.symbol} for ${args.position}`)
             return silenceAction(args)
@@ -171,7 +179,11 @@ export function symbolDuration(
                     : patterns.rake.pattern_duration_in_millis,
                 bpm
             )
+        case 'NOROT':
+            return unit == 'basenote' ? patterns.norot.duration : BaseNoteEquiv2Millis(patterns.norot.duration, bpm)
         case 'GRACENOTE':
+        // The duration of a gracenote is subtracted from the preceding note,
+        // so its nett duration is 0.
         case 'INVALID':
         case 'UNHANDLED':
         default:

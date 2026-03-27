@@ -382,8 +382,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na',
+                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     KANTILAN_SANGSIH: {
@@ -403,8 +403,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na',
+                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_POLOS: {
@@ -424,8 +424,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na',
+                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_SANGSIH: {
@@ -445,8 +445,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na',
+                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     UGAL: {
@@ -466,8 +466,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na',
+                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     REYONG_1: {
