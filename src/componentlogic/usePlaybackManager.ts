@@ -390,9 +390,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 params: {
                     position: position,
                     currnotes: [],
-                    nextnotes: samplerAction2AnimationNotes(position, actions[1]),
-                    timeuntil: actions[1].time,
-                    timeuntilMs: To2Millis(actions[1].time, actions[0].params.bpm)
+                    nextnotes: samplerAction2AnimationNotes(position, actions[0]),
+                    timeuntil: actions[0].time,
+                    timeuntilMs: To2Millis(actions[0].time, actions[0].params.bpm)
                 }
             })
 
