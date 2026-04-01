@@ -46,6 +46,7 @@ export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 export const editorFontSize = 14
 export const editorDoNotDisplay = ['KEMPLI']
 export const editorInitialExpandState = false
+export type KeyboardType = 'regular' | 'laras'
 
 export type NavigationAction =
     | 'cellup'
@@ -59,6 +60,7 @@ export type NavigationAction =
 
 export const editorSortingOrder = [
     'UGAL',
+    'GENDER_RAMBAT',
     'PEMADE_POLOS',
     'PEMADE_SANGSIH',
     'KANTILAN_POLOS',
@@ -297,6 +299,7 @@ export const RakeDownChars = ['[']
 export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S']
 export const NorotChars = ['n', 'N']
 
+//prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {
     GONGS: {
         name: 'Gongs',
@@ -334,13 +337,30 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
         validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
     },
+    KENDANG_WADON: {
+        name: 'Kendang',
+        type: 'percussion',
+        volume: 0,
+        svg_file: 'svg/GK_KENDANG.svg',
+        sampletemplate: 'GK_KENDANG_{note}.wav',
+        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
+        validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
+    },
+    KENDANG_LANANG: {
+        name: 'Kendang',
+        type: 'percussion',
+        volume: 0,
+        svg_file: 'svg/GK_KENDANG.svg',
+        sampletemplate: 'GK_KENDANG_{note}.wav',
+        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
+        validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
+    },
     JEGOGAN: {
         name: 'Jegogan',
         type: 'daun',
         volume: -5,
         svg_file: 'svg/GK_JEGOGAN.svg',
         sampletemplate: 'GK_JEGOGAN_{note}.mp3',
-        //prettier-ignore
         symbolToNoteNames: {i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i/': ['DING1'], 'o/': ['DONG1'], 'e/': ['DENG1'], 'u/': ['DUNG1'], 'a/': ['DANG1']},
         validPatterns: []
     },
@@ -350,7 +370,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -5,
         svg_file: 'svg/GK_CALUNG.svg',
         sampletemplate: 'GK_CALUNG_{note}.mp3',
-        //prettier-ignore
         symbolToNoteNames: {i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i/': ['DING1'], 'o/': ['DONG1'], 'e/': ['DENG1'], 'u/': ['DUNG1'], 'a/': ['DANG1']},
         validPatterns: []
     },
@@ -360,9 +379,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -15,
         svg_file: 'svg/GK_PENYACAH.svg',
         sampletemplate: 'GK_PENYACAH_{note}.mp3',
-        //prettier-ignore
         symbolToNoteNames: {'u,': ['DUNG0'],'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 
-                           'u,/': ['DUNG0'],'a,/': ['DANG0'],'i/': ['DING1'],'o/': ['DONG1'],'e/': ['DENG1'],'u/': ['DUNG1'],'a/': ['DANG1']},
+                           'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR']},
         validPatterns: []
     },
     KANTILAN_POLOS: {
@@ -371,11 +389,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_KANTILAN_{note}.mp3',
-        //prettier-ignore
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-        // prettier-ignore
         validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
                         'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
                         'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
@@ -392,11 +408,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_KANTILAN_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-        // prettier-ignore
         validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
                         'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
                         'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
@@ -413,11 +427,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_PEMADE_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-        // prettier-ignore
         validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
                         'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
                         'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
@@ -434,11 +446,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_PEMADE_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-        // prettier-ignore
         validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
                         'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
                         'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
@@ -455,11 +465,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_UGAL.svg',
         sampletemplate: 'GK_UGAL_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                              'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                              'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-        // prettier-ignore
         validPatterns: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
                         'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
                         'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
@@ -470,13 +478,42 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
+    TROMPONG: {
+        name: 'Ugal',
+        type: 'daun',
+        volume: -14,
+        svg_file: 'svg/GK_UGAL.svg',
+        sampletemplate: 'GK_UGAL_{note}.mp3',
+        symbolToNoteNames: { 'a,': ['DANG0'], 'i,': ['DING0'], 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a': ['DANG1'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'],
+                             'a,/': ['DANG0_ABBR'], 'i,/': ['DING0_ABBR'], 'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a/': ['DANG1_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'],
+                             'a,?': ['DANG0_MUTED'], 'i,?': ['DING0_MUTED'], 'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a?': ['DANG1_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'] },
+        validPatterns: []
+    },
+    GENDER_RAMBAT: {
+        name: 'Gender rambat',
+        type: 'daun',
+        volume: -14,
+        svg_file: '',
+        sampletemplate: 'GK_GENDERRAMBAT_{note}.mp3',
+        symbolToNoteNames: { 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
+                             'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
+                             'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
+        validPatterns: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
+                        'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
+                        'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
+                        'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
+                        'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
+                        'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
+                        'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
+                        'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
+    },
     REYONG_1: {
         name: 'Reyong 1',
         type: 'chimes',
         volume: -14,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: {'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], 
                             'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 
                             'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 
@@ -484,7 +521,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             b: ['DENG0', 'DANG0'], 'b/': ['DENG0_ABBR', 'DANG0_ABBR'], 'b?': ['DENG0_MUTED', 'DANG0_MUTED'], 
                             x: ['XDUNG0'], 'x/': ['XDUNG0_MUTED']
         },
-        // prettier-ignore
         validPatterns: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_',
                         'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_',
                         'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 
@@ -498,14 +534,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: {'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 
                             'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 
                             'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 
                             b: ['DING1', 'DENG1'], 'b/': ['DING1_ABBR', 'DENG1_ABBR'], 'b?': ['DING1_MUTED', 'DENG1_MUTED'], 
                             x: ['XDONG1'], 'x/': ['XDONG1_MUTED']
         },
-        // prettier-ignore
         validPatterns: ['u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_',
                         'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_',
                         'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 
@@ -519,14 +553,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: {o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 
                            'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'],
                            'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 
                             b: ['DUNG1', 'DING2'], 'b/': ['DUNG1_ABBR', 'DING2_ABBR'], 'b?': ['DUNG1_MUTED', 'DING2_MUTED'], 
                             x: ['XDANG1'], 'x/': ['XDANG1_MUTED']
         },
-        // prettier-ignore
         validPatterns: ['o_', 'e_', 'u_', 'a_', 'i<_', 'o<_', 'e<_',
                         'o/_', 'e/_', 'u/_', 'a/_', 'i</_', 'o</_', 'e</_',
                         'o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
@@ -540,14 +572,12 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -14,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
-        // prettier-ignore
         symbolToNoteNames: {u: ['DUNG1'], 'a': ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 'u<': ['DUNG2'], 
                            'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'], 'u</': ['DUNG2_ABBR'],
                            'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 'u<?': ['DUNG2_MUTED'],
                             b: ['DONG2', 'DUNG2'], 'b/': ['DONG2_ABBR', 'DUNG2_ABBR'], 'b?': ['DONG2_MUTED', 'DUNG2_MUTED'], 
                             x: ['XDENG2'], 'x/': ['XDENG2_MUTED']
         },
-        // prettier-ignore
         validPatterns: ['u_', 'a_', 'i<_', 'o<_', 'e<_', 'u<_',
                         'u/_', 'a/_', 'i</_', 'o</_', 'e</_', 'u</_',
                         'u;', 'a;', 'i<;', 'o<;', 'e<;', 'u<;', 

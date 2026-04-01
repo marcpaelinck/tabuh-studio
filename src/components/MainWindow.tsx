@@ -34,7 +34,7 @@ import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
 import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
-import { editorInitialExpandState, noCursor } from '../config/config'
+import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
 import type { Position, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
@@ -50,8 +50,6 @@ import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
 import PlayerWindow from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
-
-export type KeyboardType = 'regular' | 'laras'
 
 interface LoginDialogProps {
     open: boolean

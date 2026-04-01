@@ -3,9 +3,9 @@ import { useContext, useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
+import type { KeyboardType } from '../config/config'
 import TsGongIcon from '../reacticons/TsGongIcon'
-import type { EditorScore, ScoreInfo } from '../typing/types'
-import type { KeyboardType } from './MainWindow'
+import type { EditorScore, ScoreFormat, ScoreInfo } from '../typing/types'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
@@ -15,7 +15,8 @@ type Action =
     | '4'
     | 'login'
     | 'file-open'
-    | 'file-import'
+    | 'file-import-laras'
+    | 'file-import-tabuh'
     | 'file-save'
     | 'file-saveas'
     | 'instruments-select'
@@ -42,7 +43,7 @@ const SimpleTextareaDialog = ({ payload }: { payload: { payload: string } }) => 
 
 interface TabuhEditorMenuProps {
     scoreList: ScoreInfo[]
-    loadScore: (scoreInfo: ScoreInfo | undefined) => void
+    loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
 }
@@ -109,8 +110,14 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
                 }
                 break
             }
-            case 'file-import':
+            case 'file-import-laras': {
+                loadScore('Laras')
                 break
+            }
+            case 'file-import-tabuh': {
+                loadScore('Laras')
+                break
+            }
         }
         setActiveKey(undefined)
     }
@@ -131,7 +138,7 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
         setScoreSelector(false)
         if (scoreInfo) {
             console.log(`SCOREINFO=${JSON.stringify(scoreInfo)}`)
-            loadScore(scoreInfo)
+            loadScore('JSON', scoreInfo)
         }
     }
 
@@ -152,7 +159,8 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
         <Nav activeKey={activeKey} onSelect={setActiveKey}>
             <Nav.Menu eventKey="1" title="Notation" icon={<IoFolderOpenOutline />}>
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
-                <Nav.Item eventKey="file-import">Import...</Nav.Item>
+                <Nav.Item eventKey="file-import-laras">Import Laras file...</Nav.Item>
+                <Nav.Item eventKey="file-import-tabuh">Import Tabuh file...</Nav.Item>
                 <Nav.Item eventKey="file-save">Save</Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
             </Nav.Menu>

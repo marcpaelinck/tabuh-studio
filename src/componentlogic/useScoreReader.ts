@@ -1,7 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { WpApiFunctions } from '../components/contexts'
-import type { EditorScore, ScoreInfo } from '../typing/types'
+import { parseLaras } from '../scoreparsers/larasParser'
+import { parseNotation } from '../scoreparsers/notationParser'
+import type { EditorScore, ScoreFormat, ScoreInfo } from '../typing/types'
 import { readFile } from '../utils/filesystem'
 
 function postprocessScore(score: EditorScore): EditorScore {
@@ -14,7 +16,7 @@ function postprocessScore(score: EditorScore): EditorScore {
 export function useScoreReader(source: 'database' | 'file'): {
     scoreList: ScoreInfo[]
     loadedScore: EditorScore | undefined
-    loadScore: (scoreInfo: ScoreInfo | undefined) => void
+    loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     isLoading: boolean
 } {
     const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)
@@ -35,10 +37,20 @@ export function useScoreReader(source: 'database' | 'file'): {
         else console.error('useScoreReader: source for score list is not `db` or `file`.')
     }, [])
 
-    function loadScore(scoreInfo: ScoreInfo | undefined) {
-        setScoreinfo(scoreInfo)
+    function loadScore(format: ScoreFormat, scoreInfo: ScoreInfo | undefined) {
+        switch (format) {
+            case 'JSON':
+                setScoreinfo(scoreInfo)
+                break
+            case 'Laras':
+            case 'Notation':
+                importScore(format)
+                break
+            default:
+        }
     }
 
+    // Loads a Score object description from a JSON file on the web server.
     async function loadScoreFromFile() {
         if (scoreInfo) {
             setIsLoading(true)
@@ -51,6 +63,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         }
     }
 
+    // Loads a JSON Score object description from the website's database.
     async function loadScoreFromDb() {
         if (scoreInfo) {
             setIsLoading(true)
@@ -75,7 +88,28 @@ export function useScoreReader(source: 'database' | 'file'): {
         }
     }
 
+    // Imports a file with an alternative format and parses it to a Score object.
+    async function importScore(format: ScoreFormat) {
+        const parse = format == 'Laras' ? parseLaras : format == 'Notation' ? parseNotation : () => undefined
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0]
+            if (file) {
+                const content = await file.text()
+                const score = parse(content)
+                if (score) {
+                    setScore(score)
+                }
+
+                // Process content as needed
+            }
+        }
+        fileInput.click()
+    }
+
     async function loadScoreListFromDb() {
+        window.open
         setIsLoading(true)
         const response = await wpFunc.database.getScoreList()
         if (response && 'success' in response && response.success && 'result' in response) {

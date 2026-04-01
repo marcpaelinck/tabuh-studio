@@ -77,7 +77,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
             const firstPos = Object.keys(system.staffs)[0] as Position
-            const sectionCount = system.staffs[firstPos].length
+            const sectionCount = system.staffs[firstPos]?.length || 0
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []

@@ -8,12 +8,15 @@ export type Instrument = { id: string; name: string; alphabet: string[] }
 export type Position =
     | 'CALUNG'
     | 'CENGCENG'
+    | 'GENDER_RAMBAT'
     | 'GONGS'
     | 'JEGOGAN'
     | 'KANTILAN_POLOS'
     | 'KANTILAN_SANGSIH'
     | 'KEMPLI'
     | 'KENDANG'
+    | 'KENDANG_LANANG'
+    | 'KENDANG_WADON'
     | 'PEMADE_POLOS'
     | 'PEMADE_SANGSIH'
     | 'PENYACAH'
@@ -21,6 +24,7 @@ export type Position =
     | 'REYONG_2'
     | 'REYONG_3'
     | 'REYONG_4'
+    | 'TROMPONG'
     | 'UGAL'
 
 export type UUID = string
@@ -58,38 +62,7 @@ export type JsonSymbol = {
     d: number
 }
 
-// Notation of one section for one instrument position
-export type Measure = {
-    starttime: number
-    tempo: [number, number]
-    velocity: [number, number]
-    notes?: JsonNote[]
-    notation: JsonSymbol[]
-    notation_?: JsonSymbol[] // cache used to keep user edits that have not been saved yet
-}
-
-// Subdivision of a system, typically spans one kempli beat
-export type Section = {
-    id: number
-    starttime: number // start time in base notes
-    starttimeMs: number // start time in ms
-    duration: number
-    tempo: [number, number]
-    staves: Record<Position, Measure> //TODO: rename to `measures`. Needs to be renamed in all input files too.
-}
-
-// Subdivision of a score, typically spans one gongan
-export type System = {
-    uuid: UUID // unique, fixed uuid.
-    id: number // // Sequence number, used as identification in the UI. Can change when systems are added/removed/sorted.
-    gongan: number // ID from the `gamelan-notation` python application. Unused in this application.
-    starttime: number // start time of first section
-    duration: number // sum of section durations
-    part: string
-    sections: Section[]
-}
-
-export type Score = { title: string; composer: string; durationMs: number; systems: System[] }
+export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
 
 export type ScoreInfo = {
     title: string
@@ -98,7 +71,6 @@ export type ScoreInfo = {
     file: string
     notationversion: string
     pdf: string
-    format: 'old' | 'new'
 }
 
 // NEW SCORE OBJECT DEFINITIONS
@@ -111,7 +83,7 @@ export type EditorMeasure = {
 }
 
 // Notation of one instrument position within a System
-export type Staffs = Record<Position, EditorMeasure[]>
+export type Staffs = Partial<Record<Position, EditorMeasure[]>>
 
 // Subdivision of a score, typically spans one gongan
 export type EditorSystem = {
@@ -124,8 +96,6 @@ export type EditorSystem = {
     label?: string
     loop?: LoopItem
     execution?: ExecutionItem[]
-    tempo?: TempoItem[]
-    dynamics?: TempoItem[]
     copyfrom?: string // label or id of copied system
     copyfromkey?: UUID // uuid copied system
 }
@@ -232,8 +202,8 @@ export interface ExpressionItemBase extends ExecutionItemBase {
     iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
     isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
     fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
-    toSection: number // If isGradual==true: the gradual change should continue until the end of this section.
-    // Otherwise the gradual change should be effective immediately at the start of this section.
+    toSection: number // If isGradual==true: the gradual change should continue until the end of this section (numbering starts from 1).
+    // Otherwise the gradual change should be effective immediately at the start of this section (numbering starts from 1).
     fromValue?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
     toValue: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
 }
