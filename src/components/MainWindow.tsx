@@ -282,10 +282,44 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
+    const playerWindow = (
+        <PlayerWindow
+            visible={active == 'player'}
+            scoreList={scoreList}
+            score={editorScore}
+            totalDurationMs={totalDurationMs}
+            timeLine={timeLine}
+            focus={focus}
+            setFocus={setFocus}
+            updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+            playbackProgress={playbackProgress}
+            playbackSpeed={playbackSpeed}
+            setPlaybackSpeed={setPlaybackSpeed}
+            playbackState={playbackState}
+            playback={playback}
+        />
+    )
+
+    const editorWindow = (
+        <EditorWindow
+            visible={active == 'editor'}
+            expanded={expanded}
+            setExpanded={setExpanded}
+            loading={loadingScore}
+            editorScore={editorScore}
+            labels={labels}
+            updateParts={updateParts}
+            executeItemAction={executeItemAction}
+            updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+            playbackState={playbackState}
+            playback={playback}
+        />
+    )
+
     return (
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
-                <Container id="main" height="80vh">
+                <Container id="main-wide-screen" height="80vh" className="hidden md:flex">
                     <Container id="header+content" className="flex w-full">
                         <Header id="header" className="flex">
                             {/* <HStack spacing={16} align="center" p="1rem"> */}
@@ -322,37 +356,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             <div
                                 id="editor/player window box"
                                 className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                                {/* {importedScore != null && active == 'editor' && ( */}
-                                <EditorWindow
-                                    visible={active == 'editor'}
-                                    id="editor window component"
-                                    expanded={expanded}
-                                    setExpanded={setExpanded}
-                                    loading={loadingScore}
-                                    editorScore={editorScore}
-                                    labels={labels}
-                                    updateParts={updateParts}
-                                    executeItemAction={executeItemAction}
-                                    updatePlaybackFunctions={updatePlaybackCallbackFunctions}
-                                    playbackState={playbackState}
-                                    playback={playback}
-                                />
-                                {/* )} */}
-                                <PlayerWindow
-                                    visible={active == 'player'}
-                                    scoreList={scoreList}
-                                    score={editorScore}
-                                    totalDurationMs={totalDurationMs}
-                                    timeLine={timeLine}
-                                    focus={focus}
-                                    setFocus={setFocus}
-                                    updatePlaybackFunctions={updatePlaybackCallbackFunctions}
-                                    playbackProgress={playbackProgress}
-                                    playbackSpeed={playbackSpeed}
-                                    setPlaybackSpeed={setPlaybackSpeed}
-                                    playbackState={playbackState}
-                                    playback={playback}
-                                />
+                                {editorWindow}
+                                {playerWindow}
                             </div>
                         </Content>
                     </Container>
@@ -378,6 +383,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             </Sidenav.Footer>
                         </Sidenav>
                     </Sidebar>
+                </Container>
+                <Container id="main-wide-screen" className="flex md:hidden w-full h-full">
+                    {playerWindow}
                 </Container>
             </ScoreFunctions>
         </DashboardFunctions>

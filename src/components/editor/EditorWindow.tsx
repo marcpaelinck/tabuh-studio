@@ -301,7 +301,7 @@ export default function EditorWindow({
 
     return (
         // <Profiler id="App" onRender={onRender}>
-        <VStack id="editor box" visibility={visible ? 'visible' : 'collapse'}>
+        <VStack id="Editor Window" visibility={visible ? 'visible' : 'collapse'}>
             {loading ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion className="w-full">{systems}</Accordion>}
         </VStack>
         // </Profiler>

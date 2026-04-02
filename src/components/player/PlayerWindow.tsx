@@ -93,7 +93,7 @@ export default function PlayerWindow({
     }, [focus])
 
     return (
-        <VStack id="TabuhPlayer" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
+        <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
             <Menu
                 menuDisabled={menuDisabled}
                 scoreList={scoreList.map((info) => info.title)}
