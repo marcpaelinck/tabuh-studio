@@ -1,5 +1,3 @@
-@top Document { Notation }
-
 // TEMPLATES
 // commaSepML<content> { (("\t" | "\n")* "," ("\t" | "\n")* content)* }
 @precedence { Measure, EmptyMeasure, TempoMetadata, OtherMetadata }
@@ -12,31 +10,37 @@
    Eol { "\r\n" }
    Note { $[()*-.089ABEGIOPSTUXabeiorstuxy] $[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
-   tempoType { "TEMPO" }
    integerValue { $[0-9]+ }
-   OtherMetadata  { $[A-Z]+ ![\n\r\t{}]+ }
+   Arrow { '->' }
+   OtherMetadata  { ("AUTOKEMPYUNG" | "DYNAMICS" | "GONGAN" | "GOTO" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
+   InfoMetadata  { "INFO" ![\n\r\t{}]+ }
    EmptyLine { tab* Eol }
-   @precedence { tempoType, OtherMetadata }
 }
-
+ 
 // @external tokens emptyMeasure from "./tokens.ts" { EmptyMeasure }
 
+@top Document { MetadataLine Gongan+ }
 
-Notation { MetadataLine Gongan+ }
 Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 
 MetadataLine {tab lbrace space* Metadata rbrace Eol}
-Metadata { TempoMetadata | OtherMetadata }
+Metadata { InfoMetadata | TempoMetadata | OtherMetadata }
 
-TempoMetadata { tempoType space* TempoValue space* TempoParameters }
-TempoValue { integerValue }
-TempoParameters { (BeatParameter | PassParameter)* }
-BeatParameter { ("beat=" | "beats=") FromBeat ("->" ToBeat)?} 
-FromBeat { integerValue }
-ToBeat { integerValue }
+// TEMPO
+TempoMetadata { "TEMPO" space* TempoValue space*  (BeatParameter | PassParameter | LoopParameter)* }
+TempoValue { ToValue | (FromValue? Arrow ToValue) }
+FromValue { integerValue }
+ToValue { integerValue }
+BeatParameter { ("beat=" | "beats=") FromSection (Arrow ToSection)?} 
+FromSection { integerValue }
+ToSection { integerValue }
 PassParameter { ("pass=" | "passes=") (PassNumbers | "[" PassNumbers "]")}
-PassNumbers { PassNumber ("," " "? PassNumber)* }
 PassNumber { integerValue }
+PassNumbers { PassNumber ("," " "? PassNumber)* }
+LoopParameter { ("loop=" | "loops=") (LoopNumbers | "[" LoopNumbers "]")}
+LoopNumber { integerValue }
+LoopNumbers { LoopNumber ("," " "? LoopNumber)* }
+
 
 StaveLine { PositionLabel Measure+ Eol }
 Measure { tab Note* }
