@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
-import type { EditorScore, MenuItemInfo } from '../../typing/types'
+import type { EditorScore, MenuItemInfo, ScoreFormat, ScoreInfo } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,
@@ -19,14 +19,14 @@ export default function Menu({
     menuDisabled,
     scoreList,
     score,
-    // scoreUpdater,
+    loadScore,
     focusUpdater,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreList: string[]
     score: EditorScore | undefined
-    // scoreUpdater: Function
+    loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     focusUpdater: Function
     speedUpdater: Function
 }): JSX.Element {
@@ -83,12 +83,13 @@ export default function Menu({
     return (
         <div className="selectors flex flex-wrap">
             <ButtonToolbar>
+                {/* Score selector is only visible on small screens where only the player is displayed. */}
                 <Selector
                     id="tabuhselector"
                     scrollable
                     disabled={menuDisabled.current.tabuh}
                     title={selectedTabuh.displayValue || tabuhDefaultOption.displayValue}
-                    className="tabuhselector"
+                    className="tabuhselector lg:hidden"
                     width="3/10"
                     valueList={tabuhMenuItems}
                     onChange={onChangeTabuhSelector}

@@ -17,6 +17,7 @@ import {
     type MenuItemInfo,
     type PlaybackCallbackFunctions,
     type Position,
+    type ScoreFormat,
     type ScoreInfo,
     type TimeLine
 } from '../../typing/types'
@@ -28,6 +29,7 @@ interface PlayerWindowProps {
     visible: boolean
     scoreList: ScoreInfo[]
     score: EditorScore | undefined
+    loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
     focus: Position[]
@@ -43,6 +45,7 @@ export default function PlayerWindow({
     visible,
     scoreList,
     score,
+    loadScore,
     totalDurationMs,
     timeLine,
     focus,
@@ -98,7 +101,7 @@ export default function PlayerWindow({
                 menuDisabled={menuDisabled}
                 scoreList={scoreList.map((info) => info.title)}
                 score={score}
-                // scoreUpdater={updateScore}
+                loadScore={loadScore}
                 focusUpdater={updateFocus}
                 speedUpdater={setPlaybackSpeed}
             />

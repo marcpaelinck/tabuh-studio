@@ -287,6 +287,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={active == 'player'}
             scoreList={scoreList}
             score={editorScore}
+            loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
             focus={focus}
@@ -316,75 +317,79 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
+    const fullApplication = (
+        <Container id="main-wide-screen" height="80vh">
+            <Container id="header+content" className="flex ">
+                <Header id="header" className="flex">
+                    {/* <HStack spacing={16} align="center" p="1rem"> */}
+                    <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
+                        <Row align="middle">
+                            <Col span={1} align="left">
+                                <Button
+                                    appearance="primary"
+                                    startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
+                                    size="sm"
+                                    onClick={() => expandAll(buttonIsExpand)}
+                                />
+                            </Col>
+                            <Col span={22}>
+                                <Dashboard values={dashboardValues} />
+                            </Col>
+                            <Col span={1}>
+                                <Toggle
+                                    size={'lg'}
+                                    color="violet"
+                                    checkedChildren={<PlayOutlineIcon />}
+                                    unCheckedChildren={<EditIcon />}
+                                    defaultChecked
+                                    onChange={(checked) => setActive(checked ? 'player' : 'editor')}
+                                />
+                            </Col>
+                        </Row>
+                    </Grid>
+                    {/* </HStack> */}
+                </Header>
+                <Content id="content" px="1rem" className="h-9/10">
+                    <div id="editor/player window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
+                        {editorWindow}
+                        {playerWindow}
+                    </div>
+                </Content>
+            </Container>
+            <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
+                <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
+                    <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
+                        <NavHeader expanded={isExpandedSidenav} user={user} setUser={setUser} />
+                    </Sidenav.Header>
+                    <Sidenav.Body>
+                        <MainMenu
+                            keyboard={keyboard}
+                            loadScore={loadScore}
+                            setKeyboard={SetKeyboard}
+                            scoreList={scoreList}
+                        />
+                    </Sidenav.Body>
+                    <Sidenav.Footer>
+                        <IconButton
+                            icon={<ToggleIcon />}
+                            onClick={() => setSidenavExpanded(!sidenavExpanded)}
+                            appearance="subtle"
+                        />
+                    </Sidenav.Footer>
+                </Sidenav>
+            </Sidebar>
+        </Container>
+    )
+
     return (
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
-                <Container id="main-wide-screen" height="80vh" className="hidden md:flex">
-                    <Container id="header+content" className="flex w-full">
-                        <Header id="header" className="flex">
-                            {/* <HStack spacing={16} align="center" p="1rem"> */}
-                            <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
-                                <Row align="middle">
-                                    <Col span={1} align="left">
-                                        <Button
-                                            appearance="primary"
-                                            startIcon={
-                                                buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />
-                                            }
-                                            size="sm"
-                                            onClick={() => expandAll(buttonIsExpand)}
-                                        />
-                                    </Col>
-                                    <Col span={22}>
-                                        <Dashboard values={dashboardValues} />
-                                    </Col>
-                                    <Col span={1}>
-                                        <Toggle
-                                            size={'lg'}
-                                            color="violet"
-                                            checkedChildren={<PlayOutlineIcon />}
-                                            unCheckedChildren={<EditIcon />}
-                                            defaultChecked
-                                            onChange={(checked) => setActive(checked ? 'player' : 'editor')}
-                                        />
-                                    </Col>
-                                </Row>
-                            </Grid>
-                            {/* </HStack> */}
-                        </Header>
-                        <Content id="content" px="1rem" className="h-9/10">
-                            <div
-                                id="editor/player window box"
-                                className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                                {editorWindow}
-                                {playerWindow}
-                            </div>
-                        </Content>
-                    </Container>
-                    <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
-                        <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
-                            <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
-                                <NavHeader expanded={isExpandedSidenav} user={user} setUser={setUser} />
-                            </Sidenav.Header>
-                            <Sidenav.Body>
-                                <MainMenu
-                                    keyboard={keyboard}
-                                    loadScore={loadScore}
-                                    setKeyboard={SetKeyboard}
-                                    scoreList={scoreList}
-                                />
-                            </Sidenav.Body>
-                            <Sidenav.Footer>
-                                <IconButton
-                                    icon={<ToggleIcon />}
-                                    onClick={() => setSidenavExpanded(!sidenavExpanded)}
-                                    appearance="subtle"
-                                />
-                            </Sidenav.Footer>
-                        </Sidenav>
-                    </Sidebar>
+                {/* Full application is only displayed on larger screens */}
+                <Container id="full-application" className="hidden lg:flex">
+                    {fullApplication}
                 </Container>
-                <Container id="main-wide-screen" className="flex md:hidden w-full h-full">
+                {/* Container for small screens only displays the Player Window */}
+                <Container id="player-only" className="flex lg:hidden w-full h-full">
                     {playerWindow}
                 </Container>
             </ScoreFunctions>
