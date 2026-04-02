@@ -19,6 +19,7 @@ import {
     type Position,
     type ScoreFormat,
     type ScoreInfo,
+    type ScoreMenuOption,
     type TimeLine
 } from '../../typing/types'
 import Animation, { panggulDefaultOption } from './Animation'
@@ -27,7 +28,7 @@ import { Player } from './Player'
 
 interface PlayerWindowProps {
     visible: boolean
-    scoreList: ScoreInfo[]
+    scoreMenuOptions: ScoreMenuOption[]
     score: EditorScore | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
@@ -43,7 +44,7 @@ interface PlayerWindowProps {
 }
 export default function PlayerWindow({
     visible,
-    scoreList,
+    scoreMenuOptions,
     score,
     loadScore,
     totalDurationMs,
@@ -99,7 +100,7 @@ export default function PlayerWindow({
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
             <Menu
                 menuDisabled={menuDisabled}
-                scoreList={scoreList.map((info) => info.title)}
+                scoreMenuOptions={scoreMenuOptions}
                 score={score}
                 loadScore={loadScore}
                 focusUpdater={updateFocus}

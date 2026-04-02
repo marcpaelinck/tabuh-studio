@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
-import type { EditorScore, MenuItemInfo, ScoreFormat, ScoreInfo } from '../../typing/types'
+import type { EditorScore, MenuItemInfo, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,
     createSpeedMenuItems,
-    createTabuhMenuItems,
     focusDefaultOption,
     speedDefaultOption,
     tabuhDefaultOption
@@ -17,33 +16,41 @@ import Selector from './Selector'
 
 export default function Menu({
     menuDisabled,
-    scoreList,
+    scoreMenuOptions,
     score,
     loadScore,
     focusUpdater,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
-    scoreList: string[]
+    scoreMenuOptions: ScoreMenuOption[]
     score: EditorScore | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     focusUpdater: Function
     speedUpdater: Function
 }): JSX.Element {
-    const [tabuhMenuItems, setTabuhMenuItems] = useState<MenuItemInfo[]>([])
     const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
+    const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo[]>([])
     const [selectedTabuh, setSelectedTabuh] = useState<MenuItemInfo>(tabuhDefaultOption)
     const [selectedFocus, setSelectedFocus] = useState<MenuItemInfo>(focusDefaultOption)
     const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo>(speedDefaultOption)
 
     useEffect(() => {
         const updateFixedMenus = async () => {
-            setTabuhMenuItems(createTabuhMenuItems(scoreList))
             setSpeedMenuItems(createSpeedMenuItems(speedList))
         }
         updateFixedMenus()
-    }, [scoreList])
+    }, [])
+
+    // Temporary fix: player Menu uses a different menu option type than MainMenu.
+    // TODO Need to streamline both menu item types.
+    useEffect(() => {
+        const menuItems = scoreMenuOptions.map((option) => {
+            return { key: option.label, displayValue: option.label, value: option.value } as MenuItemInfo
+        })
+        setScoreMenuItems(menuItems)
+    }, [scoreMenuOptions])
 
     useEffect(() => {
         const updateFocusMenu = async () => {
@@ -64,7 +71,7 @@ export default function Menu({
     const onChangeTabuhSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
         setSelectedTabuh(item)
-        // scoreUpdater(item.value)
+        loadScore('JSON', item.value as ScoreInfo)
         onChangeFocusSelector(focusDefaultOption)
     }
 
@@ -91,7 +98,7 @@ export default function Menu({
                     title={selectedTabuh.displayValue || tabuhDefaultOption.displayValue}
                     className="tabuhselector lg:hidden"
                     width="3/10"
-                    valueList={tabuhMenuItems}
+                    valueList={scoreMenuItems}
                     onChange={onChangeTabuhSelector}
                 />
                 <Selector

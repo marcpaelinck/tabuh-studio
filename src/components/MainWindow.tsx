@@ -35,7 +35,7 @@ import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
-import type { Position, WpUserRecord } from '../typing/types'
+import type { Position, ScoreMenuOption, WpUserRecord } from '../typing/types'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
@@ -205,6 +205,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
+    const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
     // PLAYBACK SETTINGS
     const [focus, setFocus] = useState<Position[]>([])
@@ -226,6 +227,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     })
 
     useEffect(() => updatePlaybackCallbackFunctions({ generic: stopPlayback }), [])
+
+    useEffect(() => {
+        setScoreMenuOptions(
+            scoreList.map((scoreInfo) => {
+                return { value: scoreInfo, label: scoreInfo.title }
+            })
+        )
+    }, [scoreList])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -285,7 +294,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const playerWindow = (
         <PlayerWindow
             visible={active == 'player'}
-            scoreList={scoreList}
+            scoreMenuOptions={scoreMenuOptions}
             score={editorScore}
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
@@ -366,7 +375,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             keyboard={keyboard}
                             loadScore={loadScore}
                             setKeyboard={SetKeyboard}
-                            scoreList={scoreList}
+                            scoreMenuOptions={scoreMenuOptions}
                         />
                     </Sidenav.Body>
                     <Sidenav.Footer>

@@ -5,7 +5,7 @@ import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
 import type { KeyboardType } from '../config/config'
 import TsGongIcon from '../reacticons/TsGongIcon'
-import type { EditorScore, ScoreFormat, ScoreInfo } from '../typing/types'
+import type { EditorScore, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../typing/types'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
@@ -42,20 +42,14 @@ const SimpleTextareaDialog = ({ payload }: { payload: { payload: string } }) => 
 }
 
 interface TabuhEditorMenuProps {
-    scoreList: ScoreInfo[]
+    scoreMenuOptions: ScoreMenuOption[]
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
 }
 
-interface TabuhOption {
-    value: ScoreInfo
-    label: string
-}
-
-export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
+export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
-    const [scoreListOptions, setTabuhOptions] = useState<TabuhOption[]>([])
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
     const dialog = useDialog()
@@ -126,14 +120,6 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
         performAction()
     }, [activeKey])
 
-    useEffect(() => {
-        setTabuhOptions(
-            scoreList.map((scoreInfo) => {
-                return { value: scoreInfo, label: scoreInfo.title }
-            })
-        )
-    }, [scoreList])
-
     function scoreSelected(scoreInfo: ScoreInfo | undefined) {
         setScoreSelector(false)
         if (scoreInfo) {
@@ -149,7 +135,7 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
             </Modal.Header>
             <Modal.Body>
                 <Box className="grid content-center">
-                    <SelectPicker block data={scoreListOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
+                    <SelectPicker block data={scoreMenuOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
                 </Box>
             </Modal.Body>
         </Modal>

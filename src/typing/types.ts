@@ -137,7 +137,14 @@ export type NotationParagraph = ReactElement<HTMLAttributes<HTMLParagraphElement
 
 // MENUS
 
-export type menuValueType = string | number | null | (string | number | null)[]
+// SCORE MENU
+
+export interface ScoreMenuOption {
+    value: ScoreInfo
+    label: string
+}
+
+export type menuValueType = string | number | null | (string | number | null)[] | ScoreInfo | undefined
 
 export type MenuInfo = { disabled: Record<MenuName, boolean> }
 
