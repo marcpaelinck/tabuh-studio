@@ -39,7 +39,6 @@ function postProcess(score: EditorScore): EditorScore {
 
 export function parseLaras(content: string): EditorScore | undefined {
     const tree = parser.parse(content)
-    console.log(tree)
 
     const score: EditorScore = {
         uuid: uuidv4(),
@@ -59,14 +58,12 @@ export function parseLaras(content: string): EditorScore | undefined {
     var currTempo: number = 60
 
     const traverse = (node: SyntaxNode) => {
-        console.log(`NAME: ${node.name}`)
         switch (node.name) {
             case 'MetadataValue': {
                 const name = getText(node.getChild('Name')!).toLowerCase()
                 const value = cleanString(getText(node.getChild('String')!))
                 if (name === 'title') score.title = value
                 if (name === 'composer') score.composer = value
-                console.log(`TITLE=${score.title}, COMPOSER=${score.composer}`)
                 break
             }
             case 'SystemHeader': {
@@ -93,7 +90,6 @@ export function parseLaras(content: string): EditorScore | undefined {
                         } as TempoItem
                     ]
                 }
-                console.log(`SYSTEM=${JSON.stringify(currentSystem)}`)
                 score.systems.push(currentSystem)
                 if (partname) {
                     if (!(partname in score.parts)) score.parts['partname'] = [partname]
@@ -122,7 +118,6 @@ export function parseLaras(content: string): EditorScore | undefined {
     traverse(tree.topNode)
 
     const processedScore = postProcess(score)
-    console.log(processedScore)
 
     return processedScore
 }

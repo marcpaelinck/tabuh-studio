@@ -115,7 +115,7 @@ export function MainMenu({ scoreList, loadScore, keyboard, setKeyboard }: TabuhE
                 break
             }
             case 'file-import-tabuh': {
-                loadScore('Laras')
+                loadScore('Notation')
                 break
             }
         }

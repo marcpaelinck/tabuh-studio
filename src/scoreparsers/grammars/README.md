@@ -5,6 +5,12 @@ folder. Then
 .\node_modules\.bin\lezer-generator.ps1 <grammar file path> -o .\<grammar file path>\<grammar name> --typeScript
 ```
 
+e.g.
+
+```
+.\node_modules\.bin\lezer-generator.ps1 .\src\scoreparsers\grammars\tabuh\tabuh.grammar -o .\src\scoreparsers\grammars\tabuh\tabuh --typeScript
+```
+
 Where `<grammar file path>` is the path to the grammar's `*.grammar` file. Use the grammar's folder name for the
 `<grammar name>` value.
 

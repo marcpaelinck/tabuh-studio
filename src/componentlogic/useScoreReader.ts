@@ -90,6 +90,7 @@ export function useScoreReader(source: 'database' | 'file'): {
 
     // Imports a file with an alternative format and parses it to a Score object.
     async function importScore(format: ScoreFormat) {
+        console.log(format)
         const parse = format == 'Laras' ? parseLaras : format == 'Notation' ? parseNotation : () => undefined
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
