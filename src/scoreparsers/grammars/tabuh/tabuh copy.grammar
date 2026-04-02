@@ -1,0 +1,208 @@
+@top Document { Notation }
+
+@skip { space | metadata_label }
+
+// TEMPLATES
+// commaSepML<content> { (("\t" | "\n")* "," ("\t" | "\n")* content)* }
+
+@tokens {
+    // TEMPLATES
+    sep<content> { ( ("," | " ") content)* }
+    commaSep<content> { content (  ("," | " " ) content)* }
+    anycharexceptclosebrace { ![\n}] }
+    space { " "+ }
+    eol { "\n" }
+    tab { "\t" }
+    // nonspacechars { ![ ]* }
+    anychar { ![\n] }
+    Comment {"#" anychar+  }
+    /* A note consists of a pitch symbol followed by one or more modifiers */
+    /* This definition splits the notation into separate 'note' strings */
+    Note { $[\(\)\*-\.089ABEGIOPSTUXabeiorstuxy]$[,\/:;<=\?n_\[\]]* }
+
+    alphavalue  { nqalphavalue | sqalphavalue | dqalphavalue }
+    nqalphavalue { @asciiLetter+ }/* unquoted string */
+    sqalphavalue { "'" nqalphavalue "'" } /* single-quoted string */
+    dqalphavalue { '"' nqalphavalue '"' } /* double-quoted string */
+
+    Stringvalue  { nqstrvalue | sqstrvalue | dqstrvalue }
+    nqstrvalue { ![\t\n'", \(\)\[\]\{\}]+ }     /* unquoted string */
+    sqstrvalue { "'" (![\t\n'])* "'" } /* single-quoted string */
+    dqstrvalue { '"' (![\t\n"])* '"' } /* double-quoted string */
+
+    varnamevalue  { (nqvarnamevalue | sqvarnamevalue | dqvarnamevalue) }
+    nqvarnamevalue  { @asciiLetter (@asciiLetter | @digit | "_")* }      /* unquoted string */
+    sqvarnamevalue { "'" nqvarnamevalue "'" } /* single-quoted string */
+    dqvarnamevalue { '"' nqvarnamevalue '"' } /* double-quoted string */
+
+    intvalue { '-'? @digit }
+    // FloatValue { @digit+ ("" | "." @digit+) }
+    // NumValue { intvalue | FloatValue }
+
+    alphalistvalue { '[' commaSep<alphavalue> ']' }
+    strlistvalue { '[' commaSep<Stringvalue> ']' }
+    // strlistvalue_multiline { '[' commaSepML<stringvalue> ']' }
+    intlistvalue { '[' intvalue+ (',' intvalue)* ']' }
+
+    boolvalue { 'true' | 'false' }
+    // sp_nl { $[ \t\n]* }  /* Extended space, including new line. (?m) allows multiline parsing. Default is single line */ 
+    emptyline { (tab)*  eol }
+    eof { emptyline* @eof }
+    metadata_label { "metadata" }
+    comment_label { "#" }
+    InfoType { 'INFO' }
+
+}
+
+/* Notation can start with one unbound group of metadata lines.
+   All other metadata lines should either immediately precede or
+   immediately follow a gongan */
+
+@external tokens positionLabel from "./tokens.js" { PositionLabel }
+@precedence { comment @cut }
+
+Notation {  NotationInfo emptyline* Gongan+ }
+
+Gongan { (gongan_line | comment_line | metadata_line)+ (emptyline+ | eof) }
+gongan_line { PositionLabel tab alphavalue+ eol}
+
+metadata_line { tab "{" MetaData "}" tab* eol }
+
+comment_line { tab? !comment comment_label alphavalue+ eol}
+
+/* using plurals 'staves' and 'comments' because they will be grouped during post-processing */
+// gongan_line { metadata_line | Stave }
+
+/* metadata is defined below */
+
+// Stave { tagvalues (tab  Measure)+ eol }
+
+/* position tag may be anything except 'comment' or 'metadata' and can be optionally followed 
+   by a pass indicator: a colon followed by digits or by two groups of digits separated by a hyphen.
+   The latter option indicates a range of passes (e.g. `:1-3`).
+   The validity of the position and pass values will be checked in the post processing code.
+   Note that the regex for the pass indicator allows for a hypen without a second digit. 
+   This (incorrect) case will also be caught in the post processing code.
+   If no pass value is encountered the default -1 is returned                          */
+// TagValue { nqalphavalue }
+// tagvalues { TagValue ("/" TagValue)* }
+
+// Measure { Note* }
+
+// NOTATION PART 
+// This part of the grammar is used to parse the INFO line of a notation file separately.
+
+// NOTATION INFO PART (FIRST PART CONTAINING GENERAL SCORE INFORMATION)
+
+NotationInfo { "{" InfoMeta "}" tab* eol }
+InfoMeta { InfoType ('notation_id' | 'notation' | 'id') '=' NotationId InfometaParameters }
+InfometaParameters { infometa_parameter+ }
+infometa_parameter { part_id_parm | title_parm | composer_parm | instrumenttype_parm | font_parm | run_types_parm | loop_parm | beat_at_end_parm | display_parm }
+beat_at_end_parm { 'beat_at_end' '=' BeatAtEnd }
+composer_parm { 'composer' '=' Composer }
+display_parm { 'display' '=' Display }
+font_parm { 'font' '=' FontVersion }
+instrumenttype_parm { ('instrumenttype' | 'instrumentgroup' | 'instruments') '=' Instrumentgroup }
+loop_parm { 'loop' '=' (Loop) }
+part_id_parm  { ('part_id' | 'part') '=' PartId }
+run_types_parm { ('run_types') '='  RunTypes }
+title_parm { 'title' '=' Title }
+NotationId { Stringvalue }
+Title { Stringvalue }
+Composer { Stringvalue }
+Instrumentgroup { varnamevalue }
+PartId { Stringvalue }
+RunTypes { alphalistvalue }
+Loop { boolvalue }
+BeatAtEnd { boolvalue }
+Display { boolvalue }
+FontVersion { Stringvalue }
+
+// METADATA
+// MetaData { dynamicsmeta | gonganmeta | gotometa | kemplimeta | autokempyungmeta | labelmeta | loopmeta | octavatemeta | partmeta | repeatmeta | sequencemeta | suppressmeta | tempometa | copymeta | validationmeta | waitmeta }
+MetaData { copymeta | dynamicsmeta }
+
+copystring { nqstrvalue } 
+copymeta { CopyType Source ('include' '=' Include)? }
+copy_value { ('template' | 'value') '=' }
+Source { copystring }
+Include { copystring }
+// Include { stringvalue | strlistvalue }
+CopyType { 'COPY' }
+
+dynamicsmeta { DynamicsType ('value' '=')? DynamicsRange DynamicsParameters }
+/* dynamics_range can have format 'mf', 'p->mf' or '->mf' */
+DynamicsRange { (FromDynamics? "->")? ToDynamics }
+FromDynamics { dynamics_value }
+ToDynamics { dynamics_value }
+dynamics_value { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
+DynamicsType { 'DYNAMICS' }
+DynamicsParameters { (','? (beat_range_parm | beat_count_parm | passes_parm | cycle_parm | iterations_parm | positions_parm))* }
+/*
+gonganmeta { 'GONGAN' as MetaType ( ('type'|'value') '=' )? type:stringvalue }
+    
+gotometa { 'GOTO' as MetaType ( ('label'|'value') '=' )? stringvalue as Label sep<gotometaparameters> as Parameters }
+gotometaparameters { ( [','] (from_beat_parm | passes_parm | cycle_parm) )*}
+
+kemplimeta { 'KEMPLI' as MetaType ( ('status'|'value') '=' )? status:alphavalue parameters:kemplimetaparameters }
+kemplimetaparameters { ( [','] (beats_parm | scope_parm | passes_parm) )*}
+
+autokempyungmeta { 'AUTOKEMPYUNG' as MetaType ( ('status'|'value') '=' )? status:alphavalue parameters:autokempyungmetaparameters }
+autokempyungmetaparameters { ( [','] (scope_parm | positions_parm) )*}
+
+labelmeta { 'LABEL' as MetaType ( ('name'|'value') '=' )? name:stringvalue parameters:labelmetaparameters }
+labelmetaparameters { ( [','] @:beat_parm )*}
+    
+loopmeta { 'LOOP' as MetaType ( ('count'|'value') '=' )? count:intvalue parameters:loopmetaparameters }
+loopmetaparameters { ( [','] (passes_parm) )*}
+    
+octavatemeta { 'OCTAVATE' as MetaType ( ('instrument'|'value') '=' )? instrument:stringvalue parameters:octavatemetaparameters }
+octavatemetaparameters { ( [','] (octaves_parm | scope_parm) )*}
+
+partmeta { 'PART' as MetaType ( ('name'|'value') '=' )? name:stringvalue }
+    
+repeatmeta { 'REPEAT' as MetaType ( ('count'|'value') '=' )? count:intvalue }
+    
+sequencemeta { 'SEQUENCE' as MetaType ( 'value' '=' )? value:strlistvalue_multiline }
+    
+suppressmeta { 'SUPPRESS' as MetaType ( ('positions'|'value') '=' )? (positions+:stringvalue | positions:strlistvalue)  parameters:suppressmetaparameters }
+suppressmetaparameters { ( [','] (beats_parm | passes_parm) )*}
+
+tempometa { 'TEMPO' as MetaType ( 'value' '=' )? range_values:tempo_range  parameters:tempometaparameters }
+tempometaparameters { ( [','] (beat_range_parm | beat_count_parm | first_beat_parm | passes_parm | iterations_parm | cycle_parm) )*}
+
+validationmeta { 'VALIDATION' as MetaType ( ('ignore'|'value') '=' )? (ignore:strlistvalue | ignore+:stringvalue) parameters:validationmetaparameters }
+validationmetaparameters { ( [','] (beats_parm | scope_parm) )*}
+
+waitmeta { 'WAIT' as MetaType ( ('seconds'|'value') '=' )? seconds:floatvalue parameters:waitmetaparameters }
+waitmetaparameters { ( [','] (after_parm | passes_parm) )*}
+
+after_parm { 'after' '=' after:boolvalue }
+beat_parm { 'beat' '=' beat:intvalue }
+beats_parm { ('beats' | 'beat') '=' (beats+:intvalue | beats:intlistvalue) }
+*/
+beat_range_parm { (('first_beat' '=' FirstBeat) | ( 'beats' | 'beat') '=' FirstBeat ("->" LastBeat)?) }
+beat_count_parm { 'beat_count' '=' BeatCount }
+FirstBeat { intvalue }
+LastBeat { intvalue }
+BeatCount { intvalue }
+from_beat_parm { 'from_beat' '=' FromBeat }
+FromBeat { intvalue }
+octaves_parm { 'octaves' '=' Octaves }
+Octaves { intvalue }
+passes_parm { ('passes' | 'pass') '=' Passes }
+Passes { intvalue | intlistvalue }
+cycle_parm { 'cycle' '=' Cycle }
+Cycle { intvalue }
+iterations_parm { ('iterations' | 'iteration') '=' Iterations }
+Iterations { intvalue | intlistvalue }
+positions_parm { ('positions' | 'position') '=' Positions }
+Positions { Stringvalue | strlistvalue }
+
+/* tempo_range can have format '150', '100->150' or '->150' */
+/*
+tempo_range { [from_value:intvalue "->" explicit_gradual_value:`true` | "->" explicit_gradual_value:`true`] to_value:intvalue }
+iterations_parm { ('iterations' | 'iteration') '=' (iterations+:intvalue | iterations:intlistvalue) }
+scope_parm { 'scope' '=' scope:stringvalue }
+*/
+

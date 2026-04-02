@@ -1,7 +1,7 @@
 import { ExternalTokenizer } from '@lezer/lr'
 import * as fs from 'fs'
-import { instrumentTags } from './config.js'
-import { PositionLabel } from './tabuh.terms.js'
+import { instrumentTags } from './config.ts'
+import { EmptyMeasure, PositionLabel } from './tabuh.terms.ts'
 
 type Position =
     | 'CALUNG'
@@ -82,6 +82,8 @@ const validTags = Object.keys(tagLookup)
 
 const stopChars = [newLine, carriageReturn, tab]
 
+// A PositionLabel is returned if it matches an element of validTags
+// or multiple validTags elements separated by slash characters.
 export const positionLabel = new ExternalTokenizer((input) => {
     var tag = ''
     for (let i = 0; i < 10 && !stopChars.includes(input.next); i++) {
@@ -97,4 +99,17 @@ export const positionLabel = new ExternalTokenizer((input) => {
         return
     }
     input.acceptToken(PositionLabel)
+})
+
+const s = (n: number) => String.fromCharCode(n)
+
+// An EmptyMeasure token is returned if two consecutive tabs are encountered
+export const emptyMeasure = new ExternalTokenizer((input) => {
+    console.log(
+        `${input.peek(-3)} ${input.peek(-2)} ${input.peek(-1)} ${input.peek(0)} ${input.peek(1)} | ${s(input.peek(-3))} ${s(input.peek(-2))} ${s(input.peek(-1))} ${s(input.peek(0))} ${s(input.peek(1))}`
+    )
+    if (input.peek(-1) == tab && (input.next == tab || input.next == carriageReturn || input.next == carriageReturn)) {
+        // input.advance()
+        input.acceptToken(EmptyMeasure)
+    }
 })

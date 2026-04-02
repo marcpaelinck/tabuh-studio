@@ -1,13 +1,13 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
+import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { EditorScore } from '../typing/types'
-import { parser } from './grammars/tabuh/tabuh'
+import type { EditorScore } from '../typing/types.ts'
+import { parser } from './grammars/tabuh/tabuh.ts'
 
 export function parseNotation(content: string): EditorScore | undefined {
-    console.log(content)
     const tree = parser.parse(content)
-    console.log(tree)
+    // console.log(tree)
 
     const score: EditorScore = {
         uuid: uuidv4(),
@@ -21,19 +21,47 @@ export function parseNotation(content: string): EditorScore | undefined {
     }
     // let currentSystem: EditorSystem | null = null
 
-    const getText = (node: SyntaxNode): string => content.slice(node.from, node.to)
+    const getText = (node: SyntaxNode | null): string =>
+        node && 'from' in node ? content.slice(node.from, node.to) : '-?-'
     const cleanString = (str: string): string => str.slice(1, -1)
     const cleanCode = (str: string): string => str.slice(1, -1)
     var currTempo: number = 60
 
     const traverse = (node: SyntaxNode) => {
-        console.log(node.name)
+        var value = '--none--'
+        if ('from' in node && 'to' in node) value = getText(node)
         switch (node.name) {
-            case 'InfoMeta': {
-                const infoType = getText(node.getChild('InfoType')!).toLowerCase()
-                console.log(`InfoType: ${infoType}`)
+            case '⚠':
+            case 'Notation':
+            case 'PositionLabel':
+            case 'Measure':
+            case 'Note':
+            case 'MLEol':
+            case 'SLEol':
+            case 'Eol':
+            case 'MetadataLine':
+            case 'Metadata':
+                // case 'StaveLine':
+                break
+            case 'StaveLine': {
+                var staveArr: string[][] = []
+                const position = getText(node.getChild('PositionLabel'))
+                var measureNodes = node.getChildren('Measure')
+                for (const measureNode of measureNodes) {
+                    var measureArray: string[] = []
+                    staveArr.push(measureArray)
+                    var noteNode = measureNode.getChild('Note')
+                    while (noteNode) {
+                        measureArray.push(getText(noteNode))
+                        noteNode = noteNode.nextSibling
+                    }
+                }
+                const stave = _.fromPairs([[position, staveArr]])
+                console.log(`${node.name}: ${JSON.stringify(stave)}`)
+                break
             }
             default: {
+                console.log(`${node.name}: ${value}`)
             }
         }
         // switch (node.name) {
@@ -45,7 +73,8 @@ export function parseNotation(content: string): EditorScore | undefined {
         //         console.log(`TITLE=${score.title}, COMPOSER=${score.composer}`)
         //         break
         //     }
-        //     case 'SystemHeader': {
+        //     case 'Syste
+        // Header': {
         //         const title = cleanString(getText(node.getChild('String')!))
         //         const found = title.match(/(?<partname>[^\[]+) \[\d+\]/)
         //         const partname =
