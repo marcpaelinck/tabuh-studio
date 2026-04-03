@@ -10,11 +10,13 @@
    Eol { "\r\n" }
    Note { $[()*-.089ABEGIOPSTUXabeiorstuxy] $[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
-   integerValue { $[0-9]+ }
+   IntegerValue { $[0-9]+ }
    Arrow { '->' }
-   OtherMetadata  { ("AUTOKEMPYUNG" | "DYNAMICS" | "GONGAN" | "GOTO" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
+   OtherMetadata  { ("AUTOKEMPYUNG" | "GONGAN" | "GOTO" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
    InfoMetadata  { "INFO" ![\n\r\t{}]+ }
    EmptyLine { tab* Eol }
+   DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
+   StringValue { $[a-z] }
 }
  
 // @external tokens emptyMeasure from "./tokens.ts" { EmptyMeasure }
@@ -23,23 +25,23 @@
 
 Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 
-MetadataLine {tab lbrace space* Metadata rbrace Eol}
-Metadata { InfoMetadata | TempoMetadata | OtherMetadata }
+// METADATA
 
-// TEMPO
+MetadataLine {tab lbrace space* Metadata rbrace Eol}
+Metadata { InfoMetadata | TempoMetadata |  DynamicsMetadata | OtherMetadata }
+
 TempoMetadata { "TEMPO" space* TempoValue space*  (BeatParameter | PassParameter | LoopParameter)* }
-TempoValue { ToValue | (FromValue? Arrow ToValue) }
-FromValue { integerValue }
-ToValue { integerValue }
-BeatParameter { ("beat=" | "beats=") FromSection (Arrow ToSection)?} 
-FromSection { integerValue }
-ToSection { integerValue }
-PassParameter { ("pass=" | "passes=") (PassNumbers | "[" PassNumbers "]")}
-PassNumber { integerValue }
-PassNumbers { PassNumber ("," " "? PassNumber)* }
-LoopParameter { ("loop=" | "loops=") (LoopNumbers | "[" LoopNumbers "]")}
-LoopNumber { integerValue }
-LoopNumbers { LoopNumber ("," " "? LoopNumber)* }
+TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
+
+DynamicsMetadata { "DYNAMICS" space* DynamicsValue space*  (BeatParameter | PassParameter | LoopParameter | PositionParameter)* }
+DynamicsValue { DynamicsLiteral | (DynamicsLiteral? Arrow DynamicsLiteral) }
+
+// METADATA PARAMETERS
+
+BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
+PassParameter { ("pass=" | "passes=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
+LoopParameter { ("loop=" | "loops=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
+PositionParameter { ("position=" | "positions=") (StringValue | "[" StringValue ("," " "? StringValue)* "]")}
 
 
 StaveLine { PositionLabel Measure+ Eol }
