@@ -25,7 +25,7 @@ import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
-import type { EditorScore, EditorSystem } from '../../typing/types'
+import type { Score, System } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { ExecutionForm } from './ExecutionForm'
 
@@ -38,9 +38,9 @@ type EditorActionType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: EditorActionType
-    sysData: EditorSystem
-    score?: EditorScore
-    labels?: Record<string, EditorSystem>
+    sysData: System
+    score?: Score
+    labels?: Record<string, System>
     gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field. Used for validation.
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string>[]

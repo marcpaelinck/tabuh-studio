@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import type { EditorScore, EditorSystem, UUID } from '../typing/types'
+import type { Score, System, UUID } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { executionManager, type FlowStep } from './executionManager'
 
@@ -15,7 +15,7 @@ type GoToState = Record<UUID, number[]> // Each system has one state value for e
 type State = Record<UUID, GoToState> // The machine state consists of the combination of system ID and goto state.
 // Only include systems that have one or more goto instruction.
 
-function createTransitions(score: EditorScore): StateTransitionMatrix {
+function createTransitions(score: Score): StateTransitionMatrix {
     // Define the states and transitions for each goto instruction as follows.
     // All systems start with additional state 0.
     // 1. No goto or unconditional goto - 1 state.
@@ -75,7 +75,7 @@ function nextGoToState(currState: GoToState | undefined, uuid: UUID, transitions
 
 // If _debug is set, replaces system uuid with id to generate readable debug logging.
 const _debug = false
-function getId(system: EditorSystem | undefined): string {
+function getId(system: System | undefined): string {
     return system ? (_debug ? `#${system.id}` : system.uuid) : 'undefined'
 }
 
@@ -86,7 +86,7 @@ export interface ValidationResult {
     isValid: boolean
     message: string
 }
-function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix): ValidationResult {
+function simulatePlayback(score: Score, transitions: StateTransitionMatrix): ValidationResult {
     const states = new Set()
     var uuid = getId(score.systems[0])
     var gotoState: GoToState = nextGoToState(undefined, uuid, transitions)
@@ -97,7 +97,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
     resetFlow()
 
     var cycle: boolean = false
-    var step: FlowStep | undefined = { system: { id: 0 } as EditorSystem } as FlowStep
+    var step: FlowStep | undefined = { system: { id: 0 } as System } as FlowStep
     var syscounter = 0 // safety net
     var beatcount: number = 0
     const debugvar = []
@@ -105,7 +105,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
     while (!cycle && step && syscounter < 1000) {
         // Next in flow
         beatcount = 0
-        while (step && getId(step.system as EditorSystem) == uuid && beatcount < 500) {
+        while (step && getId(step.system as System) == uuid && beatcount < 500) {
             // NextInFlow returns the next beat (section) so we need to iterate until we reach the next
             // system. Count helps to detect a cycle within a system (not likely to occur).
             // A maximum of 100 allow for a cycle within a system.
@@ -151,7 +151,7 @@ function simulatePlayback(score: EditorScore, transitions: StateTransitionMatrix
 
 // Detects the presence of a closed cycle. Returns true if no cycles were detected.
 // updateScoreFlag: updates the .hasCycle flag of the score object.
-export function cycleValidation(score: EditorScore, updateScoreFlag: boolean = false): ValidationResult {
+export function cycleValidation(score: Score, updateScoreFlag: boolean = false): ValidationResult {
     if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
     const validation = simulatePlayback(score, transitions)

@@ -5,7 +5,7 @@ import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
 import type { KeyboardType } from '../config/config'
 import TsGongIcon from '../reacticons/TsGongIcon'
-import type { EditorScore, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../typing/types'
+import type { Score, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../typing/types'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
@@ -68,7 +68,7 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
             case 'file-save':
             case 'file-saveas': {
                 // Persist cached changes and empty caches
-                const score: EditorScore | undefined = { ...scoreFunc.getEditorScore() } as EditorScore
+                const score: Score | undefined = { ...scoreFunc.getEditorScore() } as Score
                 if (score) {
                     const newScore = { ...score }
                     newScore.systems.forEach((sys) =>

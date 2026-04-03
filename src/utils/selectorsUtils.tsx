@@ -1,5 +1,5 @@
 import { instrumentConfigs, type InstrumentConfig } from '../config/config'
-import type { EditorScore, EditorSystem, MenuItemInfo, menuValueType } from '../typing/types'
+import type { MenuItemInfo, menuValueType, Score, System } from '../typing/types'
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.
 // The `value` field can be a list of values. This is useful if the menu item is an
@@ -24,10 +24,10 @@ export function createSpeedMenuItems(values: number[]): MenuItemInfo[] {
     return values.map((value: number) => createItemInfo(`${value}`, `${value}%`, value / 100))
 }
 
-export function createFocusMenuItems(score: EditorScore): MenuItemInfo[] {
+export function createFocusMenuItems(score: Score): MenuItemInfo[] {
     // Create a list of positions found in the score (multiple occurrences)
     const posList: string[] = score.systems
-        .map((system: EditorSystem) => Object.keys(system.staffs))
+        .map((system: System) => Object.keys(system.staffs))
         .flat()
         .flat()
     // Reduce to single occurrences

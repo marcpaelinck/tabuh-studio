@@ -16,7 +16,6 @@ import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, position
 import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     AnimationNote,
-    EditorSystem,
     GenericAction,
     Note,
     NoteSymbol,
@@ -27,6 +26,7 @@ import type {
     PlaybackSamplerAction,
     PlaybackTempoAction,
     Position,
+    System,
     TempoFunctionParameters,
     TimeLine
 } from '../typing/types'
@@ -170,7 +170,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             return undefined
         }
 
-        var prevSystem: EditorSystem | undefined = undefined
+        var prevSystem: System | undefined = undefined
         var currAction: Record<string, PlaybackSamplerAction | null> = Object.fromEntries(
             Object.keys(positionConfigs).map((key) => [key, null])
         )

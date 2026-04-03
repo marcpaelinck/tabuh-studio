@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { useDialog } from 'rsuite'
 import { v4 as uuidv4 } from 'uuid'
 import { type DashboardFunctionsType } from '../components/contexts'
-import type { EditorScore, EditorSystem, ExecutionItem } from '../typing/types'
+import type { ExecutionItem, Score, System } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { toOrdinal } from '../utils/objectUtils'
 import { cycleValidation } from './validationManager'
@@ -100,7 +100,7 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
     }
 }
 
-function scoreToFormattedJson(score: EditorScore, clearCache: boolean = true): string {
+function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
     const flatten = (key: string, value: any) => {
         if (/^([A-Z][A-Z\d_]+|execution)$/.test(key) && value) {
             const json = value.map((meas: any) => {
@@ -134,17 +134,17 @@ function scoreToFormattedJson(score: EditorScore, clearCache: boolean = true): s
         .replace(/([\d]),(?=\d)/g, '$1, ')
 }
 
-function gotoItemTargetName(destination: EditorSystem) {
+function gotoItemTargetName(destination: System) {
     return destination.label ? destination.label : `#${destination.id}`
 }
 
 export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType) {
-    const [editorScore, setEditorScore] = useState<EditorScore | undefined>(undefined)
-    const [labels, setLabels] = useState<Record<string, EditorSystem>>({})
+    const [editorScore, setEditorScore] = useState<Score | undefined>(undefined)
+    const [labels, setLabels] = useState<Record<string, System>>({})
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const dialog = useDialog()
 
-    function updateScore(score: EditorScore) {
+    function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
         setEditorScore(score)
         const labeldict = Object.fromEntries(
@@ -233,10 +233,10 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         return editorScore
     }
 
-    function updateSystem(sysData: EditorSystem) {
+    function updateSystem(sysData: System) {
         if (!editorScore) return
         const sysIdx = sysData.index
-        const newScore: EditorScore = { ...editorScore }
+        const newScore: Score = { ...editorScore }
         const systems = editorScore.systems
         newScore.systems = [...systems.slice(0, sysIdx), sysData, ...systems.slice(sysIdx + 1)]
         setEditorScore(newScore)
@@ -244,12 +244,12 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
 
     function updateParts(parts: Record<string, string[]>) {
         if (!editorScore) return
-        const newScore: EditorScore = { ...editorScore }
+        const newScore: Score = { ...editorScore }
         newScore.parts = { ...parts }
         setEditorScore(newScore)
     }
 
-    function updatePointers(newSystemData: EditorSystem[]) {
+    function updatePointers(newSystemData: System[]) {
         // Update fields that depend on pointers to another system
         newSystemData.map((systemData) => {
             if (systemData.copyfromkey) {
@@ -285,11 +285,11 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
     }
 
     // Handles user actions triggered with buttons in the panel header
-    function executeItemAction(fieldname: string, systemData: EditorSystem, value?: string) {
+    function executeItemAction(fieldname: string, systemData: System, value?: string) {
         if (!editorScore) return
         debug(`processing ${fieldname}`)
         // Used for insertion and update
-        var newSystemData: EditorSystem | null = _.cloneDeep(systemData)
+        var newSystemData: System | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the measures.
         Object.values(newSystemData.staffs).forEach((measures) => {
             measures.forEach((measure) => {

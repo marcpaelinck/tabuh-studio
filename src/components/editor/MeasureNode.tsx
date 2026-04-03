@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState, type HTMLProps } from 'react'
 import { useKeyboardListener } from '../../componentlogic/useKeyboardListener'
 import type { NavigationAction } from '../../config/config'
-import type { EditorMeasure, EditorSystem, Position } from '../../typing/types'
+import type { Measure, Position, System } from '../../typing/types'
 import { notation2text, parseNotationText, symbolValidationUtils } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import type { NavigationFunctionsType, ScoreFunctionsType } from '../contexts'
@@ -12,8 +12,8 @@ interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     rowId: number
     colId: number
     validSymbols: string[]
-    measureData: EditorMeasure
-    systemData: EditorSystem
+    measureData: Measure
+    systemData: System
 }
 
 // Creates a cell containing one measure: the notation of one beat for a single instrument position.
@@ -28,7 +28,7 @@ export function MeasureNode({
 }: NavigationCellProps) {
     const ref = useRef<HTMLTextAreaElement>(null)
     const navFunc: NavigationFunctionsType = useContext(NavigationFunctions)
-    const [measure, setMeasure] = useState<EditorMeasure>(measureData)
+    const [measure, setMeasure] = useState<Measure>(measureData)
     // Add a keyboard listener for this cell and pass the navigation function that moves the selection
     // from this cell to another cell within the grid (next, prev, up, down, etc.).
     const [keyboardListener] = useKeyboardListener(
@@ -42,7 +42,7 @@ export function MeasureNode({
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     function updateNotation(notation: string[]) {
-        const newMeasure: EditorMeasure = { ...measure }
+        const newMeasure: Measure = { ...measure }
         newMeasure.notation_ = notation
         setMeasure(newMeasure)
     }

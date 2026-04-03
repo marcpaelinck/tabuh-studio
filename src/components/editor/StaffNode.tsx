@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { Col } from 'rsuite'
-import type { EditorMeasure, EditorSystem, Position } from '../../typing/types'
+import type { Measure, Position, System } from '../../typing/types'
 import { getValidSymbols } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'
@@ -19,15 +19,15 @@ export function StaffNode({
     sysUuid: string
     position: Position
     rowId: number
-    measures: EditorMeasure[]
-    systemData: EditorSystem
+    measures: Measure[]
+    systemData: System
     colWidths: number[]
 }) {
     if (position == 'REYONG_1') debug(`(re-)rendering stave ${sysUuid} ${position}`)
 
     const measureNodes = useMemo(
         () =>
-            measures.map((measure: EditorMeasure, sidx: number) => {
+            measures.map((measure: Measure, sidx: number) => {
                 debug(`useMemo: recreating measures of system ${sysUuid} ${position}`)
                 const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
                 const validSymbols: string[] = getValidSymbols(position, true, true)

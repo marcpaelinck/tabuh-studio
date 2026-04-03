@@ -1,5 +1,5 @@
 import { type ActionDispatch, type JSX } from 'react'
-import { type EditorScore } from '../../typing/types'
+import { type Score } from '../../typing/types'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
@@ -8,7 +8,7 @@ import 'rsuite/Slider/styles/index.css'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 
 interface PlayerProps {
-    score: EditorScore | undefined
+    score: Score | undefined
     totalDurationMs: number
     playback: ActionDispatch<[action: PlaybackAction]>
     playbackState: PlaybackState

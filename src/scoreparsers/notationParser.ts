@@ -1,10 +1,10 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
-import type { EditorScore, ExecutionItem } from '../typing/types.ts'
+import type { ExecutionItem, Score } from '../typing/types.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 
-export function parseNotation(content: string): EditorScore | undefined {
+export function parseNotation(content: string): Score | undefined {
     const tree = parser.parse(content)
 
     const getText = (node: SyntaxNode | null): string =>

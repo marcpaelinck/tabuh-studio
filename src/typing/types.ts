@@ -77,16 +77,16 @@ export type ScoreInfo = {
 //TODO the following definitions will replace Score, System, Section and Measure
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
 // Notation of one section for one instrument position
-export type EditorMeasure = {
+export type Measure = {
     notation: string[]
     notation_?: string[] // cache used to keep user edits that have not been saved yet
 }
 
 // Notation of one instrument position within a System
-export type Staffs = Partial<Record<Position, EditorMeasure[]>>
+export type Staffs = Partial<Record<Position, Measure[]>>
 
 // Subdivision of a score, typically spans one gongan
-export type EditorSystem = {
+export type System = {
     uuid: UUID // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
@@ -100,14 +100,14 @@ export type EditorSystem = {
     copyfromkey?: UUID // uuid copied system
 }
 
-export type EditorScore = {
+export type Score = {
     uuid: UUID
     title: string
     composer: string
     instrumenttype: string
     parts: Record<string, UUID[]> // <<part name>, <system uuid>[]>
     positions: Position[] // sorted list of positions ordered as displayed in the editor
-    systems: EditorSystem[]
+    systems: System[]
     hasCycle: boolean
 }
 

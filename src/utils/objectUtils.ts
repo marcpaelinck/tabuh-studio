@@ -2,7 +2,7 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
-import type { EditorScore, JsonSymbol } from '../typing/types'
+import type { JsonSymbol, Score } from '../typing/types'
 
 /**
  * Return the first key in `obj` whose value === `value` (strict equality).
@@ -58,7 +58,7 @@ const DefaultObjectFactory = {
             positions: [],
             systems: [],
             parts: {}
-        } as EditorScore
+        } as Score
     }
 }
 

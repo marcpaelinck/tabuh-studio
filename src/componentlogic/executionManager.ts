@@ -5,15 +5,15 @@ import _ from 'lodash'
 import type { BPM } from 'tone/build/esm/core/type/Units'
 import { defaultDynamics, defaultTempo } from '../config/config'
 import type {
-    EditorMeasure,
-    EditorScore,
-    EditorSystem,
     ExecutionItem,
     ExecutionItemType,
     ExpressionItem,
     GotoItem,
     LoopItem,
+    Measure,
     Position,
+    Score,
+    System,
     WaitItem
 } from '../typing/types'
 import { debug } from '../utils/debugger'
@@ -23,7 +23,7 @@ import type { PlaybackType } from './playbackReducer'
 // directives (goto, loop, tempo and dynamics), sorted by priority.
 interface FlowInfoTable {
     [idx: string]: {
-        system: EditorSystem
+        system: System
         maxSectIdx: number
         pass: number
         loop: number
@@ -43,10 +43,10 @@ interface FlowCursor {
 // Returned by function nextInFlow.
 // Contains information about the FlowCursor's current system.
 export interface FlowStep {
-    system: EditorSystem
+    system: System
     systemIdx: number
     sectionIdx: number // for future use
-    measures: Record<Position, EditorMeasure>
+    measures: Record<Position, Measure>
     positions: Position[]
     tempo: BPM[]
     dynamics: number[]
@@ -70,7 +70,7 @@ const itemPriority = (item: ExecutionItem): number => {
 const compareItems = (item1: ExecutionItem, item2: ExecutionItem): number => itemPriority(item1) - itemPriority(item2)
 
 // Returns functions that can be used to run throught the score in the correct sequence.
-export function executionManager(score: EditorScore, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
+export function executionManager(score: Score, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
     var currentStep: FlowStep | undefined = undefined
 
     // Create the lookup table and initialize the flow.
@@ -258,7 +258,7 @@ export function executionManager(score: EditorScore, startIndex: number = 0, pla
             const nextSystem = flowinfo[next.systemIdx].system
             const measures = _.fromPairs(
                 _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
-            ) as Record<Position, EditorMeasure>
+            ) as Record<Position, Measure>
 
             const nextStep = {
                 system: nextSystem,

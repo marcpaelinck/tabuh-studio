@@ -4,7 +4,7 @@ import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
 import { type PlaybackState } from '../../componentlogic/playbackReducer'
 import { useRules } from '../../componentlogic/useRules'
 import { noCursor, positionConfigs, type NavigationAction } from '../../config/config'
-import type { EditorCellCursor, EditorSystem, Position } from '../../typing/types'
+import type { EditorCellCursor, Position, System } from '../../typing/types'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { NavigationFunctions, ScoreFunctions, type NavigationFunctionsType, type ScoreFunctionsType } from '../contexts'
@@ -12,7 +12,7 @@ import { StaffNode } from './StaffNode'
 import type { GridInfo } from './_types'
 
 interface EditorSystemProps {
-    systemData: EditorSystem
+    systemData: System
     positions: string[]
     playbackState: PlaybackState
     visible: boolean

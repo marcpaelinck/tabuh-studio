@@ -13,10 +13,10 @@ import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbac
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
 import {
-    type EditorScore,
     type MenuItemInfo,
     type PlaybackCallbackFunctions,
     type Position,
+    type Score,
     type ScoreFormat,
     type ScoreInfo,
     type ScoreMenuOption,
@@ -29,7 +29,7 @@ import { Player } from './Player'
 interface PlayerWindowProps {
     visible: boolean
     scoreMenuOptions: ScoreMenuOption[]
-    score: EditorScore | undefined
+    score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined

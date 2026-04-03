@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { EditorCellCursor, EditorScore } from '../typing/types'
+import type { EditorCellCursor, Score } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { type SchedulePlaybackParams } from './usePlaybackManager'
 import { cycleValidation } from './validationManager'
@@ -27,7 +27,7 @@ export type PlaybackState = {
 export type PlaybackAction = {
     actionType: ActionType
     playbackType?: PlaybackType
-    score?: EditorScore
+    score?: Score
     systemIndex?: number
     seconds?: number
     cursor?: EditorCellCursor

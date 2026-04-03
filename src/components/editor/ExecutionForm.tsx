@@ -8,11 +8,11 @@ import { executionItemTooltip } from '../../componentlogic/useEditorScoreManager
 import { dynamicsToNumber } from '../../config/config'
 import type {
     DynamicsItem,
-    EditorSystem,
     ExecutionItem,
     ExecutionItemType,
     GotoItem,
     LoopItem,
+    System,
     TempoItem
 } from '../../typing/types'
 import { debug } from '../../utils/debugger'
@@ -147,7 +147,7 @@ const FlowElementList = ({
 }
 
 interface ExecutionFormProps extends FormProps {
-    systemData: EditorSystem
+    systemData: System
     title: string
     open: boolean
     sysOptions: InputOption<string>[]

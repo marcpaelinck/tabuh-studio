@@ -1,17 +1,17 @@
 import { createContext, type Context, type RefObject } from 'react'
 import type { NavigationAction } from '../config/config'
-import type { EditorScore, EditorSystem, WpDatabaseReturnValue, WpUserReturnValue } from '../typing/types'
+import type { Score, System, WpDatabaseReturnValue, WpUserReturnValue } from '../typing/types'
 import { emulateAsync } from '../utils/async'
 import type { ComponentName, DashboardComponentValues } from './editor/Dashboard'
 
 // SCORE FUNCTIONS
 // modify / save score
 export interface ScoreFunctionsType {
-    getEditorScore: () => EditorScore | undefined
-    updateScore: (system: EditorScore) => void
-    updateSystem: (system: EditorSystem) => void
+    getEditorScore: () => Score | undefined
+    updateScore: (system: Score) => void
+    updateSystem: (system: System) => void
     updateParts: (parts: Record<string, string[]>) => void
-    scoreToFormattedJson: (score: EditorScore) => string | undefined
+    scoreToFormattedJson: (score: Score) => string | undefined
 }
 export const defaultScoreFunc: ScoreFunctionsType = {
     getEditorScore: () => undefined,

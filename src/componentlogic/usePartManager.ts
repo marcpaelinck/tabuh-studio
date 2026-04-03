@@ -3,10 +3,10 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { partColorPalette } from '../config/config'
-import type { EditorScore, UUID } from '../typing/types'
+import type { Score, UUID } from '../typing/types'
 import { debug } from '../utils/debugger'
 
-export function usePartManager(score: EditorScore | undefined, updateParts: (parts: Record<string, string[]>) => void) {
+export function usePartManager(score: Score | undefined, updateParts: (parts: Record<string, string[]>) => void) {
     const [selectionOn, setSelectionOn] = useState<boolean>(false) // Left mouse button is down: extends selection
     const [sysToPartLookup, setSysToPartLookup] = useState<Record<string, string>>({})
     const [currSelection, setCurrSelection] = useState<string[]>([]) // List of uuids of currently selected systems

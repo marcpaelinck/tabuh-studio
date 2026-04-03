@@ -3,11 +3,11 @@
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { EditorMeasure, EditorScore, EditorSystem, Position, TempoItem } from '../typing/types'
+import type { Measure, Position, Score, System, TempoItem } from '../typing/types'
 import { labelToPosition, symbolLookup } from './grammars/laras/config'
 import { parser } from './grammars/laras/laras'
 
-function parseStave(position: Position, stave: string): EditorMeasure[] {
+function parseStave(position: Position, stave: string): Measure[] {
     var tabuhNotation: string[] = []
     for (const char of stave) {
         tabuhNotation.push(symbolLookup[position][char] || '-')
@@ -15,8 +15,8 @@ function parseStave(position: Position, stave: string): EditorMeasure[] {
     return [{ notation: tabuhNotation }]
 }
 
-function postProcess(score: EditorScore): EditorScore {
-    score.systems.forEach((system: EditorSystem) => {
+function postProcess(score: Score): Score {
+    score.systems.forEach((system: System) => {
         _.keys(system.staffs).forEach((pos) => {
             if (!score.positions.includes(pos as Position)) score.positions.push(pos as Position)
         })
@@ -24,10 +24,10 @@ function postProcess(score: EditorScore): EditorScore {
     })
 
     // Add missing positions
-    score.systems.forEach((system: EditorSystem) => {
+    score.systems.forEach((system: System) => {
         score.positions.forEach((pos) => {
             if (!(pos in system.staffs)) {
-                const newStaff: EditorMeasure[] = _.cloneDeep(_.values(system.staffs)[0])
+                const newStaff: Measure[] = _.cloneDeep(_.values(system.staffs)[0])
                 newStaff.forEach((measure) => (measure.notation = measure.notation.map(() => '-')))
                 system.staffs[pos] = newStaff
             }
@@ -37,10 +37,10 @@ function postProcess(score: EditorScore): EditorScore {
     return score
 }
 
-export function parseLaras(content: string): EditorScore | undefined {
+export function parseLaras(content: string): Score | undefined {
     const tree = parser.parse(content)
 
-    const score: EditorScore = {
+    const score: Score = {
         uuid: uuidv4(),
         title: '',
         composer: '',
@@ -50,7 +50,7 @@ export function parseLaras(content: string): EditorScore | undefined {
         parts: {},
         hasCycle: false
     }
-    let currentSystem: EditorSystem | null = null
+    let currentSystem: System | null = null
 
     const getText = (node: SyntaxNode): string => content.slice(node.from, node.to)
     const cleanString = (str: string): string => str.slice(1, -1)
@@ -102,7 +102,7 @@ export function parseLaras(content: string): EditorScore | undefined {
                 const label = getText(node.getChild('Name')!)
                 const positions: Position[] = label in labelToPosition ? labelToPosition[label] : []
                 const notation: string = cleanCode(getText(node.getChild('Code')!))
-                const measureData: EditorMeasure[] = parseStave(positions[0], notation)
+                const measureData: Measure[] = parseStave(positions[0], notation)
                 positions.forEach((pos) => (currentSystem!.staffs[pos] = measureData))
                 break
             }

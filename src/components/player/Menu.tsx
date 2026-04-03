@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
-import type { EditorScore, MenuItemInfo, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../../typing/types'
+import type { MenuItemInfo, Score, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,
@@ -24,7 +24,7 @@ export default function Menu({
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreMenuOptions: ScoreMenuOption[]
-    score: EditorScore | undefined
+    score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     focusUpdater: Function
     speedUpdater: Function

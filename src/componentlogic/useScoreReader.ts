@@ -3,10 +3,10 @@ import { v4 as uuidv4 } from 'uuid'
 import { WpApiFunctions } from '../components/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/notationParser'
-import type { EditorScore, ScoreFormat, ScoreInfo } from '../typing/types'
+import type { Score, ScoreFormat, ScoreInfo } from '../typing/types'
 import { readFile } from '../utils/filesystem'
 
-function postprocessScore(score: EditorScore): EditorScore {
+function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
     if (score.hasCycle == undefined) score.hasCycle = false
     return score
@@ -15,13 +15,13 @@ function postprocessScore(score: EditorScore): EditorScore {
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader(source: 'database' | 'file'): {
     scoreList: ScoreInfo[]
-    loadedScore: EditorScore | undefined
+    loadedScore: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     isLoading: boolean
 } {
     const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)
     const [scoreList, setScoreList] = useState<ScoreInfo[]>([])
-    const [loadedScore, setScore] = useState<EditorScore>()
+    const [loadedScore, setScore] = useState<Score>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const wpFunc = useContext(WpApiFunctions)
 
@@ -55,7 +55,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         if (scoreInfo) {
             setIsLoading(true)
             let jsonText = await readFile('scores/' + scoreInfo.file)
-            var score: EditorScore = JSON.parse(jsonText)
+            var score: Score = JSON.parse(jsonText)
             if (!score) return
             score = postprocessScore(score)
             setScore(score)
@@ -79,7 +79,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                 const json = JSON.parse(response.result[0].notation)
                 if (!json) return
 
-                var newScore: EditorScore | undefined = undefined
+                var newScore: Score | undefined = undefined
 
                 newScore = postprocessScore(json)
                 setScore(newScore)

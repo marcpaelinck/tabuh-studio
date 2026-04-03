@@ -7,7 +7,7 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
-import type { EditorCursorParameters, EditorScore, EditorSystem, PlaybackCallbackFunctions } from '../../typing/types'
+import type { EditorCursorParameters, PlaybackCallbackFunctions, Score, System } from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -21,10 +21,10 @@ interface EditorWindowProps {
     expanded: Record<string, boolean>
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
-    editorScore: EditorScore | undefined
-    labels: Record<string, EditorSystem>
+    editorScore: Score | undefined
+    labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
-    executeItemAction: (fieldname: string, systemData: EditorSystem, value?: string) => void
+    executeItemAction: (fieldname: string, systemData: System, value?: string) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
@@ -48,7 +48,7 @@ export default function EditorWindow({
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
 
     function moveEditorCursor(time: number, params: EditorCursorParameters) {
-        const sys = (uuid: string | undefined): EditorSystem | undefined => {
+        const sys = (uuid: string | undefined): System | undefined => {
             return editorScore?.systems.find((sys) => sys.uuid == uuid)
         }
 
@@ -129,7 +129,7 @@ export default function EditorWindow({
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
-    function systemSelectorOptions(self: EditorSystem, includeSelf: boolean, includeNone: boolean) {
+    function systemSelectorOptions(self: System, includeSelf: boolean, includeNone: boolean) {
         if (!editorScore) return []
         // List of labelled systems
         const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
