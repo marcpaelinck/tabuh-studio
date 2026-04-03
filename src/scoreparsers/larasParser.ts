@@ -82,8 +82,8 @@ export function parseLaras(content: string): Score | undefined {
                     execution: [
                         {
                             type: 'tempo',
-                            toSection: 1,
-                            toValue: currTempo,
+                            section: 1,
+                            value: currTempo,
                             seqId: 1,
                             tooltip: `tempo ${currTempo} BPM beat 1`,
                             tooltipshort: `${currTempo} BPM`

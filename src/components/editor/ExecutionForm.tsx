@@ -196,17 +196,17 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         if (selectedItem.type == 'wait') newFormValue.count = selectedItem.seconds
         if (selectedItem.type == 'tempo') {
             newFormValue.fromBPM = selectedItem.fromValue
-            newFormValue.toBPM = selectedItem.toValue
+            newFormValue.toBPM = selectedItem.value
             newFormValue.isGradual = selectedItem.isGradual
             newFormValue.fromSection = selectedItem.fromSection
-            newFormValue.toSection = selectedItem.toSection
+            newFormValue.toSection = selectedItem.section
         }
         if (selectedItem.type == 'dynamics') {
             newFormValue.fromDynamics = selectedItem.fromDynamics
-            newFormValue.toDynamics = selectedItem.toDynamics
+            newFormValue.toDynamics = selectedItem.dynamics
             newFormValue.isGradual = selectedItem.isGradual
             newFormValue.fromSection = selectedItem.fromSection
-            newFormValue.toSection = selectedItem.toSection
+            newFormValue.toSection = selectedItem.section
         }
         debug(`UPDATE FIELDS2=${JSON.stringify(newFormValue)}`)
         setFormValue(newFormValue)
@@ -241,25 +241,25 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         if (selectedItem.type == 'tempo') {
             newItem = newItem as TempoItem
             newItem.fromValue = formValue.fromBPM ? Number(formValue.fromBPM) : undefined
-            newItem.toValue = Number(formValue.toBPM)
+            newItem.value = Number(formValue.toBPM)
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
             if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
             else newItem.iterations = undefined
-            if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
-            debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.toValue}`)
+            if (formValue.toSection != undefined) newItem.section = formValue.toSection
+            debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.value}`)
         }
         if (selectedItem.type == 'dynamics') {
             newItem = newItem as DynamicsItem
             newItem.fromDynamics = formValue.fromDynamics
             newItem.fromValue = newItem.fromDynamics ? dynamicsToNumber[newItem.fromDynamics] : undefined
-            if (formValue.toDynamics != undefined) newItem.toDynamics = formValue.toDynamics
-            newItem.toValue = dynamicsToNumber[newItem.toDynamics]
+            if (formValue.toDynamics != undefined) newItem.dynamics = formValue.toDynamics
+            newItem.value = dynamicsToNumber[newItem.dynamics]
             newItem.isGradual = formValue.isGradual || false
             newItem.fromSection = formValue.fromSection
             if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
             else newItem.iterations = undefined
-            if (formValue.toSection != undefined) newItem.toSection = formValue.toSection
+            if (formValue.toSection != undefined) newItem.section = formValue.toSection
         }
         newItem = {
             ...newItem,

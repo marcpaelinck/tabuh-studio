@@ -209,10 +209,10 @@ export interface ExpressionItemBase extends ExecutionItemBase {
     iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
     isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
     fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
-    toSection: number // If isGradual==true: the gradual change should continue until the end of this section (numbering starts from 1).
+    section: number // If isGradual==true: the gradual change should continue until the end of this section (numbering starts from 1).
     // Otherwise the gradual change should be effective immediately at the start of this section (numbering starts from 1).
     fromValue?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
-    toValue: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+    value: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
 }
 
 export interface TempoItem extends ExpressionItemBase {
@@ -224,7 +224,7 @@ export type DynamicsValue = 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff'
 export interface DynamicsItem extends ExpressionItemBase {
     type: 'dynamics'
     fromDynamics?: DynamicsValue // If isGradual==true: starting value for gradual change. Otherwise undefined.
-    toDynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+    dynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
     positions: Position[]
 }
 

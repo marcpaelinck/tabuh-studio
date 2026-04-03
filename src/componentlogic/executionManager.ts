@@ -166,17 +166,17 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
             const exprItem = item as ExpressionItem
             // debug(`exprItem=${JSON.stringify([exprItem])}, section=${sectionNbr}`)
             if (!exprItem.isGradual) {
-                if (sectionNbr == exprItem.toSection) {
+                if (sectionNbr == exprItem.section) {
                     // Non-gradual matching item found
                     // debug(`EXPRESSION(${type}) NON-GRADUAL=${JSON.stringify([exprItem.toValue, exprItem.toValue])}`)
-                    return [exprItem.toValue, exprItem.toValue]
+                    return [exprItem.value, exprItem.value]
                 }
-            } else if (exprItem.fromSection && exprItem.fromSection <= sectionNbr && sectionNbr <= exprItem.toSection) {
+            } else if (exprItem.fromSection && exprItem.fromSection <= sectionNbr && sectionNbr <= exprItem.section) {
                 // Gradual matching item found: determine start and end values for the given section.
                 if (undefined != exprItem.fromValue) {
                     // Case 1: fromValue is given
-                    const totalSections = exprItem.toSection - exprItem.fromSection + 1
-                    const valueRange = exprItem.toValue - exprItem.fromValue
+                    const totalSections = exprItem.section - exprItem.fromSection + 1
+                    const valueRange = exprItem.value - exprItem.fromValue
                     const startValue =
                         exprItem.fromValue + valueRange * ((sectionNbr - exprItem.fromSection) / totalSections)
                     const endValue = startValue + valueRange / totalSections
@@ -184,9 +184,9 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
                     return [startValue, endValue]
                 } else {
                     // Case 2: fromValue is undefined.
-                    const remainingSections = exprItem.toSection - sectionNbr + 1
+                    const remainingSections = exprItem.section - sectionNbr + 1
                     const fromValue = currentValue
-                    const valueRange = exprItem.toValue - fromValue
+                    const valueRange = exprItem.value - fromValue
                     const startValue = fromValue
                     const endValue = fromValue + valueRange * (1 / remainingSections)
                     // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)

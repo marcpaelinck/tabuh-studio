@@ -19,7 +19,7 @@ function toText(values: number[] | undefined, ordinal: boolean = false): string 
 
 function getSeqId(item: ExecutionItem) {
     const typeSeq = { loop: 1000, tempo: 2000, dynamics: 3000, wait: 4000, goto: 5000 }[item.type]
-    const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.toSection : 0)
+    const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.section : 0)
     const passesSeq = 10 * (_.min(item.passes) || 0)
     const iterSeq = 'iterations' in item ? _.min(item.iterations) || 0 : 0
     return typeSeq + beatSeq + passesSeq + iterSeq
@@ -64,16 +64,16 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             const current = length == 'long' ? 'current ' : ''
             const itemtype = length == 'long' ? `${item.type} ` : ''
             if (item.type == 'tempo') {
-                const isGradual = item.isGradual && item.fromValue != item.toValue
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromValue ? `${current}→` : item.fromValue + '→') : ''}${item.toValue} BPM`
+                const isGradual = item.isGradual && item.fromValue != item.value
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromValue ? `${current}→` : item.fromValue + '→') : ''}${item.value} BPM`
             } else {
-                const isGradual = item.isGradual && item.fromDynamics != item.toDynamics
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.toDynamics}`
+                const isGradual = item.isGradual && item.fromDynamics != item.dynamics
+                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.dynamics}`
             }
-            const multipleSections = item.isGradual && item.fromSection != item.toSection
+            const multipleSections = item.isGradual && item.fromSection != item.section
             instruction =
                 shortTooltip +
-                ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.toSection}`
+                ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.section}`
             preposition = 'on'
             break
         }
