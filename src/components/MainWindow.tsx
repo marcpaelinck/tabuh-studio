@@ -33,6 +33,7 @@ import { playbackReducerFactory } from '../componentlogic/playbackReducer'
 import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
 import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
+import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
 import type { Position, ScoreMenuOption, WpUserRecord } from '../typing/types'
@@ -172,6 +173,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [user, setUser] = useState<WpUserRecord | undefined>(undefined)
     const [active, setActive] = useState<'editor' | 'player'>('player')
+    const screenSize = useScreenSize()
 
     // const [initialize, setInitialize] = useState<boolean>(true)
 
@@ -394,13 +396,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
                 {/* Full application is only displayed on larger screens */}
-                <Container id="full-application" className="hidden lg:flex">
-                    {fullApplication}
-                </Container>
+                {screenSize.abbr.includes('lg') && <Container id="full-application">{fullApplication}</Container>}
                 {/* Container for small screens only displays the Player Window */}
-                <Container id="player-only" className="flex lg:hidden w-full h-full">
-                    {playerWindow}
-                </Container>
+                {!screenSize.abbr.includes('lg') && <Container id="player-only">{playerWindow}</Container>}
             </ScoreFunctions>
         </DashboardFunctions>
     )
