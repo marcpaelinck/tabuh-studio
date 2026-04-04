@@ -1,7 +1,17 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
-import type { DynamicsItem, ExecutionItem, Measure, Position, Score, Staffs, TempoItem } from '../typing/types.ts'
+import { dynamicsToNumber } from '../config/config.ts'
+import type {
+    DynamicsItem,
+    DynamicsValue,
+    ExecutionItem,
+    Measure,
+    Position,
+    Score,
+    Staffs,
+    TempoItem
+} from '../typing/types.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { tagLookup } from './notationUtils.ts'
 
@@ -20,7 +30,13 @@ export function parseNotation(content: string): Score | undefined {
 
         switch (node.name) {
             case 'InfoMetadata': {
-                console.log(`${node.name}: ${getText(node, content)}`)
+                const parameters = {
+                    title: getValue<string>(node.getChild('TitleParameter'), 'StringValue', content),
+                    composer: getValue<string>(node.getChild('ComposerParameter'), 'StringValue', content),
+                    instrumenttype: getValue<string>(node.getChild('InstrumentGroupParameter'), 'StringValue', content),
+                    hasCycle: false
+                }
+                console.log(`${node.name}: ${JSON.stringify(parameters)}`)
                 break
             }
             case 'Gongan': {
@@ -42,11 +58,12 @@ export function parseNotation(content: string): Score | undefined {
     }
 
     traverse(tree.topNode)
-
     return undefined
 }
+/********************
+ AUXILIARY FUNCTIONS
+********************/
 
-// AUXILIARY FUNCTIONS
 function unquote(str: string): string {
     const match = str.match(/^(["'])(.*)\1$/s)
     return match ? match[2] : str
@@ -58,11 +75,11 @@ function getText(node: SyntaxNode | null, content: string): string {
 
 // Casts a string value to the js type that corresponds with the given ValueType.
 // A ListType is passed if strValue is an element of a list.
-function cast(strValue: string, type: ValueType | ListType) {
+function cast(strValue: string, type: ValueType) {
     var returnVal: string | number | undefined = undefined
 
-    if (['StringValue', 'StringList', 'DynamicsLiteral'].includes(type)) returnVal = strValue
-    else if (['IntegerValue', 'IntegerList'].includes(type)) {
+    if (['StringValue', 'DynamicsLiteral'].includes(type)) returnVal = strValue
+    else if (type == 'IntegerValue') {
         returnVal = Number.parseInt(strValue)
         if (Number.isNaN(returnVal)) returnVal = undefined
     }
@@ -88,15 +105,23 @@ function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListTyp
     var returnList: (T | undefined)[] = []
 
     // If valueType is a ListType, find the node's child with that name.
-    const listNode = valueType.endsWith('List') ? node.getChild(valueType) : node
+    var listNode: SyntaxNode | null
+    var elementType: ValueType
+    if (valueType.endsWith('List')) {
+        listNode = node.getChild(valueType)
+        elementType = valueType.replace('List', 'Value') as ValueType
+    } else {
+        listNode = node
+        elementType = valueType as ValueType
+    }
     if (!listNode) return undefined
 
     if (listNode) {
-        const children = node.getChildren(valueType)
+        const children = listNode.getChildren(elementType)
         if (!children || children.length == 0) return undefined
         children.forEach((child) => {
-            const value = cast(getText(child, content), valueType)
-            if (value != undefined) returnList.push(cast(getText(child, content), valueType) as T)
+            const value = cast(getText(child, content), elementType)
+            if (value != undefined) returnList.push(cast(getText(child, content), elementType) as T)
         })
     }
 
@@ -104,7 +129,9 @@ function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListTyp
     return returnList.length > 0 ? (returnList as T[]) : undefined
 }
 
-// GONGAN
+/***********
+   GONGAN   
+***********/
 
 // Creates a Staffs object from the given node's children
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
@@ -113,7 +140,7 @@ function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListTyp
 function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
     if (gonganNode == undefined) return {}
     const staffList: [Position, Measure[]][] = []
-    const staffNodes = gonganNode.getChildren('StaveLine')
+    const staffNodes = gonganNode.getChildren('StaffLine')
     for (const child of staffNodes) {
         var staff: Measure[] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
@@ -133,8 +160,9 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
     }
     return _.fromPairs(staffList)
 }
-
-// METADATA
+/***********
+  METADATA 
+***********/
 
 // Returns a list of ExecutionItem objects for the given gongan node.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
@@ -169,48 +197,39 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
                 console.error('No values found for gradual TEMPO value')
                 return undefined
             }
-            const beatParam = getBeatParameter(node, content)
-            const passParam = { passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
-            const loopParam = { loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
             const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
-            const cycleParam = { nthpass: cycle ? true : undefined }
-            const gradualAttr = { isGradual: values.isGradual || beatParam.isGradual }
-            const returnValue: TempoItem = Object.assign(
-                baseAttr,
-                values,
-                beatParam,
-                passParam,
-                loopParam,
-                gradualAttr,
-                cycleParam
-            )
-            return returnValue
+            const parameters = Object.assign(getBeatParameters(node, content), {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: cycle ? true : undefined
+            })
+            const gradualoverride = { isGradual: values.isGradual || parameters.isGradual }
+            return Object.assign(baseAttr, values, parameters, gradualoverride) as TempoItem
         }
         case 'DynamicsMetadata': {
             const baseAttr = { type: 'dynamics', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const valueNode = node.getChild('DynamicsValue')
             const values = getGradualValues(valueNode, 'DynamicsLiteral', content)
+            const dynamicsvalues = {
+                dynamics: values.value,
+                fromDynamics: values.fromValue,
+                value: dynamicsToNumber[values.value as DynamicsValue],
+                fromValue: values.fromValue ? dynamicsToNumber[values.fromValue as DynamicsValue] : undefined,
+                isGradual: values.isGradual
+            }
             if (values.value == undefined) {
                 console.error('No values found for gradual DYNAMICS value')
                 return undefined
             }
-            const beatParam = getBeatParameter(node, content)
-            const passParam = { passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
-            const loopParam = { loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
             const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
-            const cycleParam = { nthpass: cycle ? true : undefined }
-            // const positionParam = getPositionParameter(node, content)
-            const gradualAttr = { isGradual: values.isGradual || beatParam.isGradual }
-            const returnValue: DynamicsItem = Object.assign(
-                baseAttr,
-                values,
-                beatParam,
-                passParam,
-                loopParam,
-                gradualAttr,
-                cycleParam
-            )
-            return returnValue
+            const parameters = Object.assign(getBeatParameters(node, content), {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: cycle ? true : undefined,
+                positions: getValueList<string>(node.getChild('PositionParameter'), 'StringList', content)
+            })
+            const gradualoverride = { isGradual: values.isGradual || parameters.isGradual }
+            return Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
         }
         default: {
             console.log(`${node.name}: ${getText(node, content)}`)
@@ -241,7 +260,9 @@ function getGradualValues(node: SyntaxNode | null, type: ValueType, content: str
     return returnVal
 }
 
-// Parameters
+/***********
+ PARAMETERS
+***********/
 
 interface BeatParameter {
     fromSection: number | undefined
@@ -250,7 +271,7 @@ interface BeatParameter {
 }
 // Grammar definition:
 // BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
-function getBeatParameter(node: SyntaxNode, content: string): BeatParameter {
+function getBeatParameters(node: SyntaxNode, content: string): BeatParameter {
     const values = getGradualValues(node.getChild('BeatParameter'), 'IntegerValue', content)
     const param: BeatParameter = {
         fromSection: values.fromValue as number,

@@ -34,7 +34,7 @@ export const
   PositionParameter = 32,
   StringList = 33,
   OtherMetadata = 34,
-  StaveLine = 35,
+  StaffLine = 35,
   PositionLabel = 36,
   Measure = 37,
   Note = 38

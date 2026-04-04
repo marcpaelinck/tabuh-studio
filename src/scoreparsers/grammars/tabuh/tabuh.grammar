@@ -65,8 +65,9 @@ LoopParameter { ("loop=" | "loops=") IntegerList}
 CycleParameter { "cycle=" IntegerValue }
 PositionParameter { ("position=" | "positions=") StringList}
 
+// Naming is important here: <type>List should contain <type>Value elements
 IntegerList { (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]") }
-StringList { (StringValue | "[" StringValue ("," " "? StringValue)* "]") }
+StringList { (StringValue | "[" StringValue (","  StringValue)* "]") }
 
 
 
