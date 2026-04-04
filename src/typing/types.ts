@@ -171,7 +171,7 @@ export type HilightRangeFunction = (hlRange: HighlightRange) => void
 // Flow instructions: determine the playing sequence (goto and loop).
 // Expression instructions: contain tempo and dynamics information.
 
-export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics'
+export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics' | 'sequence'
 
 // Base class
 export interface ExecutionItemBase {
@@ -195,6 +195,13 @@ export interface GotoItem extends ExecutionItemBase {
 export interface LoopItem extends ExecutionItemBase {
     type: 'loop'
     count: number // Total number of times to play the System consecutively.
+}
+
+// Enables to repeat the current System.
+export interface SequenceItem extends ExecutionItemBase {
+    type: 'sequence'
+    labels: string[] // sequence of gongan labels
+    uuids: string[] // uuids of the gongans in the sequence
 }
 
 // Enables to repeat the current System.
@@ -227,7 +234,7 @@ export interface DynamicsItem extends ExpressionItemBase {
     positions: Position[]
 }
 
-export type FlowItem = GotoItem | LoopItem | WaitItem
+export type FlowItem = GotoItem | LoopItem | SequenceItem | WaitItem
 export type ExpressionItem = TempoItem | DynamicsItem
 export type ExecutionItem = FlowItem | ExpressionItem
 

@@ -1,0 +1,86 @@
+class AutoKempyungMeta(MetaDataBaseModel):
+    status: MetaDataSwitch
+    scope: Scope = Scope.GONGAN
+    positions: list[Position] = None  # PositionsFromTag
+
+class DynamicsMeta(GradualChangeMetadata):
+    # Currently, an empty list stands for all positions.
+    positions: list[Position]  # PositionsFromTag
+    from_abbr: str = ""
+    to_abbr: str = ""
+
+class GonganMeta(MetaDataBaseModel):
+    type: GonganType
+
+class GoToMeta(MetaDataBaseModel):
+    label: str
+    from_beat: int = -1  # Beat number from which to goto. Default is last beat of the gongan.
+    passes: list[int] = Field(default_factory=list)  # On which pass(es) should goto be performed?
+    cycle: int = 99
+
+class KempliMeta(MetaDataBaseModel):
+    status: MetaDataSwitch
+    beats: list[int] = Field(default_factory=list)
+    passes: list[int] = Field(default_factory=list)
+    scope: Scope = Scope.GONGAN
+
+class LabelMeta(MetaDataBaseModel):
+    name: str
+    beat: int = 1
+    # Make sure that labels are processed before gotos in same gongan.
+    _processingorder_ = 1
+
+class LoopMeta(MetaDataBaseModel):
+    count: int = 1
+    passes: list[int] = Field(default_factory=list)  # On which pass(es) should goto be performed?
+
+class OctavateMeta(MetaDataBaseModel):
+    instrument: InstrumentType  # InstrumentFromTag
+    octaves: int
+    scope: Scope = Scope.GONGAN
+
+class PartMeta(MetaDataBaseModel):
+    name: str
+
+class SequenceMeta(MetaDataBaseModel):
+    value: list[str] = Field(default_factory=list)
+
+class SuppressMeta(MetaDataBaseModel):
+    positions: list[Position]  # PositionsFromTag
+    passes: list[int] = Field(default_factory=list)
+    beats: list[int] = Field(default_factory=list)
+
+class TempoMeta(GradualChangeMetadata):
+
+class CopyMeta(MetaDataBaseModel):
+    template: str
+    include: list[MetaType] = Field(default_factory=list)
+    _processingorder_ = 10
+
+class ValidationMeta(MetaDataBaseModel):
+    beats: list[int] = Field(default_factory=list)
+    ignore: list[ValidationProperty]
+    scope: Scope = Scope.GONGAN
+
+class WaitMeta(MetaDataBaseModel):
+    seconds: float = None
+    after: bool = True
+    passes: list[int] = Field
+
+MetaDataType = Union[
+    AutoKempyungMeta,
+    CopyMeta,
+    DynamicsMeta,
+    GonganMeta,
+    GoToMeta,
+    KempliMeta,
+    LabelMeta,
+    LoopMeta,
+    OctavateMeta,
+    PartMeta,
+    SequenceMeta,
+    SuppressMeta,
+    TempoMeta,
+    ValidationMeta,
+    WaitMeta,
+]

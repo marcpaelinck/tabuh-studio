@@ -7,9 +7,12 @@ import type {
     DynamicsItem,
     DynamicsValue,
     ExecutionItem,
+    GotoItem,
+    LoopItem,
     Measure,
     Position,
     Score,
+    SequenceItem,
     Staffs,
     System,
     TempoItem
@@ -17,7 +20,7 @@ import type {
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { tagLookup } from './notationUtils.ts'
 
-type ValueType = 'IntegerValue' | 'StringValue' | 'DynamicsLiteral'
+type ValueType = 'IntegerValue' | 'FloatValue' | 'StringValue' | 'BooleanValue' | 'DynamicsLiteral'
 type ListType = 'IntegerList' | 'StringList'
 
 // Returns a Score object
@@ -56,7 +59,7 @@ export function parseNotation(content: string): Score | undefined {
             case 'Gongan': {
                 gonganCounter++
                 const staffs = getStaffs(node, content)
-                const executionItems: ExecutionItem[] | undefined = getMetadata(node, content)
+                const metaData = getMetadata(node, content)
                 const system = {
                     uuid: uuidv4(),
                     id: gonganCounter,
@@ -65,11 +68,10 @@ export function parseNotation(content: string): Score | undefined {
                     staffs: staffs,
                     colWidths: getColwidths(staffs),
                     label: undefined,
-                    execution: executionItems
+                    execution: metaData.execution
                 } as System
+                metaData.systemattr.forEach((attribute) => (system[attribute.attribute] = attribute.value as string))
                 score.systems.push(system)
-                // console.log(`METADATA: ${JSON.stringify(executionItems)}`)
-                // console.log(`${node.name}: ${JSON.stringify(staffs)}`)
                 break
             }
             default:
@@ -83,8 +85,17 @@ export function parseNotation(content: string): Score | undefined {
     }
 
     traverse(tree.topNode)
-    console.log(JSON.stringify(score))
+    score.positions = getAllPositions(score)
+    doLogging(score)
+    // TODO: in metadata: set tooltip, tooltipshort, targetuuid (GOTO)
     return score
+}
+
+function doLogging(score: Score) {
+    score.systems.forEach((sys) => {
+        console.log(`label: ${sys.label}`)
+        sys.execution?.forEach((exec) => console.log(JSON.stringify(exec)))
+    })
 }
 /********************
  AUXILIARY FUNCTIONS
@@ -102,14 +113,20 @@ function getText(node: SyntaxNode | null, content: string): string {
 // Casts a string value to the js type that corresponds with the given ValueType.
 // A ListType is passed if strValue is an element of a list.
 function cast(strValue: string, type: ValueType) {
-    var returnVal: string | number | undefined = undefined
-
-    if (['StringValue', 'DynamicsLiteral'].includes(type)) returnVal = strValue
-    else if (type == 'IntegerValue') {
-        returnVal = Number.parseInt(strValue)
-        if (Number.isNaN(returnVal)) returnVal = undefined
+    switch (type) {
+        case 'StringValue':
+        case 'DynamicsLiteral':
+        default:
+            return strValue as string
+        case 'IntegerValue':
+        case 'FloatValue': {
+            const intVal = Number.parseInt(strValue)
+            return Number.isNaN(intVal) ? undefined : intVal
+        }
+        case 'BooleanValue': {
+            return strValue.toLowerCase() == 'true' ? true : strValue.toLowerCase() == 'true' ? false : undefined
+        }
     }
-    return returnVal
 }
 
 // Returns the value of the first child of node having the given ValueType as name.
@@ -187,6 +204,7 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
     return _.fromPairs(staffList)
 }
 
+// Returns the maximum width of vertically aligned sections.
 function getColwidths(staffs: Staffs) {
     const colWidths = _.values(staffs).reduce((aggr: number[] | undefined, measures: (Measure | undefined)[]) => {
         const widths = measures.map((measure: Measure | undefined) => (measure ? measure.notation.length : 0))
@@ -201,6 +219,11 @@ function getColwidths(staffs: Staffs) {
     return colWidths
 }
 
+function getAllPositions(score: Score): Position[] {
+    const positionSet = score.systems.reduce((aggr, system) => aggr.union(new Set(_.keys(system.staffs))), new Set())
+    return Array.from(positionSet) as Position[]
+}
+
 /***********
   METADATA 
 ***********/
@@ -208,69 +231,138 @@ function getColwidths(staffs: Staffs) {
 // Returns a list of ExecutionItem objects for the given gongan node.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 //          MetadataLine {tab lbrace space* Metadata rbrace Eol}
-function getMetadata(gonganNode: SyntaxNode | null, content: string): ExecutionItem[] | undefined {
-    if (gonganNode == undefined) return undefined
+function getMetadata(
+    gonganNode: SyntaxNode | null,
+    content: string
+): { execution: ExecutionItem[]; systemattr: SystemAttribute[]; scoreattr: ScoreAttribute[] } {
+    const metaData = {
+        execution: [] as ExecutionItem[],
+        systemattr: [] as SystemAttribute[],
+        scoreattr: [] as ScoreAttribute[]
+    }
+    if (gonganNode == undefined) return metaData
 
-    const itemList: ExecutionItem[] = []
     const metadataNodes = gonganNode.getChildren('MetadataLine')
     metadataNodes.forEach((child, index) => {
         const metaDataItem = child.getChild('Metadata')
         if (metaDataItem) {
             const item = parseMetadata(metaDataItem, index + 1, content)
-            if (item) itemList.push(item)
+            if (item) {
+                if ('attribute' in item) {
+                    if (item.parent == 'system') metaData.systemattr.push(item)
+                    else if (item.parent == 'score') metaData.scoreattr.push(item)
+                } else metaData.execution.push(item as unknown as ExecutionItem)
+            }
         }
     })
-    return itemList
+    return metaData
 }
 
+interface ScoreAttribute {
+    attribute: 'part'
+    parent: 'score'
+    value: string
+}
+interface SystemAttribute {
+    attribute: 'label'
+    parent: 'system'
+    value: boolean | string
+}
+// Metadata can contain Execution items, System attributes and Score attributes (part info)
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
-function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string): ExecutionItem | undefined {
+function parseMetadata(
+    metadataNode: SyntaxNode,
+    seqNr: number,
+    content: string
+): ScoreAttribute | SystemAttribute | ExecutionItem | undefined {
     if (!metadataNode) return undefined
     const node = metadataNode.firstChild
     if (!node) return undefined
 
     switch (node.name) {
-        case 'TempoMetadata': {
-            const baseAttr = { type: 'tempo', seqId: seqNr, tooltip: '', tooltipshort: '' }
-            const valueNode = node.getChild('TempoValue')
-            const values = getGradualValues(valueNode, 'IntegerValue', content)
-            if (values.value == undefined) {
-                console.error('No values found for gradual TEMPO value')
-                return undefined
-            }
-            const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
-            const parameters = Object.assign(getBeatParameters(node, content), {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                nthpass: cycle ? true : undefined
-            })
-            const gradualoverride = { isGradual: values.isGradual || parameters.isGradual }
-            return Object.assign(baseAttr, values, parameters, gradualoverride) as TempoItem
-        }
         case 'DynamicsMetadata': {
             const baseAttr = { type: 'dynamics', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const valueNode = node.getChild('DynamicsValue')
-            const values = getGradualValues(valueNode, 'DynamicsLiteral', content)
+            const value = getGradualValues(valueNode, 'DynamicsLiteral', content)
             const dynamicsvalues = {
-                dynamics: values.value,
-                fromDynamics: values.fromValue,
-                value: dynamicsToNumber[values.value as DynamicsValue],
-                fromValue: values.fromValue ? dynamicsToNumber[values.fromValue as DynamicsValue] : undefined,
-                isGradual: values.isGradual
+                dynamics: value.value,
+                fromDynamics: value.fromValue,
+                value: dynamicsToNumber[value.value as DynamicsValue],
+                fromValue: value.fromValue ? dynamicsToNumber[value.fromValue as DynamicsValue] : undefined,
+                isGradual: value.isGradual
             }
-            if (values.value == undefined) {
+            if (value.value == undefined) {
                 console.error('No values found for gradual DYNAMICS value')
                 return undefined
             }
-            const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
             const parameters = Object.assign(getBeatParameters(node, content), {
                 passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                nthpass: cycle ? true : undefined,
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
                 positions: getValueList<string>(node.getChild('PositionParameter'), 'StringList', content)
             })
-            const gradualoverride = { isGradual: values.isGradual || parameters.isGradual }
+            const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             return Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
+        }
+        case 'GotoMetadata': {
+            const baseAttr = { type: 'goto', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = {
+                targetname: getValue<string>(node, 'StringValue', content),
+                targetuuid: '' // Will be determined later
+            }
+            const parameters = {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
+            }
+            return Object.assign(baseAttr, value, parameters) as GotoItem
+        }
+        case 'LabelMetadata': {
+            return {
+                attribute: 'label',
+                parent: 'system',
+                value: getValue<string>(node, 'StringValue', content)
+            } as SystemAttribute
+        }
+        case 'LoopMetadata': {
+            const baseAttr = { type: 'loop', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { count: getValue<number>(node, 'IntegerValue', content) }
+            const parameters = {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
+            }
+            return Object.assign(baseAttr, value, parameters) as LoopItem
+        }
+        case 'TempoMetadata': {
+            const baseAttr = { type: 'tempo', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const valueNode = node.getChild('TempoValue')
+            const value = getGradualValues(valueNode, 'IntegerValue', content)
+            if (value.value == undefined) {
+                console.error('No values found for gradual TEMPO value')
+                return undefined
+            }
+            const parameters = Object.assign(getBeatParameters(node, content), {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
+                    ? true
+                    : undefined
+            })
+            const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
+            return Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
+        }
+        case 'SequenceMetadata': {
+            const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
+            return Object.assign(baseAttr, value) as SequenceItem
+        }
+        case 'WaitMetadata': {
+            const baseAttr = { type: 'wait', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { count: getValue<number>(node, 'IntegerValue', content) }
+            const parameters = {
+                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
+            }
+            return Object.assign(baseAttr, value, parameters) as LoopItem
         }
         default: {
             console.log(`${node.name}: ${getText(node, content)}`)

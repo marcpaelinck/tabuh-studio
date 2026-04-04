@@ -12,7 +12,8 @@
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
    Arrow { '->' }
    EmptyLine { tab* Eol }
-   OtherMetadata  { ("AUTOKEMPYUNG" | "GONGAN" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
+   //               |-EXECUTION-|----------------------SYSTEM-------------------|--SCORE-|-------IGNORE-------------|
+   OtherMetadata  { ("SUPPRESS" | "KEMPLI" | "GONGAN" | "AUTOKEMPYUNG" | "COPY" | "PART" | "VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
    BooleanValue { "true" | "false"}
    IntegerValue { $[0-9]+ }
@@ -20,12 +21,11 @@
    // Quoted StringValues can contain spaces, unquoted StringValues can not.
    StringValue { ![\n\r\t ,"'{}\[\]()]+ | ('"' ![\n\r\t,"'{}\[\]()]* '"') | ("'" ![\n\r\t,"'{}\[\]()]* "'") }
 }
- 
+
 @top Document { InfoMetadataLine Gongan+ }
 
 InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
 
-//notation="gilak penutup" part=full title="Gilak Penutup" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false
 Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 
 StaffLine { PositionLabel Measure+ Eol }
@@ -34,21 +34,29 @@ Measure { tab Note* }
 // METADATA
 
 InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
-// {INFO notation="gilak penutup" part=full title="Gilak Penutup" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 MetadataLine {tab lbrace space* Metadata rbrace Eol}
-Metadata { TempoMetadata |  DynamicsMetadata | OtherMetadata }
+Metadata { TempoMetadata |  DynamicsMetadata | GotoMetadata | LabelMetadata | LoopMetadata | SequenceMetadata | WaitMetadata | OtherMetadata  }
 
-TempoMetadata { "TEMPO" space* TempoValue space*  (BeatParameter | PassParameter | LoopParameter | CycleParameter)* }
+TempoMetadata { "TEMPO" space* TempoValue space* (BeatParameter | PassParameter | LoopParameter | NthpassParameter)* }
 TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
 
-DynamicsMetadata { "DYNAMICS" space* DynamicsValue space*  (BeatParameter | PassParameter | LoopParameter | CycleParameter | PositionParameter)* }
+DynamicsMetadata { "DYNAMICS" space* DynamicsValue space* (BeatParameter | PassParameter | LoopParameter | NthpassParameter | PositionParameter)* }
 DynamicsValue { DynamicsLiteral | (DynamicsLiteral? Arrow DynamicsLiteral) }
 
-GotoMetadata { "GOTO" space* LabelName space*  (PassParameter)* }
-GotoValue { GotoLiteral | (GotoLiteral? Arrow GotoLiteral) }
+GotoMetadata { "GOTO" space* StringValue space* (PassParameter | NthpassParameter)*? }
+
+LabelMetadata { "LABEL" space* StringValue space* StringList }
+
+LoopMetadata { "LOOP" space* IntegerValue space* (PassParameter | NthpassParameter)* }
+
+SequenceMetadata { "SEQUENCE" space* StringList }
+
+WaitMetadata { "WAIT" space* IntegerValue space* (PassParameter | NthpassParameter)* }
 
 // METADATA PARAMETERS
+
+// Info metadata
 ScoreParameter { "notation" "=" StringValue}
 PartParameter { "part" "=" StringValue}
 TitleParameter { "title" "=" StringValue}
@@ -59,15 +67,16 @@ RuntypesParameter { "run_types" "=" StringValue}
 DoLoopParameter { "loop" "=" BooleanValue}
 BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
+// Gongan metadata
 BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
 PassParameter { ("pass=" | "passes=") IntegerList}
 LoopParameter { ("loop=" | "loops=") IntegerList}
-CycleParameter { "cycle=" IntegerValue }
+NthpassParameter { "nthpass=" BooleanValue }
 PositionParameter { ("position=" | "positions=") StringList}
 
 // Naming is important here: <type>List should contain <type>Value elements
 IntegerList { (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]") }
-StringList { (StringValue | "[" StringValue (","  StringValue)* "]") }
+StringList { "[" StringValue ("," (Eol space*)? StringValue)* "]" }
 
 
 
