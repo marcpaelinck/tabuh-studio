@@ -1,51 +1,34 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
-import type { DynamicsItem, ExecutionItem, Score, TempoItem } from '../typing/types.ts'
+import type { DynamicsItem, ExecutionItem, Measure, Position, Score, Staffs, TempoItem } from '../typing/types.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
+import { tagLookup } from './notationUtils.ts'
 
+type ValueType = 'IntegerValue' | 'StringValue' | 'DynamicsLiteral'
+type ListType = 'IntegerList' | 'StringList'
+
+// Returns a Score object
+// Grammar: @top Document { InfoMetadataLine Gongan+ }
+//          InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
 export function parseNotation(content: string): Score | undefined {
     const tree = parser.parse(content)
 
     const traverse = (node: SyntaxNode) => {
         var value = '--none--'
         if ('from' in node && 'to' in node) value = getText(node, content)
-        const executionItems: ExecutionItem[] = []
 
         switch (node.name) {
-            case 'Metadata': {
-                var metachild = node.firstChild
-                var seqNr = 1
-                while (metachild) {
-                    const item = parseMetadata(metachild, seqNr, content)
-                    if (item) {
-                        executionItems.push(item)
-                        seqNr++
-                    }
-                    metachild = metachild.nextSibling
-                }
-                if (executionItems.length > 0) console.log(`Metadata: ${JSON.stringify(executionItems)}`)
-                break
-            }
-            case 'StaveLine': {
-                var staveArr: string[][] = []
-                const position = getText(node.getChild('PositionLabel'), content)
-                var measureNodes = node.getChildren('Measure')
-                for (const measureNode of measureNodes) {
-                    var measureArray: string[] = []
-                    staveArr.push(measureArray)
-                    var noteNode = measureNode.getChild('Note')
-                    while (noteNode) {
-                        measureArray.push(getText(noteNode, content))
-                        noteNode = noteNode.nextSibling
-                    }
-                }
-                const stave = _.fromPairs([[position, staveArr]])
-                console.log(`${node.name}: ${JSON.stringify(stave)}`)
+            case 'InfoMetadata': {
+                console.log(`${node.name}: ${getText(node, content)}`)
                 break
             }
             case 'Gongan': {
-                console.log(`${node.name}: ${value}`)
+                // console.log(`${node.name}: ${value}`)
+                const staffs: Staffs = getStaffs(node, content)
+                const executionItems: ExecutionItem[] | undefined = getMetadata(node, content)
+                console.log(`METADATA: ${JSON.stringify(executionItems)}`)
+                console.log(`${node.name}: ${JSON.stringify(staffs)}`)
                 break
             }
             default:
@@ -64,14 +47,119 @@ export function parseNotation(content: string): Score | undefined {
 }
 
 // AUXILIARY FUNCTIONS
-
+function unquote(str: string): string {
+    const match = str.match(/^(["'])(.*)\1$/s)
+    return match ? match[2] : str
+}
+// Returns the text that corresponds with the node
 function getText(node: SyntaxNode | null, content: string): string {
-    return node && 'from' in node ? content.slice(node.from, node.to) : ''
+    return unquote(node && 'from' in node ? content.slice(node.from, node.to) : '')
+}
+
+// Casts a string value to the js type that corresponds with the given ValueType.
+// A ListType is passed if strValue is an element of a list.
+function cast(strValue: string, type: ValueType | ListType) {
+    var returnVal: string | number | undefined = undefined
+
+    if (['StringValue', 'StringList', 'DynamicsLiteral'].includes(type)) returnVal = strValue
+    else if (['IntegerValue', 'IntegerList'].includes(type)) {
+        returnVal = Number.parseInt(strValue)
+        if (Number.isNaN(returnVal)) returnVal = undefined
+    }
+    return returnVal
+}
+
+// Returns the value of the first child of node having the given ValueType as name.
+function getValue<T>(node: SyntaxNode | null, type: ValueType, content: string): T | undefined {
+    if (node) {
+        const child = node.getChild(type)
+        return cast(getText(child, content), type) as T
+    }
+    return undefined
+}
+
+// Returns the values of all childnodes of `node` having the given ValueType as name.
+// If valueType is a ListType, a child of `node` with that name will be used as starting point
+// instead of `node`.
+// includeUndefined: if true, undefined values are included in the list.
+function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListType, content: string): T[] | undefined {
+    if (!node) return undefined
+
+    var returnList: (T | undefined)[] = []
+
+    // If valueType is a ListType, find the node's child with that name.
+    const listNode = valueType.endsWith('List') ? node.getChild(valueType) : node
+    if (!listNode) return undefined
+
+    if (listNode) {
+        const children = node.getChildren(valueType)
+        if (!children || children.length == 0) return undefined
+        children.forEach((child) => {
+            const value = cast(getText(child, content), valueType)
+            if (value != undefined) returnList.push(cast(getText(child, content), valueType) as T)
+        })
+    }
+
+    // Return undefined if the list is empty
+    return returnList.length > 0 ? (returnList as T[]) : undefined
+}
+
+// GONGAN
+
+// Creates a Staffs object from the given node's children
+// Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
+//          StaffLine { PositionLabel Measure+ Eol }
+//          Measure { tab Note* }
+function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
+    if (gonganNode == undefined) return {}
+    const staffList: [Position, Measure[]][] = []
+    const staffNodes = gonganNode.getChildren('StaveLine')
+    for (const child of staffNodes) {
+        var staff: Measure[] = []
+        const positionTag = getText(child.getChild('PositionLabel'), content)
+        const tags = positionTag.split('/')
+        const positions = tags.reduce((aggr, tag) => aggr.concat(tagLookup[tag] || []), [] as Position[])
+        var measureNodes = child.getChildren('Measure')
+        for (const measureNode of measureNodes) {
+            const measure: Measure = { notation: [] }
+            var noteNode = measureNode.getChild('Note')
+            while (noteNode) {
+                measure.notation.push(getText(noteNode, content))
+                noteNode = noteNode.nextSibling
+            }
+            staff.push(measure)
+        }
+        positions.forEach((position) => staffList.push([position, staff]))
+    }
+    return _.fromPairs(staffList)
 }
 
 // METADATA
 
-function parseMetadata(node: SyntaxNode, seqNr: number, content: string): ExecutionItem | undefined {
+// Returns a list of ExecutionItem objects for the given gongan node.
+// Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
+//          MetadataLine {tab lbrace space* Metadata rbrace Eol}
+function getMetadata(gonganNode: SyntaxNode | null, content: string): ExecutionItem[] | undefined {
+    if (gonganNode == undefined) return undefined
+
+    const itemList: ExecutionItem[] = []
+    const metadataNodes = gonganNode.getChildren('MetadataLine')
+    metadataNodes.forEach((child, index) => {
+        const metaDataItem = child.getChild('Metadata')
+        if (metaDataItem) {
+            const item = parseMetadata(metaDataItem, index + 1, content)
+            if (item) itemList.push(item)
+        }
+    })
+    return itemList
+}
+
+// Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
+function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string): ExecutionItem | undefined {
+    if (!metadataNode) return undefined
+    const node = metadataNode.firstChild
+    if (!node) return undefined
+
     switch (node.name) {
         case 'TempoMetadata': {
             const baseAttr = { type: 'tempo', seqId: seqNr, tooltip: '', tooltipshort: '' }
@@ -82,10 +170,20 @@ function parseMetadata(node: SyntaxNode, seqNr: number, content: string): Execut
                 return undefined
             }
             const beatParam = getBeatParameter(node, content)
-            const passParam = getPassParameter(node, content)
-            const loopParam = getLoopParameter(node, content)
+            const passParam = { passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
+            const loopParam = { loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
+            const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
+            const cycleParam = { nthpass: cycle ? true : undefined }
             const gradualAttr = { isGradual: values.isGradual || beatParam.isGradual }
-            const returnValue: TempoItem = Object.assign(baseAttr, values, beatParam, passParam, loopParam, gradualAttr)
+            const returnValue: TempoItem = Object.assign(
+                baseAttr,
+                values,
+                beatParam,
+                passParam,
+                loopParam,
+                gradualAttr,
+                cycleParam
+            )
             return returnValue
         }
         case 'DynamicsMetadata': {
@@ -97,8 +195,10 @@ function parseMetadata(node: SyntaxNode, seqNr: number, content: string): Execut
                 return undefined
             }
             const beatParam = getBeatParameter(node, content)
-            const passParam = getPassParameter(node, content)
-            const loopParam = getLoopParameter(node, content)
+            const passParam = { passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
+            const loopParam = { loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content) }
+            const cycle = getValue<number>(node.getChild('CycleParameter'), 'IntegerValue', content)
+            const cycleParam = { nthpass: cycle ? true : undefined }
             // const positionParam = getPositionParameter(node, content)
             const gradualAttr = { isGradual: values.isGradual || beatParam.isGradual }
             const returnValue: DynamicsItem = Object.assign(
@@ -107,7 +207,8 @@ function parseMetadata(node: SyntaxNode, seqNr: number, content: string): Execut
                 beatParam,
                 passParam,
                 loopParam,
-                gradualAttr
+                gradualAttr,
+                cycleParam
             )
             return returnValue
         }
@@ -118,46 +219,6 @@ function parseMetadata(node: SyntaxNode, seqNr: number, content: string): Execut
     return undefined
 }
 
-// Generic functions
-
-function cast(strValue: string, type: ValueType) {
-    var returnVal: string | number | undefined = undefined
-
-    if (type == 'StringValue' || type == 'DynamicsLiteral') returnVal = strValue
-    else if (type == 'IntegerValue') {
-        returnVal = Number.parseInt(strValue)
-        if (Number.isNaN(returnVal)) returnVal = undefined
-    }
-    return returnVal
-}
-
-function getValue(node: SyntaxNode | null, type: ValueType, content: string): string | number | undefined {
-    if (node) {
-        const child = node.getChild(type)
-        return cast(getText(child, content), type)
-    }
-    return undefined
-}
-
-function getValues(
-    node: SyntaxNode | null,
-    type: ValueType,
-    keepUndefined: boolean,
-    content: string
-): (string | number | undefined)[] | undefined {
-    const returnList: (string | number | undefined)[] = []
-    if (node) {
-        const children = node.getChildren(type)
-        if (!children || children.length == 0) return undefined
-        children.forEach((child) => {
-            const value = cast(getText(child, content), type)
-            if (keepUndefined || value != undefined) returnList.push(cast(getText(child, content), type))
-        })
-    }
-    return returnList
-}
-
-type ValueType = 'IntegerValue' | 'StringValue' | 'DynamicsLiteral'
 interface GenericGradualValue {
     value: number | string | undefined
     fromValue: number | string | undefined
@@ -167,7 +228,7 @@ function getGradualValues(node: SyntaxNode | null, type: ValueType, content: str
     const returnVal: GenericGradualValue = { fromValue: undefined, value: undefined, isGradual: false }
 
     if (node && getText(node, content)) {
-        var values: (number | string | undefined)[] | undefined = getValues(node, type, false, content)
+        var values: (number | string | undefined)[] | undefined = getValueList(node, type, content)
         if (!values || values.length == 0) return returnVal
         const arrow = getText(node.getChild('Arrow'), content) || undefined
         const gradual = arrow != undefined && arrow != ''
@@ -196,27 +257,5 @@ function getBeatParameter(node: SyntaxNode, content: string): BeatParameter {
         section: (values.value as number) || 1,
         isGradual: values.isGradual
     }
-    return param
-}
-
-// Grammar definition:
-// PassParameter { ("pass=" | "passes=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
-interface PassParameter {
-    passes: number[] | undefined
-}
-function getPassParameter(node: SyntaxNode, content: string): PassParameter {
-    const values = getValues(node.getChild('PassParameter'), 'IntegerValue', false, content) as number[]
-    const param: PassParameter = { passes: values && values.length > 0 ? values : undefined }
-    return param
-}
-
-// Grammar definition:
-// LoopParameter { ("loop=" | "loops=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
-interface LoopParameter {
-    loops: number[] | undefined
-}
-function getLoopParameter(node: SyntaxNode, content: string): LoopParameter {
-    const values = getValues(node.getChild('LoopParameter'), 'IntegerValue', false, content) as number[]
-    const param: LoopParameter = { loops: values && values.length > 0 ? values : undefined }
     return param
 }

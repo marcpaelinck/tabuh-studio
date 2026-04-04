@@ -1,7 +1,6 @@
 import { ExternalTokenizer } from '@lezer/lr'
-import * as fs from 'fs'
-import { instrumentTags } from './config.ts'
-import { EmptyMeasure, PositionLabel } from './tabuh.terms.ts'
+import { instrumentTags } from '../../notationConfig.ts'
+import { PositionLabel } from './tabuh.terms.ts'
 
 type Position =
     | 'CALUNG'
@@ -38,26 +37,6 @@ const newLine = 10,
     carriageReturn = 13,
     tab = 9,
     slash = 47
-
-function readTsvFile(filePath: string): Record<string, string | string[]>[] {
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const lines = content.split('\n').filter((line) => line.trim())
-    const headers = lines[0].split('\t')
-
-    return lines.slice(1).map((line) => {
-        const values = line.split('\t')
-        return Object.fromEntries(
-            headers.map((header, i) => {
-                let stringValue: string = values[i]
-                let outputValue: string | string[] = ''
-                if (['tag', 'addition'].includes(stringValue)) {
-                    outputValue = stringValue.split('|').map((v) => v.trim())
-                } else outputValue = stringValue
-                return [header, outputValue]
-            })
-        )
-    })
-}
 
 function createTagLookup(tagTable: Array<Record<string, string | string[]>>) {
     const tagLookup: Record<string, string> = {}
@@ -99,17 +78,4 @@ export const positionLabel = new ExternalTokenizer((input) => {
         return
     }
     input.acceptToken(PositionLabel)
-})
-
-const s = (n: number) => String.fromCharCode(n)
-
-// An EmptyMeasure token is returned if two consecutive tabs are encountered
-export const emptyMeasure = new ExternalTokenizer((input) => {
-    console.log(
-        `${input.peek(-3)} ${input.peek(-2)} ${input.peek(-1)} ${input.peek(0)} ${input.peek(1)} | ${s(input.peek(-3))} ${s(input.peek(-2))} ${s(input.peek(-1))} ${s(input.peek(0))} ${s(input.peek(1))}`
-    )
-    if (input.peek(-1) == tab && (input.next == tab || input.next == carriageReturn || input.next == carriageReturn)) {
-        // input.advance()
-        input.acceptToken(EmptyMeasure)
-    }
 })

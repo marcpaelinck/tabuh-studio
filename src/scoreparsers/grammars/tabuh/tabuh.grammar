@@ -10,39 +10,63 @@
    Eol { "\r\n" }
    Note { $[()*-.089ABEGIOPSTUXabeiorstuxy] $[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
-   IntegerValue { $[0-9]+ }
    Arrow { '->' }
-   OtherMetadata  { ("AUTOKEMPYUNG" | "GONGAN" | "GOTO" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
-   InfoMetadata  { "INFO" ![\n\r\t{}]+ }
    EmptyLine { tab* Eol }
+   OtherMetadata  { ("AUTOKEMPYUNG" | "GONGAN" | "KEMPLI" | "LABEL" | "LOOP" | "OCTAVATE" | "PART" | "SEQUENCE" | "SUPPRESS" | "COPY" | "VALIDATION" | "WAIT") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
-   StringValue { $[a-z] }
+   BooleanValue { "true" | "false"}
+   IntegerValue { $[0-9]+ }
+   FloatValue { $[0-9]+ "." $[0-9]+ }
+   // Quoted StringValues can contain spaces, unquoted StringValues can not.
+   StringValue { ![\n\r\t ,"'{}\[\]()]+ | ('"' ![\n\r\t,"'{}\[\]()]* '"') | ("'" ![\n\r\t,"'{}\[\]()]* "'") }
 }
  
-// @external tokens emptyMeasure from "./tokens.ts" { EmptyMeasure }
+@top Document { InfoMetadataLine Gongan+ }
 
-@top Document { MetadataLine Gongan+ }
+InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
 
-Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
+//notation="gilak penutup" part=full title="Gilak Penutup" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false
+Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
+
+StaffLine { PositionLabel Measure+ Eol }
+Measure { tab Note* }
 
 // METADATA
 
-MetadataLine {tab lbrace space* Metadata rbrace Eol}
-Metadata { InfoMetadata | TempoMetadata |  DynamicsMetadata | OtherMetadata }
+InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
+// {INFO notation="gilak penutup" part=full title="Gilak Penutup" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
-TempoMetadata { "TEMPO" space* TempoValue space*  (BeatParameter | PassParameter | LoopParameter)* }
+MetadataLine {tab lbrace space* Metadata rbrace Eol}
+Metadata { TempoMetadata |  DynamicsMetadata | OtherMetadata }
+
+TempoMetadata { "TEMPO" space* TempoValue space*  (BeatParameter | PassParameter | LoopParameter | CycleParameter)* }
 TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
 
-DynamicsMetadata { "DYNAMICS" space* DynamicsValue space*  (BeatParameter | PassParameter | LoopParameter | PositionParameter)* }
+DynamicsMetadata { "DYNAMICS" space* DynamicsValue space*  (BeatParameter | PassParameter | LoopParameter | CycleParameter | PositionParameter)* }
 DynamicsValue { DynamicsLiteral | (DynamicsLiteral? Arrow DynamicsLiteral) }
 
+GotoMetadata { "GOTO" space* LabelName space*  (PassParameter)* }
+GotoValue { GotoLiteral | (GotoLiteral? Arrow GotoLiteral) }
+
 // METADATA PARAMETERS
+ScoreParameter { "notation" "=" StringValue}
+PartParameter { "part" "=" StringValue}
+TitleParameter { "title" "=" StringValue}
+ComposerParameter { "composer" "=" StringValue}
+InstrumentgroupParameter { "instrumentgroup" "=" StringValue}
+FontParameter { "font" "=" StringValue}
+RuntypesParameter { "run_types" "=" StringValue}
+DoLoopParameter { "loop" "=" BooleanValue}
+BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
 BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
-PassParameter { ("pass=" | "passes=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
-LoopParameter { ("loop=" | "loops=") (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]")}
-PositionParameter { ("position=" | "positions=") (StringValue | "[" StringValue ("," " "? StringValue)* "]")}
+PassParameter { ("pass=" | "passes=") IntegerList}
+LoopParameter { ("loop=" | "loops=") IntegerList}
+CycleParameter { "cycle=" IntegerValue }
+PositionParameter { ("position=" | "positions=") StringList}
+
+IntegerList { (IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]") }
+StringList { (StringValue | "[" StringValue ("," " "? StringValue)* "]") }
 
 
-StaveLine { PositionLabel Measure+ Eol }
-Measure { tab Note* }
+
