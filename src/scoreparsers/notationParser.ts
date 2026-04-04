@@ -1,6 +1,7 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
+import { v4 as uuidv4 } from 'uuid'
 import { dynamicsToNumber } from '../config/config.ts'
 import type {
     DynamicsItem,
@@ -10,6 +11,7 @@ import type {
     Position,
     Score,
     Staffs,
+    System,
     TempoItem
 } from '../typing/types.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
@@ -24,27 +26,50 @@ type ListType = 'IntegerList' | 'StringList'
 export function parseNotation(content: string): Score | undefined {
     const tree = parser.parse(content)
 
+    const score = {
+        uuid: uuidv4(),
+        title: '',
+        composer: '',
+        instrumenttype: '',
+        parts: {},
+        positions: [],
+        systems: [],
+        hasCycle: false
+    } as Score
+
+    var gonganCounter = 0
+
     const traverse = (node: SyntaxNode) => {
         var value = '--none--'
         if ('from' in node && 'to' in node) value = getText(node, content)
 
         switch (node.name) {
             case 'InfoMetadata': {
-                const parameters = {
+                const scoreSettings = {
                     title: getValue<string>(node.getChild('TitleParameter'), 'StringValue', content),
                     composer: getValue<string>(node.getChild('ComposerParameter'), 'StringValue', content),
-                    instrumenttype: getValue<string>(node.getChild('InstrumentGroupParameter'), 'StringValue', content),
-                    hasCycle: false
+                    instrumenttype: getValue<string>(node.getChild('InstrumentGroupParameter'), 'StringValue', content)
                 }
-                console.log(`${node.name}: ${JSON.stringify(parameters)}`)
+                Object.assign(score, scoreSettings)
                 break
             }
             case 'Gongan': {
-                // console.log(`${node.name}: ${value}`)
-                const staffs: Staffs = getStaffs(node, content)
+                gonganCounter++
+                const staffs = getStaffs(node, content)
                 const executionItems: ExecutionItem[] | undefined = getMetadata(node, content)
-                console.log(`METADATA: ${JSON.stringify(executionItems)}`)
-                console.log(`${node.name}: ${JSON.stringify(staffs)}`)
+                const system = {
+                    uuid: uuidv4(),
+                    id: gonganCounter,
+                    index: gonganCounter - 1,
+                    grouped: [],
+                    staffs: staffs,
+                    colWidths: getColwidths(staffs),
+                    label: undefined,
+                    execution: executionItems
+                } as System
+                score.systems.push(system)
+                // console.log(`METADATA: ${JSON.stringify(executionItems)}`)
+                // console.log(`${node.name}: ${JSON.stringify(staffs)}`)
                 break
             }
             default:
@@ -58,7 +83,8 @@ export function parseNotation(content: string): Score | undefined {
     }
 
     traverse(tree.topNode)
-    return undefined
+    console.log(JSON.stringify(score))
+    return score
 }
 /********************
  AUXILIARY FUNCTIONS
@@ -146,7 +172,7 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
         const positionTag = getText(child.getChild('PositionLabel'), content)
         const tags = positionTag.split('/')
         const positions = tags.reduce((aggr, tag) => aggr.concat(tagLookup[tag] || []), [] as Position[])
-        var measureNodes = child.getChildren('Measure')
+        const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
             const measure: Measure = { notation: [] }
             var noteNode = measureNode.getChild('Note')
@@ -160,6 +186,21 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
     }
     return _.fromPairs(staffList)
 }
+
+function getColwidths(staffs: Staffs) {
+    const colWidths = _.values(staffs).reduce((aggr: number[] | undefined, measures: (Measure | undefined)[]) => {
+        const widths = measures.map((measure: Measure | undefined) => (measure ? measure.notation.length : 0))
+        if (widths) {
+            if (aggr)
+                return _.zip(aggr, widths).map(([el1, el2]) =>
+                    el1 && el2 ? Math.max(el1, el2) : el1 ? el1 : el2 ? el2 : 0
+                )
+        }
+        return widths
+    }, undefined)
+    return colWidths
+}
+
 /***********
   METADATA 
 ***********/

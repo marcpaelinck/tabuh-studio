@@ -94,7 +94,6 @@ export type System = {
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string
-    loop?: LoopItem
     execution?: ExecutionItem[]
     copyfrom?: string // label or id of copied system
     copyfromkey?: UUID // uuid copied system
