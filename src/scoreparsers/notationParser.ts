@@ -7,6 +7,7 @@ import type {
     DynamicsItem,
     DynamicsValue,
     ExecutionItem,
+    ExecutionItemType,
     GotoItem,
     LoopItem,
     Measure,
@@ -20,8 +21,16 @@ import type {
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { tagLookup } from './notationUtils.ts'
 
-type ValueType = 'IntegerValue' | 'FloatValue' | 'StringValue' | 'BooleanValue' | 'DynamicsLiteral'
-type ListType = 'IntegerList' | 'StringList'
+type ValueType =
+    | 'IntegerValue'
+    | 'FloatValue'
+    | 'StringValue'
+    | 'BooleanValue'
+    | 'DynamicsLiteral'
+    | 'ExecutionValue'
+    | 'OnOffValue'
+    | 'ScopeValue'
+type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 
 // Returns a Score object
 // Grammar: @top Document { InfoMetadataLine Gongan+ }
@@ -39,6 +48,8 @@ export function parseNotation(content: string): Score | undefined {
         systems: [],
         hasCycle: false
     } as Score
+
+    const postProcessingInstructions: PostProcessing[] = []
 
     var gonganCounter = 0
 
@@ -68,9 +79,20 @@ export function parseNotation(content: string): Score | undefined {
                     staffs: staffs,
                     colWidths: getColwidths(staffs),
                     label: undefined,
-                    execution: metaData.execution
+                    execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
                 } as System
-                metaData.systemattr.forEach((attribute) => (system[attribute.attribute] = attribute.value as string))
+                metaData
+                    .filter((item) => item.type == 'attribute')
+                    .forEach((item) => {
+                        const attributeOf: Attribute = item.value as Attribute
+                        if (attributeOf.system) Object.assign(system, attributeOf.system)
+                        if (attributeOf.score) Object.assign(score, attributeOf.score)
+                    })
+                postProcessingInstructions.push(
+                    ...(metaData
+                        .filter((item) => item.type == 'postprocessing')
+                        .map((item) => item.value) as PostProcessing[])
+                )
                 score.systems.push(system)
                 break
             }
@@ -86,16 +108,18 @@ export function parseNotation(content: string): Score | undefined {
 
     traverse(tree.topNode)
     score.positions = getAllPositions(score)
-    doLogging(score)
+    doLogging(score, postProcessingInstructions)
     // TODO: in metadata: set tooltip, tooltipshort, targetuuid (GOTO)
     return score
 }
 
-function doLogging(score: Score) {
+function doLogging(score: Score, postProcessingInstructions: PostProcessing[]) {
     score.systems.forEach((sys) => {
         console.log(`label: ${sys.label}`)
         sys.execution?.forEach((exec) => console.log(JSON.stringify(exec)))
     })
+    console.log('\nPOSTPROCESSING')
+    postProcessingInstructions.forEach((instr) => console.log(JSON.stringify(instr)))
 }
 /********************
  AUXILIARY FUNCTIONS
@@ -123,8 +147,13 @@ function cast(strValue: string, type: ValueType) {
             const intVal = Number.parseInt(strValue)
             return Number.isNaN(intVal) ? undefined : intVal
         }
-        case 'BooleanValue': {
-            return strValue.toLowerCase() == 'true' ? true : strValue.toLowerCase() == 'true' ? false : undefined
+        case 'BooleanValue':
+        case 'OnOffValue': {
+            return ['true', 'on'].includes(strValue.toLowerCase())
+                ? true
+                : ['false', 'off'].includes(strValue.toLowerCase())
+                  ? false
+                  : undefined
         }
     }
 }
@@ -172,6 +201,12 @@ function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListTyp
     return returnList.length > 0 ? (returnList as T[]) : undefined
 }
 
+// Converts a list of position tags to a list of Position values.
+// Position tags are used at the start of each stave and in the `positions=` parameter of metadata items.
+function tagsToPositions(tags: string[]): Position[] {
+    return tags.reduce((aggr, tag) => aggr.concat(tagLookup[tag] || []), [] as Position[])
+}
+
 /***********
    GONGAN   
 ***********/
@@ -187,8 +222,7 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
     for (const child of staffNodes) {
         var staff: Measure[] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
-        const tags = positionTag.split('/')
-        const positions = tags.reduce((aggr, tag) => aggr.concat(tagLookup[tag] || []), [] as Position[])
+        const positions = tagsToPositions(positionTag.split('/'))
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
             const measure: Measure = { notation: [] }
@@ -228,18 +262,11 @@ function getAllPositions(score: Score): Position[] {
   METADATA 
 ***********/
 
-// Returns a list of ExecutionItem objects for the given gongan node.
+// Returns a list of ProcessingInstruction objects for the given gongan node.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 //          MetadataLine {tab lbrace space* Metadata rbrace Eol}
-function getMetadata(
-    gonganNode: SyntaxNode | null,
-    content: string
-): { execution: ExecutionItem[]; systemattr: SystemAttribute[]; scoreattr: ScoreAttribute[] } {
-    const metaData = {
-        execution: [] as ExecutionItem[],
-        systemattr: [] as SystemAttribute[],
-        scoreattr: [] as ScoreAttribute[]
-    }
+function getMetadata(gonganNode: SyntaxNode | null, content: string): ProcessingInstruction[] {
+    const metaData: ProcessingInstruction[] = []
     if (gonganNode == undefined) return metaData
 
     const metadataNodes = gonganNode.getChildren('MetadataLine')
@@ -247,39 +274,49 @@ function getMetadata(
         const metaDataItem = child.getChild('Metadata')
         if (metaDataItem) {
             const item = parseMetadata(metaDataItem, index + 1, content)
-            if (item) {
-                if ('attribute' in item) {
-                    if (item.parent == 'system') metaData.systemattr.push(item)
-                    else if (item.parent == 'score') metaData.scoreattr.push(item)
-                } else metaData.execution.push(item as unknown as ExecutionItem)
-            }
+            if (item) metaData.push(item)
         }
     })
     return metaData
 }
 
-interface ScoreAttribute {
-    attribute: 'part'
-    parent: 'score'
-    value: string
+interface Attribute {
+    score?: { parts: string[] }
+    system?: { copyfrom: string } | { label: string }
 }
-interface SystemAttribute {
-    attribute: 'label'
-    parent: 'system'
-    value: boolean | string
+interface PostProcessing {
+    copy?: { label: string; executiontypes?: ExecutionItemType[] }
+    autokempyung?: { apply: boolean; positions?: Position[]; scope?: 'score' | 'system' }
 }
-// Metadata can contain Execution items, System attributes and Score attributes (part info)
+interface ProcessingInstruction {
+    type: 'attribute' | 'executionitem' | 'postprocessing'
+    value: ExecutionItem | Attribute | PostProcessing
+}
+// Metadata can contain Execution items, System/Score attributes or instructions for the postprocessing step.
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
-function parseMetadata(
-    metadataNode: SyntaxNode,
-    seqNr: number,
-    content: string
-): ScoreAttribute | SystemAttribute | ExecutionItem | undefined {
+function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string): ProcessingInstruction | undefined {
     if (!metadataNode) return undefined
     const node = metadataNode.firstChild
     if (!node) return undefined
 
     switch (node.name) {
+        case 'AutokempyungMetadata': {
+            const apply = getValue<boolean>(node, 'OnOffValue', content) || false // value might be undefined
+            const posTags = getValueList<string>(node.getChild('PositionsParameter'), 'StringList', content)
+            const positions = posTags ? tagsToPositions(posTags) : undefined
+            const scope = getValue<string>(node.getChild('ScopeParameter'), 'ScopeValue', content)?.toLowerCase()
+            const instruction = { autokempyung: { apply: apply, positions: positions, scope: scope } } as PostProcessing
+            return { type: 'postprocessing', value: instruction } as ProcessingInstruction
+        }
+        case 'CopyMetadata': {
+            const label = getValue<string>(node, 'StringValue', content)
+            // prettier-ignore
+            const executiontypes = getValueList<string>(
+                node.getChild('IncludeExecutionTypesParameter'), 'ExecutionList', content
+            )
+            const instruction = { copy: { label: label, executiontypes: executiontypes } } as PostProcessing
+            return { type: 'postprocessing', value: instruction } as ProcessingInstruction
+        }
         case 'DynamicsMetadata': {
             const baseAttr = { type: 'dynamics', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const valueNode = node.getChild('DynamicsValue')
@@ -295,33 +332,34 @@ function parseMetadata(
                 console.error('No values found for gradual DYNAMICS value')
                 return undefined
             }
+            const posTags = getValueList<string>(node.getChild('PositionsParameter'), 'StringList', content)
+            const positions = posTags ? tagsToPositions(posTags) : undefined
             const parameters = Object.assign(getBeatParameters(node, content), {
                 passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                positions: getValueList<string>(node.getChild('PositionParameter'), 'StringList', content)
+                positions: positions
             })
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
-            return Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
+            const item = Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GotoMetadata': {
             const baseAttr = { type: 'goto', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const value = {
                 targetname: getValue<string>(node, 'StringValue', content),
-                targetuuid: '' // Will be determined later
+                targetuuid: '' // Will be determined during the postprocessing step
             }
             const parameters = {
                 passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
-            return Object.assign(baseAttr, value, parameters) as GotoItem
+            const item = Object.assign(baseAttr, value, parameters) as GotoItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'LabelMetadata': {
-            return {
-                attribute: 'label',
-                parent: 'system',
-                value: getValue<string>(node, 'StringValue', content)
-            } as SystemAttribute
+            const item: Attribute = { system: { label: getValue<string>(node, 'StringValue', content) as string } }
+            return { type: 'attribute', value: item } as ProcessingInstruction
         }
         case 'LoopMetadata': {
             const baseAttr = { type: 'loop', seqId: seqNr, tooltip: '', tooltipshort: '' }
@@ -330,7 +368,8 @@ function parseMetadata(
                 passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
-            return Object.assign(baseAttr, value, parameters) as LoopItem
+            const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'TempoMetadata': {
             const baseAttr = { type: 'tempo', seqId: seqNr, tooltip: '', tooltipshort: '' }
@@ -348,12 +387,14 @@ function parseMetadata(
                     : undefined
             })
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
-            return Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
+            const item = Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'SequenceMetadata': {
             const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
-            return Object.assign(baseAttr, value) as SequenceItem
+            const item = Object.assign(baseAttr, value) as SequenceItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'WaitMetadata': {
             const baseAttr = { type: 'wait', seqId: seqNr, tooltip: '', tooltipshort: '' }
@@ -362,7 +403,8 @@ function parseMetadata(
                 passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
-            return Object.assign(baseAttr, value, parameters) as LoopItem
+            const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         default: {
             console.log(`${node.name}: ${getText(node, content)}`)

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
 import { type PlaybackState } from '../../componentlogic/playbackReducer'
-import { useRules } from '../../componentlogic/useRules'
+import { useRules } from '../../componentlogic/castingRulesManager'
 import { noCursor, positionConfigs, type NavigationAction } from '../../config/config'
 import type { EditorCellCursor, Position, System } from '../../typing/types'
 import { notation2text } from '../../utils/alphabet'
@@ -128,8 +128,8 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
             const position: Position = pos as Position
             if (!systemData.grouped.includes(position)) return
             const newNotation = castNotation(notation, position, colId)
-            if (cached) newSystemData.staffs[position][colId].notation_ = newNotation
-            else newSystemData.staffs[position][colId].notation = newNotation
+            if (cached) newSystemData.staffs[position]![colId].notation_ = newNotation
+            else newSystemData.staffs[position]![colId].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
         })
         scoreFunc.updateSystem(newSystemData)
