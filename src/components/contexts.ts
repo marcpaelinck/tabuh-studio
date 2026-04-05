@@ -11,14 +11,12 @@ export interface ScoreFunctionsType {
     updateScore: (system: Score) => void
     updateSystem: (system: System) => void
     updateParts: (parts: Record<string, string[]>) => void
-    scoreToFormattedJson: (score: Score) => string | undefined
 }
 export const defaultScoreFunc: ScoreFunctionsType = {
     getEditorScore: () => undefined,
     updateScore: () => {},
     updateSystem: () => {},
-    updateParts: () => {},
-    scoreToFormattedJson: () => undefined
+    updateParts: () => {}
 }
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
 

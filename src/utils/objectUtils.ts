@@ -2,6 +2,7 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
+import _ from 'lodash'
 import type { JsonSymbol, Score } from '../typing/types'
 
 /**
@@ -57,7 +58,8 @@ const DefaultObjectFactory = {
             instrumenttype: '',
             positions: [],
             systems: [],
-            parts: {}
+            parts: {},
+            hasCycle: false
         } as Score
     }
 }
@@ -67,15 +69,37 @@ export function defaultObject<T>(otype: DefaultType): T {
     return DefaultObjectFactory[otype]() as T
 }
 
-export function toOrdinal(val: number): string {
-    switch (val) {
-        case 1:
-            return `1st`
-        case 2:
-            return `2nd`
-        case 3:
-            return `3rd`
-        default:
-            return `${val}th`
+export function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
+    const flatten = (key: string, value: any) => {
+        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key) && value) {
+            var json = value.map((meas: any) => {
+                return JSON.stringify(meas)
+            })
+            if (key != 'execution') json = '[' + json.join(', ') + ']'
+            return json
+        }
+        if (key == 'colWidths') {
+            const json = JSON.stringify(value)
+            return json
+        }
+        if (key == 'starttime') {
+            return undefined
+        }
+        return value
     }
+    if (clearCache) {
+        score.systems.forEach((sys) =>
+            _.toPairs(sys.staffs).forEach(([_, measures]) => measures.forEach((measure) => delete measure.notation_))
+        )
+    }
+
+    const json = JSON.stringify(score, flatten, 2)
+    return json
+        .replace(/"([\{\[])/g, '$1')
+        .replace(/([\}\]])"/g, '$1')
+        .replace(/\\"/g, '"')
+        .replace(/:(?! )/g, ': ')
+        .replace(/([\]\}\d"]),"/g, '$1, "')
+        .replace(/(true|false),(?![ \n\r])/g, '$1, ')
+        .replace(/([\d]),(?=\d)/g, '$1, ')
 }

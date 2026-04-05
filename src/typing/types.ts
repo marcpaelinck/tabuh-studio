@@ -244,7 +244,7 @@ export interface DynamicsItem extends ExpressionItemBase {
 
 export type FlowItem = GotoItem | LoopItem | SequenceItem | WaitItem
 export type ExpressionItem = TempoItem | DynamicsItem
-export type ExecutionItem = FlowItem | ExpressionItem
+export type ExecutionItem = FlowItem | ExpressionItem | SuppressItem
 
 export type EditorCellCursor = { sysUuid: UUID; measure: number }
 

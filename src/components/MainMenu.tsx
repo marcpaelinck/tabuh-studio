@@ -6,6 +6,7 @@ import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsui
 import type { KeyboardType } from '../config/config'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import type { Score, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../typing/types'
+import { scoreToFormattedJson } from '../utils/objectUtils'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
@@ -84,7 +85,7 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
                         )
                     )
                     console.log(newScore)
-                    const json = scoreFunc.scoreToFormattedJson(newScore)
+                    const json = scoreToFormattedJson(newScore)
                     if (activeKey == 'file-save') {
                         var response = undefined
                         if (json) response = await wpFunc.database.saveScore(newScore.uuid, newScore.title, json)

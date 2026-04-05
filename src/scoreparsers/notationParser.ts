@@ -1,5 +1,6 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
+import fs from 'fs'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { dynamicsToNumber } from '../config/config.ts'
@@ -19,6 +20,8 @@ import type {
     System,
     TempoItem
 } from '../typing/types.ts'
+import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
+import { scoreToFormattedJson } from '../utils/objectUtils.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { tagLookup } from './notationUtils.ts'
 
@@ -56,9 +59,6 @@ export function parseNotation(content: string): Score | undefined {
     var gonganCounter = 0
 
     const traverse = (node: SyntaxNode) => {
-        var value = '--none--'
-        if ('from' in node && 'to' in node) value = getText(node, content)
-
         switch (node.name) {
             case 'InfoMetadata': {
                 const scoreSettings = {
@@ -71,10 +71,11 @@ export function parseNotation(content: string): Score | undefined {
             }
             case 'Gongan': {
                 gonganCounter++
+                const systemuuid = uuidv4()
                 const staffs = getStaffs(node, content)
-                const metaData = getMetadata(node, content)
+                const metaData = getMetadata(node, systemuuid, content)
                 const system = {
-                    uuid: uuidv4(),
+                    uuid: systemuuid,
                     id: gonganCounter,
                     index: gonganCounter - 1,
                     grouped: [],
@@ -109,19 +110,21 @@ export function parseNotation(content: string): Score | undefined {
     }
 
     traverse(tree.topNode)
+
+    // Postprocessing
     score.positions = getAllPositions(score)
+    // TODO: Further postprocessing:
+    // - in metadata: fill in targetuuid (GOTO, SEQUENCE)
+    // - Process copy and autokempyung postProcessingInstructions
+
     doLogging(score, postProcessingInstructions)
-    // TODO: in metadata: set tooltip, tooltipshort, targetuuid (GOTO)
     return score
 }
 
 function doLogging(score: Score, postProcessingInstructions: PostProcessing[]) {
-    score.systems.forEach((sys) => {
-        console.log(`label: ${sys.label}`)
-        sys.execution?.forEach((exec) => console.log(JSON.stringify(exec)))
-    })
-    console.log('\nPOSTPROCESSING')
-    postProcessingInstructions.forEach((instr) => console.log(JSON.stringify(instr)))
+    const json = scoreToFormattedJson(score)
+    console.log(JSON.stringify(postProcessingInstructions))
+    fs.writeFileSync('./src/scoreparsers/grammars/tabuh/parsed_score.json', json)
 }
 /********************
  AUXILIARY FUNCTIONS
@@ -272,7 +275,7 @@ function getAllPositions(score: Score): Position[] {
 // Returns a list of ProcessingInstruction objects for the given gongan node.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 //          MetadataLine {tab lbrace space* Metadata rbrace Eol}
-function getMetadata(gonganNode: SyntaxNode | null, content: string): ProcessingInstruction[] {
+function getMetadata(gonganNode: SyntaxNode | null, systemuuid: string, content: string): ProcessingInstruction[] {
     const metaData: ProcessingInstruction[] = []
     if (gonganNode == undefined) return metaData
 
@@ -280,7 +283,7 @@ function getMetadata(gonganNode: SyntaxNode | null, content: string): Processing
     metadataNodes.forEach((child, index) => {
         const metaDataItem = child.getChild('Metadata')
         if (metaDataItem) {
-            const item = parseMetadata(metaDataItem, index + 1, content)
+            const item = parseMetadata(metaDataItem, index + 1, systemuuid, content)
             if (item) metaData.push(item)
         }
     })
@@ -292,7 +295,7 @@ interface Attribute {
     system?: { copyfrom: string } | { label: string }
 }
 interface PostProcessing {
-    copy?: { label: string; executiontypes?: ExecutionItemType[] }
+    copy?: { label: string; targetuuid: string; include?: ExecutionItemType[] }
     autokempyung?: { apply: boolean; positions?: Position[]; scope?: 'score' | 'system' }
 }
 interface ProcessingInstruction {
@@ -301,33 +304,33 @@ interface ProcessingInstruction {
 }
 // Metadata can contain Execution items, System/Score attributes or instructions for the postprocessing step.
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
-function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string): ProcessingInstruction | undefined {
+function parseMetadata(
+    metadataNode: SyntaxNode,
+    seqNr: number,
+    systemuuid: string,
+    content: string
+): ProcessingInstruction | undefined {
     if (!metadataNode) return undefined
     const node = metadataNode.firstChild
     if (!node) return undefined
 
     switch (node.name) {
         case 'AutokempyungMetadata': {
-            const apply = getValue<boolean>(node, 'OnOffValue', content) || false // value might be undefined
-            const posTags = getValueList<string>(node.getChild('PositionsParameter'), 'StringList', content)
-            const positions = posTags ? tagsToPositions(posTags) : undefined
-            const scope = getValue<string>(node.getChild('ScopeParameter'), 'ScopeValue', content)?.toLowerCase()
-            const instruction = { autokempyung: { apply: apply, positions: positions, scope: scope } } as PostProcessing
-            return { type: 'postprocessing', value: instruction } as ProcessingInstruction
+            const parameters = { apply: getValue<boolean>(node, 'OnOffValue', content) || false } // value might be undefined
+            Object.assign(parameters, getMetadataParameters(node, ['positions', 'scope'], content))
+            return { type: 'postprocessing', value: { autokempyung: parameters } } as ProcessingInstruction
         }
         case 'CopyMetadata': {
-            const label = getValue<string>(node, 'StringValue', content)
-            // prettier-ignore
-            const executiontypes = getValueList<string>(
-                node.getChild('IncludeExecutionTypesParameter'), 'ExecutionList', content
-            )
-            const instruction = { copy: { label: label, executiontypes: executiontypes } } as PostProcessing
-            return { type: 'postprocessing', value: instruction } as ProcessingInstruction
+            const parameters = { label: getValue<string>(node, 'StringValue', content) }
+            Object.assign(parameters, getMetadataParameters(node, ['include'], content))
+            return {
+                type: 'postprocessing',
+                value: { copy: parameters, targetuuid: systemuuid }
+            } as ProcessingInstruction
         }
         case 'DynamicsMetadata': {
-            const baseAttr = { type: 'dynamics', seqId: seqNr, tooltip: '', tooltipshort: '' }
-            const valueNode = node.getChild('DynamicsValue')
-            const value = getGradualValues(valueNode, 'DynamicsLiteral', content)
+            const baseAttr = { type: 'dynamics' }
+            const value = getGradualValues(node.getChild('DynamicsValue'), 'DynamicsLiteral', content)
             const dynamicsvalues = {
                 dynamics: value.value,
                 fromDynamics: value.fromValue,
@@ -339,58 +342,41 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
                 console.error('No values found for gradual DYNAMICS value')
                 return undefined
             }
-            const posTags = getValueList<string>(node.getChild('PositionsParameter'), 'StringList', content)
-            const positions = posTags ? tagsToPositions(posTags) : undefined
-            const parameters = Object.assign(getBeatsParameters(node, content), {
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                loops: getValueList<number>(node.getChild('LoopsParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                positions: positions
-            })
+            const parameters = Object.assign(
+                getGradualBeatsParameters(node, content),
+                getMetadataParameters(node, ['passes', 'iterations', 'nthpass', 'positions'], content)
+            )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GonganMetadata': {
             const gongantype = getValue<string>(node, 'GonganTypeValue', content) || 'none'
             if (!['gineman', 'genderan', 'kebyar'].includes(gongantype.toLowerCase())) break
-
-            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'suppress' }
             const value = { positions: ['KEMPLI'] as Position[] }
-            const parameters = {
-                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                iterations: getValue<boolean>(node.getChild('IterationsParameter'), 'BooleanValue', content)
-            }
+            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GotoMetadata': {
-            const baseAttr = { type: 'goto', seqId: seqNr, tooltip: '', tooltipshort: '' }
-            const value = {
-                targetname: getValue<string>(node, 'StringValue', content),
-                targetuuid: '' // Will be determined during the postprocessing step
-            }
-            const parameters = {
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
-            }
+            const baseAttr = { type: 'goto' }
+            const value = { targetname: getValue<string>(node, 'StringValue', content), targetuuid: '' }
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as GotoItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'KempliMetadata': {
             // Do nothing if value is ON (true)
             if (getValue<boolean>(node, 'OnOffValue', content)) break
-            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'suppress' }
             const value = { positions: ['KEMPLI'] as Position[] }
-            const parameters = {
-                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                iterations: getValueList<number>(node.getChild('IterationsParameter'), 'IntegerList', content)
-            }
+            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'LabelMetadata': {
@@ -398,58 +384,51 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
             return { type: 'attribute', value: item } as ProcessingInstruction
         }
         case 'LoopMetadata': {
-            const baseAttr = { type: 'loop', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'loop' }
             const value = { count: getValue<number>(node, 'IntegerValue', content) }
-            const parameters = {
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
-            }
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'SequenceMetadata': {
             const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
             const item = Object.assign(baseAttr, value) as SequenceItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'SuppressMetadata': {
-            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'suppress' }
             const value = { positions: getValueList<string>(node, 'StringList', content) }
-            const parameters = {
-                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                iterations: getValue<boolean>(node.getChild('IterationsParameter'), 'BooleanValue', content)
-            }
+            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'TempoMetadata': {
-            const baseAttr = { type: 'tempo', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'tempo' }
             const valueNode = node.getChild('TempoValue')
             const value = getGradualValues(valueNode, 'IntegerValue', content)
             if (value.value == undefined) {
                 console.error('No values found for gradual TEMPO value')
                 return undefined
             }
-            const parameters = Object.assign(getBeatsParameters(node, content), {
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
-                loops: getValueList<number>(node.getChild('LoopsParameter'), 'IntegerList', content) ? true : undefined
-            })
+            const parameters = Object.assign(
+                getGradualBeatsParameters(node, content),
+                getMetadataParameters(node, ['passes', 'nthpass', 'iterations'], content)
+            )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'WaitMetadata': {
-            const baseAttr = { type: 'wait', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const baseAttr = { type: 'wait' }
             const value = { count: getValue<number>(node, 'FloatValue', content) }
-            const parameters = {
-                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
-            }
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         default: {
@@ -457,6 +436,83 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
         }
     }
     return undefined
+}
+
+// Returns the requested parameters of a metadata item
+// metadatanode: root node of the metadata item
+// paramList: list of parameter names. Each parameter will be returned as a pair `paramName`: `paramvalue`
+function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], content: string): Record<string, any> {
+    const parameters: Record<string, string> = {}
+    for (const paramName of paramList) {
+        var param: any
+        switch (paramName) {
+            case 'beats':
+                param = { beats: getValueList<number>(metadatanode.getChild('BeatsParameter'), 'IntegerList', content) }
+                break
+            case 'include':
+                param = {
+                    include: getValueList<string>(
+                        metadatanode.getChild('IncludeExecutionTypesParameter'),
+                        'ExecutionList',
+                        content
+                    )
+                }
+                break
+            case 'iterations':
+                param = {
+                    iterations: getValueList<number>(
+                        metadatanode.getChild('IterationsParameter'),
+                        'IntegerList',
+                        content
+                    )
+                }
+                break
+            case 'loops':
+                param = { loops: getValueList<number>(metadatanode.getChild('LoopsParameter'), 'IntegerList', content) }
+                break
+            case 'nthpass':
+                param = {
+                    nthpass: getValue<boolean>(metadatanode.getChild('NthpassParameter'), 'BooleanValue', content)
+                }
+                break
+            case 'passes':
+                param = {
+                    passes: getValueList<number>(metadatanode.getChild('PassesParameter'), 'IntegerList', content)
+                }
+                break
+            case 'positions':
+                const posTags = getValueList<string>(metadatanode.getChild('PositionsParameter'), 'StringList', content)
+                const positions = posTags ? tagsToPositions(posTags) : undefined
+                param = { positions: positions }
+                break
+            case 'scope':
+                param = {
+                    scope: getValue<string>(
+                        metadatanode.getChild('ScopeParameter'),
+                        'ScopeValue',
+                        content
+                    )?.toLowerCase()
+                }
+                break
+            case 'score':
+                param = {
+                    scope: getValue<string>(
+                        metadatanode.getChild('ScopeParameter'),
+                        'ScopeValue',
+                        content
+                    )?.toLowerCase()
+                }
+                break
+        }
+        Object.assign(parameters, param)
+    }
+    return parameters
+}
+
+function updateSeqAndTooltips(item: ExecutionItem) {
+    item.seqId = executionItemSeqId(item)
+    item.tooltip = executionItemTooltip(item, 'long')
+    item.tooltipshort = executionItemTooltip(item, 'short')
 }
 
 interface GenericGradualValue {
@@ -492,7 +548,7 @@ interface BeatsParameter {
 }
 // Grammar definition:
 // BeatsParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
-function getBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
+function getGradualBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsParameter'), 'IntegerValue', content)
     const param: BeatsParameter = {
         fromSection: values.fromValue as number,

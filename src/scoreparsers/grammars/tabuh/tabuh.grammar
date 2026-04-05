@@ -1,7 +1,6 @@
 @precedence { Measure, EmptyMeasure }
 
 @tokens {
-   space { " " }
    lbrace  { "{" }
    rbrace  { "}" }
    tab { "\t" }
@@ -26,7 +25,7 @@
 
 @top Document { InfoMetadataLine Gongan+ }
 
-InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
+InfoMetadataLine {tab lbrace InfoMetadata rbrace Eol}
 InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
 
 Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
@@ -46,35 +45,35 @@ DoLoopParameter { "loop" "=" BooleanValue}
 
 // METADATA
 
-MetadataLine {tab lbrace space* Metadata rbrace Eol}
+MetadataLine {tab lbrace Metadata rbrace Eol}
 Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GonganMetadata | GotoMetadata | KempliMetadata | 
            LabelMetadata | LoopMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
 
-AutokempyungMetadata { "AUTOKEMPYUNG" space* OnOffValue space* (PositionsParameter | ScopeParameter)* }
+AutokempyungMetadata { "AUTOKEMPYUNG" OnOffValue (PositionsParameter | ScopeParameter)* }
 
-CopyMetadata { "COPY" space* StringValue space* IncludeExecutionTypesParameter?}
+CopyMetadata { "COPY" StringValue IncludeExecutionTypesParameter?}
 
 DynamicsMetadata { "DYNAMICS" DynamicsValue (BeatsGradualParameter | PassesParameter  | NthpassParameter | IterationsParameter | PositionsParameter)* }
 DynamicsValue { DynamicsLiteral | (DynamicsLiteral? Arrow DynamicsLiteral) }
 
 GonganMetadata { "GONGAN" GonganTypeValue }
 
-GotoMetadata { "GOTO" space* StringValue space* (PassesParameter | NthpassParameter)*? }
+GotoMetadata { "GOTO" StringValue (PassesParameter | NthpassParameter)*? }
 
 KempliMetadata { "KEMPLI" OnOffValue (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter )* }
 
-LabelMetadata { "LABEL" space* StringValue }
+LabelMetadata { "LABEL" StringValue }
 
-LoopMetadata { "LOOP" space* IntegerValue space* (PassesParameter | NthpassParameter)* }
+LoopMetadata { "LOOP" IntegerValue (PassesParameter | NthpassParameter)* }
 
-SequenceMetadata { "SEQUENCE" space* StringList }
+SequenceMetadata { "SEQUENCE" StringList }
 
 SuppressMetadata { "SUPPRESS" StringList (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter)*  }
 
-TempoMetadata { "TEMPO" space* TempoValue space* (BeatsGradualParameter | PassesParameter | NthpassParameter | IterationsParameter)* }
+TempoMetadata { "TEMPO" TempoValue (BeatsGradualParameter | PassesParameter | NthpassParameter | IterationsParameter)* }
 TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
 
-WaitMetadata { "WAIT" space* FloatValue space* (PassesParameter | NthpassParameter)* }
+WaitMetadata { "WAIT" FloatValue (PassesParameter | NthpassParameter)* }
 
 // METADATA PARAMETERS
 BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
@@ -91,8 +90,8 @@ ScopeParameter { "scope=" ScopeValue}
 
 // Naming is important here: <type>List should contain <type>Value elements
 IntegerList { IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]" }
-StringList { "[" StringValue ("," (Eol space*)? StringValue)* "]" }
-ExecutionList { "[" ExecutionValue ("," (Eol space*)? ExecutionValue)* "]" } 
+StringList { "[" StringValue ("," (Eol )? StringValue)* "]" }
+ExecutionList { "[" ExecutionValue ("," (Eol )? ExecutionValue)* "]" } 
 
 
 

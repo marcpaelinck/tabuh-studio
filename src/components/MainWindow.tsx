@@ -185,23 +185,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
     }
-    const {
-        editorScore,
-        getEditorScore,
-        updateScore,
-        labels,
-        updateSystem,
-        updateParts,
-        scoreToFormattedJson,
-        executeItemAction
-    } = useEditorScoreManager(dashboardFunctions)
-    const scoreFunctions: ScoreFunctionsType = {
-        getEditorScore,
-        updateScore,
-        updateSystem,
-        updateParts,
-        scoreToFormattedJson
-    }
+    const { editorScore, getEditorScore, updateScore, labels, updateSystem, updateParts, executeItemAction } =
+        useEditorScoreManager(dashboardFunctions)
+    const scoreFunctions: ScoreFunctionsType = { getEditorScore, updateScore, updateSystem, updateParts }
     const wpFunc = useContext(WpApiFunctions)
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})

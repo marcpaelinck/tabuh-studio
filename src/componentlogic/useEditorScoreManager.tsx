@@ -5,139 +5,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { type DashboardFunctionsType } from '../components/contexts'
 import type { ExecutionItem, Score, System } from '../typing/types'
 import { debug } from '../utils/debugger'
-import { toOrdinal } from '../utils/objectUtils'
+import { executionItemTooltip } from '../utils/executionItems'
 import { cycleValidation } from './validationManager'
-
-function toText(values: number[] | undefined, ordinal: boolean = false): string {
-    if (values) {
-        var list = values.map((val) => `${val}`)
-        if (ordinal) list = values.map((val) => toOrdinal(val))
-        if (list.length > 1) return list.slice(0, -1).join(', ') + ' & ' + _.last(list)
-        else return list.join('') // also takes care of empty array
-    } else return ''
-}
-
-function getSeqId(item: ExecutionItem) {
-    const typeSeq = { loop: 1000, tempo: 2000, dynamics: 3000, wait: 4000, goto: 5000 }[item.type]
-    const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.section : 0)
-    const passesSeq = 10 * (_.min(item.passes) || 0)
-    const iterSeq = 'iterations' in item ? _.min(item.iterations) || 0 : 0
-    return typeSeq + beatSeq + passesSeq + iterSeq
-}
-
-// Formats a floating point value as int if the decimals are all 0
-function fmtFloat(value: number): number {
-    return value == Math.floor(value) ? Math.floor(value) : value
-}
-
-export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
-    const nbrOfPasses = !item.passes ? 0 : item.passes.length
-    // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
-    const sortedPasses = item.passes ? item.passes.sort() : []
-    const sortedIterations = 'iterations' in item && item.iterations ? item.iterations.sort() : []
-    // Create components for the values to return.
-    var instruction: string = ''
-    var preposition: string = ''
-    var shortTooltip: string = ''
-    item.seqId = getSeqId(item)
-    switch (item.type) {
-        case 'goto': {
-            shortTooltip = item.targetname
-            instruction = `go to ${item.targetname}`
-            preposition = 'after'
-            break
-        }
-        case 'loop': {
-            shortTooltip = `${item.count}X`
-            instruction = `play ${item.count}X`
-            preposition = 'on'
-            break
-        }
-        case 'wait': {
-            shortTooltip = `${item.seconds} sec.`
-            instruction = `wait ${fmtFloat(item.seconds)} ${item.seconds > 1 ? 'seconds' : 'second'}`
-            preposition = 'after'
-            break
-        }
-        case 'tempo':
-        case 'dynamics': {
-            const current = length == 'long' ? 'current ' : ''
-            const itemtype = length == 'long' ? `${item.type} ` : ''
-            if (item.type == 'tempo') {
-                const isGradual = item.isGradual && item.fromValue != item.value
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromValue ? `${current}→` : item.fromValue + '→') : ''}${item.value} BPM`
-            } else {
-                const isGradual = item.isGradual && item.fromDynamics != item.dynamics
-                shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.dynamics}`
-            }
-            const multipleSections = item.isGradual && item.fromSection != item.section
-            instruction =
-                shortTooltip +
-                ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.section}`
-            preposition = 'on'
-            break
-        }
-    }
-    if (length == 'short') return shortTooltip
-
-    var loopcondition = ''
-    var andloopcondition = ''
-    if (sortedIterations.length > 0) {
-        const loopcond = `${toText(sortedIterations, true)} ${sortedIterations.length > 1 ? 'iterations' : 'iteration'}`
-        loopcondition = ' ' + preposition + ' ' + loopcond
-        andloopcondition = ', ' + loopcond
-    }
-    // Compose the long tooltip version
-    switch (true) {
-        case !nbrOfPasses:
-            return `${instruction}${loopcondition}`
-        case nbrOfPasses && !item.nthpass:
-            return `${instruction} ${preposition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}${andloopcondition}`
-        case nbrOfPasses && item.nthpass:
-            return `${instruction} ${preposition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}${andloopcondition}`
-        default:
-            return `Invalid combination: missing one or more pass numbers.`
-    }
-}
-
-function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
-    const flatten = (key: string, value: any) => {
-        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key) && value) {
-            const json = value.map((meas: any) => {
-                return JSON.stringify(meas)
-            })
-            return json
-        }
-        if (key == 'colWidths') {
-            const json = JSON.stringify(value)
-            return json
-        }
-        if (key == 'starttime') {
-            return undefined
-        }
-        return value
-    }
-    if (clearCache) {
-        score.systems.forEach((sys) =>
-            _.toPairs(sys.staffs).forEach(([_, measures]) => measures.forEach((measure) => delete measure.notation_))
-        )
-    }
-
-    const json = JSON.stringify(score, flatten, 2)
-    return json
-        .replace(/"([\{\[])/g, '$1')
-        .replace(/([\}\]])"/g, '$1')
-        .replace(/\\"/g, '"')
-        .replace(/:(?! )/g, ': ')
-        .replace(/([\]\}\d"]),"/g, '$1, "')
-        .replace(/(true|false),(?![ \n\r])/g, '$1, ')
-        .replace(/([\d]),(?=\d)/g, '$1, ')
-}
 
 function gotoItemTargetName(destination: System) {
     return destination.label ? destination.label : `#${destination.id}`
 }
-
 export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType) {
     const [editorScore, setEditorScore] = useState<Score | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, System>>({})
@@ -380,14 +253,5 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         updatePointers(newData)
         setEditorScore({ ...editorScore, ...{ systems: newData } })
     }
-    return {
-        editorScore,
-        getEditorScore,
-        updateScore,
-        labels,
-        updateSystem,
-        updateParts,
-        scoreToFormattedJson,
-        executeItemAction
-    }
+    return { editorScore, getEditorScore, updateScore, labels, updateSystem, updateParts, executeItemAction }
 }
