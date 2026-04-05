@@ -171,7 +171,7 @@ export type HilightRangeFunction = (hlRange: HighlightRange) => void
 // Flow instructions: determine the playing sequence (goto and loop).
 // Expression instructions: contain tempo and dynamics information.
 
-export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics' | 'sequence'
+export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics' | 'sequence' | 'suppress'
 
 // Base class
 export interface ExecutionItemBase {
@@ -197,17 +197,25 @@ export interface LoopItem extends ExecutionItemBase {
     count: number // Total number of times to play the System consecutively.
 }
 
-// Enables to repeat the current System.
+// Enables to execute gongans in a specific sequence.
 export interface SequenceItem extends ExecutionItemBase {
     type: 'sequence'
     labels: string[] // sequence of gongan labels
     uuids: string[] // uuids of the gongans in the sequence
 }
 
-// Enables to repeat the current System.
+// Enables to add a pause after the System.
 export interface WaitItem extends ExecutionItemBase {
     type: 'wait'
     seconds: number // Number of seconds to wait after playing the System. Rounded off to 1/4 of a second.
+}
+
+// Enables to suppress one or more instruments.
+export interface SuppressItem extends ExecutionItemBase {
+    type: 'suppress'
+    beats?: number[] // List of beats, can be used to limit the scope of the item.
+    positions?: Position[] // Positions to suppress. Assume all positions if undefined.
+    iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the item applies.
 }
 
 export interface ExpressionItemBase extends ExecutionItemBase {
@@ -231,7 +239,7 @@ export interface DynamicsItem extends ExpressionItemBase {
     type: 'dynamics'
     fromDynamics?: DynamicsValue // If isGradual==true: starting value for gradual change. Otherwise undefined.
     dynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
-    positions: Position[]
+    positions: Position[] // Positions for which the dynamics apply
 }
 
 export type FlowItem = GotoItem | LoopItem | SequenceItem | WaitItem

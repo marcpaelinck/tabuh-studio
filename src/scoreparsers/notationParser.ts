@@ -15,6 +15,7 @@ import type {
     Score,
     SequenceItem,
     Staffs,
+    SuppressItem,
     System,
     TempoItem
 } from '../typing/types.ts'
@@ -30,6 +31,7 @@ type ValueType =
     | 'ExecutionValue'
     | 'OnOffValue'
     | 'ScopeValue'
+    | 'GonganTypeValue'
 type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 
 // Returns a Score object
@@ -140,11 +142,16 @@ function cast(strValue: string, type: ValueType) {
     switch (type) {
         case 'StringValue':
         case 'DynamicsLiteral':
+        case 'GonganTypeValue':
+        case 'ScopeValue':
         default:
             return strValue as string
-        case 'IntegerValue':
-        case 'FloatValue': {
+        case 'IntegerValue': {
             const intVal = Number.parseInt(strValue)
+            return Number.isNaN(intVal) ? undefined : intVal
+        }
+        case 'FloatValue': {
+            const intVal = Number.parseFloat(strValue)
             return Number.isNaN(intVal) ? undefined : intVal
         }
         case 'BooleanValue':
@@ -334,14 +341,29 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
             }
             const posTags = getValueList<string>(node.getChild('PositionsParameter'), 'StringList', content)
             const positions = posTags ? tagsToPositions(posTags) : undefined
-            const parameters = Object.assign(getBeatParameters(node, content), {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+            const parameters = Object.assign(getBeatsParameters(node, content), {
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
+                loops: getValueList<number>(node.getChild('LoopsParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
                 positions: positions
             })
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
+        }
+        case 'GonganMetadata': {
+            const gongantype = getValue<string>(node, 'GonganTypeValue', content) || 'none'
+            if (!['gineman', 'genderan', 'kebyar'].includes(gongantype.toLowerCase())) break
+
+            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { positions: ['KEMPLI'] as Position[] }
+            const parameters = {
+                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
+                iterations: getValue<boolean>(node.getChild('IterationsParameter'), 'BooleanValue', content)
+            }
+            const item = Object.assign(baseAttr, value, parameters) as SuppressItem
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GotoMetadata': {
@@ -351,10 +373,24 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
                 targetuuid: '' // Will be determined during the postprocessing step
             }
             const parameters = {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
             const item = Object.assign(baseAttr, value, parameters) as GotoItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
+        }
+        case 'KempliMetadata': {
+            // Do nothing if value is ON (true)
+            if (getValue<boolean>(node, 'OnOffValue', content)) break
+            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { positions: ['KEMPLI'] as Position[] }
+            const parameters = {
+                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
+                iterations: getValueList<number>(node.getChild('IterationsParameter'), 'IntegerList', content)
+            }
+            const item = Object.assign(baseAttr, value, parameters) as SuppressItem
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'LabelMetadata': {
@@ -365,10 +401,28 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
             const baseAttr = { type: 'loop', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const value = { count: getValue<number>(node, 'IntegerValue', content) }
             const parameters = {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
+        }
+        case 'SequenceMetadata': {
+            const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
+            const item = Object.assign(baseAttr, value) as SequenceItem
+            return { type: 'executionitem', value: item } as ProcessingInstruction
+        }
+        case 'SuppressMetadata': {
+            const baseAttr = { type: 'suppress', seqId: seqNr, tooltip: '', tooltipshort: '' }
+            const value = { positions: getValueList<string>(node, 'StringList', content) }
+            const parameters = {
+                beats: getValueList<number>(node.getChild('BeatsParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
+                iterations: getValue<boolean>(node.getChild('IterationsParameter'), 'BooleanValue', content)
+            }
+            const item = Object.assign(baseAttr, value, parameters) as SuppressItem
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'TempoMetadata': {
@@ -379,28 +433,20 @@ function parseMetadata(metadataNode: SyntaxNode, seqNr: number, content: string)
                 console.error('No values found for gradual TEMPO value')
                 return undefined
             }
-            const parameters = Object.assign(getBeatParameters(node, content), {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                loops: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
-                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
-                    ? true
-                    : undefined
+            const parameters = Object.assign(getBeatsParameters(node, content), {
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
+                nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content),
+                loops: getValueList<number>(node.getChild('LoopsParameter'), 'IntegerList', content) ? true : undefined
             })
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
-        case 'SequenceMetadata': {
-            const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
-            const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
-            const item = Object.assign(baseAttr, value) as SequenceItem
-            return { type: 'executionitem', value: item } as ProcessingInstruction
-        }
         case 'WaitMetadata': {
             const baseAttr = { type: 'wait', seqId: seqNr, tooltip: '', tooltipshort: '' }
-            const value = { count: getValue<number>(node, 'IntegerValue', content) }
+            const value = { count: getValue<number>(node, 'FloatValue', content) }
             const parameters = {
-                passes: getValueList<number>(node.getChild('PassParameter'), 'IntegerList', content),
+                passes: getValueList<number>(node.getChild('PassesParameter'), 'IntegerList', content),
                 nthpass: getValue<boolean>(node.getChild('NthpassParameter'), 'BooleanValue', content)
             }
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
@@ -439,16 +485,16 @@ function getGradualValues(node: SyntaxNode | null, type: ValueType, content: str
  PARAMETERS
 ***********/
 
-interface BeatParameter {
+interface BeatsParameter {
     fromSection: number | undefined
     section: number
     isGradual: boolean
 }
 // Grammar definition:
-// BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
-function getBeatParameters(node: SyntaxNode, content: string): BeatParameter {
-    const values = getGradualValues(node.getChild('BeatParameter'), 'IntegerValue', content)
-    const param: BeatParameter = {
+// BeatsParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
+function getBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
+    const values = getGradualValues(node.getChild('BeatsParameter'), 'IntegerValue', content)
+    const param: BeatsParameter = {
         fromSection: values.fromValue as number,
         section: (values.value as number) || 1,
         isGradual: values.isGradual

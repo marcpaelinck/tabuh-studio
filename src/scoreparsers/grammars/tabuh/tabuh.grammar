@@ -1,6 +1,4 @@
-// TEMPLATES
-// commaSepML<content> { (("\t" | "\n")* "," ("\t" | "\n")* content)* }
-@precedence { Measure, EmptyMeasure, TempoMetadata, IgnoreMetadata }
+@precedence { Measure, EmptyMeasure }
 
 @tokens {
    space { " " }
@@ -12,17 +10,18 @@
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
    Arrow { '->' }
    EmptyLine { tab* Eol }
-   //               |-EXECUTION------------------------|--SCORE-|-------IGNORE-------------|
-   IgnoreMetadata  { ("SUPPRESS" | "KEMPLI" | "GONGAN" | "PART" | "VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
+   //               |--SCORE--|-------IGNORE-------------|
+   IgnoreMetadata  { ( "PART" | "VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
    ExecutionValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' }
+   GonganTypeValue { 'kebyar' | 'KEBYAR' | 'genderan' | 'GENDERAN' | 'gineman' | 'GINEMAN' }
    OnOffValue { 'on' | 'ON' | 'off' | 'OFF' }
    ScopeValue { 'gongan' | 'GONGAN' | 'score' | 'SCORE' }
    // Quoted StringValues can contain spaces, unquoted StringValues can not.
    StringValue { ![\n\r\t ,"'{}\[\]()]+ | ('"' ![\n\r\t,"'{}\[\]()]* '"') | ("'" ![\n\r\t,"'{}\[\]()]* "'") }
    BooleanValue { "true" | "false"}
    IntegerValue { $[0-9]+ }
-   FloatValue { $[0-9]+ "." $[0-9]+ }
+   FloatValue { $[0-9]+ ("." $[0-9]+)? }
 }
 
 @top Document { InfoMetadataLine Gongan+ }
@@ -47,37 +46,45 @@ DoLoopParameter { "loop" "=" BooleanValue}
 
 // METADATA
 
+MetadataLine {tab lbrace space* Metadata rbrace Eol}
+Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GonganMetadata | GotoMetadata | KempliMetadata | 
+           LabelMetadata | LoopMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
+
 AutokempyungMetadata { "AUTOKEMPYUNG" space* OnOffValue space* (PositionsParameter | ScopeParameter)* }
 
 CopyMetadata { "COPY" space* StringValue space* IncludeExecutionTypesParameter?}
 
-MetadataLine {tab lbrace space* Metadata rbrace Eol}
-Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GotoMetadata| IgnoreMetadata | LabelMetadata | LoopMetadata | SequenceMetadata| TempoMetadata  | WaitMetadata  }
-
-DynamicsMetadata { "DYNAMICS" space* DynamicsValue space* (BeatParameter | PassParameter | LoopParameter | NthpassParameter | PositionsParameter)* }
+DynamicsMetadata { "DYNAMICS" DynamicsValue (BeatsGradualParameter | PassesParameter  | NthpassParameter | IterationsParameter | PositionsParameter)* }
 DynamicsValue { DynamicsLiteral | (DynamicsLiteral? Arrow DynamicsLiteral) }
 
-GotoMetadata { "GOTO" space* StringValue space* (PassParameter | NthpassParameter)*? }
+GonganMetadata { "GONGAN" GonganTypeValue }
+
+GotoMetadata { "GOTO" space* StringValue space* (PassesParameter | NthpassParameter)*? }
+
+KempliMetadata { "KEMPLI" OnOffValue (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter )* }
 
 LabelMetadata { "LABEL" space* StringValue }
 
-LoopMetadata { "LOOP" space* IntegerValue space* (PassParameter | NthpassParameter)* }
+LoopMetadata { "LOOP" space* IntegerValue space* (PassesParameter | NthpassParameter)* }
 
 SequenceMetadata { "SEQUENCE" space* StringList }
 
-TempoMetadata { "TEMPO" space* TempoValue space* (BeatParameter | PassParameter | LoopParameter | NthpassParameter)* }
+SuppressMetadata { "SUPPRESS" StringList (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter)*  }
+
+TempoMetadata { "TEMPO" space* TempoValue space* (BeatsGradualParameter | PassesParameter | NthpassParameter | IterationsParameter)* }
 TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
 
-WaitMetadata { "WAIT" space* IntegerValue space* (PassParameter | NthpassParameter)* }
+WaitMetadata { "WAIT" space* FloatValue space* (PassesParameter | NthpassParameter)* }
 
 // METADATA PARAMETERS
 BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
 // Gongan metadata
-BeatParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
-PassParameter { ("pass=" | "passes=") IntegerList}
+BeatsGradualParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
+BeatsParameter { ("beat=" | "beats=") IntegerList}
+PassesParameter { ("pass=" | "passes=") IntegerList}
+IterationsParameter {("iteration=" | "iterations=") IntegerList }
 IncludeExecutionTypesParameter { "include=" ExecutionList}
-LoopParameter { ("loop=" | "loops=") IntegerList}
 NthpassParameter { "nthpass=" BooleanValue }
 PositionsParameter { ("position=" | "positions=") StringList}
 ScopeParameter { "scope=" ScopeValue}
