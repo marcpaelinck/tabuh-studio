@@ -189,7 +189,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         }
     }
 
-    // - Process copy postProcessingInstructions
+    // Process copy postProcessingInstructions
     const copyInstructions: PostProcessing[] =
         postProcessingInstructions.filter((instr) => instr.copy != undefined) || []
     for (const instr of copyInstructions) {
@@ -207,6 +207,29 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
                 target.execution.push(...copyItems)
             }
         }
+    }
+
+    // Generate and assign the score's `parts` attribute.
+    // Parts instructions only contain the first system of the part. Assume that
+    // each part should be extended until the next part or the end of the score.
+    const partPostProcessing: PostProcessing[] =
+        postProcessingInstructions.filter((instr) => instr.part != undefined) || []
+    // Extract the part definitions (PartInstruction) and sort them by system ID.
+    const partsInstr = partPostProcessing
+        .map((instr) => instr.part!)
+        .sort((part1, part2) => part1.systemid - part2.systemid) as PartInstruction[]
+    // Create [part, next part] pairs
+    const pairs = _.zip(
+        partsInstr,
+        partsInstr
+            .toSpliced(0, 1)
+            .concat([{ name: '', systemid: Number.MAX_SAFE_INTEGER, systemuuid: '' } as PartInstruction])
+    )
+
+    for (const [part, next] of pairs) {
+        if (!part || !next) continue
+        const partSystems = score.systems.filter((system) => system.id >= part?.systemid && system.id < next.systemid)
+        score.parts[part.name] = partSystems.map((system) => system.uuid)
     }
 
     return score
@@ -410,8 +433,20 @@ interface ProcessingInstruction {
     type: 'attribute' | 'executionitem' | 'postprocessing' | 'castinginstruction'
     value: ExecutionItem | Attribute | PostProcessing | CastingInstruction
 }
+interface CopyInstruction {
+    label: string
+    targetid: number
+    targetuuid: string
+    include?: ExecutionItemType[]
+}
+interface PartInstruction {
+    name: string
+    systemid: number
+    systemuuid: UUID
+}
 interface PostProcessing {
-    copy: { label: string; targetid: number; targetuuid: string; include?: ExecutionItemType[] }
+    copy?: CopyInstruction
+    part?: PartInstruction
 }
 // Metadata can contain Execution items, System/Score attributes or instructions for the postprocessing step.
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
@@ -448,7 +483,7 @@ function parseMetadata(
             Object.assign(parameters, getMetadataParameters(node, ['include'], content))
             return {
                 type: 'postprocessing',
-                value: { copy: parameters, targetuuid: systemuuid }
+                value: { copy: parameters, targetuuid: systemuuid } as PostProcessing
             } as ProcessingInstruction
         }
         case 'DynamicsMetadata': {
@@ -513,6 +548,13 @@ function parseMetadata(
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
             updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
+        }
+        case 'PartMetadata': {
+            const partName: string = getValue<string>(node, 'StringValue', content) as string
+            return {
+                type: 'postprocessing',
+                value: { part: { name: partName, systemid: systemid, systemuuid: systemuuid } } as PostProcessing
+            } as ProcessingInstruction
         }
         case 'SequenceMetadata': {
             const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }

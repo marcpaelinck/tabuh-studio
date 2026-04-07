@@ -1,16 +1,18 @@
 @precedence { Measure, EmptyMeasure }
 
+@skip{space tab}
+
 @tokens {
    lbrace  { "{" }
    rbrace  { "}" }
    tab { "\t" }
+   space {" "}
    Eol { "\r\n" }
    Note { $[()*-.089ABEGIOPSTUXabeiorstuxy] $[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
    Arrow { '->' }
    EmptyLine { tab* Eol }
-   //               |--SCORE--|-------IGNORE-------------|
-   IgnoreMetadata  { ( "PART" | "VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
+   IgnoreMetadata  { ("VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
    ExecutiontypeValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' }
    GonganTypeValue { 'kebyar' | 'KEBYAR' | 'genderan' | 'GENDERAN' | 'gineman' | 'GINEMAN' }
@@ -49,7 +51,7 @@ DoLoopParameter { "loop" "=" BooleanValue}
 
 MetadataLine {tab lbrace Metadata rbrace Eol}
 Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GonganMetadata | GotoMetadata | KempliMetadata | 
-           LabelMetadata | LoopMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
+           LabelMetadata | LoopMetadata | PartMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
 
 AutokempyungMetadata { ("KEMPYUNG" | "AUTOKEMPYUNG") OnOffValue (PositionsParameter | ScopeParameter)* }
 
@@ -67,6 +69,8 @@ KempliMetadata { "KEMPLI" OnOffValue (BeatsParameter | PassesParameter | Nthpass
 LabelMetadata { "LABEL" StringValue }
 
 LoopMetadata { "LOOP" IntegerValue (PassesParameter | NthpassParameter)* }
+
+PartMetadata { "PART" StringValue }
 
 SequenceMetadata { "SEQUENCE" StringList }
 
