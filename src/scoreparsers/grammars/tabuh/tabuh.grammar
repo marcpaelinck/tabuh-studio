@@ -12,7 +12,7 @@
    //               |--SCORE--|-------IGNORE-------------|
    IgnoreMetadata  { ( "PART" | "VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
-   ExecutionValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' }
+   ExecutiontypeValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' }
    GonganTypeValue { 'kebyar' | 'KEBYAR' | 'genderan' | 'GENDERAN' | 'gineman' | 'GINEMAN' }
    OnOffValue { 'on' | 'ON' | 'off' | 'OFF' }
    ScopeValue { 'gongan' | 'GONGAN' | 'score' | 'SCORE' }
@@ -28,12 +28,14 @@
 InfoMetadataLine {tab lbrace InfoMetadata rbrace Eol}
 InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
 
+// GONGAN
+
 Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 
 StaffLine { PositionLabel Measure+ Eol }
 Measure { tab Note* }
 
-// Info metadata parameters
+// InfoMetadata parameters
 ScoreParameter { "notation" "=" StringValue}
 PartParameter { "part" "=" StringValue}
 TitleParameter { "title" "=" StringValue}
@@ -49,7 +51,7 @@ MetadataLine {tab lbrace Metadata rbrace Eol}
 Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GonganMetadata | GotoMetadata | KempliMetadata | 
            LabelMetadata | LoopMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
 
-AutokempyungMetadata { "AUTOKEMPYUNG" OnOffValue (PositionsParameter | ScopeParameter)* }
+AutokempyungMetadata { ("KEMPYUNG" | "AUTOKEMPYUNG") OnOffValue (PositionsParameter | ScopeParameter)* }
 
 CopyMetadata { "COPY" StringValue IncludeExecutionTypesParameter?}
 
@@ -76,22 +78,21 @@ TempoValue { IntegerValue | (IntegerValue? Arrow IntegerValue) }
 WaitMetadata { "WAIT" FloatValue (PassesParameter | NthpassParameter)* }
 
 // METADATA PARAMETERS
-BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
-// Gongan metadata
-BeatsGradualParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?} 
-BeatsParameter { ("beat=" | "beats=") IntegerList}
-PassesParameter { ("pass=" | "passes=") IntegerList}
-IterationsParameter {("iteration=" | "iterations=") IntegerList }
-IncludeExecutionTypesParameter { "include=" ExecutionList}
-NthpassParameter { "nthpass=" BooleanValue }
-PositionsParameter { ("position=" | "positions=") StringList}
-ScopeParameter { "scope=" ScopeValue}
+BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
+BeatsGradualParameter { ("beat" "=" | "beats" "=") IntegerValue (Arrow IntegerValue)?} 
+BeatsParameter { ("beat" "=" | "beats" "=") IntegerList}
+PassesParameter { ("pass" "=" | "passes" "=") IntegerList}
+IterationsParameter {("iteration" "=" | "iterations" "=") IntegerList }
+IncludeExecutionTypesParameter { "include" "=" ExecutiontypeList}
+NthpassParameter { "nthpass" "=" BooleanValue }
+PositionsParameter { ("position" "=" | "positions" "=") StringList}
+ScopeParameter { "scope" "=" ScopeValue}
 
 // Naming is important here: <type>List should contain <type>Value elements
 IntegerList { IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]" }
-StringList { "[" StringValue ("," (Eol )? StringValue)* "]" }
-ExecutionList { "[" ExecutionValue ("," (Eol )? ExecutionValue)* "]" } 
+StringList { "[" StringValue ("," Eol? StringValue)* "]" }
+ExecutiontypeList { "[" ExecutiontypeValue ("," Eol? ExecutiontypeValue)* "]" } 
 
 
 

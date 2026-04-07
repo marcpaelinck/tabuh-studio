@@ -76,7 +76,7 @@ export function parseLaras(content: string): Score | undefined {
                     uuid: uuidv4(),
                     id: score.systems.length + 1,
                     index: score.systems.length,
-                    grouped: [],
+                    editorGroup: [],
                     staffs: {},
                     colWidths: [],
                     execution: [

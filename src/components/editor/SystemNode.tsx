@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import { useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { Checkbox, Col, Grid, Row, Text, VStack } from 'rsuite'
+import { castNotation } from '../../componentlogic/castingRulesManager'
 import { type PlaybackState } from '../../componentlogic/playbackReducer'
-import { useRules } from '../../componentlogic/castingRulesManager'
 import { noCursor, positionConfigs, type NavigationAction } from '../../config/config'
 import type { EditorCellCursor, Position, System } from '../../typing/types'
 import { notation2text } from '../../utils/alphabet'
@@ -24,7 +24,6 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
     const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
     const nullpointer = useRef<HTMLTextAreaElement | null>(null)
     const [highlightedMeasure, setHighlightedMeasure] = useState<EditorCellCursor>(noCursor)
-    const { castNotation } = useRules()
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     if (systemData.id == 1 || systemData.id == 13) debug(`(re-)rendering system ${systemUuid}`)
@@ -126,7 +125,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
         const newSystemData = { ...systemData }
         positions.forEach((pos) => {
             const position: Position = pos as Position
-            if (!systemData.grouped.includes(position)) return
+            if (!systemData.editorGroup.includes(position)) return
             const newNotation = castNotation(notation, position, colId)
             if (cached) newSystemData.staffs[position]![colId].notation_ = newNotation
             else newSystemData.staffs[position]![colId].notation = newNotation
@@ -137,10 +136,10 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
 
     function updateGrouped(position: string, isGrouped: boolean) {
         const newSysData = { ...systemData }
-        if (isGrouped && !newSysData.grouped.includes(position)) newSysData.grouped.push(position)
+        if (isGrouped && !newSysData.editorGroup.includes(position)) newSysData.editorGroup.push(position)
         else {
-            const idx = newSysData.grouped.indexOf(position)
-            if (idx > -1) newSysData.grouped.splice(idx, 1)
+            const idx = newSysData.editorGroup.indexOf(position)
+            if (idx > -1) newSysData.editorGroup.splice(idx, 1)
         }
         scoreFunc.updateSystem(newSysData)
     }
@@ -159,7 +158,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
                         </Col>
                         <Col id={`COL-POSITION`} span="auto">
                             <Checkbox
-                                defaultChecked={systemData.grouped.includes(position)}
+                                defaultChecked={systemData.editorGroup.includes(position)}
                                 onChange={(_, checked) => updateGrouped(position, checked)}
                             />
                         </Col>

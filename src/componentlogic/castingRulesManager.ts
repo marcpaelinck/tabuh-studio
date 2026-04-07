@@ -1,35 +1,50 @@
-// This hook contains the rules that are used for the automatic generation of notation for grouped staves.
+// This module contains the rules that are used for the automatic generation of notation for grouped staves.
 
-import { debug } from '../utils/debugger'
+import type { NoteSymbol, Position } from '../typing/types'
+import { debug } from '../utils/debugger.ts'
+
+type CastingInstructionType = 'nokempyung'
+export interface CastingInstruction {
+    type: CastingInstructionType
+    positions?: Position[]
+    scope?: 'score' | 'system'
+}
+
+type RuleName = 'default' | 'nokempyung'
+type CastingRule = Record<NoteSymbol, NoteSymbol>
+type PositionRuleSet = Partial<Record<RuleName, CastingRule>> & Record<'default', CastingRule>
+type CastingRuleSet = Partial<Record<Position, PositionRuleSet>> & Record<'DEFAULT', PositionRuleSet>
 
 // CASTING RULES
-const fromPolos: Record<string, Record<string, string>> = {
+const castingRules: CastingRuleSet = {
     // prettier-ignore
-    JEGOGAN: { 'o,': 'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' },
+    JEGOGAN: {default: { 'o,': 'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    CALUNG: { 'o,': 'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' },
+    CALUNG: {default: { 'o,': 'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    PENYACAH: { 'o,': 'o', 'e,': 'e', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' },
+    PENYACAH: {default: { 'o,': 'o', 'e,': 'e', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    PEMADE_POLOS: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' },
+    PEMADE_POLOS: {default: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    KANTILAN_POLOS: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' },
+    KANTILAN_POLOS: {default: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    PEMADE_SANGSIH: { 'o,': 'a,', 'e,': 'i', 'u,': 'o', 'a,': 'e', i: 'u', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' },
+    PEMADE_SANGSIH: {default: { 'o,': 'a,', 'e,': 'i', 'u,': 'o', 'a,': 'e', i: 'u', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' },
+                     nokempyung: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    KANTILAN_SANGSIH: { 'o,': 'a,', 'e,': 'i', 'u,': 'o', 'a,': 'e', i: 'u', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<' , '-': '-', '.': '.' },
+    KANTILAN_SANGSIH: {default: { 'o,': 'a,', 'e,': 'i', 'u,': 'o', 'a,': 'e', i: 'u', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<' , '-': '-', '.': '.' },
+                       nokempyung: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    UGAL: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' },
+    UGAL: {default: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<'  , '-': '-', '.': '.' }},
     // prettier-ignore
-    REYONG_1: { 'o,': 'a,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'u,', o: 'a,', e: 'e,', u: 'u,', a: 'a,', 'i<': 'u,' , '-': '-', '.': '.' },
+    REYONG_1: {default: { 'o,': 'a,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'u,', o: 'a,', e: 'e,', u: 'u,', a: 'a,', 'i<': 'u,' , '-': '-', '.': '.' }},
     // prettier-ignore
-    REYONG_2: { 'o,': 'o', 'e,': 'e', 'u,': 'o', 'a,': 'e', i: 'i', o: 'o', e: 'e', u: 'o', a: 'e', 'i<': 'i' , '-': '-', '.': '.' },
+    REYONG_2: {default: { 'o,': 'o', 'e,': 'e', 'u,': 'o', 'a,': 'e', i: 'i', o: 'o', e: 'e', u: 'o', a: 'e', 'i<': 'i' , '-': '-', '.': '.' }},
     // prettier-ignore
-    REYONG_3: { 'o,': 'a', 'e,': 'i<', 'u,': 'u', 'a,': 'a', i: 'i<', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<' , '-': '-', '.': '.' },
+    REYONG_3: {default: { 'o,': 'a', 'e,': 'i<', 'u,': 'u', 'a,': 'a', i: 'i<', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<' , '-': '-', '.': '.' }},
     // prettier-ignore
-    REYONG_4: { 'o,': 'o<', 'e,': 'e<', 'u,': 'u<', 'a,': 'e<', i: 'u<', o: 'o<', e: 'e<', u: 'u<', a: 'e<', 'i<': 'u<' , '-': '-', '.': '.' },
+    REYONG_4: {default: { 'o,': 'o<', 'e,': 'e<', 'u,': 'u<', 'a,': 'e<', i: 'u<', o: 'o<', e: 'e<', u: 'u<', a: 'e<', 'i<': 'u<' , '-': '-', '.': '.' }},
     // prettier-ignore
-    DEFAULT: { 'o,': ' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', '-': '-', '.': '.' }
+    DEFAULT: {default: { 'o,': ' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', '-': '-', '.': '.' }}
 }
 
 // POKOK RULES - the pokok instruments play a selection of the full notation.
@@ -48,46 +63,66 @@ const splitTone = (symbol: string): string[] => {
     return [...match.map((el) => [el[1], el[2]])].flat(1)
 }
 
-export function useRules() {
-    // Casts the measure to the given position:
-    // converts the notation to the position's range and polos/sangsih type,
-    // assuming that the measure is a basic (polos) melody.
-    // measureId starts with 0
-    function castNotation(notation: string[], position: string, measureId: number): string[] {
-        const conversion: Record<string, string> = fromPolos[position] || {}
+function selectRule(position: Position, castingInstructions?: CastingInstruction[]): CastingRule {
+    if (!castingRules[position]) return castingRules.DEFAULT.default
 
-        var updatedNotation = [...notation]
+    const posRuleset = castingRules[position]
+    if (castingInstructions) {
+        for (const instruction of castingInstructions) {
+            switch (instruction.type) {
+                case 'nokempyung':
+                    if (!instruction.positions || instruction.positions.includes(position)) {
+                        return posRuleset!.nokempyung || posRuleset!.default
+                    }
+                    break
+                default:
+            }
+        }
+    }
+    return posRuleset.default
+}
 
-        // Apply pokok rules
-        if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
-            // Clear even numbered measures. Note that measure numbering starts with 0.
-            updatedNotation = updatedNotation.map((_) => '-')
-            debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
-        }
-        if (onlyOddNotes.includes(position)) {
-            updatedNotation = updatedNotation.map((sym, idx) =>
-                // Remove even numbered notes.
-                (idx + 1) % 2 == 0 ? '-' : sym
-            )
-            debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
-        }
-        if (onlyFirstNote.includes(position)) {
-            updatedNotation = updatedNotation.map((sym, idx) =>
-                // Remove all but first note.
-                idx > 0 ? '-' : sym
-            )
-            debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
-        }
+// Casts the measure to the given position:
+// converts the notation to the position's range and polos/sangsih type,
+// assuming that the measure is a basic (polos) melody.
+// measureId starts with 0
+export function castNotation(
+    notation: string[],
+    position: Position,
+    measureId: number,
+    castingInstructions?: CastingInstruction[]
+): string[] {
+    const conversion: CastingRule = selectRule(position, castingInstructions)
 
-        // Apply casting rules
-        const result = updatedNotation.map((symbol) => {
-            const [tone, rest] = splitTone(symbol)
-            var cast = conversion[tone]
-            const newSymbol = cast ? cast + rest : ' '
-            return newSymbol
-        })
-        return result
+    var updatedNotation = [...notation]
+
+    // Apply pokok rules
+    if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
+        // Clear even numbered measures. Note that measure numbering starts with 0.
+        updatedNotation = updatedNotation.map((_) => '-')
+        debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
+    }
+    if (onlyOddNotes.includes(position)) {
+        updatedNotation = updatedNotation.map((sym, idx) =>
+            // Remove even numbered notes.
+            (idx + 1) % 2 == 0 ? '-' : sym
+        )
+        debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
+    }
+    if (onlyFirstNote.includes(position)) {
+        updatedNotation = updatedNotation.map((sym, idx) =>
+            // Remove all but first note.
+            idx > 0 ? '-' : sym
+        )
+        debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
     }
 
-    return { castNotation }
+    // Apply casting rules
+    const result = updatedNotation.map((symbol) => {
+        const [tone, rest] = splitTone(symbol)
+        var cast = conversion[tone]
+        const newSymbol = cast ? cast + rest : ' '
+        return newSymbol
+    })
+    return result
 }

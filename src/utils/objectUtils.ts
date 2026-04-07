@@ -71,7 +71,7 @@ export function defaultObject<T>(otype: DefaultType): T {
 
 export function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
     const flatten = (key: string, value: any) => {
-        if (/^([A-Z][A-Z\d_]+|execution)$/.test(key) && value) {
+        if (/^([A-Z][A-Z\d_]+|execution|staff|group|positions)$/.test(key) && value) {
             var json = value.map((meas: any) => {
                 return JSON.stringify(meas)
             })

@@ -78,19 +78,25 @@ export type ScoreInfo = {
 // EDIT TABLE: contains system data in a format that can easily be displayed in the editor
 // Notation of one section for one instrument position
 export type Measure = {
-    notation: string[]
-    notation_?: string[] // cache used to keep user edits that have not been saved yet
+    notation: NoteSymbol[]
+    notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet
 }
 
 // Notation of one instrument position within a System
 export type Staffs = Partial<Record<Position, Measure[]>>
+
+export interface GroupedNotation {
+    positions: Position[]
+    staff: Measure[]
+}
 
 // Subdivision of a score, typically spans one gongan
 export type System = {
     uuid: UUID // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
-    grouped: string[] // positions that are/were grouped in the editor for simultaneous editing using casting rules.
+    notationGroups?: GroupedNotation[] // Staves of an imported Notation assigned to multiple positions.
+    editorGroup: string[] // positions that are/were grouped in one line in the editor.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
     colWidths: number[]
     label?: string

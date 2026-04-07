@@ -3,6 +3,7 @@ import type { SyntaxNode } from '@lezer/common'
 import fs from 'fs'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
+import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
 import type {
     DynamicsItem,
@@ -10,6 +11,7 @@ import type {
     ExecutionItem,
     ExecutionItemType,
     GotoItem,
+    GroupedNotation,
     LoopItem,
     Measure,
     Position,
@@ -18,7 +20,8 @@ import type {
     Staffs,
     SuppressItem,
     System,
-    TempoItem
+    TempoItem,
+    UUID
 } from '../typing/types.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { scoreToFormattedJson } from '../utils/objectUtils.ts'
@@ -72,15 +75,16 @@ export function parseNotation(content: string): Score | undefined {
             case 'Gongan': {
                 gonganCounter++
                 const systemuuid = uuidv4()
-                const staffs = getStaffs(node, content)
-                const metaData = getMetadata(node, systemuuid, content)
+                const groupedNotation = getNotation(node, content)
+                const metaData = getMetadata(node, gonganCounter, systemuuid, content)
                 const system = {
                     uuid: systemuuid,
                     id: gonganCounter,
                     index: gonganCounter - 1,
-                    grouped: [],
-                    staffs: staffs,
-                    colWidths: getColwidths(staffs),
+                    notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
+                    editorGroup: [],
+                    staffs: {}, //TODO fill in value
+                    colWidths: [], //TODO fill in value
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
                 } as System
@@ -96,6 +100,10 @@ export function parseNotation(content: string): Score | undefined {
                         .filter((item) => item.type == 'postprocessing')
                         .map((item) => item.value) as PostProcessing[])
                 )
+                const castInstructions: CastingInstruction[] = metaData
+                    .filter((item) => item.type == 'castinginstruction')
+                    .map((item) => item.value) as CastingInstruction[]
+                system.staffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
                 score.systems.push(system)
                 break
             }
@@ -111,14 +119,10 @@ export function parseNotation(content: string): Score | undefined {
 
     traverse(tree.topNode)
 
-    // Postprocessing
-    score.positions = getAllPositions(score)
-    // TODO: Further postprocessing:
-    // - in metadata: fill in targetuuid (GOTO, SEQUENCE)
-    // - Process copy and autokempyung postProcessingInstructions
-
+    const completeScore: Score = postProcess(score, postProcessingInstructions)
     doLogging(score, postProcessingInstructions)
-    return score
+
+    return completeScore
 }
 
 function doLogging(score: Score, postProcessingInstructions: PostProcessing[]) {
@@ -126,6 +130,111 @@ function doLogging(score: Score, postProcessingInstructions: PostProcessing[]) {
     console.log(JSON.stringify(postProcessingInstructions))
     fs.writeFileSync('./src/scoreparsers/grammars/tabuh/parsed_score.json', json)
 }
+
+// When a staff notation applies to a group of positions, this function converts
+// the common staff notation to individual staff notation for each position, using 'casting' rules.
+// staffs: contains staffs of non-grouped positions.
+// groupedNotation: groups of positions with corresponding notation
+// castInstructions: contains AUTOKEMPYUNG metadata which indicates whether unisono notation
+//                   should be converted to kempyung equivalent for sangsih positions.
+function castGroupedNotationToPositions(
+    groupedNotations: GroupedNotation[],
+    castInstructions: CastingInstruction[]
+): Staffs {
+    const staffs: Staffs = {}
+    for (const group of groupedNotations) {
+        for (const position of group.positions) {
+            const staff: Measure[] = []
+            var measureId = 0
+            for (const measure of group.staff) {
+                if (group.positions.length > 1) {
+                    const castedMeasure = { ...measure }
+                    castedMeasure.notation = castNotation(measure.notation, position, measureId, castInstructions)
+                    staff.push(castedMeasure)
+                } else staff.push({ ...measure })
+                measureId++
+            }
+            staffs[position] = staff
+        }
+    }
+    return staffs
+}
+
+/********************
+ POSTPROCESSING
+********************/
+
+function postProcess(score: Score, postProcessingInstructions: PostProcessing[]): Score {
+    score.positions = getAllPositions(score)
+
+    // fill in targetuuid of GOTO
+    for (const system of score.systems) {
+        const gotoItems: GotoItem[] = (system.execution?.filter((item) => item.type == 'goto') || []) as GotoItem[]
+        for (const gotoItem of gotoItems) {
+            const target: System | undefined =
+                getSystemByLabel(gotoItem.targetname, score, system.id, 'GOTO') || undefined
+            if (target) gotoItem.targetuuid = target.uuid
+        }
+    }
+
+    // fill in uuids of SEQUENCE
+    for (const system of score.systems) {
+        const seqItems: SequenceItem[] = (system.execution?.filter((item) => item.type == 'sequence') ||
+            []) as SequenceItem[]
+        for (const seqItem of seqItems) {
+            for (const label of seqItem.labels) {
+                const target: System | undefined = getSystemByLabel(label, score, system.id, 'SEQUENCE') || undefined
+                if (target) seqItem.uuids.push(target.uuid)
+            }
+        }
+    }
+
+    // - Process copy postProcessingInstructions
+    const copyInstructions: PostProcessing[] =
+        postProcessingInstructions.filter((instr) => instr.copy != undefined) || []
+    for (const instr of copyInstructions) {
+        const copyInstr = instr.copy!
+        const target: System | undefined = getSystemByUuid(copyInstr.targetuuid, score, copyInstr.targetid, 'COPY')
+        const source: System | undefined = getSystemByLabel(copyInstr.label, score, copyInstr.targetid, 'COPY')
+        if (source && target) {
+            // Target staffs should be applied to the copy of source
+            target.staffs = Object.assign(source.staffs, target.staffs)
+            if (copyInstr.include && target.execution) {
+                const copyItems: ExecutionItem[] = target.execution.filter((item) =>
+                    copyInstr.include!.includes(item.type)
+                )
+                target.execution = target.execution || []
+                target.execution.push(...copyItems)
+            }
+        }
+    }
+
+    return score
+}
+
+function getAllPositions(score: Score): Position[] {
+    const positionSet = score.systems.reduce((aggr, system) => aggr.union(new Set(_.keys(system.staffs))), new Set())
+    return Array.from(positionSet) as Position[]
+}
+
+// Returns the system with the given label.
+// sourceId and metaItem are given to specify potential error message.
+function getSystemByLabel(label: string, score: Score, sourceId: number, metaItem: string): System | undefined {
+    const target: System | undefined = score.systems.find((system) => system.label == label)
+    if (target) return target
+    else console.error(`${metaItem} of system ${sourceId}: could not find system with label ${label}.`)
+    return undefined
+}
+
+// Returns the system with the given label.
+// sourceId and metaItem are given to specify potential error message.
+function getSystemByUuid(uuid: UUID, score: Score, sourceId: number, metaItem: string): System | undefined {
+    const target: System | undefined = score.systems.find((system) => system.uuid == uuid)
+    if (target) return target
+    else console.error(`${metaItem} of system ${sourceId}: could not find system with uuid ${uuid}.`)
+    return undefined
+}
+
 /********************
  AUXILIARY FUNCTIONS
 ********************/
@@ -159,11 +268,10 @@ function cast(strValue: string, type: ValueType) {
         }
         case 'BooleanValue':
         case 'OnOffValue': {
-            return ['true', 'on'].includes(strValue.toLowerCase())
-                ? true
-                : ['false', 'off'].includes(strValue.toLowerCase())
-                  ? false
-                  : undefined
+            var value = undefined
+            if (['true', 'on'].includes(strValue.toLowerCase())) value = true
+            if (['false', 'off'].includes(strValue.toLowerCase())) value = false
+            return value
         }
     }
 }
@@ -221,18 +329,21 @@ function tagsToPositions(tags: string[]): Position[] {
    GONGAN   
 ***********/
 
-// Creates a Staffs object from the given node's children
+// Creates a GroupedNotation object list from the given node's children
+// Returns a list of position groups if some position tags refer to multiple positions.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 //          StaffLine { PositionLabel Measure+ Eol }
 //          Measure { tab Note* }
-function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
-    if (gonganNode == undefined) return {}
-    const staffList: [Position, Measure[]][] = []
+function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNotation[] {
+    if (gonganNode == undefined) return []
+    const notationGroups: GroupedNotation[] = []
     const staffNodes = gonganNode.getChildren('StaffLine')
+
     for (const child of staffNodes) {
         var staff: Measure[] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
         const positions = tagsToPositions(positionTag.split('/'))
+        var groupedNotation: GroupedNotation
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
             const measure: Measure = { notation: [] }
@@ -243,9 +354,10 @@ function getStaffs(gonganNode: SyntaxNode | null, content: string): Staffs {
             }
             staff.push(measure)
         }
-        positions.forEach((position) => staffList.push([position, staff]))
+        groupedNotation = { positions: positions, staff: staff } as GroupedNotation
+        notationGroups.push(groupedNotation)
     }
-    return _.fromPairs(staffList)
+    return notationGroups
 }
 
 // Returns the maximum width of vertically aligned sections.
@@ -263,11 +375,6 @@ function getColwidths(staffs: Staffs) {
     return colWidths
 }
 
-function getAllPositions(score: Score): Position[] {
-    const positionSet = score.systems.reduce((aggr, system) => aggr.union(new Set(_.keys(system.staffs))), new Set())
-    return Array.from(positionSet) as Position[]
-}
-
 /***********
   METADATA 
 ***********/
@@ -275,7 +382,12 @@ function getAllPositions(score: Score): Position[] {
 // Returns a list of ProcessingInstruction objects for the given gongan node.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaveLine)+ }
 //          MetadataLine {tab lbrace space* Metadata rbrace Eol}
-function getMetadata(gonganNode: SyntaxNode | null, systemuuid: string, content: string): ProcessingInstruction[] {
+function getMetadata(
+    gonganNode: SyntaxNode | null,
+    systemid: number,
+    systemuuid: string,
+    content: string
+): ProcessingInstruction[] {
     const metaData: ProcessingInstruction[] = []
     if (gonganNode == undefined) return metaData
 
@@ -283,7 +395,7 @@ function getMetadata(gonganNode: SyntaxNode | null, systemuuid: string, content:
     metadataNodes.forEach((child, index) => {
         const metaDataItem = child.getChild('Metadata')
         if (metaDataItem) {
-            const item = parseMetadata(metaDataItem, index + 1, systemuuid, content)
+            const item = parseMetadata(metaDataItem, index + 1, systemid, systemuuid, content)
             if (item) metaData.push(item)
         }
     })
@@ -294,19 +406,19 @@ interface Attribute {
     score?: { parts: string[] }
     system?: { copyfrom: string } | { label: string }
 }
-interface PostProcessing {
-    copy?: { label: string; targetuuid: string; include?: ExecutionItemType[] }
-    autokempyung?: { apply: boolean; positions?: Position[]; scope?: 'score' | 'system' }
-}
 interface ProcessingInstruction {
-    type: 'attribute' | 'executionitem' | 'postprocessing'
-    value: ExecutionItem | Attribute | PostProcessing
+    type: 'attribute' | 'executionitem' | 'postprocessing' | 'castinginstruction'
+    value: ExecutionItem | Attribute | PostProcessing | CastingInstruction
+}
+interface PostProcessing {
+    copy: { label: string; targetid: number; targetuuid: string; include?: ExecutionItemType[] }
 }
 // Metadata can contain Execution items, System/Score attributes or instructions for the postprocessing step.
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
 function parseMetadata(
     metadataNode: SyntaxNode,
     seqNr: number,
+    systemid: number,
     systemuuid: string,
     content: string
 ): ProcessingInstruction | undefined {
@@ -316,12 +428,23 @@ function parseMetadata(
 
     switch (node.name) {
         case 'AutokempyungMetadata': {
-            const parameters = { apply: getValue<boolean>(node, 'OnOffValue', content) || false } // value might be undefined
-            Object.assign(parameters, getMetadataParameters(node, ['positions', 'scope'], content))
-            return { type: 'postprocessing', value: { autokempyung: parameters } } as ProcessingInstruction
+            // Default value for autokempyung is 'on'. Only generate casting instruction if metadata value is 'off'
+            if (getValue<boolean>(node, 'OnOffValue', content) == false) {
+                const castingInstruction = { type: 'nokempyung' }
+                Object.assign(castingInstruction, getMetadataParameters(node, ['positions', 'scope'], content))
+                return {
+                    type: 'castinginstruction',
+                    value: castingInstruction as CastingInstruction
+                } as ProcessingInstruction
+            }
+            break
         }
         case 'CopyMetadata': {
-            const parameters = { label: getValue<string>(node, 'StringValue', content) }
+            const parameters = {
+                targetid: systemid,
+                targetuuid: systemuuid,
+                label: getValue<string>(node, 'StringValue', content)
+            }
             Object.assign(parameters, getMetadataParameters(node, ['include'], content))
             return {
                 type: 'postprocessing',
