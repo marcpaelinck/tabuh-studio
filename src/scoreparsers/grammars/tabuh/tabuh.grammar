@@ -1,5 +1,3 @@
-@precedence { Measure, EmptyMeasure }
-
 @skip{space tab}
 
 @tokens {
@@ -11,7 +9,7 @@
    Note { $[()*-.089ABEGIOPSTUXabeiorstuxy] $[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/ ]+ }
    Arrow { '->' }
-   EmptyLine { tab* Eol }
+   EmptyLine { Eol }
    IgnoreMetadata  { ("VALIDATION" | "OCTAVATE") ![\n\r\t{}]+ }
    DynamicsLiteral { 'pp' | 'p' | 'mp' | 'mf' | 'f' | 'ff' }
    ExecutiontypeValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' }
@@ -25,9 +23,10 @@
    FloatValue { $[0-9]+ ("." $[0-9]+)? }
 }
 
+
 @top Document { InfoMetadataLine Gongan+ }
 
-InfoMetadataLine {tab lbrace InfoMetadata rbrace Eol}
+InfoMetadataLine {lbrace InfoMetadata rbrace Eol}
 InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
 
 // GONGAN
@@ -39,17 +38,18 @@ Measure { tab Note* }
 
 // InfoMetadata parameters
 ScoreParameter { "notation" "=" StringValue}
-PartParameter { "part" "=" StringValue}
+PartParameter { "part" "=" "full"}
 TitleParameter { "title" "=" StringValue}
 ComposerParameter { "composer" "=" StringValue}
-InstrumentgroupParameter { "instrumentgroup" "=" StringValue}
-FontParameter { "font" "=" StringValue}
-RuntypesParameter { "run_types" "=" StringValue}
+InstrumentgroupParameter { "instrumentgroup" "=" ("GONG_KEBYAR" | "SEMAR_PAGULINGAN") }
+FontParameter { "font" "=" "BaliMusic5"}
+RuntypesParameter { "run_types" "=" "[" ("DEBUG" | "PRODUCTION") (","  ("DEBUG" | "PRODUCTION")) "]" }
 DoLoopParameter { "loop" "=" BooleanValue}
+BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
 // METADATA
 
-MetadataLine {tab lbrace Metadata rbrace Eol}
+MetadataLine {lbrace Metadata rbrace Eol}
 Metadata { AutokempyungMetadata | CopyMetadata |  DynamicsMetadata | GonganMetadata | GotoMetadata | KempliMetadata | 
            LabelMetadata | LoopMetadata | PartMetadata | SequenceMetadata | SuppressMetadata | TempoMetadata  | WaitMetadata | IgnoreMetadata }
 
@@ -83,7 +83,6 @@ WaitMetadata { "WAIT" FloatValue (PassesParameter | NthpassParameter)* }
 
 // METADATA PARAMETERS
 
-BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 BeatsGradualParameter { ("beat" "=" | "beats" "=") IntegerValue (Arrow IntegerValue)?} 
 BeatsParameter { ("beat" "=" | "beats" "=") IntegerList}
 PassesParameter { ("pass" "=" | "passes" "=") IntegerList}
@@ -94,9 +93,6 @@ PositionsParameter { ("position" "=" | "positions" "=") StringList}
 ScopeParameter { "scope" "=" ScopeValue}
 
 // Naming is important here: <type>List should contain <type>Value elements
-IntegerList { IntegerValue | "[" IntegerValue ("," " "? IntegerValue)* "]" }
+IntegerList { IntegerValue | "[" IntegerValue ("," IntegerValue)* "]" }
 StringList { "[" StringValue ("," Eol? StringValue)* "]" }
 ExecutiontypeList { "[" ExecutiontypeValue ("," Eol? ExecutiontypeValue)* "]" } 
-
-
-
