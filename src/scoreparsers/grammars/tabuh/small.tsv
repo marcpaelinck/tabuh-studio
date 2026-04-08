@@ -1,3 +1,3 @@
-full{INFO notation="gilak penutup" part=full title="Gilak Penutup" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+full{INFO notation="gilak penutup" part=full title="Gilak Penutup" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 80}

@@ -46,6 +46,8 @@ type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 export function parseNotation(content: string): Score | undefined {
     const tree = parser.parse(content)
 
+    const errors: string[] = []
+
     const score = {
         uuid: uuidv4(),
         title: '',
@@ -66,9 +68,12 @@ export function parseNotation(content: string): Score | undefined {
             case 'InfoMetadata': {
                 const scoreSettings = {
                     title: getValue<string>(node.getChild('TitleParameter'), 'StringValue', content),
-                    composer: getValue<string>(node.getChild('ComposerParameter'), 'StringValue', content),
-                    instrumenttype: getValue<string>(node.getChild('InstrumentGroupParameter'), 'StringValue', content)
+                    composer: getValue<string>(node.getChild('ComposerParameter'), 'StringValue', content) || '',
+                    instrumenttype: getValue<string>(node.getChild('InstrumentgroupParameter'), 'StringValue', content)
                 }
+                if (scoreSettings.title == undefined) errors.push('INFO: Missing or incorrectly formatted title')
+                if (scoreSettings.instrumenttype == undefined)
+                    errors.push('INFO: Missing or incorrectly formatted instrumenttype')
                 Object.assign(score, scoreSettings)
                 break
             }
@@ -120,12 +125,13 @@ export function parseNotation(content: string): Score | undefined {
     traverse(tree.topNode)
 
     const completeScore: Score = postProcess(score, postProcessingInstructions)
-    doLogging(score, postProcessingInstructions)
+    doLogging(score, postProcessingInstructions, errors)
 
     return completeScore
 }
 
-function doLogging(score: Score, postProcessingInstructions: PostProcessing[]) {
+function doLogging(score: Score, postProcessingInstructions: PostProcessing[], errors: string[]) {
+    console.log(JSON.stringify(errors))
     const json = scoreToFormattedJson(score)
     console.log(JSON.stringify(postProcessingInstructions))
     fs.writeFileSync('./src/scoreparsers/grammars/tabuh/parsed_score.json', json)

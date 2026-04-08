@@ -1,4 +1,4 @@
-@skip{space tab}
+@skip{}
 
 @tokens {
    lbrace  { "{" }
@@ -29,23 +29,23 @@
 InfoMetadataLine {lbrace InfoMetadata rbrace Eol}
 InfoMetadata { "INFO" (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter)+ }
 
+// InfoMetadata parameters
+ScoreParameter { "notation" "=" StringValue}
+PartParameter { "part" "=" StringValue}
+TitleParameter { "title" "=" StringValue}
+ComposerParameter { "composer" "=" StringValue}
+InstrumentgroupParameter { "instrumentgroup" "=" StringValue }
+FontParameter { "font" "=" StringValue}
+RuntypesParameter { "run_types" "=" StringList }
+DoLoopParameter { "loop" "=" BooleanValue}
+BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
+
 // GONGAN
 
 Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 
 StaffLine { PositionLabel Measure+ Eol }
 Measure { tab Note* }
-
-// InfoMetadata parameters
-ScoreParameter { "notation" "=" StringValue}
-PartParameter { "part" "=" "full"}
-TitleParameter { "title" "=" StringValue}
-ComposerParameter { "composer" "=" StringValue}
-InstrumentgroupParameter { "instrumentgroup" "=" ("GONG_KEBYAR" | "SEMAR_PAGULINGAN") }
-FontParameter { "font" "=" "BaliMusic5"}
-RuntypesParameter { "run_types" "=" "[" ("DEBUG" | "PRODUCTION") (","  ("DEBUG" | "PRODUCTION")) "]" }
-DoLoopParameter { "loop" "=" BooleanValue}
-BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 
 // METADATA
 

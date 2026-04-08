@@ -29,8 +29,9 @@ public/icons/tabuh-studio_icon.png
 public/scores/*
 public/sounds/*
 
-# Data backup
+# Data
 public/oldscores
+public/tabuh-notation
 
 # Testing
 **/test.*
