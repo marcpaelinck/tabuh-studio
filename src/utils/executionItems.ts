@@ -80,7 +80,9 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             }
             const multipleSections = item.isGradual && item.fromSection != item.section
             const startFromSection1 = !item.isGradual && !item.fromSection && item.section == 1
-            if (!startFromSection1) {
+            if (startFromSection1) {
+                instruction = shortTooltip
+            } else {
                 instruction =
                     shortTooltip +
                     ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.section}`

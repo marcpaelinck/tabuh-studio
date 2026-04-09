@@ -5,7 +5,8 @@ export interface TestData {
 }
 
 export const NOTATIONPARSERTEST = {
-    file: './src/scoreparsers/grammars/tabuh/test/notation.tsv',
+    file: './public/tabuh-notation/gilak deng [full].tsv',
+    // file: './src/scoreparsers/grammars/tabuh/test/notation.tsv',
     outputfile: './src/scoreparsers/grammars/tabuh/test/parsed_score.json'
 }
 

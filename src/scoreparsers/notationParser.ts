@@ -113,6 +113,7 @@ export function parseNotation(content: string): ParserReturnValue {
                     .filter((item) => item.type == 'castinginstruction')
                     .map((item) => item.value) as CastingInstruction[]
                 system.staffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
+                system.colWidths = getColwidths(system.staffs)
                 parsedScore.systems.push(system)
                 break
             }
@@ -397,7 +398,7 @@ function getColwidths(staffs: Staffs) {
         }
         return widths
     }, undefined)
-    return colWidths
+    return colWidths || []
 }
 
 /***********
