@@ -1,6 +1,5 @@
 // Parser for imported scores with `Notation` formatting
-import type { SyntaxNode } from '@lezer/common'
-import fs from 'fs'
+import type { SyntaxNode, Tree } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -24,7 +23,6 @@ import type {
     UUID
 } from '../typing/types.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
-import { scoreToFormattedJson } from '../utils/objectUtils.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { tagLookup } from './notationUtils.ts'
 
@@ -43,12 +41,18 @@ type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 // Returns a Score object
 // Grammar: @top Document { InfoMetadataLine Gongan+ }
 //          InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
-export function parseNotation(content: string): Score | undefined {
+export interface ParserReturnValue {
+    score?: Score
+    errors: string[]
+    postProcessing: PostProcessing[]
+    tree: Tree
+}
+export function parseNotation(content: string): ParserReturnValue {
     const tree = parser.parse(content)
 
     const errors: string[] = []
 
-    const score = {
+    const parsedScore = {
         uuid: uuidv4(),
         title: '',
         composer: '',
@@ -59,7 +63,7 @@ export function parseNotation(content: string): Score | undefined {
         hasCycle: false
     } as Score
 
-    const postProcessingInstructions: PostProcessing[] = []
+    const postProcessing: PostProcessing[] = []
 
     var gonganCounter = 0
 
@@ -74,7 +78,7 @@ export function parseNotation(content: string): Score | undefined {
                 if (scoreSettings.title == undefined) errors.push('INFO: Missing or incorrectly formatted title')
                 if (scoreSettings.instrumenttype == undefined)
                     errors.push('INFO: Missing or incorrectly formatted instrumenttype')
-                Object.assign(score, scoreSettings)
+                Object.assign(parsedScore, scoreSettings)
                 break
             }
             case 'Gongan': {
@@ -98,9 +102,9 @@ export function parseNotation(content: string): Score | undefined {
                     .forEach((item) => {
                         const attributeOf: Attribute = item.value as Attribute
                         if (attributeOf.system) Object.assign(system, attributeOf.system)
-                        if (attributeOf.score) Object.assign(score, attributeOf.score)
+                        if (attributeOf.score) Object.assign(parsedScore, attributeOf.score)
                     })
-                postProcessingInstructions.push(
+                postProcessing.push(
                     ...(metaData
                         .filter((item) => item.type == 'postprocessing')
                         .map((item) => item.value) as PostProcessing[])
@@ -109,7 +113,7 @@ export function parseNotation(content: string): Score | undefined {
                     .filter((item) => item.type == 'castinginstruction')
                     .map((item) => item.value) as CastingInstruction[]
                 system.staffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
-                score.systems.push(system)
+                parsedScore.systems.push(system)
                 break
             }
             default:
@@ -124,17 +128,9 @@ export function parseNotation(content: string): Score | undefined {
 
     traverse(tree.topNode)
 
-    const completeScore: Score = postProcess(score, postProcessingInstructions)
-    doLogging(score, postProcessingInstructions, errors)
+    const score: Score = postProcess(parsedScore, postProcessing)
 
-    return completeScore
-}
-
-function doLogging(score: Score, postProcessingInstructions: PostProcessing[], errors: string[]) {
-    console.log(JSON.stringify(errors))
-    const json = scoreToFormattedJson(score)
-    console.log(JSON.stringify(postProcessingInstructions))
-    fs.writeFileSync('./src/scoreparsers/grammars/tabuh/parsed_score.json', json)
+    return { score, errors, postProcessing, tree }
 }
 
 // When a staff notation applies to a group of positions, this function converts
@@ -450,7 +446,7 @@ interface PartInstruction {
     systemid: number
     systemuuid: UUID
 }
-interface PostProcessing {
+export interface PostProcessing {
     copy?: CopyInstruction
     part?: PartInstruction
 }
