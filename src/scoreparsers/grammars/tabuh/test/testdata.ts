@@ -4,10 +4,43 @@ export interface TestData {
     outputfile?: string // if given, the score will be output here (only used for notationParser test). Otherwise it will be output to the console
 }
 
-export const NOTATIONPARSERTEST = {
-    file: './public/tabuh-notation/gilak deng [full].tsv',
-    // file: './src/scoreparsers/grammars/tabuh/test/notation.tsv',
-    outputfile: './src/scoreparsers/grammars/tabuh/test/parsed_score.json'
+export const tabuhScores: Record<number, string> = {
+    1: 'bapang selisir gk.tsv',
+    2: 'bapang selisir sp.tsv',
+    3: 'cendrawasih.tsv',
+    4: 'gilak deng.tsv',
+    5: 'gilak penutup wassenaar.tsv',
+    6: 'gilak penutup.tsv',
+    7: 'godek miring gk.tsv',
+    8: 'godek miring sp.tsv',
+    9: 'hujan mas.tsv',
+    10: 'janger.tsv',
+    11: 'kacang saur.tsv',
+    12: 'kahayangan.tsv',
+    13: 'legong dwi.tsv',
+    14: 'legong mahawidya gk.tsv',
+    15: 'legong mahawidya sp.tsv',
+    16: 'lengker gk.tsv',
+    17: 'lengker sp.tsv',
+    18: 'margapati.tsv',
+    19: 'merah putih.tsv',
+    20: 'narasimha.tsv',
+    21: 'palawakya.tsv',
+    22: 'pendet.tsv',
+    23: 'puspa mekar.tsv',
+    24: 'rejang dewa.tsv',
+    25: 'sekar gendot gk.tsv',
+    26: 'sekar gendot sp.tsv',
+    27: 'sinom ladrang gk.tsv',
+    28: 'sinom ladrang sp.tsv',
+    29: 'teruna jaya.tsv'
+}
+
+export const parserTestData = (id: number): TestData => {
+    return {
+        file: './public/tabuh-notation/' + tabuhScores[id],
+        outputfile: './src/scoreparsers/grammars/tabuh/test/parsed_score.json'
+    }
 }
 
 export const SMALLTEST = {

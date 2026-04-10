@@ -92,8 +92,8 @@ export function parseNotation(content: string): ParserReturnValue {
                     index: gonganCounter - 1,
                     notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
                     editorGroup: [],
-                    staffs: {}, //TODO fill in value
-                    colWidths: [], //TODO fill in value
+                    staffs: {},
+                    colWidths: [],
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
                 } as System
@@ -600,7 +600,8 @@ function parseMetadata(
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         default: {
-            console.log(`${node.name}: ${getText(node, content)}`)
+            break
+            // console.log(`${node.name}: ${getText(node, content)}`)
         }
     }
     return undefined

@@ -3,8 +3,8 @@ export const instrumentTags: Record<string, string | string[]>[] = [
     { pos_tag: ['calung', 'cal', 'ca'], specification_tag: [''], positions: ['CALUNG'] },
     { pos_tag: ['cengceng', 'ceng', 'ce'], specification_tag: [''], positions: ['CENGCENG'] },
     { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: [''], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
-    { pos_tag: ['gangsa', 'ga'], specification_tag: ['polos', 'po', 'p'], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'] },
-    { pos_tag: ['gangsa', 'ga'], specification_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
+    { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: ['polos', 'po', 'p'], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'] },
+    { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
     { pos_tag: ['genderrambat', 'gender', 'gen', 'ge'], specification_tag: [], positions: ['GENDERRAMBAT'] },
     { pos_tag: ['gongs', 'gong', 'go'], specification_tag: [''], positions: ['GONGS'] },
     { pos_tag: ['gying', 'gy'], specification_tag: [''], positions: ['UGAL'] },
@@ -29,6 +29,6 @@ export const instrumentTags: Record<string, string | string[]>[] = [
     { pos_tag: ['reyong', 'rey', 're'], specification_tag: ['24', '2+4'], positions: ['REYONG_2', 'REYONG_4'] },
     { pos_tag: ['reyong', 'rey', 're'], specification_tag: ['34', '3+4'], positions: ['REYONG_3', 'REYONG_4'] },
     { pos_tag: ['suling', 'sul', 'su'], specification_tag: [''], positions: ['SULING'] },
-    { pos_tag: ['trompong', 'tromp', 'tro', 'tr'], specification_tag: [''], positions: ['TROMPONG'] },
+    { pos_tag: ['trompong', 'tromp', 'tromp', 'tro', 'tr'], specification_tag: [''], positions: ['TROMPONG'] },
     { pos_tag: ['ugal', 'ug'], specification_tag: [''], positions: ['UGAL'] }
 ]
