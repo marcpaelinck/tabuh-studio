@@ -160,7 +160,7 @@ export default function EditorWindow({
 
     // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
     // minimize rendering because it interferes with the audio playback functions.
-    // Thesse objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
+    // These objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
     const systemIdPrefix = 'system-'
     const systemHeaderButtons: Record<string, ReactElement> | undefined = useMemo(() => {
         if (!editorScore) return

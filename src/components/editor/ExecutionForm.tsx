@@ -4,7 +4,6 @@ import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { executionItemTooltip } from '../../componentlogic/useEditorScoreManager'
 import { dynamicsToNumber } from '../../config/config'
 import type {
     DynamicsItem,
@@ -16,6 +15,7 @@ import type {
     TempoItem
 } from '../../typing/types'
 import { debug } from '../../utils/debugger'
+import { executionItemTooltip } from '../../utils/executionItems'
 import ExecutionItemForm, { formModel, type FlowConditionType, type FormValueType } from './ExecutionItemForm'
 
 type ExecutionItemDefault = {
@@ -53,6 +53,8 @@ const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
         tooltip: 'dynamics',
         tooltipshort: ''
     },
+    sequence: { type: 'sequence', tooltip: 'specify type', tooltipshort: '' },
+    suppress: { type: 'suppress', tooltip: 'specify type', tooltipshort: '' },
     new: { type: undefined, seqId: 0, tooltip: 'specify type', tooltipshort: '' }
 }
 

@@ -31,9 +31,10 @@ export function useScreenSize() {
 
     useEffect(() => {
         const handleResize = () => {
+            const currentScreensize = currentScreenSize()
             setScreenSize(currentScreenSize())
+            console.log(`screensize changed to  ${JSON.stringify(currentScreensize)}`)
         }
-
         window.addEventListener('resize', handleResize)
 
         // Clean up the event listener when the component unmounts
