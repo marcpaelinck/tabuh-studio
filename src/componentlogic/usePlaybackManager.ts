@@ -16,6 +16,7 @@ import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, position
 import { isExtension, isMuting } from '../config/configfunctions'
 import type {
     AnimationNote,
+    BPM,
     GenericAction,
     Note,
     NoteSymbol,
@@ -177,6 +178,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         var prevNote = { ...currAction }
         var prevStep: FlowStep | undefined = undefined
         var currentStep: FlowStep | undefined = nextInFlow()
+        var introBPM: BPM = currentStep?.tempo[0] || 60 // Needed for initial animation action.
         if (!currentStep) return timeline
         // Keeps track of the longest measure duration in a section. All measures in a system should have
         // the same length but in case they don't, this value will be used to resync the following system.
@@ -392,7 +394,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     currnotes: [],
                     nextnotes: samplerAction2AnimationNotes(position, actions[0]),
                     timeuntil: actions[0].time,
-                    timeuntilMs: To2Millis(actions[0].time, actions[0].params.bpm)
+                    timeuntilMs: To2Millis(actions[0].time, introBPM)
                 }
             })
 
