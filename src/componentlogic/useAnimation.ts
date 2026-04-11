@@ -133,7 +133,11 @@ function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, 
 }
 
 // Arguments are mostly state variables and therefore need to be passed as reference object
-export const useAnimationEngine = (focusRef: RefObject<Position[]>, pbSpeedRef: RefObject<number>) => {
+export const useAnimationEngine = (
+    focusRef: RefObject<Position[]>,
+    pbSpeedRef: RefObject<number>,
+    pbWindowVisibleRef: RefObject<boolean>
+) => {
     const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
     const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
@@ -149,6 +153,7 @@ export const useAnimationEngine = (focusRef: RefObject<Position[]>, pbSpeedRef: 
 
     // For the use of Draw.schedule, see
     function animateInstrument(time: number, params: AnimmationFunctionParameters): void {
+        if (!pbWindowVisibleRef.current) return
         const currentFocus = focusRef.current
         const pbSpeed = pbSpeedRef.current
         const mySvgInfo = svgInfoRef.current

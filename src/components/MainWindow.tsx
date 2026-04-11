@@ -5,7 +5,7 @@ import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
-import { useContext, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
+import { useContext, useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
@@ -279,23 +279,36 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
-    const playerWindow = (
-        <PlayerWindow
-            visible={active == 'player'}
-            scoreMenuOptions={scoreMenuOptions}
-            score={editorScore}
-            loadScore={loadScore}
-            totalDurationMs={totalDurationMs}
-            timeLine={timeLine}
-            focus={focus}
-            setFocus={setFocus}
-            updatePlaybackFunctions={updatePlaybackCallbackFunctions}
-            playbackProgress={playbackProgress}
-            playbackSpeed={playbackSpeed}
-            setPlaybackSpeed={setPlaybackSpeed}
-            playbackState={playbackState}
-            playback={playback}
-        />
+    const playerWindow = useMemo(
+        () => (
+            <PlayerWindow
+                visible={active == 'player'}
+                scoreMenuOptions={scoreMenuOptions}
+                score={editorScore}
+                loadScore={loadScore}
+                totalDurationMs={totalDurationMs}
+                timeLine={timeLine}
+                focus={focus}
+                setFocus={setFocus}
+                updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+                playbackProgress={playbackProgress}
+                playbackSpeed={playbackSpeed}
+                setPlaybackSpeed={setPlaybackSpeed}
+                playbackState={playbackState}
+                playback={playback}
+            />
+        ),
+        [
+            active,
+            scoreMenuOptions,
+            editorScore,
+            totalDurationMs,
+            timeLine,
+            focus,
+            playbackProgress,
+            playbackSpeed,
+            playbackState
+        ]
     )
 
     const editorWindow = (

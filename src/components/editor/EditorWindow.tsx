@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -46,8 +46,16 @@ export default function EditorWindow({
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(editorScore, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
+    const visibleRef = useRef<boolean>(visible)
+
+    useEffect(() => {
+        console.log(`Editor is now ${visible ? 'ACTIVE' : 'INACTIVE'}`)
+        visibleRef.current = visible
+    }, [visible])
 
     function moveEditorCursor(time: number, params: EditorCursorParameters) {
+        console.log(`MOVECURSOR says: Editor is now ${visibleRef.current ? 'ACTIVE' : 'INACTIVE'}`)
+        if (!visibleRef.current) return
         const sys = (uuid: string | undefined): System | undefined => {
             return editorScore?.systems.find((sys) => sys.uuid == uuid)
         }

@@ -37,7 +37,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
     }, [])
 
     function highlight(cell: HTMLTextAreaElement | null, on: boolean) {
-        if (!cell) return
+        if (!cell || !visible) return
         const classes = ['border-1', 'border-solid', 'border-red-500']
         classes.forEach((value) => {
             if (on && !cell.classList.contains(value)) cell.classList.add(value)

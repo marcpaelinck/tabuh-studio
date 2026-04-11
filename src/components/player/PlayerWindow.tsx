@@ -63,6 +63,12 @@ export default function PlayerWindow({
 
     const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
+    const visibleRef = useRef<boolean>(visible)
+
+    useEffect(() => {
+        console.log(`Player is now ${visible ? 'ACTIVE' : 'INACTIVE'}`)
+        visibleRef.current = visible
+    }, [visible])
 
     useEffect(() => {
         focusRef.current = focus
@@ -74,7 +80,8 @@ export default function PlayerWindow({
     // HOOKS
     const { animateInstrument, setSvgInfo, panggulOption, setPanggulOption } = useAnimationEngine(
         focusRef,
-        playbackSpeedRef
+        playbackSpeedRef,
+        visibleRef
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
