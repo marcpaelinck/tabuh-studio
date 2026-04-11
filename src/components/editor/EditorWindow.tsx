@@ -49,12 +49,10 @@ export default function EditorWindow({
     const visibleRef = useRef<boolean>(visible)
 
     useEffect(() => {
-        console.log(`Editor is now ${visible ? 'ACTIVE' : 'INACTIVE'}`)
         visibleRef.current = visible
     }, [visible])
 
     function moveEditorCursor(time: number, params: EditorCursorParameters) {
-        console.log(`MOVECURSOR says: Editor is now ${visibleRef.current ? 'ACTIVE' : 'INACTIVE'}`)
         if (!visibleRef.current) return
         const sys = (uuid: string | undefined): System | undefined => {
             return editorScore?.systems.find((sys) => sys.uuid == uuid)
