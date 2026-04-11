@@ -26,7 +26,7 @@
    FloatValue { $[0-9]+ ("." $[0-9]+)? }
 }
 
-@top Document { InfoMetadataLine MetadataLine* Gongan+ EmptyLine*}
+@top Document { InfoMetadataLine MetadataLine* (EmptyLine Gongan?)+ }
 
 InfoMetadataLine { (space|tab)* lbrace space* InfoMetadata rbrace space* }
 InfoMetadata { "INFO" ( space (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter | DisplayParameter))+ }
@@ -44,8 +44,9 @@ BeatAtEndParameter { "beat_at_end" "=" BooleanValue}
 DisplayParameter { "display" "=" BooleanValue }
 
 // GONGAN
+@precedence { StaffLine, MetadataLine }
 
-Gongan { EmptyLine+ (CommentLine | MetadataLine | StaffLine)+ }
+Gongan { (CommentLine | MetadataLine | StaffLine)+ }
 
 StaffLine { PositionLabel Measure+ (Eol | Eof) }
 Measure { tab Note* }

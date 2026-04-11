@@ -9,7 +9,8 @@
         "wpbuild": "copy .\\buildfiles\\prod\\index.css .\\src /y & tsc -b && vite build && copy .\\dist\\assets\\*.* ..\\..\\WordPressProjects\\tabuh-studio-wp\\wp-content\\plugins\\tabuh-studio\\assets /y ",
         "lint": "eslint .",
         "preview": "vite preview",
-        "test": "node .\\src\\scoreparsers\\grammars\\tabuh\\test.ts"
+        "test": "node .\\src\\scoreparsers\\grammars\\tabuh\\test.ts",
+        "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts"
     },
     "dependencies": {
         "@lezer/generator": "^1.8.0",

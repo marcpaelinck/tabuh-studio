@@ -43,7 +43,7 @@ export const parserTestData = (id: number): TestData => {
     }
 }
 
-export const SMALLTEST = {
+export const SMALL = {
     file: './src/scoreparsers/grammars/tabuh/test/small.tsv',
     expected: `Document(
                     InfoMetadataLine(
@@ -57,10 +57,10 @@ export const SMALLTEST = {
                             DoLoopParameter(BooleanValue),
                             BeatAtEndParameter(BooleanValue)
                         ),
-                        Eol
                     ),
+                    EmptyLine(),
+                    EmptyLine(),
                     Gongan(
-                        EmptyLine,
                         MetadataLine(
                             Metadata(
                                 TempoMetadata(
@@ -73,7 +73,7 @@ export const SMALLTEST = {
                 )
 `
 }
-export const LARGETEST = {
+export const LARGE = {
     file: './src/scoreparsers/grammars/tabuh/test/large.tsv',
     expected: `Document(
                     InfoMetadataLine(
@@ -86,11 +86,11 @@ export const LARGETEST = {
                             RuntypesParameter(StringList(StringValue, StringValue)),
                             DoLoopParameter(BooleanValue),
                             BeatAtEndParameter(BooleanValue)
-                        ),
-                        Eol
+                        )
                     ),
+                    EmptyLine(),
+                    EmptyLine(),
                     Gongan(
-                        EmptyLine,
                         MetadataLine(
                             Metadata(
                                 TempoMetadata(
