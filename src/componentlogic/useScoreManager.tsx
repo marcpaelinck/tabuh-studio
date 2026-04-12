@@ -11,15 +11,15 @@ import { cycleValidation } from './validationManager'
 function gotoItemTargetName(destination: System) {
     return destination.label ? destination.label : `#${destination.id}`
 }
-export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType) {
-    const [editorScore, setEditorScore] = useState<Score | undefined>(undefined)
+export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
+    const [score, setScore] = useState<Score | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, System>>({})
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const dialog = useDialog()
 
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
-        setEditorScore(score)
+        setScore(score)
         const labeldict = Object.fromEntries(
             score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
         )
@@ -57,9 +57,9 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         // (Re-) number the system index and id values.
         // Re-create and order the execution list
         // Should be performed at each render due to possible user actions (insert or delete system).
-        if (!editorScore) return
+        if (!score) return
         const executionitems: ExecutionItem[] = []
-        editorScore.systems.forEach((systemData, sysIdx) => {
+        score.systems.forEach((systemData, sysIdx) => {
             systemData.index = sysIdx
             systemData.id = systemData.index + 1
             if (systemData.execution) executionitems.push(...systemData.execution)
@@ -69,7 +69,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         if (indexedDb) {
             dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'info' })
             const transaction = indexedDb.transaction('Score', 'readwrite')
-            const request = transaction.objectStore('Score').put(editorScore)
+            const request = transaction.objectStore('Score').put(score)
             var dateStr = new Date().toString().replace(/ GMT.*$/, '')
             request.onsuccess = () =>
                 dashboardFunctions.setDashboardElement('localCache', {
@@ -89,7 +89,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         debug('updating flow items')
         executionitems.forEach((item) => {
             if (item.type == 'goto') {
-                const target = editorScore.systems.find((sys) => sys.uuid == item.targetuuid)
+                const target = score.systems.find((sys) => sys.uuid == item.targetuuid)
                 if (target) item.targetname = target.label || `# ${target.id}`
                 else {
                     item.targetname = 'target unknown'
@@ -100,26 +100,26 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             }
             debug(`${item.tooltip} -- ${item.tooltipshort}`)
         })
-    }, [editorScore])
+    }, [score])
 
-    function getEditorScore() {
-        return editorScore
+    function getScore() {
+        return score
     }
 
     function updateSystem(sysData: System) {
-        if (!editorScore) return
+        if (!score) return
         const sysIdx = sysData.index
-        const newScore: Score = { ...editorScore }
-        const systems = editorScore.systems
+        const newScore: Score = { ...score }
+        const systems = score.systems
         newScore.systems = [...systems.slice(0, sysIdx), sysData, ...systems.slice(sysIdx + 1)]
-        setEditorScore(newScore)
+        setScore(newScore)
     }
 
     function updateParts(parts: Record<string, string[]>) {
-        if (!editorScore) return
-        const newScore: Score = { ...editorScore }
+        if (!score) return
+        const newScore: Score = { ...score }
         newScore.parts = { ...parts }
-        setEditorScore(newScore)
+        setScore(newScore)
     }
 
     function updatePointers(newSystemData: System[]) {
@@ -159,7 +159,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
 
     // Handles user actions triggered with buttons in the panel header
     function executeItemAction(fieldname: string, systemData: System, value?: string) {
-        if (!editorScore) return
+        if (!score) return
         debug(`processing ${fieldname}`)
         // Used for insertion and update
         var newSystemData: System | null = _.cloneDeep(systemData)
@@ -202,7 +202,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
                 break
             }
             case 'copy': {
-                const source = editorScore.systems.find((sys) => sys.uuid == value)
+                const source = score.systems.find((sys) => sys.uuid == value)
                 debug(source)
                 if (!source) {
                     console.error(`copy system: could not find system ${value}`)
@@ -219,7 +219,7 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
                 if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
-                const validation = cycleValidation(editorScore, true)
+                const validation = cycleValidation(score, true)
                 if (!validation.isValid)
                     dashboardFunctions.setDashboardElement('cycle', {
                         visible: true,
@@ -242,16 +242,16 @@ export function useEditorScoreManager(dashboardFunctions: DashboardFunctionsType
         }
         // Update, remove or insert system
         const newData = newSystemData
-            ? [...editorScore.systems.slice(0, sliceIndex1), newSystemData, ...editorScore.systems.slice(sliceIndex2)]
-            : [...editorScore.systems.slice(0, sliceIndex1), ...editorScore.systems.slice(sliceIndex2)]
+            ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
+            : [...score.systems.slice(0, sliceIndex1), ...score.systems.slice(sliceIndex2)]
         // Update all system IDs
         newData.forEach((sysData, sysIdx) => {
             sysData.index = sysIdx
             sysData.id = sysIdx + 1
         })
-        debug('UPDATING SCORE by editorscoremanager')
+        debug('UPDATING SCORE by scoreManager')
         updatePointers(newData)
-        setEditorScore({ ...editorScore, ...{ systems: newData } })
+        setScore({ ...score, ...{ systems: newData } })
     }
-    return { editorScore, getEditorScore, updateScore, labels, updateSystem, updateParts, executeItemAction }
+    return { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction }
 }

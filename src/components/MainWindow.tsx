@@ -30,8 +30,8 @@ import {
     type FormInstance
 } from 'rsuite'
 import { playbackReducerFactory } from '../componentlogic/playbackReducer'
-import { useEditorScoreManager } from '../componentlogic/useEditorScoreManager'
 import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
+import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
@@ -185,9 +185,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
     }
-    const { editorScore, getEditorScore, updateScore, labels, updateSystem, updateParts, executeItemAction } =
-        useEditorScoreManager(dashboardFunctions)
-    const scoreFunctions: ScoreFunctionsType = { getEditorScore, updateScore, updateSystem, updateParts }
+    const { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction } =
+        useScoreManager(dashboardFunctions)
+    const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
     const wpFunc = useContext(WpApiFunctions)
 
     const [expanded, setExpanded] = useState<Record<string, boolean>>({})
@@ -268,8 +268,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }, [loadedScore])
 
     useEffect(() => {
-        debug(`New editor score available, title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
-    }, [editorScore])
+        debug(`New editor score available, title=${score?.title} with ${score?.systems.length} systems`)
+    }, [score])
 
     function expandAll(expand: boolean) {
         const newExpanded = _.mapValues(expanded, () => expand)
@@ -283,7 +283,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <PlayerWindow
             visible={active == 'player'}
             scoreMenuOptions={scoreMenuOptions}
-            score={editorScore}
+            score={score}
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
@@ -304,7 +304,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             expanded={expanded}
             setExpanded={setExpanded}
             loading={loadingScore}
-            editorScore={editorScore}
+            score={score}
             labels={labels}
             updateParts={updateParts}
             executeItemAction={executeItemAction}

@@ -7,13 +7,13 @@ import type { ComponentName, DashboardComponentValues } from './editor/Dashboard
 // SCORE FUNCTIONS
 // modify / save score
 export interface ScoreFunctionsType {
-    getEditorScore: () => Score | undefined
+    getScore: () => Score | undefined
     updateScore: (system: Score) => void
     updateSystem: (system: System) => void
     updateParts: (parts: Record<string, string[]>) => void
 }
 export const defaultScoreFunc: ScoreFunctionsType = {
-    getEditorScore: () => undefined,
+    getScore: () => undefined,
     updateScore: () => {},
     updateSystem: () => {},
     updateParts: () => {}

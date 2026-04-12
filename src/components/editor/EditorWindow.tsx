@@ -21,7 +21,7 @@ interface EditorWindowProps {
     expanded: Record<string, boolean>
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
-    editorScore: Score | undefined
+    score: Score | undefined
     labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
@@ -35,7 +35,7 @@ export default function EditorWindow({
     expanded,
     setExpanded,
     loading,
-    editorScore,
+    score,
     labels,
     updateParts,
     executeItemAction,
@@ -44,7 +44,7 @@ export default function EditorWindow({
     playback
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
-        usePartManager(editorScore, updateParts)
+        usePartManager(score, updateParts)
     const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
     const visibleRef = useRef<boolean>(visible)
 
@@ -55,7 +55,7 @@ export default function EditorWindow({
     function moveEditorCursor(time: number, params: EditorCursorParameters) {
         if (!visibleRef.current) return
         const sys = (uuid: string | undefined): System | undefined => {
-            return editorScore?.systems.find((sys) => sys.uuid == uuid)
+            return score?.systems.find((sys) => sys.uuid == uuid)
         }
 
         if (params.prevsysuuid && params.prevsysuuid != params.sysuuid) {
@@ -98,37 +98,36 @@ export default function EditorWindow({
     }
 
     useEffect(() => {
-        if (!editorScore) return
+        if (!score) return
         // TODO this code should only run when a new score is loaded. It currently runs after each
-        // update of editorScore.
+        // update of the score.
         const initExpandState = Object.fromEntries(
-            editorScore.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
+            score.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )
         setExpanded(initExpandState)
-        // setScore(editorScore)
-    }, [editorScore])
+    }, [score])
 
     // Update the list of expanded panels which is maintained in te TabuhEditor.
     // Keys (systems) might have been added or deleted.
     useEffect(() => {
-        if (!editorScore) return
-        const allKeys = Object.fromEntries(editorScore.systems.map((sys) => [sys.uuid, false]))
+        if (!score) return
+        const allKeys = Object.fromEntries(score.systems.map((sys) => [sys.uuid, false]))
         const existingKeys = _.pick(expanded, Object.keys(allKeys))
         setExpanded({ ...allKeys, ...existingKeys })
         // gotoTargets will be used by the 'delete' SummaryItem button for validation.
         var newGotoTargets: Set<string> = new Set()
-        editorScore.systems.forEach((sys) => {
+        score.systems.forEach((sys) => {
             if (sys.execution)
                 sys.execution
                     .filter((item) => item.type == 'goto')
                     .forEach((goto) => newGotoTargets.add(goto.targetuuid))
         })
         setGotoTargets(newGotoTargets)
-    }, [editorScore])
+    }, [score])
 
     // // gotoTargets will be used by the 'delete' SummaryItem button for validation.
     // var gotoTargets: Set<string> = new Set()
-    // editorScore.systems.forEach((sys) => {
+    // score.systems.forEach((sys) => {
     //     if (sys.execution)
     //         sys.execution.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
     // })
@@ -136,7 +135,7 @@ export default function EditorWindow({
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
     function systemSelectorOptions(self: System, includeSelf: boolean, includeNone: boolean) {
-        if (!editorScore) return []
+        if (!score) return []
         // List of labelled systems
         const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
             label: label,
@@ -145,7 +144,7 @@ export default function EditorWindow({
         const labelledUuid = labelOptions.map((entry) => entry.value)
         //
         // 2. List of non-labelled systems
-        const idOptions: InputOption<string>[] = editorScore.systems
+        const idOptions: InputOption<string>[] = score.systems
             .filter((sysData) => !labelledUuid.includes(sysData.uuid))
             .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
         // Merge both lists
@@ -162,23 +161,23 @@ export default function EditorWindow({
         return options
     }
 
-    debug(`Current score is title=${editorScore?.title} with ${editorScore?.systems.length} systems`)
+    debug(`Current score is title=${score?.title} with ${score?.systems.length} systems`)
 
     // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
     // minimize rendering because it interferes with the audio playback functions.
     // These objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
     const systemIdPrefix = 'system-'
     const systemHeaderButtons: Record<string, ReactElement> | undefined = useMemo(() => {
-        if (!editorScore) return
+        if (!score) return
         return Object.fromEntries(
-            editorScore.systems.map((systemData) => {
+            score.systems.map((systemData) => {
                 debug('updating editor window')
 
                 return [
                     systemData.uuid,
                     <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">
                         <PlaybackButtons
-                            score={editorScore}
+                            score={score}
                             sysUuid={systemData.uuid}
                             systemIdPrefix={systemIdPrefix}
                             playback={playback}
@@ -192,12 +191,12 @@ export default function EditorWindow({
                 ]
             })
         )
-    }, [editorScore, pbCurrUuid, pbType, pbAudioState])
+    }, [score, pbCurrUuid, pbType, pbAudioState])
     const systemHeaderFields: Record<string, ReactElement> | undefined = useMemo(() => {
-        if (!editorScore) return
+        if (!score) return
 
         return Object.fromEntries(
-            editorScore.systems.map((systemData) => {
+            score.systems.map((systemData) => {
                 const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
                 return [
                     systemData.uuid,
@@ -235,13 +234,13 @@ export default function EditorWindow({
                 ]
             })
         )
-    }, [editorScore])
+    }, [score])
 
     const systems = useMemo(() => {
-        if (!editorScore || !systemHeaderButtons || !systemHeaderFields) return
+        if (!score || !systemHeaderButtons || !systemHeaderFields) return
         // currPartName is used to determine the first system of the part so that the part name only appears once.
         var rangePartName: string = ''
-        return editorScore.systems.map((systemData) => {
+        return score.systems.map((systemData) => {
             // Structure:
             // - Panel Header: contains context menu and System summary information
             // - Panel content (visible when panel is expanded): System grid (SystemNode)
@@ -291,7 +290,7 @@ export default function EditorWindow({
                                 {expanded[systemData.uuid] && (
                                     <SystemNode
                                         systemData={systemData}
-                                        positions={editorScore.positions}
+                                        positions={score.positions}
                                         playbackState={playbackState}
                                         visible={expanded[systemData.uuid]}
                                     />
@@ -303,7 +302,7 @@ export default function EditorWindow({
                 // </Profiler>
             )
         })
-    }, [editorScore, expanded, playbackState, selectionOn, sysToPartLookup])
+    }, [score, expanded, playbackState, selectionOn, sysToPartLookup])
 
     return (
         // <Profiler id="App" onRender={onRender}>

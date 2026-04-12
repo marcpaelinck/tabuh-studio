@@ -30,7 +30,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SummaryItem: false,
     MainWindow: false,
     MainMenu: false,
-    useEditorScoreManager: false,
+    useScoreManager: false,
     useInstruments: false,
     useKeyboardListener: false,
     usePartManager: false,

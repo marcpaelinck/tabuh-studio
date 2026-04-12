@@ -69,7 +69,7 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
             case 'file-save':
             case 'file-saveas': {
                 // Persist cached changes and empty caches
-                const score: Score | undefined = { ...scoreFunc.getEditorScore() } as Score
+                const score: Score | undefined = { ...scoreFunc.getScore() } as Score
                 if (score) {
                     const newScore = { ...score }
                     newScore.systems.forEach((sys) =>

@@ -45,12 +45,12 @@ export function findKeyByPredicate<T>(
 
 export default findKeyByValue
 
-type DefaultType = 'JsonSymbol' | 'EditorScore'
+type DefaultType = 'JsonSymbol' | 'Score'
 const DefaultObjectFactory = {
     JsonSymbol: () => {
         return { sysUuid: '', sectionId: 0, s: '-', t: 0, d: 1 } as JsonSymbol
     },
-    EditorScore: () => {
+    Score: () => {
         return {
             uuid: '',
             title: 'default',
@@ -65,7 +65,7 @@ const DefaultObjectFactory = {
 }
 
 export function defaultObject<T>(otype: DefaultType): T {
-    // export function defaultObject(otype: DefaultType): JsonSymbol | EditorScore | undefined {
+    // export function defaultObject(otype: DefaultType): JsonSymbol | Score | undefined {
     return DefaultObjectFactory[otype]() as T
 }
 
