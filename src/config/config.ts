@@ -334,7 +334,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: 0,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
-        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
+        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
+                             '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
+                             '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
         validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
     },
     KENDANG_WADON: {
@@ -343,7 +345,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: 0,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
-        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
+        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
+                             '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
+                             '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
         validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
     },
     KENDANG_LANANG: {
@@ -352,7 +356,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: 0,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
-        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'] },
+        symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
+                             '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
+                             '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
         validPatterns: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;']
     },
     JEGOGAN: {

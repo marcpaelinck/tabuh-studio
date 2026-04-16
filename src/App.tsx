@@ -28,22 +28,10 @@ export default function App() {
             <div className="flex w-full min-h-0 ">
                 <DebugContext value={debug}>
                     <VStack id="vstack" className="flex w-full" align="center">
-                        {/* <Toggle
-                            size={'lg'}
-                            color="violet"
-                            checkedChildren={<PlayOutlineIcon />}
-                            unCheckedChildren={<EditIcon />}
-                            defaultChecked
-                            onChange={(checked) => setActive(checked ? 'player' : 'editor')}
-                        /> */}
                         {debugMode && <DebugWindow message={debugMessage} />}
                         <WpApiFunctions value={wpFunctions}>
                             <div className={'lg:w-8/10 sm:w-full min-h-10' + FRAMESTYLE}>
-                                {/* {active == 'player' ? (
-                                    <TabuhPlayer dataSource={dataSource} />
-                                ) : ( */}
                                 <MainWindow dataSource={dataSource} />
-                                {/* )} */}
                             </div>
                             <div id="phpdebug"></div>
                         </WpApiFunctions>

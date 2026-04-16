@@ -1,14 +1,6 @@
-import {
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type ActionDispatch,
-    type Dispatch,
-    type JSX,
-    type RefObject
-} from 'react'
+import { useEffect, useMemo, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
 import { VStack } from 'rsuite'
+import type { ReactElement } from 'rsuite/esm/internals/types'
 import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
@@ -59,7 +51,7 @@ export default function PlayerWindow({
     playbackState
 }: PlayerWindowProps) {
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
-    const [notationParas, setNotationParas] = useState<JSX.Element[] | null>(null)
+    const [notationParas, setNotationParas] = useState<ReactElement[] | null>(null)
 
     const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
@@ -90,7 +82,7 @@ export default function PlayerWindow({
             setFocus(newFocus)
             //TODO currently only displaying notation for the first focus position
             if (timeLine && timeLine.notation && newFocus && newFocus[0] in timeLine.notation)
-                setNotationParas(timeLine.notation[newFocus[0]])
+                setNotationParas(timeLine.notation[newFocus[0]] || null)
         }
     }
 

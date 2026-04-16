@@ -66,7 +66,7 @@ export default function Animation({
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
-    const defaultSvgSize = 100 // percent
+    const defaultSvgSize = 35 // percent
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
@@ -139,14 +139,12 @@ export default function Animation({
                     }
                 </Row>
                 <Row id="notation-area-row" className="p-2">
-                    <div>
-                        <NotationArea
-                            notation={notationElement}
-                            visible={notationVisible}
-                            focus={focus}
-                            updatePlaybackFunctions={updatePlaybackFunctions}
-                        />
-                    </div>
+                    <NotationArea
+                        notation={notationElement}
+                        visible={notationVisible}
+                        focus={focus}
+                        updatePlaybackFunctions={updatePlaybackFunctions}
+                    />
                 </Row>
                 <Row id="slider-row" className="pl-4 pr-4 pt-10">
                     <Slider

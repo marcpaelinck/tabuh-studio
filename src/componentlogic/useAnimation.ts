@@ -169,8 +169,7 @@ export const useAnimationEngine = (
                     // positionIndex will be used to select the highlight color combinations.
                     const positionIndex = currentFocus.indexOf(params.position)
                     if (keyElement) {
-                        //@ts-expect-error: schedule() wrapper causes ts to 'forget' that keyElement and aAction.currnote are not null
-                        Tone.getDraw().schedule(() => highlightNote(keyElement, note, positionIndex), time)
+                        Tone.getDraw().schedule(() => highlightNote(keyElement!, note, positionIndex), time)
                     }
                 })
                 // Panggul animation

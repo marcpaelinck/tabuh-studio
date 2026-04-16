@@ -256,6 +256,8 @@ export type EditorCellCursor = { sysUuid: UUID; measure: number }
 
 // SCORE PROCESSING AND TIMELINE CREATION
 
+export type PlaybackFunctionName = ''
+
 export type GenericFunction = (time: number, params: {}) => void
 export type GenericAction = { time: TimeObject; function: GenericFunction; params: {} }
 
@@ -282,6 +284,7 @@ export interface SamplerFunctionParameters {
 export type SamplerFunction = (time: number, params: SamplerFunctionParameters) => void
 export interface PlaybackSamplerAction {
     time: TimeObject
+    timeMs: number
     function: SamplerFunction
     params: SamplerFunctionParameters
 }
@@ -299,7 +302,6 @@ export interface AnimmationFunctionParameters {
     position: Position
     currnotes: AnimationNote[]
     nextnotes: AnimationNote[]
-    timeuntil: TimeObject
     timeuntilMs: number
 }
 export type AnimationFunction = (time: number, params: AnimmationFunctionParameters) => void
@@ -319,6 +321,7 @@ export interface PlayerCursorParameters {
 export type PlayerCursorFunction = (time: number, params: PlayerCursorParameters) => void
 export type PlaybackPlayerCursorAction = {
     time: TimeObject
+    functionName: string
     function: PlayerCursorFunction
     params: PlayerCursorParameters
 }
@@ -360,7 +363,7 @@ export type TimeLine = {
     playercursoractions: PlaybackPlayerCursorAction[]
     editorcursoractions: PlaybackEditorCursorAction[]
     genericactions: GenericAction[]
-    notation: Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>
+    notation: Partial<Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>>
 }
 
 // WordPress API

@@ -37,6 +37,7 @@ export function Player({
             case 'playing':
                 playback({ actionType: 'pause' })
                 break
+            case 'stopped':
             case 'paused':
                 playback({ actionType: 'play' })
                 break

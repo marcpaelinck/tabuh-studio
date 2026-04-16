@@ -17,6 +17,7 @@ import {
     TremoloChars
 } from '../config/config'
 import type {
+    BPM,
     DurationInBasenoteEquiv,
     NoteSymbol,
     PlaybackSamplerAction,
@@ -65,7 +66,7 @@ const patterns = {
     norot: { duration: 4 },
     // NOROT: a single norot symbol stands for half an 8-note norot pattern. The patternManager logic will determine which part of the pattern
     //        should be created. See Tenzer, Gamelan Gong Keybar, p. 215ff.
-    gracenote: { duration: 0.4 }
+    gracenote: { duration: 0.5 }
 }
 
 type PatternType =
@@ -106,11 +107,12 @@ function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
 export interface CreatePatternArgs {
     samplerFunction: SamplerFunction
     time: TimeInBasenoteEquiv // current time
+    timeMs: number
     position: Position
     prevsymbol: NoteSymbol | undefined // previous symbol in the notation
     symbol: NoteSymbol // current symbol in the notation
     nextsymbol: NoteSymbol | undefined // symbol following the current symbol
-    bpm: number // current tempo in BPM
+    bpm: BPM // current tempo in BPM
     velocity: Tone.Unit.NormalRange // current velocity
     prevaction: PlaybackSamplerAction | undefined // previous action created for this position
     isLast: boolean // true if this is the last symbol in the current position's notation
@@ -200,10 +202,11 @@ export function totalDuration(
     return _.sum(symbols.map((sym) => symbolDuration(sym, position, bpm, unit)))
 }
 
-function singleNoteAction(args: CreatePatternArgs) {
+function singleNoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     return [
         {
             time: n2TO(args.time),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(1),
@@ -218,10 +221,11 @@ function singleNoteAction(args: CreatePatternArgs) {
     ]
 }
 
-function halfDurationAction(args: CreatePatternArgs) {
+function halfDurationAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     return [
         {
             time: n2TO(args.time),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(0.5),
@@ -236,10 +240,11 @@ function halfDurationAction(args: CreatePatternArgs) {
     ]
 }
 
-function silenceAction(args: CreatePatternArgs) {
+function silenceAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     return [
         {
             time: n2TO(args.time),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(1),
@@ -257,7 +262,7 @@ function silenceAction(args: CreatePatternArgs) {
 // A grace note doesn't add to the playback duration. Instead, its duration is subtracted
 // from the previous note's duration.
 // A grace notes doesn't have an octave modifier, so its octave is derived from the following note.
-function gracenoteAction(args: CreatePatternArgs) {
+function gracenoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     const isMelodic = (s: NoteSymbol) => s.length > 0 && MelodicNoteChars.includes(s[0])
 
     // Subtract the grace note's duration from the previous note action
@@ -294,6 +299,7 @@ function gracenoteAction(args: CreatePatternArgs) {
     return [
         {
             time: n2TO(args.time - patterns.gracenote.duration),
+            timeMs: args.timeMs - BaseNoteEquiv2Millis(patterns.gracenote.duration, args.bpm),
             function: args.samplerFunction,
             params: {
                 duration: n2TO(patterns.gracenote.duration),
@@ -308,13 +314,13 @@ function gracenoteAction(args: CreatePatternArgs) {
     ]
 }
 
-function tremoloAction(args: CreatePatternArgs) {
+function tremoloAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     // Skip if the previous symbol is also a tremolo note.
     // In that case the pattern has already been created.
     if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
 
     const duration = 1 / patterns.tremolo.notes_per_basenote
-    const returnValue = []
+    const returnValue: PlaybackSamplerAction[] = []
     const notes = [args.symbol.slice(0, -1)]
     // Include the next symbol if it is also a tremolo note
     if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char)))
@@ -326,6 +332,7 @@ function tremoloAction(args: CreatePatternArgs) {
         const noteIdx = count % notes.length
         returnValue.push({
             time: n2TO(args.time + count * duration),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(duration),
@@ -341,12 +348,12 @@ function tremoloAction(args: CreatePatternArgs) {
     return returnValue
 }
 
-function AcceleratingTremoloAction(args: CreatePatternArgs) {
+function AcceleratingTremoloAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     // Skip if the previous symbol is also an accelerating tremolo note.
     // In that case the pattern has already been created.
     if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
 
-    const returnValue = []
+    const returnValue: PlaybackSamplerAction[] = []
     const notes = [args.symbol.slice(0, -1)]
     // Include the next symbol if it is also an accelerating tremolo note
     if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char)))
@@ -361,6 +368,7 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
         const velocity = patterns.tremolo.accelerating_velocity[idx]
         returnValue.push({
             time: n2TO(time),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(duration),
@@ -377,7 +385,7 @@ function AcceleratingTremoloAction(args: CreatePatternArgs) {
     return returnValue
 }
 
-function rakeAction(args: CreatePatternArgs) {
+function rakeAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
     const invert = RakeDownChars.includes(args.symbol.slice(-1))
     const instrumentRange = _.concat(
@@ -395,6 +403,7 @@ function rakeAction(args: CreatePatternArgs) {
     for (var idx = 0; idx < patterns.rake.number_of_notes; idx++) {
         returnValue.push({
             time: n2TO(args.time + offset),
+            timeMs: args.timeMs,
             function: args.samplerFunction,
             params: {
                 duration: n2TO(noteDuration),
@@ -409,5 +418,11 @@ function rakeAction(args: CreatePatternArgs) {
         offset += noteSpacing
     }
     debug(`result: ${JSON.stringify(returnValue)}`)
+    return returnValue
+}
+
+// TODO: elaborate
+function norotAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
+    const returnValue: PlaybackSamplerAction[] = []
     return returnValue
 }

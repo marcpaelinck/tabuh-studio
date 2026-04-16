@@ -269,6 +269,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     useEffect(() => {
         debug(`New editor score available, title=${score?.title} with ${score?.systems.length} systems`)
+        playback({
+            actionType: 'load',
+            playbackType: 'multiple',
+            score: score,
+            systemIndex: 0,
+            intro: 2000,
+            outro: 5000
+        })
     }, [score])
 
     function expandAll(expand: boolean) {

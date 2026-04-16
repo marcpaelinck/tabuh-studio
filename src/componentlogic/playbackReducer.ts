@@ -7,15 +7,15 @@ import { cycleValidation } from './validationManager'
 
 export type PlaybackType = 'single' | 'multiple' | 'none'
 export type ActionType =
-    | 'load'
-    | 'play'
-    | 'pause'
-    | 'stop'
-    | 'rewind'
-    | 'jumptotime'
-    | 'cursor'
-    | 'clear'
-    | 'reseterror'
+    | 'load' // Load a playback schedule into the ToneJS Transport object.
+    | 'play' // Play from current cursor position. Perform 'load' action first if no schedule is set.
+    | 'pause' // Pause playback.
+    | 'stop' // Stop playback and reset playback cursor.
+    | 'rewind' // Reset playback cursor.
+    | 'jumptotime' // Move playback cursor to given position.
+    | 'cursor' // Move the editor cursor.
+    | 'clear' // Clear the playback schedule.
+    | 'reseterror' // Clear error state and stop playback.
 export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
 
 export type PlaybackState = {
@@ -26,10 +26,10 @@ export type PlaybackState = {
 }
 export type PlaybackAction = {
     actionType: ActionType
-    playbackType?: PlaybackType
+    playbackType?: PlaybackType // 'single': playback a single system. 'multiple' playback until end.
     score?: Score
-    systemIndex?: number
-    seconds?: number
+    systemIndex?: number // system from which the playback should start.
+    seconds?: number // used with actionType='jumptotime': new cursor position relative to start.
     cursor?: EditorCellCursor
     intro?: number // silence before start of playback in ms
     outro?: number // silence after end of playback in ms
@@ -72,7 +72,6 @@ export function playbackReducerFactory(
 
 function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
     if (!action.score) {
-        console.error('audio reducer: action is "load" but data or functions are missing.')
         return { ...state, cursor: noCursor, audioState: 'nodata' }
     }
 
@@ -84,6 +83,7 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
     const validation = cycleValidation(action.score, true)
     if (!validation.isValid) {
         debug('validating')
+        console.warn('Can not start playback, there is a cycle in the score.')
         // dialog.alert(validation.message, { title: 'Warning' })
         return { ...state, cursor: noCursor, audioState: 'error', message: validation.message }
     }
@@ -102,19 +102,18 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
         case 'clear': {
             return { cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
+        case 'load':
+            state = loadData(state, action)
+            return state
         case 'play': {
             debug(`executing 'play'`)
             if (state.audioState == 'nodata' || (action.playbackType && action.score))
                 // New playback action: create a playback schedule
                 state = loadData(state, { ...action, actionType: 'load' })
             if (!['stopped', 'paused'].includes(state.audioState)) return { ...state }
-            // if (action.playbackType) {
             asyncPlay()
             debug({ ...state, audioState: 'playing' }, true)
             return { ...state, audioState: 'playing' }
-            // }
-            console.error('audio reducer: action is "play" but playback type is missing.')
-            return state
         }
         case 'pause': {
             debug(`executing 'pause'`)
