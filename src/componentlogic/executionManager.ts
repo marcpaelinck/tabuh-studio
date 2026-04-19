@@ -46,8 +46,8 @@ export interface FlowStep {
     system: System
     systemIdx: number
     sectionIdx: number // for future use
-    measures: Record<Position, Measure>
-    positions: Position[]
+    measures: Record<Partial<Position>, Measure>
+    positions: Partial<Position>[]
     tempo: BPM[]
     dynamics: number[]
     lastSystem: boolean
@@ -260,12 +260,12 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
                 _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
             ) as Record<Position, Measure>
 
-            const nextStep = {
+            const nextStep: FlowStep = {
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 sectionIdx: next.sectionIdx,
                 measures: measures,
-                positions: score.positions,
+                positions: _.keys(measures) as Position[],
                 tempo: getExpressionValue(
                     'tempo',
                     next.systemIdx,

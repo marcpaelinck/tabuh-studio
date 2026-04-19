@@ -43,6 +43,8 @@ export const parserTestData = (id: number): TestData => {
     }
 }
 
+export const NOTATIONTSV = { file: './src/scoreparsers/grammars/tabuh/test/notation.tsv', expected: undefined }
+
 export const SMALL = {
     file: './src/scoreparsers/grammars/tabuh/test/small.tsv',
     expected: `Document(

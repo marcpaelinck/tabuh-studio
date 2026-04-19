@@ -75,16 +75,11 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
                     newScore.systems.forEach((sys) =>
                         _.toPairs(sys.staffs).forEach(([pos, measures]) =>
                             measures.forEach((measure, measidx) => {
-                                if (sys.id == 1 && pos == 'UGAL' && measidx == 0)
-                                    console.log(
-                                        `MEASURE.NOTATION=${measure.notation}, MEASURE.NOTATION_=${measure.notation_}`
-                                    )
                                 if (measure.notation_) measure.notation = measure.notation_
                                 delete measure.notation_
                             })
                         )
                     )
-                    console.log(newScore)
                     const json = scoreToFormattedJson(newScore)
                     if (activeKey == 'file-save') {
                         var response = undefined
@@ -124,7 +119,6 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
     function scoreSelected(scoreInfo: ScoreInfo | undefined) {
         setScoreSelector(false)
         if (scoreInfo) {
-            console.log(`SCOREINFO=${JSON.stringify(scoreInfo)}`)
             loadScore('JSON', scoreInfo)
         }
     }

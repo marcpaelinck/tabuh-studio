@@ -247,6 +247,10 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         XDONG1: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
         XDANG1: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
         XDENG2: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'OPEN' },
+        XDUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' },
+        XDONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
+        XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
+        XDENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'MUTED' },
         XDONG1_MUTED: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
         XDANG1_MUTED: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
@@ -296,7 +300,7 @@ export const TremoloChars = [';']
 export const AcceleratingTremoloChars = [':']
 export const RakeUpChars = [']']
 export const RakeDownChars = ['[']
-export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S']
+export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S', 'X', 'B']
 export const NorotChars = ['n', 'N']
 
 //prettier-ignore
@@ -404,8 +408,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     KANTILAN_SANGSIH: {
@@ -423,8 +427,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_POLOS: {
@@ -442,8 +446,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     PEMADE_SANGSIH: {
@@ -461,8 +465,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     UGAL: {
@@ -480,8 +484,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'no,', 'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'No,', 'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     TROMPONG: {
@@ -510,8 +514,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
                         'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
                         'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                        'ne,', 'nu,', 'na,', 'ni', 'no', 'ne', 'nu', 'na', 'ni<',
-                        'Ne,', 'Nu,', 'Na,', 'Ni', 'No', 'Ne', 'Nu', 'Na', 'Ni<',
+                        'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
+                        'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
                         'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<']
     },
     REYONG_1: {
@@ -525,14 +529,16 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 
                             t: ['DENG0', 'DING1'], 't?': ['DENG0_MUTED', 'DING1_MUTED'], 
                             b: ['DENG0', 'DANG0'], 'b/': ['DENG0_ABBR', 'DANG0_ABBR'], 'b?': ['DENG0_MUTED', 'DANG0_MUTED'], 
-                            x: ['XDUNG0'], 'x/': ['XDUNG0_MUTED']
+                            x: ['XDUNG0'], 'x/': ['XDUNG0_ABBR'], 'x?': ['XDUNG0_MUTED']
         },
         validPatterns: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_',
                         'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_',
                         'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 
                         'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na']
+                        'in', 'on', 'en', 'un', 'an',
+                        'iN', 'oN', 'eN', 'uN', 'aN',
+                        'E', 'U', 'A', 'I', 'O', 'X', 'B'
+]
     },
     REYONG_2: {
         name: 'Reyong 2',
@@ -544,14 +550,16 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 
                             'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 
                             b: ['DING1', 'DENG1'], 'b/': ['DING1_ABBR', 'DENG1_ABBR'], 'b?': ['DING1_MUTED', 'DENG1_MUTED'], 
-                            x: ['XDONG1'], 'x/': ['XDONG1_MUTED']
+                            x: ['XDONG1'], 'x/': ['XDONG1_ABBR'], 'x?': ['XDONG1_MUTED']
         },
         validPatterns: ['u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_',
                         'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_',
                         'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 
                         'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na']
+                        'in', 'on', 'en', 'un', 'an',
+                        'iN', 'oN', 'eN', 'uN', 'aN',
+                        'I', 'O', 'E', 'U', 'A', 'X', 'B'
+                    ]
     },
     REYONG_3: {
         name: 'Reyong 3',
@@ -563,14 +571,16 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                            'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'],
                            'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 
                             b: ['DUNG1', 'DING2'], 'b/': ['DUNG1_ABBR', 'DING2_ABBR'], 'b?': ['DUNG1_MUTED', 'DING2_MUTED'], 
-                            x: ['XDANG1'], 'x/': ['XDANG1_MUTED']
+                            x: ['XDANG1'], 'x/': ['XDANG1_ABBR'], 'x?': ['XDANG1_MUTED']
         },
         validPatterns: ['o_', 'e_', 'u_', 'a_', 'i<_', 'o<_', 'e<_',
                         'o/_', 'e/_', 'u/_', 'a/_', 'i</_', 'o</_', 'e</_',
                         'o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
                         'o:', 'e:', 'u:', 'a:', 'i<:', 'o<:', 'e<:',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na']
+                        'en', 'un', 'an', 'i<n', 'o<n',
+                        'eN', 'uN', 'aN', 'i<N', 'o<N',
+                        'E', 'U', 'A', 'I', 'O', 'X', 'B'
+                    ]
     },
     REYONG_4: {
         name: 'Reyong 4',
@@ -582,14 +592,16 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                            'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 'o</': ['DONG2_ABBR'], 'e</': ['DENG2_ABBR'], 'u</': ['DUNG2_ABBR'],
                            'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED'], 'o<?': ['DONG2_MUTED'], 'e<?': ['DENG2_MUTED'], 'u<?': ['DUNG2_MUTED'],
                             b: ['DONG2', 'DUNG2'], 'b/': ['DONG2_ABBR', 'DUNG2_ABBR'], 'b?': ['DONG2_MUTED', 'DUNG2_MUTED'], 
-                            x: ['XDENG2'], 'x/': ['XDENG2_MUTED']
+                            x: ['XDENG2'], 'x/': ['XDENG2_ABBR'], 'x?': ['XDENG2_MUTED']
         },
         validPatterns: ['u_', 'a_', 'i<_', 'o<_', 'e<_', 'u<_',
                         'u/_', 'a/_', 'i</_', 'o</_', 'e</_', 'u</_',
                         'u;', 'a;', 'i<;', 'o<;', 'e<;', 'u<;', 
                         'u:', 'a:', 'i<:', 'o<:', 'e<:', 'u<:',
-                        'ni', 'no', 'ne', 'nu', 'na',
-                        'Ni', 'No', 'Ne', 'Nu', 'Na']
+                        'in', 'on', 'en', 'un', 'an',
+                        'iN', 'oN', 'eN', 'uN', 'aN',
+                        'I', 'O', 'E', 'U', 'A', 'X', 'B'
+                    ]
     }
 }
 

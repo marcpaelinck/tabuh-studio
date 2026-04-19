@@ -96,7 +96,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         Tone.getTransport()
     }
 
-    // The
     function updatePlaybackCallbackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
         pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
     }
@@ -111,6 +110,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             const instrType: string = positionConfigs[position].type
             if (!shCode) return null
             const note: Note = noteConfigs[instrType][shCode]
+            if (!note) console.log(`${shCode} ${position}`)
             const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
             result.push({
                 time: action.time,
@@ -173,6 +173,18 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         }
     }
 
+    function extendLastSamplerAction(action: PlaybackSamplerAction | null | undefined, toDuration: number) {
+        if (action && !action.ismuted) {
+            action.params.duration = TOplusNumber(action.params.duration, toDuration)
+        }
+    }
+
+    function setLastSamplerActionEndtime(action: PlaybackSamplerAction | null | undefined, toEndtime: number) {
+        if (action && !action.ismuted) {
+            action.params.duration = n2TO(toEndtime - TO2n(action.time))
+        }
+    }
+
     // Creates a timeline to play back (parts of) the score in the editor
     // useCache: if true, the unsaved (cached) user edits will be played back.
     function createTimelineFromScore(
@@ -207,13 +219,13 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         function nextSymbol(
             notation: NoteSymbol[],
             currIdx: number,
-            position: Position,
+            pos: Position,
             useCache: boolean
         ): NoteSymbol | undefined {
             if (currIdx + 1 < notation.length) return notation[currIdx + 1]
             const nextStep = nextInFlow(true)
-            if (nextStep && position in nextStep.measures) {
-                const measure = nextStep.measures[position]
+            if (nextStep && pos in nextStep.measures) {
+                const measure = nextStep.measures[pos]
                 const notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
                 return notation.length > 0 ? notation[0] : undefined
             }
@@ -224,7 +236,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         var currAction: Record<string, PlaybackSamplerAction | null> = Object.fromEntries(
             Object.keys(positionConfigs).map((key) => [key, null])
         )
-        var prevNote = { ...currAction }
         var currentStep: FlowStep | undefined = nextInFlow()
         var introTempo: BPM = defaultTempo // Needed for initial animation action.
         if (!currentStep) return newTimeLine
@@ -290,7 +301,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 newTimeLine.notation[position] = []
                 const measure = currentStep.measures[position]
                 var notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
-                if (!notation) notation = Array(4).fill(defaultObject('JsonSymbol'))
+                if (!notation) notation = Array(4).fill(defaultObject('NoteSymbol'))
                 var prevSymbol: NoteSymbol | undefined = undefined
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
@@ -300,24 +311,20 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     // CREATE SAMPLER ACTION
                     // Determine the default duration for a single base note.
                     // Add the given delay time if we reached the last note of the measure.
-                    var symbolDuration =
-                        1 +
-                        (endOfMeasure && currentStep!.waitMsAfter
-                            ? millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
-                            : 0)
+                    var symbolDuration = 1
                     var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - sectionStartTime, currentStep!))
+                    var waitTime = 0
+                    if (symbolIdx == 0) {
+                        // Start of new measure: extend the last note until the current time. This ensures that
+                        // if the previous measure was incomplete, it gets extended to the length of the beat
+                        // to which it belongs.
+                        setLastSamplerActionEndtime(currAction[position], currTime)
+                    }
                     if (isExtension(symbol)) {
                         // Extend the last note of the current position with one basenote duration.
-                        // Add the given delay time if we reached the last note of the measure.
-                        if (currAction[position]) {
-                            currAction[position].params.duration = TOplusNumber(
-                                currAction[position].params.duration,
-                                symbolDuration
-                            )
-                        }
+                        extendLastSamplerAction(currAction[position], symbolDuration)
                     } else if (isMuting(symbol)) {
-                        // No further action.
-                        // Default duration will be added to current time without extending the last note.
+                        if (currAction[position]) currAction[position].ismuted = true
                     } else {
                         // Convert potential patterns to individual note actions.
                         const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
@@ -353,7 +360,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                                     currAction[position].params.duration,
                                     millis2BaseNoteEquiv(outro, currentStep!.tempo[1])
                                 )
-                            prevNote[position] = currAction[position]
                             newTimeLine.sampleractions.push(currAction[position])
                             samplerActionsByPos[position].push(currAction[position])
                         })
@@ -363,32 +369,13 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                             n2TO(symbolDuration),
                             tempoAt(currTime - sectionStartTime, currentStep!)
                         )
+                        if (endOfMeasure && currentStep!.waitMsAfter) {
+                            waitTime = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+                            if (currAction[position]) extendLastSamplerAction(currAction[position], waitTime)
+                        }
                     }
 
-                    // // CREATE PLAYER NOTATION CURSOR ACTION
-                    // const system = currentStep!.system
-                    // const sectIdx = currentStep!.sectionIdx
-                    // const cursorOffset =
-                    //     _.concat(system.staffs[position]!.slice(0, sectIdx))
-                    //         .map((measure) => measure.notation)
-                    //         .reduce((length, sym) => length + sym.length, 0) + sectIdx // The notation contains an additional space character after each section
-                    // const cursorPos =
-                    //     cursorOffset + notation.slice(0, symbolIdx).reduce((length, sym) => length + sym.length, 0)
-                    // timeline.playercursoractions.push({
-                    //     function: pbFunctionsRef.current.playercursor,
-                    //     functionName: 'playercursor',
-                    //     time: n2TO(currTime),
-                    //     params: {
-                    //         sysuuid: currentStep!.system.uuid,
-                    //         section: currentStep!.sectionIdx,
-                    //         position: position,
-                    //         symbol: symbol,
-                    //         line: currentStep!.system.index,
-                    //         range: [cursorPos, cursorPos + symbol.length]
-                    //     }
-                    // })
-
-                    currTime += symbolDuration
+                    currTime += symbolDuration + waitTime
                     currTimeMs += symbolDurationMs
                     prevSymbol = symbol
                 })
@@ -471,11 +458,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     function: pbFunctionsRef.current.animate,
                     params: { position: position, currnotes: aNotes, nextnotes: nextANotes, timeuntilMs: timeUntilMs }
                 })
-                // if (pos == 'PEMADE_POLOS') {
-                //     console.log(
-                //         `timeTO=${action.time['16n']}, timeMS=${action.timeMs}, next=[${nextAction?.timeMs}, ${nextAction?.params.symbol}], timeUntilMs=${timeUntilMs}, ${action.params.symbol}`
-                //     )
-                // }
             })
         })
 

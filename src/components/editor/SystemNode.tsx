@@ -126,7 +126,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
         positions.forEach((pos) => {
             const position: Position = pos as Position
             if (!systemData.editorGroup.includes(position)) return
-            const newNotation = castNotation(notation, position, colId)
+            const newNotation = castNotation(notation, position, [position], colId)
             if (cached) newSystemData.staffs[position]![colId].notation_ = newNotation
             else newSystemData.staffs[position]![colId].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`)

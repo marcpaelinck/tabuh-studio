@@ -58,7 +58,6 @@ export default function PlayerWindow({
     const visibleRef = useRef<boolean>(visible)
 
     useEffect(() => {
-        console.log(`Player is now ${visible ? 'ACTIVE' : 'INACTIVE'}`)
         visibleRef.current = visible
     }, [visible])
 

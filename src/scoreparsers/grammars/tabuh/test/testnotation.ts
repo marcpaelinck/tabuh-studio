@@ -15,10 +15,11 @@ import type { SyntaxNode } from '@lezer/common'
 import { testTree } from '@lezer/generator/test'
 import fs from 'fs'
 import _ from 'lodash'
+import type { ParserReturnValue } from '../../../../typing/types.ts'
 import { scoreToFormattedJson } from '../../../../utils/objectUtils.ts'
-import { parseNotation, type ParserReturnValue } from '../../../notationParser.ts'
+import { parseNotation } from '../../../notationParser.ts'
 import { parser } from '../tabuh.ts'
-import { LARGE, parserTestData, tabuhScores, type TestData } from './testdata.ts'
+import { NOTATIONTSV, parserTestData, tabuhScores, type TestData } from './testdata.ts'
 
 // ---------- COMMON FUNCTIONS --------------------------------
 
@@ -134,9 +135,9 @@ function testParseNotation(testData: TestData, verbose: boolean = true) {
     logParserResults(testData, result, errorNodes, verbose)
 }
 
-const OPTION: number = 3
-const TREETEST = LARGE // LARGE OR SMALL
-const NOTATIONID = 12 // 1..29
+const OPTION: number = 1
+const TREETEST = NOTATIONTSV // LARGE OR SMALL
+const NOTATIONID = 3 // 1..29
 switch (OPTION) {
     case 1:
         // Tests the Lezer grammar (file tabuh.grammar). Outputs the parser tree structure as follows

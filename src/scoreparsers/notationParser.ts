@@ -1,5 +1,5 @@
 // Parser for imported scores with `Notation` formatting
-import type { SyntaxNode, Tree } from '@lezer/common'
+import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -13,6 +13,7 @@ import type {
     GroupedNotation,
     LoopItem,
     Measure,
+    ParserReturnValue,
     Position,
     Score,
     SequenceItem,
@@ -41,12 +42,6 @@ type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 // Returns a Score object
 // Grammar: @top Document { InfoMetadataLine Gongan+ }
 //          InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
-export interface ParserReturnValue {
-    score?: Score
-    errors: string[]
-    postProcessing: PostProcessing[]
-    tree: Tree
-}
 export function parseNotation(content: string): ParserReturnValue {
     const tree = parser.parse(content)
 
@@ -152,7 +147,13 @@ function castGroupedNotationToPositions(
             for (const measure of group.staff) {
                 if (group.positions.length > 1) {
                     const castedMeasure = { ...measure }
-                    castedMeasure.notation = castNotation(measure.notation, position, measureId, castInstructions)
+                    castedMeasure.notation = castNotation(
+                        measure.notation,
+                        position,
+                        group.positions,
+                        measureId,
+                        castInstructions
+                    )
                     staff.push(castedMeasure)
                 } else staff.push({ ...measure })
                 measureId++
@@ -383,6 +384,13 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
         groupedNotation = { positions: positions, staff: staff } as GroupedNotation
         notationGroups.push(groupedNotation)
     }
+    // Ensure that all staffs have the same number of measures. Add empty measures where necessary.
+    const maxMeasures = Math.max(...notationGroups.map((ng) => ng.staff.length))
+    for (const ng of notationGroups) {
+        const shortage = maxMeasures - ng.staff.length
+        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [] }) as Measure[]))
+    }
+
     return notationGroups
 }
 
@@ -601,7 +609,6 @@ function parseMetadata(
         }
         default: {
             break
-            // console.log(`${node.name}: ${getText(node, content)}`)
         }
     }
     return undefined
@@ -718,7 +725,7 @@ interface BeatsParameter {
 // Grammar definition:
 // BeatsParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
 function getGradualBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
-    const values = getGradualValues(node.getChild('BeatsParameter'), 'IntegerValue', content)
+    const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
     const param: BeatsParameter = {
         fromSection: values.fromValue as number,
         section: (values.value as number) || 1,

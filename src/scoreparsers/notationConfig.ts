@@ -2,9 +2,9 @@
 export const instrumentTags: Record<string, string | string[]>[] = [
     { pos_tag: ['calung', 'cal', 'ca'], specification_tag: [''], positions: ['CALUNG'] },
     { pos_tag: ['cengceng', 'ceng', 'ce'], specification_tag: [''], positions: ['CENGCENG'] },
-    { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: [''], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
-    { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: ['polos', 'po', 'p'], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'] },
-    { pos_tag: ['gangsa', 'gang', 'ga'], specification_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
+    { pos_tag: ['gangsa', 'ga'], specification_tag: [''], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
+    { pos_tag: ['gangsa', 'ga'], specification_tag: ['polos', 'po', 'p'], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'] },
+    { pos_tag: ['gangsa', 'ga'], specification_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
     { pos_tag: ['genderrambat', 'gender', 'gen', 'ge'], specification_tag: [], positions: ['GENDERRAMBAT'] },
     { pos_tag: ['gongs', 'gong', 'go'], specification_tag: [''], positions: ['GONGS'] },
     { pos_tag: ['gying', 'gy'], specification_tag: [''], positions: ['UGAL'] },

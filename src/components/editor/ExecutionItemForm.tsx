@@ -508,7 +508,6 @@ export default function ExecutionItemForm({
 
     function isValid(formValue: FormValueType) {
         const checkResult = formModel.check(Object.assign(emptyForm, formValue))
-        console.log(checkResult)
         const returnValue = !_.values(checkResult).some((val) => val.hasError)
         return returnValue
     }

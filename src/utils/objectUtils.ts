@@ -3,7 +3,7 @@
  */
 
 import _ from 'lodash'
-import type { JsonSymbol, Score } from '../typing/types'
+import type { Score } from '../typing/types'
 
 /**
  * Return the first key in `obj` whose value === `value` (strict equality).
@@ -45,10 +45,10 @@ export function findKeyByPredicate<T>(
 
 export default findKeyByValue
 
-type DefaultType = 'JsonSymbol' | 'Score'
+type DefaultType = 'NoteSymbol' | 'Score'
 const DefaultObjectFactory = {
-    JsonSymbol: () => {
-        return { sysUuid: '', sectionId: 0, s: '-', t: 0, d: 1 } as JsonSymbol
+    NoteSymbol: () => {
+        return '-'
     },
     Score: () => {
         return {
@@ -65,7 +65,6 @@ const DefaultObjectFactory = {
 }
 
 export function defaultObject<T>(otype: DefaultType): T {
-    // export function defaultObject(otype: DefaultType): JsonSymbol | Score | undefined {
     return DefaultObjectFactory[otype]() as T
 }
 

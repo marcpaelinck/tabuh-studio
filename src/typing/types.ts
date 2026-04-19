@@ -1,7 +1,9 @@
+import type { Tree } from '@lezer/common'
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import type { MutingType, StrokeType, ToneType } from '../config/config'
+import type { PostProcessing } from '../scoreparsers/notationParser'
 
 // INSTRUMENTS / AUDIO
 export type Instrument = { id: string; name: string; alphabet: string[] }
@@ -41,25 +43,6 @@ export type Note = {
     octave: number | null // Scale always start with DING.
     stroke: StrokeType | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
     muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
-}
-
-export type JsonNote = {
-    sysUuid: UUID
-    section: number
-    s: NoteSymbol
-    t: number // attack time in base notes
-    ms: number // attack time in ms
-    d: number
-    v: number // velocity
-}
-
-// Used as
-export type JsonSymbol = {
-    sysUuid: UUID
-    sectionId: number
-    s: NoteSymbol
-    t: number // attack time in base notes
-    d: number
 }
 
 export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
@@ -139,6 +122,14 @@ export type SVGInfo = {
 
 // export type NotationType = DetailedReactHTMLElement<React.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>[]
 export type NotationParagraph = ReactElement<HTMLAttributes<HTMLParagraphElement>>
+
+// PARSERS
+export interface ParserReturnValue {
+    score?: Score
+    errors: string[]
+    postProcessing: PostProcessing[]
+    tree?: Tree
+}
 
 // MENUS
 
@@ -286,6 +277,7 @@ export interface PlaybackSamplerAction {
     time: TimeObject
     timeMs: number
     function: SamplerFunction
+    ismuted: boolean
     params: SamplerFunctionParameters
 }
 

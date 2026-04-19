@@ -3,7 +3,7 @@
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { Measure, Position, Score, System, TempoItem } from '../typing/types'
+import type { Measure, ParserReturnValue, Position, Score, System, TempoItem } from '../typing/types'
 import { labelToPosition, symbolLookup } from './grammars/laras/config'
 import { parser } from './grammars/laras/laras'
 
@@ -37,7 +37,7 @@ function postProcess(score: Score): Score {
     return score
 }
 
-export function parseLaras(content: string): Score | undefined {
+export function parseLaras(content: string): ParserReturnValue {
     const tree = parser.parse(content)
 
     const score: Score = {
@@ -119,5 +119,7 @@ export function parseLaras(content: string): Score | undefined {
 
     const processedScore = postProcess(score)
 
-    return processedScore
+    const returnValue: ParserReturnValue = { score, errors: [], postProcessing: [], tree }
+
+    return returnValue
 }

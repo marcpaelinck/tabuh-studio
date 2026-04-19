@@ -10,6 +10,7 @@ import {
     MelodicNoteChars,
     MutingChars,
     NorotChars,
+    noteConfigs,
     OctavationChars,
     positionConfigs,
     RakeDownChars,
@@ -89,7 +90,7 @@ function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
             return 'HALF_DURATION'
         case !positionConfigs[position].validPatterns.includes(symbol):
             return 'INVALID'
-        case symbol.length > 0 && GraceNoteChars.includes(symbol[0]) && validSymbols.includes(symbol.toLowerCase()):
+        case symbol.length > 0 && GraceNoteChars.includes(symbol[0]):
             return 'GRACENOTE'
         case TremoloChars.includes(symbol.slice(-1)):
             return 'TREMOLO'
@@ -202,12 +203,23 @@ export function totalDuration(
     return _.sum(symbols.map((sym) => symbolDuration(sym, position, bpm, unit)))
 }
 
+function isMutedNote(symbol: NoteSymbol, position: Position): boolean {
+    if (!(position in positionConfigs)) return false
+    const noteName = positionConfigs[position].symbolToNoteNames[symbol]
+    if (!noteName) return false
+    const instrType = positionConfigs[position].type
+    if (!(instrType in noteConfigs)) return false
+    if (!(noteName[0] in noteConfigs[instrType]) || noteName.length == 0) return false
+    return ['ABBREVIATED', 'MUTED'].includes(noteConfigs[instrType][noteName[0]].muting)
+}
+
 function singleNoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     return [
         {
             time: n2TO(args.time),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: isMutedNote(args.symbol, args.position),
             params: {
                 duration: n2TO(1),
                 position: args.position,
@@ -227,6 +239,7 @@ function halfDurationAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
             time: n2TO(args.time),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: false,
             params: {
                 duration: n2TO(0.5),
                 position: args.position,
@@ -246,6 +259,7 @@ function silenceAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
             time: n2TO(args.time),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: true,
             params: {
                 duration: n2TO(1),
                 position: args.position,
@@ -301,6 +315,7 @@ function gracenoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
             time: n2TO(args.time - patterns.gracenote.duration),
             timeMs: args.timeMs - BaseNoteEquiv2Millis(patterns.gracenote.duration, args.bpm),
             function: args.samplerFunction,
+            ismuted: true,
             params: {
                 duration: n2TO(patterns.gracenote.duration),
                 position: args.position,
@@ -327,21 +342,23 @@ function tremoloAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         notes.push(args.nextsymbol.slice(0, -1))
     const totalNotes = notes.length * patterns.tremolo.notes_per_basenote
 
-    for (var count = 0; count < totalNotes; count++) {
+    for (var idx = 0; idx <= totalNotes; idx++) {
         // Alternate the note to be selected
-        const noteIdx = count % notes.length
+        const noteIdx = idx % notes.length
+        const count = idx + 1
         returnValue.push({
             time: n2TO(args.time + count * duration),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: count < totalNotes,
             params: {
                 duration: n2TO(duration),
                 position: args.position,
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast && count == totalNotes - 1,
-                isLastOfPattern: count == totalNotes - 1
+                isLast: args.isLast && count == totalNotes,
+                isLastOfPattern: count == totalNotes
             } as SamplerFunctionParameters
         })
     }
@@ -363,6 +380,7 @@ function AcceleratingTremoloAction(args: CreatePatternArgs): PlaybackSamplerActi
     var time = args.time
     for (var idx = 0; idx < totalNotes; idx++) {
         // Alternate the note to be selected
+        const count = idx + 1
         const noteIdx = idx % notes.length
         const duration = patterns.tremolo.accelerating_pattern[idx] / patterns.tremolo.accelerating_pattern[0]
         const velocity = patterns.tremolo.accelerating_velocity[idx]
@@ -370,14 +388,15 @@ function AcceleratingTremoloAction(args: CreatePatternArgs): PlaybackSamplerActi
             time: n2TO(time),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: count < totalNotes,
             params: {
                 duration: n2TO(duration),
                 position: args.position,
                 symbol: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: velocity,
-                isLast: args.isLast && idx == totalNotes - 1,
-                isLastOfPattern: idx == totalNotes - 1
+                isLast: args.isLast && count == totalNotes,
+                isLastOfPattern: count == totalNotes
             } as SamplerFunctionParameters
         })
         time += duration
@@ -401,18 +420,20 @@ function rakeAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
     // Generate the pattern
     const returnValue: PlaybackSamplerAction[] = []
     for (var idx = 0; idx < patterns.rake.number_of_notes; idx++) {
+        const count = idx + 1
         returnValue.push({
             time: n2TO(args.time + offset),
             timeMs: args.timeMs,
             function: args.samplerFunction,
+            ismuted: false,
             params: {
                 duration: n2TO(noteDuration),
                 position: args.position,
                 symbol: instrumentRange[startIdx + idx],
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast && idx == patterns.rake.number_of_notes - 1,
-                isLastOfPattern: idx == patterns.rake.number_of_notes - 1
+                isLast: args.isLast && count == patterns.rake.number_of_notes,
+                isLastOfPattern: count == patterns.rake.number_of_notes
             } as SamplerFunctionParameters
         })
         offset += noteSpacing

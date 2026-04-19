@@ -33,7 +33,6 @@ export function useScreenSize() {
         const handleResize = () => {
             const currentScreensize = currentScreenSize()
             setScreenSize(currentScreenSize())
-            console.log(`screensize changed to  ${JSON.stringify(currentScreensize)}`)
         }
         window.addEventListener('resize', handleResize)
 

@@ -34,7 +34,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     useInstruments: false,
     useKeyboardListener: false,
     usePartManager: false,
-    usePlaybackManager: true,
+    usePlaybackManager: false,
     useScoreReader: false,
     validationManager: false
 }

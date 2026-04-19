@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { WpApiFunctions } from '../components/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/notationParser'
-import type { Score, ScoreFormat, ScoreInfo } from '../typing/types'
+import type { ParserReturnValue, Score, ScoreFormat, ScoreInfo } from '../typing/types'
 import { readFile } from '../utils/filesystem'
 
 function postprocessScore(score: Score): Score {
@@ -90,17 +90,23 @@ export function useScoreReader(source: 'database' | 'file'): {
 
     // Imports a file with an alternative format and parses it to a Score object.
     async function importScore(format: ScoreFormat) {
-        console.log(format)
-        const parse = format == 'Laras' ? parseLaras : format == 'Notation' ? parseNotation : () => undefined
+        const parse =
+            format == 'Laras'
+                ? parseLaras
+                : format == 'Notation'
+                  ? parseNotation
+                  : () => {
+                        return { errors: [], postProcessing: [] }
+                    }
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
         fileInput.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0]
             if (file) {
                 const content = await file.text()
-                const score = parse(content)
-                if (score) {
-                    setScore(score)
+                const parserReturnValue: ParserReturnValue = parse(content)
+                if (parserReturnValue.score) {
+                    setScore(parserReturnValue.score)
                 }
 
                 // Process content as needed

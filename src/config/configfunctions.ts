@@ -33,14 +33,3 @@ async function sanityCheck() {
     if (logMessage) console.error(logMessage)
 }
 if (doSanityCheck) sanityCheck()
-
-// const alphaToDict = () => {
-//     const entries: [string, any][] = Object.entries(instrumentConfigs).map(([pos, info]) => {
-//         const newdict: { [key: string]: any } = Object.fromEntries(Object.entries(info))
-//         newdict["symbolToNotes"] = Object.fromEntries(info.alphabet.map((symbol, index) => [symbol, info.notes[index]]))
-//         return [pos, newdict]
-//     })
-//     const dict = Object.fromEntries(entries)
-//     console.log(JSON.stringify(dict))
-// }
-// alphaToDict()
