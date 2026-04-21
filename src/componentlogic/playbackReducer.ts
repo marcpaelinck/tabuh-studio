@@ -1,39 +1,10 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { EditorCellCursor, Score } from '../typing/types'
+import type { PlaybackAction, PlaybackState } from '../typing/types'
 import { debug } from '../utils/debugger'
 import { type SchedulePlaybackParams } from './usePlaybackManager'
 import { cycleValidation } from './validationManager'
 
-export type PlaybackType = 'single' | 'multiple' | 'none'
-export type ActionType =
-    | 'load' // Load a playback schedule into the ToneJS Transport object.
-    | 'play' // Play from current cursor position. Perform 'load' action first if no schedule is set.
-    | 'pause' // Pause playback.
-    | 'stop' // Stop playback and reset playback cursor.
-    | 'rewind' // Reset playback cursor.
-    | 'jumptotime' // Move playback cursor to given position.
-    | 'cursor' // Move the editor cursor.
-    | 'clear' // Clear the playback schedule.
-    | 'reseterror' // Clear error state and stop playback.
-export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
-
-export type PlaybackState = {
-    cursor: EditorCellCursor
-    audioState: AudioState
-    playbackType: PlaybackType
-    message?: string
-}
-export type PlaybackAction = {
-    actionType: ActionType
-    playbackType?: PlaybackType // 'single': playback a single system. 'multiple' playback until end.
-    score?: Score
-    systemIndex?: number // system from which the playback should start.
-    seconds?: number // used with actionType='jumptotime': new cursor position relative to start.
-    cursor?: EditorCellCursor
-    intro?: number // silence before start of playback in ms
-    outro?: number // silence after end of playback in ms
-}
 // const dialog = useDialog()
 
 const playbackFunctions = {
@@ -76,7 +47,7 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
     }
 
     if (!action.playbackType) {
-        console.error('audio reducer: action is "load" playback type is missing.')
+        console.error('audio reducer: action is "load", playback type is missing.')
         return { ...state, cursor: noCursor, audioState: 'nodata' }
     }
 

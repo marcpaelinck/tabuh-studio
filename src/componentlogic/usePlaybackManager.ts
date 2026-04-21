@@ -9,7 +9,7 @@
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
 import _ from 'lodash'
-import { createElement, useEffect, useRef, useState, type RefObject } from 'react'
+import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import * as Tone from 'tone'
 import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, positionConfigs } from '../config/config'
@@ -20,6 +20,7 @@ import type {
     GenericAction,
     Note,
     NoteSymbol,
+    PlaybackAction,
     PlaybackAnimationAction,
     PlaybackCallbackFunctions,
     PlaybackEditorCursorAction,
@@ -34,7 +35,7 @@ import type {
 } from '../typing/types'
 import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
-import { defaultObject } from '../utils/objectUtils'
+import { defaultObject, same } from '../utils/objectUtils'
 import { speedDefaultOption } from '../utils/selectorsUtils'
 import {
     BaseNoteEquiv2Millis,
@@ -47,7 +48,6 @@ import {
 } from '../utils/timeunits'
 import { executionManager, type FlowStep } from './executionManager'
 import { createNoteActions, totalDuration } from './patternManager'
-import type { PlaybackAction } from './playbackReducer'
 import { useInstruments } from './useInstruments'
 import { cycleValidation } from './validationManager'
 
@@ -77,6 +77,8 @@ export function usePlaybackManager(selectedFocus: Position[]) {
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)
 
+    var tempoLookup: Record<number, Record<number, number>> = {}
+
     // Use a ref object to avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this happens.
     const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
         useRef<PlaybackCallbackFunctions>(defaultCallbackFunctions)
@@ -85,20 +87,20 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
     }, [])
 
-    function changeTempo(time: number, params: TempoFunctionParameters): void {
+    const changeTempo = useCallback((time: number, params: TempoFunctionParameters): void => {
         if (params.bpm != undefined) {
             Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
         }
-    }
+    }, [])
 
-    function updateProgress() {
+    const updateProgress = useCallback(() => {
         setPlaybackProgress(Tone.getTransport().seconds)
         Tone.getTransport()
-    }
+    }, [])
 
-    function updatePlaybackCallbackFunctions(functions: Partial<PlaybackCallbackFunctions>) {
+    const updatePlaybackCallbackFunctions = useCallback((functions: Partial<PlaybackCallbackFunctions>) => {
         pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
-    }
+    }, [])
 
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
         if (!(position in positionConfigs)) return []
@@ -156,6 +158,10 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
     // Returns the tempo at the given relative time from the start of the current section in TimeObject units.
     function tempoAt(timeFromSectionStartInTO: number, currentStep: FlowStep) {
+        if (currentStep.id in tempoLookup && timeFromSectionStartInTO in tempoLookup[currentStep.id])
+            return tempoLookup[currentStep.id][timeFromSectionStartInTO]
+        if (!(currentStep.id in tempoLookup)) tempoLookup[currentStep.id] = []
+
         const [startTempo, endTempo] = currentStep.tempo
         const sectionDuration = Object.entries(currentStep.measures).reduce(
             (maxDur, [position, measure]) =>
@@ -166,11 +172,13 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             console.error('Requesting tempo outside of current measure.')
         }
         if (startTempo == endTempo) {
-            return startTempo
+            tempoLookup[currentStep.id][timeFromSectionStartInTO] = startTempo
         } else {
             // Gradual change
-            return startTempo + (timeFromSectionStartInTO / sectionDuration) * (endTempo - startTempo)
+            tempoLookup[currentStep.id][timeFromSectionStartInTO] =
+                startTempo + (timeFromSectionStartInTO / sectionDuration) * (endTempo - startTempo)
         }
+        return tempoLookup[currentStep.id][timeFromSectionStartInTO]
     }
 
     function extendLastSamplerAction(action: PlaybackSamplerAction | null | undefined, toDuration: number) {
@@ -203,6 +211,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         if (!validation.isValid) return undefined
 
         const newTimeLine: TimeLine = {
+            playbackAction: pbAction,
             totalDurationMs: 0,
             totalDurationTO: n2TO(0),
             tempoactions: [],
@@ -213,6 +222,9 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             genericactions: [],
             notation: {} as Record<Position, any>
         }
+
+        // Reset all cached tempo values
+        tempoLookup = {}
 
         const { nextInFlow } = executionManager(pbAction.score, pbAction.systemIndex, pbAction.playbackType)
 
@@ -535,11 +547,19 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         intro = defaultIntroTime,
         outro = defaultOutroTime
     }: SchedulePlaybackParams): void {
-        const timeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
-        if (timeLine) {
-            createPlaybackSchedule(timeLine, playbackSpeed)
-            setTimeline(timeLine)
+        // Do nothing if the timeline has already been generated
+        if (timeLine && same<PlaybackAction>(pbAction, timeLine.playbackAction)) {
+            console.log('Request to create timeline skipped.')
+            return
         }
+
+        console.log('Executing request to create timeline.')
+        const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
+        if (newTimeLine) {
+            createPlaybackSchedule(newTimeLine, playbackSpeed)
+            setTimeline(newTimeLine)
+        }
+        console.log('Done.')
     }
 
     return {

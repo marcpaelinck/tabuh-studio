@@ -102,3 +102,9 @@ export function scoreToFormattedJson(score: Score, clearCache: boolean = true): 
         .replace(/(true|false),(?![ \n\r])/g, '$1, ')
         .replace(/([\d]),(?=\d)/g, '$1, ')
 }
+
+// Compares the key/value pair of two objects on the top level only.
+export function same<T extends Object>(object1: T, object2: T | undefined): boolean {
+    if (!object2) return false
+    return Object.entries(object1).every(([key, value]) => object2[key as keyof T] == value)
+}

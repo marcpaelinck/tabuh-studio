@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { WpApiFunctions } from '../components/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
@@ -26,21 +26,19 @@ export function useScoreReader(source: 'database' | 'file'): {
     const wpFunc = useContext(WpApiFunctions)
 
     useEffect(() => {
-        if (source == 'database') loadScoreFromDb()
-        else if (source == 'file') loadScoreFromFile()
-        else console.error('useScoreReader: source for score is not `db` or `file`.')
-    }, [scoreInfo])
-
-    useEffect(() => {
         if (source == 'database') loadScoreListFromDb()
         else if (source == 'file') loadScoreListFromFile()
         else console.error('useScoreReader: source for score list is not `db` or `file`.')
     }, [])
 
-    function loadScore(format: ScoreFormat, scoreInfo: ScoreInfo | undefined) {
+    const loadScore = useCallback((format: ScoreFormat, newScoreInfo: ScoreInfo | undefined) => {
+        // if (!newScoreInfo || same<ScoreInfo>(newScoreInfo, scoreInfo)) return
         switch (format) {
             case 'JSON':
-                setScoreinfo(scoreInfo)
+                if (source == 'database') loadScoreFromDb(newScoreInfo)
+                else if (source == 'file') loadScoreFromFile(newScoreInfo)
+                setScoreinfo(newScoreInfo)
+
                 break
             case 'Laras':
             case 'Notation':
@@ -48,13 +46,13 @@ export function useScoreReader(source: 'database' | 'file'): {
                 break
             default:
         }
-    }
+    }, [])
 
     // Loads a Score object description from a JSON file on the web server.
-    async function loadScoreFromFile() {
-        if (scoreInfo) {
+    async function loadScoreFromFile(newScoreInfo: ScoreInfo | undefined) {
+        if (newScoreInfo) {
             setIsLoading(true)
-            let jsonText = await readFile('scores/' + scoreInfo.file)
+            let jsonText = await readFile('scores/' + newScoreInfo.file)
             var score: Score = JSON.parse(jsonText)
             if (!score) return
             score = postprocessScore(score)
@@ -64,10 +62,10 @@ export function useScoreReader(source: 'database' | 'file'): {
     }
 
     // Loads a JSON Score object description from the website's database.
-    async function loadScoreFromDb() {
-        if (scoreInfo) {
+    async function loadScoreFromDb(newScoreInfo: ScoreInfo | undefined) {
+        if (newScoreInfo) {
             setIsLoading(true)
-            let response = await wpFunc.database.getScore(scoreInfo.uuid)
+            let response = await wpFunc.database.getScore(newScoreInfo.uuid)
             if (
                 response &&
                 'success' in response &&
@@ -131,8 +129,8 @@ export function useScoreReader(source: 'database' | 'file'): {
     async function loadScoreListFromFile() {
         setIsLoading(true)
         const files = await readFile('scores/content.json')
-        const scoreInfo: ScoreInfo[] = JSON.parse(files)
-        setScoreList(scoreInfo.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
+        const scoreInfoList: ScoreInfo[] = JSON.parse(files)
+        setScoreList(scoreInfoList.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
         setIsLoading(false)
     }
 

@@ -123,7 +123,7 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
         }
     }
 
-    const selectNotationDialog = (
+    const selectScoreDialog = (
         <Modal className="w-[20rem]" open={scoreSelector} onClose={() => setScoreSelector(false)}>
             <Modal.Header>
                 <Modal.Title>Select a notation</Modal.Title>
@@ -164,7 +164,7 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
                 <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
                 <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
             </Nav.Menu>
-            {selectNotationDialog}
+            {selectScoreDialog}
         </Nav>
     )
 }

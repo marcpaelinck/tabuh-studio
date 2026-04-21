@@ -1,6 +1,5 @@
 import _ from 'lodash'
-import { useEffect, useState } from 'react'
-import { useDialog } from 'rsuite'
+import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { type DashboardFunctionsType } from '../components/contexts'
 import type { ExecutionItem, Score, System } from '../typing/types'
@@ -15,7 +14,6 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
     const [score, setScore] = useState<Score | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, System>>({})
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
-    const dialog = useDialog()
 
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
@@ -115,12 +113,12 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         setScore(newScore)
     }
 
-    function updateParts(parts: Record<string, string[]>) {
+    const updateParts = useCallback((parts: Record<string, string[]>) => {
         if (!score) return
         const newScore: Score = { ...score }
         newScore.parts = { ...parts }
         setScore(newScore)
-    }
+    }, [])
 
     function updatePointers(newSystemData: System[]) {
         // Update fields that depend on pointers to another system
@@ -158,7 +156,7 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
     }
 
     // Handles user actions triggered with buttons in the panel header
-    function executeItemAction(fieldname: string, systemData: System, value?: string) {
+    const executeItemAction = useCallback((fieldname: string, systemData: System, value?: string) => {
         if (!score) return
         debug(`processing ${fieldname}`)
         // Used for insertion and update
@@ -252,6 +250,7 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         debug('UPDATING SCORE by scoreManager')
         updatePointers(newData)
         setScore({ ...score, ...{ systems: newData } })
-    }
+    }, [])
+
     return { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction }
 }

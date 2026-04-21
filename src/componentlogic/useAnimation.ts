@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
 import { panggulDefaultOption } from '../components/player/Animation'
 import { animationConfig, colorPalette, type ColorName } from '../config/config'
@@ -152,7 +152,7 @@ export const useAnimationEngine = (
     }, [panggulOption])
 
     // For the use of Draw.schedule, see
-    function animateInstrument(time: number, params: AnimmationFunctionParameters): void {
+    const animateInstrument = useCallback((time: number, params: AnimmationFunctionParameters): void => {
         if (!pbWindowVisibleRef.current) return
         const currentFocus = focusRef.current
         const pbSpeed = pbSpeedRef.current
@@ -186,7 +186,7 @@ export const useAnimationEngine = (
                 }
             }
         }
-    }
+    }, [])
 
     return { animateInstrument, svgInfo, setSvgInfo, panggulOption, setPanggulOption }
 }

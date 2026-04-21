@@ -1,11 +1,10 @@
 import { type ActionDispatch, type JSX } from 'react'
-import { type Score } from '../../typing/types'
+import { type PlaybackAction, type PlaybackState, type Score } from '../../typing/types'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
-import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 
 interface PlayerProps {
     score: Score | undefined

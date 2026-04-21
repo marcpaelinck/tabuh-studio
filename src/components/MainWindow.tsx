@@ -326,7 +326,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <Container id="main-wide-screen" height="80vh">
             <Container id="header+content" className="flex ">
                 <Header id="header" className="flex">
-                    {/* <HStack spacing={16} align="center" p="1rem"> */}
                     <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
                         <Row align="middle">
                             <Col span={1} align="left">
@@ -352,7 +351,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             </Col>
                         </Row>
                     </Grid>
-                    {/* </HStack> */}
                 </Header>
                 <Content id="content" px="1rem" className="h-9/10">
                     <div id="editor/player window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>

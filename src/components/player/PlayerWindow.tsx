@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
 import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
 import {
     type MenuItemInfo,
+    type PlaybackAction,
     type PlaybackCallbackFunctions,
+    type PlaybackState,
     type Position,
     type Score,
     type ScoreFormat,

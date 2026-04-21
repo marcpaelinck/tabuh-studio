@@ -9,8 +9,8 @@ import {
     createFocusMenuItems,
     createSpeedMenuItems,
     focusDefaultOption,
-    speedDefaultOption,
-    tabuhDefaultOption
+    tabuhDefaultOption as scoreDefaultOption,
+    speedDefaultOption
 } from '../../utils/selectorsUtils'
 import Selector from './Selector'
 
@@ -32,7 +32,7 @@ export default function Menu({
     const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
     const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo[]>([])
-    const [selectedTabuh, setSelectedTabuh] = useState<MenuItemInfo>(tabuhDefaultOption)
+    const [selectedScore, setSelectedScore] = useState<MenuItemInfo>(scoreDefaultOption)
     const [selectedFocus, setSelectedFocus] = useState<MenuItemInfo>(focusDefaultOption)
     const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo>(speedDefaultOption)
 
@@ -68,9 +68,9 @@ export default function Menu({
         debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
     }
 
-    const onChangeTabuhSelector = async (item: MenuItemInfo) => {
+    const onChangeScoreSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'TABUH')
-        setSelectedTabuh(item)
+        setSelectedScore(item)
         loadScore('JSON', item.value as ScoreInfo)
         onChangeFocusSelector(focusDefaultOption)
     }
@@ -95,11 +95,11 @@ export default function Menu({
                     id="tabuhselector"
                     scrollable
                     disabled={menuDisabled.current.tabuh}
-                    title={selectedTabuh.displayValue || tabuhDefaultOption.displayValue}
+                    title={selectedScore.displayValue || scoreDefaultOption.displayValue}
                     className="tabuhselector lg:hidden"
                     width="3/10"
                     valueList={scoreMenuItems}
-                    onChange={onChangeTabuhSelector}
+                    onChange={onChangeScoreSelector}
                 />
                 <Selector
                     id="focusselector"

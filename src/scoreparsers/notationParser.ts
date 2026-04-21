@@ -727,7 +727,7 @@ interface BeatsParameter {
 function getGradualBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
     const param: BeatsParameter = {
-        fromSection: values.fromValue as number,
+        fromSection: (values.value as number) || 1,
         section: (values.value as number) || 1,
         isGradual: values.isGradual
     }

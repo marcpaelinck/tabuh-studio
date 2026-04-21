@@ -1,13 +1,19 @@
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Accordion, Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import type { PlaybackAction, PlaybackState } from '../../componentlogic/playbackReducer'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
-import type { EditorCursorParameters, PlaybackCallbackFunctions, Score, System } from '../../typing/types'
+import type {
+    EditorCursorParameters,
+    PlaybackAction,
+    PlaybackCallbackFunctions,
+    PlaybackState,
+    Score,
+    System
+} from '../../typing/types'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -52,8 +58,9 @@ export default function EditorWindow({
         visibleRef.current = visible
     }, [visible])
 
-    function moveEditorCursor(time: number, params: EditorCursorParameters) {
+    const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
         if (!visibleRef.current) return
+        console.log('animating editor cursor')
         const sys = (uuid: string | undefined): System | undefined => {
             return score?.systems.find((sys) => sys.uuid == uuid)
         }
@@ -71,7 +78,8 @@ export default function EditorWindow({
         const currElement = document.getElementById(`${systemIdPrefix}${params.sysuuid}`)
         // debug(`scrolling ${currElement?.id} into view`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    }, [])
+
     useEffect(() => updatePlaybackFunctions({ editorcursor: moveEditorCursor }), [])
 
     const pbCurrUuid = playbackState.cursor.sysUuid

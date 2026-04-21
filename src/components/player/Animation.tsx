@@ -130,7 +130,7 @@ export default function Animation({
                                 <Selector
                                     id="panggul selector"
                                     title={'panggul: ' + (panggulOption.value ? panggulOption.displayValue : 'hidden')}
-                                    className="tabuhselector"
+                                    className="panggulselector"
                                     valueList={panggulMenuItems}
                                     onChange={setPanggulVisibility}
                                 />

@@ -2,7 +2,7 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the
 // notation while the corresponding notes are being played.
 
-import { useEffect, useRef, type Dispatch, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import type {
     HighlightRange,
     HilightRangeFunction,
@@ -50,12 +50,12 @@ export default function NotationArea({ notation, visible, focus, updatePlaybackF
     //     }
     // }
 
-    const animateNotationCursor = (time: number, params: PlayerCursorParameters) => {
+    const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {
         // if (currentFocus.includes(cAction.position)) {
         if (focus.length > 0 && focus[0] === params.position) {
             highlightCursor({ line: params.line, range: params.range })
         }
-    }
+    }, [])
 
     useEffect(() => updatePlaybackFunctions({ playercursor: animateNotationCursor }), [])
 

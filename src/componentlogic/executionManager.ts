@@ -11,13 +11,13 @@ import type {
     GotoItem,
     LoopItem,
     Measure,
+    PlaybackType,
     Position,
     Score,
     System,
     WaitItem
 } from '../typing/types'
 import { debug } from '../utils/debugger'
-import type { PlaybackType } from './playbackReducer'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
@@ -43,6 +43,7 @@ interface FlowCursor {
 // Returned by function nextInFlow.
 // Contains information about the FlowCursor's current system.
 export interface FlowStep {
+    id: number
     system: System
     systemIdx: number
     sectionIdx: number // for future use
@@ -261,6 +262,7 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
             ) as Record<Position, Measure>
 
             const nextStep: FlowStep = {
+                id: currentStep ? currentStep.id + 1 : 1,
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 sectionIdx: next.sectionIdx,
