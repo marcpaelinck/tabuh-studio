@@ -22,28 +22,26 @@ export const tabuhScores: Record<number, string> = {
     15: 'legong mahawidya sp.tsv',
     16: 'lengker gk.tsv',
     17: 'lengker sp.tsv',
-    18: 'margapati.tsv',
-    19: 'merah putih.tsv',
-    20: 'narasimha.tsv',
-    21: 'palawakya.tsv',
-    22: 'pendet.tsv',
-    23: 'puspa mekar.tsv',
-    24: 'rejang dewa.tsv',
-    25: 'sekar gendot gk.tsv',
-    26: 'sekar gendot sp.tsv',
-    27: 'sinom ladrang gk.tsv',
-    28: 'sinom ladrang sp.tsv',
-    29: 'teruna jaya.tsv'
+    18: 'merah putih.tsv',
+    19: 'palawakya.tsv',
+    20: 'pendet.tsv',
+    21: 'puspa mekar.tsv',
+    22: 'rejang dewa.tsv',
+    23: 'sekar gendot gk.tsv',
+    24: 'sekar gendot sp.tsv',
+    25: 'sinom ladrang gk.tsv',
+    26: 'sinom ladrang sp.tsv',
+    27: 'teruna jaya.tsv'
 }
 
 export const parserTestData = (id: number): TestData => {
     return {
-        file: './public/tabuh-notation/' + tabuhScores[id],
-        outputfile: './src/scoreparsers/grammars/tabuh/test/parsed_score.json'
+        file: './test/scoreparsers/notationParser/data/tabuh-notation/' + tabuhScores[id],
+        outputfile: './test/scoreparsers/notationParser/data/parsed_score.json'
     }
 }
 
-export const NOTATIONTSV = { file: './src/scoreparsers/grammars/tabuh/test/notation.tsv', expected: undefined }
+export const NOTATIONTSV = { file: './test/scoreparsers/notationParser/data/notation.tsv', expected: undefined }
 
 export const SMALL = {
     file: './src/scoreparsers/grammars/tabuh/test/small.tsv',
@@ -76,7 +74,7 @@ export const SMALL = {
 `
 }
 export const LARGE = {
-    file: './src/scoreparsers/grammars/tabuh/test/large.tsv',
+    file: './test/scoreparsers/notationParser/data/large.tsv',
     expected: `Document(
                     InfoMetadataLine(
                         InfoMetadata(

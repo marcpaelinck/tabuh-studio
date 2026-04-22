@@ -1,0 +1,239 @@
+{INFO notation="kacang saur" part=full title="Kacang Saur" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{PART kebyar1}
+	{TEMPO 90}
+	{GONGAN kebyar}
+ga/ugal	a,.a,u,-----------.a,ioe------------u.ua------------uuaueu--a---i.i
+cal/jeg	---u---------------e---------------a-----------------u--------i
+	{WAIT 2}
+
+	{GONGAN kebyar}
+	{TEMPO 120}
+ga p/ugal	a,i.a,.ia,.o,e,.o,.e,o,.u,a,.u,.a,u,
+gangsa s	e.oeo.e.a,.u,a,u,.a,.o.ioi.o
+calung	---a-------o----------u
+jegogan	----------------------u
+	{WAIT 2}
+
+	{GONGAN kebyar}
+ga/ug/rey	e-u,e,-u,-e,u,-e,-u,e,-u,-e,u,
+cal/jeg	---e----u----e----u
+kendang	9-99-9-99-9-99-9-99
+calung	---e----u----e----u
+jegogan	------------------u
+	{WAIT 3}
+
+	{TEMPO 90}
+	{GONGAN kebyar}
+gangsa	a,.a,i------------a,/a,ia,u,a,------------i.oe-----ue.eu-------uuau-ai<--a-----uuau-eo
+cal/jeg	---i-----------------a---------------e---------u----------------a-----------o
+	{WAIT 1}
+
+	{GONGAN kebyar}
+	## 5
+gangsa	i.ia,-------i/ioia,i---------o.oe-----a,.a,/a,-io--e--o
+cal/jeg	---a------------i------------e-----------------o
+gong	-----------------------------------------------G
+	{WAIT 3}
+
+	{TEMPO 120}
+	{TEMPO 100 beat=2}
+	{GONGAN kebyar}
+ga/ug/rey	e,.u,e,.a,.u,a,.e.oe.o.eo-----	a,ioeoioeoia,u,-----e,e,/
+calung	---e----a----e----o-----	-i-e-i-e-i-u-------
+jegogan	------------------o-----	-----------u-------
+kendang	9-99-9-99-9-99-9-99-----	99-9-9-9-9-9-------
+	{WAIT 1}
+
+	{GONGAN kebyar}
+ga p/ugal	u,u,.u,.u,.a,u,u,.u,.u,.a,u,...e,u,.e,---	o,o,.o,.o,.e,o,o,.o,.o,.e,o,.
+ga s	oo.o.oi.oo.o.oi.o...io.i---	a,a,.a,.a,u,.a,a,.a,.a,u,.a,.
+reyong	....................bb.b---	------------------
+calung	-u-------u------u......e---	-o-------o------o.
+jegogan	-----------------------e---
+	{WAIT 1}
+
+	{TEMPO 60}
+	{TEMPO 120 beat=2}
+	{GONGAN kebyar}
+	{DYNAMICS ->p positions=[gangsa,ugal] beat=2}
+ugal	e,e,u,a,u,u,a,ia,a,io--euaueo-	ii.io-i-e-o,-
+gangsa	e,e,u,a,u,u,a,ia,a,io---------	ii.io-i-e-o-
+calung	...a---i---o
+jegogan	...........o
+	{GOTO PENGAWAK-BEGIN}
+
+	{PART pengawak}
+	{LABEL PENGAWAK}
+	{TEMPO 160 beats=1->4 pass=2}
+ga p/ugal	u,-..u,-a,-..u,-..a,-	u,---e,e,.e,u,-e,-a,-u,-	e,-..a,-..o-..i-..	e-..o-..u-..e-..
+ga s	o-i-o-..i-o-i-..	o---i/i.io-i-e-o-	i-u,-..i-..a,-..o-	..i-..e-..o-..i.
+calung	u-------u-------	a-------u-------	e-------o-------	e-------u-------
+jegogan	u---------------	a---------------	e---------------	e---------------
+gong	G
+
+	{TEMPO 180 beats=1->2 pass=2}
+	## 10
+ga p/ugal	o-..o-e-..o-..e-	o---ii.io-i-e-o-
+ga s	a-u-a-..u-a-u-..	a---uu.ua-u-i<-a-
+calung	o-------e-------	o-------e-------
+jegogan	o---------------	o---------------
+
+	{LABEL PENGAWAK-BEGIN}
+	{SUPPRESS [gong] passes=[2,3]}
+ga p/ugal	i-o-o-e-..o-o-e-	..o-..o-..o-..e-	o-..o-e-..o-..e-	o---ii.io-i-e-o-
+ga s	u-a-a-..u-a-a-..	u-a-..a-..a-u-..	a-u-a-..u-a-u-..	a---uu.ua-u-i<-a-
+calung	i-------o---e---	u-------e-------	o-------e-------	o-------e-------
+jegogan	i---------------	u---------------	o---------------	o---------------
+gong	G
+
+	{DYNAMICS f positions=[gangsa,ugal] beat=3}
+ga p/ugal	i-a,-u,u,-u,a,-u,-i-a,-	u,-..a,a,.a,i-a,-o-i-	a,-..a,-i-..a,-..i-	a,-..u,u,.u,a,-u,-i-a,-
+ga s	u-e-oo-oe-o-u-e-	o-..ee.eu-e-a-u-	e-o-e-..o-e-o-..	e-..oo.oe-o-u-e-
+calung	i-------a-------	u-------i-------	a-------i-------	a-------i-------
+jegogan	i---------------	u---------------	a---------------	a---------------
+
+	{DYNAMICS ->p beat=4 positions=[gangsa,ugal] passes=[1,2]}
+ga p/ugal	u,-e,-o,-o,?.e,-o,-o,?.e,-	o,-e,-..o,-e,-..o,-e,-	....a-..a-..a-..	a-..a-..a-..a---
+ga s	o-i-a,-u,-..a,-u,-..	a,-..u,-a,-..u,-a,-..	u,-i<-..i<-..i<-..i<-	..i<-..i<-..i<--...
+calung	u-------e-------	o-------e-------	u-------a-------	i-------a-------
+jegogan	u---------------	o---------------	u---------------	i---------------
+	{GOTO PENGAWAK passes=[1,2]}
+
+	{GONGAN kebyar}
+	{TEMPO 120}
+	{TEMPO 100 beat=2}
+	{DYNAMICS f positions=[reyong]}
+ga/ugal	u,--------e,-u,e,-u,-e,u,-e,-u,e,-o,-e,u,	---a,a,ooiieeoou-u/u---
+calung	u-----------e----u----e----u	-----o---e---u--u---
+jegogan	u---------------------------	----------------u---
+gong	G---------------------------	----------------G---
+
+	{GONGAN kebyar}
+	## 15
+	{TEMPO 120 beat=2}
+ga/ugal	i<i<uui<i<uui<-Au-_e---iieeiieeiiu,	---i-a,i-a,-ia,-e,-o,e,-u,-a,u,----e,e,/..
+calung	--u---u-----_e---i-e-i-e-i-u	------i----a----e----u--------
+jegogan	------------_e-------------u	---------------------u-----e/--
+gong	------------_G-------------G	---------------------G--------
+
+	{GONGAN kebyar}
+	{TEMPO 110->70}
+	{DYNAMICS ->p beat=1 positions=[gangsa,ugal,reyong]}
+	{DYNAMICS mf beat=2 positions=[gangsa,ugal,reyong]}
+ugal	u,-u,-i-i-u,-u,-a,-a,-i-i-u,-u,-a,-a,-i-a,-Io---	o-oo/o-eeoia,-Io-i-Oe-o-i-eee/uau
+gangsa	u,-u,-i-i-u,-u,-a,-a,-i-i-u,-u,-a,-a,-i-a,-Io---	----------------------eee/...
+reyong	x-x-x-x-x-x-x-x-x-x-b-b-b/.b-b/.b/.b---	----------------------xxx/...
+cal/jeg	u-------u-------i-------a-------o---
+gong	--------------------------------G---
+
+
+	{DYNAMICS f positions=[gangsa,ugal,reyong]}
+	{DYNAMICS ->p beat=4 positions=[gangsa,ugal,reyong]}
+	{TEMPO 60 beats=3->4}
+ga p/ugal	e.oe.eo.	e.oe.a,.i	a,u,e,.u,e,.u,	e,.u,.i...
+gangsa s	.io.i.oi	.io.i.u,.	a,u,.a,u,.a,u,	.e,.a,....
+reyong13	a,i.a,ia,.i	a,i.a,i.u,.	a,u,e,.u,e,.u,	e,e,u,a,i...
+reyong24	e.oe.eo.	e.oe.a,.i	a,.ia,.ia,.	eeuai<...
+calung	e---o---	e---i---	a---u---	e---i-a-
+jegogan	e-------	--------	a-------	----i-a-
+	{SEQUENCE [B,B,C,D,A,B,C,D,A,B,C1,D1,KEBYAR]}
+
+	{PART pengecet}
+	{LABEL A}
+	{TEMPO 100 beats=1->8 pass=2}
+	{KEMPLI double pass=2}
+ga p/ugal	.ii.i.i.	i.i.i.i.	i.i.e.e.	e.i.i.i.	eee.eaa.	a.u.i<.a.	u.i.e.i.	e.i.i...
+gangsa s	.iio.o.o	.o.o.o.o	.a,.o.u.u	.o.a,.a,.o	eeeu.aai<	.e.a.u.e	.a,.o.a,.o	.o.a,....
+calung	i---o---	i---o---	i---o---	e---o---	e---u---	a---e---	u---o---	e---a---
+jegogan	i-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+
+	{LABEL B}
+	{TEMPO 125 beats=1->8 pass=4}
+	{KEMPLI double pass=4}
+ga p/ugal	u,a,.u,a,.u,a,	.a,u,.a,u,.a,	u,.i.e.e.	e.i.i.i.	eee.eaa.	a.u.i<.a.	u.i.e.i.	e.i.i...
+gangsa s	o.io.io.	i.oi.oi.	oa,.o.u.u	.o.a,.a,.o	eeeu.aai<	.e.a.u.e	.a,.o.a,.o	.o.a,....
+calung	u---a---	i---a---	u---a---	i---o---	e---u---	a---e---	u---o---	e---a---
+jegogan	u-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+	{LABEL C}
+	{TEMPO ->75 beat=1}
+	{DYNAMICS ->f beat=1 positions=[gangsa,ugal,reyong]}
+	{TEMPO ->60 beat=4}
+	{DYNAMICS ->mf beat=4 positions=[gangsa,ugal,reyong]}
+	{TEMPO ->75 beat=5}
+	{DYNAMICS p->f beat=5 positions=[gangsa,ugal,reyong]}
+	{TEMPO 60 beats=7->8}
+	{DYNAMICS ->p beat=8 positions=[gangsa,ugal,reyong]}
+	## 20
+ga p/ugal	u,a,.u,a,.u,a,	.a,u,.a,u,.a,	u,.i.i.a,.	a,.u,..e,e,/.	.e,e,e,e,e,u,a,	.ii.i.i.	i.i.iee.	e....ii/.
+gangsa s	o.io.io.	i.oi.oi.	oa,.o.u,.i	.e,.a,.ii.	.iiiiioe	.iio.o.o	.o.o.eeu	.....uu/.
+calung	u---a---	i---a---	u---u---	a---u---	e---o---	i---o---	i---o---	e---o---
+jegogan	u-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+	{LABEL D}
+	{COPY C include=[DYNAMICS,TEMPO]}
+	{TEMPO ->75 beats=7->8 pass=2}
+ga p/ugal	iii.i.i.	i.i.i.i.	i/ii.i.a,.	a,.u,..e,e,/.	.e,e,e,e,e,u,a,	.ii.i.i.	i.i.iee.	e....ii/.
+gangsa s	.iio.o.o	.o.o.o.o	i/iia,.u,.i	.e,.a,.ii.	.iiiiioe	.iio.o.o	.o.o.eeu	.....uu/.
+calung	i---o---	i---o---	i---u---	a---u---	e---o---	i---o---	i---o---	e---o---
+jegogan	i-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+	{LABEL C1}
+	{COPY C}
+	{KEMPLI double}
+	{DYNAMICS f positions=[gangsa,ugal,reyong]}
+ga p/ugal	u,a,.u,a,.u,a,	.a,u,.a,u,.a,	u,.i.i.a,.	a,.u,..e,e,/.	.e,e,e,e,e,u,a,	i-------	--iii.ii	i.iii...
+gangsa s	o.io.io.	i.oi.oi.	oa,.o.u,.i	.e,.a,.ii.	.iiiiioe	i-------	--uuu.uu	u.uuu...
+calung	u---a---	i---a---	u---u---	a---u---	e---o---	i---o---	i---o---	e---o---
+jegogan	u-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+	{LABEL D1}
+	{COPY D}
+	{KEMPLI double}
+ga p/ugal	iii.i.i.	i.i.i.i.	i/ii.i.a,.	a,.u,..e,e,/.	.e,e,e,e,e,u,a,	i-------	--iii.ii	i.iii...
+gangsa s	.iio.o.o	.o.o.o.o	i/iia,.u,.i	.e,.a,.ii.	.iiiiioe	i-------	--uuu.uu	u.uuu...
+calung	i---o---	i---o---	i---u---	a---u---	e---o---	i---o---	i---o---	e---o---
+jegogan	i-------	--------	--------	--------	e-------	--------	--------	--------
+gong	G
+
+	{PART kebyar2}
+	{LABEL KEBYAR}
+	{GONGAN kebyar}
+	{TEMPO 100}
+ga/ugal	iieeiieei-aauueeo--ia,oia,u,...o---
+reyong	iieeiieei-aauueeo--ia,oia,u,...b---
+calung	i---e---i---u---o---a---u---o---
+jegogan	i---------------o-----------o---
+
+	## 25
+	{GONGAN kebyar}
+ga p/ugal	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u,---e,]---
+ga s	uueeaaeeooeeaaeeuueeaaeeo---e,]---
+reyong	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u,---b---
+calung	i---o---u---o---i---o---u-------
+jegogan	i---------------i---------------
+gong	G---------------G---------------
+
+	{GONGAN kebyar}
+ga p/ugal	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u,.e,]-a[---
+ga s	uueeaaeeooeeaaeeuueeaaeeo-e,]-a[---
+reyong	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u.b-b---
+calung	i---o---u---o---i---o---u-------
+jegogan	i---------------i---------------
+gong	G---------------G---------------
+
+	{TEMPO 55 beat=2}
+	{DYNAMICS mf positions=[gangsa,ugal,reyong]}
+	{GONGAN kebyar}
+ga/ugal	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u,.........	a,-a,/a,
+reyong	iia,a,ooa,a,u,u,a,a,ooa,a,iia,a,ooa,a,u,.........	b-b/b
+calung	i---o---u---o---i---o---u---------	---a
+jegogan	i---------------i-----------------	---a
+gong	G---------------G-----------------	---G

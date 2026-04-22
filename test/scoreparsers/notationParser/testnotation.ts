@@ -15,10 +15,12 @@ import type { SyntaxNode } from '@lezer/common'
 import { testTree } from '@lezer/generator/test'
 import fs from 'fs'
 import _ from 'lodash'
-import type { ParserReturnValue } from '../../../../typing/types.ts'
-import { scoreToFormattedJson } from '../../../../utils/objectUtils.ts'
-import { parseNotation } from '../../../notationParser.ts'
-import { parser } from '../tabuh.ts'
+import type { ExecutionItem, ParserReturnValue, Score } from '../../..//src/typing/types.ts'
+import { parser } from '../../../src/scoreparsers/grammars/tabuh/tabuh.ts'
+import { parseNotation } from '../../../src/scoreparsers/notationParser.ts'
+// import { scoreToFormattedJson } from '../../../src/utils/objectUtils.ts'
+import path from 'path'
+import { scoreToFormattedJson } from '../../../src/utils/objectUtils.ts'
 import { NOTATIONTSV, parserTestData, tabuhScores, type TestData } from './testdata.ts'
 
 // ---------- COMMON FUNCTIONS --------------------------------
@@ -64,7 +66,7 @@ function treeTest(testData: TestData, verbose: boolean = true) {
     if (testData.expected) testTree(tree, testData.expected)
 }
 
-//---------------- PARSER TESTER ----------------------------------------
+//---------------- PARSER TESTER (tree errors) ----------------------------------------
 
 function lineNr(str: string, position: number): number {
     return str.slice(0, position).split(String.fromCharCode(10)).length
@@ -135,9 +137,88 @@ function testParseNotation(testData: TestData, verbose: boolean = true) {
     logParserResults(testData, result, errorNodes, verbose)
 }
 
-const OPTION: number = 1
+//---------------- PARSER TESTER (compare with Python JSON export) ----------------------------------------
+
+function equal(ex1: ExecutionItem, ex2: ExecutionItem | undefined): boolean {
+    if (!ex2) return false
+    _.entries(ex1).forEach(([key, val1]) => {
+        if (!(key in ex2)) return false
+        const val2 = ex2[key as keyof ExecutionItem]
+        const same = Array.isArray(val1) && Array.isArray(val2) ? val1.toSorted() == val2.toSorted() : val1 == val2
+        if (!same) return false
+    })
+    return true
+}
+
+function compareScores(score: Score, ref: Score, skip: string[]): string[] {
+    const messages: string[] = []
+    // Compare execution items
+    for (const system of score.systems) {
+        var hasErrors = false
+        const refsys = ref.systems.find((sys) => sys.id == system.id)
+        if (!system.execution) continue
+        if (!refsys) {
+            messages.push(`System ${system.id} not found in reference score. Aborting test.`)
+            return messages
+        }
+        const refexecutions = refsys.execution || []
+        for (const exec of system.execution) {
+            if (skip.includes(exec.type)) continue
+            const strExec = JSON.stringify(exec, _.keys(exec).toSorted())
+            const refexec = refexecutions.find((ex) => ex.seqId == exec.seqId) as ExecutionItem
+            const strRefexec = refexec ? JSON.stringify(refexec, _.keys(refexec).toSorted()) : 'NONE'
+            if (!equal(exec, refexec)) {
+                if (!hasErrors) {
+                    messages.push(`System ${system.id}: `)
+                    hasErrors = true
+                }
+                messages.push(`   parsed:  ${strExec}`)
+                messages.push(`   ref   :  ${strRefexec}`)
+            }
+        }
+    }
+    if (messages.length == 0) messages.push('     No differences')
+    return messages
+}
+
+// Parses the input file (.tsv) into a Score obejct and compares the result with the object
+// stored in the reference file.
+// Currently only the execution items are compared.
+// inputFile: TSV file that should be parsed
+// referenceFile: contains the expected result (generated with the Python application)
+// id: file id (for logging purposes)
+// skip: Metadata items that should not be compared.
+function parseAndCompare(inputFile: string, referenceFile: string, id: number, skip: string[]) {
+    const fileName = path.parse(inputFile).name
+    const messages: string[] = []
+    const title = `${id} - ${fileName.toUpperCase()}`
+    messages.push(title)
+    messages.push('-'.repeat(title.length))
+
+    const content: string | undefined = readTextFile(inputFile)
+    var jsonContent: string | undefined
+    try {
+        jsonContent = readTextFile(referenceFile)
+    } catch {
+        messages.push('JSON reference file not found')
+    }
+    if (jsonContent) {
+        const parsedContent: ParserReturnValue = parseNotation(content)
+        const score = parsedContent.score
+        const refScore = JSON.parse(jsonContent)
+        if (score) {
+            const compareMsgs: string[] = compareScores(score, refScore, skip)
+            messages.push(...compareMsgs)
+        } else messages.push('No parsing result.')
+    }
+    messages.push('\n')
+
+    messages.forEach((msg) => console.log(msg))
+}
+
+const OPTION: number = 4
 const TREETEST = NOTATIONTSV // LARGE OR SMALL
-const NOTATIONID = 3 // 1..29
+const NOTATIONID = 5 // 1..29
 switch (OPTION) {
     case 1:
         // Tests the Lezer grammar (file tabuh.grammar). Outputs the parser tree structure as follows
@@ -165,6 +246,16 @@ switch (OPTION) {
         // Should yield 0 errors for each file. Use OPTION 2 to deep-dive into a specific notation file.
         for (const id of _.keys(tabuhScores)) {
             testParseNotation(parserTestData(Number.parseInt(id)), false)
+        }
+        break
+    }
+    case 4: {
+        // Parses all files listed in testdata.ts and compares the resulting Score object with the reference json file.
+        // Currently only the Execution items are compared.
+        for (const id of _.keys(tabuhScores).map((id) => Number.parseInt(id))) {
+            const skip = ['kempli', 'suppress', 'sequence', 'wait'] // These metadata items are not available in the reference file.
+            const tsvFile = parserTestData(id).file
+            parseAndCompare(tsvFile, tsvFile.replace('.tsv', '.json'), id, skip)
         }
     }
 }
