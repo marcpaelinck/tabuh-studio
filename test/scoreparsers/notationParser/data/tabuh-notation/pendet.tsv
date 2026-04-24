@@ -32,7 +32,7 @@ reyong2	----	-oe.	eoe.	eeie	----	.oi.	ioi.	.oe.
 reyong3	----	uuau	auau	.au.	----	aaua	uaua	uuau
 reyong4	----	u<u<e<u<	e<u<e<u<	e<e<u<e<	----	.o<i<.	i<o<i<.	u<u<e<u<
 
-	{TEMPO 60 beats=2->3}
+	{TEMPO ->60 beat=2}
 	{SUPPRESS kempli}
 ugal	----	----	-o-Eu
 

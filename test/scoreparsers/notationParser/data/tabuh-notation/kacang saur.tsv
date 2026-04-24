@@ -118,7 +118,7 @@ jegogan	------------_e-------------u	---------------------u-----e/--
 gong	------------_G-------------G	---------------------G--------
 
 	{GONGAN kebyar}
-	{TEMPO 110->70}
+	{TEMPO 110->70 beat=1}
 	{DYNAMICS ->p beat=1 positions=[gangsa,ugal,reyong]}
 	{DYNAMICS mf beat=2 positions=[gangsa,ugal,reyong]}
 ugal	u,-u,-i-i-u,-u,-a,-a,-i-i-u,-u,-a,-a,-i-a,-Io---	o-oo/o-eeoia,-Io-i-Oe-o-i-eee/uau

@@ -1,5 +1,5 @@
 {
-    "uuid": "e1f3520f-80db-45e1-a3c9-3914034512d2",
+    "uuid": "f6ea26b8-0fe7-4347-b230-1b766b15ee2e",
     "title": "Gilak Deng",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -19,7 +19,7 @@
     "parts": {},
     "systems": [
         {
-            "uuid": "79905274-389d-4a1f-b185-20dd8a6b6f93",
+            "uuid": "191b0a8c-4fdb-409d-85e1-f22e04cd9a86",
             "id": 1,
             "index": 0,
             "label": "Regular_Gongan",
@@ -46,7 +46,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "71b3cc03-32b7-40d3-a950-f2e318b93c00",
+            "uuid": "1e7b793b-7aa1-4890-a29c-c496304cde2f",
             "id": 2,
             "index": 1,
             "execution": [
@@ -69,7 +69,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "66a4ca5c-7f37-4d42-8300-ba2fbaf95d56",
+            "uuid": "f733305f-d2b3-4c3a-8846-0aac24b00d20",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -90,16 +90,16 @@
             "editorGroup": []
         },
         {
-            "uuid": "4158d190-b33d-4cfd-8684-5efd14507edb",
+            "uuid": "81ed41c0-7c41-42e8-80fc-f3fc2389236a",
             "id": 4,
             "index": 3,
             "execution": [
                 {"type": "loop", "seqId": 1000, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-                {"type": "tempo", "seqId": 2133, "passes": [3], "nthpass": false, "tooltip": "tempo 80 BPM on pass 3, 3rd iteration", "tooltipshort": "80 BPM", "iterations": [3], "isGradual": false, "section": 1, "value": 80.0},
-                {"type": "tempo", "seqId": 2134, "passes": [3], "nthpass": false, "tooltip": "tempo 50 BPM on pass 3, 4th iteration", "tooltipshort": "50 BPM", "iterations": [4], "isGradual": false, "section": 1, "value": 50.0},
+                {"type": "tempo", "seqId": 2133, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219280 BPM beat 1\u21928 on pass 3, 3rd iteration", "tooltipshort": "\u219280 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "section": 8, "value": 80.0},
+                {"type": "tempo", "seqId": 2134, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 1\u21928 on pass 3, 4th iteration", "tooltipshort": "\u219250 BPM", "iterations": [4], "isGradual": true, "fromSection": 1, "section": 8, "value": 50.0},
                 {"type": "dynamics", "seqId": 3101, "tooltip": "dynamics mp on 1st iteration", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
                 {"type": "dynamics", "seqId": 3114, "passes": [1, 2], "nthpass": false, "tooltip": "dynamics f on passes 1 & 2, 4th iteration", "tooltipshort": "f", "iterations": [4], "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to END after pass 3", "tooltipshort": "END", "targetuuid": "cb493787-d275-4332-9f80-77afdf505df8", "targetname": "END"}
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to END after pass 3", "tooltipshort": "END", "targetuuid": "b7f2d4c0-dcda-4c50-a416-7236d5fe0d62", "targetname": "END"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -118,7 +118,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "44e9c8ac-b392-419c-8134-92eb0b463965",
+            "uuid": "38463769-508b-4202-a5dd-b0eed988581a",
             "id": 5,
             "index": 4,
             "execution": [
@@ -141,11 +141,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "172773c6-a5b8-4ed7-ab6b-12d47950c899",
+            "uuid": "d4ed56e5-01fa-484d-891e-61265147095e",
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to REGULAR_GONGAN after passes 1 & 2", "tooltipshort": "REGULAR_GONGAN", "targetuuid": "79905274-389d-4a1f-b185-20dd8a6b6f93", "targetname": "REGULAR_GONGAN"}
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to REGULAR_GONGAN after passes 1 & 2", "tooltipshort": "REGULAR_GONGAN", "targetuuid": "191b0a8c-4fdb-409d-85e1-f22e04cd9a86", "targetname": "REGULAR_GONGAN"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -164,7 +164,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "cb493787-d275-4332-9f80-77afdf505df8",
+            "uuid": "b7f2d4c0-dcda-4c50-a416-7236d5fe0d62",
             "id": 7,
             "index": 6,
             "label": "End",

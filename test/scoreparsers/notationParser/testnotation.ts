@@ -15,11 +15,12 @@ import type { SyntaxNode } from '@lezer/common'
 import { testTree } from '@lezer/generator/test'
 import fs from 'fs'
 import _ from 'lodash'
-import type { ExecutionItem, ParserReturnValue, Score } from '../../..//src/typing/types.ts'
+import type { ExecutionItem, ExecutionItemType, ParserReturnValue, Score } from '../../..//src/typing/types.ts'
 import { parser } from '../../../src/scoreparsers/grammars/tabuh/tabuh.ts'
 import { parseNotation } from '../../../src/scoreparsers/notationParser.ts'
 // import { scoreToFormattedJson } from '../../../src/utils/objectUtils.ts'
 import path from 'path'
+import { lineNr } from '../../../src/scoreparsers/notationUtils.ts'
 import { scoreToFormattedJson } from '../../../src/utils/objectUtils.ts'
 import { NOTATIONTSV, parserTestData, tabuhScores, type TestData } from './testdata.ts'
 
@@ -67,10 +68,6 @@ function treeTest(testData: TestData, verbose: boolean = true) {
 }
 
 //---------------- PARSER TESTER (tree errors) ----------------------------------------
-
-function lineNr(str: string, position: number): number {
-    return str.slice(0, position).split(String.fromCharCode(10)).length
-}
 
 function logParserResults(
     testData: TestData,
@@ -137,47 +134,125 @@ function testParseNotation(testData: TestData, verbose: boolean = true) {
     logParserResults(testData, result, errorNodes, verbose)
 }
 
-//---------------- PARSER TESTER (compare with Python JSON export) ----------------------------------------
+//---------------- PARSER TESTER (compare with Python JSON Score object export) ----------------------------------------
 
 function equal(ex1: ExecutionItem, ex2: ExecutionItem | undefined): boolean {
     if (!ex2) return false
-    _.entries(ex1).forEach(([key, val1]) => {
-        if (!(key in ex2)) return false
+    for (const [key, val1] of _.entries(ex1)) {
+        if (!(key in ex2) && val1 != undefined) return false
         const val2 = ex2[key as keyof ExecutionItem]
-        const same = Array.isArray(val1) && Array.isArray(val2) ? val1.toSorted() == val2.toSorted() : val1 == val2
+        const same =
+            Array.isArray(val1) && Array.isArray(val2)
+                ? JSON.stringify(val1.toSorted()) == JSON.stringify(val2.toSorted())
+                : val1 == val2
         if (!same) return false
-    })
+    }
     return true
 }
 
-function compareScores(score: Score, ref: Score, skip: string[]): string[] {
+function diff(ex1: ExecutionItem, ex2: ExecutionItem): object {
+    const ignoreKeys = ['targetuuid']
+    const deltas: Record<string, string[]> = {}
+
+    for (const [key, val1] of _.entries(ex1)) {
+        const val2 = ex2[key as keyof ExecutionItem]
+        const ignore = ignoreKeys.includes(key)
+        const same =
+            Array.isArray(val1) && Array.isArray(val2)
+                ? JSON.stringify(val1.toSorted()) == JSON.stringify(val2.toSorted())
+                : val1 == val2
+        if (!same && !ignore) deltas[key] = [val1, val2]
+    }
+    return deltas
+}
+
+function compareExecutionItems(
+    execItems: ExecutionItem[],
+    refItems: ExecutionItem[],
+    skip: ExecutionItemType[],
+    exact: boolean = true
+): { diffMsgs: string[]; nomatch: ExecutionItem[]; nomatchRef: ExecutionItem[] } {
+    const refRemaining = [...refItems]
+    const nomatch = [] // collects the execItems for which no match was found
+    const diffMsgs: string[] = []
+
+    for (const exec of execItems) {
+        if (skip.includes(exec.type)) continue
+        const strExec = JSON.stringify(exec, _.keys(exec).toSorted())
+        var matchingIdxs: number[] = []
+        if (exact)
+            matchingIdxs = refRemaining
+                .map((it, idx) => [idx, it.seqId])
+                .filter(([_id, seqId]) => seqId == exec.seqId)
+                .map(([id, _seqId]) => id)
+        else
+            // Find ref items which match the sequence ID on the first two digits.
+            matchingIdxs = refRemaining
+                .map((re, idx) => [idx, re.seqId])
+                .filter(([_id, seqId]) => Math.abs(seqId - exec.seqId) < 100)
+                .map(([id, _seqId]) => id)
+        if (matchingIdxs.length == 0) {
+            nomatch.push(exec)
+            continue
+        }
+
+        // Find the best match
+        var bestMatch: { id: number; delta: object; diffCount: number } | undefined
+        for (const id of matchingIdxs) {
+            const delta = diff(exec, refRemaining[id])
+            const diffCount = _.keys(delta).length
+            if (!bestMatch || diffCount < bestMatch.diffCount) {
+                bestMatch = { id, delta, diffCount }
+            }
+        }
+
+        if (!bestMatch) {
+            // should not happen
+            nomatch.push(exec)
+            if (!exact) {
+                diffMsgs.push(`   parsed:  ${strExec}`)
+                diffMsgs.push(`   parsed:  NO MATCH`)
+            }
+            continue
+        }
+
+        if (bestMatch.diffCount) {
+            const id = bestMatch.id
+            const strRefexec = JSON.stringify(refRemaining[id], _.keys(refRemaining[id]).toSorted())
+            // diffMsgs.push(`   parsed:  ${strExec}`)
+            // diffMsgs.push(`   ref   :  ${strRefexec}`)
+            diffMsgs.push(`    ${refRemaining[id].type.toUpperCase()} ${JSON.stringify(bestMatch.delta)}`)
+        }
+        refRemaining.splice(bestMatch.id, 1) // Remove the matched item
+    }
+    return { diffMsgs, nomatch, nomatchRef: refRemaining }
+}
+
+function compareScores(score: Score, ref: Score, skip: ExecutionItemType[]): string[] {
     const messages: string[] = []
     // Compare execution items
     for (const system of score.systems) {
-        var hasErrors = false
         const refsys = ref.systems.find((sys) => sys.id == system.id)
         if (!system.execution) continue
         if (!refsys) {
             messages.push(`System ${system.id} not found in reference score. Aborting test.`)
-            return messages
+            continue
         }
-        const refexecutions = refsys.execution || []
-        for (const exec of system.execution) {
-            if (skip.includes(exec.type)) continue
-            const strExec = JSON.stringify(exec, _.keys(exec).toSorted())
-            const refexec = refexecutions.find((ex) => ex.seqId == exec.seqId) as ExecutionItem
-            const strRefexec = refexec ? JSON.stringify(refexec, _.keys(refexec).toSorted()) : 'NONE'
-            if (!equal(exec, refexec)) {
-                if (!hasErrors) {
-                    messages.push(`System ${system.id}: `)
-                    hasErrors = true
-                }
-                messages.push(`   parsed:  ${strExec}`)
-                messages.push(`   ref   :  ${strRefexec}`)
-            }
+        const refexecution = refsys.execution ? [...refsys.execution] : []
+
+        // Find exact match
+        const executionMsg = []
+        var { diffMsgs, nomatch, nomatchRef } = compareExecutionItems(system.execution, refexecution, skip)
+        executionMsg.push(...diffMsgs)
+        var { diffMsgs, nomatch } = compareExecutionItems(nomatch, nomatchRef, skip, false)
+        executionMsg.push(...diffMsgs)
+
+        if (executionMsg.length > 0) {
+            messages.push(`System ${system.id} (line ${system.line}): `)
+            messages.push(...executionMsg)
         }
     }
-    if (messages.length == 0) messages.push('     No differences')
+    // if (messages.length == 0) messages.push('     No differences')
     return messages
 }
 
@@ -188,14 +263,19 @@ function compareScores(score: Score, ref: Score, skip: string[]): string[] {
 // referenceFile: contains the expected result (generated with the Python application)
 // id: file id (for logging purposes)
 // skip: Metadata items that should not be compared.
-function parseAndCompare(inputFile: string, referenceFile: string, id: number, skip: string[]) {
+function parseAndCompare(
+    inputFile: string,
+    referenceFile: string,
+    id: number,
+    skip: ExecutionItemType[],
+    suppressSame: boolean = false // Print logging if no differences were found
+) {
     const fileName = path.parse(inputFile).name
     const messages: string[] = []
     const title = `${id} - ${fileName.toUpperCase()}`
-    messages.push(title)
-    messages.push('-'.repeat(title.length))
 
-    const content: string | undefined = readTextFile(inputFile)
+    // Import the input file (TSV) and the reference file (JSON)
+    const tsvContent: string | undefined = readTextFile(inputFile)
     var jsonContent: string | undefined
     try {
         jsonContent = readTextFile(referenceFile)
@@ -203,22 +283,27 @@ function parseAndCompare(inputFile: string, referenceFile: string, id: number, s
         messages.push('JSON reference file not found')
     }
     if (jsonContent) {
-        const parsedContent: ParserReturnValue = parseNotation(content)
+        const parsedContent: ParserReturnValue = parseNotation(tsvContent)
         const score = parsedContent.score
         const refScore = JSON.parse(jsonContent)
         if (score) {
             const compareMsgs: string[] = compareScores(score, refScore, skip)
+            if (!suppressSame && compareMsgs.length == 0) compareMsgs.push('     No differences')
             messages.push(...compareMsgs)
         } else messages.push('No parsing result.')
     }
-    messages.push('\n')
 
+    if (messages.length) {
+        console.log(title)
+        console.log('-'.repeat(title.length))
+        messages.push('\n')
+    }
     messages.forEach((msg) => console.log(msg))
 }
 
 const OPTION: number = 4
 const TREETEST = NOTATIONTSV // LARGE OR SMALL
-const NOTATIONID = 5 // 1..29
+const NOTATIONID = 28 // 1..28
 switch (OPTION) {
     case 1:
         // Tests the Lezer grammar (file tabuh.grammar). Outputs the parser tree structure as follows
@@ -244,8 +329,9 @@ switch (OPTION) {
         // Currently only Node errors of the parsing tree are being logged, error messages generated during the tree processing
         // are not yet logged.
         // Should yield 0 errors for each file. Use OPTION 2 to deep-dive into a specific notation file.
-        for (const id of _.keys(tabuhScores)) {
-            testParseNotation(parserTestData(Number.parseInt(id)), false)
+        for (const id of _.keys(tabuhScores).map((id) => Number.parseInt(id))) {
+            const SELECT = false // required file id for single file testing or false/undefined to test all files
+            if (!SELECT || SELECT == id) testParseNotation(parserTestData(id), false)
         }
         break
     }
@@ -253,9 +339,10 @@ switch (OPTION) {
         // Parses all files listed in testdata.ts and compares the resulting Score object with the reference json file.
         // Currently only the Execution items are compared.
         for (const id of _.keys(tabuhScores).map((id) => Number.parseInt(id))) {
-            const skip = ['kempli', 'suppress', 'sequence', 'wait'] // These metadata items are not available in the reference file.
+            const SELECT = 28 // required file id for single file testing or false/undefined to test all files
+            const skip = ['kempli', 'suppress', 'sequence', 'wait'] as ExecutionItemType[] // These metadata items are not available in the reference file.
             const tsvFile = parserTestData(id).file
-            parseAndCompare(tsvFile, tsvFile.replace('.tsv', '.json'), id, skip)
+            if (!SELECT || SELECT == id) parseAndCompare(tsvFile, tsvFile.replace('.tsv', '.json'), id, skip, false)
         }
     }
 }

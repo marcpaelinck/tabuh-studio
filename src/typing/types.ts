@@ -78,6 +78,7 @@ export type System = {
     uuid: UUID // unique uuid, never changes
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
+    line?: number // in case the score was parsed from a text file, the first line of the system
     notationGroups?: GroupedNotation[] // Staves of an imported Notation assigned to multiple positions.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.

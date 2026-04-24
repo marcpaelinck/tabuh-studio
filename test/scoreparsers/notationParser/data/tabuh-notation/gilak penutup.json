@@ -1,5 +1,5 @@
 {
-    "uuid": "737c1fb8-59a3-4e92-934f-cfdcacdb11d0",
+    "uuid": "109d42a4-cec5-4324-b1b9-76b9282fb90e",
     "title": "Gilak Penutup",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -20,23 +20,23 @@
     ],
     "parts": {
         "Unisono": [
-            "f0e58586-a1ea-44fc-92f9-8d11a8bf1aff",
-            "0c7b9938-0fcf-478b-91cc-5af26ab14db8",
-            "f95707b9-59c6-464a-9912-6378f980584b"
+            "1b819305-584e-444a-ad76-7c27a30c1acb",
+            "31a91777-d68d-480a-8d73-9e583f072c20",
+            "74cb726f-a815-4530-a7cf-eae24699089e"
         ],
         "Transition": [
-            "1b4cb3ba-315d-4615-a1dd-b7486ce92d0d"
+            "47fa74fb-5a3d-4282-876e-c235430aa835"
         ],
         "Kotekan": [
-            "6c390f3e-386b-4fcd-97d1-5f7557955803",
-            "c4c92e03-ab01-48a2-a9b8-3384cf3d3798",
-            "83eb2227-00dd-4741-b18b-6c7893e6950f",
-            "28e5f615-9a6b-4bb6-9f5c-a8446a4cd136"
+            "b56f6d32-a2a6-4654-b40f-71b7be89b640",
+            "26cbfac1-a26f-4149-b3c6-a1edc37e5312",
+            "e81f1fb3-ef98-44d4-9ec8-65eff59001f2",
+            "6aeda5d8-ac7b-44df-a854-dbabd01d9276"
         ]
     },
     "systems": [
         {
-            "uuid": "f0e58586-a1ea-44fc-92f9-8d11a8bf1aff",
+            "uuid": "1b819305-584e-444a-ad76-7c27a30c1acb",
             "id": 1,
             "index": 0,
             "label": "Regular",
@@ -64,11 +64,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "0c7b9938-0fcf-478b-91cc-5af26ab14db8",
+            "uuid": "31a91777-d68d-480a-8d73-9e583f072c20",
             "id": 2,
             "index": 1,
             "execution": [
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": true, "tooltip": "go to TRANSITION after every 3rd pass", "tooltipshort": "TRANSITION", "targetuuid": "1b4cb3ba-315d-4615-a1dd-b7486ce92d0d", "targetname": "TRANSITION"}
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": true, "tooltip": "go to TRANSITION after every 3rd pass", "tooltipshort": "TRANSITION", "targetuuid": "47fa74fb-5a3d-4282-876e-c235430aa835", "targetname": "TRANSITION"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -89,13 +89,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "f95707b9-59c6-464a-9912-6378f980584b",
+            "uuid": "74cb726f-a815-4530-a7cf-eae24699089e",
             "id": 3,
             "index": 2,
             "execution": [
-                {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current \u219250 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 50.0},
-                {"type": "goto", "seqId": 5000, "tooltip": "go to REGULAR", "tooltipshort": "REGULAR", "targetuuid": "f0e58586-a1ea-44fc-92f9-8d11a8bf1aff", "targetname": "REGULAR"},
-                {"type": "goto", "seqId": 5050, "passes": [5], "nthpass": false, "tooltip": "go to END after pass 5", "tooltipshort": "END", "targetuuid": "28e5f615-9a6b-4bb6-9f5c-a8446a4cd136", "targetname": "END"}
+                {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 1\u21928 on pass 5", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 50.0},
+                {"type": "goto", "seqId": 5000, "tooltip": "go to REGULAR", "tooltipshort": "REGULAR", "targetuuid": "1b819305-584e-444a-ad76-7c27a30c1acb", "targetname": "REGULAR"},
+                {"type": "goto", "seqId": 5050, "passes": [5], "nthpass": false, "tooltip": "go to END after pass 5", "tooltipshort": "END", "targetuuid": "6aeda5d8-ac7b-44df-a854-dbabd01d9276", "targetname": "END"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -116,7 +116,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "1b4cb3ba-315d-4615-a1dd-b7486ce92d0d",
+            "uuid": "47fa74fb-5a3d-4282-876e-c235430aa835",
             "id": 4,
             "index": 3,
             "label": "Transition",
@@ -140,7 +140,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6c390f3e-386b-4fcd-97d1-5f7557955803",
+            "uuid": "b56f6d32-a2a6-4654-b40f-71b7be89b640",
             "id": 5,
             "index": 4,
             "label": "Kotekan",
@@ -164,11 +164,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "c4c92e03-ab01-48a2-a9b8-3384cf3d3798",
+            "uuid": "26cbfac1-a26f-4149-b3c6-a1edc37e5312",
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 5090, "passes": [9], "nthpass": false, "tooltip": "go to END after pass 9", "tooltipshort": "END", "targetuuid": "28e5f615-9a6b-4bb6-9f5c-a8446a4cd136", "targetname": "END"}
+                {"type": "goto", "seqId": 5090, "passes": [9], "nthpass": false, "tooltip": "go to END after pass 9", "tooltipshort": "END", "targetuuid": "6aeda5d8-ac7b-44df-a854-dbabd01d9276", "targetname": "END"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -189,12 +189,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "83eb2227-00dd-4741-b18b-6c7893e6950f",
+            "uuid": "e81f1fb3-ef98-44d4-9ec8-65eff59001f2",
             "id": 7,
             "index": 6,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to KOTEKAN", "tooltipshort": "KOTEKAN", "targetuuid": "6c390f3e-386b-4fcd-97d1-5f7557955803", "targetname": "KOTEKAN"},
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": true, "tooltip": "go to REGULAR after every 3rd pass", "tooltipshort": "REGULAR", "targetuuid": "f0e58586-a1ea-44fc-92f9-8d11a8bf1aff", "targetname": "REGULAR"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to KOTEKAN", "tooltipshort": "KOTEKAN", "targetuuid": "b56f6d32-a2a6-4654-b40f-71b7be89b640", "targetname": "KOTEKAN"},
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": true, "tooltip": "go to REGULAR after every 3rd pass", "tooltipshort": "REGULAR", "targetuuid": "1b819305-584e-444a-ad76-7c27a30c1acb", "targetname": "REGULAR"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -215,7 +215,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "28e5f615-9a6b-4bb6-9f5c-a8446a4cd136",
+            "uuid": "6aeda5d8-ac7b-44df-a854-dbabd01d9276",
             "id": 8,
             "index": 7,
             "label": "End",

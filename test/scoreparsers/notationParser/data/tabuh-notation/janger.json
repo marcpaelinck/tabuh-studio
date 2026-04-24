@@ -1,5 +1,5 @@
 {
-    "uuid": "41861d08-ec04-4858-ab90-aebac6ed8e3d",
+    "uuid": "0b6a3860-c62a-490f-8d9e-3cffa776bd46",
     "title": "Janger",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -19,7 +19,7 @@
     "parts": {},
     "systems": [
         {
-            "uuid": "3b88433f-cc51-455c-b407-3f9e0f1f4f62",
+            "uuid": "906e865a-0204-4d90-b664-5ebda24ed603",
             "id": 1,
             "index": 0,
             "execution": [
@@ -42,7 +42,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "7a03b36f-6458-4f71-98f1-c51c5f88ccde",
+            "uuid": "b0e01459-f958-470a-afc2-9af6b2018bde",
             "id": 2,
             "index": 1,
             "execution": [
@@ -65,7 +65,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "c37fe2fc-3f21-4d4b-b2be-cb32d87f9c0e",
+            "uuid": "c504dfc2-d93d-4b08-8508-5b27ced6c7c7",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -86,7 +86,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "560a527f-b393-4115-bb87-79e18d4faba9",
+            "uuid": "b569be42-5776-468e-9418-19789080b9bd",
             "id": 4,
             "index": 3,
             "execution": [
@@ -109,7 +109,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "1ce8ed0f-9f9f-4fe7-b940-910a8352ecd0",
+            "uuid": "54e07f62-be0e-43af-a828-49e871dcb47c",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -130,7 +130,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "a7f45531-c327-4cf0-9a6d-695d9e269888",
+            "uuid": "cf1e6335-5c7b-4b1b-baa2-4ce3caf8081c",
             "id": 6,
             "index": 5,
             "execution": [],
@@ -151,7 +151,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "962c9ca9-901e-4a33-b778-de95ba2a9f18",
+            "uuid": "25a321fe-7ff0-4bdd-8fac-066653f4a022",
             "id": 7,
             "index": 6,
             "label": "Song_Start",
@@ -175,7 +175,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "5a73c44b-462c-4a55-90ce-3644cb6782fe",
+            "uuid": "8e1a6166-0ffc-4e0f-a280-bb18f2d7115e",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -196,7 +196,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "0f22296e-fc87-46ed-a48e-fabb913f1074",
+            "uuid": "60a1e672-47e8-4b13-abad-bfdb91b2391c",
             "id": 9,
             "index": 8,
             "execution": [],
@@ -217,13 +217,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "14685115-19df-47be-98a1-38d8fb82ab46",
+            "uuid": "d38a5c03-291f-4ac5-9baa-c6ea547e6f8c",
             "id": 10,
             "index": 9,
             "execution": [
                 {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-                {"type": "tempo", "seqId": 2123, "passes": [2], "nthpass": false, "tooltip": "tempo 30 BPM on pass 2, 3rd iteration", "tooltipshort": "30 BPM", "iterations": [3], "isGradual": false, "section": 1, "value": 30.0},
-                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to SONG_START after pass 1", "tooltipshort": "SONG_START", "targetuuid": "962c9ca9-901e-4a33-b778-de95ba2a9f18", "targetname": "SONG_START"}
+                {"type": "tempo", "seqId": 2123, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219230 BPM beat 1\u21924 on pass 2, 3rd iteration", "tooltipshort": "\u219230 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "section": 4, "value": 30.0},
+                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to SONG_START after pass 1", "tooltipshort": "SONG_START", "targetuuid": "25a321fe-7ff0-4bdd-8fac-066653f4a022", "targetname": "SONG_START"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "i", "o"]}, {"notation": ["e", "u", "e", "u"]}, {"notation": ["e", "-", "o", "u"]}, {"notation": ["e", "-", "o", "-"]}],
@@ -242,7 +242,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "aa45de67-ab57-4c92-aae1-5bb2c1c36eba",
+            "uuid": "f5ab7882-1399-4d71-9e04-100d331bcb65",
             "id": 11,
             "index": 10,
             "label": "Chorus",
@@ -266,7 +266,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "7fa8ff35-3dca-4d73-9453-a2e4e2723960",
+            "uuid": "dbbc2b24-8a43-4121-9ee8-8082a04af4a7",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -287,14 +287,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "6409bc12-6bb9-4bb3-9de3-0891432146ba",
+            "uuid": "c9e54517-b93a-4666-bc3f-11321b48e9d5",
             "id": 13,
             "index": 12,
             "execution": [
                 {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-                {"type": "tempo", "seqId": 2141, "passes": [4], "nthpass": false, "tooltip": "tempo 65 BPM on pass 4, 1st iteration", "tooltipshort": "65 BPM", "iterations": [1], "isGradual": false, "section": 1, "value": 65.0},
-                {"type": "tempo", "seqId": 2142, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM on pass 4, 2nd iteration", "tooltipshort": "50 BPM", "iterations": [2], "isGradual": false, "section": 1, "value": 50.0},
-                {"type": "goto", "seqId": 5010, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to CHORUS after passes 1, 2 & 3", "tooltipshort": "CHORUS", "targetuuid": "aa45de67-ab57-4c92-aae1-5bb2c1c36eba", "targetname": "CHORUS"}
+                {"type": "tempo", "seqId": 2141, "passes": [4], "nthpass": false, "tooltip": "tempo current\u219265 BPM beat 1\u21926 on pass 4, 1st iteration", "tooltipshort": "\u219265 BPM", "iterations": [1], "isGradual": true, "fromSection": 1, "section": 6, "value": 65.0},
+                {"type": "tempo", "seqId": 2142, "passes": [4], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 1\u21926 on pass 4, 2nd iteration", "tooltipshort": "\u219250 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "section": 6, "value": 50.0},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to CHORUS after passes 1, 2 & 3", "tooltipshort": "CHORUS", "targetuuid": "f5ab7882-1399-4d71-9e04-100d331bcb65", "targetname": "CHORUS"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "-", "i", "i", "-", "i", "-"]}, {"notation": ["-", "-", "i", "-", "a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o", "o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-", "u", "-", "o", "-"]}, {"notation": ["e", "-", "-", "e", "u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-", "a,", "-", "o", "-"]}],
@@ -313,7 +313,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "3a89e10f-32b8-49a8-9e9e-ce36ac3f9011",
+            "uuid": "6eb7ab8a-3768-489a-9a39-8224f6c6551f",
             "id": 14,
             "index": 13,
             "execution": [],

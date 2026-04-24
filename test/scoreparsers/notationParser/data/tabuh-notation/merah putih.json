@@ -1,5 +1,5 @@
 {
-    "uuid": "22520bbe-405b-42fd-942d-2b2080a23bf8",
+    "uuid": "da3e762d-7723-46b0-8001-fa04bdb53352",
     "title": "Merah Putih",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -18,7 +18,7 @@
     "parts": {},
     "systems": [
         {
-            "uuid": "f4ec8f4f-df6a-44b9-820a-b01f674efb01",
+            "uuid": "92d2406a-cdc0-45b7-bf08-4c1c756d5b2c",
             "id": 1,
             "index": 0,
             "execution": [
@@ -42,7 +42,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "1b36758d-bdd2-4f0e-8e38-22e4d307593a",
+            "uuid": "906c1cbd-82e1-414d-8b20-257dd9945237",
             "id": 2,
             "index": 1,
             "execution": [],
@@ -62,7 +62,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "666f45af-1661-409a-8577-03b93f3dac3f",
+            "uuid": "13e95bda-0769-4928-9d88-6f296b753661",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -82,7 +82,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6f4f0ecb-c324-43bf-889a-472076ebb59e",
+            "uuid": "5c7fa6e6-73c8-409f-bb9d-6a50ea9d11ee",
             "id": 4,
             "index": 3,
             "execution": [],

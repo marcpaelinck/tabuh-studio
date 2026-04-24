@@ -40,7 +40,7 @@ ga/ca	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	
 jegogan	e								e
 
 
-	{TEMPO 50 beats=1->7}
+	{TEMPO 50 beats=1->8}
 	{SUPPRESS kempli}
 trompong	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---
 ga/ca	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---
@@ -57,14 +57,14 @@ jegogan	u	a	u	e	e	a	u	e
 gong	G
 
 
-	{TEMPO 57 beats=1->7}
+	{TEMPO 57 beats=1->8}
 trompong	u,-------	a,-i-u,-a,-	i---o-e-	o---i---	a,-----i-	o---e-o-	i---o-i-	a,-o-i-a,-
 gangsa p	u.ua.u.a	ua.ua.ua	.u.au.ua	.ia.ia.i	a.ai.a.i	a.ii.i.o	i.io.i.o	iau.au.a
 gangsa s	oio.ioi.	o.io.io.	ioi.oio.	i.eo.eo.	eoe.oeo.	e.i.e.eo	.e.oe.eo	.eoi.oi.
 calung	u-------	a-i-u-a-	i---o-e-	o---i---	a-----i-	o---e-o-	i---o-i-	a-o-i-a-
 jegogan	u	a	i	o	a	o	i	a
 
-	{TEMPO ->50 beat=7 passes=[1,2]}
+	{TEMPO ->50 beat=7->8 passes=[1,2]}
 	{TEMPO 120 beats=4->8 passes=[3]}
 trompong	u,-------	a,---i-a,-	u,-a,-u,---	e,---o,-u,-	e,-----u,-	a,---i-a,-	u,-a,-u,---	e,-u,-a,---
 gangsa p	u.ua.u.a	u.ua.u.a	u.ua.u.a	uo.io.io	.i.oi.io	.au.au.a	u.ua.u.a	u.ua.u.a

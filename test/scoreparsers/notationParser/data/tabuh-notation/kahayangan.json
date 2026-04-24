@@ -1,5 +1,5 @@
 {
-    "uuid": "46c0a4ee-dfaf-420b-8126-baa1d32e52a9",
+    "uuid": "2796f8ea-81fe-43c5-9be6-beed4a02f779",
     "title": "Kahayangan",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -19,33 +19,33 @@
     ],
     "parts": {
         "kawitan": [
-            "2b63032e-3e52-48ce-80be-029a317c5ce5",
-            "930e6a87-1469-4b05-94c0-27fc876849d2",
-            "a240b3e3-9c88-4ec4-959c-31c7111e1cd7",
-            "ea487cdf-3061-45fe-9007-b38b0b109310",
-            "4596beb7-9af5-44be-8827-924d31477e04"
+            "215dfef3-928a-46ad-aa68-5295c71c1eca",
+            "297825cd-822d-4265-b083-1d8e0fad1675",
+            "0dc619d9-05ff-48a8-a77e-a57bd35e93d1",
+            "c0d524ad-3159-4e6c-8457-0518c7e70b09",
+            "6f5934a9-9198-4a90-a5f0-4915688084ce"
         ],
         "pengawak": [
-            "e2b0d753-4d87-4144-9685-b995d10745fc",
-            "96f1ff6b-7b53-4bbf-aae7-066881148f0f"
+            "3caa76ad-602e-4630-befe-324d1552bf45",
+            "b1fabe35-a6e2-4c01-948f-dea52834c9e2"
         ],
         "pengecet": [
-            "36ae4aab-222a-4438-b309-978136347f5f",
-            "9c1aa642-6671-48e6-8ece-d95263fed837",
-            "dbcc29c5-14a4-4951-9eaf-9e470648cbd9",
-            "786ef2e3-7c20-4f6b-bb74-56a2d2e1d33b",
-            "e2596244-c001-42fc-b02e-cb487cb6791d",
-            "be17bfd5-3861-4ac5-ad86-e3ebc43bc3f7",
-            "84061cd0-7e22-4227-88d8-4008ff9f1206",
-            "c985721e-3ebe-4d15-a91b-32fd18b8b421",
-            "0db23eeb-2f12-4661-b5e5-eb0f25143e5a",
-            "f2483247-ebbf-4c04-8187-0f45b8a65a7f",
-            "977b02cf-5cd0-4360-8487-6a33bd4c0b39"
+            "d4ebec41-46f7-4a0a-84c4-6c81a81a3b1f",
+            "e137731d-1348-4f62-b199-45bf3f5c8b4c",
+            "85365567-7c69-4718-9eb9-1beb235d4475",
+            "0656c148-c467-4a70-b607-963fbfa4875a",
+            "c804ed1d-381a-405a-9618-0aca92647789",
+            "e3f5c8c7-3aa5-4585-a79f-ff7389600ab0",
+            "61c9f6e4-5519-479c-855b-fb4ba66465bc",
+            "f193e153-7ba2-4e49-9632-72612587198a",
+            "82b1e916-bd7d-4b93-bf78-03bc75dadc24",
+            "98ddd99d-a757-4511-9ae1-790e05059677",
+            "a59f29f6-4651-4d87-bd20-9bef19f4c9ec"
         ]
     },
     "systems": [
         {
-            "uuid": "b30e1d71-c358-46be-99a9-bb5315e3ed72",
+            "uuid": "10804749-92d5-4a33-84c9-89deb5c4e598",
             "id": 1,
             "index": 0,
             "execution": [
@@ -70,7 +70,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "2b63032e-3e52-48ce-80be-029a317c5ce5",
+            "uuid": "215dfef3-928a-46ad-aa68-5295c71c1eca",
             "id": 2,
             "index": 1,
             "execution": [
@@ -94,7 +94,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "930e6a87-1469-4b05-94c0-27fc876849d2",
+            "uuid": "297825cd-822d-4265-b083-1d8e0fad1675",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -116,7 +116,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "a240b3e3-9c88-4ec4-959c-31c7111e1cd7",
+            "uuid": "0dc619d9-05ff-48a8-a77e-a57bd35e93d1",
             "id": 4,
             "index": 3,
             "execution": [],
@@ -138,7 +138,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "ea487cdf-3061-45fe-9007-b38b0b109310",
+            "uuid": "c0d524ad-3159-4e6c-8457-0518c7e70b09",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -160,7 +160,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "4596beb7-9af5-44be-8827-924d31477e04",
+            "uuid": "6f5934a9-9198-4a90-a5f0-4915688084ce",
             "id": 6,
             "index": 5,
             "execution": [
@@ -184,7 +184,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "e2b0d753-4d87-4144-9685-b995d10745fc",
+            "uuid": "3caa76ad-602e-4630-befe-324d1552bf45",
             "id": 7,
             "index": 6,
             "execution": [
@@ -208,7 +208,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "96f1ff6b-7b53-4bbf-aae7-066881148f0f",
+            "uuid": "b1fabe35-a6e2-4c01-948f-dea52834c9e2",
             "id": 8,
             "index": 7,
             "execution": [
@@ -232,7 +232,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "36ae4aab-222a-4438-b309-978136347f5f",
+            "uuid": "d4ebec41-46f7-4a0a-84c4-6c81a81a3b1f",
             "id": 9,
             "index": 8,
             "execution": [
@@ -257,7 +257,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "9c1aa642-6671-48e6-8ece-d95263fed837",
+            "uuid": "e137731d-1348-4f62-b199-45bf3f5c8b4c",
             "id": 10,
             "index": 9,
             "execution": [],
@@ -279,7 +279,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "dbcc29c5-14a4-4951-9eaf-9e470648cbd9",
+            "uuid": "85365567-7c69-4718-9eb9-1beb235d4475",
             "id": 11,
             "index": 10,
             "execution": [],
@@ -301,7 +301,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "786ef2e3-7c20-4f6b-bb74-56a2d2e1d33b",
+            "uuid": "0656c148-c467-4a70-b607-963fbfa4875a",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -323,7 +323,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "e2596244-c001-42fc-b02e-cb487cb6791d",
+            "uuid": "c804ed1d-381a-405a-9618-0aca92647789",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -345,7 +345,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "be17bfd5-3861-4ac5-ad86-e3ebc43bc3f7",
+            "uuid": "e3f5c8c7-3aa5-4585-a79f-ff7389600ab0",
             "id": 14,
             "index": 13,
             "execution": [
@@ -370,7 +370,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "84061cd0-7e22-4227-88d8-4008ff9f1206",
+            "uuid": "61c9f6e4-5519-479c-855b-fb4ba66465bc",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -392,7 +392,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "c985721e-3ebe-4d15-a91b-32fd18b8b421",
+            "uuid": "f193e153-7ba2-4e49-9632-72612587198a",
             "id": 16,
             "index": 15,
             "execution": [],
@@ -414,7 +414,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "0db23eeb-2f12-4661-b5e5-eb0f25143e5a",
+            "uuid": "82b1e916-bd7d-4b93-bf78-03bc75dadc24",
             "id": 17,
             "index": 16,
             "execution": [],
@@ -436,7 +436,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "f2483247-ebbf-4c04-8187-0f45b8a65a7f",
+            "uuid": "98ddd99d-a757-4511-9ae1-790e05059677",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -458,7 +458,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "977b02cf-5cd0-4360-8487-6a33bd4c0b39",
+            "uuid": "a59f29f6-4651-4d87-bd20-9bef19f4c9ec",
             "id": 19,
             "index": 18,
             "execution": [],

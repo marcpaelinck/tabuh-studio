@@ -1,5 +1,5 @@
 {
-    "uuid": "8b396ba8-31e7-498a-bbf6-157df393f656",
+    "uuid": "7b654174-6621-4049-a269-061de9e010dd",
     "title": "Legong Mahawidya SP",
     "composer": "",
     "instrumenttype": "SEMAR_PAGULINGAN",
@@ -16,39 +16,39 @@
     ],
     "parts": {
         "kawitan": [
-            "568bb8c6-33ac-40a9-8bab-aaf869d2f067",
-            "8a01c8fd-adf7-4af5-8a42-30b488c53970",
-            "db625efb-1c7e-47f9-8c97-5b15fbbc1c08",
-            "98f16f3f-adb6-4648-9176-73039c557697",
-            "4b999292-1b47-4b89-8f13-31c54fefb641",
-            "f8dc067a-5983-4a07-8fca-3676978ba56c",
-            "a5d90087-ad79-4c38-8285-36ff02e28231",
-            "6d8ea532-b5de-403b-b4e3-186dadd1cf2b",
-            "361f8598-48c7-4716-b2d3-b120b06ef311"
+            "d6e49913-9782-4f7a-9066-7b3c27415c63",
+            "c711c597-356d-470b-bf28-dab2202addea",
+            "186fcfbe-b6df-4944-9b42-3cbbfc28e69a",
+            "48a4ad67-e12b-45c3-9a1b-48bcfe60d155",
+            "6cf94081-a5d0-4f81-8e4c-d7de277429e4",
+            "f5977420-7dee-4ede-8a33-4c69831bd753",
+            "3e3f1113-f214-485d-8aef-ff5722134094",
+            "0c320165-d5ed-4fea-aee9-4ac15d5e45a2",
+            "f1f438c3-9d29-4d82-9a8d-be94ab94b023"
         ],
         "pengawak": [
-            "bb2518a1-e063-4a24-9694-8c395555741c",
-            "50d9b45a-af2c-4cea-b28f-933cc7b3c05b",
-            "a0747067-f0e7-4fde-92bb-0636de261ec1",
-            "cb91dee1-d3cd-4c4b-baf4-d412dd56d2c2",
-            "0a1d201c-40c1-47e1-9527-47cc2fda9a38",
-            "482c9390-1f86-4d0e-86c3-d2a3322eeb6d",
-            "40a51553-8ac8-43c1-9212-779e0df03eba",
-            "c81d67ea-e877-4d9c-8330-cdb1f112a59e",
-            "d14be6c2-8cd3-4c97-a9c3-8bd5b3a00644"
+            "0d333c77-8fea-47be-911e-6f5f76128404",
+            "42a5bf03-27c1-4a71-81c8-fc1035a5a944",
+            "23530ed1-9b93-4499-821e-5f3eb718edab",
+            "797eb5ed-691a-4ab4-8595-25e26f258a9d",
+            "0655fd6f-b914-4a56-81ee-a05caacee49d",
+            "cd190892-5691-47ee-a992-ed111d753645",
+            "f782abc8-2287-4edb-a98d-d33de15ba8c8",
+            "394c7719-d9d7-4635-b793-877fdda37d78",
+            "00508bb5-e90b-43b5-9789-ee0f870d85c6"
         ],
         "pengecet": [
-            "8a697730-bdbe-4e30-b7e0-4fb03857fe63",
-            "d60707e3-ab38-4599-b56f-50250d54d927",
-            "721b27b9-6c38-491b-a51c-48f4f2fa1b55",
-            "ad77810a-0b96-4e67-ab1f-a8c0629f7ac1",
-            "4c63f1a2-a4e5-4631-9bcd-50f69c696f6c",
-            "6730a867-32fa-441b-aa15-b76b92539e4c"
+            "b371a8e2-e2b1-41b4-bf49-676e7b111b74",
+            "2bb47bf3-807e-4442-9d2c-e2036ffc6237",
+            "795e0059-bff4-42f6-a15b-3ffab5d61bd4",
+            "a76f1556-4b1a-4f31-bf3f-3bfccd1ff614",
+            "c54d2beb-81d4-4a49-920b-47983d38dd75",
+            "7367a2a4-b3e5-4711-aff5-b151fe21d111"
         ]
     },
     "systems": [
         {
-            "uuid": "955ba8c2-1807-4bc9-a075-c33b4dd3dad2",
+            "uuid": "d3e6290f-522c-4085-ace4-04cc96c453bd",
             "id": 1,
             "index": 0,
             "execution": [
@@ -70,7 +70,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "568bb8c6-33ac-40a9-8bab-aaf869d2f067",
+            "uuid": "d6e49913-9782-4f7a-9066-7b3c27415c63",
             "id": 2,
             "index": 1,
             "execution": [
@@ -91,7 +91,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "8a01c8fd-adf7-4af5-8a42-30b488c53970",
+            "uuid": "c711c597-356d-470b-bf28-dab2202addea",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -110,7 +110,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "db625efb-1c7e-47f9-8c97-5b15fbbc1c08",
+            "uuid": "186fcfbe-b6df-4944-9b42-3cbbfc28e69a",
             "id": 4,
             "index": 3,
             "execution": [],
@@ -129,7 +129,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "98f16f3f-adb6-4648-9176-73039c557697",
+            "uuid": "48a4ad67-e12b-45c3-9a1b-48bcfe60d155",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -148,7 +148,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "4b999292-1b47-4b89-8f13-31c54fefb641",
+            "uuid": "6cf94081-a5d0-4f81-8e4c-d7de277429e4",
             "id": 6,
             "index": 5,
             "execution": [],
@@ -167,7 +167,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "f8dc067a-5983-4a07-8fca-3676978ba56c",
+            "uuid": "f5977420-7dee-4ede-8a33-4c69831bd753",
             "id": 7,
             "index": 6,
             "execution": [],
@@ -186,11 +186,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "a5d90087-ad79-4c38-8285-36ff02e28231",
+            "uuid": "3e3f1113-f214-485d-8aef-ff5722134094",
             "id": 8,
             "index": 7,
             "execution": [
-                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current \u219290 BPM beat 3\u219215", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 3, "section": 15, "value": 90.0}
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u219290 BPM beat 3\u219216", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 3, "section": 16, "value": 90.0}
             ],
             "staffs": {
                 "GENDERRAMBAT": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "a,"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "e"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "e", "-"]}],
@@ -207,7 +207,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6d8ea532-b5de-403b-b4e3-186dadd1cf2b",
+            "uuid": "0c320165-d5ed-4fea-aee9-4ac15d5e45a2",
             "id": 9,
             "index": 8,
             "execution": [
@@ -228,7 +228,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "361f8598-48c7-4716-b2d3-b120b06ef311",
+            "uuid": "f1f438c3-9d29-4d82-9a8d-be94ab94b023",
             "id": 10,
             "index": 9,
             "execution": [],
@@ -247,7 +247,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "bb2518a1-e063-4a24-9694-8c395555741c",
+            "uuid": "0d333c77-8fea-47be-911e-6f5f76128404",
             "id": 11,
             "index": 10,
             "execution": [],
@@ -266,7 +266,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "50d9b45a-af2c-4cea-b28f-933cc7b3c05b",
+            "uuid": "42a5bf03-27c1-4a71-81c8-fc1035a5a944",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -285,7 +285,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "a0747067-f0e7-4fde-92bb-0636de261ec1",
+            "uuid": "23530ed1-9b93-4499-821e-5f3eb718edab",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -304,7 +304,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "cb91dee1-d3cd-4c4b-baf4-d412dd56d2c2",
+            "uuid": "797eb5ed-691a-4ab4-8595-25e26f258a9d",
             "id": 14,
             "index": 13,
             "execution": [],
@@ -323,7 +323,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "0a1d201c-40c1-47e1-9527-47cc2fda9a38",
+            "uuid": "0655fd6f-b914-4a56-81ee-a05caacee49d",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -342,7 +342,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "482c9390-1f86-4d0e-86c3-d2a3322eeb6d",
+            "uuid": "cd190892-5691-47ee-a992-ed111d753645",
             "id": 16,
             "index": 15,
             "execution": [],
@@ -361,7 +361,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "40a51553-8ac8-43c1-9212-779e0df03eba",
+            "uuid": "f782abc8-2287-4edb-a98d-d33de15ba8c8",
             "id": 17,
             "index": 16,
             "execution": [],
@@ -380,7 +380,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "c81d67ea-e877-4d9c-8330-cdb1f112a59e",
+            "uuid": "394c7719-d9d7-4635-b793-877fdda37d78",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -399,11 +399,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "d14be6c2-8cd3-4c97-a9c3-8bd5b3a00644",
+            "uuid": "00508bb5-e90b-43b5-9789-ee0f870d85c6",
             "id": 19,
             "index": 18,
             "execution": [
-                {"type": "tempo", "seqId": 2500, "tooltip": "tempo current \u2192105 BPM beat 5\u21929", "tooltipshort": "\u2192105 BPM", "isGradual": true, "fromSection": 5, "section": 9, "value": 105.0}
+                {"type": "tempo", "seqId": 2500, "tooltip": "tempo current\u2192105 BPM beat 5\u21928", "tooltipshort": "\u2192105 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 105.0}
             ],
             "staffs": {
                 "GENDERRAMBAT": [{"notation": ["u", "-", "-", "-", "O", "i", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-", "o", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-", "o", "-", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-", "u", "-", "a", "-"]}, {"notation": ["U", "e", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "-", "-", "u", "-"]}, {"notation": ["A,", "i", "-", "a", "-", "u", "-", "e", "-"]}],
@@ -420,7 +420,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "8a697730-bdbe-4e30-b7e0-4fb03857fe63",
+            "uuid": "b371a8e2-e2b1-41b4-bf49-676e7b111b74",
             "id": 20,
             "index": 19,
             "execution": [],
@@ -439,7 +439,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "d60707e3-ab38-4599-b56f-50250d54d927",
+            "uuid": "2bb47bf3-807e-4442-9d2c-e2036ffc6237",
             "id": 21,
             "index": 20,
             "execution": [],
@@ -458,7 +458,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "721b27b9-6c38-491b-a51c-48f4f2fa1b55",
+            "uuid": "795e0059-bff4-42f6-a15b-3ffab5d61bd4",
             "id": 22,
             "index": 21,
             "execution": [],
@@ -477,7 +477,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "ad77810a-0b96-4e67-ab1f-a8c0629f7ac1",
+            "uuid": "a76f1556-4b1a-4f31-bf3f-3bfccd1ff614",
             "id": 23,
             "index": 22,
             "execution": [],
@@ -496,12 +496,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "4c63f1a2-a4e5-4631-9bcd-50f69c696f6c",
+            "uuid": "c54d2beb-81d4-4a49-920b-47983d38dd75",
             "id": 24,
             "index": 23,
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current \u219270 BPM beat 1\u21929", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 1, "section": 9, "value": 70.0},
-                {"type": "tempo", "seqId": 3100, "tooltip": "tempo current \u219250 BPM beat 11\u219216", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 11, "section": 16, "value": 50.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u219270 BPM beat 1\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 70.0},
+                {"type": "tempo", "seqId": 3100, "tooltip": "tempo current\u219250 BPM beat 11\u219215", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 11, "section": 15, "value": 50.0}
             ],
             "staffs": {
                 "GENDERRAMBAT": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["U", "e", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "U", "a", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["a", "-", "e", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["u", "-", "o", "-"]}, {"notation": ["e", ".", ".", "."]}, {"notation": [".", ".", "e", "-"]}],
@@ -518,7 +518,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6730a867-32fa-441b-aa15-b76b92539e4c",
+            "uuid": "7367a2a4-b3e5-4711-aff5-b151fe21d111",
             "id": 25,
             "index": 24,
             "execution": [],

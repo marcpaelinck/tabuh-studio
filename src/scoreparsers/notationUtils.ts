@@ -21,3 +21,8 @@ function createTagLookup(tagTable: Array<Record<string, string | string[]>>): Re
 }
 
 export const tagLookup: Record<string, Position[]> = createTagLookup(instrumentTags)
+
+// Returns the number of lines contained in `str` up to `position`.
+export function lineNr(str: string, position: number): number {
+    return str.slice(0, position).split(String.fromCharCode(13)).length
+}

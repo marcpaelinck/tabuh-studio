@@ -96,7 +96,7 @@ export const defaultDynamics: number = 0.67 // mf
 export const dynamicsToNumber: Record<DynamicsValue, number> = {
     pp: 0.24,
     p: 0.35,
-    mp: 0.5,
+    mp: 0.51,
     mf: 0.67,
     f: 0.83,
     ff: 1.0

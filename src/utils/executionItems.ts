@@ -18,8 +18,8 @@ function fmtFloat(value: number): number {
 
 function toText(values: number[] | undefined, ordinal: boolean = false): string {
     if (values) {
-        var list = values.map((val) => `${val}`)
-        if (ordinal) list = values.map((val) => toOrdinal(val))
+        var list = values.toSorted((a, b) => a - b).map((val) => `${val}`)
+        if (ordinal) list = values.toSorted((a, b) => a - b).map((val) => toOrdinal(val))
         if (list.length > 1) return list.slice(0, -1).join(', ') + ' & ' + _.last(list)
         else return list.join('') // also takes care of empty array
     } else return ''
@@ -69,7 +69,7 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
         }
         case 'tempo':
         case 'dynamics': {
-            const current = length == 'long' ? 'current ' : ''
+            const current = length == 'long' ? 'current' : ''
             const itemtype = length == 'long' ? `${item.type} ` : ''
             if (item.type == 'tempo') {
                 const isGradual = item.isGradual && item.fromValue != item.value

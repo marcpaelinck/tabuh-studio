@@ -1,5 +1,5 @@
 {
-    "uuid": "ddd32f26-e0f2-4ebf-873b-021600775538",
+    "uuid": "7e248d9a-d268-41ff-b6d6-ee955c589bc9",
     "title": "Lengker SP",
     "composer": "",
     "instrumenttype": "SEMAR_PAGULINGAN",
@@ -16,35 +16,35 @@
     ],
     "parts": {
         "kawitan": [
-            "46076930-85d5-4632-999e-4fd501f4768a",
-            "734addd1-6c86-443e-b349-8994cb0a7366",
-            "62f538f3-1820-4b82-97a3-1f389ba9e7e5",
-            "1615f7eb-0b3a-433c-adb3-267d5aacfbd1",
-            "b4f35145-d97c-43dd-be2d-fbf62febf007",
-            "f00a7b46-1101-4f52-a0fa-9e740885094d",
-            "c44db25d-fb56-4814-86ba-21fdbc832c80",
-            "3299845b-b74f-444e-bdce-a50837af6eeb"
+            "ccc04ada-78cb-4f93-855f-0dbcda32bb5f",
+            "35bdf5ba-bd92-4d71-8d09-e43c32787a68",
+            "c7c604d3-d3b3-4381-be4b-054adeab30d5",
+            "d4b1aa8f-4e39-4372-a84e-d6b9fbf1c88b",
+            "6a0f5fb8-d945-4d11-8ffa-6ed497051f7d",
+            "5877ffa8-0436-41e0-a8ff-155393fe72df",
+            "3273a055-1dc9-465c-b24e-e9885cff707b",
+            "138beb7c-cdc1-40a4-b017-81c28b331e15"
         ],
         "pengawak": [
-            "2e830d6f-b6f6-41a6-b0b2-5d58a2faeaed",
-            "20a58f4d-f6b8-4c74-b1d0-432bafed9cd9",
-            "8c2099fe-28b5-4665-9128-705066a2fc0c",
-            "4e00bb85-b5d3-4e4d-a3de-beef78f24cd3",
-            "eed31b3e-aa8a-40b3-8e54-3d37b1a2a26b",
-            "59f7af09-34d4-4570-8cd8-493a35e7513d",
-            "ae0dee23-de59-42a7-978f-91dbcc976f9b",
-            "b5929caa-48a4-4490-b962-9ae6549d119b"
+            "debc1c23-2b06-43e8-98b6-fe31b53c2969",
+            "7e53801f-8532-49ba-9947-88e8dd8ba67a",
+            "326435e3-640c-4ab7-8edb-3a199157a55e",
+            "1d37a5ff-c5bd-4fcb-9f4a-7a5b645c22ca",
+            "7a67d96f-9549-4864-aa4c-acce25717960",
+            "3d0b7c73-4828-42d9-80bd-acae78f29664",
+            "afd0bf37-9d08-43e5-8fe4-94f0a31b293b",
+            "12b6197c-3ad3-4e7a-badc-ddc956aadf38"
         ],
         "pengecet": [
-            "51272f2d-3d85-4c44-8536-25f1b0f27afa",
-            "4c49ac31-0451-4b94-b99c-abe5f5a6274c",
-            "d0a4e3bc-5fcd-4984-8449-cf92bbdb3889",
-            "1edefbb9-dfb7-481c-8ea4-b156714565a5"
+            "a4cd5a23-32e7-420b-8337-e3c83a7c8519",
+            "89a250bf-3f91-4b35-b6a6-9516d7db7c37",
+            "cf49761b-e152-4726-b7b0-ac19026e14aa",
+            "04210464-a977-499c-8fd5-3be1707f7510"
         ]
     },
     "systems": [
         {
-            "uuid": "46076930-85d5-4632-999e-4fd501f4768a",
+            "uuid": "ccc04ada-78cb-4f93-855f-0dbcda32bb5f",
             "id": 1,
             "index": 0,
             "execution": [
@@ -66,13 +66,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "734addd1-6c86-443e-b349-8994cb0a7366",
+            "uuid": "35bdf5ba-bd92-4d71-8d09-e43c32787a68",
             "id": 2,
             "index": 1,
             "label": "Kawitan_Unisono",
             "execution": [
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "goto", "seqId": 5020, "passes": [2], "nthpass": false, "tooltip": "go to KAWITAN_UNISONO_ANGSEL after pass 2", "tooltipshort": "KAWITAN_UNISONO_ANGSEL", "targetuuid": "1615f7eb-0b3a-433c-adb3-267d5aacfbd1", "targetname": "KAWITAN_UNISONO_ANGSEL"}
+                {"type": "goto", "seqId": 5020, "passes": [2], "nthpass": false, "tooltip": "go to KAWITAN_UNISONO_ANGSEL after pass 2", "tooltipshort": "KAWITAN_UNISONO_ANGSEL", "targetuuid": "d4b1aa8f-4e39-4372-a84e-d6b9fbf1c88b", "targetname": "KAWITAN_UNISONO_ANGSEL"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -89,11 +89,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "62f538f3-1820-4b82-97a3-1f389ba9e7e5",
+            "uuid": "c7c604d3-d3b3-4381-be4b-054adeab30d5",
             "id": 3,
             "index": 2,
             "execution": [
-                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN_UNISONO after pass 1", "tooltipshort": "KAWITAN_UNISONO", "targetuuid": "734addd1-6c86-443e-b349-8994cb0a7366", "targetname": "KAWITAN_UNISONO"}
+                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN_UNISONO after pass 1", "tooltipshort": "KAWITAN_UNISONO", "targetuuid": "35bdf5ba-bd92-4d71-8d09-e43c32787a68", "targetname": "KAWITAN_UNISONO"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -110,12 +110,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "1615f7eb-0b3a-433c-adb3-267d5aacfbd1",
+            "uuid": "d4b1aa8f-4e39-4372-a84e-d6b9fbf1c88b",
             "id": 4,
             "index": 3,
             "label": "Kawitan_Unisono_Angsel",
             "execution": [
-                {"type": "tempo", "seqId": 2300, "tooltip": "tempo 80 BPM beat 3", "tooltipshort": "80 BPM", "isGradual": false, "section": 3, "value": 80.0}
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u219280 BPM beat 3\u21928", "tooltipshort": "\u219280 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 80.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -132,7 +132,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "b4f35145-d97c-43dd-be2d-fbf62febf007",
+            "uuid": "6a0f5fb8-d945-4d11-8ffa-6ed497051f7d",
             "id": 5,
             "index": 4,
             "execution": [
@@ -154,7 +154,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "f00a7b46-1101-4f52-a0fa-9e740885094d",
+            "uuid": "5877ffa8-0436-41e0-a8ff-155393fe72df",
             "id": 6,
             "index": 5,
             "execution": [],
@@ -173,11 +173,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "c44db25d-fb56-4814-86ba-21fdbc832c80",
+            "uuid": "3273a055-1dc9-465c-b24e-e9885cff707b",
             "id": 7,
             "index": 6,
             "execution": [
-                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192ff beat 1\u21926", "tooltipshort": "\u2192ff", "isGradual": true, "fromSection": 1, "section": 6, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -194,12 +194,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "3299845b-b74f-444e-bdce-a50837af6eeb",
+            "uuid": "138beb7c-cdc1-40a4-b017-81c28b331e15",
             "id": 8,
             "index": 7,
             "execution": [
-                {"type": "tempo", "seqId": 2600, "tooltip": "tempo 50 BPM beat 6", "tooltipshort": "50 BPM", "isGradual": false, "section": 6, "value": 50.0},
-                {"type": "dynamics", "seqId": 4100, "tooltip": "dynamics mf1", "tooltipshort": "mf", "isGradual": false, "section": 11, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "tempo", "seqId": 2600, "tooltip": "tempo current\u219250 BPM beat 6\u219216", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 6, "section": 16, "value": 50.0},
+                {"type": "dynamics", "seqId": 4100, "tooltip": "dynamics current\u2192mf beat 11\u219216", "tooltipshort": "\u2192mf", "isGradual": true, "fromSection": 11, "section": 16, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -216,11 +216,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "2e830d6f-b6f6-41a6-b0b2-5d58a2faeaed",
+            "uuid": "debc1c23-2b06-43e8-98b6-fe31b53c2969",
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK_LINE2", "tooltipshort": "PENGAWAK_LINE2", "targetuuid": "8c2099fe-28b5-4665-9128-705066a2fc0c", "targetname": "PENGAWAK_LINE2"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK_LINE2", "tooltipshort": "PENGAWAK_LINE2", "targetuuid": "326435e3-640c-4ab7-8edb-3a199157a55e", "targetname": "PENGAWAK_LINE2"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "o", "-", "o", "o"]}, {"notation": ["o", "-", "i", "-", "O", "e", "-", "o", "-"]}, {"notation": ["i", "-", "-", "-", "o", "-", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-", "e", "-", "e", "e?"]}, {"notation": ["e", "-", "o", "-", "i", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-", "o", "-", "e", "-"]}],
@@ -237,7 +237,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "20a58f4d-f6b8-4c74-b1d0-432bafed9cd9",
+            "uuid": "7e53801f-8532-49ba-9947-88e8dd8ba67a",
             "id": 10,
             "index": 9,
             "label": "Pengawak",
@@ -259,7 +259,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "8c2099fe-28b5-4665-9128-705066a2fc0c",
+            "uuid": "326435e3-640c-4ab7-8edb-3a199157a55e",
             "id": 11,
             "index": 10,
             "label": "Pengawak_Line2",
@@ -279,13 +279,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "4e00bb85-b5d3-4e4d-a3de-beef78f24cd3",
+            "uuid": "1d37a5ff-c5bd-4fcb-9f4a-7a5b645c22ca",
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo 100 BPM on pass 3", "tooltipshort": "100 BPM", "isGradual": false, "section": 1, "value": 100.0},
-                {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": false, "tooltip": "dynamics ff on pass 3", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to END_PENGAWAK after pass 3", "tooltipshort": "END_PENGAWAK", "targetuuid": "ae0dee23-de59-42a7-978f-91dbcc976f9b", "targetname": "END_PENGAWAK"}
+                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u2192100 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u2192100 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 100.0},
+                {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": false, "tooltip": "dynamics current\u2192ff beat 1\u21928 on pass 3", "tooltipshort": "\u2192ff", "isGradual": true, "fromSection": 1, "section": 8, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to END_PENGAWAK after pass 3", "tooltipshort": "END_PENGAWAK", "targetuuid": "afd0bf37-9d08-43e5-8fe4-94f0a31b293b", "targetname": "END_PENGAWAK"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["u", "-", "-", "-", "a", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-", "a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "a", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-", "a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-", "e", "-", "u", "-"]}, {"notation": ["a", "-", "s", "-", "a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-", "u", "-", "e", "-"]}],
@@ -302,7 +302,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "eed31b3e-aa8a-40b3-8e54-3d37b1a2a26b",
+            "uuid": "7a67d96f-9549-4864-aa4c-acce25717960",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -321,11 +321,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "59f7af09-34d4-4570-8cd8-493a35e7513d",
+            "uuid": "3d0b7c73-4828-42d9-80bd-acae78f29664",
             "id": 14,
             "index": 13,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK", "tooltipshort": "PENGAWAK", "targetuuid": "20a58f4d-f6b8-4c74-b1d0-432bafed9cd9", "targetname": "PENGAWAK"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK", "tooltipshort": "PENGAWAK", "targetuuid": "7e53801f-8532-49ba-9947-88e8dd8ba67a", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["U", "e", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-", "i", "-", "o", "-"]}, {"notation": ["e", "-", "u", "-", "e", "-", "o", "-"]}, {"notation": ["i", "-", "-", "-", "o", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-", "a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "a", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-", "a", "-", "-", "-"]}],
@@ -342,12 +342,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "ae0dee23-de59-42a7-978f-91dbcc976f9b",
+            "uuid": "afd0bf37-9d08-43e5-8fe4-94f0a31b293b",
             "id": 15,
             "index": 14,
             "label": "End_Pengawak",
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 150 BPM", "tooltipshort": "150 BPM", "isGradual": false, "section": 1, "value": 150.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u2192150 BPM beat 1\u21928", "tooltipshort": "\u2192150 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 150.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "a", "-", "s", "-"]}, {"notation": ["a", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -364,11 +364,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "b5929caa-48a4-4490-b962-9ae6549d119b",
+            "uuid": "12b6197c-3ad3-4e7a-badc-ddc956aadf38",
             "id": 16,
             "index": 15,
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 200 BPM", "tooltipshort": "200 BPM", "isGradual": false, "section": 1, "value": 200.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u2192200 BPM beat 1\u21924", "tooltipshort": "\u2192200 BPM", "isGradual": true, "fromSection": 1, "section": 4, "value": 200.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a", "-", "-", "-", "i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -385,14 +385,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "51272f2d-3d85-4c44-8536-25f1b0f27afa",
+            "uuid": "a4cd5a23-32e7-420b-8337-e3c83a7c8519",
             "id": 17,
             "index": 16,
             "label": "Pengecet",
             "execution": [
                 {"type": "tempo", "seqId": 2110, "passes": [1, 2], "nthpass": false, "tooltip": "tempo 100 BPM on passes 1 & 2", "tooltipshort": "100 BPM", "isGradual": false, "section": 1, "value": 100.0},
-                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to PENGECET_END after pass 3", "tooltipshort": "PENGECET_END", "targetuuid": "d0a4e3bc-5fcd-4984-8449-cf92bbdb3889", "targetname": "PENGECET_END"}
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192mf beat 1\u21924", "tooltipshort": "\u2192mf", "isGradual": true, "fromSection": 1, "section": 4, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to PENGECET_END after pass 3", "tooltipshort": "PENGECET_END", "targetuuid": "cf49761b-e152-4726-b7b0-ac19026e14aa", "targetname": "PENGECET_END"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -409,12 +409,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "4c49ac31-0451-4b94-b99c-abe5f5a6274c",
+            "uuid": "89a250bf-3f91-4b35-b6a6-9516d7db7c37",
             "id": 18,
             "index": 17,
             "execution": [
-                {"type": "tempo", "seqId": 3420, "passes": [2], "nthpass": false, "tooltip": "tempo 110 BPM4 on pass 2", "tooltipshort": "110 BPM", "isGradual": false, "section": 14, "value": 110.0},
-                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGECET", "tooltipshort": "PENGECET", "targetuuid": "51272f2d-3d85-4c44-8536-25f1b0f27afa", "targetname": "PENGECET"}
+                {"type": "tempo", "seqId": 3420, "passes": [2], "nthpass": false, "tooltip": "tempo current\u2192110 BPM beat 14\u219216 on pass 2", "tooltipshort": "\u2192110 BPM", "isGradual": true, "fromSection": 14, "section": 16, "value": 110.0},
+                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGECET", "tooltipshort": "PENGECET", "targetuuid": "a4cd5a23-32e7-420b-8337-e3c83a7c8519", "targetname": "PENGECET"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -431,13 +431,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "d0a4e3bc-5fcd-4984-8449-cf92bbdb3889",
+            "uuid": "cf49761b-e152-4726-b7b0-ac19026e14aa",
             "id": 19,
             "index": 18,
             "label": "Pengecet_End",
             "execution": [
-                {"type": "tempo", "seqId": 2300, "tooltip": "tempo 50 BPM beat 3", "tooltipshort": "50 BPM", "isGradual": false, "section": 3, "value": 50.0},
-                {"type": "dynamics", "seqId": 4300, "tooltip": "dynamics f3", "tooltipshort": "f", "isGradual": false, "section": 13, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u219250 BPM beat 3\u219216", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 3, "section": 16, "value": 50.0},
+                {"type": "dynamics", "seqId": 4300, "tooltip": "dynamics f beat 13", "tooltipshort": "f", "isGradual": false, "section": 13, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "-", "o"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -454,7 +454,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "1edefbb9-dfb7-481c-8ea4-b156714565a5",
+            "uuid": "04210464-a977-499c-8fd5-3be1707f7510",
             "id": 20,
             "index": 19,
             "execution": [],

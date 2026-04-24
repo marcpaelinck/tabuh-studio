@@ -4,6 +4,7 @@ export interface TestData {
     outputfile?: string // if given, the score will be output here (only used for notationParser test). Otherwise it will be output to the console
 }
 
+// Enables to select a specific file by id for testing
 export const tabuhScores: Record<number, string> = {
     1: 'bapang selisir gk.tsv',
     2: 'bapang selisir sp.tsv',
@@ -31,7 +32,8 @@ export const tabuhScores: Record<number, string> = {
     24: 'sekar gendot sp.tsv',
     25: 'sinom ladrang gk.tsv',
     26: 'sinom ladrang sp.tsv',
-    27: 'teruna jaya.tsv'
+    27: 'teruna jaya.tsv',
+    28: 'manuk rawa.tsv'
 }
 
 export const parserTestData = (id: number): TestData => {

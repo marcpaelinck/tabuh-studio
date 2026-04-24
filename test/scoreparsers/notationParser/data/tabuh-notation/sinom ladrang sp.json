@@ -1,5 +1,5 @@
 {
-    "uuid": "d4cce960-6a1a-4082-8196-9479f0620466",
+    "uuid": "46d5b5c6-1c6e-422a-8682-6f9f525be3ed",
     "title": "Sinom Ladrang SP",
     "composer": "",
     "instrumenttype": "SEMAR_PAGULINGAN",
@@ -17,31 +17,31 @@
     ],
     "parts": {
         "pengawak": [
-            "363f3d7a-f507-4150-b9de-68f7b9596dd8",
-            "52196c81-5785-4005-b904-9809e2edcf9e",
-            "7a1be3b2-2f49-4e83-a6c5-5ba75bec8ab6",
-            "a31a598a-c3c0-4bd6-9495-3542f826d148",
-            "c0e51136-fb68-4b01-8535-b67cf7a3de2e"
+            "f81865db-8b0b-486e-81fa-124eb624f2af",
+            "61376fbf-4ced-49f2-89c5-f6edf1d374a3",
+            "8a872a83-b40f-4aeb-9087-3b9460e9fe5f",
+            "8b3dedfd-8499-4175-b753-bb19a5f6f57b",
+            "34fec80d-9b2d-46a6-81a3-c8abff6ad234"
         ],
         "pengecet": [
-            "a975cf9a-7965-4ba3-84e6-23519916723f",
-            "bd04dc67-8000-40bf-a00c-e0fb3d69f38f",
-            "0e6776d4-a5ba-46d2-9115-de893a81b669",
-            "283f920e-db8c-4ada-9329-23255c076a7d",
-            "a117a867-56f6-4002-8f10-adfb94a8e4ce",
-            "dbd43fad-3179-4d4e-b9b7-7547d7dfaf44",
-            "9a94bde6-43ec-4dc2-9b0d-6d077a3b9077",
-            "85a7eeea-54e4-47a7-9831-1114b8e18c0e",
-            "25c4f185-6106-48c6-bffa-5c2feb36fed7",
-            "264533f3-0743-4bb9-b91b-8f3de1e53432",
-            "a62fff16-b2dd-471d-af62-a4ea5ec77a75",
-            "17da8e56-27f3-4b93-acd9-e8f6c54c25be",
-            "06423197-331f-405b-a35c-2d724805a9a8"
+            "c3c5e3a8-34dc-43bd-b264-3c119e60ac3a",
+            "6addffbe-6b7d-44be-811f-01a8a3ee3f75",
+            "de7129d0-7fc4-4968-aebb-ee6a40e8cf56",
+            "2b6aa12b-2f59-4058-9420-41894c54a505",
+            "104aed67-eb7e-48e6-b08a-50cbde59f3c1",
+            "193d32f0-264e-4843-a3c9-d414785e1654",
+            "0e3e5cbe-6ff9-4d5f-8294-299f29edf47c",
+            "37e7ea8a-22b4-4014-9e3f-1a36e479ab5e",
+            "0686b92e-56cf-4fba-975c-07fe8d644ffc",
+            "54ff33a9-1c5a-4613-8c2a-9004aa3a2f42",
+            "a847622b-a845-4f70-9211-d8fb331727d3",
+            "324735f3-b2ce-4844-85d0-7e7277f7c746",
+            "2bdbe603-4d44-4eea-93a8-86d39cf538e7"
         ]
     },
     "systems": [
         {
-            "uuid": "ee1d447d-43b3-4976-b9e1-f6ae13a5fd4b",
+            "uuid": "82576bfb-9244-408f-8088-e61c53a7fd06",
             "id": 1,
             "index": 0,
             "execution": [
@@ -63,7 +63,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "2b81b046-0ecb-4f5d-ac47-68bf2b2c6da6",
+            "uuid": "0996f1c5-cc7b-4cfa-96c2-6ad9c633ea1d",
             "id": 2,
             "index": 1,
             "execution": [],
@@ -83,7 +83,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "2cdfbc77-99f5-482d-89c3-25d43c3fc1e7",
+            "uuid": "c72578cd-7720-46bc-a049-10a599196bed",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -103,11 +103,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "92fdd355-2669-4752-a539-90cbdb3d5c69",
+            "uuid": "82f52746-b7e9-4ed4-8a13-3ec5edb3d6b2",
             "id": 4,
             "index": 3,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK_1", "tooltipshort": "PENGAWAK_1", "targetuuid": "363f3d7a-f507-4150-b9de-68f7b9596dd8", "targetname": "PENGAWAK_1"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK_1", "tooltipshort": "PENGAWAK_1", "targetuuid": "f81865db-8b0b-486e-81fa-124eb624f2af", "targetname": "PENGAWAK_1"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["u,", "-", "e,", "-", "a,:", "u,:", "a,/", ".", ".", ".", ".", "o,", "e,_"]}, {"notation": ["u,", "-", "-", "-", "-", "-", "-", "-", "a,", "-", "i", "-", "o", "-", "e", "-", "u/", "e_", "u", "-", "-", "-", "u_", "e/", "u_", "e", "-", "-", "-", "o", "e", "u_", "u/", "e_"]}, {"notation": ["u", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -125,13 +125,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "363f3d7a-f507-4150-b9de-68f7b9596dd8",
+            "uuid": "f81865db-8b0b-486e-81fa-124eb624f2af",
             "id": 5,
             "index": 4,
             "label": "Pengawak_1",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 50 BPM", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50.0},
-                {"type": "goto", "seqId": 5000, "tooltip": "go to CONTINUE", "tooltipshort": "CONTINUE", "targetuuid": "7a1be3b2-2f49-4e83-a6c5-5ba75bec8ab6", "targetname": "CONTINUE"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to CONTINUE", "tooltipshort": "CONTINUE", "targetuuid": "8a872a83-b40f-4aeb-9087-3b9460e9fe5f", "targetname": "CONTINUE"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "-"]}, {"notation": ["u", "u", "e", "-", "U", "a", "-", "-", "a"]}, {"notation": ["u", "-", "-", "-", "u", "-", "u", "e"]}, {"notation": ["u", "u", "e", "u", "a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-", "u", "u", "e", "u"]}, {"notation": ["a", "-", "-", "u", "e", "u", "a", "a"]}],
@@ -149,14 +149,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "52196c81-5785-4005-b904-9809e2edcf9e",
+            "uuid": "61376fbf-4ced-49f2-89c5-f6edf1d374a3",
             "id": 6,
             "index": 5,
             "label": "Pengawak",
             "execution": [
                 {"type": "tempo", "seqId": 2110, "passes": [1], "nthpass": false, "tooltip": "tempo 50 BPM on pass 1", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50.0},
                 {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo 60 BPM on pass 2", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60.0},
-                {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current \u219250 BPM beat 8\u21929 on pass 2", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 8, "section": 9, "value": 50.0}
+                {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 8 on pass 2", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 8, "section": 8, "value": 50.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "-"]}, {"notation": ["u", "u", "e", "-", "U", "a", "-", "-", "a"]}, {"notation": ["u", "-", "-", "-", "u", "-", "u", "e"]}, {"notation": ["u", "u", "e", "u", "a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-", "u", "u", "e", "u"]}, {"notation": ["a", "-", "-", "u", "e", "u", "a", "a"]}],
@@ -174,7 +174,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "7a1be3b2-2f49-4e83-a6c5-5ba75bec8ab6",
+            "uuid": "8a872a83-b40f-4aeb-9087-3b9460e9fe5f",
             "id": 7,
             "index": 6,
             "label": "Continue",
@@ -195,11 +195,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "a31a598a-c3c0-4bd6-9495-3542f826d148",
+            "uuid": "8b3dedfd-8499-4175-b753-bb19a5f6f57b",
             "id": 8,
             "index": 7,
             "execution": [
-                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current \u219265 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u219265 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 65.0}
+                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219265 BPM beat 1\u21927 on pass 3", "tooltipshort": "\u219265 BPM", "isGradual": true, "fromSection": 1, "section": 7, "value": 65.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "a,", "u,", "a,", "i"]}, {"notation": ["o", "-", "-", "-", "e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-", "i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-", "u", "-", "u", "."]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "u"]}, {"notation": ["a", "-", "-", "-", "u", "-", "-", "u"]}, {"notation": ["e", "-", "-", "e", "o", "e", "u", "u"]}],
@@ -217,13 +217,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "c0e51136-fb68-4b01-8535-b67cf7a3de2e",
+            "uuid": "34fec80d-9b2d-46a6-81a3-c8abff6ad234",
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current \u219290 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 90.0},
-                {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current \u219247 BPM beat 5\u21928 on passes 1 & 2", "tooltipshort": "\u219247 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 47.0},
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "52196c81-5785-4005-b904-9809e2edcf9e", "targetname": "PENGAWAK"}
+                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219290 BPM beat 1\u21927 on pass 3", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 1, "section": 7, "value": 90.0},
+                {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current\u219247 BPM beat 5\u21928 on passes 1 & 2", "tooltipshort": "\u219247 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 47.0},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "61376fbf-4ced-49f2-89c5-f6edf1d374a3", "targetname": "PENGAWAK"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["e", "-", "-", "-", "e", "-", "e", "e/"]}, {"notation": ["e", "-", "u", "-", "a", "-", "s", "a"]}, {"notation": ["u", "-", "-", "e", "o", "-", "e", "-"]}, {"notation": ["u", "-", "o", "-", "e", "o", "u", "e"]}, {"notation": ["o", "-", "-", "-", "o", "-", "o", "o/"]}, {"notation": ["o", "e", "u", "-", "e", "u", "o", "e"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "e/"]}, {"notation": ["e", "-", "u", "-", "a", "-", "s", "a"]}],
@@ -241,7 +241,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "a975cf9a-7965-4ba3-84e6-23519916723f",
+            "uuid": "c3c5e3a8-34dc-43bd-b264-3c119e60ac3a",
             "id": 10,
             "index": 9,
             "execution": [
@@ -264,7 +264,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "bd04dc67-8000-40bf-a00c-e0fb3d69f38f",
+            "uuid": "6addffbe-6b7d-44be-811f-01a8a3ee3f75",
             "id": 11,
             "index": 10,
             "label": "Pengecet_Loop",
@@ -288,7 +288,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "0e6776d4-a5ba-46d2-9115-de893a81b669",
+            "uuid": "de7129d0-7fc4-4968-aebb-ee6a40e8cf56",
             "id": 12,
             "index": 11,
             "execution": [],
@@ -308,7 +308,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "283f920e-db8c-4ada-9329-23255c076a7d",
+            "uuid": "2b6aa12b-2f59-4058-9420-41894c54a505",
             "id": 13,
             "index": 12,
             "execution": [],
@@ -328,7 +328,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "a117a867-56f6-4002-8f10-adfb94a8e4ce",
+            "uuid": "104aed67-eb7e-48e6-b08a-50cbde59f3c1",
             "id": 14,
             "index": 13,
             "execution": [],
@@ -348,7 +348,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "dbd43fad-3179-4d4e-b9b7-7547d7dfaf44",
+            "uuid": "193d32f0-264e-4843-a3c9-d414785e1654",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -368,7 +368,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "9a94bde6-43ec-4dc2-9b0d-6d077a3b9077",
+            "uuid": "0e3e5cbe-6ff9-4d5f-8294-299f29edf47c",
             "id": 16,
             "index": 15,
             "execution": [],
@@ -388,11 +388,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "85a7eeea-54e4-47a7-9831-1114b8e18c0e",
+            "uuid": "37e7ea8a-22b4-4014-9e3f-1a36e479ab5e",
             "id": 17,
             "index": 16,
             "execution": [
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to FINAL after pass 3", "tooltipshort": "FINAL", "targetuuid": "a62fff16-b2dd-471d-af62-a4ea5ec77a75", "targetname": "FINAL"}
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to FINAL after pass 3", "tooltipshort": "FINAL", "targetuuid": "a847622b-a845-4f70-9211-d8fb331727d3", "targetname": "FINAL"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["u,", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}],
@@ -410,7 +410,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "25c4f185-6106-48c6-bffa-5c2feb36fed7",
+            "uuid": "0686b92e-56cf-4fba-975c-07fe8d644ffc",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -430,12 +430,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "264533f3-0743-4bb9-b91b-8f3de1e53432",
+            "uuid": "54ff33a9-1c5a-4613-8c2a-9004aa3a2f42",
             "id": 19,
             "index": 18,
             "execution": [
-                {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current \u219295 BPM beat 3\u21928 on pass 2", "tooltipshort": "\u219295 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 95.0},
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET_LOOP after passes 1 & 2", "tooltipshort": "PENGECET_LOOP", "targetuuid": "bd04dc67-8000-40bf-a00c-e0fb3d69f38f", "targetname": "PENGECET_LOOP"}
+                {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219295 BPM beat 3\u21928 on pass 2", "tooltipshort": "\u219295 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 95.0},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET_LOOP after passes 1 & 2", "tooltipshort": "PENGECET_LOOP", "targetuuid": "6addffbe-6b7d-44be-811f-01a8a3ee3f75", "targetname": "PENGECET_LOOP"}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["a", "-", "e", "-"]}],
@@ -453,12 +453,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "a62fff16-b2dd-471d-af62-a4ea5ec77a75",
+            "uuid": "a847622b-a845-4f70-9211-d8fb331727d3",
             "id": 20,
             "index": 19,
             "label": "Final",
             "execution": [
-                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current \u219270 BPM beat 3\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 70.0}
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u219270 BPM beat 3\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 70.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["a", "-", "-", "a"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["a", "-", "s", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["a", "-", "-", "e"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "u", "-"]}],
@@ -476,11 +476,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "17da8e56-27f3-4b93-acd9-e8f6c54c25be",
+            "uuid": "324735f3-b2ce-4844-85d0-7e7277f7c746",
             "id": 21,
             "index": 20,
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current \u219260 BPM beat 1\u21926", "tooltipshort": "\u219260 BPM", "isGradual": true, "fromSection": 1, "section": 6, "value": 60.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u219260 BPM beat 1\u21925", "tooltipshort": "\u219260 BPM", "isGradual": true, "fromSection": 1, "section": 5, "value": 60.0}
             ],
             "staffs": {
                 "TROMPONG": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["a", "-", "e", "-"]}],
@@ -498,7 +498,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "06423197-331f-405b-a35c-2d724805a9a8",
+            "uuid": "2bdbe603-4d44-4eea-93a8-86d39cf538e7",
             "id": 22,
             "index": 21,
             "execution": [],

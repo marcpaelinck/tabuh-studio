@@ -55,14 +55,14 @@ jegogan	u	a	u	e	e	a	u	e
 gong	G
 
 
-	{TEMPO 57 beats=1->7}
+	{TEMPO 57 beats=1->8}
 ugal	u,-------	a,-i-u,-a,-	i---o-e-	o---i---	a,-----i-	o---e-o-	i---o-i-	a,-o-i-a,-
 gangsa p	u,.u,a,.u,.a,	u,a,.u,a,.u,a,	.u,.a,u,.u,a,	.ia,.ia,.i	a,.a,i.a,.i	a,.ii.i.o	i.io.i.o	ia,u,.a,u,.a,
 gangsa s	oio.ioi.	o.io.io.	ioi.oio.	i.eo.eo.	eoe.oeo.	e.i.e.eo	.e.oe.eo	.eoi.oi.
 calung	u-------	a-i-u-a-	i---o-e-	o---i---	a-----i-	o---e-o-	i---o-i-	a-o-i-a-
 jegogan	u	a	i	o	a	o	i	a
 
-	{TEMPO ->50 beat=7 passes=[1,2]}
+	{TEMPO ->50 beat=7->8 passes=[1,2]}
 	{TEMPO 120 beats=4->8 passes=[3]}
 ugal	u,-------	a,---i-a,-	u,-a,-u,---	e---o-u,-	e-----u,-	a,---i-a,-	u,-a,-u,---	e-u,-a,---
 gangsa p	u,.u,a,.u,.a,	u,.u,a,.u,.a,	u,.u,a,.u,.a,	u,o.io.io	.i.oi.io	.a,u,.a,u,.a,	u,.u,a,.u,.a,	u,.u,a,.u,.a,

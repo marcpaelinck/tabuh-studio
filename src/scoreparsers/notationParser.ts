@@ -25,7 +25,7 @@ import type {
 } from '../typing/types.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
-import { tagLookup } from './notationUtils.ts'
+import { lineNr, tagLookup } from './notationUtils.ts'
 
 type ValueType =
     | 'IntegerValue'
@@ -63,6 +63,7 @@ export function parseNotation(content: string): ParserReturnValue {
     var gonganCounter = 0
 
     const traverse = (node: SyntaxNode) => {
+        const line = lineNr(content, node.from)
         switch (node.name) {
             case 'InfoMetadata': {
                 const scoreSettings = {
@@ -85,6 +86,7 @@ export function parseNotation(content: string): ParserReturnValue {
                     uuid: systemuuid,
                     id: gonganCounter,
                     index: gonganCounter - 1,
+                    line: lineNr(content, node.from),
                     notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
                     editorGroup: [],
                     staffs: {},
@@ -512,7 +514,7 @@ function parseMetadata(
                 return undefined
             }
             const parameters = Object.assign(
-                getGradualBeatsParameters(node, content),
+                getGradualBeatsParameters(node, content, value.isGradual),
                 getMetadataParameters(node, ['passes', 'iterations', 'nthpass', 'positions'], content)
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
@@ -591,7 +593,7 @@ function parseMetadata(
                 return undefined
             }
             const parameters = Object.assign(
-                getGradualBeatsParameters(node, content),
+                getGradualBeatsParameters(node, content, value.isGradual),
                 getMetadataParameters(node, ['passes', 'nthpass', 'iterations'], content)
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
@@ -618,7 +620,7 @@ function parseMetadata(
 // metadatanode: root node of the metadata item
 // paramList: list of parameter names. Each parameter will be returned as a pair `paramName`: `paramvalue`
 function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], content: string): Record<string, any> {
-    const parameters: Record<string, string> = {}
+    const parameters: Record<string, any> = {}
     for (const paramName of paramList) {
         var param: any
         switch (paramName) {
@@ -682,6 +684,7 @@ function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], co
         }
         Object.assign(parameters, param)
     }
+    if (parameters.passes && !parameters.nthpass) parameters.nthpass = false
     return parameters
 }
 
@@ -724,10 +727,13 @@ interface BeatsParameter {
 }
 // Grammar definition:
 // BeatsParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
-function getGradualBeatsParameters(node: SyntaxNode, content: string): BeatsParameter {
+// valueGradual: whether the (dynamics or tempo) value is gradual (contains a `->`).
+function getGradualBeatsParameters(node: SyntaxNode, content: string, valueGradual: boolean): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
+    const gradual: boolean = valueGradual || values.isGradual
     const param: BeatsParameter = {
-        fromSection: (values.fromValue as number) || (values.isGradual ? 1 : (values.value as number)),
+        fromSection: (values.fromValue as number) || (gradual ? (values.value as number) : undefined),
+        // fromSection: values.isGradual ? (values.fromValue as number) || 1 : (values.fromValue as number),
         section: (values.value as number) || 1,
         isGradual: values.isGradual
     }

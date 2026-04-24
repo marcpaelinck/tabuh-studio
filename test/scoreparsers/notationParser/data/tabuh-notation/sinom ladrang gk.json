@@ -1,5 +1,5 @@
 {
-    "uuid": "b59acf7d-ab8c-400f-8880-951a2a803186",
+    "uuid": "58b70e72-34f0-4c5a-bdda-d0503a2d5f32",
     "title": "Sinom Ladrang GK",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -17,31 +17,31 @@
     ],
     "parts": {
         "pengawak": [
-            "af9f21d5-5d12-4f5c-842d-2e707b0887c2",
-            "25c76e51-8832-436d-8701-130d2c1dfd9c",
-            "459e7e6b-da88-4ad2-888c-9d8d6888bbdf",
-            "b3035c64-0cde-4c07-8af1-9568b10a231b",
-            "df6fed54-bfe7-4692-8d2b-d968f69b0eaa"
+            "ae87ad5e-3fdc-409d-8569-8fe297649909",
+            "6579a98e-375e-456d-9af9-c459fab34bdc",
+            "656dc9a2-b714-48ec-bd1e-a3b796956368",
+            "fdb71e7d-6945-48a2-a2d0-e5c1dd2b208c",
+            "81f5385f-dfd0-4c12-99f1-8065f8bfc0bc"
         ],
         "pengecet": [
-            "52a19549-f067-49c7-bdee-3ce55f7aae53",
-            "b435aed9-6ed9-43c3-b699-b03117824704",
-            "2d43a9e2-5d2f-4b94-a302-da2b5215e5e1",
-            "8c11c62b-ec93-456d-89e4-82a080e250ce",
-            "d7ee79dd-03b6-4a49-a0c3-688f46666617",
-            "b1d6bf66-3334-4ba3-bdd2-99b69dfa0960",
-            "b9cd5c8e-4a0a-4938-a264-62b400f1f077",
-            "f5a9b1dd-59b3-40df-8857-e3bc69b7ab28",
-            "3c1edcd9-a044-472b-86fd-78d47ba0edf7",
-            "cc557387-4ea5-4f27-bbe1-772113d2655b",
-            "95171021-8db9-42c2-b3ce-eea3d86eff80",
-            "b1a950af-9752-459b-bb88-d17a148899a6",
-            "0f0119b7-0c9a-4b2b-b52b-2eaa0b658f35"
+            "94b5277b-cc6f-4594-9140-3d7c4f207370",
+            "acb8c943-99e2-4dcf-bfe8-3e9dc0ae702a",
+            "878a4137-582c-4c5f-aacd-7c1fcd9d2b12",
+            "7c1d017a-bb19-4d55-9fd9-a2c024b9bfc3",
+            "086cd968-8a39-4802-b5e1-dc8d0d0649bb",
+            "aba51374-6dbe-4b58-8f78-ffef010df5c4",
+            "770b714d-5204-48d3-b420-8c5b66252c55",
+            "1b1579cd-427b-43c1-b34a-bc0b25b12135",
+            "8c073185-0782-4596-9053-dff665924512",
+            "070e7566-9a1f-41ca-8346-50e2685e0b77",
+            "951cc928-c2b1-4259-8658-30f150188959",
+            "850dcee0-0548-4d39-8866-f18b88b2dfac",
+            "8e7ad829-48c7-44f6-bc07-6d494d0ed890"
         ]
     },
     "systems": [
         {
-            "uuid": "786211d2-b825-4b9f-8b10-56bb141f11cd",
+            "uuid": "60f7baf6-41ac-43e3-a27f-9d29a548ca57",
             "id": 1,
             "index": 0,
             "execution": [
@@ -63,7 +63,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "ff9e9cd8-3a7f-4a78-b215-b6a1a67a3ade",
+            "uuid": "42a1b3fa-383a-4052-bda7-69b4bc47c0fa",
             "id": 2,
             "index": 1,
             "execution": [
@@ -85,7 +85,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "e22e8230-6370-4eb7-8560-13ca09e4a038",
+            "uuid": "788315d9-5148-4e97-b992-bfc0f1c6a524",
             "id": 3,
             "index": 2,
             "execution": [],
@@ -105,7 +105,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "26eb2180-379c-48ae-b4dd-064d38177051",
+            "uuid": "0804e47e-bbb2-4c0a-af6e-7d3c591d3304",
             "id": 4,
             "index": 3,
             "execution": [
@@ -127,7 +127,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "66f08a6b-349d-47ca-84f9-e1bdc3759a4a",
+            "uuid": "40fb0a79-15ee-422d-8940-5fb953915650",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -147,7 +147,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6d3fe406-6b8f-4f7e-8ee5-b72344749393",
+            "uuid": "0ceb62b8-9f5b-4ba8-a822-6ecf2fb2bd02",
             "id": 6,
             "index": 5,
             "execution": [],
@@ -167,11 +167,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "7b9bd09d-c057-4888-877f-e2b14e9b377a",
+            "uuid": "b3caab2a-e7c1-4de6-bf5e-20769511c4bc",
             "id": 7,
             "index": 6,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to A1", "tooltipshort": "A1", "targetuuid": "af9f21d5-5d12-4f5c-842d-2e707b0887c2", "targetname": "A1"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to A1", "tooltipshort": "A1", "targetuuid": "ae87ad5e-3fdc-409d-8569-8fe297649909", "targetname": "A1"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
@@ -189,13 +189,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "af9f21d5-5d12-4f5c-842d-2e707b0887c2",
+            "uuid": "ae87ad5e-3fdc-409d-8569-8fe297649909",
             "id": 8,
             "index": 7,
             "label": "A1",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 50 BPM", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50.0},
-                {"type": "goto", "seqId": 5000, "tooltip": "go to CONTINUE", "tooltipshort": "CONTINUE", "targetuuid": "459e7e6b-da88-4ad2-888c-9d8d6888bbdf", "targetname": "CONTINUE"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to CONTINUE", "tooltipshort": "CONTINUE", "targetuuid": "656dc9a2-b714-48ec-bd1e-a3b796956368", "targetname": "CONTINUE"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "-"]}, {"notation": ["u", "u", "e", "-", "U", "a", "-", "-", "a"]}, {"notation": ["u", "-", "-", "-", "u", "-", "u", "e"]}, {"notation": ["u", "u", "e", "u", "a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-", "u", "u", "e", "u"]}, {"notation": ["a", "-", "-", "u", "e", "u", "a", "a"]}],
@@ -213,14 +213,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "25c76e51-8832-436d-8701-130d2c1dfd9c",
+            "uuid": "6579a98e-375e-456d-9af9-c459fab34bdc",
             "id": 9,
             "index": 8,
             "label": "A",
             "execution": [
                 {"type": "tempo", "seqId": 2110, "passes": [1], "nthpass": false, "tooltip": "tempo 50 BPM on pass 1", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50.0},
                 {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo 60 BPM on pass 2", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60.0},
-                {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current \u219250 BPM beat 8\u21929 on pass 2", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 8, "section": 9, "value": 50.0}
+                {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 8 on pass 2", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 8, "section": 8, "value": 50.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "-"]}, {"notation": ["u", "u", "e", "-", "U", "a", "-", "-", "a"]}, {"notation": ["u", "-", "-", "-", "u", "-", "u", "e"]}, {"notation": ["u", "u", "e", "u", "a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-", "u", "u", "e", "u"]}, {"notation": ["a", "-", "-", "u", "e", "u", "a", "a"]}],
@@ -238,7 +238,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "459e7e6b-da88-4ad2-888c-9d8d6888bbdf",
+            "uuid": "656dc9a2-b714-48ec-bd1e-a3b796956368",
             "id": 10,
             "index": 9,
             "label": "Continue",
@@ -259,11 +259,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "b3035c64-0cde-4c07-8af1-9568b10a231b",
+            "uuid": "fdb71e7d-6945-48a2-a2d0-e5c1dd2b208c",
             "id": 11,
             "index": 10,
             "execution": [
-                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current \u219265 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u219265 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 65.0}
+                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219265 BPM beat 1\u21927 on pass 3", "tooltipshort": "\u219265 BPM", "isGradual": true, "fromSection": 1, "section": 7, "value": 65.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "a,", "u,", "a,", "i"]}, {"notation": ["o", "-", "-", "-", "e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-", "i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-", "u", "-", "u", "."]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "u"]}, {"notation": ["a", "-", "-", "-", "u", "-", "-", "u"]}, {"notation": ["e", "-", "-", "e", "o", "e", "u", "u"]}],
@@ -281,13 +281,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "df6fed54-bfe7-4692-8d2b-d968f69b0eaa",
+            "uuid": "81f5385f-dfd0-4c12-99f1-8065f8bfc0bc",
             "id": 12,
             "index": 11,
             "execution": [
-                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current \u219290 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 90.0},
-                {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current \u219247 BPM beat 5\u21928 on passes 1 & 2", "tooltipshort": "\u219247 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 47.0},
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to A after passes 1 & 2", "tooltipshort": "A", "targetuuid": "25c76e51-8832-436d-8701-130d2c1dfd9c", "targetname": "A"}
+                {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219290 BPM beat 1\u21928 on pass 3", "tooltipshort": "\u219290 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 90.0},
+                {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current\u219247 BPM beat 5\u21928 on passes 1 & 2", "tooltipshort": "\u219247 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 47.0},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to A after passes 1 & 2", "tooltipshort": "A", "targetuuid": "6579a98e-375e-456d-9af9-c459fab34bdc", "targetname": "A"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-", "e", "-", "e", "e/"]}, {"notation": ["e", "-", "u", "-", "a", "-", "i<", "a"]}, {"notation": ["u", "-", "-", "e", "o", "-", "e", "-"]}, {"notation": ["u", "-", "o", "-", "e", "o", "u", "e"]}, {"notation": ["o", "-", "-", "-", "o", "-", "o", "o/"]}, {"notation": ["o", "e", "u", "-", "e", "u", "o", "e"]}, {"notation": ["u", "-", "a", "-", "u", "-", "e", "e/"]}, {"notation": ["e", "-", "u", "-", "a", "-", "i<", "a"]}],
@@ -305,7 +305,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "52a19549-f067-49c7-bdee-3ce55f7aae53",
+            "uuid": "94b5277b-cc6f-4594-9140-3d7c4f207370",
             "id": 13,
             "index": 12,
             "execution": [
@@ -328,7 +328,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "b435aed9-6ed9-43c3-b699-b03117824704",
+            "uuid": "acb8c943-99e2-4dcf-bfe8-3e9dc0ae702a",
             "id": 14,
             "index": 13,
             "label": "B",
@@ -352,7 +352,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "2d43a9e2-5d2f-4b94-a302-da2b5215e5e1",
+            "uuid": "878a4137-582c-4c5f-aacd-7c1fcd9d2b12",
             "id": 15,
             "index": 14,
             "execution": [],
@@ -372,7 +372,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "8c11c62b-ec93-456d-89e4-82a080e250ce",
+            "uuid": "7c1d017a-bb19-4d55-9fd9-a2c024b9bfc3",
             "id": 16,
             "index": 15,
             "execution": [],
@@ -392,7 +392,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "d7ee79dd-03b6-4a49-a0c3-688f46666617",
+            "uuid": "086cd968-8a39-4802-b5e1-dc8d0d0649bb",
             "id": 17,
             "index": 16,
             "execution": [],
@@ -412,7 +412,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "b1d6bf66-3334-4ba3-bdd2-99b69dfa0960",
+            "uuid": "aba51374-6dbe-4b58-8f78-ffef010df5c4",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -432,7 +432,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "b9cd5c8e-4a0a-4938-a264-62b400f1f077",
+            "uuid": "770b714d-5204-48d3-b420-8c5b66252c55",
             "id": 19,
             "index": 18,
             "execution": [],
@@ -452,11 +452,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "f5a9b1dd-59b3-40df-8857-e3bc69b7ab28",
+            "uuid": "1b1579cd-427b-43c1-b34a-bc0b25b12135",
             "id": 20,
             "index": 19,
             "execution": [
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to D after pass 3", "tooltipshort": "D", "targetuuid": "95171021-8db9-42c2-b3ce-eea3d86eff80", "targetname": "D"}
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to D after pass 3", "tooltipshort": "D", "targetuuid": "951cc928-c2b1-4259-8658-30f150188959", "targetname": "D"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}],
@@ -474,7 +474,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "3c1edcd9-a044-472b-86fd-78d47ba0edf7",
+            "uuid": "8c073185-0782-4596-9053-dff665924512",
             "id": 21,
             "index": 20,
             "execution": [],
@@ -494,12 +494,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "cc557387-4ea5-4f27-bbe1-772113d2655b",
+            "uuid": "070e7566-9a1f-41ca-8346-50e2685e0b77",
             "id": 22,
             "index": 21,
             "execution": [
-                {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current \u219295 BPM beat 3\u21928 on pass 2", "tooltipshort": "\u219295 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 95.0},
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to B after passes 1 & 2", "tooltipshort": "B", "targetuuid": "b435aed9-6ed9-43c3-b699-b03117824704", "targetname": "B"}
+                {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219295 BPM beat 3\u21928 on pass 2", "tooltipshort": "\u219295 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 95.0},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to B after passes 1 & 2", "tooltipshort": "B", "targetuuid": "acb8c943-99e2-4dcf-bfe8-3e9dc0ae702a", "targetname": "B"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["a", "-", "e", "-"]}],
@@ -517,12 +517,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "95171021-8db9-42c2-b3ce-eea3d86eff80",
+            "uuid": "951cc928-c2b1-4259-8658-30f150188959",
             "id": 23,
             "index": 22,
             "label": "D",
             "execution": [
-                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current \u219270 BPM beat 3\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 70.0}
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u219270 BPM beat 3\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 70.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a", "-", "-", "a"]}, {"notation": ["a", "-", "a", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["a", "-", "-", "e"]}, {"notation": ["e", "-", "e", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["e", "-", "u", "-"]}],
@@ -540,11 +540,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "b1a950af-9752-459b-bb88-d17a148899a6",
+            "uuid": "850dcee0-0548-4d39-8866-f18b88b2dfac",
             "id": 24,
             "index": 23,
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current \u219260 BPM beat 1\u21926", "tooltipshort": "\u219260 BPM", "isGradual": true, "fromSection": 1, "section": 6, "value": 60.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u219260 BPM beat 1\u21925", "tooltipshort": "\u219260 BPM", "isGradual": true, "fromSection": 1, "section": 5, "value": 60.0}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["a", "-", "e", "-"]}],
@@ -562,7 +562,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "0f0119b7-0c9a-4b2b-b52b-2eaa0b658f35",
+            "uuid": "8e7ad829-48c7-44f6-bc07-6d494d0ed890",
             "id": 25,
             "index": 24,
             "execution": [],

@@ -1,5 +1,5 @@
 {
-    "uuid": "f7feb19a-386c-4966-bcc8-17d4d7dea86b",
+    "uuid": "fec4145d-b117-43b4-8695-1a2422338aed",
     "title": "Bapang Selisir GK",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -17,7 +17,7 @@
     "parts": {},
     "systems": [
         {
-            "uuid": "21b6b2fa-acd8-4cbc-96d2-0bf830b10c2f",
+            "uuid": "2b61ad9e-f75c-4044-881a-85990e557eae",
             "id": 1,
             "index": 0,
             "execution": [
@@ -38,7 +38,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "4de028d0-ffe4-4dde-827a-92bc00ebbe24",
+            "uuid": "8fb801fd-c784-43f5-84ab-9b918a9fcca3",
             "id": 2,
             "index": 1,
             "label": "Kawitan",
@@ -62,7 +62,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "1524ba97-4672-4c41-9a1a-98fd8739923e",
+            "uuid": "c0bab509-1377-4539-b0a7-24c26434d25e",
             "id": 3,
             "index": 2,
             "execution": [
@@ -83,12 +83,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "08788c93-30a3-43f0-92df-2cce23d7c06c",
+            "uuid": "65b474db-bafd-49f7-8ea6-e1b76aec9e45",
             "id": 4,
             "index": 3,
             "execution": [
-                {"type": "dynamics", "seqId": 3510, "passes": [1, 3], "nthpass": false, "tooltip": "dynamics mp beat 5 on passes 1 & 3", "tooltipshort": "mp", "isGradual": false, "section": 5, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
-                {"type": "goto", "seqId": 5020, "passes": [2, 4], "nthpass": false, "tooltip": "go to KAWITAN2 after passes 2 & 4", "tooltipshort": "KAWITAN2", "targetuuid": "792e9a2b-9536-4ba0-a4f9-ea4c1d518033", "targetname": "KAWITAN2"}
+                {"type": "dynamics", "seqId": 3510, "passes": [1, 3], "nthpass": false, "tooltip": "dynamics current\u2192mp beat 5\u21928 on passes 1 & 3", "tooltipshort": "\u2192mp", "isGradual": true, "fromSection": 5, "section": 8, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
+                {"type": "goto", "seqId": 5020, "passes": [2, 4], "nthpass": false, "tooltip": "go to KAWITAN2 after passes 2 & 4", "tooltipshort": "KAWITAN2", "targetuuid": "4a8ba3c5-7f76-4b7c-8f0b-5161a0d508b8", "targetname": "KAWITAN2"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
@@ -105,11 +105,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "6637fc61-8fa6-4e07-ad20-3634cf2628e7",
+            "uuid": "3998c147-9745-4fb3-a890-f56b0beabc40",
             "id": 5,
             "index": 4,
             "execution": [
-                {"type": "goto", "seqId": 5000, "tooltip": "go to KAWITAN", "tooltipshort": "KAWITAN", "targetuuid": "4de028d0-ffe4-4dde-827a-92bc00ebbe24", "targetname": "KAWITAN"}
+                {"type": "goto", "seqId": 5000, "tooltip": "go to KAWITAN", "tooltipshort": "KAWITAN", "targetuuid": "8fb801fd-c784-43f5-84ab-9b918a9fcca3", "targetname": "KAWITAN"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "o", "e"]}],
@@ -126,7 +126,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "792e9a2b-9536-4ba0-a4f9-ea4c1d518033",
+            "uuid": "4a8ba3c5-7f76-4b7c-8f0b-5161a0d508b8",
             "id": 6,
             "index": 5,
             "label": "Kawitan2",
@@ -148,7 +148,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "c6749609-4eff-4112-bca9-fc5a01852366",
+            "uuid": "f4380c8d-f849-4077-a444-afcc59589aca",
             "id": 7,
             "index": 6,
             "execution": [],
@@ -167,7 +167,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "7b2d0b7b-3241-4158-b94d-fd30b901a183",
+            "uuid": "a5060864-f246-4507-b9ba-210e567dcd78",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -186,11 +186,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "b22f9f33-4b12-4fd3-975b-ba6cd94c87f2",
+            "uuid": "dff0e1e4-6a91-4716-9e87-aa2472f001c7",
             "id": 9,
             "index": 8,
             "execution": [
-                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN after pass 1", "tooltipshort": "KAWITAN", "targetuuid": "4de028d0-ffe4-4dde-827a-92bc00ebbe24", "targetname": "KAWITAN"}
+                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to KAWITAN after pass 1", "tooltipshort": "KAWITAN", "targetuuid": "8fb801fd-c784-43f5-84ab-9b918a9fcca3", "targetname": "KAWITAN"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", ".", "o", "-"]}, {"notation": ["E", "u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
@@ -207,12 +207,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "d15bb21f-8628-4e98-a7bf-a8b040b955e1",
+            "uuid": "44829098-56d3-4294-85ea-04c3c2b91b22",
             "id": 10,
             "index": 9,
             "execution": [
                 {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-                {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo 60 BPM on pass 2", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60.0},
+                {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo current\u219260 BPM beat 1\u21928 on pass 2", "tooltipshort": "\u219260 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 60.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["UGAL"]}
             ],
@@ -231,7 +231,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "07c46892-42c4-4727-b6bf-1d74cc1a59ae",
+            "uuid": "3a707f0e-ff33-4dde-b491-e5b063c2b908",
             "id": 11,
             "index": 10,
             "execution": [],
