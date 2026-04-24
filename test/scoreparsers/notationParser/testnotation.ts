@@ -339,8 +339,9 @@ switch (OPTION) {
         // Parses all files listed in testdata.ts and compares the resulting Score object with the reference json file.
         // Currently only the Execution items are compared.
         for (const id of _.keys(tabuhScores).map((id) => Number.parseInt(id))) {
-            const SELECT = 28 // required file id for single file testing or false/undefined to test all files
-            const skip = ['kempli', 'suppress', 'sequence', 'wait'] as ExecutionItemType[] // These metadata items are not available in the reference file.
+            const SELECT = false // required file id for single file testing or false/undefined to test all files
+            // const skip = ['kempli', 'suppress', 'sequence', 'wait'] as ExecutionItemType[] // These metadata items are not available in the reference file.
+            const skip = [] as ExecutionItemType[] // These metadata items are not available in the reference file.
             const tsvFile = parserTestData(id).file
             if (!SELECT || SELECT == id) parseAndCompare(tsvFile, tsvFile.replace('.tsv', '.json'), id, skip, false)
         }

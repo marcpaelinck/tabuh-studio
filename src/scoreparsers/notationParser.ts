@@ -21,7 +21,8 @@ import type {
     SuppressItem,
     System,
     TempoItem,
-    UUID
+    UUID,
+    WaitItem
 } from '../typing/types.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
@@ -603,9 +604,9 @@ function parseMetadata(
         }
         case 'WaitMetadata': {
             const baseAttr = { type: 'wait' }
-            const value = { count: getValue<number>(node, 'FloatValue', content) }
+            const value = { seconds: getValue<number>(node, 'FloatValue', content) }
             const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
-            const item = Object.assign(baseAttr, value, parameters) as LoopItem
+            const item = Object.assign(baseAttr, value, parameters) as WaitItem
             updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
