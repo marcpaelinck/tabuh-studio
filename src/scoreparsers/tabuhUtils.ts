@@ -1,13 +1,11 @@
 import type { Position } from '../typing/instruments.ts'
-import { instrumentTags } from './tabuhConfig.ts'
-
-const separators = ['', ' ', '_', '-'] // Separators
+import { instrumentTags, separators } from './tabuhConfig.ts'
 
 function createTagLookup(tagTable: Array<Record<string, string | string[]>>): Record<string, Position[]> {
     const tagLookup: Record<string, Position[]> = {}
     tagTable.forEach((record) => {
-        const tags = record['pos_tag'] as string[]
-        const additions = record['specification_tag'] as string[]
+        const tags = record['instr_tag'] as string[]
+        const additions = record['pos_tag'] as string[]
         const positions = record['positions'] as Position[]
         tags.forEach((tag) =>
             additions.forEach((add) =>
