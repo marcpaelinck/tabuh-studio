@@ -14,12 +14,11 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import * as Tone from 'tone'
 import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, positionConfigs } from '../config/config'
 import { isExtension, isMuting } from '../config/configfunctions'
+import type { BPM, NoteSymbol } from '../typing/basetypes'
+import type { Position } from '../typing/instruments'
 import type {
     AnimationNote,
-    BPM,
     GenericAction,
-    Note,
-    NoteSymbol,
     PlaybackAction,
     PlaybackAnimationAction,
     PlaybackCallbackFunctions,
@@ -27,12 +26,10 @@ import type {
     PlaybackPlayerCursorAction,
     PlaybackSamplerAction,
     PlaybackTempoAction,
-    Position,
-    Score,
-    System,
     TempoFunctionParameters,
     TimeLine
-} from '../typing/types'
+} from '../typing/playback'
+import type { Note, Score, System } from '../typing/score'
 import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { defaultObject, same } from '../utils/objectUtils'

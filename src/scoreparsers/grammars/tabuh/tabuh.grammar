@@ -98,7 +98,7 @@ PassesParameter { ("pass" "=" | "passes" "=") IntegerList}
 PositionsParameter { ("position" "=" | "positions" "=") StringList}
 ScopeParameter { "scope" "=" ScopeValue}
 
-// Naming is important here: <type>List should contain <type>Value elements
+// Naming is important here: <type>List should contain <type>Value elements, e.g. StringList, StringValue
 IntegerList { IntegerValue | "[" IntegerValue ("," space* IntegerValue)* "]" }
 StringList { StringValue | "[" StringValue ("," space* (Eol space* tab*)? StringValue)* "]" }
 ExecutiontypeList { ExecutiontypeValue | "[" ExecutiontypeValue ("," space* (Eol space* tab*)? ExecutiontypeValue)* "]" } 

@@ -2,8 +2,8 @@ import type { HTMLAttributes, MouseEvent } from 'react'
 import { useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
-import type { AudioState, PlaybackAction, PlaybackType } from '../../componentlogic/playbackReducer'
-import type { Score } from '../../typing/types'
+import type { AudioState, PlaybackAction, PlaybackType } from '../../typing/playback'
+import type { Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 
 export function PlaybackButtons({

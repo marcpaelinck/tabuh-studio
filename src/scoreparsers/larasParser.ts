@@ -3,7 +3,10 @@
 import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { Measure, ParserReturnValue, Position, Score, System, TempoItem } from '../typing/types'
+import type { TempoItem } from '../typing/execution'
+import type { Position } from '../typing/instruments'
+import type { ParserReturnValue } from '../typing/parsers'
+import type { Measure, Score, System } from '../typing/score'
 import { labelToPosition, symbolLookup } from './grammars/laras/config'
 import { parser } from './grammars/laras/laras'
 

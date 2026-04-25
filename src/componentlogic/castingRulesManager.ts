@@ -1,7 +1,8 @@
 // This module contains the rules that are used for the automatic generation of notation for grouped staves.
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
-import type { NoteSymbol, Position } from '../typing/types'
+import type { NoteSymbol } from '../typing/basetypes.ts'
+import type { Position } from '../typing/instruments.ts'
 import { debug } from '../utils/debugger.ts'
 
 type CastingInstructionType = 'nokempyung'

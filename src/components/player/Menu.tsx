@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
-import type { MenuItemInfo, Score, ScoreFormat, ScoreInfo, ScoreMenuOption } from '../../typing/types'
+import type { MenuItemInfo, ScoreInfo, ScoreMenuOption } from '../../typing/menus'
+import type { Score, ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,

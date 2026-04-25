@@ -11,7 +11,8 @@ import {
     SOUNDS_FOLDER
 } from '../config/config'
 import { soundFile } from '../config/configfunctions'
-import type { Position, SamplerFunctionParameters } from '../typing/types'
+import type { Position } from '../typing/instruments'
+import type { SamplerFunctionParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import { millis2BaseNoteEquiv } from '../utils/timeunits'
 

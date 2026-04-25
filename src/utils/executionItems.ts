@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import type { ExecutionItem } from '../typing/types'
+import type { ExecutionItem } from '../typing/execution'
 
 export function executionItemSeqId(item: ExecutionItem) {
     const typeSeq = { loop: 1000, tempo: 2000, dynamics: 3000, wait: 4000, goto: 5000, sequence: 6000, suppress: 7000 }[

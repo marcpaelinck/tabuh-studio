@@ -1,6 +1,6 @@
 import * as Tone from 'tone'
 import { noCursor } from '../config/config'
-import type { PlaybackAction, PlaybackState } from '../typing/types'
+import type { PlaybackAction, PlaybackState } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import { type SchedulePlaybackParams } from './usePlaybackManager'
 import { cycleValidation } from './validationManager'

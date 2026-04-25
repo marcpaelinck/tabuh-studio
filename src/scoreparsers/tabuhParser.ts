@@ -4,31 +4,32 @@ import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
+import type { UUID } from '../typing/basetypes.ts'
 import type {
     DynamicsItem,
     DynamicsValue,
     ExecutionItem,
-    ExecutionItemType,
     GotoItem,
-    GroupedNotation,
     KempliItem,
     KempliValue,
     LoopItem,
-    Measure,
-    ParserReturnValue,
-    Position,
-    Score,
     SequenceItem,
-    Staffs,
     SuppressItem,
-    System,
     TempoItem,
-    UUID,
     WaitItem
-} from '../typing/types.ts'
+} from '../typing/execution.ts'
+import type { Position } from '../typing/instruments.ts'
+import type {
+    Attribute,
+    ParserReturnValue,
+    PartInstruction,
+    PostProcessing,
+    ProcessingInstruction
+} from '../typing/parsers.ts'
+import type { GroupedNotation, Measure, Score, Staffs, System } from '../typing/score.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
-import { lineNr, tagLookup } from './notationUtils.ts'
+import { lineNr, tagLookup } from './tabuhUtils.ts'
 
 type ValueType =
     | 'BooleanValue'
@@ -67,7 +68,6 @@ export function parseNotation(content: string): ParserReturnValue {
     var gonganCounter = 0
 
     const traverse = (node: SyntaxNode) => {
-        const line = lineNr(content, node.from)
         switch (node.name) {
             case 'InfoMetadata': {
                 const scoreSettings = {
@@ -442,29 +442,6 @@ function getMetadata(
     return metaData
 }
 
-interface Attribute {
-    score?: { parts: string[] }
-    system?: { copyfrom: string } | { label: string }
-}
-interface ProcessingInstruction {
-    type: 'attribute' | 'executionitem' | 'postprocessing' | 'castinginstruction'
-    value: ExecutionItem | Attribute | PostProcessing | CastingInstruction
-}
-interface CopyInstruction {
-    label: string
-    targetid: number
-    targetuuid: string
-    include?: ExecutionItemType[]
-}
-interface PartInstruction {
-    name: string
-    systemid: number
-    systemuuid: UUID
-}
-export interface PostProcessing {
-    copy?: CopyInstruction
-    part?: PartInstruction
-}
 // Metadata can contain Execution items, System/Score attributes or instructions for the postprocessing step.
 // Grammar: Metadata { TempoMetadata |  DynamicsMetadata | ... }
 function parseMetadata(

@@ -4,19 +4,15 @@ import { ReactSVG } from 'react-svg'
 import { Col, Grid, Loader, Row, Slider, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
-import type {
-    AnimationData,
-    MenuItemInfo,
-    NotationParagraph,
-    PlaybackCallbackFunctions,
-    Position,
-    SVGInfo
-} from '../../typing/types'
+import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
+import type { Position } from '../../typing/instruments'
+import type { MenuItemInfo } from '../../typing/menus'
+import type { PlaybackCallbackFunctions } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
-import { type XCoordRecord, type YCoordRecord } from '../../typing/types'
+import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import Selector from './Selector'
 
 // Returns the SVG filename for the given position if found.

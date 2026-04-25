@@ -1,5 +1,5 @@
-import type { Position } from '../typing/types.ts'
-import { instrumentTags } from './notationConfig.ts'
+import type { Position } from '../typing/instruments.ts'
+import { instrumentTags } from './tabuhConfig.ts'
 
 const separators = ['', ' ', '_', '-'] // Separators
 

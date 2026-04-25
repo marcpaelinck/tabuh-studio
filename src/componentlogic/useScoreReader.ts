@@ -2,8 +2,10 @@ import { useCallback, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { WpApiFunctions } from '../components/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
-import { parseNotation } from '../scoreparsers/notationParser'
-import type { ParserReturnValue, Score, ScoreFormat, ScoreInfo } from '../typing/types'
+import { parseNotation } from '../scoreparsers/tabuhParser'
+import type { ScoreInfo } from '../typing/menus'
+import type { ParserReturnValue } from '../typing/parsers'
+import type { Score, ScoreFormat } from '../typing/score'
 import { readFile } from '../utils/filesystem'
 
 function postprocessScore(score: Score): Score {
@@ -118,7 +120,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(true)
         const response = await wpFunc.database.getScoreList()
         if (response && 'success' in response && response.success && 'result' in response) {
-            const newList = response.result.map((result) => {
+            const newList = response.result.map((result: Score) => {
                 return { ...result, ...{ instrumentgroup: 'gongkebyar' }, ...{ notationversion: 'new' } }
             })
             setScoreList(newList)

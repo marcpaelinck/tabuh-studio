@@ -1,5 +1,6 @@
 import { type ActionDispatch, type JSX } from 'react'
-import { type PlaybackAction, type PlaybackState, type Score } from '../../typing/types'
+import { type PlaybackAction, type PlaybackState } from '../../typing/playback'
+import { type Score } from '../../typing/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
 import { FaBackwardFast } from 'react-icons/fa6'

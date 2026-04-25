@@ -3,14 +3,9 @@
 // notation while the corresponding notes are being played.
 
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
-import type {
-    HighlightRange,
-    HilightRangeFunction,
-    NotationParagraph,
-    PlaybackCallbackFunctions,
-    PlayerCursorParameters,
-    Position
-} from '../../typing/types'
+import type { HighlightRange, HilightRangeFunction, NotationParagraph } from '../../typing/animation'
+import type { Position } from '../../typing/instruments'
+import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
 
 interface NotationAreaProps {
     notation: NotationParagraph[] | null

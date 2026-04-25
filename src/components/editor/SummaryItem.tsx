@@ -25,7 +25,7 @@ import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
-import type { Score, System } from '../../typing/types'
+import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { ExecutionForm } from './ExecutionForm'
 

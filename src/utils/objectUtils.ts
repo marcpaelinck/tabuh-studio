@@ -3,7 +3,7 @@
  */
 
 import _ from 'lodash'
-import type { Score } from '../typing/types'
+import type { Score } from '../typing/score'
 
 /**
  * Return the first key in `obj` whose value === `value` (strict equality).

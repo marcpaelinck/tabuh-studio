@@ -14,7 +14,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
-import type { DynamicsValue, ExecutionItemType } from '../../typing/types'
+import type { DynamicsValue, ExecutionItemType } from '../../typing/execution'
 
 export type FlowConditionType = 'pass' | 'nthpass' | 'iteration'
 

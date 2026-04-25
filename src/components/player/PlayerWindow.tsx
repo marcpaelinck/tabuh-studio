@@ -3,18 +3,15 @@ import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
+import { type Position } from '../../typing/instruments'
+import { type MenuItemInfo, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
 import {
-    type MenuItemInfo,
     type PlaybackAction,
     type PlaybackCallbackFunctions,
     type PlaybackState,
-    type Position,
-    type Score,
-    type ScoreFormat,
-    type ScoreInfo,
-    type ScoreMenuOption,
     type TimeLine
-} from '../../typing/types'
+} from '../../typing/playback'
+import { type Score, type ScoreFormat } from '../../typing/score'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import { Player } from './Player'

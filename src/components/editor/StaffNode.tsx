@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Col } from 'rsuite'
-import type { Measure, Position, System } from '../../typing/types'
+import type { Position } from '../../typing/instruments'
+import type { Measure, System } from '../../typing/score'
 import { getValidSymbols } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { getTextWidthInPx } from '../../utils/measurements'

@@ -10,16 +10,18 @@ import type {
     ExecutionItem,
     ExecutionItemType,
     GotoItem,
+    KempliValue,
     LoopItem,
-    System,
     TempoItem
-} from '../../typing/types'
+} from '../../typing/execution'
+import type { System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { executionItemTooltip } from '../../utils/executionItems'
 import ExecutionItemForm, { formModel, type FlowConditionType, type FormValueType } from './ExecutionItemForm'
 
 type ExecutionItemDefault = {
     type?: ExecutionItemType
+    value?: KempliValue | number
     targetuuid?: string
     targetname?: string
     isGradual?: boolean
@@ -55,6 +57,7 @@ const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     },
     sequence: { type: 'sequence', tooltip: 'specify type', tooltipshort: '' },
     suppress: { type: 'suppress', tooltip: 'specify type', tooltipshort: '' },
+    kempli: { type: 'kempli', tooltip: 'specify type', tooltipshort: '' },
     new: { type: undefined, seqId: 0, tooltip: 'specify type', tooltipshort: '' }
 }
 

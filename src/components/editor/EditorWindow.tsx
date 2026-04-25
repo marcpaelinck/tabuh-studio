@@ -10,10 +10,9 @@ import type {
     EditorCursorParameters,
     PlaybackAction,
     PlaybackCallbackFunctions,
-    PlaybackState,
-    Score,
-    System
-} from '../../typing/types'
+    PlaybackState
+} from '../../typing/playback'
+import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { PlaybackButtons } from './PlaybackButtons'

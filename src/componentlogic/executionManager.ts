@@ -10,13 +10,11 @@ import type {
     ExpressionItem,
     GotoItem,
     LoopItem,
-    Measure,
-    PlaybackType,
-    Position,
-    Score,
-    System,
     WaitItem
-} from '../typing/types'
+} from '../typing/execution'
+import type { Position } from '../typing/instruments'
+import type { PlaybackType } from '../typing/playback'
+import type { Measure, Score, System } from '../typing/score'
 import { debug } from '../utils/debugger'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of

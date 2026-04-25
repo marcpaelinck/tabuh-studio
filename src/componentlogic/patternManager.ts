@@ -17,16 +17,9 @@ import {
     RakeUpChars,
     TremoloChars
 } from '../config/config'
-import type {
-    BPM,
-    DurationInBasenoteEquiv,
-    NoteSymbol,
-    PlaybackSamplerAction,
-    Position,
-    SamplerFunction,
-    SamplerFunctionParameters,
-    TimeInBasenoteEquiv
-} from '../typing/types'
+import type { BPM, DurationInBasenoteEquiv, NoteSymbol, TimeInBasenoteEquiv } from '../typing/basetypes'
+import type { Position } from '../typing/instruments'
+import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../typing/playback'
 import { getValidSymbols, noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
