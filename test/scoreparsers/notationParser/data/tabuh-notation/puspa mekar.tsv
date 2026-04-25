@@ -3,7 +3,7 @@
 	{PART kawitan}
 	{DYNAMICS mf positions=[gangsa]}
 	{TEMPO 90}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 gangsa	a-u-	Ai<-a-	u-e-	Ua-u-	e-o-	e...
 
 	# melody 1
@@ -73,7 +73,7 @@ gong	G
 
 
 	{PART pengawak}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 60}
 	{DYNAMICS mf positions=gangsa}
 ga/ugal	.....ue.	Ua---uea-
@@ -112,12 +112,12 @@ gong							G
 	{PART "pengecet 1"}
 	{LABEL PENGECET1}
 	{TEMPO 100}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ga/ugal	a,---	e---	o---	a,---	o---	i---	a,---	i---
 calung	a	e	o	a	o	i	a	i
 gong	G
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ga/ugal	a,---	u,---	a,---	e,---	a,-u,-	e,-u,-
 calung	a	u	a	e	a-u-	e-u-
 
@@ -297,7 +297,7 @@ gong	G				T
 	{LABEL ANGSEL2B}
 	# angsel 2 melody B
 	{DYNAMICS f positions=gangsa}
-	{DYNAMICS ->mp positions=gangsa beats=5->7}
+	{DYNAMICS ->mp positions=gangsa beats=5->8}
 	{TEMPO 120}
 ga/ugal	a,---	e,---	u,---	o,---	e,---	a,---	i---	u,---
 gangsa p	a.u.	au.u	a.u.	au.u	a...	a-a/.	..a-	----
@@ -320,7 +320,7 @@ gong	G				T
 	# angsel 3 melody A accelerating
 	{DYNAMICS mf positions=gangsa beat=5}
 	{TEMPO 95}
-	{TEMPO 120 beats=3->8}
+	{TEMPO 120 beats=3->6}
 ga/ugal	a,---	o---	e---	i---	o---	a,---	i---	u,---
 gangsa p	a.u.	au.u	a.u.	au.u	a---	Aa-a-	a-a-	a---
 gangsa s	ai<.i<	a.i<.	ai<.i<	a.i<.	a---	Aa-a-	a-a-	a---

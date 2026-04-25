@@ -11,6 +11,8 @@ import type {
     ExecutionItemType,
     GotoItem,
     GroupedNotation,
+    KempliItem,
+    KempliValue,
     LoopItem,
     Measure,
     ParserReturnValue,
@@ -29,15 +31,16 @@ import { parser } from './grammars/tabuh/tabuh.ts'
 import { lineNr, tagLookup } from './notationUtils.ts'
 
 type ValueType =
-    | 'IntegerValue'
-    | 'FloatValue'
-    | 'StringValue'
     | 'BooleanValue'
+    | 'FloatValue'
+    | 'IntegerValue'
+    | 'StringValue'
     | 'DynamicsLiteral'
     | 'ExecutionValue'
+    | 'GonganTypeValue'
+    | 'KempliValue'
     | 'OnOffValue'
     | 'ScopeValue'
-    | 'GonganTypeValue'
 type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
 
 // Returns a Score object
@@ -526,10 +529,10 @@ function parseMetadata(
         case 'GonganMetadata': {
             const gongantype = getValue<string>(node, 'GonganTypeValue', content) || 'none'
             if (!['gineman', 'genderan', 'kebyar'].includes(gongantype.toLowerCase())) break
-            const baseAttr = { type: 'suppress' }
-            const value = { positions: ['KEMPLI'] as Position[] }
+            const baseAttr = { type: 'kempli' }
+            const value = { value: 'off' as KempliValue }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
-            const item = Object.assign(baseAttr, value, parameters) as SuppressItem
+            const item = Object.assign(baseAttr, value, parameters) as KempliItem
             updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
@@ -542,12 +545,10 @@ function parseMetadata(
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'KempliMetadata': {
-            // Do nothing if value is ON (true)
-            if (getValue<boolean>(node, 'OnOffValue', content)) break
-            const baseAttr = { type: 'suppress' }
-            const value = { positions: ['KEMPLI'] as Position[] }
+            const value = { value: getValue<string>(node, 'KempliValue', content) }
+            const baseAttr = { type: 'kempli' }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
-            const item = Object.assign(baseAttr, value, parameters) as SuppressItem
+            const item = Object.assign(baseAttr, value, parameters) as KempliItem
             updateSeqAndTooltips(item)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }

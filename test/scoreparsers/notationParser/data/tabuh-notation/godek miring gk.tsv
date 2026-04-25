@@ -33,14 +33,14 @@ jegogan	i		i		i		e		i		e		i
 gong	G
 
 	{TEMPO 120 beats=14->16}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 gangsa	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 calung	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
 
 
 	{TEMPO 50 beats=1->7}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e,-u,-	a,---
 gangsa	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e,-u,-	a,---
 calung	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---
@@ -76,7 +76,7 @@ jegogan	u	a	u	e	e	a	u	e
 	{TEMPO 120}
 	{TEMPO 150 beats=1->2}
 	{TEMPO 120 beats=5->8}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	u,---a,---	i---o-i-	a,-i-o---	i---a,---	e/...e---	o---e/...	e---o---	e---o---
 gangsa	u,---a,---	i---o-i-	a,-i-o---	i---a,---	e/...e---	o---e/...	e---o---	e---o---
 calung	u---a---	i---o-i-	a-i-o---	i---a---	e/...e---	o---e/...	e---o---	e---o---
@@ -84,7 +84,7 @@ gong	G
 
 
 	{TEMPO 100 beats=7->8}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	e/...e---	o---e/...	e---o---	e-o-i-a,-	i---i-ii?	i-o-i-a,-	u,-a,-i-a,-	i---o---
 gangsa	e/...e---	o---e/...	e---o---	e-o-i-a,-	i---i-ii?	i-o-i-a-	u,-a,-i-a,-	i---o---
 calung	e/...e---	o---e/...	e---o---	e-o-i-a-	i---i-ii?	i-o-i-a-	u-a-i-a-	i---o---
@@ -110,12 +110,12 @@ gangsa p	.u,.a,	u,.u,a,	.o.i	o.io	.i.o	i.io	.a,.u,	a,.u,a,	.u,.a,	u,.u,a,	.a,u,.
 gangsa s	ioi.	oio.	i.e.	oe.o	e.eo	.e.o	e.io	.io.	ioi.	oio.	i.oi	.oi.	o/.io	e-o-	e---	o---
 calung	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a-	i---	u-a-	i---	a---	u/.io	e-o-	e---	o---
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 gangsa	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 calung	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 60 beats=1->8}
 ugal	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---	u,---
 gangsa	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---	u,---

@@ -151,7 +151,7 @@ function equal(ex1: ExecutionItem, ex2: ExecutionItem | undefined): boolean {
 }
 
 function diff(ex1: ExecutionItem, ex2: ExecutionItem): object {
-    const ignoreKeys = ['targetuuid']
+    const ignoreKeys = ['targetuuid', 'uuids']
     const deltas: Record<string, string[]> = {}
 
     for (const [key, val1] of _.entries(ex1)) {
@@ -197,7 +197,7 @@ function compareExecutionItems(
         }
 
         // Find the best match
-        var bestMatch: { id: number; delta: object; diffCount: number } | undefined
+        var bestMatch: { id: number; delta: object; diffCount: number } | undefined = undefined
         for (const id of matchingIdxs) {
             const delta = diff(exec, refRemaining[id])
             const diffCount = _.keys(delta).length
@@ -302,8 +302,7 @@ function parseAndCompare(
 }
 
 const OPTION: number = 4
-const TREETEST = NOTATIONTSV // LARGE OR SMALL
-const NOTATIONID = 28 // 1..28
+const TREETEST = NOTATIONTSV // LARGE OR SMALL OR NOTATIONTSV
 switch (OPTION) {
     case 1:
         // Tests the Lezer grammar (file tabuh.grammar). Outputs the parser tree structure as follows
@@ -322,6 +321,7 @@ switch (OPTION) {
         //             The Lezer parser skips unexpected values until it reaches a point that matches the grammar at that point.
         // ERRORS: Error messages generated while converting the parsed tree into a Score structure.
         // POSTPROCESSING: Metadata that needs to be processed after the entire tree has been processed, such as GOTO and PART.
+        const NOTATIONID = 28 // 1..28
         testParseNotation(parserTestData(NOTATIONID), true)
         break
     case 3: {

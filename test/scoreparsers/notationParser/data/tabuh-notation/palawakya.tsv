@@ -2,7 +2,7 @@
 
 	{TEMPO 80}
 	{PART pepeson}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 70 beat=9}
 ugal	--o-	Eu---	a-u-	Ai<---	a-i<-	Au-a-	u-e-	o-..
 gangsa	....	....	....	....	....	....	....	....	a,a,a,a,
@@ -28,7 +28,7 @@ jegogan	u
 gong	T
 
 	{TEMPO 75}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	....	..u,-	Ai-i-	oeue	u-a-	i<-u-	a-u/.	.ii/.
 gangsa	i---							.ii/.
 reyong	b---
@@ -75,10 +75,10 @@ gong					G
 kendang	..9--9	9-9--9	9-9--9	9-9--9	9-----
 
 	{TEMPO 100}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{DYNAMICS mf positions=[kendang, reyong]}
 	{DYNAMICS f positions=gangsa}
-	{DYNAMICS ->mp positions=gangsa beats=5->8}
+	{DYNAMICS ->mp positions=gangsa beats=5->7}
 ugal	u-a-	Io-e-	o-ia,	i...
 gangsa p	....	....	....	...a,	a,-a,a,	a,a,.a,	....
 gangsa s	....	....	....	...a,	a,-a,a,	a,a,i.	i...

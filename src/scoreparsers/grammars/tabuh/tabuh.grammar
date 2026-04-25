@@ -17,7 +17,7 @@
    ExecutiontypeValue { 'goto' |'GOTO' | 'loop' | 'LOOP' | 'wait' | 'WAIT' | 'tempo' | 'TEMPO' | 'dynamics' | 'DYNAMICS' | 'sequence' |  'SEQUENCE' | 'kempli' | 'KEMPLI' }
    GonganTypeValue { 'kebyar' | 'KEBYAR' | 'genderan' | 'GENDERAN' | 'gineman' | 'GINEMAN' }
    OnOffValue { 'on' | 'ON' | 'off' | 'OFF' }
-   KempliValue { 'double' | 'DOUBLE' }
+   KempliStyle { 'double' | 'DOUBLE' }
    ScopeValue { 'gongan' | 'GONGAN' | 'score' | 'SCORE' }
    // Quoted StringValues can contain spaces, unquoted StringValues can not.
    StringValue { ![\n\r\t ,"'{}\[\]()]+ | ('"' ![\n\r\t,"'{}\[\]]* '"') | ("'" ![\n\r\t,"'{}\[\]]* "'") }
@@ -68,7 +68,8 @@ GonganMetadata { "GONGAN" space+ GonganTypeValue }
 
 GotoMetadata { "GOTO" space+ StringValue (space+ (FromBeatParameter | PassesParameter | NthpassParameter))*? }
 
-KempliMetadata { "KEMPLI" space+ (OnOffValue | KempliValue) (space+ (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter))* }
+KempliMetadata { "KEMPLI" space+ KempliValue (space+ (BeatsParameter | PassesParameter | NthpassParameter | IterationsParameter))* }
+KempliValue { OnOffValue | KempliStyle }
 
 LabelMetadata { "LABEL" space+ StringValue }
 

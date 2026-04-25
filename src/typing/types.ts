@@ -169,7 +169,8 @@ export type HilightRangeFunction = (hlRange: HighlightRange) => void
 // Flow instructions: determine the playing sequence (goto and loop).
 // Expression instructions: contain tempo and dynamics information.
 
-export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics' | 'sequence' | 'suppress'
+export type ExecutionItemType = 'goto' | 'loop' | 'wait' | 'tempo' | 'dynamics' | 'sequence' | 'suppress' | 'kempli'
+export type KempliValue = 'double' | 'off'
 
 // Base class
 export interface ExecutionItemBase {
@@ -187,6 +188,14 @@ export interface GotoItem extends ExecutionItemBase {
     type: 'goto'
     targetuuid: UUID // next System to play.
     targetname: string // Display name of the target System.
+}
+
+// Enables to modify the kempli style.
+export interface KempliItem extends ExecutionItemBase {
+    type: 'kempli'
+    value: KempliValue
+    beats?: number[] // List of beats, can be used to limit the scope of the item.
+    iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the item applies.
 }
 
 // Enables to repeat the current System.
@@ -242,7 +251,7 @@ export interface DynamicsItem extends ExpressionItemBase {
 
 export type FlowItem = GotoItem | LoopItem | SequenceItem | WaitItem
 export type ExpressionItem = TempoItem | DynamicsItem
-export type ExecutionItem = FlowItem | ExpressionItem | SuppressItem
+export type ExecutionItem = FlowItem | ExpressionItem | SuppressItem | KempliItem
 
 export type EditorCellCursor = { sysUuid: UUID; measure: number }
 

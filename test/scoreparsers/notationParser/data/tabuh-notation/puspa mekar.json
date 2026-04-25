@@ -1,5 +1,5 @@
 {
-    "uuid": "fd96caca-990a-4c42-9025-63034f628384",
+    "uuid": "474411d4-98da-4ae2-b762-d146a5d0f52e",
     "title": "Puspa Mekar",
     "composer": "",
     "instrumenttype": "GONG_KEBYAR",
@@ -16,69 +16,70 @@
     ],
     "parts": {
         "kawitan": [
-            "98ac2550-a6a9-4f6e-b51a-935900e84196",
-            "4f841411-0158-4054-8747-ab8ac60d3a28",
-            "1998e9d4-4784-47b0-8486-134794ac0955",
-            "e713c274-af2e-4e78-bb8e-db9e99184ea6",
-            "eda2a80c-dc88-43f6-ae82-8875187a5824",
-            "8d9d18f8-996d-4757-ac04-3c2198822cd9",
-            "c148469f-1edd-4d7c-9a07-0c0fb67600f9",
-            "e8996752-2825-4378-bef0-376be7e43dbf"
+            "9adeafbb-958a-4417-9054-086445fa16ea",
+            "961b1c63-bfe2-459a-8504-aa0194bb16a3",
+            "f43196ed-fd05-4a9a-877e-ae8b52282f99",
+            "593566c9-1e80-420d-b933-6ae0a7fdb892",
+            "06bb730a-3353-483a-bed5-2f9f0bb0c860",
+            "ed8171b5-5c34-4edb-9e21-385fbd4bfa88",
+            "f29824d0-e98f-4ff6-a2cb-0e44cb40f37b",
+            "d4a96c3d-74b3-437b-bd35-8aed27077a10"
         ],
         "pengawak": [
-            "16831383-e5fc-4a08-a562-40b906b6730f",
-            "570357f1-2a9b-4544-9294-e75246746e13",
-            "9eeb775e-8331-451c-8fe0-9d6175b3cb47",
-            "90bf2efa-93eb-4120-bf68-b8c68c18a97b",
-            "b7626bdb-55c3-4568-b71d-acbb33320610",
-            "29ce7a9c-a36d-4c84-8d03-bf0c4a9ea2a6"
+            "b0eab724-3731-4b8b-85d0-b94341df7092",
+            "3add247b-ec67-4918-a62b-a7a098d32769",
+            "f7b4cb36-fb15-47d5-a1a0-156ed5556d02",
+            "0d1f2e4b-6541-4d37-bee6-96a7f3455824",
+            "56e9730c-a57b-451a-b633-4c0082e647a0",
+            "548b66c6-452d-4e01-b9ab-d79f48c247fe"
         ],
         "pengecet 1": [
-            "92c8e1bd-fe4e-48a1-9d01-d106f041d034",
-            "2cea2570-0940-402f-a306-963b1891f912",
-            "493b7f87-b73b-4558-bb0d-27a44a060bff",
-            "6c7b7204-1ba9-4906-8372-f69e9de6ca31",
-            "ec61cb66-8255-42dc-aea3-5ddbdeb39612",
-            "e541564f-5b2d-4089-8cef-2b4ccd12464a",
-            "b9444625-f65d-43e4-9854-98efc8faad79",
-            "f47d2aac-a988-4320-bf5c-7cffa650adb2",
-            "e5898f39-9659-4601-a4bb-9e75440d0d9b",
-            "a07483b0-15f8-43e1-8536-2c6cb0158d43",
-            "e60a6495-77fb-4186-8b80-2933cdf9cbaf"
+            "d7819e18-7430-47fa-9c1d-6a3257da919a",
+            "7d9b5e00-8054-480b-99dc-cab14e198c2a",
+            "f01d28ef-fe4b-4880-83b8-296a9ae4a7e8",
+            "6e29e2f0-1bcc-47b1-8c52-dfeccba5a84b",
+            "5ac16b39-7aee-47a0-b630-486641081b21",
+            "9792178e-3ff1-431f-b309-ffdf720bcd3d",
+            "15d3fa40-93e7-4dfc-a299-496cdf539ee5",
+            "7c676714-105b-4a8b-a58a-4ed1d5979c0f",
+            "40d51513-f430-4b28-8016-c8542103e6f5",
+            "7814a2c6-5fac-400d-bfd7-86da3ecac68b",
+            "8e029383-4d53-4797-b098-a52cb5489924"
         ],
         "Pengecet 2": [
-            "8a1e8ca2-a9ea-44df-a56b-9eec9605c627",
-            "0eb67f6b-d89f-4354-8e2d-648e11edc651",
-            "5f582da3-489d-4499-a97e-e385042904f8",
-            "041306a6-3ab1-47f5-8fff-bc95595954d2",
-            "7aa45e80-1948-418b-b2ba-d33279fe4540",
-            "941901ae-1d01-4941-9646-d9774eff8224",
-            "4b82c2a5-0e6c-45cf-bb01-cab98410ae48",
-            "482fc952-78f5-412f-a540-233d4936a9b9",
-            "a3eda11b-22fa-4c7c-864f-267d28824f95",
-            "2ff3f04f-5886-4791-b5d2-97d1323ffb45",
-            "f414d10e-bb79-4c41-969d-d5a63f9b3059",
-            "5516726d-6cad-463a-81e0-4886a472e611",
-            "d5c86ca7-69a4-4c9a-9198-b83d570dc8a2",
-            "cf7be283-3fb9-491f-8809-29be564f0e11",
-            "79957f17-5740-47c2-84f9-6e61d5bf2a58",
-            "ce92679e-f6ce-4077-858f-aa57a2f5e2bf",
-            "6c1a2f05-e68f-48d9-85de-8864938482ac",
-            "efa406c3-91f3-46cf-b813-d53aa39161fd",
-            "414cc755-180e-48c8-9d99-194eba5e599a",
-            "b2daa19c-e655-459b-9d8a-b5747c5f3058",
-            "e8a292ac-2eaf-411f-89e9-366ead807e8a",
-            "a41ff8fe-c20e-471d-9bb4-f4d77ff2fdaf"
+            "7fd6768d-f221-4434-a85c-335a4da24c8b",
+            "dc85acf2-cfb4-46ec-98da-a43621904e11",
+            "bbe9dab9-1373-4775-bff3-998d78540574",
+            "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa",
+            "b855eb1a-2790-4f75-aa23-98cd3b5aef9c",
+            "b017ba97-d956-4f41-b65b-f02705aede3a",
+            "6d493d64-32d7-44be-8c1f-efb1f102e5b6",
+            "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54",
+            "f40e4b78-a343-405e-982c-bd562a83bffd",
+            "c5b9ae4e-2c2e-45df-a785-55602a76b7cf",
+            "3d802a72-d91f-4fa2-a383-c00f801f1010",
+            "9b19731a-ec3b-4d21-861a-8b41ec3bdf41",
+            "b13d2704-7e21-4560-8c12-96feaebdd482",
+            "4e7be305-3ff0-4444-874b-8933b6d2ad1a",
+            "afe76103-328f-4b74-a727-a78ba99719fd",
+            "d4679ce8-7562-4cff-a763-cb4805ea0b71",
+            "acba797b-1c47-4f19-926b-b3efad1f178a",
+            "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6",
+            "c26fee00-1c90-4e7c-91b7-425e15cc8aa4",
+            "50798a89-f41c-470c-bde5-0b8a39383362",
+            "afc71359-5c1f-4aa7-9ed5-973ede5d62ff",
+            "a71b444f-2876-49b5-b3ba-fbf2f5203bff"
         ]
     },
     "systems": [
         {
-            "uuid": "98ac2550-a6a9-4f6e-b51a-935900e84196",
+            "uuid": "9adeafbb-958a-4417-9054-086445fa16ea",
             "id": 1,
             "index": 0,
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "section": 1, "value": 90.0},
-                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "kempli", "seqId": 7000, "tooltip": "", "tooltipshort": "", "value": "off"}
             ],
             "staffs": {
                 "UGAL": [{"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
@@ -95,7 +96,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "4f841411-0158-4054-8747-ab8ac60d3a28",
+            "uuid": "961b1c63-bfe2-459a-8504-aa0194bb16a3",
             "id": 2,
             "index": 1,
             "label": "P1",
@@ -120,12 +121,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "1998e9d4-4784-47b0-8486-134794ac0955",
+            "uuid": "f43196ed-fd05-4a9a-877e-ae8b52282f99",
             "id": 3,
             "index": 2,
             "execution": [
                 {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current\u219250 BPM beat 1\u21923 on pass 3", "tooltipshort": "\u219250 BPM", "isGradual": true, "fromSection": 1, "section": 3, "value": 50.0},
-                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to K_END after pass 3", "tooltipshort": "K_END", "targetuuid": "c148469f-1edd-4d7c-9a07-0c0fb67600f9", "targetname": "K_END"}
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to K_END after pass 3", "tooltipshort": "K_END", "targetuuid": "f29824d0-e98f-4ff6-a2cb-0e44cb40f37b", "targetname": "K_END"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "u", "-"]}],
@@ -142,7 +143,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "e713c274-af2e-4e78-bb8e-db9e99184ea6",
+            "uuid": "593566c9-1e80-420d-b933-6ae0a7fdb892",
             "id": 4,
             "index": 3,
             "execution": [
@@ -165,7 +166,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "eda2a80c-dc88-43f6-ae82-8875187a5824",
+            "uuid": "06bb730a-3353-483a-bed5-2f9f0bb0c860",
             "id": 5,
             "index": 4,
             "execution": [],
@@ -184,11 +185,11 @@
             "editorGroup": []
         },
         {
-            "uuid": "8d9d18f8-996d-4757-ac04-3c2198822cd9",
+            "uuid": "ed8171b5-5c34-4edb-9e21-385fbd4bfa88",
             "id": 6,
             "index": 5,
             "execution": [
-                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to P1 after passes 1 & 2", "tooltipshort": "P1", "targetuuid": "4f841411-0158-4054-8747-ab8ac60d3a28", "targetname": "P1"}
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to P1 after passes 1 & 2", "tooltipshort": "P1", "targetuuid": "961b1c63-bfe2-459a-8504-aa0194bb16a3", "targetname": "P1"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}],
@@ -205,7 +206,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "c148469f-1edd-4d7c-9a07-0c0fb67600f9",
+            "uuid": "f29824d0-e98f-4ff6-a2cb-0e44cb40f37b",
             "id": 7,
             "index": 6,
             "label": "K_End",
@@ -225,7 +226,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "e8996752-2825-4378-bef0-376be7e43dbf",
+            "uuid": "d4a96c3d-74b3-437b-bd35-8aed27077a10",
             "id": 8,
             "index": 7,
             "execution": [],
@@ -244,12 +245,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "16831383-e5fc-4a08-a562-40b906b6730f",
+            "uuid": "b0eab724-3731-4b8b-85d0-b94341df7092",
             "id": 9,
             "index": 8,
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 60 BPM", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60.0},
-                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "sequence", "seqId": 6000, "tooltip": "", "tooltipshort": "", "labels": ["A1", "A2", "A3", "A1", "A2", "B1", "B2", "A1", "A2", "PENGECET1"], "uuids": ["3add247b-ec67-4918-a62b-a7a098d32769", "f7b4cb36-fb15-47d5-a1a0-156ed5556d02", "0d1f2e4b-6541-4d37-bee6-96a7f3455824", "3add247b-ec67-4918-a62b-a7a098d32769", "f7b4cb36-fb15-47d5-a1a0-156ed5556d02", "56e9730c-a57b-451a-b633-4c0082e647a0", "548b66c6-452d-4e01-b9ab-d79f48c247fe", "3add247b-ec67-4918-a62b-a7a098d32769", "f7b4cb36-fb15-47d5-a1a0-156ed5556d02", "d7819e18-7430-47fa-9c1d-6a3257da919a"]},
+                {"type": "kempli", "seqId": 7000, "tooltip": "", "tooltipshort": "", "value": "off"}
             ],
             "staffs": {
                 "UGAL": [{"notation": [".", ".", ".", ".", ".", "u", "e", "."]}, {"notation": ["U", "a", "-", "-", "-", "u", "e", "a", "-"]}],
@@ -266,9 +269,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "570357f1-2a9b-4544-9294-e75246746e13",
+            "uuid": "3add247b-ec67-4918-a62b-a7a098d32769",
             "id": 10,
             "index": 9,
+            "label": "A1",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["U", "e", "-", "-", "-", "-", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-", "u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "a,", "u,", "a,", "e,", "-"]}, {"notation": ["U,", "a,", "-", "i", "i", "a,", "i", "u,", "-"]}, {"notation": ["A,", "i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "o", "o", "i", "o", "a,", "-"]}, {"notation": ["I", "o", "-", "-", "-", "-", "-", "a,", "-"]}, {"notation": ["I", "o", "-", "-", "-", "i", "-", "o", "-"]}],
@@ -285,9 +289,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "9eeb775e-8331-451c-8fe0-9d6175b3cb47",
+            "uuid": "f7b4cb36-fb15-47d5-a1a0-156ed5556d02",
             "id": 11,
             "index": 10,
+            "label": "A2",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["I", "a,", "-", "e", "e", "o", "e", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["O", "i", "-", "O", "e", "-", "o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-", "i", "i", "a,", "-"]}, {"notation": ["I", "o", "-", "-", "-", "i", "i/", "i", "a,"]}, {"notation": ["i", "-", "O", "e", "-", "o", "-", "i", "-"]}],
@@ -304,9 +309,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "90bf2efa-93eb-4120-bf68-b8c68c18a97b",
+            "uuid": "0d1f2e4b-6541-4d37-bee6-96a7f3455824",
             "id": 12,
             "index": 11,
+            "label": "A3",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-", "-", "-", "a", "a/"]}, {"notation": ["a", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "-", "-", "u", "u/"]}, {"notation": ["u", "-", "e", "e", "u", "e", "a", "-"]}, {"notation": ["U", "e", "-", "-", "-", "-", "-", "a", "a/"]}, {"notation": ["a", "-", "-", "-", "u", "-", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "-", "-", "u", "u/"]}, {"notation": ["u", "-", "e", "e", "u", "e", "a", "-"]}],
@@ -323,9 +329,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "b7626bdb-55c3-4568-b71d-acbb33320610",
+            "uuid": "56e9730c-a57b-451a-b633-4c0082e647a0",
             "id": 13,
             "index": 12,
+            "label": "B1",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i<", ".", ".", ".", ".", ".", ".", "."]}, {"notation": ["A", "u", "-", "a", "-", "u", "-", "e", "-"]}, {"notation": ["U", "a", "-", "i", "-", "o", "-", "i", "-"]}, {"notation": ["a", "-", "u", "u", "e", "u", "o", "-"]}, {"notation": ["E", "u", "-", "e", "e", "o", "e", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-", "U", "a", "-", "i<", "-"]}, {"notation": ["a", "-", "-", "-", "u", "-", "a", "-"]}],
@@ -342,9 +349,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "29ce7a9c-a36d-4c84-8d03-bf0c4a9ea2a6",
+            "uuid": "548b66c6-452d-4e01-b9ab-d79f48c247fe",
             "id": 14,
             "index": 13,
+            "label": "B2",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["U", "e", "-", "U", "a", "-", "u", "-", "e", "-"]}, {"notation": ["o", "-", "e", "e", "o", "e", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-", "u", "u", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "u", "u", "e", "-"]}, {"notation": ["U", "a", "-", "-", "-", "i", "i/", "i", "a,"]}, {"notation": ["i", "-", "O", "e", "-", "o", "-", "i", "-"]}, {"notation": ["a,", "-", "a", ".", "a", "-", "-", "-"]}],
@@ -361,11 +369,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "92c8e1bd-fe4e-48a1-9d01-d106f041d034",
+            "uuid": "d7819e18-7430-47fa-9c1d-6a3257da919a",
             "id": 15,
             "index": 14,
+            "label": "Pengecet1",
             "execution": [
-                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 100 BPM", "tooltipshort": "100 BPM", "isGradual": false, "section": 1, "value": 100.0}
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 100 BPM", "tooltipshort": "100 BPM", "isGradual": false, "section": 1, "value": 100.0},
+                {"type": "kempli", "seqId": 7000, "tooltip": "", "tooltipshort": "", "value": "off"}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -382,10 +392,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "2cea2570-0940-402f-a306-963b1891f912",
+            "uuid": "7d9b5e00-8054-480b-99dc-cab14e198c2a",
             "id": 16,
             "index": 15,
-            "execution": [],
+            "execution": [
+                {"type": "kempli", "seqId": 7000, "tooltip": "", "tooltipshort": "", "value": "off"}
+            ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "u,", "-"]}],
                 "PEMADE_POLOS": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "u,", "-"]}],
@@ -401,7 +413,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "493b7f87-b73b-4558-bb0d-27a44a060bff",
+            "uuid": "f01d28ef-fe4b-4880-83b8-296a9ae4a7e8",
             "id": 17,
             "index": 16,
             "execution": [
@@ -422,7 +434,7 @@
             "editorGroup": []
         },
         {
-            "uuid": "6c7b7204-1ba9-4906-8372-f69e9de6ca31",
+            "uuid": "6e29e2f0-1bcc-47b1-8c52-dfeccba5a84b",
             "id": 18,
             "index": 17,
             "execution": [],
@@ -441,10 +453,12 @@
             "editorGroup": []
         },
         {
-            "uuid": "ec61cb66-8255-42dc-aea3-5ddbdeb39612",
+            "uuid": "5ac16b39-7aee-47a0-b630-486641081b21",
             "id": 19,
             "index": 18,
-            "execution": [],
+            "execution": [
+                {"type": "sequence", "seqId": 6000, "tooltip": "", "tooltipshort": "", "labels": ["PA1", "PA2", "PA1", "PA2", "PB1", "PB2", "PB1", "PB2", "PB3", "PB4", "PA1", "PA2", "PA1", "PA2", "PB1", "PB2", "PB1", "PB2", "PB3", "PB4"], "uuids": ["9792178e-3ff1-431f-b309-ffdf720bcd3d", "15d3fa40-93e7-4dfc-a299-496cdf539ee5", "9792178e-3ff1-431f-b309-ffdf720bcd3d", "15d3fa40-93e7-4dfc-a299-496cdf539ee5", "7c676714-105b-4a8b-a58a-4ed1d5979c0f", "40d51513-f430-4b28-8016-c8542103e6f5", "7c676714-105b-4a8b-a58a-4ed1d5979c0f", "40d51513-f430-4b28-8016-c8542103e6f5", "7814a2c6-5fac-400d-bfd7-86da3ecac68b", "8e029383-4d53-4797-b098-a52cb5489924", "9792178e-3ff1-431f-b309-ffdf720bcd3d", "15d3fa40-93e7-4dfc-a299-496cdf539ee5", "9792178e-3ff1-431f-b309-ffdf720bcd3d", "15d3fa40-93e7-4dfc-a299-496cdf539ee5", "7c676714-105b-4a8b-a58a-4ed1d5979c0f", "40d51513-f430-4b28-8016-c8542103e6f5", "7c676714-105b-4a8b-a58a-4ed1d5979c0f", "40d51513-f430-4b28-8016-c8542103e6f5", "7814a2c6-5fac-400d-bfd7-86da3ecac68b", "8e029383-4d53-4797-b098-a52cb5489924"]}
+            ],
             "staffs": {
                 "UGAL": [{"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}],
                 "PEMADE_POLOS": [{"notation": ["a", ".", "a", "."]}, {"notation": ["a", ".", "a", "."]}, {"notation": ["a", "u", "e", "."]}, {"notation": ["e", ".", "e", "u"]}],
@@ -460,9 +474,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "e541564f-5b2d-4089-8cef-2b4ccd12464a",
+            "uuid": "9792178e-3ff1-431f-b309-ffdf720bcd3d",
             "id": 20,
             "index": 19,
+            "label": "Pa1",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "i", "."]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["u,", "-", "a,", "-"]}],
@@ -479,9 +494,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "b9444625-f65d-43e4-9854-98efc8faad79",
+            "uuid": "15d3fa40-93e7-4dfc-a299-496cdf539ee5",
             "id": 21,
             "index": 20,
+            "label": "Pa2",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}],
@@ -498,9 +514,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "f47d2aac-a988-4320-bf5c-7cffa650adb2",
+            "uuid": "7c676714-105b-4a8b-a58a-4ed1d5979c0f",
             "id": 22,
             "index": 21,
+            "label": "Pb1",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "u,", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
@@ -517,9 +534,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "e5898f39-9659-4601-a4bb-9e75440d0d9b",
+            "uuid": "40d51513-f430-4b28-8016-c8542103e6f5",
             "id": 23,
             "index": 22,
+            "label": "Pb2",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["e,", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
@@ -536,9 +554,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "a07483b0-15f8-43e1-8536-2c6cb0158d43",
+            "uuid": "7814a2c6-5fac-400d-bfd7-86da3ecac68b",
             "id": 24,
             "index": 23,
+            "label": "Pb3",
             "execution": [],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "u,", "-"]}, {"notation": ["o,", "-", "e,", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
@@ -555,9 +574,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "e60a6495-77fb-4186-8b80-2933cdf9cbaf",
+            "uuid": "8e029383-4d53-4797-b098-a52cb5489924",
             "id": 25,
             "index": 24,
+            "label": "Pb4",
             "execution": [
                 {"type": "tempo", "seqId": 2620, "passes": [2], "nthpass": false, "tooltip": "tempo current\u2192130 BPM beat 6\u21928 on pass 2", "tooltipshort": "\u2192130 BPM", "isGradual": true, "fromSection": 6, "section": 8, "value": 130.0}
             ],
@@ -576,12 +596,13 @@
             "editorGroup": []
         },
         {
-            "uuid": "8a1e8ca2-a9ea-44df-a56b-9eec9605c627",
+            "uuid": "7fd6768d-f221-4434-a85c-335a4da24c8b",
             "id": 26,
             "index": 25,
             "execution": [
                 {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "sequence", "seqId": 6000, "tooltip": "", "tooltipshort": "", "labels": ["A", "A", "B", "B", "A", "A", "B", "B", "A", "AN", "ANGSEL1B", "ANGSEL2B", "A", "AN", "ANGSEL3B", "B", "AN", "ANGSEL4A", "ANGSEL5B", "ANGSEL5B", "ANGSEL5A", "ANGSEL4A", "ANGSEL5B", "ANGSEL5B", "ANGSEL5A", "ANGSEL4A", "ANGSEL5B", "ANGSEL6B", "ANGSEL4A", "A", "B", "B", "ANGSEL3A", "A", "BN", "ANGSEL1B", "ANGSEL5AS", "AS", "BS", "BS", "AS", "AS", "BS", "BS", "AS", "ANGSEL3AX", "B", "ANGSEL4B", "ANGSEL7A", "ASS", "END"], "uuids": ["dc85acf2-cfb4-46ec-98da-a43621904e11", "dc85acf2-cfb4-46ec-98da-a43621904e11", "b017ba97-d956-4f41-b65b-f02705aede3a", "b017ba97-d956-4f41-b65b-f02705aede3a", "dc85acf2-cfb4-46ec-98da-a43621904e11", "dc85acf2-cfb4-46ec-98da-a43621904e11", "b017ba97-d956-4f41-b65b-f02705aede3a", "b017ba97-d956-4f41-b65b-f02705aede3a", "dc85acf2-cfb4-46ec-98da-a43621904e11", "bbe9dab9-1373-4775-bff3-998d78540574", "f40e4b78-a343-405e-982c-bd562a83bffd", "c5b9ae4e-2c2e-45df-a785-55602a76b7cf", "dc85acf2-cfb4-46ec-98da-a43621904e11", "bbe9dab9-1373-4775-bff3-998d78540574", "b13d2704-7e21-4560-8c12-96feaebdd482", "b017ba97-d956-4f41-b65b-f02705aede3a", "bbe9dab9-1373-4775-bff3-998d78540574", "4e7be305-3ff0-4444-874b-8933b6d2ad1a", "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6", "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6", "d4679ce8-7562-4cff-a763-cb4805ea0b71", "4e7be305-3ff0-4444-874b-8933b6d2ad1a", "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6", "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6", "d4679ce8-7562-4cff-a763-cb4805ea0b71", "4e7be305-3ff0-4444-874b-8933b6d2ad1a", "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6", "c26fee00-1c90-4e7c-91b7-425e15cc8aa4", "4e7be305-3ff0-4444-874b-8933b6d2ad1a", "dc85acf2-cfb4-46ec-98da-a43621904e11", "b017ba97-d956-4f41-b65b-f02705aede3a", "b017ba97-d956-4f41-b65b-f02705aede3a", "3d802a72-d91f-4fa2-a383-c00f801f1010", "dc85acf2-cfb4-46ec-98da-a43621904e11", "6d493d64-32d7-44be-8c1f-efb1f102e5b6", "f40e4b78-a343-405e-982c-bd562a83bffd", "acba797b-1c47-4f19-926b-b3efad1f178a", "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa", "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54", "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54", "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa", "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa", "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54", "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54", "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa", "9b19731a-ec3b-4d21-861a-8b41ec3bdf41", "b017ba97-d956-4f41-b65b-f02705aede3a", "afe76103-328f-4b74-a727-a78ba99719fd", "50798a89-f41c-470c-bde5-0b8a39383362", "b855eb1a-2790-4f75-aa23-98cd3b5aef9c", "a71b444f-2876-49b5-b3ba-fbf2f5203bff"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
@@ -598,9 +619,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "0eb67f6b-d89f-4354-8e2d-648e11edc651",
+            "uuid": "dc85acf2-cfb4-46ec-98da-a43621904e11",
             "id": 27,
             "index": 26,
+            "label": "A",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -620,9 +642,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "5f582da3-489d-4499-a97e-e385042904f8",
+            "uuid": "bbe9dab9-1373-4775-bff3-998d78540574",
             "id": 28,
             "index": 27,
+            "label": "An",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
@@ -643,9 +666,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "041306a6-3ab1-47f5-8fff-bc95595954d2",
+            "uuid": "ab5c3fbe-900c-4bc8-bb5c-79fbfeb0aefa",
             "id": 29,
             "index": 28,
+            "label": "As",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 95 BPM", "tooltipshort": "95 BPM", "isGradual": false, "section": 1, "value": 95.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -665,9 +689,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "7aa45e80-1948-418b-b2ba-d33279fe4540",
+            "uuid": "b855eb1a-2790-4f75-aa23-98cd3b5aef9c",
             "id": 30,
             "index": 29,
+            "label": "Ass",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 70 BPM", "tooltipshort": "70 BPM", "isGradual": false, "section": 1, "value": 70.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -687,9 +712,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "941901ae-1d01-4941-9646-d9774eff8224",
+            "uuid": "b017ba97-d956-4f41-b65b-f02705aede3a",
             "id": 31,
             "index": 30,
+            "label": "B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -709,9 +735,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "4b82c2a5-0e6c-45cf-bb01-cab98410ae48",
+            "uuid": "6d493d64-32d7-44be-8c1f-efb1f102e5b6",
             "id": 32,
             "index": 31,
+            "label": "Bn",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
@@ -732,9 +759,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "482fc952-78f5-412f-a540-233d4936a9b9",
+            "uuid": "fe4672f3-f0aa-48df-8e4a-8e7ba15a2c54",
             "id": 33,
             "index": 32,
+            "label": "Bs",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 95 BPM", "tooltipshort": "95 BPM", "isGradual": false, "section": 1, "value": 95.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -754,9 +782,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "a3eda11b-22fa-4c7c-864f-267d28824f95",
+            "uuid": "f40e4b78-a343-405e-982c-bd562a83bffd",
             "id": 34,
             "index": 33,
+            "label": "Angsel1B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -776,13 +805,14 @@
             "editorGroup": []
         },
         {
-            "uuid": "2ff3f04f-5886-4791-b5d2-97d1323ffb45",
+            "uuid": "c5b9ae4e-2c2e-45df-a785-55602a76b7cf",
             "id": 35,
             "index": 34,
+            "label": "Angsel2B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-                {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics current\u2192mp beat 5\u21926", "tooltipshort": "\u2192mp", "isGradual": true, "fromSection": 5, "section": 6, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+                {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics current\u2192mp beat 5\u21928", "tooltipshort": "\u2192mp", "isGradual": true, "fromSection": 5, "section": 8, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
             "staffs": {
                 "UGAL": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
@@ -799,9 +829,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "f414d10e-bb79-4c41-969d-d5a63f9b3059",
+            "uuid": "3d802a72-d91f-4fa2-a383-c00f801f1010",
             "id": 36,
             "index": 35,
+            "label": "Angsel3A",
             "execution": [
                 {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics mf beat 5", "tooltipshort": "mf", "isGradual": false, "section": 5, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
             ],
@@ -820,9 +851,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "5516726d-6cad-463a-81e0-4886a472e611",
+            "uuid": "9b19731a-ec3b-4d21-861a-8b41ec3bdf41",
             "id": 37,
             "index": 36,
+            "label": "Angsel3Ax",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 95 BPM", "tooltipshort": "95 BPM", "isGradual": false, "section": 1, "value": 95.0},
                 {"type": "tempo", "seqId": 2300, "tooltip": "tempo current\u2192120 BPM beat 3\u21926", "tooltipshort": "\u2192120 BPM", "isGradual": true, "fromSection": 3, "section": 6, "value": 120.0},
@@ -843,9 +875,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "d5c86ca7-69a4-4c9a-9198-b83d570dc8a2",
+            "uuid": "b13d2704-7e21-4560-8c12-96feaebdd482",
             "id": 38,
             "index": 37,
+            "label": "Angsel3B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics mf beat 5", "tooltipshort": "mf", "isGradual": false, "section": 5, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -865,9 +898,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "cf7be283-3fb9-491f-8809-29be564f0e11",
+            "uuid": "4e7be305-3ff0-4444-874b-8933b6d2ad1a",
             "id": 39,
             "index": 38,
+            "label": "Angsel4A",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -887,9 +921,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "79957f17-5740-47c2-84f9-6e61d5bf2a58",
+            "uuid": "afe76103-328f-4b74-a727-a78ba99719fd",
             "id": 40,
             "index": 39,
+            "label": "Angsel4B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -909,9 +944,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "ce92679e-f6ce-4077-858f-aa57a2f5e2bf",
+            "uuid": "d4679ce8-7562-4cff-a763-cb4805ea0b71",
             "id": 41,
             "index": 40,
+            "label": "Angsel5A",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -931,9 +967,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "6c1a2f05-e68f-48d9-85de-8864938482ac",
+            "uuid": "acba797b-1c47-4f19-926b-b3efad1f178a",
             "id": 42,
             "index": 41,
+            "label": "Angsel5As",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "tempo", "seqId": 2500, "tooltip": "tempo current\u219295 BPM beat 5\u21928", "tooltipshort": "\u219295 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 95.0},
@@ -955,9 +992,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "efa406c3-91f3-46cf-b813-d53aa39161fd",
+            "uuid": "9b26ad2e-0f44-4667-80d1-6e0638ccf6e6",
             "id": 43,
             "index": 42,
+            "label": "Angsel5B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -977,9 +1015,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "414cc755-180e-48c8-9d99-194eba5e599a",
+            "uuid": "c26fee00-1c90-4e7c-91b7-425e15cc8aa4",
             "id": 44,
             "index": 43,
+            "label": "Angsel6B",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -999,9 +1038,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "b2daa19c-e655-459b-9d8a-b5747c5f3058",
+            "uuid": "50798a89-f41c-470c-bde5-0b8a39383362",
             "id": 45,
             "index": 44,
+            "label": "Angsel7A",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -1021,9 +1061,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "e8a292ac-2eaf-411f-89e9-366ead807e8a",
+            "uuid": "afc71359-5c1f-4aa7-9ed5-973ede5d62ff",
             "id": 46,
             "index": 45,
+            "label": "Angsel8A",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
@@ -1043,9 +1084,10 @@
             "editorGroup": []
         },
         {
-            "uuid": "a41ff8fe-c20e-471d-9bb4-f4d77ff2fdaf",
+            "uuid": "a71b444f-2876-49b5-b3ba-fbf2f5203bff",
             "id": 47,
             "index": 46,
+            "label": "End",
             "execution": [
                 {"type": "tempo", "seqId": 2100, "tooltip": "tempo 70 BPM", "tooltipshort": "70 BPM", "isGradual": false, "section": 1, "value": 70.0},
                 {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
