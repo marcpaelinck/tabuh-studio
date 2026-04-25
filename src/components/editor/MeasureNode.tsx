@@ -88,6 +88,10 @@ export function MeasureNode({
         newMeasure.notation_ = parseNotationText(ref.current.value, validRegExpCell)
         navFunc.applyRules(newMeasure.notation_, rowId, colId, true)
         const newSysData = { ...systemData }
+        if (newSysData.staffs[position] == null) {
+            console.error(`Missing staffs for position ${position}`)
+            return
+        }
         newSysData.staffs[position][colId] = { ...newMeasure }
         scoreFunc.updateSystem(newSysData)
     }
