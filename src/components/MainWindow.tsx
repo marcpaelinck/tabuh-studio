@@ -46,7 +46,7 @@ import {
     type ComponentName,
     type DashboardComponentValues,
     type DashboardValues
-} from './editor/Dashboard'
+} from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
 import PlayerWindow from './player/PlayerWindow'

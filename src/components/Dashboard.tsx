@@ -6,7 +6,7 @@ import { BsDatabase, BsFileEarmarkMusic } from 'react-icons/bs'
 import { IoReload } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
 import { HStack, Tooltip, Whisper } from 'rsuite'
-import { debug } from '../../utils/debugger'
+import { debug } from '../utils/debugger'
 
 export type ComponentName = 'cycle' | 'score' | 'localCache'
 
