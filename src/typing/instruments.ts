@@ -23,3 +23,5 @@ export type Position =
     | 'REYONG_4'
     | 'TROMPONG'
     | 'UGAL'
+
+export type Tone = 'i,' | 'o,' | 'e,' | 'u,' | 'a,' | 'i' | 'o' | 'e' | 'u' | 'a' | 'i<' | 'o<' | 'e<' | 'u<' | 'a<'

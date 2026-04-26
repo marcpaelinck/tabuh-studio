@@ -86,8 +86,8 @@ ugal/ga	i---	----	----	----	----	----	--a,/.	a---
 reyong	b---	----	----	----	----	----	--b?.	b---
 cal/jeg	i
 gong	G		P		T		P
-
 	{GOTO PENGECET pass=1}
+
 	{TEMPO 80->50 beats=1->8}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beats=7->8}
 ugal/ga	i-o-i-o-	i-o-i-o-	i-o-i-oi	a,-i-a,-u,a,	i/.i-o-e-	u-a-u-e-	u---u-u-	u?..uu?uu?.
@@ -175,9 +175,9 @@ reyong	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-
 calung	i	u	e	o	i	u	e	e
 jegogan	i				i
 gong	G		P		T		P
+	{GOTO B1_1 pass=3}
 
 	## gongan 20
-	{GOTO B1_1 pass=3}
 	{TEMPO ->100 beats=1->8 pass=1}
 	{DYNAMICS f positions=[gangsa,reyong,ugal]}
 ugal/ga	ii-a	.au-	ee-o	.oe-	i-oe	uuuu	u?.u-	----
@@ -211,8 +211,8 @@ reyong24	i.b-	b?.b-	b?.b-	-xxx	x.o.	io.i	.oi.	oio.
 calung	i	u	e	e	e	u	u	e
 jegogan	i				e
 gong	G		P		T		P
-
 	{GOTO PENGECET}
+
 	{LABEL B1_1}
 ugal/pem	--ii	i-i/.	--ii	i-i/.	--i-	o-e-	i-o-	i-a,-
 kantilan p	i.e.	i.u,.	i.e.	i.u,.	i.e.	i.u,.	i.i.	e.o.

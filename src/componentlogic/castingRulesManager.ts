@@ -3,16 +3,18 @@
 
 import type { NoteSymbol } from '../typing/basetypes.ts'
 import type { Position } from '../typing/instruments.ts'
+import { splitTone } from '../utils/alphabet.ts'
 import { debug } from '../utils/debugger.ts'
+import { isEvenByIndex as isEvenPositionByIndex } from '../utils/objectUtils.ts'
 
-type CastingInstructionType = 'nokempyung'
+type CastingInstructionType = 'nokempyung' | 'norot'
 export interface CastingInstruction {
     type: CastingInstructionType
     positions?: Position[]
     scope?: 'score' | 'system'
 }
 
-type RuleName = 'default' | 'nokempyung'
+type RuleName = 'default' | 'nokempyung' | 'norot'
 type CastingRule = Record<NoteSymbol, NoteSymbol>
 type PositionRuleSet = Partial<Record<RuleName, CastingRule>> & Record<'default', CastingRule>
 type CastingRuleSet = Partial<Record<Position, PositionRuleSet>> & Record<'DEFAULT', PositionRuleSet>
@@ -40,20 +42,25 @@ const castingRules: CastingRuleSet = {
     REYONG_1: {default: { 'o,':'a,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'u,', o: 'a,', e: 'e,', u: 'u,', a: 'a,', 'i<':'u,',
                         'I':'A', 'O': 'I', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 't':'t', 'b':'b', 'x':'x', '-': '-', '.': '.' },
             nokempyung: { 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', 'e': 'e,', 'u': 'u,', 'a': 'a,', 'i<': 'i', 'o<': 'o',
-                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' }},
+                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
+                norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
     REYONG_2: {default: { 'o,':'o', 'e,': 'e', 'u,': 'o', 'a,': 'e', i: 'i', o: 'o', e: 'e', u: 'o', a: 'e', 'i<': 'i',
                         'I':'I', 'O': 'O', 'E':'E', 'U': 'O', 'A': 'E', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
             nokempyung: { 'a,': 'a,', i: 'i', o: 'o', 'e': 'e', 'u': 'u,', 'a': 'a,', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u',
-                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' }},
+                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
+                norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
     REYONG_3: {default: { 'o,':'a', 'e,': 'i<', 'u,': 'u', 'a,': 'a', i: 'i<', o: 'a', e: 'i<', u: 'u', a: 'a', 'i<': 'i<',
                         'I':'I', 'O': 'A', 'E':'I', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
             nokempyung: { 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i<', o: 'o<', 'e': 'e', 'u': 'u', 'a': 'a', 'i<': 'i<', 'o<': 'o<',
-                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' }},
+                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
+                norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
     REYONG_4: {default: { 'o,':'o<', 'e,': 'e<', 'u,': 'u<', 'a,': 'e<', i: 'u<', o: 'o<', e: 'e<', u: 'u<', a: 'e<', 'i<': 'u<',
                         'I':'U', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'E', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
             nokempyung: { 'a,': 'a', i: 'i<', o: 'o<', 'e': 'e<', 'u': 'u<', 'a': 'a', 'i<': 'i<', 'o<': 'o<', 'e<': 'e<', 'u<': 'u<',
-                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' }},
-    DEFAULT: {default: { 'o,':' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', '-': '-', '.': '.' }}
+                        'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.' },
+                norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
+    DEFAULT: {default: { 'i,':' ', 'o,':' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', 'o<': ' ', 'e<': ' ', 'u<': ' ', 'a<': ' ', '-': '-', '.': '.' }
+}
 }
 
 // POKOK RULES - the pokok instruments play a selection of the full notation.
@@ -69,34 +76,35 @@ const nokempyung: Partial<Position>[][] = [
     ['REYONG_1', 'REYONG_3'],
     ['REYONG_2', 'REYONG_4']
 ]
-// Splits a symbol in a tone (pitch letter + octave character) and the rest (remaining characters).
-const splitTone = (symbol: string): string[] => {
-    // const regExp = RegExp(_.escapeRegExp('^([aeiours-\.][,<]{0,1})(.*)$'), 'g')
-    const regExp = /^([abeiourstxABEIOURSX\-\.][,<]{0,1})(.*)$/g
-    const match = symbol.matchAll(regExp)
-    return [...match.map((el) => [el[1], el[2]])].flat(1)
-}
 
-function selectRule(position: Position, group: Position[], castingInstructions?: CastingInstruction[]): CastingRule {
+function selectRule(
+    position: keyof CastingRuleSet,
+    group: Position[],
+    castingInstructions?: CastingInstruction[]
+): CastingRule {
     if (!castingRules[position]) return castingRules.DEFAULT.default
 
     // Do not cast notes to the kempyung equivalent if the group occurs in `nokempyung`.
     if (nokempyung.some((nkgroup) => group.every((pos) => nkgroup.includes(pos))))
         return castingRules[position].nokempyung!
+    // Do not cast notes to the kempyung equivalent if the `.
 
     const posRuleset = castingRules[position]
     if (castingInstructions) {
         for (const instruction of castingInstructions) {
             switch (instruction.type) {
                 case 'nokempyung':
-                    if (!instruction.positions || instruction.positions.includes(position)) {
+                    if (!instruction.positions || instruction.positions.includes(position as Position)) {
                         return posRuleset!.nokempyung || posRuleset!.default
                     }
                     break
+                case 'norot':
+                    return posRuleset.norot || posRuleset.default
                 default:
             }
         }
     }
+
     return posRuleset.default
 }
 
@@ -108,15 +116,17 @@ export function castNotation(
     notation: string[],
     position: Position,
     group: Position[],
-    measureId: number,
+    measureIdx: number,
     castingInstructions?: CastingInstruction[]
 ): string[] {
     const conversion: CastingRule = selectRule(position, group, castingInstructions)
+    // Norot notes should not be translated to kempyung
+    const norotconversion: CastingRule = selectRule(position, group, [{ type: 'norot' as CastingInstructionType }])
 
     var updatedNotation = [...notation]
 
     // Apply pokok rules
-    if (onlyOddMeasures.includes(position) && (measureId + 1) % 2 == 0) {
+    if (onlyOddMeasures.includes(position) && isEvenPositionByIndex(measureIdx)) {
         // Clear even numbered measures. Note that measure numbering starts with 0.
         updatedNotation = updatedNotation.map((_) => '-')
         debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
@@ -139,7 +149,7 @@ export function castNotation(
     // Apply casting rules
     const result = updatedNotation.map((symbol) => {
         const [tone, rest] = splitTone(symbol)
-        var cast = conversion[tone]
+        var cast = rest.includes('n') ? norotconversion[tone] : conversion[tone]
         const newSymbol = cast ? cast + rest : ' '
         return newSymbol
     })

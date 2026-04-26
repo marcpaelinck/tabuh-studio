@@ -10,8 +10,8 @@ import { NavigationFunctions, ScoreFunctions } from '../contexts'
 
 interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
     position: Position
-    rowId: number
-    colId: number
+    rowIdx: number
+    colIdx: number
     validSymbols: string[]
     measureData: Measure
     systemData: System
@@ -20,8 +20,8 @@ interface NavigationCellProps extends HTMLProps<HTMLTextAreaElement> {
 // Creates a cell containing one measure: the notation of one beat for a single instrument position.
 export function MeasureNode({
     position,
-    rowId,
-    colId,
+    rowIdx,
+    colIdx,
     validSymbols,
     measureData,
     systemData,
@@ -36,7 +36,7 @@ export function MeasureNode({
         `${props.id}`,
         ref,
         validSymbols,
-        (action: NavigationAction) => navFunc.navigate(action, rowId, colId),
+        (action: NavigationAction) => navFunc.navigate(action, rowIdx, colIdx),
         updateNotation
     )
     const { validRegExpCell } = symbolValidationUtils(validSymbols)
@@ -49,7 +49,7 @@ export function MeasureNode({
     }
 
     useEffect(() => {
-        navFunc.register(rowId, colId, ref)
+        navFunc.register(rowIdx, colIdx, ref)
         // Edits are cached until the user saves their changes.
         // Display the cached value if previous edits have not yet been saved.
         if (measure.notation_ && ref.current) ref.current.value = measure.notation_.join('')
@@ -57,7 +57,7 @@ export function MeasureNode({
     }, [])
 
     useEffect(() => {
-        debug(`updating data of cell ${rowId},${colId} to ${ref.current?.value}`)
+        debug(`updating data of cell ${rowIdx},${colIdx} to ${ref.current?.value}`)
         if (ref.current) {
             ref.current.value = notation2text(measure.notation_ || measure.notation)
             highlightOnChangedContent(ref.current)
@@ -87,13 +87,13 @@ export function MeasureNode({
         debug(`updating!`, false, 'MeasureNode')
         const newMeasure = { ...measure }
         newMeasure.notation_ = parseNotationText(ref.current.value, validRegExpCell)
-        navFunc.applyRules(newMeasure.notation_, rowId, colId, true)
+        navFunc.applyRules(newMeasure.notation_, rowIdx, colIdx, true)
         const newSysData = { ...systemData }
         if (newSysData.staffs[position] == null) {
             console.error(`Missing staffs for position ${position}`)
             return
         }
-        newSysData.staffs[position][colId] = { ...newMeasure }
+        newSysData.staffs[position][colIdx] = { ...newMeasure }
         scoreFunc.updateSystem(newSysData)
     }
 

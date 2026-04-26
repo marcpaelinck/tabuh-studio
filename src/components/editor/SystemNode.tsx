@@ -119,17 +119,17 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
 
     // Fills the notation of the given measure (colId) for all grouped instruments
     // by casting the given notation for each instrument.
-    function applyRules(notation: string[], rowId: number, colId: number, cached: boolean) {
+    function applyRules(notation: string[], rowIdx: number, colIdx: number, cached: boolean) {
         // Input should currently come from Pemade polos part
         // TODO add a separate input field for grouped positions
-        if (positions[rowId] != 'PEMADE_POLOS') return
+        if (positions[rowIdx] != 'PEMADE_POLOS') return
         const newSystemData = { ...systemData }
         positions.forEach((pos) => {
             const position: Position = pos as Position
             if (!systemData.editorGroup.includes(position)) return
-            const newNotation = castNotation(notation, position, [position], colId)
-            if (cached) newSystemData.staffs[position]![colId].notation_ = newNotation
-            else newSystemData.staffs[position]![colId].notation = newNotation
+            const newNotation = castNotation(notation, position, [position], colIdx)
+            if (cached) newSystemData.staffs[position]![colIdx].notation_ = newNotation
+            else newSystemData.staffs[position]![colIdx].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
         })
         scoreFunc.updateSystem(newSystemData)
@@ -147,7 +147,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
 
     const staffNodes = useMemo(
         () =>
-            Object.entries(systemData.staffs).map(([pos, measures], rowId) => {
+            Object.entries(systemData.staffs).map(([pos, measures], rowIdx) => {
                 const position: Position = pos as Position
                 if (systemData.index == 0) debug(`useMemo: recreating staffnodes of system ${systemUuid}`)
                 return (
@@ -166,7 +166,7 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
                         <StaffNode
                             sysUuid={systemUuid}
                             position={position}
-                            rowId={rowId}
+                            rowIdx={rowIdx}
                             measures={measures}
                             systemData={systemData}
                             colWidths={systemData.colWidths}

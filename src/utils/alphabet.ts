@@ -99,3 +99,11 @@ export function noteRange(position: Position, invert: boolean = false) {
     const range = _.keys(positionConfigs[position].symbolToNoteNames).filter((sym) => /^[aeiou][,<]{0,1}$/.test(sym))
     return sortNotes(range)
 }
+
+// Splits a symbol in a tone (pitch letter + octave character) and the rest (remaining characters).
+export const splitTone = (symbol: string): string[] => {
+    // const regExp = RegExp(_.escapeRegExp('^([aeiours-\.][,<]{0,1})(.*)$'), 'g')
+    const regExp = /^([abeiourstxABEIOURSX\-\.][,<]{0,1})(.*)$/g
+    const match = symbol.matchAll(regExp)
+    return [...match.map((el) => [el[1], el[2]])].flat(1)
+}

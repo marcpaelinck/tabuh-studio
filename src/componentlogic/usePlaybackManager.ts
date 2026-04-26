@@ -340,6 +340,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                             samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
                             timeMs: currTimeMs,
+                            measureIdx: currentStep!.sectionIdx,
                             position,
                             prevsymbol: prevSymbol,
                             symbol: cleanSymbol(symbol),

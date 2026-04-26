@@ -12,14 +12,14 @@ import { MeasureNode } from './MeasureNode'
 export function StaffNode({
     sysUuid,
     position,
-    rowId,
+    rowIdx,
     measures,
     systemData,
     colWidths
 }: {
     sysUuid: string
     position: Position
-    rowId: number
+    rowIdx: number
     measures: Measure[]
     systemData: System
     colWidths: number[]
@@ -28,18 +28,18 @@ export function StaffNode({
 
     const measureNodes = useMemo(
         () =>
-            measures.map((measure: Measure, sidx: number) => {
+            measures.map((measure: Measure, sectIdx: number) => {
                 debug(`useMemo: recreating measures of system ${sysUuid} ${position}`)
-                const width: string = getTextWidthInPx('x'.repeat(colWidths[sidx]), 14) + 15 + 'px'
+                const width: string = getTextWidthInPx('x'.repeat(colWidths[sectIdx]), 14) + 15 + 'px'
                 const validSymbols: string[] = getValidSymbols(position, true, true)
                 return (
-                    <Col id={`COL-${rowId * 100 + sidx}`} key={rowId * 100 + sidx} span="auto">
+                    <Col id={`COL-${rowIdx * 100 + sectIdx}`} key={rowIdx * 100 + sectIdx} span="auto">
                         <MeasureNode
-                            key={`sys ${sysUuid} ${position} measure ${sidx}`}
-                            id={`sys ${sysUuid} ${position} measure ${sidx}`}
+                            key={`sys ${sysUuid} ${position} measure ${sectIdx}`}
+                            id={`sys ${sysUuid} ${position} measure ${sectIdx}`}
                             position={position}
-                            rowId={rowId}
-                            colId={sidx}
+                            rowIdx={rowIdx}
+                            colIdx={sectIdx}
                             validSymbols={validSymbols}
                             measureData={measure}
                             systemData={systemData}

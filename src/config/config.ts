@@ -304,7 +304,7 @@ export const AcceleratingTremoloChars = [':']
 export const RakeUpChars = [']']
 export const RakeDownChars = ['[']
 export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S', 'X', 'B']
-export const NorotChars = ['n', 'N']
+export const NorotChars = ['n', 'm']
 
 //prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {
