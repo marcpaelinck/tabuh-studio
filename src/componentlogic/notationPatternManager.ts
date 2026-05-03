@@ -258,21 +258,21 @@ function norotPattern(position: Position, staff: Measure[], measureIdx: number, 
     }
     // Remove any space symbols and determine the norot type
     const notation = staff[measureIdx].notation.filter((symbol) => symbol.replace(' ', '') != '')
-    //     if (notation.length > 2) {
-    //         console.error(`Unexpected number of norot symbols: expected 1 or 2 but found ${notation.length}.`)
-    //         return []
-    //     }
     const norotType: NorotType = notation.length == 1 ? 'kotekan' : 'homophonic'
 
     // Determine the current and previous tone
-    // Assume that the first symbol of the staff coincides with the GIR and set the prevSymbol to undefined.
+    // Assume that the first symbol of the staff coincides with the GIR and set its prevSymbol value to undefined.
     const symbol = staff[measureIdx].notation[symbolIdx]
-    const prevSymbol =
+    var prevSymbol =
         symbolIdx > 0
-            ? staff[measureIdx].notation[symbolIdx - 1]
+            ? staff[measureIdx].notation[symbolIdx - 1] // previous symbol is in the same measure
             : measureIdx > 0
-              ? staff[measureIdx - 1].notation.at(-1)
+              ? staff[measureIdx - 1].notation.at(-1) // previous symbol is the last symbol of the previous measure
               : undefined
+
+    // Ignore the previous norot symbol if it not a norot symbol.
+    if (prevSymbol && getPatternType(prevSymbol, position) == 'NOROT') prevSymbol = undefined
+
     // The norot pattern is set to majalan if there is a change in tone, at the beginning of a norot sequence or on the GIR.
     const norotPattern: NorotSubPattern = prevSymbol == symbol ? 'ngubeng' : 'majalan'
 
@@ -285,10 +285,10 @@ function norotPattern(position: Position, staff: Measure[], measureIdx: number, 
     // Majalan: set the first pattern note to the last norot pokok if it exists, otherwise set it to a muting symbol.
     // The previous note is either the first note of the measure (homophonic) or the (last) note of the previous measure (kotekan).
     // In the latter case the previous measure is in the current staff (majalan can not occur in the first beat of the staff).
-    var firstNote, _rest2: NoteSymbol
+    var firstNote: NoteSymbol
     if (measureIdx == 0 && symbolIdx == 0)
         firstNote = patterns.norot.patterns[position]![currTone][norotType].basenote // subpattern on GIR
-    else if (prevSymbol && getPatternType(prevSymbol, position) == 'NOROT') {
+    else if (prevSymbol) {
         const [prevTone, _rest2] = splitTone(prevSymbol)
         firstNote = patterns.norot.patterns[position]![prevTone][norotType].basenote
     } else firstNote = '.' // start of a norot sequence

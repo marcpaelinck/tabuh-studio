@@ -227,6 +227,10 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         })
     }
 
+    // Add kempli
+    for (const system of score.systems) {
+    }
+
     // Generate and assign the score's `parts` attribute.
     // Parts instructions only contain the first system of the part. Assume that
     // each part should be extended until the next part or the end of the score.
