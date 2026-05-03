@@ -15,11 +15,10 @@ const DefaultObjectFactory = {
             uuid: '',
             title: 'default',
             composer: '',
-            instrumenttype: '',
+            instrumenttype: 'UNDEFINED',
             positions: [],
             systems: [],
-            parts: {},
-            hasCycle: false
+            parts: {}
         } as Score
     }
 }

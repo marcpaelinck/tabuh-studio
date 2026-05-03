@@ -218,7 +218,7 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
             case 'execution':
                 // Changes to the system data have been performed by the FlowItemsForm
                 if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
-                const validation = cycleValidation(score, true)
+                const validation = cycleValidation(score)
                 if (!validation.isValid)
                     dashboardFunctions.setDashboardElement('cycle', {
                         visible: true,

@@ -257,7 +257,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         if (loadedScore) {
             updateScore(loadedScore)
             // UPDATE DASHBOARD
-            const validation = cycleValidation(loadedScore, true)
+            const validation = cycleValidation(loadedScore)
             if (!validation.isValid)
                 setDashboardElement('cycle', { visible: true, tooltip: validation.message, level: 'error' })
             setDashboardElement('score', {

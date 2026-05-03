@@ -1,30 +1,32 @@
-// Converts symbols that represent multiple notes to an array of symbol/duration pairs.
+// Converts symbols to one or more playback actions.
+//
+// This module handles single note symbols and special patterns characters that cannot be written
+// accurately as a sequence of base notes, such as tremolo or rake.
+//
+// Patterns that are shorthand notation for sequences of base notes --e.g. 'norot' patterns--
+// should be converted to regular notation symbols by the notationPatternManager. They are not handled
+// in this module.
 
 import _ from 'lodash'
 import * as ToneJS from 'tone'
 import {
     AcceleratingTremoloChars,
     ExtensionChars,
-    GraceNoteChars,
-    HalfDurationChars,
     MelodicNoteChars,
     MutingChars,
-    NorotChars,
     noteConfigs,
     OctavationChars,
     positionConfigs,
     RakeDownChars,
-    RakeUpChars,
     TremoloChars
 } from '../config/config'
 import type { BPM, DurationInBasenoteEquiv, NoteSymbol, TimeInBasenoteEquiv } from '../typing/basetypes'
-import type { Position, Tone } from '../typing/instruments'
+import type { Position } from '../typing/instruments'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../typing/playback'
-import { getValidSymbols, noteRange, splitTone } from '../utils/alphabet'
+import { noteRange } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
+import { getPatternType } from '../utils/patterns'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
-
-type NorotType = 'unisono' | 'kotekan'
 
 // prettier-ignore
 const patterns = {
@@ -60,132 +62,7 @@ const patterns = {
             pattern_duration_in_millis: 120, // Total duration of the pattern.
             note_duration_in_millis: 5000 // sustain time of the notes: this will make the notes overlap.
         },
-    norot:
-        // NOROT: a single norot symbol stands for a 4-note norot pattern, either ngubeng or majalan. The patternManager logic will determine which pattern
-        //        should be created. See Tenzer, Gamelan Gong Keybar, p. 215ff.
-        {
-            modifiers: { unisono: 'n', kotekan: 'm' },
-            duration: 4,
-            index: { ngubeng: 0, majalan: 1 }, // index of the pattern in the list
-            patterns: {
-                // ngubeng and majalan patterns. '?' stands for the previous base note
-                // (or the current base note if the previous symbol is not a norot pattern).
-                // The majalan pattern is applied at the beginning of a norot passage, when the base note changes
-                // and when a norot symbol aligns with the gir.
-                PEMADE_POLOS: {
-                    'o,': { unisono: [['o,', 'e,', 'o,', 'e,'], ['?', 'o,/', 'o,', 'e,']], kotekan: [['o,', '.', 'o,', '.'], ['?', 'o,', 'o,', '.']] },
-                    'e,': { unisono: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,/', 'e,', 'u,']], kotekan: [['e,', '.', 'e,', '.'], ['?', 'e,', 'e,', '.']] },
-                    'u,': { unisono: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,/', 'u,', 'a,']], kotekan: [['u,', '.', 'u,', '.'], ['?', 'u,', 'u,', '.']] },
-                    'a,': { unisono: [['a,', 'i,', 'a,', 'i,'], ['?', 'a,/', 'a,', 'i,']], kotekan: [['a,', '.', 'a,', '.'], ['?', 'a,', 'a,', '.']] },
-                    i: { unisono: [['i', 'o', 'i', 'o'], ['?', 'i/', 'i', 'o']], kotekan: [['i', '.', 'i', '.'], ['?', 'i', 'i', '.']] },
-                    o: { unisono: [['o', 'e', 'o', 'e'], ['?', 'o/', 'o', 'e']], kotekan: [['o', '.', 'o', '.'], ['?', 'o', 'o', '.']] },
-                    e: { unisono: [['e', 'u', 'e', 'u'], ['?', 'e/', 'e', 'u']], kotekan: [['e', '.', 'e', '.'], ['?', 'e', 'e', '.']] },
-                    u: { unisono: [['u', 'a', 'u', 'a'], ['?', 'u/', 'u', 'a']], kotekan: [['u', '.', 'u', '.'], ['?', 'u', 'u', '.']] },
-                    a: { unisono: [['a', 'i<', 'a', 'i<'], ['?', 'a/', 'a', 'i<']], kotekan: [['a', '.', 'a', '.'], ['?', 'a', 'a', '.']] },
-                    'i<': { unisono: [['i<', 'a', 'i<', 'a'], ['?', 'i</', 'i<', 'a']], kotekan: [['i<', '.', 'i<', '.'], ['?', 'i</', 'i<', '.']] }
-                },
-                KANTILAN_POLOS: {
-                    'o,': { unisono: [['o,', 'e,', 'o,', 'e,'], ['?', 'o,/', 'o,', 'e,']], kotekan: [['o,', '.', 'o,', '.'], ['?', 'o,', 'o,', '.']] },
-                    'e,': { unisono: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,/', 'e,', 'u,']], kotekan: [['e,', '.', 'e,', '.'], ['?', 'e,', 'e,', '.']] },
-                    'u,': { unisono: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,/', 'u,', 'a,']], kotekan: [['u,', '.', 'u,', '.'], ['?', 'u,', 'u,', '.']] },
-                    'a,': { unisono: [['a,', 'i,', 'a,', 'i,'], ['?', 'a,/', 'a,', 'i,']], kotekan: [['a,', '.', 'a,', '.'], ['?', 'a,', 'a,', '.']] },
-                    i: { unisono: [['i', 'o', 'i', 'o'], ['?', 'i/', 'i', 'o']], kotekan: [['i', '.', 'i', '.'], ['?', 'i', 'i', '.']] },
-                    o: { unisono: [['o', 'e', 'o', 'e'], ['?', 'o/', 'o', 'e']], kotekan: [['o', '.', 'o', '.'], ['?', 'o', 'o', '.']] },
-                    e: { unisono: [['e', 'u', 'e', 'u'], ['?', 'e/', 'e', 'u']], kotekan: [['e', '.', 'e', '.'], ['?', 'e', 'e', '.']] },
-                    u: { unisono: [['u', 'a', 'u', 'a'], ['?', 'u/', 'u', 'a']], kotekan: [['u', '.', 'u', '.'], ['?', 'u', 'u', '.']] },
-                    a: { unisono: [['a', 'i<', 'a', 'i<'], ['?', 'a/', 'a', 'i<']], kotekan: [['a', '.', 'a', '.'], ['?', 'a', 'a', '.']] },
-                    'i<': { unisono: [['i<', 'a', 'i<', 'a'], ['?', 'i</', 'i<', 'a']], kotekan: [['i<', '.', 'i<', '.'], ['?', 'i</', 'i<', '.']] }
-                },
-                PEMADE_SANGSIH: {
-                    'o,': { unisono: [['o,', 'e,', 'o,', 'e,'], ['?', 'o,/','o,','e,']], kotekan: [['.', 'e,', '.', 'e,'], ['.,', 'o,', 'o,', 'e,']] },
-                    'e,': { unisono: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,/','e,','u,']], kotekan: [['.', 'u,', '.', 'u,'], ['.,', 'e,', 'e,', 'u,']] },
-                    'u,': { unisono: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,/','u,','a,']], kotekan: [['.', 'a,', '.', 'a,'], ['.,', 'u,', 'u,', 'a,']] },
-                    'a,': { unisono: [['a,', 'i,', 'a,', 'i,'], ['?', 'a,/','a,','i,']], kotekan: [['.', 'i,', '.', 'i,'], ['.,', 'a,', 'a,', 'i,']] },
-                    i: { unisono: [['i', 'o', 'i', 'o'], ['?', 'i/', 'i', 'o']], kotekan: [['.', 'o', '.', 'o'], ['.', 'i', 'i', 'o']] },
-                    o: { unisono: [['o', 'e', 'o', 'e'], ['?', 'o/', 'o', 'e']], kotekan: [['.', 'e', '.', 'e'], ['.', 'o', 'o', 'e']] },
-                    e: { unisono: [['e', 'u', 'e', 'u'], ['?', 'e/', 'e', 'u']], kotekan: [['.', 'u', '.', 'u'], ['.', 'e', 'e', 'u']] },
-                    u: { unisono: [['u', 'a', 'u', 'a'], ['?', 'u/', 'u', 'a']], kotekan: [['.', 'a', '.', 'a'], ['.', 'u', 'u', 'a']] },
-                    a: { unisono: [['a', 'i<', 'a', 'i<'], ['?', 'a/', 'a', 'i<']], kotekan: [['.', 'i<', '.', 'i<'], ['.', 'a', 'a', 'i<']] },
-                    'i<': { unisono: [['i<', 'a', 'i<', 'a'], ['?', 'i</', 'i<', 'a']], kotekan: [['.', 'a', '.', 'a'], ['.', 'i</', 'i<', 'a']] }
-                },
-                KANTILAN_SANGSIH: {
-                    'o,': { unisono: [['o,', 'e,', 'o,', 'e,'], ['?', 'o,/','o,','e,']], kotekan: [['.', 'e,', '.', 'e,'], ['.,', 'o,', 'o,', 'e,']] },
-                    'e,': { unisono: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,/','e,','u,']], kotekan: [['.', 'u,', '.', 'u,'], ['.,', 'e,', 'e,', 'u,']] },
-                    'u,': { unisono: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,/','u,','a,']], kotekan: [['.', 'a,', '.', 'a,'], ['.,', 'u,', 'u,', 'a,']] },
-                    'a,': { unisono: [['a,', 'i,', 'a,', 'i,'], ['?', 'a,/','a,','i,']], kotekan: [['.', 'i,', '.', 'i,'], ['.,', 'a,', 'a,', 'i,']] },
-                    i: { unisono: [['i', 'o', 'i', 'o'], ['?', 'i/', 'i', 'o']], kotekan: [['.', 'o', '.', 'o'], ['.', 'i', 'i', 'o']] },
-                    o: { unisono: [['o', 'e', 'o', 'e'], ['?', 'o/', 'o', 'e']], kotekan: [['.', 'e', '.', 'e'], ['.', 'o', 'o', 'e']] },
-                    e: { unisono: [['e', 'u', 'e', 'u'], ['?', 'e/', 'e', 'u']], kotekan: [['.', 'u', '.', 'u'], ['.', 'e', 'e', 'u']] },
-                    u: { unisono: [['u', 'a', 'u', 'a'], ['?', 'u/', 'u', 'a']], kotekan: [['.', 'a', '.', 'a'], ['.', 'u', 'u', 'a']] },
-                    a: { unisono: [['a', 'i<', 'a', 'i<'], ['?', 'a/', 'a', 'i<']], kotekan: [['.', 'i<', '.', 'i<'], ['.', 'a', 'a', 'i<']] },
-                    'i<': { unisono: [['i<', 'a', 'i<', 'a'], ['?', 'i</', 'i<', 'a']], kotekan: [['.', 'a', '.', 'a'], ['.', 'i</', 'i<', 'a']] }
-                },
-                REYONG_1: {
-                    i: { unisono: [['.', 'a,', 'u,', 'a,'], ['?', '.', 'u,', 'a,']], kotekan: [['.', 'a,', 'u,', 'a,'], ['?', '.', 'u,', 'a,']] },
-                    o: { unisono: [['.', 't', '.', 't'], ['?', 'u,', 'a,', 't']], kotekan: [['.', 't', '.', 't'], ['?', 'u,', 'a,', 't']] },
-                    e: { unisono: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,', 'e,', 'u,']], kotekan: [['e,', 'u,', 'e,', 'u,'], ['?', 'e,', 'e,', 'u,']] },
-                    u: { unisono: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,', 'u,', 'a,']], kotekan: [['u,', 'a,', 'u,', 'a,'], ['?', 'u,', 'u,', 'a,']] },
-                    a: { unisono: [['a,', 'e,', 'a,', 'e,'], ['?', 'a,', 'a,', 'e,']], kotekan: [['a,', 'e,', 'a,', 'e,'], ['?', 'a,', 'a,', 'e,']] }
-                },
-                REYONG_2: {
-                    i: { unisono: [['i', 'o', 'i', 'o'], ['?', 'i', 'i', 'o']], kotekan: [['i', 'o', 'i', 'o'], ['?', 'i', 'i', 'o']] },
-                    o: { unisono: [['o', 'e', 'o', 'e'], ['?', 'o', 'o', 'e']], kotekan: [['o', 'e', 'o', 'e'], ['?', 'o', 'o', 'e']] },
-                    e: { unisono: [['e', 'i', 'e', 'i'], ['?', 'e', 'e', 'i']], kotekan: [['e', 'i', 'e', 'i'], ['?', 'e', 'e', 'i']] },
-                    u: { unisono: [['.', 'e', 'o', 'e'], ['?', '.', 'o', 'e']], kotekan: [['.', 'e', 'o', 'e'], ['?', '.', 'o', 'e']] },
-                    a: { unisono: [['.', 'i', 'o', 'i'], ['?', '.', 'o', 'i']], kotekan: [['.', 'i', 'o', 'i'], ['?', '.', 'o', 'i']] }
-                },
-                REYONG_3: {
-                    i: { unisono: [['a', '.', 'a', 'u'], ['?', '.', 'u', 'a']], kotekan: [['a', '.', 'a', 'u'], ['?', '.', 'u', 'a']] },
-                    o: { unisono: [['.', 'i<', 'a', 'i<'], ['?', '.', 'a', 'i<']], kotekan: [['.', 'i<', 'a', 'i<'], ['?', '.', 'a', 'i<']] },
-                    e: { unisono: [['.', 'u', 'a', 'u'], ['?', '.', 'a', 'u']], kotekan: [['.', 'u', 'a', 'u'], ['?', '.', 'a', 'u']] },
-                    u: { unisono: [['u', 'a', 'u', 'a'], ['?', 'u', 'u', 'a']], kotekan: [['u', 'a', 'u', 'a'], ['?', 'u', 'u', 'a']] },
-                    a: { unisono: [['a', 'u', 'a', 'u'], ['?', 'a', 'a', 'u']], kotekan: [['a', 'u', 'a', 'u'], ['?', 'a', 'a', 'u']] }
-                },
-                REYONG_4: {
-                    i: { unisono: [['o<', 'i<', 'o<', 'i<'], ['?', 'i<', 'i<', 'o<']], kotekan: [['o<', 'i<', 'o<', 'i<'], ['?', 'i<', 'i<', 'o<']] },
-                    o: { unisono: [['o<', 'e<', 'o<', 'e<'], ['?', 'o<', 'o<', 'e<']], kotekan: [['o<', 'e<', 'o<', 'e<'], ['?', 'o<', 'o<', 'e<']] },
-                    e: { unisono: [['e<', 'u<', 'e<', 'u<'], ['?', 'e<', 'e<', 'u<']], kotekan: [['e<', 'u<', 'e<', 'u<'], ['?', 'e<', 'e<', 'u<']] },
-                    u: { unisono: [['u<', 'e<', 'u<', 'e<'], ['?', 'u<', 'u<', 'e<']], kotekan: [['u<', 'e<', 'u<', 'e<'], ['?', 'u<', 'u<', 'e<']] },
-                    a: { unisono: [['.', 'i<', 'o<', 'i<'], ['?', '.', 'o<', 'i<']], kotekan: [['.', 'i<', 'o<', 'i<'], ['?', '.', 'o<', 'i<']] }
-                }
-            }
-        },
     gracenote: { duration: 0.5 }
-}
-
-type PatternType =
-    | 'SINGLENOTE'
-    | 'HALF_DURATION'
-    | 'TREMOLO'
-    | 'TREMOLO_ACC'
-    | 'GRACENOTE'
-    | 'RAKE'
-    | 'NOROT'
-    | 'UNHANDLED'
-    | 'INVALID'
-
-function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
-    const validSymbols = getValidSymbols(position, true, false)
-    switch (true) {
-        case validSymbols.includes(symbol):
-            return 'SINGLENOTE'
-        case HalfDurationChars.some((char) => symbol.endsWith(char)):
-            return 'HALF_DURATION'
-        case !positionConfigs[position].validPatterns.includes(symbol):
-            return 'INVALID'
-        case symbol.length > 0 && GraceNoteChars.includes(symbol[0]):
-            return 'GRACENOTE'
-        case NorotChars.some((char) => symbol.includes(char)):
-            return 'NOROT'
-        case TremoloChars.includes(symbol.slice(-1)):
-            return 'TREMOLO'
-        case AcceleratingTremoloChars.includes(symbol.slice(-1)):
-            return 'TREMOLO_ACC'
-        case _.concat(RakeUpChars, RakeDownChars).includes(symbol.slice(-1)):
-            return 'RAKE'
-        default:
-            return 'UNHANDLED'
-    }
 }
 
 export interface CreatePatternArgs {
@@ -224,8 +101,6 @@ export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerActio
             return AcceleratingTremoloAction(args)
         case 'RAKE':
             return rakeAction(args)
-        case 'NOROT':
-            return norotAction(args)
         case 'INVALID': {
             console.error(`invalid pattern ${args.symbol} for ${args.position}`)
             return silenceAction(args)
@@ -266,8 +141,6 @@ export function symbolDuration(
                     : patterns.rake.pattern_duration_in_millis,
                 bpm
             )
-        case 'NOROT':
-            return unit == 'basenote' ? patterns.norot.duration : BaseNoteEquiv2Millis(patterns.norot.duration, bpm)
         case 'GRACENOTE':
         // The duration of a gracenote is subtracted from the preceding note,
         // so its nett duration is 0.
@@ -525,66 +398,5 @@ function rakeAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         offset += noteSpacing
     }
     debug(`result: ${JSON.stringify(returnValue)}`)
-    return returnValue
-}
-
-// TODO: elaborate
-function norotAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
-    function getNorotType(symbol: string | undefined): NorotType | undefined {
-        if (symbol == undefined) return undefined
-        return args.symbol.includes(patterns.norot.modifiers.unisono)
-            ? 'unisono'
-            : args.symbol.includes(patterns.norot.modifiers.kotekan)
-              ? 'kotekan'
-              : undefined
-    }
-    const currNorotType: NorotType | undefined = getNorotType(args.symbol)
-    if (currNorotType == undefined) return []
-
-    const [currNorotTone, _rest1] = splitTone(args.symbol)
-    const prevNorotType = getNorotType(args.prevsymbol)
-    const [prevNorotTone, _rest2] =
-        prevNorotType && args.prevsymbol ? splitTone(args.prevsymbol) : [undefined, undefined]
-
-    // TODO: We currently determine the 'gir' measure as the first measure in a staff.
-    //       This method should be refined.
-    const patternIdx =
-        prevNorotTone == currNorotTone && args.measureIdx != 0
-            ? patterns.norot.index.ngubeng
-            : patterns.norot.index.majalan
-
-    // Retrieve the norot pattern
-    const posPatterns: Partial<Record<Tone, Record<NorotType, NoteSymbol[][]>>> =
-        patterns.norot.patterns[args.position as keyof typeof patterns.norot.patterns]
-    if (!posPatterns) return []
-    if (!(currNorotTone in posPatterns)) return []
-    const pattern: NoteSymbol[] = posPatterns[currNorotTone as Tone]![currNorotType][patternIdx]
-
-    if (patternIdx == patterns.norot.index.majalan) {
-        // Substitute the first note of the pattern
-        pattern.splice(0, 1, pattern[0].replace('?', prevNorotTone || currNorotTone))
-    }
-    const returnValue: PlaybackSamplerAction[] = []
-
-    const duration = 1 // duration of each note in the pattern, in BaseNote equivalents
-    const totalNotes = pattern.length
-    for (var idx = 0; idx <= pattern.length; idx++) {
-        const count = idx + 1
-        returnValue.push({
-            time: n2TO(args.time + count * duration),
-            timeMs: args.timeMs + BaseNoteEquiv2Millis(count * duration, args.bpm),
-            function: args.samplerFunction,
-            ismuted: count < totalNotes,
-            params: {
-                duration: n2TO(duration),
-                position: args.position,
-                symbol: pattern[idx],
-                bpm: args.bpm,
-                velocity: args.velocity,
-                isLast: args.isLast && count == totalNotes,
-                isLastOfPattern: count == totalNotes
-            } as SamplerFunctionParameters
-        })
-    }
     return returnValue
 }

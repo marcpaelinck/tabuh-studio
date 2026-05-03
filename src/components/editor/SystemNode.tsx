@@ -14,7 +14,7 @@ import type { GridInfo } from './_types'
 
 interface EditorSystemProps {
     systemData: System
-    positions: string[]
+    positions: Position[]
     playbackState: PlaybackState
     visible: boolean
 }
@@ -124,10 +124,9 @@ export function SystemNode({ systemData, positions, playbackState, visible, ...p
         // TODO add a separate input field for grouped positions
         if (positions[rowIdx] != 'PEMADE_POLOS') return
         const newSystemData = { ...systemData }
-        positions.forEach((pos) => {
-            const position: Position = pos as Position
+        positions.forEach((position) => {
             if (!systemData.editorGroup.includes(position)) return
-            const newNotation = castNotation(notation, position, [position], colIdx)
+            const newNotation = castNotation(notation, newSystemData.staffs[position]!, positions, colIdx, rowIdx)
             if (cached) newSystemData.staffs[position]![colIdx].notation_ = newNotation
             else newSystemData.staffs[position]![colIdx].notation = newNotation
             debug(`updated notation of ${position} to ${notation2text(newNotation)}`)

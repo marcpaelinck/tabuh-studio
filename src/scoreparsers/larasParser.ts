@@ -50,8 +50,7 @@ export function parseLaras(content: string): ParserReturnValue {
         instrumenttype: 'GONG_KEBYAR',
         systems: [],
         positions: [],
-        parts: {},
-        hasCycle: false
+        parts: {}
     }
     let currentSystem: System | null = null
 

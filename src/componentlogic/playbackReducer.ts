@@ -51,7 +51,7 @@ function loadData(state: PlaybackState, action: PlaybackAction): PlaybackState {
         return { ...state, cursor: noCursor, audioState: 'nodata' }
     }
 
-    const validation = cycleValidation(action.score, true)
+    const validation = cycleValidation(action.score)
     if (!validation.isValid) {
         debug('validating')
         console.warn('Can not start playback, there is a cycle in the score.')

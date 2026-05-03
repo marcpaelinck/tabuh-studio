@@ -10,7 +10,6 @@ import { readFile } from '../utils/filesystem'
 
 function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
-    if (score.hasCycle == undefined) score.hasCycle = false
     return score
 }
 
@@ -121,7 +120,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         const response = await wpFunc.database.getScoreList()
         if (response && 'success' in response && response.success && 'result' in response) {
             const newList = response.result.map((result: Score) => {
-                return { ...result, ...{ instrumentgroup: 'gongkebyar' }, ...{ notationversion: 'new' } }
+                return { ...result, instrumentgroup: 'gongkebyar', notationversion: 'new' }
             })
             setScoreList(newList)
         }

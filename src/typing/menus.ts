@@ -9,9 +9,9 @@ export type ScoreInfo = {
     title: string
     uuid: UUID
     instrumentgroup: string
-    file: string
+    file?: string
     notationversion: string
-    pdf: string
+    pdf?: string
 }
 
 export interface ScoreMenuOption {

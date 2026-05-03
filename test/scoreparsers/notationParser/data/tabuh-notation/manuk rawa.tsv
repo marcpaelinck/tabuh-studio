@@ -34,7 +34,7 @@ reyong	....	....	....	....	.xxx	xxxx	x.bb	b?...
 ga	i---	----	----	----	----	i-o-	e-ii	i/...
 
 	## gongan 5
-	{LABEL PENGECET}
+	{LABEL PENGIPUK}
 	{LOOP 2}
 ugal	i---	o---	i---	e---	u---	a---	a-u-	e-o-
 gangsa p	i.io	.i.o	i.u.	ue.e	u.i<.	i<.a.	a.e.	e...
@@ -86,14 +86,14 @@ ugal/ga	i---	----	----	----	----	----	--a,/.	a---
 reyong	b---	----	----	----	----	----	--b?.	b---
 cal/jeg	i
 gong	G		P		T		P
-	{GOTO PENGECET pass=1}
+	{GOTO PENGIPUK pass=1}
 
 	{TEMPO 80->50 beats=1->8}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beats=7->8}
 ugal/ga	i-o-i-o-	i-o-i-o-	i-o-i-oi	a,-i-a,-u,a,	i/.i-o-e-	u-a-u-e-	u---u-u-	u?..uu?uu?.
 reyong	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x---b-b-	b?..bb?bb?.
-calung	i		i		i		a		i		u		u		u
-jegogan	i								i
+calung	i	i	i	a	i	u	u	u
+jegogan	i				i
 gong	G
 
 	{PART Pengawak}
@@ -102,7 +102,7 @@ gong	G
 	{DYNAMICS f positions=[gangsa,reyong,ugal] beat=5}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beat=6}
 ugal	u---u-uu/	u-uueuo-	Eu---u-ee/	e-Uaa-a?ai<	Ua---a-u-	a/.a---u-	Ai<---i<-au	a---au/ua
-gangsa	.u?uauaua	uauauaua	uauaue?eu	eueuea?ai<	ai<ai<ai<ai<	a?.a--i<?i<a	i<ai<ai<a?ai<	ai<ai<au?ua
+gangsa	un   un   	un   un   	un   en   	en   an   	an   an   	a?.a-i<n   	i<n   an   	an   un   
 reyong	un   un   	un   un   	un   en   	en   an   	an   an   	b?.b-in   	in   an   	an   un   
 calung	u	u	u	e	a	a	i	a
 jegogan	u				a
@@ -111,8 +111,7 @@ gong	G
 	{DYNAMICS f positions=[gangsa,reyong,ugal] beat=5}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beat=6}
 ugal	u---u-uu/	u---e-o-	Eu-------	u----o?oe	o--eoioe	oeo..e?eu	e--ueu?ua	u--auo?oe
-gangsa	uauauaua	uauauaua	uauauaua	uauauo?oe	oeoeoeoe	oeo..e?eu	eueueu?ua	uauauo?oe
-reyong	un   un   	un   un   	un   un   	un   on   	on   on   	oeo.en   	en   un   	un   on   
+ga/rey	un   un   	un   un   	un   un   	un   on   	on   on   	oeo.en   	en   un   	un   on   
 calung	u	u	u	u	o	o	e	u
 jegogan	u
 gong	T
@@ -121,7 +120,7 @@ gong	T
 	{DYNAMICS f positions=[ugal,gangsa,reyong] beat=5}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beat=6}
 ugal	o-e-oioe	o---ia,i-	o-------	o-Ia,a,.a,?a,i	a,--ia,u,a,i	a,?.a,---u-	Ai--oia,a,i	a,-i-a,u,o,e,
-gangsa	oo/oeoeoe	oeoeoeoe	oeoeoeoe	oeoeoa,?a,i	a,ia,ia,ia,i	a,?.a,--i?io	ioioia,?a,i	a,ia,ia,u,?u,a,
+gangsa	on   on   	on   on   	on   on   	on   an   	an   an   	a,?.a,-in   	in   an   	an   un   
 reyong	on   on   	on   on   	on   on   	on   an   	an   an   	b?.b-in   	in   an   	an   un   
 calung	o	o	o	o	a	a	i	a
 jegogan	o				a			
@@ -131,20 +130,17 @@ gong	G
 	{TEMPO ->105 beats=1->8}
 	{DYNAMICS ->mf positions=[gangsa,reyong,ugal] beat=3}
 ugal	u,---u,-u,u,/	u,-u,u,e,u,o,-	Eu,--a,u,e,?e,u,	e,--u,e,u,u,a,	u,--a,u,i?io	i--i--io	i--oiooe	o-e-oiio
-gangsa	u,a,u,a,u,a,u,a,	u,a,u,a,u,a,u,a,	u,a,u,a,u,e,?e,u,	e,u,e,u,e,u,?u,a,	u,a,u,a,u,i?io	ioioioio	ioioio?oe	oeoeoi?io
-reyong	un   un   	un   un   	un   en   	en   un   	un   in   	in   in   	in   on   	on   in   
+ga/rey	un   un   	un   un   	un   en   	en   un   	un   in   	in   in   	in   on   	on   in   
 calung	u	u	u	e	u	i	i	o
 jegogan	u				u
 gong	T
 
 	{TEMPO ->85 beat=8}
 	{DYNAMICS ->f positions=[gangsa,reyong,ugal] beats=6->8}
-ugal	i.i.i.i.	i.i.iee.	e.e.e.e.	e.e.eii.	i.i.iee.	e.e.e.e.	e.e.e.e.	e?.e-e?...
-gangsa p	i.i.i.i.	i.i.iee.	e.e.e.e.	e.e.eii.	i.i.iee.	e.e.e.e.	e.e.e.e.	e?.e-e?...
-gangsa s	.o.o.o.o	.o.o.eeu	.u.u.u.u	.u.u.iio	.o.o.eeu	.u.u.u.u	.u.u.u.u	i<?.i<-i<?...
-reyong	in   in   	in   en   	en   en   	en   in   	in   en   	en   en   	en   en   	b?.b-b?...
-calung	i	i	e	e	i	e	e	e
-jegogan	u				u
+ugal/ga	in	in	in	en	en	en	en	in	in	en	en	en	en	en	e?.e-	e?...
+reyong	in	in	in	en	en	en	en	in	in	en	en	en	en	en	b?.b-	b?...
+calung	i		i		e		e		i		e		e		e
+jegogan	i								i
 gong	G
 
 	{TEMPO ->60 beats=6->7}
@@ -157,7 +153,7 @@ gong	T
 	{TEMPO ->85 beats=5->8}
 	{DYNAMICS ->mf positions=[gangsa,reyong,ugal] beat=3}
 ugal	.u,?u,a,u,a,?a,i	a,--iaiio	i--a,Ioioe	uau--e?eu	eueuei?io	ioioia,?a,i	a,ia,ia,ioe	oeoeoi?io
-gangsa	.u,?u,a,u,a,?a,i	a,ia,ia,i?io	ioioiu?ua	uau..e?eu	eueuei?io	ioioia,?a,i	a,ia,ia,ioe	oeoeoi?io
+gangsa	.u,?u,a,u,a,?a,i	an   in   	in   un   	uau.en   	en   in   	in   an   	an   on   	on   in   
 reyong	un   an   	an   in   	in   un   	uau.en   	en   in   	in   an   	an   on   	on   in   
 calung	u	a	i	u	e	i	a	o
 jegogan	u				e
@@ -189,9 +185,9 @@ gong	G		P		T		P
 ugal	.uu.	u.u.	u.u.	uoo.	o.o.	oii.	i.i.	....
 gangsa p	.uu.	u.u.	u.u.	uoo.	o.o.	oii.	i.i.	....
 gangsa s	.uua	.a.a	.a.a	.ooe	.e.e	.iio	.o..	....
-reyong	un	on	un	on	on	in	in	....		.	.	.	.	.
+reyong	un	on	un	on	on	in	in	....
 calung	u	a	u	e	o	e	i	e
-jegogan	u				o				i
+jegogan	u				o
 gong	G		P		T		P
 
 	{DYNAMICS mp positions=[gangsa,reyong,ugal]}

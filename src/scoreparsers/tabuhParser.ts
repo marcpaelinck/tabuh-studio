@@ -3,6 +3,7 @@ import type { SyntaxNode } from '@lezer/common'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
+import { applyPatterns, notationWidth } from '../componentlogic/notationPatternManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
 import type { UUID } from '../typing/basetypes.ts'
 import type {
@@ -56,11 +57,10 @@ export function parseNotation(content: string): ParserReturnValue {
         uuid: uuidv4(),
         title: '',
         composer: '',
-        instrumenttype: '',
+        instrumenttype: 'UNDEFINED',
         parts: {},
         positions: [],
-        systems: [],
-        hasCycle: false
+        systems: []
     } as Score
 
     const postProcessing: PostProcessing[] = []
@@ -139,7 +139,7 @@ export function parseNotation(content: string): ParserReturnValue {
 // the common staff notation to individual staff notation for each position, using 'casting' rules.
 // staffs: contains staffs of non-grouped positions.
 // groupedNotation: groups of positions with corresponding notation
-// castInstructions: contains AUTOKEMPYUNG metadata which indicates whether unisono notation
+// castInstructions: contains AUTOKEMPYUNG metadata which indicates whether homophonic notation
 //                   should be converted to kempyung equivalent for sangsih positions.
 function castGroupedNotationToPositions(
     groupedNotations: GroupedNotation[],
@@ -147,25 +147,26 @@ function castGroupedNotationToPositions(
 ): Staffs {
     const staffs: Staffs = {}
     for (const group of groupedNotations) {
-        for (const position of group.positions) {
+        group.positions.forEach((position, posIdx) => {
             const staff: Measure[] = []
-            var measureId = 0
+            var measureIdx = 0
             for (const measure of group.staff) {
                 if (group.positions.length > 1) {
                     const castedMeasure = { ...measure }
                     castedMeasure.notation = castNotation(
                         measure.notation,
-                        position,
+                        staff,
                         group.positions,
-                        measureId,
+                        measureIdx,
+                        posIdx,
                         castInstructions
                     )
                     staff.push(castedMeasure)
                 } else staff.push({ ...measure })
-                measureId++
+                measureIdx++
             }
             staffs[position] = staff
-        }
+        })
     }
     return staffs
 }
@@ -199,7 +200,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         }
     }
 
-    // Process copy postProcessingInstructions
+    // Process COPY postProcessingInstructions
     const copyInstructions: PostProcessing[] =
         postProcessingInstructions.filter((instr) => instr.copy != undefined) || []
     for (const instr of copyInstructions) {
@@ -217,6 +218,13 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
                 target.execution.push(...copyItems)
             }
         }
+    }
+
+    // Expand shorthand pattern symbols
+    for (const system of score.systems) {
+        _.entries(system.staffs).forEach(([position, staff]) => {
+            system.staffs[position as Position] = applyPatterns(position as Position, staff)
+        })
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -401,18 +409,18 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
 }
 
 // Returns the maximum width of vertically aligned sections.
-function getColwidths(staffs: Staffs) {
-    const colWidths = _.values(staffs).reduce((aggr: number[] | undefined, measures: (Measure | undefined)[]) => {
-        const widths = measures.map((measure: Measure | undefined) => (measure ? measure.notation.length : 0))
-        if (widths) {
-            if (aggr)
-                return _.zip(aggr, widths).map(([el1, el2]) =>
-                    el1 && el2 ? Math.max(el1, el2) : el1 ? el1 : el2 ? el2 : 0
-                )
-        }
-        return widths
-    }, undefined)
-    return colWidths || []
+function getColwidths(staffs: Staffs): number[] {
+    // Convert the Staffs dict to a table containing the measure widths for each position
+    const sizes = _.entries(staffs)
+        .filter(([position, measures]) => measures != undefined)
+        .map(([position, measures]) => measures.map((measure) => notationWidth(measure.notation, position as Position)))
+    // Transpose the resulting table
+    const widthsByColumn = _.zip(...sizes)
+    // Determine the maximum measure width per column
+    const columnWidths: number[] = widthsByColumn.map((widths) =>
+        widths.reduce((max, width) => Math.max(max || 0, width || 0), 0)
+    ) as number[]
+    return columnWidths
 }
 
 /***********

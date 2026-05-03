@@ -1,7 +1,7 @@
 import type { MutingType, StrokeType, ToneType } from '../config/config'
 import type { NoteSymbol, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
-import type { Position } from './instruments'
+import type { InstrumentType, Position } from './instruments'
 
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
@@ -49,9 +49,8 @@ export type Score = {
     uuid: UUID
     title: string
     composer: string
-    instrumenttype: string
-    parts: Record<string, UUID[]> // <<part name>, <system uuid>[]>
+    instrumenttype: InstrumentType
+    parts: Record<string, UUID[]> // <`part name`, `system uuid`[]>
     positions: Position[] // sorted list of positions ordered as displayed in the editor
     systems: System[]
-    hasCycle: boolean
 }

@@ -44,7 +44,7 @@ import {
     TOplusTO
 } from '../utils/timeunits'
 import { executionManager, type FlowStep } from './executionManager'
-import { createNoteActions, totalDuration } from './patternManager'
+import { createNoteActions, totalDuration } from './playbackPatternManager'
 import { useInstruments } from './useInstruments'
 import { cycleValidation } from './validationManager'
 
@@ -204,7 +204,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         )
         if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined)) return undefined
 
-        const validation = cycleValidation(pbAction.score, true)
+        const validation = cycleValidation(pbAction.score)
         if (!validation.isValid) return undefined
 
         const newTimeLine: TimeLine = {

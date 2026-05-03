@@ -304,7 +304,7 @@ export const AcceleratingTremoloChars = [':']
 export const RakeUpChars = [']']
 export const RakeDownChars = ['[']
 export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S', 'X', 'B']
-export const NorotChars = ['n', 'm']
+export const NorotChars = ['n']
 
 //prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {
@@ -580,9 +580,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                         'o/_', 'e/_', 'u/_', 'a/_', 'i</_', 'o</_', 'e</_',
                         'o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
                         'o:', 'e:', 'u:', 'a:', 'i<:', 'o<:', 'e<:',
-                        'en', 'un', 'an', 'i<n', 'o<n',
-                        'eN', 'uN', 'aN', 'i<N', 'o<N',
-                        'E', 'U', 'A', 'I', 'O', 'X', 'B'
+                        'in', 'on', 'en', 'un', 'an',
+                        'iN', 'oN', 'eN', 'uN', 'aN',
+                        'I', 'O', 'E', 'U', 'A', 'X', 'B'
                     ]
     },
     REYONG_4: {

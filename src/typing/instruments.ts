@@ -24,4 +24,6 @@ export type Position =
     | 'TROMPONG'
     | 'UGAL'
 
+export type InstrumentType = 'GONG_KEBYAR' | 'SEMAR_PAGULINGAN' | 'UNDEFINED'
+
 export type Tone = 'i,' | 'o,' | 'e,' | 'u,' | 'a,' | 'i' | 'o' | 'e' | 'u' | 'a' | 'i<' | 'o<' | 'e<' | 'u<' | 'a<'

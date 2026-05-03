@@ -152,10 +152,9 @@ function simulatePlayback(score: Score, transitions: StateTransitionMatrix): Val
 
 // Detects the presence of a closed cycle. Returns true if no cycles were detected.
 // updateScoreFlag: updates the .hasCycle flag of the score object.
-export function cycleValidation(score: Score, updateScoreFlag: boolean = false): ValidationResult {
+export function cycleValidation(score: Score): ValidationResult {
     if (!score) return { isValid: true, message: '' }
     const transitions: StateTransitionMatrix = createTransitions(score)
     const validation = simulatePlayback(score, transitions)
-    if (updateScoreFlag) score.hasCycle = !validation.isValid
     return validation
 }
