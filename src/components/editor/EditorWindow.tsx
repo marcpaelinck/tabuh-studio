@@ -6,6 +6,7 @@ import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
+import type { UUID } from '../../typing/basetypes'
 import type {
     EditorCursorParameters,
     PlaybackAction,
@@ -27,6 +28,7 @@ interface EditorWindowProps {
     loading: boolean
     setExpanded: Dispatch<Record<string, boolean>>
     score: Score | undefined
+    currentScoreId: UUID
     labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
@@ -41,6 +43,7 @@ export default function EditorWindow({
     setExpanded,
     loading,
     score,
+    currentScoreId,
     labels,
     updateParts,
     executeItemAction,
@@ -106,13 +109,11 @@ export default function EditorWindow({
 
     useEffect(() => {
         if (!score) return
-        // TODO this code should only run when a new score is loaded. It currently runs after each
-        // update of the score.
         const initExpandState = Object.fromEntries(
             score.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )
         setExpanded(initExpandState)
-    }, [score])
+    }, [currentScoreId])
 
     // Update the list of expanded panels which is maintained in te TabuhEditor.
     // Keys (systems) might have been added or deleted.

@@ -3,6 +3,7 @@ import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/useAnimation'
 import { positionConfigs } from '../../config/config'
+import type { UUID } from '../../typing/basetypes'
 import { type Position } from '../../typing/instruments'
 import { type MenuItemInfo, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
 import {
@@ -20,6 +21,7 @@ interface PlayerWindowProps {
     visible: boolean
     scoreMenuOptions: ScoreMenuOption[]
     score: Score | undefined
+    currentScoreId: UUID
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
@@ -36,6 +38,7 @@ export default function PlayerWindow({
     visible,
     scoreMenuOptions,
     score,
+    currentScoreId,
     loadScore,
     totalDurationMs,
     timeLine,

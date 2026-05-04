@@ -475,7 +475,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     UGAL: {
         name: 'Ugal',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_UGAL.svg',
         sampletemplate: 'GK_UGAL_{note}.mp3',
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],

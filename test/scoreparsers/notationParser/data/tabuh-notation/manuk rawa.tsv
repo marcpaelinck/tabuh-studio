@@ -2,7 +2,7 @@
 
 	{DYNAMICS f positions=[ugal,gangsa,reyong,calung]}
 	{GONGAN kebyar}
-	{TEMPO 50}
+	{TEMPO 60}
 ugal/ga	e,------e,a,ia,e,a,i----
 reyong1	b------e,a,u,a,e,a,u,----
 reyong2	b------e.i.e.i----
@@ -11,7 +11,7 @@ reyong4	b------e<.u<.e<.u<----
 calung	e--------i---i----
 gong	G------------G----
 
-	{TEMPO ->100 beats=1->8}
+	{TEMPO 40->100 beats=1->8}
 	{DYNAMICS mf positions=[ugal,gangsa,reyong,calung]}
 ugal/ga	-a,ia,	ieoi	a,ia,i	a,eio	euou	euou	eioe	uoeo
 reyong1	-a,ia,	ie,a,i	a,ia,i	a,e,ia,	e,u,a,u,	e,u,a,u,	e,ia,e,	u,a,e,a,
@@ -23,6 +23,7 @@ jegogan		i	a	a	e	e	e	u
 gong			G				G
 
 	{LOOP 2}
+	{TEMPO 120}
 ugal/ga	ii-o	-io-	ee-u	-eu-	aa-i<	-au-	ee-u	-eo-
 reyong	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-
 calung	i		e		a		e
@@ -46,8 +47,8 @@ gong	G		P		T		P
 
 ugal/ga	ii-o	-ia,-	u,u,-e,	-u,a,-	ii-o	-ia,-	u,u,-a,	-ia,-
 reyong	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-
-calung	ieue	ieue
-jegogan	i	i
+calung	i	e	u	e	i	e	u	e
+jegogan	i				i
 gong	G		P		T		P
 
 ugal/ga	u,---	----	----	----	--u,-	a,-i-	o-a,/.	a,---
@@ -88,7 +89,7 @@ cal/jeg	i
 gong	G		P		T		P
 	{GOTO PENGIPUK pass=1}
 
-	{TEMPO 80->50 beats=1->8}
+	{TEMPO 100->50 beats=1->8}
 	{DYNAMICS ->p positions=[gangsa,reyong,ugal] beats=7->8}
 ugal/ga	i-o-i-o-	i-o-i-o-	i-o-i-oi	a,-i-a,-u,a,	i/.i-o-e-	u-a-u-e-	u---u-u-	u?..uu?uu?.
 reyong	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x-x-x-x-	x---b-b-	b?..bb?bb?.

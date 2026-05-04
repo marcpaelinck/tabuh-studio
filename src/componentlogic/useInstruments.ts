@@ -38,7 +38,7 @@ const createSampler = ({
 }: {
     instr_type: string
     samples: { [key: string]: string }
-    volume: number
+    volume: Tone.Unit.Decibels
 }) => {
     if (['daun', 'chimes'].includes(instr_type))
         // PitchShift currently disabled because it causes a slight time lag

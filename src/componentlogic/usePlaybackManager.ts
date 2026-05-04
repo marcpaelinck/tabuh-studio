@@ -397,19 +397,19 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     .join('').length
                 // if (sectIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
                 const span = notation.join('')
-                newTimeLine.playercursoractions.push({
-                    function: pbFunctionsRef.current.playercursor,
-                    functionName: 'playercursor',
-                    time: n2TO(sectionStartTime),
-                    params: {
-                        sysuuid: currentStep!.system.uuid,
-                        section: currentStep!.sectionIdx,
-                        position: position,
-                        symbol: notation.join(''),
-                        line: currentStep!.system.index,
-                        range: [cursorPos, cursorPos + span.length]
-                    }
-                })
+                // newTimeLine.playercursoractions.push({
+                //     function: pbFunctionsRef.current.playercursor,
+                //     functionName: 'playercursor',
+                //     time: n2TO(sectionStartTime),
+                //     params: {
+                //         sysuuid: currentStep!.system.uuid,
+                //         section: currentStep!.sectionIdx,
+                //         position: position,
+                //         symbol: notation.join(''),
+                //         line: currentStep!.system.index,
+                //         range: [cursorPos, cursorPos + span.length]
+                //     }
+                // })
 
                 maxMeasureDuration = Math.max(currTime - sectionStartTime, maxMeasureDuration)
             }

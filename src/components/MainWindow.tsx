@@ -36,6 +36,7 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
+import type { UUID } from '../typing/basetypes'
 import type { Position } from '../typing/instruments'
 import type { ScoreMenuOption } from '../typing/menus'
 import type { WpUserRecord } from '../typing/wordpress'
@@ -189,10 +190,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }
     const { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction } =
         useScoreManager(dashboardFunctions)
+    const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
     const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
     const wpFunc = useContext(WpApiFunctions)
 
-    const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+    const [expanded, setExpanded] = useState<Record<UUID, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
@@ -271,14 +273,17 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     useEffect(() => {
         debug(`New editor score available, title=${score?.title} with ${score?.systems.length} systems`)
-        playback({
-            actionType: 'load',
-            playbackType: 'multiple',
-            score: score,
-            systemIndex: 0,
-            intro: 2000,
-            outro: 5000
-        })
+        if (score && currentScoreId != score.uuid) {
+            setCurrentScoreId(score.uuid)
+            playback({
+                actionType: 'load',
+                playbackType: 'multiple',
+                score: score,
+                systemIndex: 0,
+                intro: 2000,
+                outro: 5000
+            })
+        }
     }, [score])
 
     function expandAll(expand: boolean) {
@@ -294,6 +299,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={active == 'player'}
             scoreMenuOptions={scoreMenuOptions}
             score={score}
+            currentScoreId={currentScoreId}
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
@@ -315,6 +321,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             setExpanded={setExpanded}
             loading={loadingScore}
             score={score}
+            currentScoreId={currentScoreId}
             labels={labels}
             updateParts={updateParts}
             executeItemAction={executeItemAction}

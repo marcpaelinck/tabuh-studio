@@ -270,8 +270,8 @@ function norotPattern(position: Position, staff: Measure[], measureIdx: number, 
               ? staff[measureIdx - 1].notation.at(-1) // previous symbol is the last symbol of the previous measure
               : undefined
 
-    // Ignore the previous norot symbol if it not a norot symbol.
-    if (prevSymbol && getPatternType(prevSymbol, position) == 'NOROT') prevSymbol = undefined
+    // Ignore the previous symbol if it not a norot symbol.
+    if (prevSymbol && getPatternType(prevSymbol, position) != 'NOROT') prevSymbol = undefined
 
     // The norot pattern is set to majalan if there is a change in tone, at the beginning of a norot sequence or on the GIR.
     const norotPattern: NorotSubPattern = prevSymbol == symbol ? 'ngubeng' : 'majalan'
