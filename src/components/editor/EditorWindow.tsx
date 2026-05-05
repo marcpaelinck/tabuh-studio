@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Accordion, Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
+import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { usePartManager } from '../../componentlogic/usePartManager'
@@ -62,23 +62,22 @@ export default function EditorWindow({
 
     const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
         if (!visibleRef.current) return
-        console.log('animating editor cursor')
-        const sys = (uuid: string | undefined): System | undefined => {
-            return score?.systems.find((sys) => sys.uuid == uuid)
-        }
+        // const sys = (uuid: string | undefined): System | undefined => {
+        //     return score?.systems.find((sys) => sys.uuid == uuid)
+        // }
 
-        if (params.prevsysuuid && params.prevsysuuid != params.sysuuid) {
-            debug(`Close panel ${sys(params.prevsysuuid)?.id}, curr=${sys(params.sysuuid)?.id}`)
-            expandIfNotExpanded(params.prevsysuuid, false)
-        }
-        if (params.prevsysuuid != params.sysuuid) {
-            debug(`Open panel ${sys(params.sysuuid)?.id} prev=${sys(params.prevsysuuid)?.id}`)
-            expandIfNotExpanded(params.sysuuid, true)
-        }
+        // if (params.prevsysuuid && params.prevsysuuid != params.sysuuid) {
+        //     debug(`Close panel ${sys(params.prevsysuuid)?.id}, curr=${sys(params.sysuuid)?.id}`)
+        //     expandIfNotExpanded(params.prevsysuuid, false)
+        // }
+        // if (params.prevsysuuid != params.sysuuid) {
+        //     debug(`Open panel ${sys(params.sysuuid)?.id} prev=${sys(params.prevsysuuid)?.id}`)
+        //     expandIfNotExpanded(params.sysuuid, true)
+        // }
+        console.log(JSON.stringify(params))
         playback({ actionType: 'cursor', cursor: { sysUuid: params.sysuuid, measure: params.section } })
-        // debug(`setting cursor to sys=${cAction.sysuuid} measure=${cAction.section}`)
         const currElement = document.getElementById(`${systemIdPrefix}${params.sysuuid}`)
-        // debug(`scrolling ${currElement?.id} into view`)
+        console.log(`${currElement?.id}, ${pbCurrUuid}`)
         currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, [])
 
@@ -169,8 +168,6 @@ export default function EditorWindow({
         return options
     }
 
-    debug(`Current score is title=${score?.title} with ${score?.systems.length} systems`)
-
     // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
     // minimize rendering because it interferes with the audio playback functions.
     // These objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
@@ -187,11 +184,9 @@ export default function EditorWindow({
                         <PlaybackButtons
                             score={score}
                             sysUuid={systemData.uuid}
-                            systemIdPrefix={systemIdPrefix}
                             playback={playback}
                             hasCursor={systemData.uuid == pbCurrUuid}
                             playbackType={pbType}
-                            expandIfNotExpanded={expandIfNotExpanded}
                             playbackAudioState={pbAudioState}
                             className="content-start"
                         />
@@ -200,6 +195,7 @@ export default function EditorWindow({
             })
         )
     }, [score, pbCurrUuid, pbType, pbAudioState])
+
     const systemHeaderFields: Record<string, ReactElement> | undefined = useMemo(() => {
         if (!score) return
 
@@ -272,38 +268,36 @@ export default function EditorWindow({
                         />
                         {/* Expandable panel containing a system */}
                         <Col span={23}>
-                            <Accordion.Panel
+                            {/* <Accordion.Panel
                                 id={`${systemIdPrefix}${systemData.uuid}`}
                                 key={systemData.uuid}
                                 // Panel Header
-                                header={
-                                    <Grid
-                                        id="systemsummary"
-                                        className="ml-0 pt-0 pb-0"
-                                        // Avoid expanding the panel when the user clicks on a header item.
-                                        onClick={(e) => e.stopPropagation()}>
-                                        {/* Displays playback buttons and info about the System */}
-                                        <Row id="row">
-                                            {systemHeaderButtons[systemData.uuid]}
-                                            {systemHeaderFields[systemData.uuid]}
-                                        </Row>
-                                    </Grid>
-                                }
+                                header={ */}
+                            <Grid
+                                id="systemsummary"
+                                className="ml-0 pt-0 pb-0"
+                                // Avoid expanding the panel when the user clicks on a header item.
+                                onClick={(e) => e.stopPropagation()}>
+                                {/* Displays playback buttons and info about the System */}
+                                <Row id="row">
+                                    {systemHeaderButtons[systemData.uuid]}
+                                    {systemHeaderFields[systemData.uuid]}
+                                </Row>
+                            </Grid>
+                            {/* }
                                 expanded={expanded[systemData.uuid]}
                                 onSelect={() => {
                                     flipExpanded(systemData.uuid)
-                                }}>
-                                {/* Panel content: visible when panel is expanded */}
-
-                                {expanded[systemData.uuid] && (
-                                    <SystemNode
-                                        systemData={systemData}
-                                        positions={score.positions}
-                                        playbackState={playbackState}
-                                        visible={expanded[systemData.uuid]}
-                                    />
-                                )}
-                            </Accordion.Panel>
+                                }}> */}
+                            <SystemNode
+                                id={`${systemIdPrefix}${systemData.uuid}`}
+                                systemData={systemData}
+                                positions={score.positions}
+                                playbackState={playbackState}
+                                visible
+                                // visible={expanded[systemData.uuid]}
+                            />
+                            {/* </Accordion.Panel> */}
                         </Col>
                     </Row>
                 </Grid>
@@ -315,7 +309,7 @@ export default function EditorWindow({
     return (
         // <Profiler id="App" onRender={onRender}>
         <VStack id="Editor Window" visibility={visible ? 'visible' : 'collapse'}>
-            {loading ? <Placeholder.Grid rows={12} columns={6} /> : <Accordion className="w-full">{systems}</Accordion>}
+            {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
         </VStack>
         // </Profiler>
     )

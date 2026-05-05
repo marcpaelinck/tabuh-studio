@@ -9,21 +9,17 @@ import { debug } from '../../utils/debugger'
 export function PlaybackButtons({
     score,
     sysUuid,
-    systemIdPrefix,
     hasCursor,
     playbackType,
     playbackAudioState,
-    expandIfNotExpanded,
     playback,
     ...props
 }: {
     score: Score
     sysUuid: string
-    systemIdPrefix: string
     hasCursor: boolean
     playbackType: PlaybackType
     playbackAudioState: AudioState
-    expandIfNotExpanded: (uuid: string, expand: boolean) => void
     playback: (action: PlaybackAction) => void
 } & HTMLAttributes<HTMLDivElement>) {
     const buttongroupRef = useRef<HTMLDivElement>(null)
