@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import {
     useContext,
     useEffect,
@@ -12,7 +13,7 @@ import {
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { castNotation } from '../../componentlogic/castingRulesManager'
-import { noCursor, positionConfigs } from '../../config/config'
+import { editorFontSize, noCursor, positionConfigs } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
 import type { Position } from '../../typing/instruments'
 import type { EditorCellCursor, PlaybackAction, PlaybackState } from '../../typing/playback'
@@ -165,10 +166,13 @@ export function SystemNode({
         .map((position) => positionConfigs[position as Position].name)
         .join('\n')
     const notationText = Object.values(systemData.staffs)
-        .map((measures) => measures.map((measure) => measure.notation.join('')).join(' '))
+        .map((measures) => measures.map((measure) => measure.notation.join('')).join(''))
         .join('\n')
 
     const notationArea = useMemo(() => {
+        const positionTitlesFont = `courierfont${10}`
+        const notationFont = `balifontspaced${editorFontSize}`
+        const rows = _.keys(systemData.staffs).length
         return (
             <Grid id={`system ${systemData.uuid}`} className="ml-4">
                 <Row id="SystemHeader">
@@ -179,21 +183,21 @@ export function SystemNode({
                     <Col span={3} id="Positions">
                         <Textarea
                             readOnly
-                            autosize
-                            maxHeight={1000}
-                            className={`courierfont10 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                            rows={rows}
+                            className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             defaultValue={positionTitles}
                         />
                     </Col>
                     <Col span={20} id="Notation">
-                        {' '}
                         <Textarea
                             id={props.id}
-                            autosize
-                            className={`balifont10 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                            rows={rows}
+                            className={`${notationFont} grid-gong-at-start leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                            style={{ position: 'relative', zIndex: 1, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
                             spellCheck="false"
                             defaultValue={notationText}
                         />
+                        {/* </div> */}
                     </Col>
                 </Row>
             </Grid>

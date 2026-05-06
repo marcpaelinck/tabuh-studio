@@ -53,11 +53,32 @@
     }
 }
 
+.courierfont10 {
+    font-family: 'Courier';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 10pt;
+}
+.courierfont12 {
+    font-family: 'Courier';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12pt;
+}
 @font-face {
     font-family: 'BaliMusic5';
     src:
-        url('/fonts/BaliMusic5.woff2') format('woff2'),
-        url('/fonts/BaliMusic5.woff') format('woff');
+        url('./fonts/BaliMusic5.woff2') format('woff2'),
+        url('./fonts/BaliMusic5.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'BaliMusic5-spaced';
+    src:
+        url('./fonts/BaliMusic5-spaced.woff2') format('woff2'),
+        url('./fonts/BaliMusic5-spaced.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -85,6 +106,12 @@
     font-style: normal;
     font-size: 12pt;
 }
+.balifontspaced12 {
+    font-family: 'BaliMusic5-spaced';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 12pt;
+}
 .balifont14 {
     font-family: 'BaliMusic5';
     font-size: 14pt;
@@ -94,4 +121,56 @@
     font-weight: normal;
     font-style: normal;
     font-size: 16pt;
+}
+/* Editor character Grid, gong at start */
+.grid-gong-at-start {
+    white-space: pre;
+    padding-left: 0;
+
+    /* Layered backgrounds (Green every 4th, Gray every 1ch) */
+    background-image:
+        repeating-linear-gradient(
+            to right,
+            rgba(0, 255, 0, 0.8) 0px,
+            rgba(0, 255, 0, 0.8) 2px,
+            transparent 2px,
+            transparent 4ch
+        ),
+        repeating-linear-gradient(
+            to right,
+            rgba(0, 0, 0, 0.1) 0px,
+            rgba(0, 0, 0, 0.1) 1px,
+            transparent 1px,
+            transparent 1ch
+        );
+
+    /* Centers lines on characters */
+    background-position: calc(0.5ch - 1px) 0;
+    background-repeat: repeat-x;
+}
+/* Editor character Grid, gong at end */
+.grid-gong-at-end {
+    white-space: pre;
+    padding-left: 0;
+
+    /* Layered backgrounds (Green every 4th, Gray every 1ch) */
+    background-image:
+        repeating-linear-gradient(
+            to left,
+            rgba(0, 255, 0, 0.8) 0px,
+            rgba(0, 255, 0, 0.8) 2px,
+            transparent 2px,
+            transparent 4ch
+        ),
+        repeating-linear-gradient(
+            to left,
+            rgba(0, 0, 0, 0.1) 0px,
+            rgba(0, 0, 0, 0.1) 1px,
+            transparent 1px,
+            transparent 1ch
+        );
+
+    /* Centers lines on characters */
+    background-position: calc(-0.5ch + 1px) 0;
+    background-repeat: no-repeat;
 }

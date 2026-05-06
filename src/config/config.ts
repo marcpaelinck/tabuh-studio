@@ -46,7 +46,8 @@ export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 
 // EDITOR
 
-export const editorFontSize = 14
+export const editorFontSize = 12
+export const pixelsPerPoint = 1.3333
 export const editorDoNotDisplay = ['KEMPLI']
 export const editorInitialExpandState = false
 export type KeyboardType = 'regular' | 'laras'
