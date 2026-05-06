@@ -227,7 +227,18 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         })
     }
 
-    // Add kempli
+    // Expand all measures to the beat's duration.
+    // Note: this is necessary because the notation system allows to omit trailing extension symbols or spaces.
+    for (const system of score.systems) {
+        for (const [position, measures] of _.entries(system.staffs)) {
+            measures.forEach((measure, colIdx) => {
+                const diff = system.colWidths[colIdx] - measure.notation.length
+                if (diff > 0) measure.notation.push(...Array(diff).fill(' '))
+            })
+        }
+    }
+
+    // TODO Add kempli
     for (const system of score.systems) {
     }
 

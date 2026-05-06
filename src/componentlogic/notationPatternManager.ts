@@ -201,6 +201,8 @@ export function patternSize(symbol: NoteSymbol, position: Position): number {
     switch (pattern) {
         case 'NOROT':
             return patterns.norot.size
+        case 'GRACENOTE':
+            return 0
         default:
             return 1
     }
