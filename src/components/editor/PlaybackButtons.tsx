@@ -1,22 +1,24 @@
-import type { HTMLAttributes, MouseEvent } from 'react'
-import { useRef } from 'react'
+import type { HTMLAttributes, MouseEvent, RefObject } from 'react'
+import { useEffect, useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup } from 'rsuite'
-import type { AudioState, PlaybackAction, PlaybackType } from '../../typing/playback'
+import type { AudioState, PlaybackAction, PlaybackState, PlaybackType } from '../../typing/playback'
 import type { Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 
 export function PlaybackButtons({
-    score,
+    scoreRef,
     sysUuid,
+    playbackState,
     hasCursor,
-    playbackType,
-    playbackAudioState,
+    // playbackType,
+    // playbackAudioState,
     playback,
     ...props
 }: {
-    score: Score
+    scoreRef: RefObject<Score>
     sysUuid: string
+    playbackState: PlaybackState
     hasCursor: boolean
     playbackType: PlaybackType
     playbackAudioState: AudioState
@@ -25,25 +27,25 @@ export function PlaybackButtons({
     const buttongroupRef = useRef<HTMLDivElement>(null)
 
     function isDisabled(pbType: PlaybackType) {
-        return playbackAudioState == 'playing' && playbackType != pbType
+        return playbackState.audioState == 'playing' && playbackState.playbackType != pbType
     }
 
     async function playStopClicked(event: MouseEvent<HTMLElement>, pbType: PlaybackType) {
-        event.stopPropagation()
+        // event.stopPropagation()
         if (isDisabled(pbType)) return
-        if (playbackAudioState == 'playing') {
+        if (playbackState.audioState == 'playing') {
             playback({ actionType: 'stop' })
         } else {
             debug(`playing sys seq=${sysUuid}`)
             // Create a playback score
-            const index = score.systems.findIndex((sysData) => sysData.uuid == sysUuid)
+            const index = scoreRef.current.systems.findIndex((sysData) => sysData.uuid == sysUuid)
             if (index < 0) {
                 console.error(`no playback data found for system ${sysUuid}`)
             }
             playback({
                 actionType: 'play',
                 playbackType: pbType,
-                score: score,
+                score: scoreRef.current,
                 systemIndex: index,
                 intro: 2000,
                 outro: 5000
@@ -52,9 +54,13 @@ export function PlaybackButtons({
         }
     }
 
+    useEffect(() => {
+        debug(`playback state is ${playbackState.audioState}`)
+    }, [playbackState.audioState])
+
     function buttonColor(pbType: PlaybackType) {
         if (hasCursor) debug(`button-sysidx=${sysUuid} has the cursor`)
-        return hasCursor && playbackType == pbType ? 'orange' : 'gray'
+        return hasCursor && playbackState.playbackType == pbType ? 'orange' : 'gray'
     }
 
     const playIcon = (pbType: PlaybackType, color: string) =>
@@ -65,8 +71,8 @@ export function PlaybackButtons({
 
     const button = (pbType: PlaybackType) => (
         <Button as="div" onClick={(e) => playStopClicked(e, pbType)} disabled={isDisabled(pbType)}>
-            {playbackAudioState == 'playing' ? (
-                playbackType == pbType ? (
+            {playbackState.audioState == 'playing' ? (
+                playbackState.playbackType == pbType ? (
                     <IoStop color={buttonColor(pbType)} />
                 ) : (
                     playIconOutline(pbType, buttonColor(pbType))

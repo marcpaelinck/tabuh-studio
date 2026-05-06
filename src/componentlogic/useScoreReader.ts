@@ -99,6 +99,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                     }
         const fileInput = document.createElement('input')
         fileInput.type = 'file'
+        fileInput.accept = format == 'Notation' ? '.tsv' : '.laras'
         fileInput.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0]
             if (file) {

@@ -53,18 +53,6 @@
     }
 }
 
-.courierfont {
-    font-family: 'Courier';
-    font-weight: normal;
-    font-style: normal;
-}
-.courierfont10 {
-    font-family: 'Courier';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 10pt;
-}
-
 @font-face {
     font-family: 'BaliMusic5';
     src:

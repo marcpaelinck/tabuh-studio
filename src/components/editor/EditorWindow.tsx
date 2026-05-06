@@ -1,9 +1,6 @@
-import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
-import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import type { ReactElement } from 'rsuite/esm/internals/types'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { editorInitialExpandState } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
@@ -14,20 +11,15 @@ import type {
     PlaybackState
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
-import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
-import { PlaybackButtons } from './PlaybackButtons'
-import { SCol, SummaryItem } from './SummaryItem'
 import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
 
 interface EditorWindowProps {
     visible: boolean
-    expanded: Record<string, boolean>
     loading: boolean
-    setExpanded: Dispatch<Record<string, boolean>>
-    score: Score | undefined
+    score: Score
     currentScoreId: UUID
     labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
@@ -39,8 +31,6 @@ interface EditorWindowProps {
 
 export default function EditorWindow({
     visible,
-    expanded,
-    setExpanded,
     loading,
     score,
     currentScoreId,
@@ -53,12 +43,14 @@ export default function EditorWindow({
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
         usePartManager(score, updateParts)
-    const [gotoTargets, setGotoTargets] = useState<Set<string>>(new Set())
+    const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
 
     useEffect(() => {
         visibleRef.current = visible
     }, [visible])
+
+    const systemId = (uuid: UUID) => 'system-' + uuid
 
     const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
         if (!visibleRef.current) return
@@ -74,18 +66,14 @@ export default function EditorWindow({
         //     debug(`Open panel ${sys(params.sysuuid)?.id} prev=${sys(params.prevsysuuid)?.id}`)
         //     expandIfNotExpanded(params.sysuuid, true)
         // }
-        console.log(JSON.stringify(params))
         playback({ actionType: 'cursor', cursor: { sysUuid: params.sysuuid, measure: params.section } })
-        const currElement = document.getElementById(`${systemIdPrefix}${params.sysuuid}`)
-        console.log(`${currElement?.id}, ${pbCurrUuid}`)
-        currElement?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        console.log(`scrolling to system ${params.sysuuid}`)
+        const currElement = document.getElementById(systemId(params.sysuuid))
+
+        currElement?.scrollIntoView({ behavior: 'instant', block: 'center' })
     }, [])
 
     useEffect(() => updatePlaybackFunctions({ editorcursor: moveEditorCursor }), [])
-
-    const pbCurrUuid = playbackState.cursor.sysUuid
-    const pbType = playbackState.playbackType
-    const pbAudioState = playbackState.audioState
 
     const dialog = useDialog()
 
@@ -98,31 +86,17 @@ export default function EditorWindow({
         }
     }, [playbackState])
 
-    function flipExpanded(uuid: string) {
-        setExpanded({ ...expanded, ...Object.fromEntries([[uuid, !expanded[uuid]]]) })
-    }
-
-    function expandIfNotExpanded(uuid: string, expand: boolean) {
-        if (expanded[uuid] != expand) flipExpanded(uuid)
-    }
-
     useEffect(() => {
         if (!score) return
         const initExpandState = Object.fromEntries(
             score.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
         )
-        setExpanded(initExpandState)
     }, [currentScoreId])
 
-    // Update the list of expanded panels which is maintained in te TabuhEditor.
-    // Keys (systems) might have been added or deleted.
     useEffect(() => {
         if (!score) return
-        const allKeys = Object.fromEntries(score.systems.map((sys) => [sys.uuid, false]))
-        const existingKeys = _.pick(expanded, Object.keys(allKeys))
-        setExpanded({ ...allKeys, ...existingKeys })
         // gotoTargets will be used by the 'delete' SummaryItem button for validation.
-        var newGotoTargets: Set<string> = new Set()
+        var newGotoTargets: Set<UUID> = new Set()
         score.systems.forEach((sys) => {
             if (sys.execution)
                 sys.execution
@@ -132,116 +106,10 @@ export default function EditorWindow({
         setGotoTargets(newGotoTargets)
     }, [score])
 
-    // // gotoTargets will be used by the 'delete' SummaryItem button for validation.
-    // var gotoTargets: Set<string> = new Set()
-    // score.systems.forEach((sys) => {
-    //     if (sys.execution)
-    //         sys.execution.filter((item) => item.type == 'goto').forEach((goto) => gotoTargets.add(goto.targetuuid))
-    // })
-
-    // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
-    // This is a list of systems identified by their label if any, otherwise by their id.
-    function systemSelectorOptions(self: System, includeSelf: boolean, includeNone: boolean) {
-        if (!score) return []
-        // List of labelled systems
-        const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
-            label: label,
-            value: sysData.uuid
-        }))
-        const labelledUuid = labelOptions.map((entry) => entry.value)
-        //
-        // 2. List of non-labelled systems
-        const idOptions: InputOption<string>[] = score.systems
-            .filter((sysData) => !labelledUuid.includes(sysData.uuid))
-            .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
-        // Merge both lists
-        var options = [...labelOptions, ...idOptions]
-        // Remove the systemData item for which the list is being created
-        options = options.filter((o) => o.value != self.uuid)
-        // Add 'self' to the start of the list if requested.
-        if (includeSelf) {
-            options = [{ label: '<this system>', value: self.uuid }, ...options]
-        }
-        if (includeNone) {
-            options = [{ label: '<none>', value: undefined }, ...options]
-        }
-        return options
-    }
-
-    // Objects systemHeaderButtons and systemHeaderFields are created separately with useMemo to
-    // minimize rendering because it interferes with the audio playback functions.
-    // These objects contain the accordeon panel header content for each system (playback and edit buttons + fields)
-    const systemIdPrefix = 'system-'
-    const systemHeaderButtons: Record<string, ReactElement> | undefined = useMemo(() => {
-        if (!score) return
-        return Object.fromEntries(
-            score.systems.map((systemData) => {
-                debug('updating editor window')
-
-                return [
-                    systemData.uuid,
-                    <Col key={`sysheader-${systemData.uuid}`} span={3} className="flex">
-                        <PlaybackButtons
-                            score={score}
-                            sysUuid={systemData.uuid}
-                            playback={playback}
-                            hasCursor={systemData.uuid == pbCurrUuid}
-                            playbackType={pbType}
-                            playbackAudioState={pbAudioState}
-                            className="content-start"
-                        />
-                    </Col>
-                ]
-            })
-        )
-    }, [score, pbCurrUuid, pbType, pbAudioState])
-
-    const systemHeaderFields: Record<string, ReactElement> | undefined = useMemo(() => {
-        if (!score) return
-
-        return Object.fromEntries(
-            score.systems.map((systemData) => {
-                const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
-                return [
-                    systemData.uuid,
-                    <>
-                        <SCol span={2}>
-                            <SummaryItem item="id" sysData={systemData} />
-                        </SCol>
-                        <SCol span={4}>
-                            <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
-                        </SCol>
-                        <SCol span={6}>
-                            <SummaryItem
-                                item="execution"
-                                sysData={systemData}
-                                options={systemSelectorOptions(systemData, false, false)}
-                                execute={execute}
-                            />
-                        </SCol>
-                        <SCol span={4}>
-                            <SummaryItem item="new" sysData={systemData} execute={execute} />
-                            <SummaryItem
-                                item="copy"
-                                sysData={systemData}
-                                options={systemSelectorOptions(systemData, true, false)}
-                                execute={execute}
-                            />
-                            <SummaryItem
-                                item="delete"
-                                gototargets={gotoTargets}
-                                sysData={systemData}
-                                execute={execute}
-                            />
-                        </SCol>
-                    </>
-                ]
-            })
-        )
-    }, [score])
+    const scoreRef = useRef<Score>(score)
 
     const systems = useMemo(() => {
-        if (!score || !systemHeaderButtons || !systemHeaderFields) return
+        if (!score) return
         // currPartName is used to determine the first system of the part so that the part name only appears once.
         var rangePartName: string = ''
         return score.systems.map((systemData) => {
@@ -256,8 +124,8 @@ export default function EditorWindow({
                 // <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
                 <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
                     <Row>
-                        {/* Left margin containing the part name */}
                         <PartIndicator
+                            key={`key-${systemData.uuid}`}
                             uuid={systemData.uuid}
                             partName={partName}
                             partColor={partColor}
@@ -266,45 +134,26 @@ export default function EditorWindow({
                             toggleSelection={toggleSelection}
                             extendSelection={extendSelection}
                         />
-                        {/* Expandable panel containing a system */}
                         <Col span={23}>
-                            {/* <Accordion.Panel
-                                id={`${systemIdPrefix}${systemData.uuid}`}
-                                key={systemData.uuid}
-                                // Panel Header
-                                header={ */}
-                            <Grid
-                                id="systemsummary"
-                                className="ml-0 pt-0 pb-0"
-                                // Avoid expanding the panel when the user clicks on a header item.
-                                onClick={(e) => e.stopPropagation()}>
-                                {/* Displays playback buttons and info about the System */}
-                                <Row id="row">
-                                    {systemHeaderButtons[systemData.uuid]}
-                                    {systemHeaderFields[systemData.uuid]}
-                                </Row>
-                            </Grid>
-                            {/* }
-                                expanded={expanded[systemData.uuid]}
-                                onSelect={() => {
-                                    flipExpanded(systemData.uuid)
-                                }}> */}
                             <SystemNode
-                                id={`${systemIdPrefix}${systemData.uuid}`}
+                                id={systemId(systemData.uuid)}
                                 systemData={systemData}
                                 positions={score.positions}
                                 playbackState={playbackState}
                                 visible
-                                // visible={expanded[systemData.uuid]}
+                                scoreRef={scoreRef}
+                                labels={labels}
+                                playback={playback}
+                                executeItemAction={executeItemAction}
+                                gotoTargets={gotoTargets}
                             />
-                            {/* </Accordion.Panel> */}
                         </Col>
                     </Row>
                 </Grid>
                 // </Profiler>
             )
         })
-    }, [score, expanded, playbackState, selectionOn, sysToPartLookup])
+    }, [score, playbackState, selectionOn])
 
     return (
         // <Profiler id="App" onRender={onRender}>
