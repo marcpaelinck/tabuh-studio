@@ -163,17 +163,11 @@ export function SummaryItem({
                     setEditing(false)
                 }
             }
-            // function handleClick(event: PointerEvent) {
-            //     debug(`Setting editing to false (2)`)
-            //     setEditing(false)
-            // }
-            // document.addEventListener('keydown', handleEscapeKey)
-            // // document.addEventListener('click', handleClick)
-            // return () => {
-            //     // Cleanup functions
-            //     document.removeEventListener('keydown', handleEscapeKey)
-            //     document.removeEventListener('click', handleClick)
-            // }
+            document.addEventListener('keydown', handleEscapeKey)
+            return () => {
+                // Cleanup functions
+                document.removeEventListener('keydown', handleEscapeKey)
+            }
         }
     }, [editing])
 
