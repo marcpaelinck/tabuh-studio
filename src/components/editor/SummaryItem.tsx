@@ -141,11 +141,11 @@ export function SummaryItem({
 
     // Action performed on button click event and after field editing/selection.
     function buttonAction(event: any, action: string) {
-        debug(`executing button action ${action}`)
         if (specs[item].hasfield) {
             setEditing(true)
             return
         }
+        debug(`Setting editing to false (0)`)
         setEditing(false)
         debug(`EXECUTING ${item}`)
         if (action != 'cancel' && validate() && execute) execute(item)
@@ -154,22 +154,26 @@ export function SummaryItem({
     useEffect(() => {
         // Cancel editing when Esc key is pressed or when user clicks anywhere outside the input field.
         // The input field's onClick handler stops propagation to avoid closing it on mouse click.
+        debug(`Editing= ${editing}`)
+
         if (editing) {
             function handleEscapeKey(event: KeyboardEvent) {
                 if (event.code === 'Escape') {
+                    debug(`Setting editing to false (1)`)
                     setEditing(false)
                 }
             }
-            function handleClick(event: PointerEvent) {
-                setEditing(false)
-            }
-            document.addEventListener('keydown', handleEscapeKey)
-            document.addEventListener('click', handleClick)
-            return () => {
-                // Cleanup functions
-                document.removeEventListener('keydown', handleEscapeKey)
-                document.removeEventListener('click', handleClick)
-            }
+            // function handleClick(event: PointerEvent) {
+            //     debug(`Setting editing to false (2)`)
+            //     setEditing(false)
+            // }
+            // document.addEventListener('keydown', handleEscapeKey)
+            // // document.addEventListener('click', handleClick)
+            // return () => {
+            //     // Cleanup functions
+            //     document.removeEventListener('keydown', handleEscapeKey)
+            //     document.removeEventListener('click', handleClick)
+            // }
         }
     }, [editing])
 

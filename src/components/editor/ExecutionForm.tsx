@@ -173,6 +173,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
 
     useEffect(() => debug(`ITEMLIST=${JSON.stringify(itemList)}`), [itemList])
+    useEffect(() => debug(`ExecutionForm is ${open ? 'open' : 'closed'}`), [open])
 
     // Set the loop state value
     useEffect(() => {
@@ -182,7 +183,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         } else {
             setLoop(undefined)
         }
-    }, itemList)
+    }, [itemList])
 
     // Populates the forms fields with the values of the selected item
     function updateFieldsFromSelected() {
