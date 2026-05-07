@@ -129,6 +129,15 @@
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
     background-image:
+        /* This first gradient limits to 12 characters the total length of the pattern */
+        /* cursor */
+        linear-gradient(
+            to right,
+            transparent 0 calc(4ch),
+            rgba(255, 247, 0, 0.6) calc(4ch - 2pt) calc(5ch - 2pt),
+            transparent calc(5ch - 2pt) 100%
+        ),
+        linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff calc(32ch - 1px) 100%),
         repeating-linear-gradient(
             to right,
             rgba(0, 255, 0, 0.8) 0px,
@@ -145,8 +154,11 @@
         );
 
     /* Centers lines on characters */
-    background-position: calc(0.5ch - 1px) 0;
-    background-repeat: repeat-x;
+    background-position:
+        left,
+        calc(0.5ch - 2px) 0,
+        calc(0.5ch - 2px) 0,
+        calc(0.5ch - 2px) 0;
 }
 /* Editor character Grid, gong at end */
 .grid-gong-at-end {

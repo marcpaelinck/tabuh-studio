@@ -1,8 +1,8 @@
+import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
-import { editorInitialExpandState } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
 import type {
     EditorCursorParameters,
@@ -11,10 +11,13 @@ import type {
     PlaybackState
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
+import { debug } from '../../utils/debugger'
 import { PartIndicator } from './PartIndicator'
 import { SystemNode } from './SystemNode'
 
 export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
+
+export type SystemCursorFunction = (cursor: EditorCursorParameters) => void
 
 interface EditorWindowProps {
     visible: boolean
@@ -52,28 +55,41 @@ export default function EditorWindow({
 
     const systemId = (uuid: UUID) => 'system-' + uuid
 
-    const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
-        if (!visibleRef.current) return
-        // const sys = (uuid: string | undefined): System | undefined => {
-        //     return score?.systems.find((sys) => sys.uuid == uuid)
-        // }
+    // In order to minimize re-renders, each SystemNode gets its own cursor update function.
+    // const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
+    const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
 
-        // if (params.prevsysuuid && params.prevsysuuid != params.sysuuid) {
-        //     debug(`Close panel ${sys(params.prevsysuuid)?.id}, curr=${sys(params.sysuuid)?.id}`)
-        //     expandIfNotExpanded(params.prevsysuuid, false)
-        // }
-        // if (params.prevsysuuid != params.sysuuid) {
-        //     debug(`Open panel ${sys(params.sysuuid)?.id} prev=${sys(params.prevsysuuid)?.id}`)
-        //     expandIfNotExpanded(params.sysuuid, true)
-        // }
-        playback({ actionType: 'cursor', cursor: { sysUuid: params.sysuuid, measure: params.section } })
-        console.log(`scrolling to system ${params.sysuuid}`)
-        const currElement = document.getElementById(systemId(params.sysuuid))
+    // This function is passed to the SystemNode elements, so that they can each add their own cursor function
+    // to the systemCursorFunctions record.
+    function updateCursorFunction(uuid: UUID, func: SystemCursorFunction) {
+        debug(`updating cursor function for ${uuid}`)
+        // See https://react.dev/learn/queueing-a-series-of-state-updates
+        setSystemCursorFunctions((systemCursorFunctions) => {
+            const newFunctions = { ...systemCursorFunctions }
+            newFunctions[uuid] = func
+            return newFunctions
+        })
+        debug(`new CursorFunctions: ${JSON.stringify(_.keys(systemCursorFunctions))}`)
+    }
 
-        currElement?.scrollIntoView({ behavior: 'instant', block: 'center' })
-    }, [])
+    // This is the actual editor cursor function. It calls the corresponding SystemCursorFunction.
+    const moveEditorCursor = useCallback(
+        (time: number, params: EditorCursorParameters) => {
+            if (params.sysuuid in systemCursorFunctions) {
+                debug(`moving cursor in system ${params.sysuuid}`)
+                systemCursorFunctions[params.sysuuid](params)
+                // Reset cursor animation in the previous system
+                if (params.prevsysuuid) systemCursorFunctions[params.prevsysuuid](params)
+            }
+        },
+        [systemCursorFunctions]
+    )
 
-    useEffect(() => updatePlaybackFunctions({ editorcursor: moveEditorCursor }), [])
+    // Pass the editorcursor function to the playbackManager.
+    useEffect(() => {
+        debug(`cursorFunctions=${JSON.stringify(_.keys(systemCursorFunctions))}`)
+        updatePlaybackFunctions({ editorcursor: moveEditorCursor })
+    }, [systemCursorFunctions])
 
     const dialog = useDialog()
 
@@ -85,13 +101,6 @@ export default function EditorWindow({
             playback({ actionType: 'reseterror' })
         }
     }, [playbackState])
-
-    useEffect(() => {
-        if (!score) return
-        const initExpandState = Object.fromEntries(
-            score.systems.map((sysInfo) => [sysInfo.index, editorInitialExpandState])
-        )
-    }, [currentScoreId])
 
     useEffect(() => {
         if (!score) return
@@ -107,6 +116,9 @@ export default function EditorWindow({
     }, [score])
 
     const scoreRef = useRef<Score>(score)
+    useEffect(() => {
+        scoreRef.current = score
+    }, [score])
 
     const systems = useMemo(() => {
         if (!score) return
@@ -139,12 +151,14 @@ export default function EditorWindow({
                                 id={systemId(systemData.uuid)}
                                 systemData={systemData}
                                 positions={score.positions}
-                                playbackState={playbackState}
+                                playbackType={playbackState.playbackType}
+                                audioState={playbackState.audioState}
                                 visible
                                 scoreRef={scoreRef}
                                 labels={labels}
                                 playback={playback}
                                 executeItemAction={executeItemAction}
+                                updateCursorFunction={updateCursorFunction}
                                 gotoTargets={gotoTargets}
                             />
                         </Col>

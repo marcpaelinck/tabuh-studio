@@ -32,7 +32,7 @@ import type {
 import type { Note, Score, System } from '../typing/score'
 import { cleanSymbol } from '../utils/alphabet'
 import { debug } from '../utils/debugger'
-import { defaultObject, same } from '../utils/objectUtils'
+import { defaultObject } from '../utils/objectUtils'
 import { speedDefaultOption } from '../utils/selectorsUtils'
 import {
     BaseNoteEquiv2Millis,
@@ -542,10 +542,10 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         outro = defaultOutroTime
     }: SchedulePlaybackParams): void {
         // Do nothing if the timeline has already been generated
-        if (timeLine && same<PlaybackAction>(pbAction, timeLine.playbackAction)) {
-            console.log('Request to create timeline skipped.')
-            return
-        }
+        // if (timeLine && same<PlaybackAction>(pbAction, timeLine.playbackAction)) {
+        //     console.log('Request to create timeline skipped.')
+        //     return
+        // }
 
         console.log('Executing request to create timeline.')
         const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)

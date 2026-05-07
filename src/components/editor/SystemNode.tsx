@@ -16,38 +16,50 @@ import { castNotation } from '../../componentlogic/castingRulesManager'
 import { editorFontSize, noCursor, positionConfigs } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
 import type { Position } from '../../typing/instruments'
-import type { EditorCellCursor, PlaybackAction, PlaybackState } from '../../typing/playback'
+import type {
+    AudioState,
+    EditorCellCursor,
+    EditorCursorParameters,
+    PlaybackAction,
+    PlaybackType
+} from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { ScoreFunctions, type ScoreFunctionsType } from '../contexts'
 import type { GridInfo } from './_types'
+import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
 
 interface EditorSystemProps extends TextareaProps {
     systemData: System
     positions: Position[]
-    playbackState: PlaybackState
+    // playbackCursor: EditorCellCursor | undefined
+    audioState: AudioState
+    playbackType: PlaybackType
     visible: boolean
     scoreRef: RefObject<Score>
     labels: Record<string, System>
     gotoTargets: Set<UUID>
     playback: ActionDispatch<[action: PlaybackAction]>
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
+    updateCursorFunction: (uuid: UUID, func: SystemCursorFunction) => void
 }
 
 // Creates a grid containing the notation of one system/gongan.
 export function SystemNode({
     systemData,
     positions,
-    playbackState,
+    audioState,
+    playbackType,
     visible,
     scoreRef,
     labels,
     gotoTargets,
     playback,
     executeItemAction,
+    updateCursorFunction,
     ...props
 }: EditorSystemProps): ReactNode {
     const systemUuid = systemData.uuid
@@ -56,9 +68,9 @@ export function SystemNode({
     const [highlightedMeasure, setHighlightedMeasure] = useState<EditorCellCursor>(noCursor)
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
-    if (systemData.id == 1 || systemData.id == 13) debug(`(re-)rendering system ${systemUuid}`)
+    const [playbackCursor, setPlaybackCursor] = useState<EditorCellCursor | null>(null)
 
-    useEffect(() => debug(`recreating system ${systemUuid} due to change of data`), [systemData])
+    const notationAreaRef = useRef<HTMLTextAreaElement>(null)
 
     // Fills the notation of the given measure (colId) for all grouped instruments
     // by casting the given notation for each instrument.
@@ -77,27 +89,40 @@ export function SystemNode({
         scoreFunc.updateSystem(newSystemData)
     }
 
-    useEffect(() => {
-        if (systemUuid == playbackState.cursor.sysUuid) {
-            // console.log(`${systemUuid} ${systemUuid == playbackState.cursor.sysUuid ? 'has' : 'lost'} cursor`)
-            debug(`${systemUuid} has the cursor`)
+    function moveEditorCursor(cursor: EditorCursorParameters) {
+        console.log(`moveEditorCursor(${JSON.stringify(cursor)}), currsysuuid=${systemData.uuid}`)
+        if (cursor.sysuuid != systemData.uuid) {
+            setPlaybackCursor(null)
+            return
         }
-    }, [playbackState])
+        console.log(
+            `setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`
+        )
+        setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.section })
+        notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
 
-    const systemHeaderButtons: ReactElement | undefined = (
-        <Col key={`systemButtons-${systemData.uuid}`} span={3} className="flex">
-            <PlaybackButtons
-                scoreRef={scoreRef}
-                sysUuid={systemUuid}
-                playback={playback}
-                playbackState={playbackState}
-                hasCursor={systemUuid == playbackState.cursor.sysUuid}
-                playbackType={playbackState.playbackType}
-                playbackAudioState={playbackState.audioState}
-                className="content-start"
-            />
-        </Col>
-    )
+    useEffect(() => {
+        // console.log('setting update editorcursor function')
+        updateCursorFunction(systemData.uuid, moveEditorCursor)
+    }, [])
+
+    const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
+        debug(`re-rendering buttons of system ${systemData.id}`)
+        return (
+            <Col key={`systemButtons-${systemData.uuid}`} span={3} className="flex">
+                <PlaybackButtons
+                    scoreRef={scoreRef}
+                    sysUuid={systemUuid}
+                    playback={playback}
+                    playbackCursor={playbackCursor}
+                    playbackType={playbackType}
+                    playbackAudioState={audioState}
+                    className="content-start"
+                />
+            </Col>
+        )
+    }, [systemData, playbackCursor, audioState, playbackType])
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
@@ -130,6 +155,7 @@ export function SystemNode({
 
     const systemHeaderFields: ReactElement | undefined = useMemo(() => {
         if (!systemData) return
+        debug(`re-rendering header fields of system ${systemData.id}`)
 
         const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
         return (
@@ -170,6 +196,7 @@ export function SystemNode({
         .join('\n')
 
     const notationArea = useMemo(() => {
+        debug(`re-rendering notation area of system ${systemData.id}`)
         const positionTitlesFont = `courierfont${10}`
         const notationFont = `balifontspaced${editorFontSize}`
         const rows = _.keys(systemData.staffs).length
@@ -190,6 +217,7 @@ export function SystemNode({
                     </Col>
                     <Col span={20} id="Notation">
                         <Textarea
+                            ref={notationAreaRef}
                             id={props.id}
                             rows={rows}
                             className={`${notationFont} grid-gong-at-start leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
@@ -197,12 +225,11 @@ export function SystemNode({
                             spellCheck="false"
                             defaultValue={notationText}
                         />
-                        {/* </div> */}
                     </Col>
                 </Row>
             </Grid>
         )
-    }, [systemData, playbackState])
+    }, [systemData, playbackCursor, audioState, playbackType])
 
     return visible && notationArea
 }

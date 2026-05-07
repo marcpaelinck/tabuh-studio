@@ -317,8 +317,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const editorWindow = score && (
         <EditorWindow
             visible={active == 'editor'}
-            expanded={expanded}
-            setExpanded={setExpanded}
             loading={loadingScore}
             score={score}
             currentScoreId={currentScoreId}
