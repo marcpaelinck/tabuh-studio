@@ -184,6 +184,9 @@ export function SystemNode({
                     />
                     <SummaryItem item="delete" gototargets={gotoTargets} sysData={systemData} execute={execute} />
                 </SCol>
+                <SCol span={2}>
+                    <SummaryItem item="kempli" sysData={systemData} />
+                </SCol>
             </>
         )
     }, [systemData])

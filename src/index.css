@@ -128,30 +128,32 @@
     padding-left: 0;
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
-    background-image:
-        /* This first gradient limits to 12 characters the total length of the pattern */
-        /* cursor */
+    background:
+	    /* cursor */
         linear-gradient(
             to right,
-            transparent 0 calc(4ch),
-            rgba(255, 247, 0, 0.6) calc(4ch - 2pt) calc(5ch - 2pt),
-            transparent calc(5ch - 2pt) 100%
+            transparent 0 calc(4ch - 2px),
+            rgba(255, 255, 0, 0.5) calc(4ch - 2px) calc(5ch - 2px),
+            transparent calc(5ch) 100%
         ),
-        linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff calc(32ch - 1px) 100%),
+        /* Sets the span width of the background in characters */
+        linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff 32ch 100%),
+        /* Kempli beat grid lines */
         repeating-linear-gradient(
-            to right,
-            rgba(0, 255, 0, 0.8) 0px,
-            rgba(0, 255, 0, 0.8) 2px,
-            transparent 2px,
-            transparent 4ch
-        ),
+                to right,
+                rgba(0, 255, 0, 0.8) 0px,
+                rgba(0, 255, 0, 0.8) 2px,
+                transparent 2px,
+                transparent 4ch
+            ),
+        /* Basic grid lines */
         repeating-linear-gradient(
-            to right,
-            rgba(0, 0, 0, 0.1) 0px,
-            rgba(0, 0, 0, 0.1) 1px,
-            transparent 1px,
-            transparent 1ch
-        );
+                to right,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 1ch
+            );
 
     /* Centers lines on characters */
     background-position:
@@ -159,6 +161,8 @@
         calc(0.5ch - 2px) 0,
         calc(0.5ch - 2px) 0,
         calc(0.5ch - 2px) 0;
+
+    background-repeat: repeat-x;
 }
 /* Editor character Grid, gong at end */
 .grid-gong-at-end {
@@ -166,23 +170,36 @@
     padding-left: 0;
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
-    background-image:
+    /* prettier-ignore */
+    background:
+	    /* cursor */
+        linear-gradient(
+            to right,
+            transparent 0 calc(4ch - 1px),
+            rgba(255, 255, 0, 0.5) calc(4ch - 1px) calc(5ch - 1px),
+            transparent calc(5ch) 100%
+        ),
+        /* Sets the span width of the background in characters */
+        linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff 32ch 100%),
+        /* Kempli beat grid lines */
         repeating-linear-gradient(
-            to left,
-            rgba(0, 255, 0, 0.8) 0px,
-            rgba(0, 255, 0, 0.8) 2px,
-            transparent 2px,
-            transparent 4ch
+            to right, 
+            transparent 0 calc(3ch - 1pt), 
+            rgba(0, 255, 0, 0.8) calc(3ch - 1pt) calc(3ch + 1pt),
+            transparent calc(3ch + 1pt) calc(4ch)
         ),
         repeating-linear-gradient(
-            to left,
-            rgba(0, 0, 0, 0.1) 0px,
-            rgba(0, 0, 0, 0.1) 1px,
-            transparent 1px,
-            transparent 1ch
+            to right, 
+            rgba(0, 0, 0, 0.1) 0px 1px, 
+            transparent 1px 1ch
         );
 
     /* Centers lines on characters */
-    background-position: calc(-0.5ch + 1px) 0;
-    background-repeat: no-repeat;
+    background-position:
+        left,
+        calc(0.5ch - 1px) 0,
+        calc(0.5ch - 1px) 0,
+        calc(0.5ch - 1px) 0;
+
+    background-repeat: repeat-x;
 }

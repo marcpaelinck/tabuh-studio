@@ -23,6 +23,7 @@ import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { tsBlue } from '../../config/config'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
+import TsKempliIcon from '../../reacticons/TsKempliIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import type { Score, System } from '../../typing/score'
@@ -34,7 +35,7 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type EditorActionType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution'
+type EditorActionType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution' | 'kempli'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: EditorActionType
@@ -62,7 +63,7 @@ export function SummaryItem({
 }: SummaryItemProps) {
     // Specifications of the display mode and functionality of each SummaryItem type.
     // See below for a detailed description of the properties of this interface.
-    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'executionform' | 'none'
+    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'executionform' | 'kempli' | 'none'
     interface SpecType {
         icon: IconType
         iconcolor?: string
@@ -73,6 +74,7 @@ export function SummaryItem({
         textcolor?: string
         buttonTooltip?: string
         fieldTooltip?: string
+        appearance?: string
     }
 
     // Specification of the items. Each item corresponds with an attribute of a System object and contains a button and/or a field.
@@ -133,6 +135,13 @@ export function SummaryItem({
             textcolor: 'green',
             buttonTooltip: 'Playing sequence, tempo & dynamics.',
             fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
+        },
+        kempli: {
+            icon: TsKempliIcon,
+            iconcolor: tsBlue,
+            action: 'kempli',
+            hasfield: false,
+            buttonTooltip: 'Set kempli beats'
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
