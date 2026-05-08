@@ -101,44 +101,43 @@ export function SystemNode({
         notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
-    function setGrid1(systemData: System) {
-        if (notationAreaRef.current) notationAreaRef.current.style.border = '2px solid #AA0000'
-    }
-
     // Sets the background grid and cursor highlighting
     function setGrid(systemData: System, cursor: EditorCellCursor | null) {
-        if (!notationAreaRef.current) return
-        var measureSize = 0
-        if (cursor) measureSize = systemData.colWidths[cursor?.measure]
+        // Generates a gradient function for the kempli lines
+        function kempliGrid(systemData: System): string {
+            const gradients = systemData.colWidths
+                .map((width, idx) => {
+                    const offset = _.sum(systemData.colWidths.slice(0, idx))
+                    const css = `
+                rgba(0, 255, 0, 0.8) ${offset}ch calc(${offset}ch + 2px),
+                transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
+                    return css
+                })
+                .join(', ')
+            return `linear-gradient(to right, ` + gradients + '),'
+        }
 
+        if (!notationAreaRef.current) return
+        const totalWidth = _.sum(systemData.colWidths)
+        const cursorMeasureSize = cursor ? systemData.colWidths[cursor?.measure] : 0
+        const bgColor = notationAreaRef.current.style.backgroundColor
         const highlight = cursor
             ? `linear-gradient(
             to right,
             transparent 0 calc(${cursor.measure * 4}ch - 2px),
-            rgba(255, 255, 0, 0.5) calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + measureSize}ch - 2px),
-            transparent calc(${cursor.measure * 4 + measureSize}ch) 100%
+            rgba(255, 255, 0, 0.5) calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + cursorMeasureSize}ch - 2px),
+            transparent calc(${cursor.measure * 4 + cursorMeasureSize}ch) 100%
         ),`
             : ''
-        notationAreaRef.current.style.setProperty(
-            'background',
-            highlight +
-                `linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff 32ch 100%),
-        repeating-linear-gradient(
-                to right,
-                rgba(0, 255, 0, 0.8) 0px,
-                rgba(0, 255, 0, 0.8) 2px,
-                transparent 2px,
-                transparent 4ch
-            ),
-        repeating-linear-gradient(
-                to right,
-                rgba(0, 0, 0, 0.1) 0px,
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 1ch
-            )
-`
-        )
+        const kempliLines = kempliGrid(systemData)
+        // Hides the superfluous gridlines which are generated with a recurring pattern
+        const gridlineHider = `linear-gradient(to right, transparent 0 calc(${totalWidth}ch - 1px), ${bgColor} ${totalWidth}ch 100%),`
+        const gridlines = `repeating-linear-gradient(
+            to right, 
+            rgba(0, 0, 0, 0.2) 0px 1px, 
+            transparent 1px 1ch
+        )`
+        notationAreaRef.current.style.setProperty('background', highlight + gridlineHider + kempliLines + gridlines)
         /* Centers lines on characters */
         notationAreaRef.current.style.setProperty(
             'background-position',

@@ -128,41 +128,31 @@
     padding-left: 0; */
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
-    background:
-	    /* cursor */
-        linear-gradient(
-            to right,
-            transparent 0 calc(4ch - 2px),
-            rgba(255, 255, 0, 0.5) calc(4ch - 2px) calc(5ch - 2px),
-            transparent calc(5ch) 100%
-        ),
-        /* Sets the span width of the background in characters */
-        linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff 32ch 100%),
-        /* Kempli beat grid lines */
-        repeating-linear-gradient(
-                to right,
-                rgba(0, 255, 0, 0.8) 0px,
-                rgba(0, 255, 0, 0.8) 2px,
-                transparent 2px,
-                transparent 4ch
-            ),
-        /* Basic grid lines */
-        repeating-linear-gradient(
-                to right,
-                rgba(0, 0, 0, 0.1) 0px,
-                rgba(0, 0, 0, 0.1) 1px,
-                transparent 1px,
-                transparent 1ch
-            );
+    background: linear-gradient(
+        to right,
+        rgba(0, 255, 0, 0.8) 0 2px,
+        transparent 2px 4ch,
+        rgba(0, 255, 0, 0.8) 4ch calc(4ch + 2px),
+        transparent calc(4ch + 2px) 8ch,
+        rgba(0, 255, 0, 0.8) 8ch calc(8ch + 2px),
+        transparent calc(8ch + 2px) 12ch,
+        rgba(0, 255, 0, 0.8) 12ch calc(12ch + 2px),
+        transparent calc(12ch + 2px) 16ch,
+        rgba(0, 255, 0, 0.8) 16ch calc(16ch + 2px),
+        transparent calc(16ch + 2px) 20ch,
+        rgba(0, 255, 0, 0.8) 20ch calc(20ch + 2px),
+        transparent calc(20ch + 2px) 24ch,
+        rgba(0, 255, 0, 0.8) 24ch calc(24ch + 2px),
+        transparent calc(24ch + 2px) 28ch,
+        rgba(0, 255, 0, 0.8) 28ch calc(28ch + 2px),
+        transparent calc(28ch + 2px) 100%
+    );
+    /* linear-gradient(to right, rgba(0, 0, 0, 0.1) 28ch calc(28ch + 1px), transparent calc(28ch + 1px) 29ch); */
 
     /* Centers lines on characters */
-    background-position:
-        left,
-        calc(0.5ch - 2px) 0,
-        calc(0.5ch - 2px) 0,
-        calc(0.5ch - 2px) 0;
+    background-position: left;
 
-    background-repeat: repeat-x;
+    background-repeat: no-repeat;
 }
 /* Editor character Grid, gong at end */
 .grid-gong-at-end {
