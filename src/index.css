@@ -124,8 +124,8 @@
 }
 /* Editor character Grid, gong at start */
 .grid-gong-at-start {
-    white-space: pre;
-    padding-left: 0;
+    /* white-space: pre;
+    padding-left: 0; */
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
     background:
@@ -166,8 +166,8 @@
 }
 /* Editor character Grid, gong at end */
 .grid-gong-at-end {
-    white-space: pre;
-    padding-left: 0;
+    /* white-space: pre;
+    padding-left: 0; */
 
     /* Layered backgrounds (Green every 4th, Gray every 1ch) */
     /* prettier-ignore */

@@ -35,7 +35,6 @@ import { SCol, SummaryItem } from './SummaryItem'
 interface EditorSystemProps extends TextareaProps {
     systemData: System
     positions: Position[]
-    // playbackCursor: EditorCellCursor | undefined
     audioState: AudioState
     playbackType: PlaybackType
     visible: boolean
@@ -102,10 +101,66 @@ export function SystemNode({
         notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
 
+    function setGrid1(systemData: System) {
+        if (notationAreaRef.current) notationAreaRef.current.style.border = '2px solid #AA0000'
+    }
+
+    // Sets the background grid and cursor highlighting
+    function setGrid(systemData: System, cursor: EditorCellCursor | null) {
+        if (!notationAreaRef.current) return
+        var measureSize = 0
+        if (cursor) measureSize = systemData.colWidths[cursor?.measure]
+
+        const highlight = cursor
+            ? `linear-gradient(
+            to right,
+            transparent 0 calc(${cursor.measure * 4}ch - 2px),
+            rgba(255, 255, 0, 0.5) calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + measureSize}ch - 2px),
+            transparent calc(${cursor.measure * 4 + measureSize}ch) 100%
+        ),`
+            : ''
+        notationAreaRef.current.style.setProperty(
+            'background',
+            highlight +
+                `linear-gradient(to right, transparent 0 calc(32ch - 1px), #ffffff 32ch 100%),
+        repeating-linear-gradient(
+                to right,
+                rgba(0, 255, 0, 0.8) 0px,
+                rgba(0, 255, 0, 0.8) 2px,
+                transparent 2px,
+                transparent 4ch
+            ),
+        repeating-linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0.1) 0px,
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 1ch
+            )
+`
+        )
+        /* Centers lines on characters */
+        notationAreaRef.current.style.setProperty(
+            'background-position',
+            `
+            left,
+            calc(0.5ch - 2px) 0,
+            calc(0.5ch - 2px) 0,
+            calc(0.5ch - 2px) 0
+`
+        )
+        notationAreaRef.current.style.setProperty('background-repeat', 'repeat-x')
+    }
+
     useEffect(() => {
         // console.log('setting update editorcursor function')
         updateCursorFunction(systemData.uuid, moveEditorCursor)
     }, [])
+
+    useEffect(() => {
+        // console.log('setting update editorcursor function')
+        setGrid(systemData, playbackCursor)
+    }, [systemData, playbackCursor])
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
         debug(`re-rendering buttons of system ${systemData.id}`)
@@ -223,7 +278,7 @@ export function SystemNode({
                             ref={notationAreaRef}
                             id={props.id}
                             rows={rows}
-                            className={`${notationFont} grid-gong-at-start leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                            className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             style={{ position: 'relative', zIndex: 1, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
                             spellCheck="false"
                             defaultValue={notationText}
