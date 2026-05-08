@@ -71,6 +71,13 @@ export function SystemNode({
 
     const notationAreaRef = useRef<HTMLTextAreaElement>(null)
 
+    const gridColors = {
+        cursor: 'rgba(255, 255, 0, 0.5)',
+        kempli: 'rgba(0, 255, 0, 0.8)',
+        grid: 'rgba(0, 0, 0, 0.2)',
+        background: 'rgba(255, 255, 255, 0.9)'
+    }
+
     // Fills the notation of the given measure (colId) for all grouped instruments
     // by casting the given notation for each instrument.
     function applyRules(notation: string[], rowIdx: number, colIdx: number, cached: boolean) {
@@ -109,7 +116,7 @@ export function SystemNode({
                 .map((width, idx) => {
                     const offset = _.sum(systemData.colWidths.slice(0, idx))
                     const css = `
-                rgba(0, 255, 0, 0.8) ${offset}ch calc(${offset}ch + 2px),
+                ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
                 transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
                     return css
                 })
@@ -117,24 +124,37 @@ export function SystemNode({
             return `linear-gradient(to right, ` + gradients + '),'
         }
 
+        function cursorHighlight(cursor: EditorCellCursor | null): string {
+            if (!cursor) return ''
+            const cursorMeasureSize = systemData.colWidths[cursor.measure]
+            const cursorOffset = _.sum(systemData.colWidths.slice(0, cursor.measure))
+            const highlight = `linear-gradient(
+                to right,
+                transparent 0 calc(${cursorOffset}ch - 2px),
+                ${gridColors.cursor} calc(${cursorOffset}ch - 2px) calc(${cursorOffset + cursorMeasureSize}ch - 2px),
+                transparent calc(${cursorOffset + cursorMeasureSize}ch) 100%),`
+            return highlight
+        }
+
         if (!notationAreaRef.current) return
         const totalWidth = _.sum(systemData.colWidths)
-        const cursorMeasureSize = cursor ? systemData.colWidths[cursor?.measure] : 0
-        const bgColor = notationAreaRef.current.style.backgroundColor
-        const highlight = cursor
-            ? `linear-gradient(
-            to right,
-            transparent 0 calc(${cursor.measure * 4}ch - 2px),
-            rgba(255, 255, 0, 0.5) calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + cursorMeasureSize}ch - 2px),
-            transparent calc(${cursor.measure * 4 + cursorMeasureSize}ch) 100%
-        ),`
-            : ''
+        // const cursorMeasureSize = cursor ? systemData.colWidths[cursor?.measure] : 0
+        // const cursorOffset = _.sum(systemData.colWidths.slice(0, cursor?.measure))
+        // const highlight = cursor
+        //     ? `linear-gradient(
+        //     to right,
+        //     transparent 0 calc(${cursor.measure * 4}ch - 2px),
+        //     ${gridColors.cursor} calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + cursorMeasureSize}ch - 2px),
+        //     transparent calc(${cursor.measure * 4 + cursorMeasureSize}ch) 100%
+        // ),`
+        //     : ''
+        const highlight = cursorHighlight(cursor)
         const kempliLines = kempliGrid(systemData)
         // Hides the superfluous gridlines which are generated with a recurring pattern
-        const gridlineHider = `linear-gradient(to right, transparent 0 calc(${totalWidth}ch - 1px), ${bgColor} ${totalWidth}ch 100%),`
+        const gridlineHider = `linear-gradient(to right, transparent 0 calc(${totalWidth}ch - 1px), ${gridColors.background} ${totalWidth}ch 100%),`
         const gridlines = `repeating-linear-gradient(
             to right, 
-            rgba(0, 0, 0, 0.2) 0px 1px, 
+            ${gridColors.grid} 0px 1px, 
             transparent 1px 1ch
         )`
         notationAreaRef.current.style.setProperty('background', highlight + gridlineHider + kempliLines + gridlines)
@@ -278,7 +298,7 @@ export function SystemNode({
                             id={props.id}
                             rows={rows}
                             className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                            style={{ position: 'relative', zIndex: 1, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+                            style={{ position: 'relative', zIndex: 1, backgroundColor: gridColors.background }}
                             spellCheck="false"
                             defaultValue={notationText}
                         />
