@@ -112,16 +112,30 @@ export function SystemNode({
     function setGrid(systemData: System, cursor: EditorCellCursor | null) {
         // Generates a gradient function for the kempli lines
         function kempliGrid(systemData: System): string {
-            const gradients = systemData.colWidths
-                .map((width, idx) => {
-                    const offset = _.sum(systemData.colWidths.slice(0, idx))
-                    const css = `
-                ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
-                transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
-                    return css
-                })
-                .join(', ')
-            return `linear-gradient(to right, ` + gradients + '),'
+            switch (systemData.kempli.state) {
+                case 'on': {
+                    return `repeating-linear-gradient(
+                        to right, 
+                        ${gridColors.kempli} 0px 2px, 
+                        transparent 2px ${systemData.kempli.frequency || 4}ch
+                        ),`
+                }
+                case 'notation': {
+                    const gradients = systemData.colWidths
+                        .map((width, idx) => {
+                            const offset = _.sum(systemData.colWidths.slice(0, idx))
+                            const css = `
+                                ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
+                                transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
+                            return css
+                        })
+                        .join(', ')
+                    return `linear-gradient(to right, ` + gradients + '),'
+                }
+                case 'off':
+                default:
+                    return ''
+            }
         }
 
         function cursorHighlight(cursor: EditorCellCursor | null): string {
@@ -138,16 +152,7 @@ export function SystemNode({
 
         if (!notationAreaRef.current) return
         const totalWidth = _.sum(systemData.colWidths)
-        // const cursorMeasureSize = cursor ? systemData.colWidths[cursor?.measure] : 0
-        // const cursorOffset = _.sum(systemData.colWidths.slice(0, cursor?.measure))
-        // const highlight = cursor
-        //     ? `linear-gradient(
-        //     to right,
-        //     transparent 0 calc(${cursor.measure * 4}ch - 2px),
-        //     ${gridColors.cursor} calc(${cursor.measure * 4}ch - 2px) calc(${cursor.measure * 4 + cursorMeasureSize}ch - 2px),
-        //     transparent calc(${cursor.measure * 4 + cursorMeasureSize}ch) 100%
-        // ),`
-        //     : ''
+
         const highlight = cursorHighlight(cursor)
         const kempliLines = kempliGrid(systemData)
         // Hides the superfluous gridlines which are generated with a recurring pattern
@@ -259,7 +264,7 @@ export function SystemNode({
                     <SummaryItem item="delete" gototargets={gotoTargets} sysData={systemData} execute={execute} />
                 </SCol>
                 <SCol span={2}>
-                    <SummaryItem item="kempli" sysData={systemData} />
+                    <SummaryItem item="kempli" sysData={systemData} execute={execute} />
                 </SCol>
             </>
         )
@@ -286,7 +291,7 @@ export function SystemNode({
                 <Row id="SystemNotation">
                     <Col span={3} id="Positions">
                         <Textarea
-                            readOnly
+                            disabled
                             rows={rows}
                             className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
                             defaultValue={positionTitles}

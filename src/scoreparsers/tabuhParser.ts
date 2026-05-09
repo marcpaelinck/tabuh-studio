@@ -94,6 +94,7 @@ export function parseNotation(content: string): ParserReturnValue {
                     notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
                     editorGroup: [],
                     staffs: {},
+                    kempli: { state: 'on', frequency: 4 },
                     colWidths: [],
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
@@ -240,6 +241,17 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
 
     // TODO Add kempli
     for (const system of score.systems) {
+        // Note that a default value for system.kempli had been assigned on system creation.
+        system.kempli.frequency = system.colWidths && system.colWidths.length > 0 ? system.colWidths[0] : 4
+        if (system.execution) {
+            const kempliItem: KempliItem = system.execution.find((exec) => exec.type == 'kempli') as KempliItem
+            if (kempliItem) {
+                if (kempliItem.value == 'off') {
+                    system.kempli.state = 'off'
+                }
+                if ((kempliItem.value = 'double')) system.kempli.frequency = system.kempli.frequency! / 2
+            }
+        }
     }
 
     // Generate and assign the score's `parts` attribute.

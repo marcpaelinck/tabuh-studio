@@ -12,6 +12,7 @@ calung	e--------i---i----
 gong	G------------G----
 
 	{TEMPO 40->100 beats=1->8}
+	{GONGAN kebyar}
 	{DYNAMICS mf positions=[ugal,gangsa,reyong,calung]}
 ugal/ga	-a,ia,	ieoi	a,ia,i	a,eio	euou	euou	eioe	uoeo
 reyong1	-a,ia,	ie,a,i	a,ia,i	a,e,ia,	e,u,a,u,	e,u,a,u,	e,ia,e,	u,a,e,a,
@@ -398,4 +399,5 @@ jegogan	i		e		i		e
 kendang	....	....	.8*8	*8*8	*---	....	....	....
 gong	G		P		T		P
 
+	{KEMPLI off}
 gong	G

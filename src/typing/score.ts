@@ -13,6 +13,11 @@ export type Note = {
 // JSON: standard score format
 // Laras, Notation: text versions that can be imported. Each format needs its own parser.
 export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
+export type KempliState = 'on' | 'off' | 'notation'
+export interface KempliSetting {
+    state: KempliState
+    frequency?: number
+}
 
 // SCORE OBJECT DEFINITIONS
 
@@ -38,6 +43,7 @@ export type System = {
     notationGroups?: GroupedNotation[] // Staves of an imported Notation assigned to multiple positions.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
     staffs: Staffs // Contains the notation as a sequence of measures for each position.
+    kempli: KempliSetting
     colWidths: number[]
     label?: string
     execution?: ExecutionItem[]

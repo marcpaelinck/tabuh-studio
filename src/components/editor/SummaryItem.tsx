@@ -23,7 +23,9 @@ import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { tsBlue } from '../../config/config'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
-import TsKempliIcon from '../../reacticons/TsKempliIcon'
+import TsKempliNotationIcon from '../../reacticons/TsKempliNotationIcon'
+import TsKempliOffIcon from '../../reacticons/TsKempliOffIcon'
+import TsKempliOnIcon from '../../reacticons/TsKempliOnIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
 import TsNewIcon from '../../reacticons/TsNewIcon'
 import type { Score, System } from '../../typing/score'
@@ -64,6 +66,7 @@ export function SummaryItem({
     // Specifications of the display mode and functionality of each SummaryItem type.
     // See below for a detailed description of the properties of this interface.
     type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'executionform' | 'kempli' | 'none'
+
     interface SpecType {
         icon: IconType
         iconcolor?: string
@@ -137,11 +140,19 @@ export function SummaryItem({
             fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
         },
         kempli: {
-            icon: TsKempliIcon,
+            // Kempli button toggles between three states
+            icon: [TsKempliOnIcon, TsKempliOffIcon, TsKempliNotationIcon][
+                ['on', 'off', 'notation'].indexOf(sysData.kempli.state)
+            ],
             iconcolor: tsBlue,
             action: 'kempli',
-            hasfield: false,
-            buttonTooltip: 'Set kempli beats'
+            hasfield: true,
+            fieldval: sysData.kempli.state == 'on' ? `${sysData.kempli.frequency}` : '',
+            buttonTooltip: [
+                `Kempli beat every ${sysData.kempli.frequency} notes.`,
+                'Kempli off.',
+                'Kempli according to notation.'
+            ][['on', 'off', 'notation'].indexOf(sysData.kempli.state)]
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
