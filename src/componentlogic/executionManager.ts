@@ -48,7 +48,9 @@ export interface FlowStep {
     id: number
     system: System
     systemIdx: number
-    sectionIdx: number // for future use
+    sectionIdx: number
+    pass: number // Current pass count
+    loop: number // current iteration count
     measures: Record<Partial<Position>, Measure>
     positions: Partial<Position>[]
     tempo: BPM[]
@@ -75,7 +77,12 @@ const itemPriority = (item: ExecutionItem): number => {
 const compareItems = (item1: ExecutionItem, item2: ExecutionItem): number => itemPriority(item1) - itemPriority(item2)
 
 // Returns functions that can be used to run throught the score in the correct sequence.
-export function executionManager(score: Score, startIndex: number = 0, playbackType: PlaybackType = 'multiple') {
+export function executionManager(
+    score: Score,
+    playbackType: PlaybackType = 'multiple',
+    startAtSystemIndex: number = 0,
+    startAtPass: number = 1
+) {
     var currentStep: FlowStep | undefined = undefined
 
     // Create the lookup table and initialize the flow.
@@ -98,6 +105,25 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
     var uuidLookup: Record<string, number> = Object.fromEntries(
         score.systems.map((system) => [system.uuid, system.index])
     )
+
+    // Spool forward to the requested system and pass
+    // This will set all flow variables correctly
+    if (startAtSystemIndex != 0 || startAtPass != 1) {
+        var quit = false
+        do {
+            const nextStep = nextStepInFlow(true) // get next step but do not change flow variables
+            if (!nextStep) {
+                console.error(`Requested system ${startAtSystemIndex} unreachable from the start of the score`)
+                currentStep = nextStepInFlow()
+                break
+            }
+            if (nextStep.systemIdx != startAtSystemIndex || nextStep.pass != startAtPass) {
+                // Proceed to next step if the requested position is not yet reached
+                // or if the end of the score is reached.
+                currentStep = nextStepInFlow()
+            } else quit = true
+        } while (!quit)
+    }
 
     function resetFlow() {
         _.values(flowinfo).forEach((value) => {
@@ -250,11 +276,11 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
             case !currentStep: {
                 // Start of playback sequence: return the first measure
                 _.assign(next, {
-                    systemIdx: startIndex,
+                    systemIdx: 0,
                     sectionIdx: 0,
                     newSystem: true,
                     systemStart: true,
-                    lastSection: flowinfo![startIndex].maxSectIdx == 0
+                    lastSection: flowinfo![0].maxSectIdx == 0
                 } as FlowCursor)
                 break
             }
@@ -306,6 +332,8 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 sectionIdx: next.sectionIdx,
+                pass: flowinfo[next.systemIdx].pass + 1,
+                loop: flowinfo[next.systemIdx].loop + 1,
                 measures: measures,
                 positions: _.keys(measures) as Position[],
                 tempo: getExpressionValue(

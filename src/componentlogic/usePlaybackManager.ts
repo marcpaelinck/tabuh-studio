@@ -223,7 +223,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         // Reset all cached tempo values
         tempoLookup = {}
 
-        const { nextInFlow } = executionManager(pbAction.score, pbAction.systemIndex, pbAction.playbackType)
+        const { nextInFlow } = executionManager(pbAction.score, pbAction.playbackType, pbAction.systemIndex)
 
         function nextSymbol(
             notation: NoteSymbol[],
