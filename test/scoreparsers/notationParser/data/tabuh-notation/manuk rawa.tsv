@@ -224,7 +224,7 @@ gong	G		P		T		P
 	## gongan 25
 	{LABEL B1_2}
 	{COPY B1_1}
-ugal/ga	i-ii	i-i/.	--ii	i-i/.	--i-	o-e-	i-o-	i-a,-
+ugal/ga	i-ii	i-i/.	..ii	i-i/.	..i-	o-e-	i-o-	i-a,-
 
 	{LABEL B1_3}
 	{COPY B1_2}
@@ -232,13 +232,13 @@ reyong	in	in	in	in	-b--	b--b	--b-	-b-b
 
 	{LABEL B1_4}
 	{COPY B1_2}
-ugal/pem	----	----	----	----	--i-	o-e-	i-o-	i-a,-
-kantilan p	----	----	----	----	----	----	----	----
-kantilan s	----	----	----	----	----	----	----	----
+ugal/pem	i---	----	----	----	--i-	o-e-	i-o-	i-a,-
+kantilan p	u---	----	----	----	----	----	----	----
+kantilan s	u---	----	----	----	----	----	----	----
 reyong	....	....	x...	x...	b-b?.	....	....	....
 
 	{LABEL B2_124}
-ugal/pem	u,-oo	o-o/.	o-o-	o-o/.	--o-	i-a,-	i-u,-	a,-i-
+ugal/pem	u,-oo	o-o/.	..oo	o-o/.	..o-	i-a,-	i-u,-	a,-i-
 kantilan p	u.i<.	u.o.	u.i<.	u.o.	u.i<.	u.o.	o.a,.	o.a.
 kantilan s	.a.a	.e.e	.a.a	.e.e	.a.a	.e.e	.i.i	.i.i
 reyong	on	on	on	on	on	in	in	un
@@ -252,7 +252,7 @@ reyong	--xx	xxxx	xxxx	xxx.	b-xx	xbb?.	b-xx	xbb?.
 
 	## gongan 30
 	{LABEL B3_124}
-ugal/pem	o-uu?	u-u/.	--uu	u-u/.	--u-	a-i<-	a-u-	e-o-
+ugal/pem	o-uu	u-u/.	..uu	u-u/.	..u-	a-i<-	a-u-	e-o-
 kantilan p	o.u.	o.a,.	o.u.	o.a,.	o.u.	o.a,.	o.u.	e.o.
 kantilan s	.e.e	.i.i	.e.e	.i.i	.e.e	.i.i	.e.o	.u.e
 reyong	un	un	un	un	un	an	an	in
@@ -261,7 +261,7 @@ jegogan	o				u
 gong	G		P		T		P
 
 	{LABEL B3_3}
-	{COPY B2_124}
+	{COPY B3_124}
 reyong	b-xx	xbb?.	b-xx	xbb?.	b-xx	xbb?.	b-xx	xxxx
 
 	{LABEL B4}
@@ -282,7 +282,7 @@ jegogan	i				i
 gong	G		P		T		P
 
 	{LABEL C2}
-ugal/ga	u,-oo	o-o/.	o-o-	o-o/.	--o-	i-a,-	i-u-	a,-i-
+ugal/ga	u,-oo	o-o/.	o-oo	o-o/.	--o-	i-a,-	i-u-	a,-i-
 reyong	--xx	xxxx	xxxx	xxx.	b-xx	xbb?.	b-xx	xbb?.
 calung	u		o		o		i
 jegogan	u

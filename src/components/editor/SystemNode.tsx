@@ -96,14 +96,12 @@ export function SystemNode({
     }
 
     function moveEditorCursor(cursor: EditorCursorParameters) {
-        console.log(`moveEditorCursor(${JSON.stringify(cursor)}), currsysuuid=${systemData.uuid}`)
+        debug(`moveEditorCursor(${JSON.stringify(cursor)}), currsysuuid=${systemData.uuid}`)
         if (cursor.sysuuid != systemData.uuid) {
             setPlaybackCursor(null)
             return
         }
-        console.log(
-            `setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`
-        )
+        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`)
         setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.section })
         notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }

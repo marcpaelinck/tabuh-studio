@@ -4,26 +4,26 @@ import type { ExecutionItem } from './execution'
 import type { InstrumentType, Position } from './instruments'
 
 export type Note = {
-    tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) type of stroke.
-    octave: number | null // Scale always start with DING.
+    tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
+    octave: number | null // 0, 1 or 2: relative to the instrument. Scale always start with DING.
     stroke: StrokeType | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
     muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 
-// JSON: standard score format
-// Laras, Notation: text versions that can be imported. Each format needs its own parser.
+// 'JSON': standard score format
+// 'Laras'or 'Notation': text versions that can be imported. Each format needs its own parser.
 export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
-export type KempliState = 'on' | 'off' | 'notation'
+// 'on': kempli will be added during playback. 'explicit': system contains a kempli staff.
+export type KempliState = 'on' | 'off' | 'explicit'
+// if state is 'on', frequency must be given.
 export interface KempliSetting {
     state: KempliState
     frequency?: number
 }
 
-// SCORE OBJECT DEFINITIONS
-
 export type Measure = {
     notation: NoteSymbol[]
-    notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet
+    notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet. Enables to revert changes.
 }
 
 // Notation of one instrument position within a System

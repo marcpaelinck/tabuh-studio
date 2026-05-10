@@ -50,7 +50,7 @@ export interface LoopItem extends ExecutionItemBase {
 export interface SequenceItem extends ExecutionItemBase {
     type: 'sequence'
     labels: string[] // sequence of gongan labels
-    uuids: string[] // uuids of the gongans in the sequence
+    uuids: UUID[] // uuids of the gongans in the sequence
 }
 // Enables to add a pause after the System.
 

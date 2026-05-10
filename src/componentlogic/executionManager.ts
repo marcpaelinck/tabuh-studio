@@ -1,6 +1,7 @@
 // The FlowManager functions enable to run through the score in the correct sequence.
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
+import type { UUID } from 'crypto'
 import _ from 'lodash'
 import type { BPM } from 'tone/build/esm/core/type/Units'
 import { defaultDynamics, defaultTempo } from '../config/config'
@@ -10,6 +11,7 @@ import type {
     ExpressionItem,
     GotoItem,
     LoopItem,
+    SequenceItem,
     WaitItem
 } from '../typing/execution'
 import type { Position } from '../typing/instruments'
@@ -36,6 +38,8 @@ interface FlowCursor {
     newSystem: boolean // True if this system is different than that of the previous step
     systemStart: boolean // True if this is the first section of the system
     lastSection: boolean // True if this is the last section of the current system
+    sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx: number | undefined // Current index of the active sequence
 }
 
 // Returned by function nextInFlow.
@@ -52,6 +56,8 @@ export interface FlowStep {
     lastSystem: boolean
     lastSection: boolean
     waitMsAfter: number // Delay after the end of the current section in milliseconds
+    sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx?: number // Current index of the active sequence
 }
 
 const itemPriority = (item: ExecutionItem): number => {
@@ -78,7 +84,7 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
             const firstPos = Object.keys(system.staffs)[0] as Position
             const sectionCount = system.staffs[firstPos]?.length || 0
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
-            for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics'] as ExecutionItemType[]) {
+            for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
                 // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
             }
@@ -135,13 +141,40 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
         return matches
     }
 
-    function getNextSystemInFlow(sysIdx: number, flowInfo: FlowInfoTable, lastSystem: boolean): number | undefined {
+    // Returns the sequence linked to the given system if available
+    function getSequence(currentStep: FlowStep): UUID[] | undefined {
+        const sequenceItems: SequenceItem[] = getExecutionItems('sequence', currentStep.systemIdx) as SequenceItem[]
+        if (sequenceItems.length > 0) {
+            // There should not be more than one sequence item
+            return sequenceItems[0].uuids as UUID[]
+        }
+    }
+
+    // Returns the next index in the current system's sequence if there is a sequence
+    // or undefined if there are no more systems in the sequence.
+    function getNextSequenceIdx(currentStep: FlowStep, sequence: UUID[]): number | undefined {
+        var currSequenceIdx = currentStep.sequenceIdx != undefined ? currentStep.sequenceIdx : -1
+        if (currSequenceIdx < sequence.length - 1) {
+            return currSequenceIdx + 1
+        }
+    }
+
+    function getNextSystemInFlow(
+        currentStep: FlowStep,
+        flowInfo: FlowInfoTable,
+        sequence: UUID[] | undefined,
+        nextSequenceIdx: number | undefined
+    ): number | undefined {
+        var sysIdx = currentStep.systemIdx
         const loopItems: LoopItem[] = getExecutionItems('loop', sysIdx) as LoopItem[]
         if (loopItems.length > 0 && flowInfo[sysIdx].loop < loopItems[0].count) {
             return sysIdx
         }
+        if (sequence && nextSequenceIdx != undefined) {
+            return uuidLookup[sequence[nextSequenceIdx]]
+        }
         const gotoItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
-        if (gotoItems.length == 0) return lastSystem ? undefined : sysIdx + 1
+        if (gotoItems.length == 0) return currentStep.lastSystem ? undefined : sysIdx + 1
         return uuidLookup[gotoItems[0].targetuuid]
     }
 
@@ -205,7 +238,9 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
             sectionIdx: -1,
             newSystem: false,
             systemStart: false,
-            lastSection: false
+            lastSection: false,
+            sequence: undefined,
+            sequenceIdx: undefined
         }
         switch (true) {
             case flowinfo == undefined: {
@@ -230,22 +265,29 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
                     sectionIdx: currentStep.sectionIdx + 1,
                     newSystem: false,
                     systemStart: false,
-                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep.systemIdx].maxSectIdx
+                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep.systemIdx].maxSectIdx,
+                    sequence: currentStep.sequence,
+                    sequenceIdx: currentStep.sequenceIdx
                 } as FlowCursor)
                 break
             }
             case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
                 // Reached end of system. Determine next system.
                 if (playbackType == 'single') return undefined
-                // Check if a goto or loop item is applicable. Otherwise, take next system in sequence.
-                const nextSysIdx = getNextSystemInFlow(currentStep.systemIdx, flowinfo, currentStep.lastSystem)
+                // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
+                const sequence = currentStep.sequence || getSequence(currentStep)
+                const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
+                console.log(`NEXTSEQUID: ${nextSequenceIdx}`)
+                const nextSysIdx = getNextSystemInFlow(currentStep, flowinfo, sequence, nextSequenceIdx)
                 if (nextSysIdx == undefined) return undefined
                 _.assign(next, {
                     systemIdx: nextSysIdx,
                     sectionIdx: 0,
                     newSystem: currentStep.systemIdx != nextSysIdx,
                     systemStart: true,
-                    lastSection: flowinfo![nextSysIdx].maxSectIdx == 0
+                    lastSection: flowinfo![nextSysIdx].maxSectIdx == 0,
+                    sequence: nextSequenceIdx != undefined ? sequence : undefined,
+                    sequenceIdx: nextSequenceIdx
                 } as FlowCursor)
                 break
             }
@@ -280,7 +322,9 @@ export function executionManager(score: Score, startIndex: number = 0, playbackT
                 ),
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
                 lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
-                waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0
+                waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0,
+                sequence: next.sequence,
+                sequenceIdx: next.sequenceIdx
             }
             if (!peek) {
                 // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
