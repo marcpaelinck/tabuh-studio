@@ -282,7 +282,7 @@ jegogan	i				i
 gong	G		P		T		P
 
 	{LABEL C2}
-ugal/ga	u,-oo	o-o/.	o-oo	o-o/.	--o-	i-a,-	i-u,-	a,-i-
+ugal/ga	u,-oo	o-o/.	..oo	o-o/.	--o-	i-a,-	i-u,-	a,-i-
 reyong	--xx	xxxx	xxxx	xxx.	b-xx	xbb?.	b-xx	xbb?.
 calung	u		o		o		i
 jegogan	u
@@ -290,7 +290,7 @@ gong	G		P		T		P
 
 	## gongan 35
 	{LABEL C3}
-ugal/ga	o-uu	u-u/.	--uu	u-u/.	--u-	a-i<-	a-u-	e-o-
+ugal/ga	o-uu	u-u/.	..uu	u-u/.	--u-	a-i<-	a-u-	e-o-
 reyong	b-xx	xbb?.	b-xx	xbb?.	b-xx	xbb?.	b-xx	xxxx
 calung	o		u		u		a
 jegogan	o
@@ -371,6 +371,7 @@ jegogan	i
 gong	G		P		T		P
 
 	{LABEL FINAL}
+	{LOOP 4}
 ugal	i---	i---	e---	e---	i---	i---	e---	e---
 pemade p	i.ei	.ei.	ei.e	ie.e	i.ei	.ei.	ei.e	ie.e
 pemade s	.ue.	ue.u	e.ue	.ueu	.ue.	ue.u	e.ue	.ueu
@@ -384,7 +385,6 @@ jegogan	i		e		i		e
 gong	G		P		T		P
 
 	{COPY FINAL}
-	{LOOP 4}
 kantilan	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	..ua	i<-i</.
 ugal	i---	i---	e---	e---	i---	i---	e--.	....
 gangsa p	i.ei	.ei.	ei.e	ie.e	i.ei	.ei.	eie.	....

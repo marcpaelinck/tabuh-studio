@@ -2,13 +2,14 @@
 // The icons give status information and warnings and can be switched on or off.
 
 import _ from 'lodash'
+import { AiFillSound } from 'react-icons/ai'
 import { BsDatabase, BsFileEarmarkMusic } from 'react-icons/bs'
 import { IoReload } from 'react-icons/io5'
 import type { IconType } from 'react-icons/lib'
 import { HStack, Tooltip, Whisper } from 'rsuite'
 import { debug } from '../utils/debugger'
 
-export type ComponentName = 'cycle' | 'score' | 'localCache'
+export type ComponentName = 'cycle' | 'score' | 'localCache' | 'playback'
 
 export type ComponentType = 'icon' | 'text'
 export type Level = 'info' | 'warning' | 'error'
@@ -48,12 +49,14 @@ const dashboardElements: Record<ComponentName, DashboardElementType> = {
                 'close the application without saving your changes.',
             error: 'Could not save data to the local storage.'
         }
-    }
+    },
+    playback: { type: 'text', icon: AiFillSound, tooltips: { info: 'Playback' } }
 }
 export const dashboardDefaults: DashboardValues = {
     score: { visible: false },
     cycle: { visible: false },
-    localCache: { visible: false }
+    localCache: { visible: false },
+    playback: { visible: false }
 }
 // -----------------------------------------------------------
 

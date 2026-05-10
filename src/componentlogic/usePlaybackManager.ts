@@ -22,6 +22,7 @@ import type {
     PlaybackAction,
     PlaybackAnimationAction,
     PlaybackCallbackFunctions,
+    PlaybackDashboardAction,
     PlaybackEditorCursorAction,
     PlaybackPlayerCursorAction,
     PlaybackSamplerAction,
@@ -57,6 +58,7 @@ export const defaultCallbackFunctions: PlaybackCallbackFunctions = {
     animate: (): void => {},
     playercursor: (): void => {},
     editorcursor: (): void => {},
+    updatedashboard: (): void => {},
     progress: (): void => {},
     generic: (): void => {}
 }
@@ -216,6 +218,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             animationactions: [],
             playercursoractions: [],
             editorcursoractions: [],
+            dashboardactions: [],
             genericactions: [],
             notation: {} as Record<Position, any>
         }
@@ -414,7 +417,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 maxMeasureDuration = Math.max(currTime - sectionStartTime, maxMeasureDuration)
             }
 
-            // CREATE EDITOR CURSOR ACTIONS
+            // CREATE EDITOR CURSOR ACTION
 
             var cursorTime = sectionStartTime
             newTimeLine.editorcursoractions.push({
@@ -427,6 +430,20 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 }
             })
 
+            // CREATE DASHBOARD ACTION
+            newTimeLine.dashboardactions.push({
+                function: pbFunctionsRef.current.updatedashboard,
+                time: n2TO(cursorTime),
+                params: {
+                    system: currentStep.system.id,
+                    pass: currentStep.pass,
+                    iteration: currentStep.loop,
+                    tempo: currentStep.tempo[0],
+                    dynamics: currentStep.dynamics[0]
+                }
+            })
+
+            newTimeLine.totalDurationTO = TOplusNumber(newTimeLine.totalDurationTO, sectionDuration)
             newTimeLine.totalDurationMs += BaseNoteEquiv2Millis(sectionDuration, currentStep.tempo)
             sectionStartTime += maxMeasureDuration
             prevSystem = currentStep.system
@@ -467,9 +484,16 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             })
         })
 
+        // ADD DASHBOARD ACTION TO SWITCH OFF THE DASHBOARD PLAYBACK ITEM
+        newTimeLine.dashboardactions.push({
+            function: pbFunctionsRef.current.updatedashboard,
+            time: newTimeLine.totalDurationTO,
+            params: { system: undefined, pass: 0, iteration: 0, tempo: 0, dynamics: 0 }
+        })
+
         // Determine the total playback duration
         newTimeLine.totalDurationMs += outro
-        newTimeLine.totalDurationTO = n2TO(sectionStartTime)
+        // newTimeLine.totalDurationTO = n2TO(sectionStartTime)
         setTotalDurationMs(newTimeLine.totalDurationMs)
         if (pbFunctionsRef.current.generic)
             newTimeLine.genericactions.push({
@@ -523,6 +547,11 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // Editor Cursor actions
         timeLine.editorcursoractions.forEach((action: PlaybackEditorCursorAction) => {
+            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+        })
+
+        // Editor Cursor actions
+        timeLine.dashboardactions.forEach((action: PlaybackDashboardAction) => {
             Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
         })
 

@@ -303,7 +303,6 @@ export function executionManager(
                 // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
                 const sequence = currentStep.sequence || getSequence(currentStep)
                 const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
-                console.log(`NEXTSEQUID: ${nextSequenceIdx}`)
                 const nextSysIdx = getNextSystemInFlow(currentStep, flowinfo, sequence, nextSequenceIdx)
                 if (nextSysIdx == undefined) return undefined
                 _.assign(next, {
@@ -327,13 +326,20 @@ export function executionManager(
                 _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
             ) as Record<Position, Measure>
 
+            if (!peek) {
+                // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
+                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
+                if (next.newSystem) flowinfo[next.systemIdx].pass += 1
+                if (next.systemStart) flowinfo[next.systemIdx].loop += 1
+            }
+
             const nextStep: FlowStep = {
                 id: currentStep ? currentStep.id + 1 : 1,
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 sectionIdx: next.sectionIdx,
-                pass: flowinfo[next.systemIdx].pass + 1,
-                loop: flowinfo[next.systemIdx].loop + 1,
+                pass: flowinfo[next.systemIdx].pass,
+                loop: flowinfo[next.systemIdx].loop,
                 measures: measures,
                 positions: _.keys(measures) as Position[],
                 tempo: getExpressionValue(
@@ -354,11 +360,8 @@ export function executionManager(
                 sequence: next.sequence,
                 sequenceIdx: next.sequenceIdx
             }
+
             if (!peek) {
-                // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
-                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
-                if (next.newSystem) flowinfo[next.systemIdx].pass += 1
-                if (next.systemStart) flowinfo[next.systemIdx].loop += 1
                 currentStep = nextStep
             }
             return nextStep

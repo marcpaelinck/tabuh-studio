@@ -118,7 +118,7 @@ export function SystemNode({
                         transparent 2px ${systemData.kempli.frequency || 4}ch
                         ),`
                 }
-                case 'notation': {
+                case 'explicit': {
                     const gradients = systemData.colWidths
                         .map((width, idx) => {
                             const offset = _.sum(systemData.colWidths.slice(0, idx))

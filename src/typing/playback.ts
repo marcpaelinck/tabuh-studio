@@ -96,13 +96,25 @@ export interface EditorCursorParameters {
     section: number
 }
 
-export type EditorCursorFunction = (time: number, params: EditorCursorParameters) => void
-
 export type PlaybackEditorCursorAction = {
     time: TimeObject
     function: EditorCursorFunction
     params: EditorCursorParameters
 }
+
+export interface DashboardParameters {
+    system: number | undefined
+    pass: number
+    iteration: number
+    tempo: number
+    dynamics: number // TODO: DynamicsValue
+}
+
+export type EditorCursorFunction = (time: number, params: EditorCursorParameters) => void
+
+export type DashboardFunction = (time: number, params: DashboardParameters) => void
+
+export type PlaybackDashboardAction = { time: TimeObject; function: DashboardFunction; params: DashboardParameters }
 
 export type ProgressFunction = (time: number, params: {}) => void
 
@@ -115,6 +127,7 @@ export interface PlaybackCallbackFunctions {
     animate: AnimationFunction
     playercursor: PlayerCursorFunction
     editorcursor: EditorCursorFunction
+    updatedashboard: DashboardFunction
     progress: ProgressFunction
     generic: GenericFunction
 }
@@ -128,6 +141,7 @@ export type TimeLine = {
     animationactions: PlaybackAnimationAction[]
     playercursoractions: PlaybackPlayerCursorAction[]
     editorcursoractions: PlaybackEditorCursorAction[]
+    dashboardactions: PlaybackDashboardAction[]
     genericactions: GenericAction[]
     notation: Partial<Record<Position, ReactElement<HTMLAttributes<HTMLParagraphElement>>[]>>
 }

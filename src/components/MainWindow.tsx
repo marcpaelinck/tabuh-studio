@@ -39,6 +39,7 @@ import { editorInitialExpandState, noCursor, type KeyboardType } from '../config
 import type { UUID } from '../typing/basetypes'
 import type { Position } from '../typing/instruments'
 import type { ScoreMenuOption } from '../typing/menus'
+import type { DashboardParameters } from '../typing/playback'
 import type { WpUserRecord } from '../typing/wordpress'
 import { debug } from '../utils/debugger'
 import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
@@ -218,7 +219,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         playbackType: 'none'
     })
 
-    useEffect(() => updatePlaybackCallbackFunctions({ generic: stopPlayback }), [])
+    useEffect(
+        () => updatePlaybackCallbackFunctions({ generic: stopPlayback, updatedashboard: playbackDashboardFunction }),
+        []
+    )
 
     useEffect(() => {
         setScoreMenuOptions(
@@ -233,14 +237,28 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
-        const newDashboardValues: DashboardValues = { ...dashboardValues }
-        newDashboardValues[name] = value
-        setDashboardValues(newDashboardValues)
+        setDashboardValues((currDashboardValues) => {
+            const newDashboardValues: DashboardValues = { ...currDashboardValues }
+            newDashboardValues[name] = value
+            return newDashboardValues
+        })
     }
+
     function clearDashboardElement(name: ComponentName) {
-        const newDashboardValues: DashboardValues = { ...dashboardValues }
-        newDashboardValues[name] = { visible: false }
-        setDashboardValues(newDashboardValues)
+        setDashboardValues((currDashboardValues) => {
+            const newDashboardValues: DashboardValues = { ...dashboardValues }
+            newDashboardValues[name] = { visible: false }
+            return currDashboardValues
+        })
+    }
+
+    function playbackDashboardFunction(time: number, params: DashboardParameters) {
+        if (!params.system) setDashboardElement('playback', { visible: false })
+        else
+            setDashboardElement('playback', {
+                visible: true,
+                text: `sys[${params.system}] pass[${params.pass}] iter[${params.iteration}] [${params.tempo}]BPM`
+            })
     }
 
     // On initial render, check if the user is logged in to the WordPress site and set state accordingly.
