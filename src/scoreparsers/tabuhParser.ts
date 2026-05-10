@@ -210,7 +210,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         const source: System | undefined = getSystemByLabel(copyInstr.label, score, copyInstr.targetid, 'COPY')
         if (source && target) {
             // Target staffs should be applied to the copy of source
-            target.staffs = Object.assign(source.staffs, target.staffs)
+            target.staffs = { ...source.staffs, ...target.staffs }
             if (copyInstr.include && target.execution) {
                 const copyItems: ExecutionItem[] = target.execution.filter((item) =>
                     copyInstr.include!.includes(item.type)
