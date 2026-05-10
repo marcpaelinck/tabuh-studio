@@ -151,7 +151,7 @@ export function SummaryItem({
             buttonTooltip: [
                 `Kempli beat every ${sysData.kempli.frequency} notes.`,
                 'Kempli off.',
-                'Kempli according to notation.'
+                'Kempli in notation.'
             ][['on', 'off', 'notation'].indexOf(sysData.kempli.state)]
         }
     }
