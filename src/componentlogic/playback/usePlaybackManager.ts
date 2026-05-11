@@ -12,10 +12,18 @@ import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import * as Tone from 'tone'
-import { defaultIntroTime, defaultOutroTime, defaultTempo, noteConfigs, positionConfigs } from '../config/config'
-import { isExtension, isMuting } from '../config/configfunctions'
-import type { BPM, NoteSymbol } from '../typing/basetypes'
-import type { Position } from '../typing/instruments'
+import {
+    defaultBeatFrequency,
+    defaultIntroTime,
+    defaultOutroTime,
+    defaultTempo,
+    dynamicsToNumber,
+    noteConfigs,
+    positionConfigs
+} from '../../config/config'
+import { isExtension, isMuting } from '../../config/configfunctions'
+import type { BPM, NoteSymbol } from '../../typing/basetypes'
+import type { Position } from '../../typing/instruments'
 import type {
     AnimationNote,
     GenericAction,
@@ -29,12 +37,12 @@ import type {
     PlaybackTempoAction,
     TempoFunctionParameters,
     TimeLine
-} from '../typing/playback'
-import type { Note, Score, System } from '../typing/score'
-import { cleanSymbol } from '../utils/alphabet'
-import { debug } from '../utils/debugger'
-import { defaultObject } from '../utils/objectUtils'
-import { speedDefaultOption } from '../utils/selectorsUtils'
+} from '../../typing/playback'
+import type { Note, Score, System } from '../../typing/score'
+import { cleanSymbol } from '../../utils/alphabet'
+import { debug } from '../../utils/debugger'
+import { defaultObject, getSystemDuration } from '../../utils/objectUtils'
+import { speedDefaultOption } from '../../utils/selectorsUtils'
 import {
     BaseNoteEquiv2Millis,
     millis2BaseNoteEquiv,
@@ -43,11 +51,11 @@ import {
     TO2n,
     TOplusNumber,
     TOplusTO
-} from '../utils/timeunits'
+} from '../../utils/timeunits'
+import { cycleValidation } from '../validationManager'
 import { executionManager, type FlowStep } from './executionManager'
 import { createNoteActions, totalDuration } from './playbackPatternManager'
 import { useInstruments } from './useInstruments'
-import { cycleValidation } from './validationManager'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
 export const defaultCallbackFunctions: PlaybackCallbackFunctions = {
@@ -306,6 +314,11 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             }
 
             for (const position of currentStep.positions) {
+                if (position == 'KEMPLI' && currentStep.system.kempli.state != 'notation') {
+                    // Kempli will be generated separately based on 'on' or 'off' state.
+                    break
+                }
+
                 var currTime: number = sectionStartTime
                 var currTimeMs = newTimeLine.totalDurationMs
 
@@ -431,6 +444,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             })
 
             // CREATE DASHBOARD ACTION
+
             newTimeLine.dashboardactions.push({
                 function: pbFunctionsRef.current.updatedashboard,
                 time: n2TO(cursorTime),
@@ -442,6 +456,49 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     dynamics: currentStep.dynamics[0]
                 }
             })
+
+            // CREATE KEMPLI ACTION
+
+            // Generate kempli actions once at the start of the system.
+            // Note: the tempo is currently only used for rake patterns
+            // which should not be used in combination with implicit kempli beats
+            const systemDuration = getSystemDuration(currentStep.system, currentStep.tempo[0])
+            if (
+                currentStep.sectionIdx == 0 &&
+                currentStep.system.kempli.state == 'on' &&
+                currentStep.system.kempli.frequency != undefined
+            ) {
+                for (
+                    var beatOffset = 0;
+                    beatOffset <= systemDuration;
+                    beatOffset += currentStep.system.kempli.frequency || defaultBeatFrequency
+                ) {
+                    const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
+                        samplerFunction: pbFunctionsRef.current.play,
+                        time: sectionStartTime + beatOffset, // Note that this is equal to the system start
+                        // The tempo given for the following calculation is not precise
+                        // but this is irrelevent because there is no kempli animation
+                        timeMs: BaseNoteEquiv2Millis(sectionStartTime + beatOffset, currentStep.tempo[0]),
+                        measureIdx: currentStep!.sectionIdx,
+                        position: 'KEMPLI',
+                        prevsymbol: undefined,
+                        symbol: cleanSymbol('x?'),
+                        nextsymbol: undefined,
+                        // The tempo is not precise but irrelevant for single notes
+                        bpm: currentStep.tempo[0],
+                        velocity: dynamicsToNumber['mf'],
+                        prevaction: undefined,
+                        isLast:
+                            currentStep.lastSystem && beatOffset + currentStep.system.kempli.frequency! > systemDuration
+                    })
+                    // createNoteActions always returns an array containing 1 or more actions
+                    if (patternNoteActions) {
+                        newTimeLine.sampleractions.push(...patternNoteActions)
+                    } else {
+                        console.log('what`s going on here?')
+                    }
+                }
+            }
 
             newTimeLine.totalDurationTO = TOplusNumber(newTimeLine.totalDurationTO, sectionDuration)
             newTimeLine.totalDurationMs += BaseNoteEquiv2Millis(sectionDuration, currentStep.tempo)

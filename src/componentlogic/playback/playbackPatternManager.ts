@@ -19,14 +19,14 @@ import {
     positionConfigs,
     RakeDownChars,
     TremoloChars
-} from '../config/config'
-import type { BPM, DurationInBasenoteEquiv, NoteSymbol, TimeInBasenoteEquiv } from '../typing/basetypes'
-import type { Position } from '../typing/instruments'
-import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../typing/playback'
-import { noteRange } from '../utils/alphabet'
-import { debug } from '../utils/debugger'
-import { getPatternType } from '../utils/patterns'
-import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../utils/timeunits'
+} from '../../config/config'
+import type { BPM, DurationInBasenoteEquiv, NoteSymbol, TimeInBasenoteEquiv } from '../../typing/basetypes'
+import type { Position } from '../../typing/instruments'
+import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
+import { noteRange } from '../../utils/alphabet'
+import { debug } from '../../utils/debugger'
+import { getPatternType } from '../../utils/patterns'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../../utils/timeunits'
 
 // prettier-ignore
 const patterns = {

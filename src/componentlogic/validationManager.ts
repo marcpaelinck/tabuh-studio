@@ -2,7 +2,7 @@ import _ from 'lodash'
 import type { UUID } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 import { debug } from '../utils/debugger'
-import { executionManager, type FlowStep } from './executionManager'
+import { executionManager, type FlowStep } from './playback/executionManager'
 
 // CYCLE DETECTION
 

@@ -1,9 +1,9 @@
 import * as Tone from 'tone'
-import { noCursor } from '../config/config'
-import type { PlaybackAction, PlaybackState } from '../typing/playback'
-import { debug } from '../utils/debugger'
+import { noCursor } from '../../config/config'
+import type { PlaybackAction, PlaybackState } from '../../typing/playback'
+import { debug } from '../../utils/debugger'
+import { cycleValidation } from '../validationManager'
 import { type SchedulePlaybackParams } from './usePlaybackManager'
-import { cycleValidation } from './validationManager'
 
 // const dialog = useDialog()
 

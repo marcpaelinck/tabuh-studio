@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
 import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import { useAnimationEngine } from '../../componentlogic/useAnimation'
+import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import { positionConfigs } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
 import { type Position } from '../../typing/instruments'

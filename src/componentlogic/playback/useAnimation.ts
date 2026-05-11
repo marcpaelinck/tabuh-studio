@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { panggulDefaultOption } from '../components/player/Animation'
-import { animationConfig, colorPalette, type ColorName } from '../config/config'
-import type { SVGInfo } from '../typing/animation'
-import type { Position } from '../typing/instruments'
-import type { MenuItemInfo } from '../typing/menus'
-import type { AnimationNote, AnimmationFunctionParameters } from '../typing/playback'
-import { debug } from '../utils/debugger'
+import { panggulDefaultOption } from '../../components/player/Animation'
+import { animationConfig, colorPalette, type ColorName } from '../../config/config'
+import type { SVGInfo } from '../../typing/animation'
+import type { Position } from '../../typing/instruments'
+import type { MenuItemInfo } from '../../typing/menus'
+import type { AnimationNote, AnimmationFunctionParameters } from '../../typing/playback'
+import { debug } from '../../utils/debugger'
 
 const moveToDuration = 500 // duration of the movement to the next key
 const strikeDuration = 600 // duration of the stroke

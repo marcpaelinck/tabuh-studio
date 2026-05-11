@@ -8,7 +8,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     UNKNOWN: false,
     castingRulesManager: false,
     createSchedule: false,
-    Dashboard: true,
+    Dashboard: false,
     EditorWindow: false,
     ExecutionForm: false,
     ExecutionItemForm: false,

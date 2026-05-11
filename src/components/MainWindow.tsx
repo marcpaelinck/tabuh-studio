@@ -29,8 +29,8 @@ import {
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
-import { playbackReducerFactory } from '../componentlogic/playbackReducer'
-import { usePlaybackManager } from '../componentlogic/usePlaybackManager'
+import { playbackReducerFactory } from '../componentlogic/playback/playbackReducer'
+import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManager'
 import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'

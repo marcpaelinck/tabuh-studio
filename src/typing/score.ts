@@ -13,12 +13,13 @@ export type Note = {
 // 'JSON': standard score format
 // 'Laras'or 'Notation': text versions that can be imported. Each format needs its own parser.
 export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
-// 'on': kempli will be added during playback. 'explicit': system contains a kempli staff.
-export type KempliState = 'on' | 'off' | 'explicit'
+// 'on': kempli will be added during playback. 'notation': system contains a kempli staff.
+export type KempliState = 'on' | 'off' | 'notation'
 // if state is 'on', frequency must be given.
 export interface KempliSetting {
     state: KempliState
     frequency?: number
+    beatAtEnd?: boolean
 }
 
 export type Measure = {

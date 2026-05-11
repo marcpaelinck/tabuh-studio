@@ -166,7 +166,7 @@ gong	G
 	{TEMPO ->90 beats=5->8 pass=1}
 	{DYNAMICS p positions=[gangsa,reyong,ugal] pass=1}
 	{LOOP 2 pass=3}
-	{TEMPO ->65 beats=1->8 pass=3 iteration=2}
+	{TEMPO ->80 beats=1->8 pass=3 iteration=2}
 	{DYNAMICS mf positions=[gangsa,reyong,ugal]}
 ugal/ga	ii-a	.au-	ee-o	.oe-	ii-a	.au-	ee-o	.oe-
 reyong	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-	bb-b?	-bb?-

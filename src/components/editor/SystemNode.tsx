@@ -13,7 +13,7 @@ import {
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { castNotation } from '../../componentlogic/castingRulesManager'
-import { editorFontSize, noCursor, positionConfigs } from '../../config/config'
+import { defaultBeatFrequency, editorFontSize, noCursor, positionConfigs } from '../../config/config'
 import type { UUID } from '../../typing/basetypes'
 import type { Position } from '../../typing/instruments'
 import type {
@@ -115,10 +115,10 @@ export function SystemNode({
                     return `repeating-linear-gradient(
                         to right, 
                         ${gridColors.kempli} 0px 2px, 
-                        transparent 2px ${systemData.kempli.frequency || 4}ch
+                        transparent 2px ${systemData.kempli.frequency || defaultBeatFrequency}ch
                         ),`
                 }
-                case 'explicit': {
+                case 'notation': {
                     const gradients = systemData.colWidths
                         .map((width, idx) => {
                             const offset = _.sum(systemData.colWidths.slice(0, idx))

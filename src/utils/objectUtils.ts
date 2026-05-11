@@ -3,7 +3,10 @@
  */
 
 import _ from 'lodash'
-import type { Score } from '../typing/score'
+import { totalDuration } from '../componentlogic/playback/playbackPatternManager'
+import type { BPM } from '../typing/basetypes'
+import type { Position } from '../typing/instruments'
+import type { Score, System } from '../typing/score'
 
 type DefaultType = 'NoteSymbol' | 'Score'
 const DefaultObjectFactory = {
@@ -71,4 +74,25 @@ export function same<T extends Object>(object1: T, object2: T | undefined): bool
 // Returns true if the *position* given by the index is even (where position == index+1)
 export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
+}
+
+// Returns the maximum duration of the measures at the given index.
+export function getSectionDuration(system: System, sectionIdx: number, bpm: BPM) {
+    const measures = _.flatten(
+        _.values(system.staffs).map((posMeasures) => (posMeasures.length > sectionIdx ? posMeasures[sectionIdx] : []))
+    )
+    return Object.entries(measures).reduce(
+        (maxDur, [position, measure]) =>
+            Math.max(maxDur, totalDuration(measure.notation, position as Position, bpm, 'basenote')),
+        0
+    )
+}
+
+// Returns the maximum duration of the system's staffs.
+export function getSystemDuration(system: System, bpm: BPM) {
+    return Math.max(
+        ..._.entries(system.staffs).map(([pos, measures]) =>
+            _.sum(measures.map((measure) => totalDuration(measure.notation, pos as Position, bpm, 'basenote')))
+        )
+    )
 }

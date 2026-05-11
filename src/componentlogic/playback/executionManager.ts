@@ -4,7 +4,7 @@
 import type { UUID } from 'crypto'
 import _ from 'lodash'
 import type { BPM } from 'tone/build/esm/core/type/Units'
-import { defaultDynamics, defaultTempo } from '../config/config'
+import { defaultDynamics, defaultTempo } from '../../config/config'
 import type {
     ExecutionItem,
     ExecutionItemType,
@@ -13,11 +13,11 @@ import type {
     LoopItem,
     SequenceItem,
     WaitItem
-} from '../typing/execution'
-import type { Position } from '../typing/instruments'
-import type { PlaybackType } from '../typing/playback'
-import type { Measure, Score, System } from '../typing/score'
-import { debug } from '../utils/debugger'
+} from '../../typing/execution'
+import type { Position } from '../../typing/instruments'
+import type { PlaybackType } from '../../typing/playback'
+import type { Measure, Score, System } from '../../typing/score'
+import { debug } from '../../utils/debugger'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
