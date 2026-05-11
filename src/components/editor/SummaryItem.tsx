@@ -148,11 +148,9 @@ export function SummaryItem({
             action: 'kempli',
             hasfield: false,
             fieldval: sysData.kempli.state == 'on' ? `${sysData.kempli.frequency || defaultBeatFrequency}` : '',
-            buttonTooltip: [
-                `Kempli beat every ${sysData.kempli.frequency} notes.`,
-                'Kempli off.',
-                'Kempli in notation.'
-            ][['on', 'off', 'notation'].indexOf(sysData.kempli.state)]
+            buttonTooltip: [`Kempli beat every ${sysData.kempli.frequency} notes`, 'Kempli off', 'Kempli in notation'][
+                ['on', 'off', 'notation'].indexOf(sysData.kempli.state)
+            ]
         }
     }
     const [editing, setEditing] = useState<boolean>(false)
