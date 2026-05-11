@@ -550,7 +550,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // Determine the total playback duration
         newTimeLine.totalDurationMs += outro
-        // newTimeLine.totalDurationTO = n2TO(sectionStartTime)
+        newTimeLine.totalDurationTO = n2TO(sectionStartTime)
         setTotalDurationMs(newTimeLine.totalDurationMs)
         if (pbFunctionsRef.current.generic)
             newTimeLine.genericactions.push({

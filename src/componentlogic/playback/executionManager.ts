@@ -106,7 +106,7 @@ export function executionManager(
         score.systems.map((system) => [system.uuid, system.index])
     )
 
-    // Spool forward to the requested system and pass
+    // Fast forward to the requested system and pass
     // This will set all flow variables correctly
     if (startAtSystemIndex != 0 || startAtPass != 1) {
         var quit = false
@@ -326,6 +326,9 @@ export function executionManager(
                 _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
             ) as Record<Position, Measure>
 
+            const nextPass = next.newSystem ? flowinfo[next.systemIdx].pass + 1 : flowinfo[next.systemIdx].pass
+            const nextLoop = next.systemStart ? flowinfo[next.systemIdx].loop + 1 : flowinfo[next.systemIdx].loop
+
             if (!peek) {
                 // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
                 if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
@@ -338,8 +341,8 @@ export function executionManager(
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 sectionIdx: next.sectionIdx,
-                pass: flowinfo[next.systemIdx].pass,
-                loop: flowinfo[next.systemIdx].loop,
+                pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
+                loop: peek ? nextLoop : flowinfo[next.systemIdx].loop,
                 measures: measures,
                 positions: _.keys(measures) as Position[],
                 tempo: getExpressionValue(
