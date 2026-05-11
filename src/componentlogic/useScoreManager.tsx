@@ -2,8 +2,9 @@ import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { type DashboardFunctionsType } from '../components/contexts'
+import { defaultBeatFrequency } from '../config/config'
 import type { ExecutionItem } from '../typing/execution'
-import type { Score, System } from '../typing/score'
+import { kempliStates, type Score, type System } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
 import { cycleValidation } from './validationManager'
@@ -156,102 +157,121 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         })
     }
 
-    // Handles user actions triggered with buttons in the panel header
+    // This function is called by executeItemAction.
+    function updateScoreFromItemAction(
+        score: Score | undefined,
+        fieldname: string,
+        systemData: System,
+        value?: string
+    ): Score | undefined {
+        var newSystemData: System | null = _.cloneDeep(systemData)
+        // Reset the edit buffers of the measures.
+        Object.values(newSystemData.staffs).forEach((measures) => {
+            measures.forEach((measure) => {
+                measure.notation_ = undefined
+            })
+        })
+        if (!score) return undefined
+        // Determines where to insert the new system data item. Default is set to replace current.
+        var sliceIndex1: number = systemData.index
+        var sliceIndex2: number = systemData.index + 1
+        switch (fieldname) {
+            case 'label':
+                if (typeof value == 'string') {
+                    // New label: add it to the list
+                    // First remove any existing label for the current system
+                    // Also avoid duplication of the new label to be sure (should not be necessary).
+                    var newLabels = _.omitBy(labels, (value) => value.uuid == systemData.uuid)
+                    newLabels = _.omit(newLabels, value)
+                    // Add the label
+                    newSystemData.label = value
+                    newLabels[value] = newSystemData
+                    setLabels(newLabels)
+                }
+                break
+            case 'new': {
+                // Creates an empty system based on the measure settings of the current systemn.
+                Object.values(newSystemData.staffs).forEach((measures) => {
+                    // clear existing values
+                    measures.forEach((measure) => {
+                        measure.notation_ = undefined
+                        measure.notation = []
+                    })
+                })
+                newSystemData.label = undefined
+                newSystemData.execution = undefined
+                newSystemData.uuid = uuidv4()
+                sliceIndex1 = systemData.index + 1 // Insert below current
+                break
+            }
+            case 'copy': {
+                const source = score.systems.find((sys) => sys.uuid == value)
+                debug(source)
+                if (!source) {
+                    console.error(`copy system: could not find system ${value}`)
+                    return
+                }
+                newSystemData = _.cloneDeep(source)
+                newSystemData.uuid = uuidv4()
+                newSystemData.label = undefined
+                newSystemData.copyfromkey = source.uuid
+                // newSystemData.copyfrom = source.label || `#${source.index}`
+                sliceIndex1 = systemData.index + 1 // Copy after the current system
+                break
+            }
+            case 'execution':
+                // Changes to the system data have been performed by the FlowItemsForm
+                if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
+                const validation = cycleValidation(score)
+                if (!validation.isValid)
+                    dashboardFunctions.setDashboardElement('cycle', {
+                        visible: true,
+                        tooltip: validation.message,
+                        level: 'error'
+                    })
+                else dashboardFunctions.clearDashboardElement('cycle')
+                break
+            case 'delete':
+                if (newSystemData.label) {
+                    newLabels = { ...labels }
+                    delete labels[newSystemData.label]
+                    setLabels(newLabels)
+                }
+                newSystemData = null
+                break
+            case 'kempli':
+                // Toggle the kempli value
+                const stateIdx = kempliStates.indexOf(newSystemData.kempli.state)
+                const nextIdx = (stateIdx + 1) % kempliStates.length
+                newSystemData.kempli.state = kempliStates[nextIdx]
+                if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
+                break
+            default:
+                // Unrecognized action
+                return
+        }
+        // Update, remove or insert system
+        const newData = newSystemData
+            ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
+            : [...score.systems.slice(0, sliceIndex1), ...score.systems.slice(sliceIndex2)]
+        // Update all system IDs
+        newData.forEach((sysData, sysIdx) => {
+            sysData.index = sysIdx
+            sysData.id = sysIdx + 1
+        })
+        debug('UPDATING SCORE by scoreManager')
+        updatePointers(newData)
+        return { ...score, ...{ systems: newData } }
+    }
+
+    // Handles user actions triggered with buttons in the panel header.
+    // Note this is a callback function.
     const executeItemAction = useCallback(
         (fieldname: string, systemData: System, value?: string) => {
-            if (!score) return
             debug(`processing ${fieldname}`)
-            // Used for insertion and update
-            var newSystemData: System | null = _.cloneDeep(systemData)
-            // Reset the edit buffers of the measures.
-            Object.values(newSystemData.staffs).forEach((measures) => {
-                measures.forEach((measure) => {
-                    measure.notation_ = undefined
-                })
-            })
-            // Determines where to insert the new system data item. Default is set to replace current.
-            var sliceIndex1: number = systemData.index
-            var sliceIndex2: number = systemData.index + 1
-            switch (fieldname) {
-                case 'label':
-                    if (typeof value == 'string') {
-                        // New label: add it to the list
-                        // First remove any existing label for the current system
-                        // Also avoid duplication of the new label to be sure (should not be necessary).
-                        var newLabels = _.omitBy(labels, (value) => value.uuid == systemData.uuid)
-                        newLabels = _.omit(newLabels, value)
-                        // Add the label
-                        newSystemData.label = value
-                        newLabels[value] = newSystemData
-                        setLabels(newLabels)
-                    }
-                    break
-                case 'new': {
-                    // Creates an empty system based on the measure settings of the current systemn.
-                    Object.values(newSystemData.staffs).forEach((measures) => {
-                        // clear existing values
-                        measures.forEach((measure) => {
-                            measure.notation_ = undefined
-                            measure.notation = []
-                        })
-                    })
-                    newSystemData.label = undefined
-                    newSystemData.execution = undefined
-                    newSystemData.uuid = uuidv4()
-                    sliceIndex1 = systemData.index + 1 // Insert below current
-                    break
-                }
-                case 'copy': {
-                    const source = score.systems.find((sys) => sys.uuid == value)
-                    debug(source)
-                    if (!source) {
-                        console.error(`copy system: could not find system ${value}`)
-                        return
-                    }
-                    newSystemData = _.cloneDeep(source)
-                    newSystemData.uuid = uuidv4()
-                    newSystemData.label = undefined
-                    newSystemData.copyfromkey = source.uuid
-                    // newSystemData.copyfrom = source.label || `#${source.index}`
-                    sliceIndex1 = systemData.index + 1 // Copy after the current system
-                    break
-                }
-                case 'execution':
-                    // Changes to the system data have been performed by the FlowItemsForm
-                    if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
-                    const validation = cycleValidation(score)
-                    if (!validation.isValid)
-                        dashboardFunctions.setDashboardElement('cycle', {
-                            visible: true,
-                            tooltip: validation.message,
-                            level: 'error'
-                        })
-                    else dashboardFunctions.clearDashboardElement('cycle')
-                    break
-                case 'delete':
-                    if (newSystemData.label) {
-                        newLabels = { ...labels }
-                        delete labels[newSystemData.label]
-                        setLabels(newLabels)
-                    }
-                    newSystemData = null
-                    break
-                default:
-                    // Unrecognized action
-                    return
-            }
-            // Update, remove or insert system
-            const newData = newSystemData
-                ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
-                : [...score.systems.slice(0, sliceIndex1), ...score.systems.slice(sliceIndex2)]
-            // Update all system IDs
-            newData.forEach((sysData, sysIdx) => {
-                sysData.index = sysIdx
-                sysData.id = sysIdx + 1
-            })
-            debug('UPDATING SCORE by scoreManager')
-            updatePointers(newData)
-            setScore({ ...score, ...{ systems: newData } })
+            // Callback functions have to pass a function to state setters if they need to
+            // access to the current value of that state.
+            setScore((currentScore) => updateScoreFromItemAction(currentScore, fieldname, systemData, value))
         },
         [score]
     )

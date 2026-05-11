@@ -119,17 +119,40 @@ export function SystemNode({
                         ),`
                 }
                 case 'notation': {
-                    const gradients = systemData.colWidths
-                        .map((width, idx) => {
-                            const offset = _.sum(systemData.colWidths.slice(0, idx))
-                            const css = `
-                                ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
-                                transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
+                    // Get the kempli notation for the entire system
+                    const notation: string[] = _.flatten(
+                        _.flatten(systemData.staffs['KEMPLI'] || []).map((measure) => measure.notation)
+                    )
+                    // Determine the positions of the kempli characters
+                    const indices = notation.reduce(
+                        (aggr: number[], note, idx) => (note == 'x?' ? aggr.concat([idx]) : aggr),
+                        []
+                    )
+                    if (indices.length == 0) return ''
+                    // Generate the gradient functions
+                    const gradients = indices
+                        .map((index, idx, arr) => {
+                            const transpEnd = idx < arr.length - 1 ? `calc(${arr[idx + 1]}ch)` : '100%'
+                            const css =
+                                `${gridColors.kempli} ${index}ch calc(${index}ch + 2px),
+                                transparent calc(${index}ch + 2px) ` + transpEnd
                             return css
                         })
                         .join(', ')
                     return `linear-gradient(to right, ` + gradients + '),'
                 }
+                // case 'notation': {
+                //     const gradients = systemData.colWidths
+                //         .map((width, idx) => {
+                //             const offset = _.sum(systemData.colWidths.slice(0, idx))
+                //             const css = `
+                //                 ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
+                //                 transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
+                //             return css
+                //         })
+                //         .join(', ')
+                //     return `linear-gradient(to right, ` + gradients + '),'
+                // }
                 case 'off':
                 default:
                     return ''

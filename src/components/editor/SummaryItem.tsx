@@ -20,7 +20,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import { tsBlue } from '../../config/config'
+import { defaultBeatFrequency, tsBlue } from '../../config/config'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsKempliNotationIcon from '../../reacticons/TsKempliNotationIcon'
@@ -146,8 +146,8 @@ export function SummaryItem({
             ],
             iconcolor: tsBlue,
             action: 'kempli',
-            hasfield: true,
-            fieldval: sysData.kempli.state == 'on' ? `${sysData.kempli.frequency}` : '',
+            hasfield: false,
+            fieldval: sysData.kempli.state == 'on' ? `${sysData.kempli.frequency || defaultBeatFrequency}` : '',
             buttonTooltip: [
                 `Kempli beat every ${sysData.kempli.frequency} notes.`,
                 'Kempli off.',

@@ -14,7 +14,9 @@ export type Note = {
 // 'Laras'or 'Notation': text versions that can be imported. Each format needs its own parser.
 export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
 // 'on': kempli will be added during playback. 'notation': system contains a kempli staff.
-export type KempliState = 'on' | 'off' | 'notation'
+// See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
+export const kempliStates = ['on', 'off', 'notation']
+export type KempliState = (typeof kempliStates)[number]
 // if state is 'on', frequency must be given.
 export interface KempliSetting {
     state: KempliState
