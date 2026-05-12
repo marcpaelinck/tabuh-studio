@@ -141,18 +141,6 @@ export function SystemNode({
                         .join(', ')
                     return `linear-gradient(to right, ` + gradients + '),'
                 }
-                // case 'notation': {
-                //     const gradients = systemData.colWidths
-                //         .map((width, idx) => {
-                //             const offset = _.sum(systemData.colWidths.slice(0, idx))
-                //             const css = `
-                //                 ${gridColors.kempli} ${offset}ch calc(${offset}ch + 2px),
-                //                 transparent calc(${offset}ch + 2px) calc(${offset + width}ch)`
-                //             return css
-                //         })
-                //         .join(', ')
-                //     return `linear-gradient(to right, ` + gradients + '),'
-                // }
                 case 'off':
                 default:
                     return ''
@@ -285,7 +273,16 @@ export function SystemNode({
                     <SummaryItem item="delete" gototargets={gotoTargets} sysData={systemData} execute={execute} />
                 </SCol>
                 <SCol span={2}>
-                    <SummaryItem item="kempli" sysData={systemData} execute={execute} />
+                    <SummaryItem
+                        item="kempli"
+                        sysData={systemData}
+                        execute={execute}
+                        options={Array(16)
+                            .fill(0)
+                            .map((_, idx) => {
+                                return { value: idx + 1, label: `${idx + 1}` } as InputOption<number>
+                            })}
+                    />
                 </SCol>
             </>
         )

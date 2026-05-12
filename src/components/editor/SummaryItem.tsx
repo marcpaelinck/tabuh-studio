@@ -20,6 +20,7 @@ import {
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
+import type { AppearanceType } from 'rsuite/esm/internals/types'
 import { defaultBeatFrequency, tsBlue } from '../../config/config'
 import TsCopyIcon from '../../reacticons/TsCopyIcon'
 import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
@@ -37,16 +38,16 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type EditorActionType = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution' | 'kempli'
+type ItemName = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution' | 'kempli'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
-    item: EditorActionType
+    item: ItemName
     sysData: System
     score?: Score
     labels?: Record<string, System>
     gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field. Used for validation.
     execute?: (fieldname: string, value?: string) => void
-    options?: InputOption<string>[]
+    options?: InputOption<string | number>[]
 }
 
 // This Element displays a single System attribute. The element containing a button and/or a value field.
@@ -65,19 +66,24 @@ export function SummaryItem({
 }: SummaryItemProps) {
     // Specifications of the display mode and functionality of each SummaryItem type.
     // See below for a detailed description of the properties of this interface.
-    type ActionType = 'editfield' | 'execute' | 'inputpicker' | 'executionform' | 'kempli' | 'none'
+    type ActionType = 'fieldeditor' | 'execute' | 'none'
+    type FieldEditorType = 'inputfield' | 'stringinputpicker' | 'numberinputpicker' | 'executionform' | 'none'
+    type FieldEditorBehavior = 'always' | 'afterbuttonclick'
 
-    interface SpecType {
-        icon: IconType
+    // A summary item consists of a button followed by an optional (editable or fixed) text field.
+    interface ItemSpecs {
+        icon: IconType // Button icon
         iconcolor?: string
-        action: ActionType
-        hasfield?: boolean
+        appearance?: AppearanceType // Button's appearance (default='default')
+        action: ActionType // Action on button click
+        hasfield?: boolean // Button is followed by a text field
         formtitle?: string // Title to display in editing mode
+        fieldeditor?: FieldEditorType // Field editor type
+        fieldeditwhen?: FieldEditorBehavior // When should editor be activated?
         fieldval?: string | number
-        textcolor?: string
+        textcolor?: string // Field's text color
         buttonTooltip?: string
         fieldTooltip?: string
-        appearance?: string
     }
 
     // Specification of the items. Each item corresponds with an attribute of a System object and contains a button and/or a field.
@@ -92,14 +98,23 @@ export function SummaryItem({
     //textcolor: Text color of the field.
     //buttonTooltip: Tooltip text for the button.
     //fieldTooltip: Tooltip text for the field.
-    const specs: Record<EditorActionType, SpecType> = {
-        id: { icon: AiOutlineNumber, action: 'none', hasfield: true, fieldval: sysData.id, fieldTooltip: sysData.uuid },
+    const itemSpecs: Record<ItemName, ItemSpecs> = {
+        id: {
+            icon: AiOutlineNumber,
+            action: 'none',
+            hasfield: true,
+            fieldeditor: 'none',
+            fieldval: sysData.id,
+            fieldTooltip: sysData.uuid
+        },
         label: {
             icon: TsLabelIcon,
             iconcolor: tsBlue,
-            action: 'editfield',
+            action: 'fieldeditor',
             hasfield: true,
-            fieldval: sysData.label,
+            fieldeditor: 'inputfield',
+            fieldeditwhen: 'afterbuttonclick',
+            fieldval: sysData.label || '',
             textcolor: 'orange',
             buttonTooltip: 'Add or remove a label to mark a system for copying or for `goto` instructions.'
         },
@@ -113,10 +128,12 @@ export function SummaryItem({
         copy: {
             icon: TsCopyIcon,
             iconcolor: tsBlue,
-            action: 'inputpicker',
+            action: 'fieldeditor',
             hasfield: true,
+            fieldeditor: 'stringinputpicker',
+            fieldeditwhen: 'afterbuttonclick',
             formtitle: 'copy',
-            fieldval: sysData.copyfrom,
+            fieldval: sysData.copyfrom || '',
             textcolor: 'blue',
             buttonTooltip: 'Select a system that should be copied below this one.',
             fieldTooltip: 'Label or number of the system from which this system was copied.'
@@ -131,8 +148,10 @@ export function SummaryItem({
         execution: {
             icon: RiPlayListFill,
             iconcolor: tsBlue,
-            action: 'executionform',
+            action: 'fieldeditor',
             hasfield: true,
+            fieldeditor: 'executionform',
+            fieldeditwhen: 'afterbuttonclick',
             formtitle: `system # ${sysData.id}`,
             fieldval: sysData.execution?.map((item) => item.tooltipshort).join(' | ') || '',
             textcolor: 'green',
@@ -140,34 +159,25 @@ export function SummaryItem({
             fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
         },
         kempli: {
-            // Kempli button toggles between three states
+            // Kempli button toggles between three states.
+            // The field displays the kempli frequency and is only visible when kempli state is 'on'.
             icon: [TsKempliOnIcon, TsKempliOffIcon, TsKempliNotationIcon][
                 ['on', 'off', 'notation'].indexOf(sysData.kempli.state)
             ],
             iconcolor: tsBlue,
-            action: 'kempli',
-            hasfield: false,
-            fieldval: sysData.kempli.state == 'on' ? `${sysData.kempli.frequency || defaultBeatFrequency}` : '',
+            action: 'execute',
+            hasfield: sysData.kempli.state == 'on',
+            fieldeditor: 'numberinputpicker',
+            fieldeditwhen: 'always',
+            fieldval: sysData.kempli.frequency || defaultBeatFrequency,
             buttonTooltip: [`Kempli beat every ${sysData.kempli.frequency} notes`, 'Kempli off', 'Kempli in notation'][
                 ['on', 'off', 'notation'].indexOf(sysData.kempli.state)
             ]
         }
     }
-    const [editing, setEditing] = useState<boolean>(false)
+    const [editing, setEditing] = useState<boolean>(itemSpecs[item].fieldeditwhen == 'always')
     const inputRef = useRef<HTMLInputElement & PickerHandle>(null)
     const [warning, setWarning] = useState<string | null>(null)
-
-    // Action performed on button click event and after field editing/selection.
-    function buttonAction(event: any, action: string) {
-        if (specs[item].hasfield) {
-            setEditing(true)
-            return
-        }
-        debug(`Setting editing to false (0)`)
-        setEditing(false)
-        debug(`EXECUTING ${item}`)
-        if (action != 'cancel' && validate() && execute) execute(item)
-    }
 
     useEffect(() => {
         // Cancel editing when Esc key is pressed or when user clicks anywhere outside the input field.
@@ -176,7 +186,7 @@ export function SummaryItem({
 
         if (editing) {
             function handleEscapeKey(event: KeyboardEvent) {
-                if (event.code === 'Escape') {
+                if (event.code === 'Escape' && itemSpecs[item].fieldeditwhen != 'always') {
                     debug(`Setting editing to false (1)`)
                     setEditing(false)
                 }
@@ -189,17 +199,29 @@ export function SummaryItem({
         }
     }, [editing])
 
-    function inputAction(event: any, action: string, value: string | undefined) {
+    // Action performed on button click.
+    function buttonAction(event: any, action: string) {
+        if (itemSpecs[item].fieldeditwhen == 'afterbuttonclick') {
+            setEditing(true)
+            return
+        }
+        debug(`EXECUTING ${item}`)
+        if (action != 'cancel' && validate() && execute) execute(item)
+    }
+
+    // Action performed after editing a field.
+    function inputFieldAction(event: any, action: string, value: string | undefined) {
         event.target.blur()
         debug(`warning is ${warning}`)
         if (action != 'cancel' && !(warning == null)) return
         const returnValue = value || inputRef.current?.value
         debug(`executing field action ${action} value=${returnValue}`)
-        setEditing(false)
+        if (itemSpecs[item].fieldeditwhen != 'always') setEditing(false)
         setWarning(null) // Can only reach this point if cancel was selected.
         if (action != 'cancel' && execute) execute(item, returnValue)
     }
 
+    // Called by buttonAction function and by onChange callback of input fields
     function validate(value?: string | undefined): boolean {
         var msg: string | null = null
         switch (item) {
@@ -224,7 +246,7 @@ export function SummaryItem({
     function onEnter(e: any, value?: string) {
         if (e.key === 'Enter') {
             e.target.blur()
-            inputAction(e, 'save', value)
+            inputFieldAction(e, 'save', value)
         }
     }
 
@@ -238,7 +260,7 @@ export function SummaryItem({
                 appearance={action == 'save' ? 'subtle' : 'link'}
                 color={action == 'save' ? 'green' : 'red'}
                 icon={<Icon />}
-                onClick={(e) => inputAction(e, action, inputRef.current?.value)}
+                onClick={(e) => inputFieldAction(e, action, inputRef.current?.value)}
             />
         )
     }
@@ -246,7 +268,7 @@ export function SummaryItem({
     // Input field for values whose action is 'edit'
     const inputField = (
         <InputGroup inside size="xs" {...props}>
-            <Input ref={inputRef} defaultValue={specs[item].fieldval || ''} onKeyUp={onEnter} onChange={validate} />
+            <Input ref={inputRef} defaultValue={itemSpecs[item].fieldval || ''} onKeyUp={onEnter} onChange={validate} />
             <InputGroup.Addon as="span">
                 <SaveCancelBtn action="cancel" />
                 <SaveCancelBtn action="save" />
@@ -254,40 +276,41 @@ export function SummaryItem({
         </InputGroup>
     )
 
-    // Selection list for 'copy' and 'goto' actions
     const inputPicker = (
         <InputPicker
             ref={inputRef}
             data={options || []}
-            defaultValue={specs[item].fieldval || ''}
-            onChange={(val, e) => inputAction(e, 'save', val)}
-            placeholder={`${specs[item].formtitle}`}
+            defaultValue={itemSpecs[item].fieldval}
+            onChange={(val, e) => inputFieldAction(e, 'save', val)}
+            placeholder={`${itemSpecs[item].formtitle}`}
             width="100%"
+            cleanable={false}
+            size="xs"
         />
     )
 
     const executionItemsForm = (
         <ExecutionForm
             systemData={sysData}
-            title={`${specs[item].formtitle}`}
+            title={`${itemSpecs[item].formtitle}`}
             open={editing}
-            sysOptions={options || []}
+            sysOptions={(options || []) as InputOption<string>[]}
             setOpen={setEditing}
             onSave={() => execute!('execution')}
         />
     )
 
     const inputMethod =
-        specs[item].action == 'editfield'
+        itemSpecs[item].fieldeditor == 'inputfield'
             ? inputField
-            : specs[item].action == 'inputpicker'
+            : itemSpecs[item].fieldeditor?.includes('inputpicker')
               ? inputPicker
-              : specs[item].action == 'executionform'
+              : itemSpecs[item].fieldeditor == 'executionform'
                 ? executionItemsForm
                 : null
 
-    const SummaryIcon = specs[item].icon
-    const summaryIcon = <SummaryIcon size="1.3rem" color={specs[item].iconcolor} />
+    const SummaryIcon = itemSpecs[item].icon
+    const summaryIcon = <SummaryIcon size="1.3rem" color={itemSpecs[item].iconcolor} />
     const textWhisperRef = useRef<OverlayTriggerHandle>(null)
 
     // Show message on warning. Note: currently warning is only set by field validation.
@@ -298,47 +321,53 @@ export function SummaryItem({
 
     return (
         <>
-            {specs[item].action == 'none' ? (
+            {itemSpecs[item].action == 'none' ? (
                 summaryIcon
             ) : (
                 <Whisper
                     placement="autoVerticalStart"
                     delayClose={50}
-                    trigger={warning ? 'click' : specs[item].buttonTooltip ? 'hover' : 'none'}
+                    trigger={warning ? 'click' : itemSpecs[item].buttonTooltip ? 'hover' : 'none'}
                     controlId={`control-id-Whisper`}
                     className="mytooltip"
                     speaker={
-                        <Tooltip className="mytooltip">{warning ? warning : specs[item].buttonTooltip || ''}</Tooltip>
+                        <Tooltip className="mytooltip">
+                            {warning ? warning : itemSpecs[item].buttonTooltip || ''}
+                        </Tooltip>
                     }>
                     <IconButton
                         size="sm"
                         as={'span'}
                         icon={summaryIcon}
                         onClick={(event: MouseEvent<HTMLElement>) => {
-                            buttonAction(event, specs[item].action)
+                            buttonAction(event, itemSpecs[item].action)
                         }}
                         className="pl-0 pr-1 pt-0 pb-0"
+                        appearance={itemSpecs[item].appearance}
                     />
                 </Whisper>
             )}
-            {specs[item].hasfield ? (
+            {itemSpecs[item].hasfield ? (
                 <Whisper
                     ref={textWhisperRef}
                     delayClose={50}
-                    trigger={specs[item].fieldTooltip ? 'hover' : 'none'}
+                    trigger={itemSpecs[item].fieldTooltip ? 'hover' : 'none'}
                     placement="autoVerticalStart"
                     controlId={`control-id-Whisper`}
                     speaker={
-                        // style whiteSpace:pre enables to use \n for new line
+                        // style whitespace:pre enables to use \n for new line
                         <Tooltip className="whitespace-pre">
-                            {warning ? warning : specs[item].fieldTooltip || ''}
+                            {warning ? warning : itemSpecs[item].fieldTooltip || ''}
                         </Tooltip>
                     }>
-                    <span style={{ color: specs[item].textcolor, width: '100%' }} className="text-sm pl-3">
+                    <span style={{ color: itemSpecs[item].textcolor, width: '100%' }} className="text-sm pl-3">
                         {editing ? inputMethod : null}
-                        {editing && ['editfield', 'inputpicker'].includes(specs[item].action)
+                        {editing &&
+                        ['inputfield', 'numberinputpicker', 'stringinputpicker'].includes(
+                            itemSpecs[item].fieldeditor || 'other'
+                        )
                             ? null
-                            : `${specs[item].fieldval || ''}`}
+                            : `${itemSpecs[item].fieldval || ''}`}
                     </span>
                 </Whisper>
             ) : (

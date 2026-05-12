@@ -28,7 +28,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     StaffNode: false,
     SystemContextMenu: false,
     SystemNode: false,
-    SummaryItem: false,
+    SummaryItem: true,
     MainWindow: false,
     MainMenu: false,
     useScoreManager: false,

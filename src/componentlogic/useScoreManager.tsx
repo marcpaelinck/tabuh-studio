@@ -162,7 +162,7 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         score: Score | undefined,
         fieldname: string,
         systemData: System,
-        value?: string
+        value?: string | number
     ): Score | undefined {
         var newSystemData: System | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the measures.
@@ -240,11 +240,16 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
                 newSystemData = null
                 break
             case 'kempli':
-                // Toggle the kempli value
-                const stateIdx = kempliStates.indexOf(newSystemData.kempli.state)
-                const nextIdx = (stateIdx + 1) % kempliStates.length
-                newSystemData.kempli.state = kempliStates[nextIdx]
-                if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
+                if (value) {
+                    // Field value was edited
+                    newSystemData.kempli.frequency = value as number
+                } else {
+                    // Button was clicked: toggle the kempli state
+                    const stateIdx = kempliStates.indexOf(newSystemData.kempli.state)
+                    const nextIdx = (stateIdx + 1) % kempliStates.length
+                    newSystemData.kempli.state = kempliStates[nextIdx]
+                    if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
+                }
                 break
             default:
                 // Unrecognized action
@@ -267,7 +272,7 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
     // Handles user actions triggered with buttons in the panel header.
     // Note this is a callback function.
     const executeItemAction = useCallback(
-        (fieldname: string, systemData: System, value?: string) => {
+        (fieldname: string, systemData: System, value?: string | number) => {
             debug(`processing ${fieldname}`)
             // Callback functions have to pass a function to state setters if they need to
             // access to the current value of that state.
