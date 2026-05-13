@@ -1,0 +1,377 @@
+{INFO notation=palawakya part=full title=Palawakya instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 80}
+	{PART pepeson}
+	{KEMPLI off}
+	{TEMPO 70 beat=9}
+ugal	--o-	Eu---	a-u-	Ai<---	a-i<-	Au-a-	u-e-	o-..
+gangsa	....	....	....	....	....	....	....	....	a,a,a,a,
+
+	{DYNAMICS f positions=[gangsa, reyong] beats=->4}
+	{DYNAMICS mp positions=[gangsa, reyong]}
+	{TEMPO 65}
+	{TEMPO 90 beats=->4}
+gangsa	iiii	iiii	iiii	iia,i	oooo	ooio	eeee	eee/.
+reyong	xxxx	xxxx	x...	..xx	xxxx	x...	xxxx	xbb/.
+penyacah	i	o	i	a	o	i	e	o
+calung	i		i		o		e
+jegogan	i
+gong	G
+
+
+	{DYNAMICS mf positions=[gangsa, reyong] beat=8}
+gangsa	.uuu	ueua	i<i<i<i<	uuuu	aaaa	uuuu	eeee	o.ii/
+reyong	....	....	xxxx	xxxx	x.bb	b/.bb	b/...	..bb/
+penyacah	u	a	i	u	a	u	e	o
+calung	u		i		a		e
+jegogan	u
+gong	T
+
+	{TEMPO 75}
+	{KEMPLI off}
+ugal	....	..u,-	Ai-i-	oeue	u-a-	i<-u-	a-u/.	.ii/.
+gangsa	i---							.ii/.
+reyong	b---
+penyacah	i
+calung	i
+gong	T
+	{WAIT 1}
+
+	{TEMPO 150}
+	{DYNAMICS p positions=gangsa}
+ugal	i---	o---	i---	o-e-	u---	a---	u---	e-o-	i---	o---	i---	o-i-	a,--i	o---	i---	a---
+gangsa p	i.io	.i.o	i.u.	eu.e	u.eu	.i.o	i.io	.i.o	i.io	.i.o	i.a,i	.a,.i	a,.a,i	.a,.i	a,.u,a,	.u,.a,
+gangsa s	.e.o	e.eo	.e.o	e.oe	.oe.	o.eo	.e.o	e.eo	.e.o	e.eo	.o.i	o.oi	.o.i	o.oi	.i.a,	i.ia,
+penyacah	i	o	i	e	u	a	u	o	i	o	i	o	a,	i	a,	i
+calung	i		i		u		u		i		i		a		a
+jegogan	i								i
+gong	G
+
+	{DYNAMICS f positions=[gangsa, kendang]}
+ugal	u,---	a,---	u,---	a,-i-	o--e	u---	e---	o---	i---	o---	i---	o-i-	a,--i	o---	i---	a---
+gangsa p	u,.u,a,	.u,.a,	u,.oe	.o.e	o.oe	.o.e	o.io	.i.o	i.io	.i.o	i.a,i	.a,.i	a,.a,i	.a,.i	a,.u,a,	.u,.a,
+gangsa s	.i.a,	i.ia,	.u.e	u.ue	.u.e	u.ue	.e.o	e.eo	.e.o	e.eo	.o.i	o.oi	.o.i	o.oi	.i.a,	i.ia,
+penyacah	u,	a,	u,	a,	o	u	e	o	i	o	i	o	a,	i	a,	i
+calung	u		u		o		e		i		i		a		a
+jegogan	u								i
+
+ugal	u,	a,---	u,---	a,-i-	o--e	u---	e---	o---	i---	a,---	i--i	a,--a,	i---
+gangsa p	u,.u,a,	.u,.a,	u,.oe	.o.e	o.oe	.o.e	o.io	.i.o	i.a,.	a,.o.	i.a,.	a,.o.	i---
+gangsa s	.i.a,	i.ia,	.u.e	u.ue	.u.e	u.ue	.e.o	e.eo	.u,.u,	.i.a,	.u,.u,	.i.a,	i---
+penyacah	u,	a,	u,	a,	o	u	e	o	i	a,	i	a,	i
+calung	u		u		o		e		i		i		i
+jegogan	u								i				i
+gong													G
+	{WAIT 1}
+
+	{GONGAN kebyar}
+	{DYNAMICS ff positions=[gangsa, kendang, reyong]}
+ugal/ga	..o--i	o-a,--i	a,-i--a,	i-u,--a,	u,-----
+reyong	..x--x	x-x--x	x-x--x	x-x--x	x-----
+penyacah		o	a,	i	u,
+calung		o	a	i	u
+jegogan					u
+gong					G
+kendang	..9--9	9-9--9	9-9--9	9-9--9	9-----
+
+	{TEMPO 100}
+	{KEMPLI off}
+	{DYNAMICS mf positions=[kendang, reyong]}
+	{DYNAMICS f positions=gangsa}
+	{DYNAMICS ->mp positions=gangsa beats=5->7}
+ugal	u-a-	Io-e-	o-ia,	i...
+gangsa p	....	....	....	...a,	a,-a,a,	a,a,.a,	....
+gangsa s	....	....	....	...a,	a,-a,a,	a,a,i.	i...
+	{SEQUENCE [A_ANGSEL,A_SLOW, A_ACCEL, A_FAST, A_FAST, A_ANGSEL,
+	A_SLOW, A_ACCEL, A_FAST, A_FAST, A_ANGSEL,
+	A_SLOW, A_ACCEL, A_FAST, A_FAST, A_ANGSEL,
+	A_SLOW, A_ACCEL, A_FAST, A_FAST, A_ANGSEL,
+	A_SLOW, A_ACCEL, A_FAST, A_FAST, A_ANGSEL,
+	A_SLOW_F, A_ACCEL, A_FAST, A_FAST, A_ANGSEL, CONTINUE]}
+
+	{LABEL A_ANGSEL}
+	{TEMPO 110}
+	{DYNAMICS mp positions=gangsa}
+	{DYNAMICS ff positions=gangsa beat=4}
+	{DYNAMICS mp positions=gangsa beats=13->16}
+ugal	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+gangsa p	.ii.	i.i.	i.i.	ia,a,.	a,.a,.	a,ii.	i.i.	iu,u,.	u,---	.oo.	o.o.	o.o.	o.a,a,	-a,a,a,	a,a,.a,	....
+gangsa s	.iio	.o.o	.o.o	.a,a,i	.i.i	.iio	.o.o	.u,u,a,	....	.ooe	.e.e	.e.e	..a,a,	-a,a,a,	a,a,i.	i/...
+penyacah	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+calung	i		i		a		i		u		o		o		e
+jegogan	i								u
+gong	G				P				T				P
+
+	{TEMPO 25}
+	{LABEL A_SLOW}
+	{DYNAMICS p positions=gangsa}
+ugal	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+gangsa	.i/io	ioio	ioio	ia/,a,i	a,ia,i	a,i/io	ioio	iu,/u,a,	u,a,u,a,	u,u,a,i	oeoe	o_e_o_i_a,i	oeoe	oe/eu	eueu	ei/io
+penyacah	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+calung	i		i		a		i		u		o		o		e
+jegogan	i								u
+gong	G				P				T				P
+
+	{TEMPO 25}
+	{LABEL A_SLOW_F}
+	{DYNAMICS f positions=gangsa}
+	{DYNAMICS p positions=gangsa beats=13->15}
+ugal	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+gangsa	.i/io	ioio	ioio	ia/,a,i	a,ia,i	a,i/io	ioio	iu,/u,a,	u,a,u,a,	u,u,a,i	oeoe	o_e_o_i_a,i	oeoe	oe/eu	eueu	ei/io
+penyacah	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+calung	i		i		a		i		u		o		o		e
+jegogan	i								u
+gong	G				P				T				P
+
+	{LABEL A_ACCEL}
+	{TEMPO 110 beats=1->14}
+	{DYNAMICS mf positions=gangsa beats=14->16}
+ugal	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+gangsa p	.i/i.	i.i.	i.i.	ia,/a,.	a,.a,.	a,i/i.	i.i.	iu,u,.	u,.u,.	u,oo.	o.o.	o.o.	o.o.	oee.	e.e.	eii.
+gangsa s	.i/io	.o.o	.o.o	.a/,a,i	.i.i	.i/io	.o.o	.u,u,a,	.a,.a,	.ooe	.e.e	.e.e	.e.e	.eeu	.u.u	.iio
+penyacah	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+calung	i		i		a		i		u		o		o		e
+jegogan	i								u
+gong	G				P				T				P
+
+	{LABEL A_FAST}
+	{TEMPO 110}
+	{DYNAMICS ff positions=gangsa}
+	{DYNAMICS p positions=gangsa beat=5}
+ugal	i	o	i	u,	a,	o	i	a,	u,	i	o	e	o	u	e	o
+gangsa p	.i/i.	i.i.	i.i.	i.i.	i.o.	u.u.	o.u.	o.o.	u.u.	u.u.	i<.i<.	i<aa.	a.a.	aee.	e.e.	eii.
+gangsa s	.i/io	.o.o	.o.o	.o.o	.i.e	.a.e	.a.e	.i.e	.a.e	.e.a	.a.a	.aai<	.i<.i<	.eeu	.u.u	.iio
+penyacah	i	o	i	a	i	u	e	a	u	a	i	u	a	u	e	o
+calung	i		i		i		e		u		i		a		e
+jegogan	i								u
+gong	G				P				T				P
+
+	{LABEL CONTINUE}
+ugal	i
+gangsa p	i
+gangsa s	.
+penyacah	i
+calung	i
+jegogan	i
+gong	G
+	{WAIT 2}
+
+	{PART pengawak}
+	{TEMPO 60}
+	{GONGAN genderan}
+trompong	u-----------	u-----	u-u--	i<-u-a-i<-u-i<-a-u-i<-u-a-i<-auai<
+
+	{TEMPO 120}
+	{DYNAMICS p positions=gangsa}
+	{GONGAN genderan}
+trompong	o<-..
+gangsa p	.oo.
+gangsa s	.ooe
+
+	{DYNAMICS p positions=gangsa}
+	{DYNAMICS ff positions=gangsa beat=6}
+trompong	o<-------	e<-o<.----	o<-------	i<-------	a-------	u-------	o-------	e-------	u-------
+gangsa p	o.o.oee.	e.e.eoo.	o.o.oii.	i.i.ia,a,.	a,.a,.a,u,u,.	u,.u,.u,o,o,.	o,.o,.oe,e,.	e,.e,.e,u,u,.	u,-------
+gangsa s	.e.e.eeu	.u.u.ooe	.e.e.iio	.o.o.a,a,i	.i.i.u,u,a,	.a,.a,.o,o,e	.e,.e,.e,e,u,	.u,.u,.u,u,a,	u,-------
+penyacah	o	e	o	i	a,	u,	o	e	u
+calung	o	e	o	i	a	u	o	e	u
+jegogan	o				a				u
+gong									G
+	{WAIT 3}
+
+	{LABEL TROMPONG}
+	{TEMPO 120}
+	{GONGAN genderan}
+trompong	u-e-u---a---
+
+	{DYNAMICS p positions=gangsa}
+trompong	i<-------	o<-------	i<-------	u-------	a-------	i<-------	o<-------
+gangsa p	i.i.i.i.	i.i.i.i.	i.i.a,.a,.	u,.u,.i.i.	u,.u,.a,.a,.	i.u,.a,.i.	o--..ee.
+gangsa s	.o.o.o.o	.o.o.o.o	u.u.e.e.	o.o.u.u.	o.o.e.e.	u.o.e.u.	a....eeu
+penyacah	i	o	i	u,	a,	i	o
+calung	i	o	i	u	a	i	o
+jegogan	i		i				o
+gong	P
+
+	{DYNAMICS f positions=gangsa}
+trompong	e<-o<.----	o<-------	i<-------	a-------	u-------	o-------	e-------
+gangsa p	e.e.eoo.	o.o.oii.	i.i.ia,a,.	a,.a,.a,u,u,.	u,.u,.u,o,o,.	o,.o,.oe,e,.	e,.e,.e,u,u,.
+gangsa s	.u.u.ooe	.e.e.iio	.o.o.a,a,i	.i.i.u,u,a,	.a,.a,.o,o,e,	.e,.e,.e,e,u,	.u,.u,.u,u,a,
+penyacah	e	o	i	a,	u,	o	e
+calung	e	o	i	a	u	o	e
+jegogan				a
+gong				P
+	{GOTO END2 pass=2}
+
+trompong	u-------
+gangsa p	u,-------
+gangsa s	u,-------
+penyacah	u,
+calung	u
+jegogan	u
+gong	G
+	{WAIT 3}
+	{GOTO TROMPONG}
+
+	{LABEL END2}
+trompong	u-------
+gangsa p	u,-------
+gangsa s	u,-------
+penyacah	u,
+calung	u
+jegogan	u
+gong	G
+	{WAIT 1}
+
+	{GONGAN genderan}
+trompong	o<-i<-o<---e<---
+
+	{DYNAMICS mp positions=gangsa}
+trompong	u-------		u<-------	e<-------	u<-------	e<-------
+gangsa p	u.u.u.u.	u.u.u.u.	u.u.uaa.	a.a.auu.	u.u.uee.	e.e.euu.
+gangsa s	.a.a.a.a	.a.a.a.a	.a.a.aai<	.i<.i<.uua	.a.a.eeu	.u.u.uua
+penyacah	u	a	u	a	u	e
+calung	u	a	u	a	u	e
+jegogan	u				u
+gong	P
+
+	{PART pekaad}
+	{TEMPO 170}
+trompong	u<---
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u---	----	----	----	----	----	----	----	----	----	----	----	--oe	u---	----	----
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+	{SEQUENCE [REGULAR, ANGSEL1A, SILENTREGULAR, REGULAR, ANGSEL1B, LOUDSOFT, SOFTLOUDSOFT, ANGSEL1A, SILENTLOUD, LOUD, ANGSEL2, REGULAR, ANGSEL1B, SILENTLOUD, LOUDSOFT, REGULAR,
+	ANGSEL1B, LOUDSOFT, SOFTLOUDSOFT, ANGSEL1END, SLOWDOWN]}
+
+	{LABEL REGULAR}
+	{LOOP 2}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS mp position=ugal}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL ANGSEL1A}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS mp positions=ugal}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal] beat=4}
+	{DYNAMICS f positions=[gangsa, reyong, ugal] beat=14}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e/...	uuu.	....	....
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL ANGSEL1END}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
+	{DYNAMICS mf positions=[gangsa, reyong, ugal] beat=14}
+	{TEMPO 100 beats=14->16}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e/...	uuu.	....	....
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL ANGSEL1B}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS mp position=ugal}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal] beat=4}
+	{DYNAMICS mf positions=[gangsa, reyong, ugal] beat=14}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o-e-	u-a-
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e/...	uuu.	....	....
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL SILENTREGULAR}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS mp position=ugal}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u---	----	----	----	----	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL LOUDSOFT}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
+	{DYNAMICS p positions=[gangsa, reyong] beat=8}
+	{DYNAMICS mp position=ugal beat=8}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL ANGSEL2}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
+	{DYNAMICS p positions=[gangsa, reyong] beats=9->13}
+	{DYNAMICS mp position=ugal beats=9->13}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e/.oe	u---	----	----
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL SOFTLOUDSOFT}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS mf position=ugal}
+	{DYNAMICS ff positions=[gangsa, reyong] beat=7}
+	{DYNAMICS p positions=[gangsa, reyong] beats=9->12}
+	{DYNAMICS mf position=ugal beat=8}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL SILENTLOUD}
+	{DYNAMICS p positions=[gangsa, reyong]}
+	{DYNAMICS ff position=ugal}
+	{DYNAMICS ff positions=[gangsa, reyong] beat=9}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	----	----	----	----	----	----	----	----	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL LOUD}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+	{LABEL SLOWDOWN}
+	{DYNAMICS mf positions=[gangsa, reyong, ugal]}
+	{DYNAMICS mp positions=[gangsa, reyong, ugal] beats=1->16}
+	{TEMPO 85 beats=1->16}
+ugal	u---	i<---	u---	i<---	u---	o---	e---	i---	o---	a,---	i---	o---	e---	u---	o---	e---
+gangsa	u-u-	i<-i<-	u-u-	i<-i<-	u-u-	o-o-	e-e-	i-i-	o-o-	a-a-	i-i-	o-o-	e-e-	u-u-	o-o-	e-e-
+penyacah	u	i	u	i	u	o	e	i	o	a,	i	o	e	u	o	e
+calung	u		i		u		e		o		i		e		o
+jegogan	u								o
+gong	G				G	P		P	G				G	P		P
+
+ugal	u---
+gangsa	u---
+penyacah	u
+calung	u
+jegogan	u
+gong	G

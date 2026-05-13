@@ -1,0 +1,36 @@
+{INFO notation="merah putih" part=full title="Merah Putih" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 60}
+	{DYNAMICS mp position=gangsa}
+	{DYNAMICS f position=ugal}
+ugal	i-------	--u-e-o-	i-----o-	e--ua-e-	u-------	--a-i<-a-	u---a-u-	e---o-u-
+gangsa p	i.e.i.e.	i.e.i.e.	i.e.i.e.	i.e.i.i<.	u.i<.u.i<.	u.i<.u.i<.	u.i<.u.i<.	u.i<.u.a.
+gangsa s	.u.o.u.o	.u.o.u.o	.u.o.u.o	.u.o.a.e	.a.e.a.e	.a.e.a.e	.a.e.a.e	.a.e.i<.u
+reyong1	........	........	--bbb---	-b-b/.xx.	u,a,u,a,u,a,u,a,	u,a,u,a,u,a,u,a,	u,a,u,a,u,a,u,a,	u,a,u,a,u,u,a,u,
+reyong2	........	........	--bbb---	-b-b/.xx.	.eoe.eoe	.eoe.eoe	.eoe.eoe	.eoe.eei
+calung	i		i	e	u		u	e
+jegogan	i				u
+
+ugal	e-------	--e-e-e-	e---o-i-	a,---i-u,-
+gangsa p	e.a.e.a.	e.a.e.a.	e.a.e.a.	e.a.e.e.
+gangsa s	.i<.u.i<.u	.i<.u.i<.u	.i<.u.i<.u	.i<.u.o.u
+reyong1	e,u,e,u,e,u,e,u,	e,u,e,u,e,u,e,u,	e,u,e,u,e,u,e,u,	e,u,e,u,e,a,a,e,
+reyong2	eieieiei	eieieiei	eieieiei	eieieeei
+calung	e		e	a
+jegogan	e
+
+ugal	a-------	--a-i-o-	e--ua-e-	u--eo-u-	e-------	--e-u-a-	i--oi-a-	u-uau-e-
+gangsa p	a.e.a.e.	a.e.a.a.	e.a.e.a.	e.a.e.a.	e.a.e.a.	e.a.e.u.	i<.u.i<.u.	i<.u.i<.u.
+gangsa s	.o.u.o.u	.o.u.i<.u	.i<.u.i<.u	.i<.u.i<.u	.i<.u.i<.u	.i<.u.e.a	.e.a.e.a	.e.a.a.e
+reyong1	a,e,a,e,a,e,a,e,	a,e,a,e,a,e,e,u,	e,u,e,u,e,u,u,a,	u,a,u,a,u,e,e,u,	e,u,e,u,e,u,e,u,	e,u,e,e,u,e,u,a,	.a,u,a,.u,u,a,	u,a,u,a,u,u,a,t
+reyong2	eieieiei	eieieeei	eieieiei	eieieiei	eieieiei	eieieiio	ioioi.oi	.ioi.ioe
+calung	a		e	u	e		i	u
+jegogan	a				e
+
+ugal	o-------	--e-e-u-	e-----i-	o--iu,-a,-
+gangsa p	o.u.o.u.	o.u.o.a.	e.a.e.a.	e.a.e.e.
+gangsa s	.a.e.a.e	.a.e.i<.u	.i<.u.i<.u	.i<.u.u.o
+reyong1	.t.t.t.t	.t.t.e,e,u,	e,-bbb---	-b-b/.xx.
+reyong2	oeoeoeoe	oeoeoeei	e-bbb---	-b-b/.xx.
+calung	o		e	o
+jegogan	o

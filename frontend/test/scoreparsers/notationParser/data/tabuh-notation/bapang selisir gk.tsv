@@ -1,0 +1,89 @@
+{INFO notation="bapang selisir gk" part=full title="Bapang Selisir GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 100}
+	{SUPPRESS kempli}
+ugal	..o-	Eu---	e---	a---	e---	o---	e--u	a-u-	e-uu?
+
+	{LOOP 3}
+	{LABEL KAWITAN}
+	{DYNAMICS mp positions=[gangsa]}
+	{DYNAMICS mf positions=[ugal]}
+ugal	u---	e---	a---	e---	o---	e--u	a-u-	e-uu?
+gangsa p	.eoe	.eoe	.eo.	eo.e	o.oe	.oe.	eo.e	o.oe
+gangsa s	ua.a	ua.a	u.au	.au.	aua.	ua.u	.au.	aua.
+calung	u	e	a	e	o	e	a	e
+jegogan	u				o
+gong	G				T
+
+	# angsel
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	u---	e---	a---	e---	o---	e--u	a-u-	e-uu?
+gangsa p	.eoe	.eoe	.eo.	eo.e	o.oe	.oe.	eo.e	o.oe
+gangsa s	ua.a	ua.a	u.au	.au.	aua.	ua.u	.au.	aua.
+calung	u	e	a	e	o	e	a	e
+jegogan	u				o
+gong	G				T
+
+	{DYNAMICS mp positions=[gangsa,ugal] beats=5->8 passes=[1,3]}
+ugal	u---	e---	a---	e---	o---	e---	a---	e---
+gangsa p	.eoe	.eoe	.eo.	eo.e	o.o-	Eu---	----	----
+gangsa s	ua.a	ua.a	u.au	.au.	a.a-	Iu---	----	----
+calung	u	e	a	e	o	e	a	e
+jegogan	u				o
+gong	G				T
+	{GOTO KAWITAN2 passes=[2,4]}
+
+ugal	u---	e---	a---	e---	o---	e---	a---	e-oe
+calung	u	e	a	e	o	e	a	e
+jegogan	u				o
+gong	G				T
+	{GOTO KAWITAN}
+
+	{LABEL KAWITAN2}
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	u--u	u-u-	u-a-	u-e-	o--i	a,-i-	a,---	i---
+gangsa p	u--u	u-u-	u-a-	u-e-	o--i	a,-i-	a,---	i---
+gangsa s	u--u	u-u-	u-a-	u-i<-	a--u	e-u-	e---	u---
+calung	u--u	u-u-	u-a-	u-e-	o--i	a-i-	a---	i---
+jegogan	u				o
+gong	G				T
+
+ugal	o--o	o-o-	o-e-	o-i-	a,-io	e-o-	e---	u---
+gangsa p	o--o	o-o-	o-e-	o-i-	a,-io	e-o-	e---	u---
+gangsa s	a--a	a-a-	a-i<-	a-u-	e-ua	i<-a-	i<---	u---
+calung	o--o	o-o-	o-e-	o-i-	a-io	e-o-	e---	u---
+jegogan	o				o
+gong	G				T
+
+ugal	e--e	e-e-	e-a-	u-e-	o--e	u-e-	u---	a---
+gangsa p	e--e	e-e-	e-a-	u-e-	o--e	u-e-	u---	a---
+gangsa s	i<--i<	i<-i<-	i<-a-	u-i<-	a--i<	u-i<-	u---	a---
+calung	e--e	e-e-	e-a-	u-e-	o--e	u-e-	u---	a---
+jegogan	e				o
+gong	G				T
+
+ugal	u--u	u-u-	u-a-	u-e-	o.o-	Eu---	----	----
+gangsa p	u--u	u-u-	u-a-	u-e-	o.o-	Eu---	----	----
+gangsa s	u--u	u-u-	u-a-	u-i<-	a.a-	Iu---	----	----
+calung	u--u	u-u-	u-a-	u-e-	o.e-	u---	----	----
+jegogan	u				o
+gong	G				T
+	{GOTO KAWITAN passes=[1]}
+
+	{LOOP 2}
+	{TEMPO 60 beats=1->8 passes=[2]}
+	{DYNAMICS mp positions=[gangsa]}
+	{DYNAMICS mf positions=[ugal]}
+ugal	u---	e---	a---	e---	o---	e--u	a-u-	e--o
+gangsa p	.eoe	.eoe	.eo.	eo.e	o.oe	.oe.	eo.e	o.oe
+gangsa s	ua.a	ua.a	u.au	.au.	aua.	ua.u	.au.	aua.
+calung	u	e	a	e	o	e	a	e
+jegogan	u		a		o		a
+gong	G				T
+
+ugal	Eu
+gangsa p	u
+gangsa s	u
+calung	u
+jegogan	u
+gong	G

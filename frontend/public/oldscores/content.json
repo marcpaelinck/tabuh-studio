@@ -1,0 +1,22 @@
+[
+    {"title": "Bapang Selisir (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "bapang selisir gk [full].json", "notationversion": "07-sep-2025", "pdf": "bapang selisir gk [full].pdf", "format": "old"},
+    {"title": "Cendrawasih", "instrumentgroup": "GONG_KEBYAR", "file": "cendrawasih [full].json", "notationversion": "07-sep-2025", "pdf": "cendrawasih [full].pdf", "format": "old"},
+    {"title": "Gilak Deng", "instrumentgroup": "GONG_KEBYAR", "file": "gilak deng [full].json", "notationversion": "07-sep-2025", "pdf": "gilak deng [full].pdf", "format": "old"},
+    {"title": "Gilak Penutup", "instrumentgroup": "GONG_KEBYAR", "file": "gilak penutup [full].json", "notationversion": "09-sep-2025", "pdf": "gilak penutup [full].pdf", "format": "old"},
+    {"title": "Gilak Penutup (compact)", "instrumentgroup": "GONG_KEBYAR", "file": "gilak penutup compact [full].json", "notationversion": "08-jan-2026", "pdf": "gilak penutup [full].pdf", "format": "new"},
+    {"title": "Godek Miring (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "godek miring gk [full].json", "notationversion": "08-sep-2025", "pdf": "godek miring gk [full].pdf", "format": "old"},
+    {"title": "Hujan Mas", "instrumentgroup": "GONG_KEBYAR", "file": "hujan mas [full].json", "notationversion": "07-sep-2025", "pdf": "hujan mas [full].pdf", "format": "old"},
+    {"title": "Janger", "instrumentgroup": "GONG_KEBYAR", "file": "janger [full].json", "notationversion": "07-sep-2025", "pdf": "janger [full].pdf", "format": "old"},
+    {"title": "Kacang Saur", "instrumentgroup": "GONG_KEBYAR", "file": "kacang saur [full].json", "notationversion": "27-oct-2025", "pdf": "kacang saur [full].pdf", "format": "old"},
+    {"title": "Kahayangan", "instrumentgroup": "GONG_KEBYAR", "file": "kahayangan [full].json", "notationversion": "08-sep-2025", "pdf": "kahayangan [full].pdf", "format": "old"},
+    {"title": "Legong Mahawidya (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "legong mahawidya gk [full].json", "notationversion": "07-nov-2025", "pdf": "legong mahawidya gk [full].pdf", "format": "old"},
+    {"title": "Lengker (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "lengker gk [full].json", "notationversion": "08-sep-2025", "pdf": "lengker gk [full].pdf", "format": "old"},
+    {"title": "Merah Putih", "instrumentgroup": "GONG_KEBYAR", "file": "merah putih [full].json", "notationversion": "19-oct-2025", "pdf": "merah putih [full].pdf", "format": "old"},
+    {"title": "Palawakya", "instrumentgroup": "GONG_KEBYAR", "file": "palawakya [full].json", "notationversion": "07-sep-2025", "pdf": "palawakya [full].pdf", "format": "old"},
+    {"title": "Pendet", "instrumentgroup": "GONG_KEBYAR", "file": "pendet [full].json", "notationversion": "08-sep-2025", "pdf": "pendet [full].pdf", "format": "old"},
+    {"title": "Puspa Mekar", "instrumentgroup": "GONG_KEBYAR", "file": "puspa mekar [full].json", "notationversion": "07-sep-2025", "pdf": "puspa mekar [full].pdf", "format": "old"},
+    {"title": "Rejang Dewa", "instrumentgroup": "GONG_KEBYAR", "file": "rejang dewa [full].json", "notationversion": "07-sep-2025", "pdf": "rejang dewa [full].pdf", "format": "old"},
+    {"title": "Sekar Gendot (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "sekar gendot gk [full].json", "notationversion": "08-sep-2025", "pdf": "sekar gendot gk [full].pdf", "format": "old"},
+    {"title": "Sinom Ladrang (GK)", "instrumentgroup": "GONG_KEBYAR", "file": "sinom ladrang gk [full].json", "notationversion": "08-sep-2025", "pdf": "sinom ladrang gk [full].pdf", "format": "old"},
+    {"title": "Teruna Jaya (under development)", "instrumentgroup": "GONG_KEBYAR", "file": "teruna jaya [full].json", "notationversion": "07-sep-2025", "pdf": "teruna jaya [full].pdf", "format": "old"}
+]

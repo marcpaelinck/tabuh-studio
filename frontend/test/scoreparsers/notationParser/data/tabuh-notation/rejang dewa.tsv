@@ -1,0 +1,127 @@
+{INFO notation="rejang dewa" part=full title="Rejang Dewa" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{AUTOKEMPYUNG off scope=SCORE}
+	{TEMPO 80}
+	{SUPPRESS kempli}
+	{PART "reyong intro"}
+reyong1+3	a-.ia-i-	..ai..i-	a.ai.ai.	ia.ia.ai	.aa-a-eu	-e-ua.ua	.a.uee-e	-uua.ua.
+reyong2+4	e-o.e-.-	o-e.o-..	eoe.oe.o	.eo.eoe.	.oo-o-eo	-e-o.io.	i.ioee-e	-ooei.ei
+
+	{SUPPRESS kempli}
+	{TEMPO 50  beats=3->8}
+reyong1+3	.aa-aua.	aa-ua.ua	.a.uee-e	-uueueeu	e-ua.ua.	au.au.ua	..ai.ai.	ia.ia.ai
+reyong2+4	.ee-eoei	oo-o.io.	i.ioee-e	-ooeoeeo	e-o.io.i	.oi.oio.	i-e.oe.o	.eo.eoe.
+
+	## 0:49 (maat 0) || 00:32/01:39 (opname reyong Krishna 22 dec 2024) || 0:19 (idem hele melodie op gangsa)
+	{VALIDATION ignore=[kempyung] scope=SCORE}
+	{TEMPO 50}
+	{LABEL PENGAWAK}
+	{PART pengawak}
+	{DYNAMICS mp positions=[gangsa]}
+gangsa	o---e---	u---e---	o---u---	e---a---	u---u---	a---u---	e---a---	u---e---
+##	oo-oeuoe	uu-ueoue	ouoeuoeu	eoueouoe	.uu-u-eu	-a-eueau	eoeuaeua	u,a,ia,iu,a,i
+reyong1+3	aa-aeuae	uu-ueaue	.ua.ua.u	.au.aua.	.uu-u.eu	-a-eueau	e.euaeua	ua.a.ua.
+reyong2+4	oo-oe.oe	oo-oeo.e	o.oe.oe.	eo.eo.oe	.ii-i-ei	-e-eoe.o	eoe.eeoe	.eieioei
+calung	o	u	o	e	u	a	e	u
+jegogan	o		o		u		e
+gong	G				P
+
+	## 1:11 (maat 16) || 00:50/01:56 ||
+gangsa	o---a,---	i---o---	e---i---	a,---o---	i---o-i-	a,---i---	o---a,---	e,---u,---
+##	ioo-o-u,a,	-i-ioeio	e-u,a,iu,a,i	a,u,ia,u,iu,a,	i-a,ioa,io	ia,oia,oa,i	o-e,u,a,e,u,a,	u,e,,a,u,e,a,e,u,
+reyong1+3	uaa-a-ua	-u-uaeua	e-ua.ua.	au.au.ua	..ai.ai.	ia.ia.ai	.-eu.eu.	ue.ue.eu
+reyong2+4	ioo-o-oe	-i-ioeio	e-o.io.i	.oi.oio.	i-e.oe.o	.eo.eoe.	o-i.ai.a	.ia.iai.
+calung	o	i	e	a	i---o-i-	a	o	e
+jegogan	o		e		i		o
+gong	T				P		----P---	----P---
+
+	## 1:34 (maat 32) || 01:07/02:13 || 01:01
+gangsa	a,---i---	o---i---	a,---o---	i---e---	o---i---	e---o---	i---e---	o---i---
+##	a,a,-a,iu,a,i	oo-a,iu,a,i	a,u,a,ioa,io	ia,oia,oa,i	.oo-o-e,u,	-e,-u,a,iu,a,	ia,iu,e,e,-e,	-u,u,a,iu,a,i
+reyong1+3	aa-a.ua.	aa-a.ua.	a.ai.ai.	ia.ia.ai	.aa.a.eu	-e-ua.ua	.a.uee-e	-uua.ua.
+reyong2+4	ee-eioei	oo-eioei	eoe.oe.o	.eo.eoe.	.oo-o-eo	-e-o.io.	i.ioee-e	-ooei.ei
+calung	a	o	a	i	o	e	i	o
+jegogan	a		a		o		i
+gong	G				P
+
+	## 1:56 (maat 48) || 01:22 ||
+gangsa	a,---a,---	o---a,---	i---e---	o---u---	e---u-e-	o---e---	u---o---	i---e---
+##	.a,a,-a,u,a,i	oo-u,a,iu,a,	ia,ioee-e	-u,u,e,u,e,e,u,	e,-u,a,iu,a,i	a,u,ia,u,iu,a,	i-a,ioa,io	ia,oia,oa,i
+reyong1+3	.aa-aua.	aa.ua.ua	.a.uee-e	-uueueeu	e-ua.ua.	au.au.ua	..ai.ai.	ia.ia.ai
+reyong2+4	.ee-eoei	oo-o.io.	i.ioee-e	-ooeoeeo	e-o.io.i	.oi.oio.	i-e.oe.o	.eo.eoe.
+calung	a	o	i	o	e---u-e-	o	u	i
+jegogan	a		i		e		u
+gong	T				P		----P---	----P---
+	{GOTO PENGAWAK passes=[1,2]}
+
+	{TEMPO 100 beats=3->8}
+gangsa	o-------	u-------	o-------	u-------	o---e---	i---o---	e---i-i-	o-o-i-i-
+reyong1+3	u,--xxxx-	b--xxxx-	b--xxxx-	b--xxxx-	b-..b-..	b-..b-..	b--.b-b-	b/..bb/bb/.
+reyong2+4	o--xxxx-	b--xxxx-	b--xxxx-	b--xxxx-	b-..b-..	b-..b-..	b--.b-b-	b/..bb/bb/.
+calung	o	u	o	u	o---e---	i---o---	e---i---	o---i---
+jegogan	o		o		o		e
+
+
+
+	## 6:00
+	{TEMPO 100}
+	{LABEL PENGECET}
+	{PART pengecet}
+gangsa p	a,-a,-	i-i-	a,-a,-	i-i-	a,-a,-	e-e-	i-i-	o-o-
+gangsa s	-a,-a,	-i-i	-a,-a,	-i-i	-a,-a,	-e-e	-i-i	-o-o
+reyong1+3	a,i.a,	ia,.i	a,i.a,	ia,.i	a,.io	.io.	oi.o	i.io
+reyong2+4	e.oe	.eo.	e.oe	.eo.	e.u.	eu.e	.ue.	ueu.
+calung	a		a		a		i
+jegogan	a				a
+gong	G
+
+gangsa p	e-e-	u-u-	e-e-	a-a-	u-u-	o-o-	i-i-	e-e-
+gangsa s	-e-e	-u-u	-e-e	-a-a	-u-u	-o-o	-i-i	-e-e
+reyong1+3	.io.	oi.o	.io.	oio.	..a,i	.a,i.	ia,.i	a,.a,i
+reyong2+4	eu.e	.ue.	eu.e	.u.e	u.e.	oe.o	.eo.	eoe.
+calung	e		e		u		i
+jegogan	e				u
+gong	P
+
+gangsa p	o-o-	e-e-	o-o-	i-i-	o-o-	e-e-	i-i-	o-o-
+gangsa s	-o-o	-e-e	-o-o	-i-i	-o-o	-e-e	-i-i	-o-o
+reyong1+3	.a,i.	ia,.i	.a,i.	ia,.i	..io	.io.	oi.o	i.io
+reyong2+4	oe.o	.eo.	oe.o	.eo.	o.u.	eu.e	.ue.	ueu.
+calung	o		o		o		i
+jegogan	o				o
+gong	T
+
+gangsa p	e-e-	u-u-	e-e-	a-a-	u-u-	o-o-	i-i-	e-e-
+gangsa s	-e-e	-u-u	-e-e	-a-a	-u-u	-o-o	-i-i	-e-e
+reyong1+3	.io.	oi.o	.io.	oio.	..a,i	.a,i.	ia,.i	a,.a,i
+reyong2+4	eu.e	.ue.	eu.e	.u.e	u.e.	oe.o	.eo.	eoe.
+calung	e		e		u		i
+jegogan	e				u
+gong	P
+
+	{TEMPO 80 beats=1->8 passes=[4]}
+gangsa p	o-o-	e-e-	o-o-	u-u-	e-e-	i-i-	o-o-	i-i-
+gangsa s	-o-o	-e-e	-o-o	-u-u	-e-e	-i-i	-o-o	-i-i
+reyong1+3	.a,i.	ia,.i	.o.i	o.io	.io.	oi.o	.ia,a,	.a,.i
+reyong2+4	oe.o	.eo.	o-eu	.eu.	eu.e	.ue.	e.eo	.eo.
+calung	o		o		e		o
+jegogan	o				e
+gong	T
+
+	{TEMPO 50 beats=1->8 passes=[4]}
+gangsa p	a,-a,-	u,-u,-	e,-e,-	u,-u,-	a,-a,-	i-i-	o-o-	i-i-
+gangsa s	-a,-a,	-u,-u,	-e,-e,	-u,-u,	-a,-a,	-i-i	-o-o	-i-i
+reyong1+3	a,i.a,	ia,.i	a,i.a,	ia,.i	a,i.a,	i.a,i	.ia,.	ia,.i
+reyong2+4	e.oe	.eo.	e.oe	.eo.	e.oe	.oe.	o.eo	.eo.
+calung	a		e		e		a
+jegogan	a				e
+gong	P
+	{GOTO PENGECET passes=[1,2,3]}
+
+gangsa p	a,
+gangsa s	e
+reyong1+3	a,
+reyong2+4	e
+calung	a
+jegogan	a
+gong	P
