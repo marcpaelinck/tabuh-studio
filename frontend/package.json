@@ -4,16 +4,16 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "copy .\\buildfiles\\dev\\index.css .\\src /y & vite",
-        "build": "copy .\\buildfiles\\prod\\index.css .\\src /y & tsc -b && vite build",
-        "wpbuild": "copy .\\buildfiles\\prod\\index.css .\\src /y & tsc -b && vite build && copy .\\dist\\assets\\*.* ..\\..\\WordPressProjects\\tabuh-studio-wp\\wp-content\\plugins\\tabuh-studio\\assets /y ",
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "wpbuild": "copy .\\buildfiles\\prod\\index-wordpress.css .\\src\\index.css /y & tsc -b && vite build && copy .\\dist\\assets\\*.* ..\\..\\WordPressProjects\\tabuh-studio-wp\\wp-content\\plugins\\tabuh-studio\\assets /y ",
         "lint": "eslint .",
         "preview": "vite preview",
         "test": "node .\\src\\scoreparsers\\grammars\\tabuh\\test.ts",
         "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts"
     },
     "dependencies": {
-	"@tabuhstudio/shared": "file:../shared",
+        "@tabuhstudio/shared": "file:../shared",
         "@lezer/generator": "^1.8.0",
         "@lezer/lr": "^1.4.2",
         "@tailwindcss/vite": "^4.1.17",
