@@ -200,7 +200,7 @@ export function executionManager(
             return uuidLookup[sequence[nextSequenceIdx]]
         }
         const gotoItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
-        if (gotoItems.length == 0) return currentStep.lastSystem ? undefined : sysIdx + 1
+        if (gotoItems.length == 0) return sysIdx == score.systems.length - 1 ? undefined : sysIdx + 1
         return uuidLookup[gotoItems[0].targetuuid]
     }
 
@@ -299,11 +299,18 @@ export function executionManager(
             }
             case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
                 // Reached end of system. Determine next system.
-                if (playbackType == 'single') return undefined
                 // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
                 const sequence = currentStep.sequence || getSequence(currentStep)
                 const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
                 const nextSysIdx = getNextSystemInFlow(currentStep, flowinfo, sequence, nextSequenceIdx)
+                // In case of single system playback: quit if we leave the requested system
+                if (
+                    playbackType == 'single' &&
+                    currentStep.systemIdx == startAtSystemIndex &&
+                    nextSysIdx != startAtSystemIndex
+                )
+                    return undefined
+
                 if (nextSysIdx == undefined) return undefined
                 _.assign(next, {
                     systemIdx: nextSysIdx,
