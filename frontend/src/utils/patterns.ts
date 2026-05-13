@@ -9,8 +9,7 @@ import {
     RakeUpChars,
     TremoloChars
 } from '../config/config'
-import type { NoteSymbol } from '../typing/basetypes'
-import type { Position } from '../typing/instruments'
+import type { NoteSymbol, Position } from '../typing/basetypes'
 import { getValidSymbols } from './alphabet'
 
 type PatternType =

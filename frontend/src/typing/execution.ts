@@ -1,5 +1,4 @@
-import type { UUID } from './basetypes'
-import type { Position } from './instruments'
+import type { Position, UUID } from './basetypes'
 
 // EXECUTION
 // These objects contain information for playing the notation.

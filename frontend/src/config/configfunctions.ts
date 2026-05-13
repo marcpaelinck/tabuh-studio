@@ -1,4 +1,4 @@
-import type { Position } from '../typing/instruments'
+import type { Position } from '../typing/basetypes'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck, ExtensionChars, MutingChars, positionConfigs, SOUNDS_FOLDER } from './config'
 

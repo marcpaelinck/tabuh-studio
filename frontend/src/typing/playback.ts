@@ -1,9 +1,7 @@
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
-import type { MutingType, StrokeType, ToneType } from '../config/config'
-import type { NoteSymbol, UUID } from './basetypes'
-import type { Position } from './instruments'
+import type { MutingType, NoteSymbol, Position, StrokeType, ToneType, UUID } from './basetypes'
 import type { Score } from './score'
 
 // PLAYBACK SCHEDULING

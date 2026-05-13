@@ -14,8 +14,7 @@ import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { castNotation } from '../../componentlogic/castingRulesManager'
 import { defaultBeatFrequency, editorFontSize, noCursor, positionConfigs } from '../../config/config'
-import type { UUID } from '../../typing/basetypes'
-import type { Position } from '../../typing/instruments'
+import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
     EditorCellCursor,

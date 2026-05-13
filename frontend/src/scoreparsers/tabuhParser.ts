@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
 import { applyPatterns, notationWidth } from '../componentlogic/notationPatternManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
-import type { UUID } from '../typing/basetypes.ts'
+import type { Position, UUID } from '../typing/basetypes.ts'
 import type {
     DynamicsItem,
     DynamicsValue,
@@ -19,7 +19,6 @@ import type {
     TempoItem,
     WaitItem
 } from '../typing/execution.ts'
-import type { Position } from '../typing/instruments.ts'
 import type {
     Attribute,
     ParserReturnValue,

@@ -20,8 +20,7 @@ import {
     RakeDownChars,
     TremoloChars
 } from '../../config/config'
-import type { BPM, DurationInBasenoteEquiv, NoteSymbol, TimeInBasenoteEquiv } from '../../typing/basetypes'
-import type { Position } from '../../typing/instruments'
+import type { BPM, DurationInBasenoteEquiv, NoteSymbol, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
 import { noteRange } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'

@@ -5,6 +5,7 @@ import type { UUID } from 'crypto'
 import _ from 'lodash'
 import type { BPM } from 'tone/build/esm/core/type/Units'
 import { defaultDynamics, defaultTempo } from '../../config/config'
+import type { Position } from '../../typing/basetypes'
 import type {
     ExecutionItem,
     ExecutionItemType,
@@ -14,7 +15,6 @@ import type {
     SequenceItem,
     WaitItem
 } from '../../typing/execution'
-import type { Position } from '../../typing/instruments'
 import type { PlaybackType } from '../../typing/playback'
 import type { Measure, Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'

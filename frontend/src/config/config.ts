@@ -1,6 +1,6 @@
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
+import type { MutingType, Position, ToneType } from '../typing/basetypes'
 import type { DynamicsValue } from '../typing/execution'
-import type { Position } from '../typing/instruments'
 import type { EditorCellCursor } from '../typing/playback'
 import type { Note } from '../typing/score'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
@@ -125,16 +125,6 @@ export const doSanityCheck = false
 // prettier-ignore
 export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2',
                       'F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
-
-// Typing of tone and muting
-// See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
-// prettier-ignore
-const _tones_ = ['DING','DONG','DENG','DUNG','DANG','GIR','PUR','TONG','X','X','KA','PAK','DE','TUT','CUNG','KUNG'] as const
-export type ToneType = (typeof _tones_)[number] // 'DING' | 'DONG' | 'DENG' | ...
-const _strokes_ = ['KNOB', 'RIM'] as const
-export type StrokeType = (typeof _strokes_)[number]
-const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
-export type MutingType = (typeof _mutings_)[number]
 
 // INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
 

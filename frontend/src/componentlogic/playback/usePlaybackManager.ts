@@ -22,8 +22,7 @@ import {
     positionConfigs
 } from '../../config/config'
 import { isExtension, isMuting } from '../../config/configfunctions'
-import type { BPM, NoteSymbol } from '../../typing/basetypes'
-import type { Position } from '../../typing/instruments'
+import type { BPM, NoteSymbol, Position } from '../../typing/basetypes'
 import type {
     AnimationNote,
     GenericAction,

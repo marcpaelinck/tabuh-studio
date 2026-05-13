@@ -1,8 +1,7 @@
 // Converts (shorthand) symbols that represent a sequence of base notes to the corresponding base note symbols.
 
 import { MutingChars } from '../config/config'
-import type { NoteSymbol } from '../typing/basetypes'
-import type { Position } from '../typing/instruments'
+import type { NoteSymbol, Position } from '../typing/basetypes'
 import type { Measure } from '../typing/score'
 import { splitTone } from '../utils/alphabet'
 import { getPatternType } from '../utils/patterns'

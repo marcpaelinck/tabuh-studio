@@ -1,4 +1,4 @@
-import type { Position } from '../../../typing/instruments'
+import type { Position } from '../../../typing/basetypes'
 
 // Instrument tag conversion (tag -> )
 export const labelToPosition: Record<string, Position[]> = {

@@ -1,7 +1,5 @@
-import type { MutingType, StrokeType, ToneType } from '../config/config'
-import type { NoteSymbol, UUID } from './basetypes'
+import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeType, ToneType, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
-import type { InstrumentType, Position } from './instruments'
 
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.

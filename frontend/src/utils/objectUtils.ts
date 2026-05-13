@@ -4,8 +4,7 @@
 
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/playbackPatternManager'
-import type { BPM } from '../typing/basetypes'
-import type { Position } from '../typing/instruments'
+import type { BPM, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
 type DefaultType = 'NoteSymbol' | 'Score'

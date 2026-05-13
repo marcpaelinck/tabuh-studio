@@ -2,8 +2,7 @@
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
 import { NorotChars } from '../config/config.ts'
-import type { NoteSymbol } from '../typing/basetypes.ts'
-import type { Position } from '../typing/instruments.ts'
+import type { NoteSymbol, Position } from '../typing/basetypes.ts'
 import type { Measure } from '../typing/score.ts'
 import { splitTone } from '../utils/alphabet.ts'
 import { debug } from '../utils/debugger.ts'

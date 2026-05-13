@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import type { HighlightRange, HilightRangeFunction, NotationParagraph } from '../../typing/animation'
-import type { Position } from '../../typing/instruments'
+import type { Position } from '../../typing/basetypes'
 import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
 
 interface NotationAreaProps {

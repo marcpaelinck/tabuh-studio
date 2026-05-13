@@ -3,8 +3,7 @@ import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import { positionConfigs } from '../../config/config'
-import type { UUID } from '../../typing/basetypes'
-import { type Position } from '../../typing/instruments'
+import type { Position, UUID } from '../../typing/basetypes'
 import { type MenuItemInfo, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
 import {
     type PlaybackAction,

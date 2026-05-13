@@ -1,4 +1,4 @@
-import type { Position } from '../typing/instruments.ts'
+import type { Position } from '../typing/basetypes.ts'
 import { instrumentTags, separators } from './tabuhConfig.ts'
 
 function createTagLookup(tagTable: Array<Record<string, string | string[]>>): Record<string, Position[]> {
