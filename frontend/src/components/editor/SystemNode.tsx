@@ -14,6 +14,7 @@ import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { castNotation } from '../../componentlogic/castingRulesManager'
 import { defaultBeatFrequency, editorFontSize, noCursor, positionConfigs } from '../../config/config'
+import { ScoreFunctions, type ScoreFunctionsType } from '../../context/contexts'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
@@ -25,7 +26,6 @@ import type {
 import type { Score, System } from '../../typing/score'
 import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import { ScoreFunctions, type ScoreFunctionsType } from '../contexts'
 import type { GridInfo } from './_types'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'

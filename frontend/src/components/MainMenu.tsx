@@ -4,11 +4,11 @@ import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
 import type { KeyboardType } from '../config/config'
+import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from '../context/contexts'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import type { ScoreInfo, ScoreMenuOption } from '../typing/menus'
 import type { Score, ScoreFormat } from '../typing/score'
 import { scoreToFormattedJson } from '../utils/objectUtils'
-import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from './contexts'
 
 type Action =
     | '1'

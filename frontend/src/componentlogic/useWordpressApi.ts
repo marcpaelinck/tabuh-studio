@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
-import type { WordPressApiType } from '../components/contexts'
+import type { WordPressApiType } from '../context/contexts'
 import type { UUID } from '../typing/basetypes'
 
 // Will be passed by the Tabu Studio WordPress plugin

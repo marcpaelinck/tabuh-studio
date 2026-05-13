@@ -36,13 +36,14 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
+import { useAuth } from '../context/AuthContext'
+import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
+import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
 import type { ScoreMenuOption } from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
 import type { WpUserRecord } from '../typing/wordpress'
 import { debug } from '../utils/debugger'
-import type { DashboardFunctionsType, ScoreFunctionsType } from './contexts'
-import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from './contexts'
 import {
     Dashboard,
     dashboardDefaults as defaultDashboardValues,
@@ -59,17 +60,21 @@ interface LoginDialogProps {
     open: boolean
     setOpen: Dispatch<boolean>
     setUser: Dispatch<WpUserRecord | undefined>
+    onSuccess?: () => void
 }
 
-function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
+function LoginDialog({ open, setOpen, setUser, onSuccess }: LoginDialogProps) {
     interface FormValue {
         username: string
         password: string
     }
+    const { login } = useAuth()
     const formRef = useRef<FormInstance>(null)
     const model = SchemaModel<FormValue>({ username: StringType().isRequired(), password: StringType().isRequired() })
+
     const [formValue, setFormValue] = useState<Record<string, any>>({ username: '', password: '' })
-    const wpFunc = useContext(WpApiFunctions)
+    const [error, setError] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async () => {
         if (!formRef.current) return
@@ -77,12 +82,15 @@ function LoginDialog({ open, setOpen, setUser }: LoginDialogProps) {
             console.error('Form Error')
             return
         }
-        wpFunc.user.login(formValue.username as string, formValue.password as string).then((result) => {
-            if (result && !('error' in result) && 'user' in result) {
-                setUser(result.user)
-                setOpen(false)
-            } else setUser(undefined)
-        })
+        try {
+            await login(formValue.username as string, formValue.password as string)
+            onSuccess?.()
+            setUser(formValue.username)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Login failed')
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (

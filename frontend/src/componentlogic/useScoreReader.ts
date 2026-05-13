@@ -1,8 +1,10 @@
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { WpApiFunctions } from '../components/contexts'
+import { WpApiFunctions } from '../context/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
+import type { ScoreListItem } from '../services/apiService'
+import { apiGetScore, apiGetScores } from '../services/apiService'
 import type { ScoreInfo } from '../typing/menus'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
@@ -11,6 +13,15 @@ import { readFile } from '../utils/filesystem'
 function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
     return score
+}
+
+function toScoreInfo(item: ScoreListItem): ScoreInfo {
+    return {
+        title: item.title,
+        uuid: item.uuid,
+        instrumentgroup: item.instrument_set,
+        notationversion: (item as any).notationversion ?? ''
+    }
 }
 
 // Loads and parses a score when a new tabuh (score title) is selected
@@ -64,26 +75,21 @@ export function useScoreReader(source: 'database' | 'file'): {
 
     // Loads a JSON Score object description from the website's database.
     async function loadScoreFromDb(newScoreInfo: ScoreInfo | undefined) {
-        if (newScoreInfo) {
-            setIsLoading(true)
-            let response = await wpFunc.database.getScore(newScoreInfo.uuid)
-            if (
-                response &&
-                'success' in response &&
-                response.success &&
-                'result' in response &&
-                response.result.length > 0 &&
-                'notation' in response.result[0]
-            ) {
-                const json = JSON.parse(response.result[0].notation)
-                if (!json) return
+        if (!newScoreInfo) return
+        setIsLoading(true)
+        try {
+            // Find the database id by matching uuid from the score list
+            const scores = await apiGetScores()
+            const match = scores.find((s) => s.uuid === newScoreInfo.uuid)
+            if (!match) throw new Error(`Score not found: ${newScoreInfo.uuid}`)
 
-                var newScore: Score | undefined = undefined
-
-                newScore = postprocessScore(json)
-                setScore(newScore)
-                setIsLoading(false)
-            }
+            const record = await apiGetScore(match.id)
+            const score = postprocessScore(record.content as Score)
+            setScore(score)
+        } catch (err) {
+            console.error('Failed to load score from database:', err)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -118,14 +124,18 @@ export function useScoreReader(source: 'database' | 'file'): {
     async function loadScoreListFromDb() {
         window.open
         setIsLoading(true)
-        const response = await wpFunc.database.getScoreList()
-        if (response && 'success' in response && response.success && 'result' in response) {
-            const newList = response.result.map((result: Score) => {
-                return { ...result, instrumentgroup: 'gongkebyar', notationversion: 'new' }
-            })
-            setScoreList(newList)
+        try {
+            // Find the database id by matching uuid from the score list
+            const scores = await apiGetScores()
+            if (scores) {
+                const scoreInfoList = scores.map((score) => toScoreInfo(score))
+                setScoreList(scoreInfoList)
+            } else throw new Error('Did not receive score list')
+        } catch (err) {
+            console.error('Failed to load score from database:', err)
+        } finally {
+            setIsLoading(false)
         }
-        setIsLoading(false)
     }
 
     async function loadScoreListFromFile() {

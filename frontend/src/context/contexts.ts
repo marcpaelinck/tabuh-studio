@@ -1,9 +1,9 @@
 import { createContext, type Context, type RefObject } from 'react'
+import type { ComponentName, DashboardComponentValues } from '../components/Dashboard'
 import type { NavigationAction } from '../config/config'
 import type { Score, System } from '../typing/score'
 import type { WpDatabaseReturnValue, WpUserReturnValue } from '../typing/wordpress'
 import { emulateAsync } from '../utils/async'
-import type { ComponentName, DashboardComponentValues } from './Dashboard'
 
 // SCORE FUNCTIONS
 // modify / save score
