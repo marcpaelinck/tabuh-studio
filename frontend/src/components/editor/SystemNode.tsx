@@ -189,8 +189,14 @@ export function SystemNode({
         updateCursorFunction(systemData.uuid, moveEditorCursor)
     }, [])
 
+    // This will cause the cursor to disappear when playback is stopped
     useEffect(() => {
-        // console.log('setting update editorcursor function')
+        if (!['playing', 'paused'].includes(audioState)) {
+            setPlaybackCursor(null)
+        }
+    }, [audioState])
+
+    useEffect(() => {
         setGrid(systemData, playbackCursor)
     }, [systemData, playbackCursor])
 
