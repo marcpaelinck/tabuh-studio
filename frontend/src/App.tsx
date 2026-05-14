@@ -6,6 +6,10 @@ import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
 
+// inside the component:
+// const { user, isLoading } = useAuth()
+// console.log('Auth state:', { user, isLoading })
+
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
 export default function App() {
