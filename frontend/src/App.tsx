@@ -6,10 +6,6 @@ import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
 
-// inside the component:
-// const { user, isLoading } = useAuth()
-// console.log('Auth state:', { user, isLoading })
-
 export const DebugContext = createContext<Dispatch<string>>(() => {})
 
 export default function App() {
@@ -19,7 +15,8 @@ export default function App() {
     const [debugMessage, setDebugMessage] = useState<string | null>(null)
 
     // Use 'dummy' WordPress functions and files in development mode.
-    const dataSource = import.meta.env.MODE == 'production' ? 'database' : 'file'
+    // const dataSource = import.meta.env.MODE == 'production' ? 'database' : 'file'
+    const dataSource = 'database'
 
     function debug(message: string) {
         setDebugMessage(message)

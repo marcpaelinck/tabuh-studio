@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
+import { ResultSetHeader, RowDataPacket } from 'mysql2'
 import pool from '../db/pool'
 
 dotenv.config()
@@ -11,23 +12,25 @@ async function createAdminUser() {
 
     try {
         // Check if user already exists
-        const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email])
+        const [existing] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [email])
 
-        if (existing.rows[0]) {
+        if ((existing as RowDataPacket[])[0]) {
             console.log(`User ${email} already exists, skipping.`)
             process.exit(0)
         }
 
         const password_hash = await bcrypt.hash(password, 12)
 
-        const result = await pool.query(
-            `INSERT INTO users (email, password_hash, role)
-       VALUES ($1, $2, $3)
-       RETURNING id, email, role`,
+        const [result] = await pool.query<ResultSetHeader>(
+            'INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)',
             [email, password_hash, role]
         )
 
-        console.log('Admin user created:', result.rows[0])
+        const insertId = (result as ResultSetHeader).insertId
+
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT id, email, role FROM users WHERE id = ?', [insertId])
+
+        console.log('Admin user created:', (rows as RowDataPacket[])[0])
         process.exit(0)
     } catch (err) {
         console.error('Error creating admin user:', err)

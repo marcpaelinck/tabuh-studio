@@ -1,8 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { apiLogin, apiLogout, apiRefreshToken } from '../services/apiService'
 
-interface AuthUser {
+export interface AuthUser {
     id: number
+    name: string
     email: string
     role: string
 }

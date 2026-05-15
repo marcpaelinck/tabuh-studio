@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
+import { RowDataPacket } from 'mysql2'
 import path from 'path'
 import pool from '../db/pool'
 
@@ -10,7 +11,7 @@ dotenv.config()
 const SCORES_FOLDER = process.env.SCORES_FOLDER || './scores'
 
 // The owner of all migrated scores (your admin user)
-const OWNER_EMAIL = process.env.ADMIN_EMAIL || 'your@email.com'
+const OWNER_EMAIL = process.env.ADMIN_EMAIL || 'marc.paelinck@proton.me'
 // ─────────────────────────────────────────────────────────────
 
 async function migrateScores() {
@@ -23,15 +24,15 @@ async function migrateScores() {
     }
 
     // Get the owner's id from the database
-    const ownerResult = await pool.query('SELECT id FROM users WHERE email = $1', [OWNER_EMAIL])
+    const [ownerRows] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [OWNER_EMAIL])
 
-    if (!ownerResult.rows[0]) {
+    if (!ownerRows[0]) {
         console.error(`User not found: ${OWNER_EMAIL}`)
         console.error('Run the createAdminUser seed script first.')
         process.exit(1)
     }
 
-    const ownerId = ownerResult.rows[0].id
+    const ownerId = ownerRows[0].id
     console.log(`Migrating scores as user: ${OWNER_EMAIL} (id: ${ownerId})`)
 
     // Read all JSON files from the scores folder
@@ -63,20 +64,23 @@ async function migrateScores() {
             }
 
             // Check if this score has already been migrated (by uuid)
-            const existing = await pool.query(`SELECT id FROM scores WHERE content->>'uuid' = $1`, [score.uuid])
-
-            if (existing.rows[0]) {
+            const [existing] = await pool.query<RowDataPacket[]>(
+                `SELECT id FROM scores WHERE JSON_UNQUOTE(JSON_EXTRACT(content, '$.uuid')) = ?`,
+                [score.uuid]
+            )
+            if (existing[0]) {
                 console.log(`  ↷ Skipping ${file} — already in database (uuid: ${score.uuid})`)
                 skipped++
                 continue
             }
 
             // Insert the score
-            await pool.query(
-                `INSERT INTO scores (owner_id, instrument_set, title, content)
-         VALUES ($1, $2, $3, $4)`,
-                [ownerId, score.instrumenttype ?? 'UNKNOWN', score.title, JSON.stringify(score)]
-            )
+            await pool.query(`INSERT INTO scores (owner_id, instrument_set, title, content) VALUES (?, ?, ?, ?)`, [
+                ownerId,
+                score.instrumenttype ?? 'UNKNOWN',
+                score.title,
+                JSON.stringify(score)
+            ])
 
             console.log(`  ✓ Migrated: ${score.title} (${file})`)
             succeeded++

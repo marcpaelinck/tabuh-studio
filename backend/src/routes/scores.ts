@@ -1,4 +1,5 @@
 import { Response, Router } from 'express'
+import { ResultSetHeader, RowDataPacket } from 'mysql2'
 import { z } from 'zod'
 import pool from '../db/pool'
 import { AuthenticatedRequest, requireAuth, requireRole } from '../middleware/auth'
@@ -27,20 +28,20 @@ const scoreSchema = z.object({
 
 router.get('/', async (_req, res: Response) => {
     try {
-        const result = await pool.query(
+        const [rows] = await pool.query<RowDataPacket[]>(
             `SELECT
          s.id,
          s.title,
          s.instrument_set,
          s.created_at,
          u.email AS owner_email,
-         s.content->>'uuid' AS uuid,
-         s.content->>'notationversion' AS notationversion
+         JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.uuid')) AS uuid,
+         JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.notationversion')) AS notationversion
        FROM scores s
        JOIN users u ON u.id = s.owner_id
        ORDER BY s.created_at DESC`
         )
-        res.json(result.rows)
+        res.json(rows)
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
@@ -49,25 +50,25 @@ router.get('/', async (_req, res: Response) => {
 
 router.get('/:id', async (req, res: Response) => {
     try {
-        const result = await pool.query(
+        const [rows] = await pool.query<RowDataPacket[]>(
             `SELECT s.*, u.email AS owner_email
        FROM scores s
        JOIN users u ON u.id = s.owner_id
-       WHERE s.id = $1`,
+       WHERE s.id = ?`,
             [req.params.id]
         )
-        if (!result.rows[0]) {
+        if (!rows[0]) {
             res.status(404).json({ error: 'Score not found' })
             return
         }
-        res.json(result.rows[0])
+        res.json(rows[0])
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
     }
 })
 
-// ── Editor routes (login + editor role required) ──────────────
+// ── Editor routes ─────────────────────────────────────────────
 
 router.post(
     '/',
@@ -77,13 +78,13 @@ router.post(
     async (req: AuthenticatedRequest, res: Response) => {
         try {
             const { title, instrument_set, content } = req.body
-            const result = await pool.query(
-                `INSERT INTO scores (owner_id, title, instrument_set, content)
-         VALUES ($1, $2, $3, $4)
-         RETURNING *`,
-                [req.user!.id, title, instrument_set, JSON.stringify(content)]
+            const [result] = await pool.query<ResultSetHeader>(
+                `INSERT INTO scores (owner_id, instrument_set, title, content)
+         VALUES (?, ?, ?, ?)`,
+                [req.user!.id, instrument_set, title, JSON.stringify(content)]
             )
-            res.status(201).json(result.rows[0])
+            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [result.insertId])
+            res.status(201).json(rows[0])
         } catch (err) {
             console.error(err)
             res.status(500).json({ error: 'Server error' })
@@ -99,31 +100,30 @@ router.patch(
     async (req: AuthenticatedRequest, res: Response) => {
         try {
             // Verify ownership or explicit permission
-            const check = await pool.query(
+            const [check] = await pool.query<RowDataPacket[]>(
                 `SELECT 1 FROM scores s
          LEFT JOIN score_permissions sp
-           ON sp.score_id = s.id AND sp.user_id = $1 AND sp.can_edit = true
-         WHERE s.id = $2
-           AND (s.owner_id = $1 OR sp.user_id IS NOT NULL)`,
-                [req.user!.id, req.params.id]
+           ON sp.score_id = s.id AND sp.user_id = ? AND sp.can_edit = 1
+         WHERE s.id = ?
+           AND (s.owner_id = ? OR sp.user_id IS NOT NULL)`,
+                [req.user!.id, req.params.id, req.user!.id]
             )
-            if (!check.rows[0]) {
+            if (!check[0]) {
                 res.status(403).json({ error: 'Not allowed to edit this score' })
                 return
             }
 
             const { title, instrument_set, content } = req.body
-            const result = await pool.query(
+            await pool.query(
                 `UPDATE scores
-         SET title = COALESCE($1, title),
-             instrument_set = COALESCE($2, instrument_set),
-             content = COALESCE($3, content),
-             updated_at = NOW()
-         WHERE id = $4
-         RETURNING *`,
-                [title, instrument_set, content ? JSON.stringify(content) : null, req.params.id]
+         SET title          = COALESCE(?, title),
+             instrument_set = COALESCE(?, instrument_set),
+             content        = COALESCE(?, content)
+         WHERE id = ?`,
+                [title ?? null, instrument_set ?? null, content ? JSON.stringify(content) : null, req.params.id]
             )
-            res.json(result.rows[0])
+            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [req.params.id])
+            res.json(rows[0])
         } catch (err) {
             console.error(err)
             res.status(500).json({ error: 'Server error' })
@@ -133,15 +133,15 @@ router.patch(
 
 router.delete('/:id', requireAuth, requireRole('editor'), async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const check = await pool.query('SELECT 1 FROM scores WHERE id = $1 AND owner_id = $2', [
+        const [check] = await pool.query<RowDataPacket[]>('SELECT 1 FROM scores WHERE id = ? AND owner_id = ?', [
             req.params.id,
             req.user!.id
         ])
-        if (!check.rows[0]) {
+        if (!check[0]) {
             res.status(403).json({ error: 'Only the owner can delete a score' })
             return
         }
-        await pool.query('DELETE FROM scores WHERE id = $1', [req.params.id])
+        await pool.query('DELETE FROM scores WHERE id = ?', [req.params.id])
         res.status(204).send()
     } catch (err) {
         console.error(err)

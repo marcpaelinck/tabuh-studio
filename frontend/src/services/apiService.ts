@@ -21,7 +21,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 // ── Auth ──────────────────────────────────────────────────────
 
 export async function apiLogin(email: string, password: string) {
-    return request<{ user: { id: number; email: string; role: string } }>('/auth/login', {
+    return request<{ user: { id: number; name: string; email: string; role: string } }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
     })

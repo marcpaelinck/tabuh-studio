@@ -4,5 +4,6 @@ backend/node_modules
 shared/node_modules
 frontend/dist
 backend/dist
+shared/README-PRODUCTION.md
 .env
 *.env.local

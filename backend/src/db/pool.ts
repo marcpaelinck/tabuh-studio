@@ -1,18 +1,18 @@
 import dotenv from 'dotenv'
-import { Pool } from 'pg'
+import mysql from 'mysql2/promise'
 
 dotenv.config()
 
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000
-})
-
-pool.on('error', (err) => {
-    console.error('Unexpected PostgreSQL pool error:', err)
-    process.exit(-1)
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT ?? 3306),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    timezone: 'Z' // store/retrieve dates in UTC
 })
 
 export default pool

@@ -36,13 +36,12 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
-import { useAuth } from '../context/AuthContext'
+import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
 import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
 import type { ScoreMenuOption } from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
-import type { WpUserRecord } from '../typing/wordpress'
 import { debug } from '../utils/debugger'
 import {
     Dashboard,
@@ -59,16 +58,14 @@ import logo from '/dist/icons/tabuh-studio_icon.svg'
 interface LoginDialogProps {
     open: boolean
     setOpen: Dispatch<boolean>
-    setUser: Dispatch<WpUserRecord | undefined>
-    onSuccess?: () => void
+    login: (email: string, password: string) => Promise<void>
 }
 
-function LoginDialog({ open, setOpen, setUser, onSuccess }: LoginDialogProps) {
+function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
     interface FormValue {
         username: string
         password: string
     }
-    const { login } = useAuth()
     const formRef = useRef<FormInstance>(null)
     const model = SchemaModel<FormValue>({ username: StringType().isRequired(), password: StringType().isRequired() })
 
@@ -84,12 +81,11 @@ function LoginDialog({ open, setOpen, setUser, onSuccess }: LoginDialogProps) {
         }
         try {
             await login(formValue.username as string, formValue.password as string)
-            onSuccess?.()
-            setUser(formValue.username)
         } catch (err) {
+            console.error('Login failed')
             setError(err instanceof Error ? err.message : 'Login failed')
         } finally {
-            setIsSubmitting(false)
+            setOpen(false)
         }
     }
 
@@ -128,10 +124,11 @@ function LoginDialog({ open, setOpen, setUser, onSuccess }: LoginDialogProps) {
 
 interface NavHeaderProps {
     expanded: boolean
-    user: WpUserRecord | undefined
-    setUser: Dispatch<WpUserRecord | undefined>
+    user: AuthUser | null
+    login: (email: string, password: string) => Promise<void>
+    logout: () => Promise<void>
 }
-function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
+function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [logoutMenu, setLogoutMenu] = useState<boolean>(false)
     const wpFunc = useContext(WpApiFunctions)
@@ -148,8 +145,7 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
             <a
                 onClick={async () => {
                     setLogoutMenu(false)
-                    const result = await wpFunc.user.logout()
-                    if (result && result['logged_in'] == false) setUser(undefined)
+                    logout()
                 }}>
                 logout
             </a>
@@ -167,10 +163,10 @@ function NavHeader({ expanded, user, setUser, ...rest }: NavHeaderProps) {
                     icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />}
                     onClick={() => (user ? setLogoutMenu(true) : setOpenLogin(true))}
                 />
-                <div className="text-[0.75rem]">{expanded && user ? ' ' + user.display_name : ''}</div>
+                <div className="text-[0.75rem]">{expanded && user ? ` ${user.name} (${user?.role})` : ''}</div>
             </HStack>
             {user && logoutPop}
-            <LoginDialog open={openLogin} setOpen={setOpenLogin} setUser={setUser} />
+            <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
         </>
     )
 }
@@ -182,16 +178,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
-    const [user, setUser] = useState<WpUserRecord | undefined>(undefined)
     const [active, setActive] = useState<'editor' | 'player'>('player')
     const screenSize = useScreenSize()
+    const { user, isLoading: isLogging, login, logout, isEditor, isAdmin } = useAuth()
+
+    useEffect(() => {
+        if (user) console.log(`${user} successfully logged in`)
+        else console.log(`Logout successful`)
+    }, [user])
 
     // const [initialize, setInitialize] = useState<boolean>(true)
 
     //DASHBOARD WARNINGS
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { scoreList, loadedScore, loadScore, isLoading: loadingScore } = useScoreReader(dataSource)
+    const { scoreList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
     const dashboardFunctions: DashboardFunctionsType = {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
@@ -268,17 +269,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             })
     }
 
-    // On initial render, check if the user is logged in to the WordPress site and set state accordingly.
-    useEffect(() => {
-        const getUser = async () => {
-            const result = await wpFunc.user.getUser()
-            if (result && result['logged_in']) {
-                setUser(result?.user)
-            }
-        }
-        getUser()
-    }, [])
-
     useEffect(() => {
         debug(`New score imported, title=${loadedScore?.title} with ${loadedScore?.systems.length} systems`)
         if (loadedScore) {
@@ -342,7 +332,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const editorWindow = score && (
         <EditorWindow
             visible={active == 'editor'}
-            loading={loadingScore}
+            loading={isLoadingScore}
             score={score}
             currentScoreId={currentScoreId}
             labels={labels}
@@ -394,7 +384,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
                 <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
                     <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
-                        <NavHeader expanded={isExpandedSidenav} user={user} setUser={setUser} />
+                        <NavHeader expanded={isExpandedSidenav} user={user} login={login} logout={logout} />
                     </Sidenav.Header>
                     <Sidenav.Body>
                         <MainMenu
