@@ -80,6 +80,7 @@ export function parseLaras(content: string): ParserReturnValue {
                     index: score.systems.length,
                     editorGroup: [],
                     staffs: {},
+                    kempli: { state: 'notation' },
                     colWidths: [],
                     execution: [
                         {
@@ -121,7 +122,7 @@ export function parseLaras(content: string): ParserReturnValue {
 
     const processedScore = postProcess(score)
 
-    const returnValue: ParserReturnValue = { score, errors: [], postProcessing: [], tree }
+    const returnValue: ParserReturnValue = { score: processedScore, errors: [], postProcessing: [], tree }
 
     return returnValue
 }

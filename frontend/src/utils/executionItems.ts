@@ -2,9 +2,16 @@ import _ from 'lodash'
 import type { ExecutionItem } from '../typing/execution'
 
 export function executionItemSeqId(item: ExecutionItem) {
-    const typeSeq = { loop: 1000, tempo: 2000, dynamics: 3000, wait: 4000, goto: 5000, sequence: 6000, suppress: 7000 }[
-        item.type
-    ]
+    const typeSeq = {
+        loop: 1000,
+        tempo: 2000,
+        dynamics: 3000,
+        wait: 4000,
+        goto: 5000,
+        sequence: 6000,
+        suppress: 7000,
+        kempli: 8000
+    }[item.type]
     const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.section : 0)
     const passesSeq = 10 * (_.min(item.passes) || 0)
     const iterSeq = 'iterations' in item ? _.min(item.iterations) || 0 : 0

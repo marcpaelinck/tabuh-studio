@@ -44,8 +44,10 @@ export default function EditorWindow({
     playbackState,
     playback
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
-    const { sysToPartLookup, selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } =
-        usePartManager(score, updateParts)
+    const { selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } = usePartManager(
+        score,
+        updateParts
+    )
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
 

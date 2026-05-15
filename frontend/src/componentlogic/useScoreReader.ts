@@ -1,6 +1,5 @@
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { WpApiFunctions } from '../context/contexts'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem } from '../services/apiService'
@@ -31,11 +30,9 @@ export function useScoreReader(source: 'database' | 'file'): {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     isLoading: boolean
 } {
-    const [scoreInfo, setScoreinfo] = useState<ScoreInfo | undefined>(undefined)
     const [scoreList, setScoreList] = useState<ScoreInfo[]>([])
     const [loadedScore, setScore] = useState<Score>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const wpFunc = useContext(WpApiFunctions)
 
     useEffect(() => {
         if (source == 'database') loadScoreListFromDb()
@@ -49,7 +46,6 @@ export function useScoreReader(source: 'database' | 'file'): {
             case 'JSON':
                 if (source == 'database') loadScoreFromDb(newScoreInfo)
                 else if (source == 'file') loadScoreFromFile(newScoreInfo)
-                setScoreinfo(newScoreInfo)
 
                 break
             case 'Laras':

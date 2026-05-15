@@ -5,7 +5,7 @@ import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
-import { useContext, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
+import { useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
@@ -38,7 +38,7 @@ import { cycleValidation } from '../componentlogic/validationManager'
 import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
-import { DashboardFunctions, ScoreFunctions, WpApiFunctions } from '../context/contexts'
+import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
 import type { ScoreMenuOption } from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
@@ -70,8 +70,6 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
     const model = SchemaModel<FormValue>({ username: StringType().isRequired(), password: StringType().isRequired() })
 
     const [formValue, setFormValue] = useState<Record<string, any>>({ username: '', password: '' })
-    const [error, setError] = useState<string | null>(null)
-    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async () => {
         if (!formRef.current) return
@@ -83,7 +81,7 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
             await login(formValue.username as string, formValue.password as string)
         } catch (err) {
             console.error('Login failed')
-            setError(err instanceof Error ? err.message : 'Login failed')
+            // setError(err instanceof Error ? err.message : 'Login failed')
         } finally {
             setOpen(false)
         }
@@ -131,7 +129,6 @@ interface NavHeaderProps {
 function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [logoutMenu, setLogoutMenu] = useState<boolean>(false)
-    const wpFunc = useContext(WpApiFunctions)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -180,7 +177,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [active, setActive] = useState<'editor' | 'player'>('player')
     const screenSize = useScreenSize()
-    const { user, isLoading: isLogging, login, logout, isEditor, isAdmin } = useAuth()
+    const { user, login, logout } = useAuth()
 
     useEffect(() => {
         if (user) console.log(`${user} successfully logged in`)
@@ -201,7 +198,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         useScoreManager(dashboardFunctions)
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
     const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
-    const wpFunc = useContext(WpApiFunctions)
 
     const [expanded, setExpanded] = useState<Record<UUID, boolean>>({})
     const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)

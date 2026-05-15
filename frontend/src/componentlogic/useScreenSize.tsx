@@ -31,7 +31,6 @@ export function useScreenSize() {
 
     useEffect(() => {
         const handleResize = () => {
-            const currentScreensize = currentScreenSize()
             setScreenSize(currentScreenSize())
         }
         window.addEventListener('resize', handleResize)

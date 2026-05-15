@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import {
-    useContext,
     useEffect,
     useMemo,
     useRef,
@@ -12,9 +11,7 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { castNotation } from '../../componentlogic/castingRulesManager'
-import { defaultBeatFrequency, editorFontSize, noCursor, positionConfigs } from '../../config/config'
-import { ScoreFunctions, type ScoreFunctionsType } from '../../context/contexts'
+import { defaultBeatFrequency, editorFontSize, positionConfigs } from '../../config/config'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
@@ -24,9 +21,7 @@ import type {
     PlaybackType
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
-import { notation2text } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import type { GridInfo } from './_types'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
@@ -61,10 +56,6 @@ export function SystemNode({
     ...props
 }: EditorSystemProps): ReactNode {
     const systemUuid = systemData.uuid
-    const grid = useRef<GridInfo>({ maxRowId: 0, maxColId: 0, cells: {} })
-    const nullpointer = useRef<HTMLTextAreaElement | null>(null)
-    const [highlightedMeasure, setHighlightedMeasure] = useState<EditorCellCursor>(noCursor)
-    const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCellCursor | null>(null)
 
@@ -79,20 +70,20 @@ export function SystemNode({
 
     // Fills the notation of the given measure (colId) for all grouped instruments
     // by casting the given notation for each instrument.
-    function applyRules(notation: string[], rowIdx: number, colIdx: number, cached: boolean) {
-        // Input should currently come from Pemade polos part
-        // TODO add a separate input field for grouped positions
-        if (positions[rowIdx] != 'PEMADE_POLOS') return
-        const newSystemData = { ...systemData }
-        positions.forEach((position) => {
-            if (!systemData.editorGroup.includes(position)) return
-            const newNotation = castNotation(notation, newSystemData.staffs[position]!, positions, colIdx, rowIdx)
-            if (cached) newSystemData.staffs[position]![colIdx].notation_ = newNotation
-            else newSystemData.staffs[position]![colIdx].notation = newNotation
-            debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
-        })
-        scoreFunc.updateSystem(newSystemData)
-    }
+    // function applyRules(notation: string[], rowIdx: number, colIdx: number, cached: boolean) {
+    //     // Input should currently come from Pemade polos part
+    //     // TODO add a separate input field for grouped positions
+    //     if (positions[rowIdx] != 'PEMADE_POLOS') return
+    //     const newSystemData = { ...systemData }
+    //     positions.forEach((position) => {
+    //         if (!systemData.editorGroup.includes(position)) return
+    //         const newNotation = castNotation(notation, newSystemData.staffs[position]!, positions, colIdx, rowIdx)
+    //         if (cached) newSystemData.staffs[position]![colIdx].notation_ = newNotation
+    //         else newSystemData.staffs[position]![colIdx].notation = newNotation
+    //         debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
+    //     })
+    //     scoreFunc.updateSystem(newSystemData)
+    // }
 
     function moveEditorCursor(cursor: EditorCursorParameters) {
         debug(`moveEditorCursor(${JSON.stringify(cursor)}), currsysuuid=${systemData.uuid}`)
