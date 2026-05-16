@@ -23,16 +23,25 @@ app.use(
 
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))
 
-app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }))
+const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500 })
 
-app.use(
-    '/api/auth',
-    rateLimit({
-        windowMs: 15 * 60 * 1000,
-        max: 10,
-        message: { error: 'Too many login attempts, please try again later' }
-    })
-)
+const writeLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 })
+
+const authLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { error: 'Too many login attempts, please try again later' }
+})
+
+// Default limit applies to everything including /api/health
+app.use(readLimit)
+
+// More specific limits override for specific routes
+app.use('/api/auth', authLimit)
+app.use('/api/scores', (req, res, next) => {
+    if (req.method === 'GET') return readLimit(req, res, next)
+    return writeLimit(req, res, next)
+})
 
 app.use(express.json({ limit: '500kb' }))
 app.use(cookieParser())
