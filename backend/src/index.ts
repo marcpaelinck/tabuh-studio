@@ -53,7 +53,7 @@ if (fs.existsSync(frontendPath)) {
 
     // Handle React client-side routing — serve index.html for all
     // non-API routes so that refreshing a page works correctly
-    app.get('*', (req, res) => {
+    app.get('/{*path}', (req, res) => {
         if (!req.path.startsWith('/api/')) {
             res.sendFile(path.join(frontendPath, 'index.html'))
         }
