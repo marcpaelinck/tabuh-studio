@@ -21,6 +21,20 @@ app.use(
     })
 )
 
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                fontSrc: ["'self'", 'data:'],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", 'data:', 'blob:']
+            }
+        }
+    })
+)
+
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))
 
 const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500 })
@@ -58,7 +72,21 @@ app.get('/api/health', (_req, res) => {
 const frontendPath = path.resolve(__dirname, '../../frontend-dist')
 
 if (fs.existsSync(frontendPath)) {
-    app.use(express.static(frontendPath))
+    app.use(
+        express.static(frontendPath, {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith('.woff2')) {
+                    res.setHeader('Content-Type', 'font/woff2')
+                } else if (filePath.endsWith('.woff')) {
+                    res.setHeader('Content-Type', 'font/woff')
+                } else if (filePath.endsWith('.ttf')) {
+                    res.setHeader('Content-Type', 'font/ttf')
+                } else if (filePath.endsWith('.otf')) {
+                    res.setHeader('Content-Type', 'font/otf')
+                }
+            }
+        })
+    )
 
     // Handle React client-side routing — serve index.html for all
     // non-API routes so that refreshing a page works correctly
