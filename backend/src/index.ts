@@ -29,7 +29,9 @@ app.use(
                 fontSrc: ["'self'", 'data:'],
                 scriptSrc: ["'self'", "'unsafe-inline'"],
                 styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", 'data:', 'blob:']
+                imgSrc: ["'self'", 'data:', 'blob:'],
+                workerSrc: ["'self'", 'blob:'],
+                connectSrc: ["'self'"]
             }
         }
     })
