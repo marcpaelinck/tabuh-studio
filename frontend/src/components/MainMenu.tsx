@@ -146,24 +146,39 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
                 <Nav.Item eventKey="file-save">Save</Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="2" title="Instruments" icon={<TsGongIcon height="1em" width="1em" color="black" />}>
+            <Nav.Menu
+                disabled
+                eventKey="2"
+                title="Instruments"
+                icon={<TsGongIcon height="1em" width="1em" color="black" />}>
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
+            <Nav.Menu disabled eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
                 <Nav.Item
+                    disabled
                     active={keyboard == 'regular'}
                     onSelect={() => setKeyboard('regular')}
                     eventKey="keyboard-regular">
                     Regular
                 </Nav.Item>
-                <Nav.Item active={keyboard == 'laras'} onSelect={() => setKeyboard('laras')} eventKey="keyboard-laras">
+                <Nav.Item
+                    disabled
+                    active={keyboard == 'laras'}
+                    onSelect={() => setKeyboard('laras')}
+                    eventKey="keyboard-laras">
                     Laras
                 </Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="4" title="Settings" icon={<IoSettingsOutline />}>
-                <Nav.Item eventKey="settings-instruments">Instrument definitions</Nav.Item>
-                <Nav.Item eventKey="settings-keyboard">Keyboard definitions</Nav.Item>
-                <Nav.Item eventKey="settings-colors">Color schemes</Nav.Item>
+            <Nav.Menu disabled eventKey="4" title="Settings" icon={<IoSettingsOutline />}>
+                <Nav.Item disabled eventKey="settings-instruments">
+                    Instrument definitions
+                </Nav.Item>
+                <Nav.Item disabled eventKey="settings-keyboard">
+                    Keyboard definitions
+                </Nav.Item>
+                <Nav.Item disabled eventKey="settings-colors">
+                    Color schemes
+                </Nav.Item>
             </Nav.Menu>
             {selectScoreDialog}
         </Nav>

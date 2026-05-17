@@ -313,6 +313,7 @@ export function SystemNode({
                     </Col>
                     <Col span={20} id="Notation">
                         <Textarea
+                            disabled
                             ref={notationAreaRef}
                             id={props.id}
                             rows={rows}
