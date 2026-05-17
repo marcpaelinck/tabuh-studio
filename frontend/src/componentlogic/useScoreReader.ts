@@ -128,7 +128,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                 setScoreList(scoreInfoList)
             } else throw new Error('Did not receive score list')
         } catch (err) {
-            console.error('Failed to load score from database:', err)
+            console.error('Failed to load score list from database:', err)
         } finally {
             setIsLoading(false)
         }

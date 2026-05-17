@@ -28,6 +28,7 @@ const scoreSchema = z.object({
 
 router.get('/', async (_req, res: Response) => {
     try {
+        console.log('Submitting query to DB')
         const [rows] = await pool.query<RowDataPacket[]>(
             `SELECT
          s.id,
