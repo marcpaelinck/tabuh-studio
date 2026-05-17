@@ -12,20 +12,20 @@ const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    timezone: 'Z', // store/retrieve dates in UTC
-    typeCast: (field, next) => {
-        // Automatically parse JSON columns into objects
-        if (field.type === 'JSON') {
-            const value = field.string()
-            if (value === null) return null
-            try {
-                return JSON.parse(value)
-            } catch {
-                return value
-            }
-        }
-        return next()
-    }
+    timezone: 'Z' // store/retrieve dates in UTC
+    // typeCast: (field, next) => {
+    //     // Automatically parse JSON columns into objects
+    //     if (field.type === 'JSON') {
+    //         const value = field.string()
+    //         if (value === null) return null
+    //         try {
+    //             return JSON.parse(value)
+    //         } catch {
+    //             return value
+    //         }
+    //     }
+    //     return next()
+    // }
 })
 
 export default pool
