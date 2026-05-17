@@ -41,6 +41,14 @@ router.get('/', async (_req, res: Response) => {
        JOIN users u ON u.id = s.owner_id
        ORDER BY s.created_at DESC`
         )
+        console.log('content of score list:', rows ? rows[0] : rows)
+        // console.log('content type:', typeof record.content)
+        // console.log(
+        //     'content value preview:',
+        //     typeof record.content === 'string'
+        //         ? record.content.substring(0, 50)
+        //         : JSON.stringify(record.content).substring(0, 50)
+        // )
         res.json(rows[0])
     } catch (err) {
         console.error(err)
