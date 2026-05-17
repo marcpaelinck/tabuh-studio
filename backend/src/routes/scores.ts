@@ -41,21 +41,7 @@ router.get('/', async (_req, res: Response) => {
        JOIN users u ON u.id = s.owner_id
        ORDER BY s.created_at DESC`
         )
-        const record = rows[0]
-        // Temporary debug logging
-        console.log('content type:', typeof record.content)
-        console.log(
-            'content value preview:',
-            typeof record.content === 'string'
-                ? record.content.substring(0, 50)
-                : JSON.stringify(record.content).substring(0, 50)
-        )
-
-        // Parse content if mysql2 returned it as a string
-        if (typeof record.content === 'string') {
-            record.content = JSON.parse(record.content)
-        }
-        res.json(record)
+        res.json(rows[0])
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
@@ -75,7 +61,21 @@ router.get('/:id', async (req, res: Response) => {
             res.status(404).json({ error: 'Score not found' })
             return
         }
-        res.json(rows[0])
+        const record = rows[0]
+        // Temporary debug logging
+        console.log('content type:', typeof record.content)
+        console.log(
+            'content value preview:',
+            typeof record.content === 'string'
+                ? record.content.substring(0, 50)
+                : JSON.stringify(record.content).substring(0, 50)
+        )
+
+        // Parse content if mysql2 returned it as a string
+        if (typeof record.content === 'string') {
+            record.content = JSON.parse(record.content)
+        }
+        res.json(record)
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
