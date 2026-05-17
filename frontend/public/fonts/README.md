@@ -1,1 +1,1 @@
-The WOFF font files were generated from the ttf file with fontsquirrel.com
+The WOFF font files were generated from the ttf file with cloudconvert.com
