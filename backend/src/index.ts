@@ -14,13 +14,29 @@ dotenv.config()
 
 const app = express()
 
-// ── Security middleware ───────────────────────────────────────
-app.use(
-    helmet({
-        contentSecurityPolicy: false // adjust later once frontend is working
-    })
-)
+const frontendPath = path.resolve(__dirname, '../../frontend-dist')
 
+// ── Static files — before before everything else ─────────
+
+if (fs.existsSync(frontendPath)) {
+    app.use(
+        express.static(frontendPath, {
+            setHeaders: (res, filePath) => {
+                if (filePath.endsWith('.woff2')) {
+                    res.setHeader('Content-Type', 'font/woff2')
+                } else if (filePath.endsWith('.woff')) {
+                    res.setHeader('Content-Type', 'font/woff')
+                } else if (filePath.endsWith('.ttf')) {
+                    res.setHeader('Content-Type', 'font/ttf')
+                } else if (filePath.endsWith('.otf')) {
+                    res.setHeader('Content-Type', 'font/otf')
+                }
+            }
+        })
+    )
+}
+
+// ── Security middleware ───────────────────────────────────────
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -39,18 +55,24 @@ app.use(
 
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))
 
-const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500 })
+// ── Body parsing and cookies — only needed for API routes ─────
+app.use('/api', express.json({ limit: '500kb' }))
+app.use('/api', cookieParser())
 
-const writeLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 })
+const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false })
+
+const writeLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false })
 
 const authLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
     message: { error: 'Too many login attempts, please try again later' }
 })
 
-// Default limit applies to everything including /api/health
-app.use(readLimit)
+//  ── API rate limiting — only applies to /api/* routes ─────────
+app.use('/api', readLimit)
 
 // More specific limits override for specific routes
 app.use('/api/auth', authLimit)
@@ -58,9 +80,6 @@ app.use('/api/scores', (req, res, next) => {
     if (req.method === 'GET') return readLimit(req, res, next)
     return writeLimit(req, res, next)
 })
-
-app.use(express.json({ limit: '500kb' }))
-app.use(cookieParser())
 
 // ── API routes ────────────────────────────────────────────────
 app.use('/api/auth', authRouter)
@@ -70,26 +89,9 @@ app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' })
 })
 
-// ── Serve frontend static files ───────────────────────────────
-const frontendPath = path.resolve(__dirname, '../../frontend-dist')
+// ── React client-side routing ───────────────────────────────
 
 if (fs.existsSync(frontendPath)) {
-    app.use(
-        express.static(frontendPath, {
-            setHeaders: (res, filePath) => {
-                if (filePath.endsWith('.woff2')) {
-                    res.setHeader('Content-Type', 'font/woff2')
-                } else if (filePath.endsWith('.woff')) {
-                    res.setHeader('Content-Type', 'font/woff')
-                } else if (filePath.endsWith('.ttf')) {
-                    res.setHeader('Content-Type', 'font/ttf')
-                } else if (filePath.endsWith('.otf')) {
-                    res.setHeader('Content-Type', 'font/otf')
-                }
-            }
-        })
-    )
-
     // Handle React client-side routing — serve index.html for all
     // non-API routes so that refreshing a page works correctly
     app.get('/{*path}', (req, res) => {
