@@ -5,7 +5,7 @@ source ~/nodevenv/tabuh-studio/backend/20/bin/activate
 
 echo "── Pulling latest code ──"
 cd ~/tabuh-studio
-git pull origin main
+git pull origin add-backend-project
 
 echo "── Installing dependencies ──"
 cd backend
