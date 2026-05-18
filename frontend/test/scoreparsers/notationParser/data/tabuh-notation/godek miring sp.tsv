@@ -1,0 +1,129 @@
+{INFO notation="godek miring sp" part=full title="Godek Miring SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{GONGAN gineman}
+	{TEMPO 110}
+trompong	i---	a,-i-	--a,-	i-a,-	i--o	e-o-	e--o	i-a,-	i--o	e-o-	e--o	i-a,-	i-o-	i-a,-	u,---	a,---
+
+	{PART kawitan}
+	{LABEL KAWITAN}
+trompong	i---	o---	i---	a,---	i---	o---	e---	o---	i---	o---	e---	o---	i---	a,---	u,---	a,---
+gangsa p	i.io	.i.o	i.io	.i.o	io.i	o.io	.oi.	oi.o	io.i	o.io	.oi.	oi.o	io.i	o.eo	.oi.	oi.o
+gangsa s	ueu.	eue.	ueu.	eue.	u.eu	.eu.	e.ue	.ue.	u.eu	.eu.	e.ue	.ue.	u.e.	au.a	u.ue	.ue.
+calung	i	o	i	a	i	o	e	o	i	o	e	o	i	a	u	a
+jegogan	i		i		i		e		i		e		i		u
+gong	G
+	{GOTO TRANSITION_TO_PENGAWAK passes=[3]}
+
+	# angsel
+trompong	i---	o---	i---	a,---	i---	o---	e---	o---	i---	o---	e---	o---	i---	a,---	u,---	----
+gangsa p	i.io	.i.o	i.io	.i.o	io.i	o.io	.oi.	oi.o	io.i	o.io	.oi.	oi.o	io.i	o.eo	i---	----
+gangsa s	ueu.	eue.	ueu.	eue.	u.eu	.eu.	e.ue	.ue.	u.eu	.eu.	e.ue	.ue.	u.e.	au.a	u---	----
+calung	i	o	i	a	i	o	e	o	i	o	e	o	i	a	u
+jegogan	i		i		i		e		i		e		i		u
+gong	G
+	{GOTO KAWITAN passes=[1,2]}
+
+	{LABEL TRANSITION_TO_PENGAWAK}
+	{SUPPRESS kempli beats=[14,15,16]}
+	{TEMPO 130 beats=14->16}
+trompong	i---	o---	i---	a,---	i---	o---	e---	o---	i---	o---	e---	o---	i-io	e---	e---	o---
+gangsa p	i.io	.i.o	i.io	.i.o	io.i	o.io	.oi.	oi.o	io.i	o.io	.oi.	oi.o	i/.io	e-o-	e---	o---
+gangsa s	ueu.	eue.	ueu.	eue.	u.eu	.eu.	e.ue	.ue.	u.eu	.eu.	e.ue	.ue.	i/.io	e-o-	e---	o---
+calung	i	o	i	a	i	o	e	o	i	o	e	o	i/.io	e-o-	e---	o---
+jegogan	i		i		i		e		i		e		i
+gong	G
+
+	{TEMPO 80 beats=7->16}
+	{SUPPRESS kempli}
+trompong	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
+ga/ca	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
+jegogan	e								e
+
+
+	{TEMPO 50 beats=1->8}
+	{SUPPRESS kempli}
+trompong	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---
+ga/ca	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---
+jegogan	i
+
+	{PART pengawak}
+	{LABEL PENGAWAK}
+	{TEMPO 55 beats=1->8}
+trompong	u,-------	a,---i-a,-	u,-a,-u,---	e,---o,-u,-	e,-----u,-	a,---i-a,-	u,-a,-u,---	e,-u,-a,---
+gangsa p	u.ua.u.a	u.ua.u.a	u.ua.u.a	uo.io.io	.i.oi.io	.au.au.a	u.ua.u.a	u.ua.u.a
+gangsa s	oio.ioi.	oio.ioi.	oio.ioi.	o.e.oe.o	e.oe.e.o	e.oi.oi.	oio.ioi.	oio.ioi.
+calung	u-------	a---i-a-	u-a-u---	e---o-u-	e-----u-	a---i-a-	u-a-u---	e-u-a---
+jegogan	u	a	u	e	e	a	u	e
+gong	G
+
+
+	{TEMPO 57 beats=1->8}
+trompong	u,-------	a,-i-u,-a,-	i---o-e-	o---i---	a,-----i-	o---e-o-	i---o-i-	a,-o-i-a,-
+gangsa p	u.ua.u.a	ua.ua.ua	.u.au.ua	.ia.ia.i	a.ai.a.i	a.ii.i.o	i.io.i.o	iau.au.a
+gangsa s	oio.ioi.	o.io.io.	ioi.oio.	i.eo.eo.	eoe.oeo.	e.i.e.eo	.e.oe.eo	.eoi.oi.
+calung	u-------	a-i-u-a-	i---o-e-	o---i---	a-----i-	o---e-o-	i---o-i-	a-o-i-a-
+jegogan	u	a	i	o	a	o	i	a
+
+	{TEMPO ->50 beat=7->8 passes=[1,2]}
+	{TEMPO 120 beats=4->8 passes=[3]}
+trompong	u,-------	a,---i-a,-	u,-a,-u,---	e,---o,-u,-	e,-----u,-	a,---i-a,-	u,-a,-u,---	e,-u,-a,---
+gangsa p	u.ua.u.a	u.ua.u.a	u.ua.u.a	uo.io.io	.i.oi.io	.au.au.a	u.ua.u.a	u.ua.u.a
+gangsa s	oio.ioi.	oio.ioi.	oio.ioi.	o.e.oe.o	e.oe.e.o	e.oi.oi.	oio.ioi.	oio.ioi.
+calung	u-------	a---i-a-	u-a-u---	e---o-u-	e-----u-	a---i-a-	u-a-u---	e-u-a---
+jegogan	u	a	u	e	e	a	u	e
+	{GOTO PENGAWAK passes=[1,2]}
+
+	# Transition to pengecet
+	{TEMPO 120->150 beats=1->2}
+	{TEMPO 120 beats=5->8}
+	{SUPPRESS kempli}
+trompong	u,---a,---	i---o-i-	a,-i-o---	i---a,---	e/...e---	o---e/...	e---o---	e---o---
+ga/ca	u---a---	i---o-i-	a-i-o---	i---a---	e/...e---	o---e/...	e---o---	e---o---
+jegogan	u				e
+gong	G
+
+
+	{TEMPO 100 beats=7->8}
+	{SUPPRESS kempli}
+trompong	e/...e---	o---e/...	e---o---	e-o-i-a,-	i---i-ii?	i-o-i-a,-	u,-a,-i-a,-	i---o---
+ga/ca	e/...e---	o---e/...	e---o---	e-o-i-a-	i---i-ii?	i-o-i-a-	u-a-i-a-	i---o---
+jegogan	e				i
+
+	{PART pengecet}
+	{LABEL PENGECET}
+trompong	i---	--a,-	i-u,-	a,-i-	--a,-	--i-	a,-o-	i-a,-	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a,-
+gangsa p	i---	----	--aa	.au.	a.ua	.au.	.a.u	a.ua	.u.a	u.ua	.o.i	o.io	.i.o	i.io	.a.u	a.ua
+gangsa s	i---	----	--oo	.o.e	oe.o	eo.e	o.io	.io.	ioi.	oio.	i.e.	oe.o	e.eo	.e.o	e.io	.io.
+calung	i---	--a-	i-u-	a-i-	--a-	--i-	a-o-	i-a-	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a-
+jegogan	i		i		a		a		a		e		o		e
+gong	G
+	{GOTO FINAL passes=[3]}
+
+
+trompong	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a,-	i---	u,-a,-	i---	a,---	u,-a,-	i-a,-	i---	o---
+gangsa p	.u.a	u.ua	.o.i	o.io	.i.o	i.io	.a.u	a.ua	.u.a	u.ua	.au.	au.a	u.ua	i-a-	i---	o---
+gangsa s	ioi.	oio.	i.e.	oe.o	e.eo	.e.o	e.io	.io.	ioi.	oio.	i.oi	.oi.	o.oe	i-e-	i---	o---
+calung	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a-	i---	u-a-	i---	a---	u-a-	i-a-	i---	o---
+jegogan	a		e		o		e		i		i		u		i
+	{GOTO PENGECET passes=[1,2]}
+
+	{LABEL FINAL}
+trompong	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a,-	i---	u,-a,-	i---	a,---	u,/.io	e-o-	e---	o---
+gangsa p	.u.a	u.ua	.o.i	o.io	.i.o	i.io	.a.u	a.ua	.u.a	u.ua	.au.	au.a	u/.io	e-o-	e---	o---
+gangsa s	ioi.	oio.	i.e.	oe.o	e.eo	.e.o	e.io	.io.	ioi.	oio.	i.oi	.oi.	o/.io	e-o-	e---	o---
+calung	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a-	i---	u-a-	i---	a---	u/.io	e-o-	e---	o---
+jegogan	a		e		o		e		i		i		u
+
+
+	{SUPPRESS kempli}
+trompong	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
+tr/ga/ca	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
+jegogan	e								e
+
+
+	{SUPPRESS kempli}
+	{TEMPO 60 beats=1->8}
+trompong	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---	u,---
+ga/ca	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---	u---
+jegogan	i								u
+gong									G

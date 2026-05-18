@@ -1,0 +1,331 @@
+{INFO notation="hujan mas" part=full title="Hujan Mas" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{PART 1}
+	{TEMPO 130}
+	{GONGAN kebyar}
+ga/ugal	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-
+pen/cal/jeg	u								u
+
+ugal	u	a	e	i	u	a	e	i
+gangsa_p	u,.e,.	u,e,.u,	e,.i.	i.i.	u,.e,.	u,e,.u,	e,.i.	i.i.
+gangsa_s	.u,.a,	u,.a,u,	.o.a,	.o.a,	.u,.a,	u,.a,u,	.o.a,	.o.a,
+penyacah	u	a	e	i	u	a	e	i
+calung	u	a	e	i	u	a	e	i
+jegogan	u		e		u		e
+
+ugal	u,	i	a,	o	i	e	o	a,	i	u,	a,---
+gangsa_p	u,.a,.	u,a,.u,	a,.i.	a,i.a,	i.o.	io.i	o.i.	oi.o	i.a,a,	.a,.i	a,---
+gangsa_s	.u,.e,	u,.e,u,	.a,.u,	a,.u,a,	.i.a,	i.a,i	.o.e	o.eo	..ee	.eo.	e---
+penyacah	u,	i	a,	o	i	e	o	a,	i	u,	a,
+calung	u		a		i		o		i		a
+jegogan	u				i				i		a
+gongs																			G
+	{WAIT 3}
+
+	{PART 2}
+	{GONGAN kebyar}
+	{SUPPRESS penyacah}
+ga/ugal	a,--a,	a,-a,-	a,-i-	o-e-	o-e-	i-o-	e-o-	i-a,-
+calung	a				o
+jegogan	a				o
+
+ugal	i	o	i	o	i	u	i	u	i	u	a	e	u
+gangsa_p	i.a,i	.ia,.	i.a,i	.ia,.	ii-u,	-u,-a,	ii-u,	-u,-a,	i.i.	ia,.i	a,.a,.	a,u,.a,	u,---
+gangsa_s	.oe.	o.eo	.oe.	o.eo	uu-o	-o-e	uu-o	-o-e	io.o	.eo.	ei.i	.oi.	o---
+penyacah	i	o	i	o	i	u	i	u	i	u	a	e	u
+calung	i		a		i		u		i		a		u
+jegogan	i				i				i				u
+gongs													G
+	{WAIT 3}
+
+	{PART 3}
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+	{TEMPO 90}
+ga/ugal	u,/....u,u,/....u,/.u,/.u,:---	u,-----	e,-u,-a,-i-a,	u,------	a,/....a,a,/....a,/.a,/.a,:---	a,-----	u,-a,-e,-u,	a,
+pen/cal/jeg	...................	u,		u,	...................	a,		a,
+	{WAIT 2}
+
+	{PART 4}
+	{GONGAN kebyar}
+	{TEMPO 130}
+ga/ugal	--i-	o-e-
+
+ugal	u	a	e	i	u	a	e	i	u	o	e	i	o	a	i	u
+gangsa_p	u.e.	ue.u	e.u.	i<.a.	u.e.	ue.u	e.u.	i<.a.	u.e.	ue.u	e.o.	eo.e	o.i.	oi.o	i.a,.	ia,.i
+gangsa_s	.u.a	u.au	.e.a	.u.e	.u.a	u.au	.e.a	.u.e	.u.a	u.au	.e.u	e.ue	.o.e	o.eo	.i.o	i.oi
+penyacah	u	a	e	i	u	a	e	i	u	o	e	i	o	a	i	u
+jegogan	u		e		u		e		u		e		o		i
+calung	u		e		u		e		u				o
+
+ugal	a	o	i	e	o	u	e	a	u	a	e	i	u	a	e	i
+gangsa_p	a,.i.	a,i.a,	i.o.	io.i	o.e.	oe.o	e.u.	eu.e	u.e.	ue.u	e.u.	i<.a.	u.e.	ue.u	e.u.	i<.a.
+gangsa_s	.a,.u,	a,.u,a,	.i.a,	i.a,i	.o.i	o.io	.e.o	e.oe	.u.a	u.au	.e.a	.u.e	.u.a	u.au	.e.a	.u.e
+penyacah	a	o	i	e	o	u	e	a	u	a	e	i	u	a	e	i
+calung	a		i		o		e		u		e		u		e
+jegogan	a				o				u		e		u		e
+
+ugal	u	o	e	i	o	a	o	e	u	o	e	i	o	a	o	e	u
+gangsa_p	u.e.	ue.u	e.o.	eo.e	o.a,a,	-io-	a,a,-i	o.e.	u.e.	ue.u	e.o.	eo.e	o.a,a,	-io-	a,a,-i	o-e-	u---
+gangsa_s	.u.a	u.au	.e.u	e.ue	..ee	-ua-	ee-u	a-i<i<	-u.a	u.au	.e.u	e.ue	..ee	-ua-	ee-u	a-i<-	u---
+penyacah	u	o	e	i	o	a	o	e	u	o	e	i	o	a	o	e	u
+calung	u		e		o		a		u		e		o		a		u
+jegogan	u				o				u				o				u
+gongs																	G
+	{WAIT 3}
+
+	{PART 5}
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+ga/ugal	u/...
+	{WAIT 1}
+
+ugal	u	a	e	i	u	a	e	i	u
+gangsa_p	u.e.	ue.u	e.u.	i<.a.	u.e.	ue.u	e.u.	i<.a.	u---
+gangsa_s	uu.a	u.au	.e.a	.u.e	.u.a	u.au	.e.a	.u.e	u---
+penyacah	u	a	e	i	u	a	e	i	u
+calung	u		e		u		e		u
+jegogan	u		e		u		e		u
+gongs									G
+	{WAIT 2}
+
+	{PART 6}
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+ga/ugal	o--e	u--u	u-u-	u-a-	u-a-	u-e-	o-e-	o-i-	a,-i-	u,-a,-	i-o-	i-a,-
+pen/cal/jeg		u
+
+ugal	u	a	e	i	u	a	e	i	u
+gangsa_p	u,.e,.	u,e,.u,	e,.i.	i.i.	u,.e,.	u,e,.u,	e,.i.	i.i.	u,---
+gangsa_s	.u,.a,	u,.a,u,	.o.a,	.o.a,	.u,.a,	u,.a,u,	.o.a,	.o.a,	o---
+penyacah	u	a	e	i	u	a	e	i	u
+calung	u		e		u		e
+jegogan	u		e		u		e
+gongs									G
+	{WAIT 1}
+
+	{PART 7}
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+ga/ugal	--i-	o-e-
+
+
+ugal	u	o	e	i	o
+gangsa_p	u.e.	ue.u	e.o.	eo.e	o---
+gangsa_s	.u.a	u.au	.e.u	e.ue	a---
+penyacah	u	o	e	i	o
+cal/jeg	u		e		o
+gongs					G
+	{WAIT 1}
+
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+ga/ugal	--i-	o-e-
+
+ugal	u	o	e	i	o	a,	i	u,	a,
+gangsa_p	u.e.	ue.u	e.o.	eo.e	o.i.	oi.o	i.a,.	ia,.i	a,---
+gangsa_s	.u.a	u.au	.e.u	e.ue	.o.e	o.eo	.i.o	i.oi	e---
+penyacah	u	o	e	i	o	a,	i	u,	a,
+calung	u		e		o		i		a
+jegogan	u				o				a
+gongs									G
+	{WAIT 2}
+
+	{PART 8}
+	{GONGAN kebyar}
+	{SUPPRESS [penyacah, calung, jegogan] beat=1}
+gangsa_p	--u,-	--a,-	i-a,-	u,.a,.	o.i.
+gangsa_s	--o-	--e-	u-ee	.u,.i	.a,.o
+
+	{LABEL LOOP8}
+	{SUPPRESS kempli beats=[6,7,9]}
+	{VALIDATION ignore=beat-duration}
+ugal	e	u	e	u	e/...			a,
+gangsa_p	e.oe	.eo.	e.oe	.eo.	e.o.	..a,.	a,.i	a,a,.a,	.a,.i
+gangsa_s	.ua.	u.au	.ua.	u.au	e.a.	..e.	eo.	ee.e	.eo.
+penyacah	e	u	e	u	e/...			a,
+calung	e		e		e			a
+jegogan	e		e		e			a
+
+	{SUPPRESS kempli beats=[2]}
+ugal	a,		a,	a,	u,	a,	u,	a,	o
+gangsa_p	a,a,.a,	.a,.i	a,.e,.	a,.u,a,	.a,u,.	a,.u,a,	.a,u,.	a,.a,.	o.i.
+gangsa_s	ee.e	.eoi	.o,.u,	.io.	i.oi	.io.	i.oi	.u,.i	.a,.o
+penyacah	a,		a,	a,	u,	a,	u,	a,	o
+calung	a		a	a		a		a
+jegogan	a		a	a		a		a
+	{GOTO LOOP8 passes=[1,2]}
+
+ga/ugal	e...
+calung	e
+jegogan	e
+gongs	G
+	{WAIT 1}
+
+	{PART 9}
+	{LABEL LOOP9}
+	{DYNAMICS f positions=gangsa pass=3}
+ugal	e	u	e	u	e	u	e	o
+gangsa_p	eee.	e.e.	e.oe	.eo.	e.oe	.eo.	e.oe	.eo.
+gangsa_s	i<eeu	.u.u	.ua.	u.au	.ua.	u.au	.ua.	u.eo
+penyacah	e	u	e	u	e	u	e	o
+calung	e		u		e		o
+jegogan	e		u		e		o
+gongs	G
+
+ugal	i	o	i	o	i	o	i	a,
+gangsa_p	iii.	i.i.	i.a,i	.ia,.	i.a,i	.ia,.	i.a,i	.ia,.
+gangsa_s	.o.o	.o.o	.oe.	o.eo	.oe.	o.eo	.oe.	o.ia,
+penyacah	i	o	i	o	i	o	i	a,
+calung	i		o		i		a
+jegogan	i		o		i		a
+
+ugal	u,	a,	u,	a,	e	u	a
+gangsa_p	u,u,u,.	u,.u,.	u,.a,.	o.i.	e...	u.i<.	a...
+gangsa_s	.a,.a,	.a,.a,	.u,.i	.a,.o	...e	.a.u	....
+penyacah	u,	a,	u,	a,	e	u	a
+calung	u		o		e		a
+jegogan	u		o		e		a
+	{GOTO LOOP9 passes=[1,2]}
+
+	{PART Transition}
+	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
+ugal	e	u	e	o	i	o	i	o	e	u	e	o	i	o	i	o
+gangs	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.
+reyong_13	.io.	io.i	o.io	..u,a,	.u,a,.	u,a,.u,	a,.u,a,	..io	.io.	io.i	o.io	..u,a,	.u,a,.	u,a,.u,	a,.u,a,	..u,.
+reyong_24	eu.e	u.eu	.eu.	e.o.	io.i	o.io	.io.	i.u.	eu.e	u.eu	.eu.	e.o.	io.i	o.io	.io.	i.u.
+penyacah	e	u	e	o	i	o	i	o	e	u	e	o	i	o	i	o
+calung			e		i		i		e		e		i		i
+jegogan			e		i		i		e		e		i		i
+kendang	99.9	(.99	.9(.	9.(.	99.9	(.99	.9(.	9.(.	99.9	(.99	.9(.	9.(.	99.9	(.99	.9(.	9.(.
+gongs					P				T				P
+
+ugal	e	a,	i	o	e	u	a	e	u	o	e	a	u
+gangsa_p	e...	a,a,.a,	i-a,-	i-o-	eee.	eaa.	a.a.	auu.	u.u.	uee.	e.e.	euu.	u
+gangsa_s	i<...	ee.e	u-e-	u-a-	eeeu	.aai<	.i<.i<	.uua	.a.a	.eeu	.u.u	.uua	u
+reyong_1	a,/...	a,a,.a,	..a,-	..u,-	e,---	-a,a,e,	a,e,a,e,	a,u,u,a,	u,a,u,a,	u,e,e,u,	e,u,e,u,	e,u,u,a,	u,
+reyong_2	e/...	ee.e	i.e.	i.o.	e---	-.oi	.ioi	..oe	.eoe	.eei	eiei	e.oe	.
+reyong_3	a/...	ea.a	..a-	..u-	.---	-aau	auau	auua	uaua	u.au	.uau	.uua	u
+reyong_4	e</...	e<e<.e<	i<.e<.	i<.o<.	e<---	-.o<i<	.i<o<i<	.u<u<e<	u<e<u<e<	u<e<e<u<	e<u<e<u<	e<u<u<e<	u<
+penyacah	e	a,	i	o	e	u	a	e	u	o	e	a	u
+calung	e		i		e		a		u		e		u
+jegogan	e		i		e		a		u		e		u
+kendang	9...	((.(	9.(.	9.(.	.8*8	*0)0	)8*0	)9(0	)9-(	(9(9	(9.8	*(9(	9
+gongs	G				G		P		T		P		G
+	{WAIT 3}
+
+	{PART reyongan}
+	{GONGAN kebyar}
+	{DYNAMICS mf positions=[gangsa, reyong, ugal]}
+reyong_13	i-io	.io.	....	....	i-io	.io.	....	....
+reyong_24	u-u.	eu.e	u---	----	u-u.	eu.e	u---	----
+
+	{GONGAN kebyar}
+reyong_13	a,-a,i	.a,i.	ia,.i	a,.a,i	..e,u,	..u,a,	..e,u,	..u,a,	..a,i	.ia,i	..io	..a,i	..io	..a,i	..u,a,	....
+reyong_24	e-e.	oe.o	.eo.	eoe.	o.i.	a,.o.	i.i.	a,.o.	i.e.	oe.e	o.u.	e.e.	o.u.	e.e.	o.o.	i---
+
+	{GONGAN kebyar}
+	{DYNAMICS p beat=5 positions=reyong}
+reyong_13	u,-u,a,	.u,.a,	u,-u,a,	....	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	....
+reyong_24	o-o.	ioi.	o-o.	i---	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o-o.	i---
+
+	{GONGAN kebyar}
+	{DYNAMICS f positions=reyong}
+reyong_13	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,---
+reyong_24	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o---
+	{WAIT 0.3}
+
+	{GONGAN kebyar}
+reyong_13	..e,u,	.e,u,.	u,-u,a,	.u,a,.	a,-e,u,	.e,u,.	u,-a,i	.a,i.	ia,.i	a,.a,i	..io	.io.	oi.o	i.io	....	.i.o
+reyong_24	..i.	a,.ia,	..o.	i.oi	..i.	a,.ia,	..e.	oe.o	.eo.	eoe.	o.u.	eu.e	.ue.	ueu.	e...	.ue.
+
+	{SUPPRESS kempli}
+reyong_13	i
+reyong_24	u
+	{WAIT  3}
+
+	{PART pengecet}
+	{TEMPO 110}
+	{SUPPRESS kempli}
+ugal	i/...	....
+gangs	i/...	....
+
+	{DYNAMICS mp positions=ugal}
+calung	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
+gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.oi	a,a,.i	a,a,.i	a,.e.	e.eo
+gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
+reyong															.xxx	x.b.
+penyacah	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
+calung	i		o		a		i		u		o		a		e
+jegogan	i				a				u				a
+kendang															.8*8	*(9.
+gongs	G				P				T				P
+	{SEQUENCE [REGULAR, REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA_AFTER3, REYONG2_NOGANGSA, REGULAR,
+	REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA_AFTER3, REYONG2_NOGANGSA, REYONG3, REYONG1_AFTER3, REYONG2, END]}
+
+	{LABEL REGULAR}
+	{LOOP 2}
+ugal	i		u	e	a	u	e	a	u	o	e	i	a	u	e	o
+gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.oi	a,a,.i	a,a,.i	a,.e.	e.eo
+gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
+reyong	.xxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxx.	b-xx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+penyacah	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
+calung	i		o		a		i		u		o		a		e
+jegogan	i		o		a		i		u		o		a		e
+kendang	.8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	(9-(	(9(9	(9.8	*(9(
+gongs	G				P				T				P
+
+	{LABEL REYONG1}
+	{COPY REGULAR}
+	{DYNAMICS mf positions=reyong}
+reyong	xxxx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
+kendang	-8*8	*0)8	*(99	----	-8*8	*0)8	*(99	----	-9(9	((9(	(9(9	((9(	(9((?	9-9-	-9(9	(9(-
+
+	{LABEL REYONG1_AFTER3}
+	{COPY REYONG1}
+	{DYNAMICS mf position=reyong}
+reyong_13	..xx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
+reyong_24	i-xx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
+kendang	-8*8	*0)8	*(99	----	-8*8	*0)8	*(99	----	-9(9	((9(	(9(9	((9(	(9((?	9-9-	-9(9	(9(-
+
+
+	{LABEL REYONG1_NOGANGSA}
+	{COPY REYONG1}
+	{SUPPRESS gangsa}
+	{DYNAMICS f positions=reyong}
+
+	{LABEL REYONG1_NOGANGSA_AFTER3}
+	{COPY REYONG1_AFTER3}
+	{SUPPRESS gangsa}
+	{DYNAMICS f positions=reyong}
+
+	{LABEL REYONG2}
+	{COPY REGULAR}
+	{DYNAMICS f positions=reyong}
+reyong	.xxx	xxxx	x.bb	-xx.	bbbb	bbbb	b/.bb/	.xx.	xxxx	xxxx	xbb/b	b/.bb/	.bb/.	b-b-	..b/.	b/.b/.
+kendang	-8*8	*0)8	*.99	---8	*(99	9999	9.((	-8*.	9(((	((((	(9(9	((9(	(9(9?	9-9-	-9(9	(9(-
+
+	{LABEL REYONG2_NOGANGSA}
+	{COPY REYONG2}
+	{DYNAMICS f positions=reyong}
+	{SUPPRESS gangsa}
+
+	{LABEL REYONG3}
+	{COPY REGULAR}
+	{LOOP 2}
+	{DYNAMICS mf positions=reyong}
+reyong_13	.xxx	xxxx	x.a,i	.a,.i	a,-xx	xxxx	x.u,a,	.u,.a,	u,-xx	xxxx	x.a,i	.a,.i	a,iio	....	.u,u,a,	.u,u,a,
+reyong_24	.xxx	xxxx	x.e.	oeo.	e-xx	xxxx	x.o.	ioi.	o-xx	xxxx	x.e.	oeo.	euu.	e---	-oo.	ioo.
+
+	{LABEL REYONG3_NOGANGSA}
+	{COPY REYONG3}
+	{LOOP 2}
+	{SUPPRESS gangsa}
+	{DYNAMICS f positions=reyong}
+
+	{LABEL END}
+ga/ugal	i
+reyong	b
+pen/ca/jeg	i
+kendang	9
+gongs	G

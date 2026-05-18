@@ -1,0 +1,286 @@
+import { type Dispatch, type KeyboardEvent, type RefObject } from 'react'
+import type { ElementWithValueTracker } from '../components/editor/_types'
+import { type NavigationAction } from '../config/config'
+import { symbolValidationUtils } from '../utils/alphabet'
+import { debug } from '../utils/debugger'
+
+type KeyType =
+    | 'ArrowUp'
+    | 'ArrowDown'
+    | 'ArrowLeft'
+    | 'ArrowRight'
+    | 'Backspace'
+    | 'Delete'
+    | 'Shift'
+    | 'Ctrl'
+    | 'Alt'
+    | 'Home'
+    | 'End'
+    | 'PgUp'
+    | 'PgDn'
+type Action =
+    | 'pop-left-char'
+    | 'pop-left-symbol'
+    | 'pop-right-char'
+    | 'pop-right-symbol'
+    | 'insert'
+    | 'cursorleft'
+    | 'cursorright'
+    | 'cellup'
+    | 'celldown'
+    | 'cellleft'
+    | 'cellright'
+    | 'rowstart'
+    | 'rowend'
+    | 'firstrow'
+    | 'lastrow'
+    | 'ignore'
+type ActionRecord = {
+    keys: KeyType[]
+    left: RegExp | null // regex describing the character(s) left of the cursor
+    right: RegExp | null // regex describing the character(s) right of the cursor
+    action: Action
+    value?: string | number
+}
+// Used to find a match with an ActionRecord elements
+type SearchRecord = { keys: KeyType[]; left: string; right: string; selection: string }
+
+// Definition of keyboard codes that should be intercepted + action to perform.
+// keys: key combination.
+// left, right: regex to match the strings to the left and right of the cursor (null = don't care).
+// action: action code
+// value: optional action parameter
+const keyActions: ActionRecord[] = [
+    // TYPING
+    // octavate upward
+    { keys: ['ArrowUp', 'Alt'], left: /[aeiours],$/, right: null, action: 'pop-left-char' },
+    { keys: ['ArrowUp', 'Alt'], left: /[aeiours]$/, right: null, action: 'insert', value: '<' },
+    { keys: ['ArrowUp', 'Alt'], left: /[^aeiours,]$|^$/, right: null, action: 'ignore' },
+    // octavate downward
+    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]<$/, right: null, action: 'pop-left-char' },
+    { keys: ['ArrowDown', 'Alt'], left: /[aeiours]$/, right: null, action: 'insert', value: ',' },
+    { keys: ['ArrowDown', 'Alt'], left: /[^aeiours<]$|^$/, right: null, action: 'ignore' },
+    // deletion
+    { keys: ['Backspace'], left: /.+/, right: null, action: 'pop-left-symbol' },
+    { keys: ['Delete'], left: null, right: /.+/, action: 'pop-right-symbol' },
+    // NAVIGATION
+    // navigate within a cell: ensure that cursor skips entire (compound) symbols
+    { keys: ['ArrowLeft'], left: /.+$/, right: null, action: 'cursorleft' },
+    { keys: ['ArrowRight'], left: null, right: /.+$/, action: 'cursorright' },
+    // move cell selection left or right
+    { keys: ['ArrowLeft'], left: /^$/, right: null, action: 'cellleft' },
+    { keys: ['ArrowLeft', 'Ctrl'], left: null, right: null, action: 'cellleft' },
+    { keys: ['ArrowRight'], left: null, right: /^$/, action: 'cellright' },
+    { keys: ['ArrowRight', 'Ctrl'], left: null, right: null, action: 'cellright' },
+    // move cell selection up or down
+    { keys: ['ArrowUp'], left: null, right: null, action: 'cellup' },
+    { keys: ['ArrowDown'], left: null, right: null, action: 'celldown' },
+    // move cell selection to top or bottom of column / start or end of row
+    { keys: ['ArrowUp', 'Ctrl'], left: null, right: null, action: 'firstrow' },
+    { keys: ['ArrowDown', 'Ctrl'], left: null, right: null, action: 'lastrow' },
+    { keys: ['Home', 'Ctrl'], left: null, right: null, action: 'rowstart' },
+    { keys: ['End', 'Ctrl'], left: null, right: null, action: 'rowend' }
+]
+
+const match = (event: SearchRecord, action: ActionRecord) => {
+    const keysMatch =
+        event.keys.length === action.keys.length &&
+        event.keys.every((x) => action.keys.includes(x)) &&
+        action.keys.every((x) => event.keys.includes(x))
+    if (!keysMatch) return false
+    const leftMatch = !action.left || action.left.test(event.left)
+    if (!leftMatch) return false
+    const rightMatch = !action.right || action.right.test(event.right)
+    return rightMatch
+}
+
+export const useKeyboardListener = (
+    id: string,
+    ref: RefObject<HTMLTextAreaElement | null>,
+    validSymbols: string[],
+    navigate: (action: NavigationAction) => RefObject<HTMLTextAreaElement | null>,
+    updateNotation: Dispatch<string[]>
+) => {
+    // Defined as hook in order to be able to use states, such as keyboard definitions, 'smart edit' or 'octavation on'.
+    const { validRegExpCell, validRegExpByLength, validKeystrokes } = symbolValidationUtils(validSymbols)
+
+    // Checks for a matching valid symbol at the beginning (direction==1) or end (direction==-1) of a string.
+    // Returns the length of the symbol if a match is found, null otherwise.
+    function matchValidChar(contentToMatch: string, direction: -1 | 1): number | null {
+        const regexStart = direction > 0 ? '^' : ''
+        const regexEnd = direction > 0 ? '' : '$'
+
+        for (const length of Object.keys(validRegExpByLength).sort().reverse()) {
+            // validRegExpByLength[length] matches all valid symbols of a given length.
+            const regExp = RegExp(regexStart + '(' + validRegExpByLength[length] + ')' + regexEnd)
+            if (regExp.test(contentToMatch)) return Number(length)
+        }
+        return null
+    }
+
+    function onChanged(target: ElementWithValueTracker) {
+        const [selStart, selEnd] = [target.selectionStart, target.selectionEnd]
+        target.select()
+        const cellValue = document.getSelection()?.toString() || ''
+        target._valueTracker.setValue(cellValue)
+        target.selectionStart = selStart
+        target.selectionEnd = selEnd
+        const matches = cellValue ? cellValue.matchAll(validRegExpCell) : []
+        const notation = [...matches.map((el) => el[0])]
+        if (cellValue && notation.join('') != cellValue)
+            // const notation = cellValue ? validRegExpCell.exec(cellValue) : []
+            console.error(`${id}: invalid cell content: ${cellValue}. Valids are: ${validSymbols.join(' ')}`)
+        if (notation.length == 0) updateNotation([])
+        else updateNotation(notation)
+        debug(JSON.stringify(notation))
+        target.dispatchEvent(new Event('change'))
+    }
+
+    function keyboardListener(event: KeyboardEvent<HTMLTextAreaElement>) {
+        var changed = false
+        debug(`key=${event.code} selectionEnd=${ref.current?.selectionEnd}`)
+        // Check that target exists
+        if (!ref.current || event.target !== ref.current) return
+        if (['Deat'].includes(event.key)) return
+        const target: ElementWithValueTracker = ref.current as ElementWithValueTracker
+
+        if (event.key.length == 1 && !event.altKey && !event.ctrlKey) {
+            // Character has been typed. Check validity.
+            if (!validKeystrokes.includes(event.key)) {
+                event.preventDefault()
+                return
+            } else if (event.type == 'keyup') {
+                // Ignore keydown event, target content will only change on keyup.
+                event.preventDefault()
+                onChanged(target)
+            }
+        }
+        // The following code only considers keydown events
+        if (event.type == 'keyup') return
+
+        // Create a search record to search a matching keyAction record
+        const eventRecord: SearchRecord = {
+            keys: [
+                event.key,
+                event.shiftKey ? 'Shift' : null,
+                event.ctrlKey ? 'Ctrl' : null,
+                event.altKey ? 'Alt' : null
+            ].filter((v) => v != null) as KeyType[],
+            left: target.value.slice(0, target.selectionStart), // string to the left of the cursor
+            right: target.value.slice(target.selectionEnd), // string to the right of the cursor
+            selection: target.value.slice(target.selectionStart, target.selectionEnd)
+        }
+        // Find a matching keyAction record and perform the corresponding key action if found
+        for (const keyAction of keyActions) {
+            if (match(eventRecord, keyAction)) {
+                debug('pass')
+                event.preventDefault()
+
+                if (keyAction.action == 'insert') {
+                    if (typeof keyAction.value == 'string') {
+                        // Check that insert results in a valid symbol
+                        const isValid =
+                            (!keyAction.left || matchValidChar(eventRecord.left + keyAction.value, -1)) &&
+                            (!keyAction.right || matchValidChar(keyAction.value + eventRecord.right, 1))
+                        if (!isValid) break
+                        target.setRangeText(keyAction.value)
+                        target.selectionStart += 1
+                        target.selectionEnd = target.selectionStart
+                        changed = true
+                        debug(`INSERT ${keyAction.value}`)
+                    } else debug('unexpected null keyAction value(s)')
+                    break
+                }
+                if (keyAction.action == 'pop-left-char') {
+                    // Check that pop action results in a valid symbol
+                    const leftEnd = eventRecord.left.length - 1
+                    const isValid =
+                        !keyAction.left || leftEnd <= 0 || matchValidChar(eventRecord.left.slice(0, leftEnd), -1)
+                    if (!isValid) break
+                    target.selectionStart -= 1
+                    debug(`REMOVE LEFT ${target.value.slice(target.selectionStart, target.selectionEnd)}`)
+                    target.setRangeText('')
+                    changed = true
+                    break
+                }
+                if (['pop-left-symbol', 'pop-right-symbol'].includes(keyAction.action)) {
+                    // Delete the selection if any, otherwise the symbol left/right of the cursor.
+                    var [selStart, selEnd] = [target.selectionStart, target.selectionEnd]
+                    var [left, deleteTarget, right] = [eventRecord.left, eventRecord.selection, eventRecord.right]
+                    if (!deleteTarget) {
+                        // No selection. Select symbol closest to the cursor.
+                        if (keyAction.action == 'pop-left-symbol') {
+                            const targetLen = matchValidChar(left, -1)
+                            selStart -= targetLen || 0
+                        } else {
+                            const targetLen = matchValidChar(right, 1)
+                            selEnd += targetLen || 0
+                        }
+                        left = target.value.slice(0, selStart)
+                        deleteTarget = target.value.slice(selStart, selEnd)
+                        right = target.value.slice(selEnd)
+                    }
+                    if (deleteTarget) {
+                        // Delete target only if the characters left and right of the cursor will remain valid.
+                        if (!left || (matchValidChar(left, -1) && (!right || matchValidChar(right, 1)))) {
+                            debug(`${keyAction.action.toUpperCase()} ${deleteTarget}`)
+                            target.selectionStart = selStart
+                            target.selectionEnd = selEnd
+                            target.setRangeText('')
+                            changed = true
+                        }
+                    }
+                    break
+                }
+                if (keyAction.action == 'ignore') {
+                    debug('IGNORE')
+                    break
+                }
+                if (
+                    [
+                        'cellup',
+                        'celldown',
+                        'cellleft',
+                        'cellright',
+                        'rowstart',
+                        'rowend',
+                        'firstrow',
+                        'lastrow'
+                    ].includes(keyAction.action)
+                ) {
+                    const elementRef: RefObject<HTMLTextAreaElement | null> = navigate(
+                        keyAction.action as NavigationAction
+                    )
+                    if (elementRef.current) {
+                        elementRef.current?.focus()
+                        elementRef.current.selectionStart = 0
+                        elementRef.current.selectionEnd = 0
+                    }
+                    break
+                }
+                if (['cursorleft', 'cursorright'].includes(keyAction.action)) {
+                    // Skip an entire symbol, which might consist of multiple characters.
+                    const direction = keyAction.action == 'cursorright' ? 1 : -1
+                    const contentToMatch = direction > 0 ? eventRecord.right : eventRecord.left
+                    const regexStart = direction > 0 ? '^' : ''
+                    const regexEnd = direction > 0 ? '' : '$'
+
+                    // Find a match for the previous/next (compound) symbol. Start with longest possible symbol code.
+                    for (const length of Object.keys(validRegExpByLength).sort().reverse()) {
+                        // validRegExpByLength[length] matches all valid symbols of a given length.
+                        const regExp = RegExp(regexStart + '(' + validRegExpByLength[length] + ')' + regexEnd)
+                        if (regExp.test(contentToMatch)) {
+                            target.selectionStart += direction * Number(length)
+                            target.selectionEnd = target.selectionStart
+                            break
+                        }
+                    }
+                    break
+                }
+            }
+        }
+        if (changed) onChanged(target)
+    }
+
+    return [keyboardListener]
+}

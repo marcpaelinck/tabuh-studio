@@ -1,0 +1,233 @@
+{INFO notation="legong mahawidya gk" part=full title="Legong Mahawidya GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	# https://www.youtube.com/watch?v=gILdibv6Jos
+	{GONGAN gineman}
+	{TEMPO 75}
+ugal	e:---	ooeoiOeueUau--
+	{WAIT 2}
+
+	{PART kawitan}
+	{TEMPO 150}
+	## 0:10
+ugal	i---	---a,	u,---	----	a,---	----	i---	---o	e---	----	u---	---e	o---	----	a---	----
+gangsa p	....	....	....	....	....	....	....	....	....	....	..e-	----	--eu	a-a/.	a-a/.	a---
+gangsa s	....	....	....	....	....	....	....	....	....	....	..i<-	----	--i<u	a-a/.	a-a/.	a---
+calung	i		u		a		i		e		u		o		a
+jegogan	i								e
+gong	G								T
+	{SEQUENCE [K_REGULAR, K_ANGSEL1, K_ANGSEL1, K_ANGSEL2, K_REGULAR, K_ANGSEL3, K_REGULAR, K_ANGSEL4, K_REGULAR, K_REGULAR, K_FINAL]}
+
+	{LABEL K_REGULAR}
+	## 0:17
+ugal	i---	---a,	u,---	----	a,---	----	i---	---o	e---	----	u---	---e	o---	----	a---	----
+##	ieoi	eoie	ieoi	eaeu	aeua	eaeu	aeua	eeio	eioe	ieoi	eioe	ioue	oueo	uaeu	aeua	oieo
+gangsa p	i.oi	.io.	i.oi	.a.u	a.ua	.au.	a.ua	.e.o	e.oe	.eo.	e.oe	.o.e	o.eo	.a.u	a.ua	.i.o
+gangsa s	.eo.	e.oe	.eo.	e.eu	.eu.	e.ue	.eu.	e.io	.io.	i.oi	.io.	i.ue	.ue.	u.eu	.eu.	e.eo
+calung	i		u		a		i		e		u		o		a
+jegogan	i								e
+gong	G								T
+
+	{LABEL K_ANGSEL1}
+	## 0:24
+	{COPY K_REGULAR}
+gangsa p	i.oi	.io.	i.oi	.a.u	a.ua	.au.	a.ua	.e.o	e---	----	----	----	o.eo	.a.u	a.ua	.i.o
+gangsa s	.eo.	e.oe	.eo.	e.eu	.eu.	e.ue	.eu.	e.ua	i<---	----	----	----	.ue.	u.eu	.eu.	e.eo
+
+	{LABEL K_ANGSEL2}
+	## 0:36
+	## GONGAN 5
+	{COPY K_REGULAR}
+gangsa p	i.oi	.io.	i.oi	.a.u	a.ua	.au.	a.ua	.e.o	e.oe	.eo.	e.oe	.o.e	o.eu	a---	----	----
+gangsa s	.eo.	e.oe	.eo.	e.eu	.eu.	e.ue	.eu.	e.io	.io.	i.oi	.io.	i.ue	..i<u	a---	----	----
+
+	{LABEL K_ANGSEL3}
+	## 0:36
+	{COPY K_REGULAR}
+gangsa p	i.oi	.io.	i.aa	.a--	..ii	.i--	----	----	e.oe	.eo.	e...	....	..eu	a---	----	----
+gangsa s	.eo.	e.oe	..aa	.a--	..uu	.u--	----	----	.io.	i.oi	....	....	..i<u	a---	----	----
+
+	{LABEL K_ANGSEL4}
+	## 1:02
+	{COPY K_REGULAR}
+gangsa p	i.oi	.oi.	i.oi	.a.u	a.ua	.au.	a.ua	.e.o	e.oe	.eo.	e...	....	--eu	a-a/.	a-a/.	a---
+gangsa s	.eo.	eo.e	.eo.	e.eu	.eu.	e.ue	.eu.	e.io	.io.	i.oi	....	....	--i<u	a-a/.	a-a/.	a---
+
+	{LABEL K_FINAL}
+	{TEMPO 90 beats=3->16}
+ugal	i---	---a,	u,---	----	a,---	----	i---	---o	e---	----	u---	---e	o---	----	a---	--e-
+gangsa p	i.oi	.io.	i---	----	---a	a-a-	----	----	----	-u.e	u.eu	.eue	o.eu	a.a.	a...	..e-
+gangsa s	.eo.	e.oe	....	....	---a	a-a-	----	----	----	-.oe	.oe.	e.ue	..i<u	ai<.i<	....	..i<-
+calung	i		u		a		i		e		u		o		a
+jegog	i								e
+gong	G								T
+
+ugal	Oi---
+gangsa p	Oi---
+gangsa s	Au---
+calung	i
+jegog	i
+gong	G
+	{WAIT 2}
+
+	## 1:33
+	{PART pengawak}
+	{GONGAN gineman}
+	{TEMPO 75}
+	## GONGAN 10
+ugal	------oo/	o---o-i-	Oe---u-a-	Ue---o-i-	Oe---e-o-	Ia,---i-o-
+
+	{GONGAN gineman}
+ugal	e-------	u---a-u-	e---e-o-	Ia,-i-o-a,-
+calung	e
+jegogan	e
+
+	{GONGAN gineman}
+ugal	i---o-i-	Oe---o-i-	Oe---e-o-	Eu---a-u-
+gangsa p	--------	--------	--------	--e.--Oi-
+gangsa s	--------	--------	--------	--i<.--Au-
+calung	i
+jegogan	i
+
+	## 1:56
+ugal	e-------	u---a-u-	e---e-o-	Eu---a-u-	e---Ua---	u-e-o-i-	o-----i-	Oe-o-i-a,-
+##	Oeioeieoi	eioeieoi	eioeieoi	eioeieoi	eioeieoi	e---a-i-	Ua-------	------e-
+gangsa p	Oe.oe.eo.	e.oe.eo.	e.oe.eo.	e.oe.eo.	e.oe.eo.	e---a-i<-	Ua-------	------e-
+gangsa s	.io.i.oi	.io.i.oi	.io.i.oi	.io.i.oi	.io.i.oi	i<---a-i<-	Ua-------	------i<-
+calung	e	u	e	u	e	u	o	e
+jegogan	e				e
+gong	G
+
+	## 2:09
+ugal	i-------	i---i-ia,	i---o-i-	a,---i-a,-	Io---e-o-	Eu---e-o-	Eu---Uu-e-	Ua--ai<-a-
+##	Oieoieioe	ieoieioe	ieoieioe	ieoieoue	oueoeuoe	uoeuoueo	uoeuoueo	uoeuoueo
+gangsa p	Oi.oi.io.	i.oi.io.	i.oi.io.	i.oi.o.e	o.eo.u.e	u.eu.ue.	u.eu.ue.	u.eu.ue.
+gangsa s	.eo.e.oe	.eo.e.oe	.eo.e.oe	.eo.e.ue	.ue.e.oe	.oe.o.eo	.oe.o.eo	.oe.o.eo
+calung	i	i	i	a	o	u	u	a
+jegogan	i				o
+gong	G
+
+	## 2:23
+	## GONGAN 15
+ugal	u--u-u--	u--uuu-e	u--uuue-	Ua---i<-a-	u---Eo---	e---o-i-	Oe---e-o-	Eu---a-u-
+##	uoeuoueo	uoeuoueo	uoeuoueo	uoeuoueo	uoeuoeio	eioeioei	eioeioei	eioeioei
+gangsa p	u.eu.ue.	u.eu.ue.	u.eu.ue.	u.eu.ue.	u.eu.e.o	e.oe.eo.	e.oe.eo.	e.oe.eo.
+gangsa s	.oe.o.eo	.oe.o.eo	.oe.o.eo	.oe.o.eo	.oe.o.io	.io.i.oi	.io.i.oi	.io.i.oi
+calung	u	a	u	a	u	e	e	u
+jegogan	u				u
+gong	G
+
+	## 2:37
+ugal	e-------	e---e-eo	e---e-o-	Eu---a-u-	e---Ua---	u---e-u-	Eo-----e-	Ua---i<-a-
+gangsa p	e.oe.eo.	e.oe.eo.	e.oe.eo.	e.oe.eo.	e.oe.eo.	e---e-u-	Eo-------	--------
+gangsa s	.io.i.oi	.io.i.oi	.io.i.oi	.io.i.oi	.io.i.oi	i<---i<-u-	Ia-------	--------
+calung	e	e	e	u	e	u	o	a
+jegogan	e				e
+gong	G
+
+	## 2:51
+ugal	u--u-u-e	u--uuu-e	u--uuue-	Ua--ue-o-	e---u---	e---o-i-	Oe-----o-	Eu---a-u-
+gangsa p	u.eu.ue.	u.eu.ue.	u.eu.ue.	u.eu.ue.	e.oe.eo.	e---o-i-	Oe.oe.eo.	e.e---i-
+gangsa s	.oe.o.eo	.oe.o.eo	.oe.o.eo	.oe.o.eo	.io.i.oi	i<---a-u-	Ai<io.i.oi	i<.i<---u-
+calung	u	a	u	a	e	e	e	u
+jegogan	u				e
+gong	G
+
+	## 3:03
+ugal	e-------	e-o-i-a,-	i---i-a,-	Io---e-o-	i---a,-i-	Au,---a,-i-	Oe---e-o-	Eu---a-u-
+##	Oeioeieoi	eoieoieo	ieoieoie	oeioeioe	ieoieuoe	uoeuoeio	eioeieoi	eioeieoi
+gangsa p	Oe.oe.eo.	e.i.oi.o	i.oi.oi.	o.io.io.	i.oi.u.e	u.eu.e.o	e.oe.eo.	e.oe.eo.
+gangsa s	.io.i.oi	.o.eo.eo	.eo.eo.e	oe.oe.oe	.eo.e.oe	.oe.o.io	.io.i.oi	.io.i.oi
+calung	e	e	i	o	i	u	e	u
+jegogan	e				i
+gong	G
+
+	## 3:16
+ugal	e-------	e---e-eo	e---Ua---	u---euo-	Eu--ua---	u---euo-	Eu--ue---	Oi-e-o-i-
+##	eioeieoi	eioeieoi	eioeieoi	eioeiuoe	uoeuoueo	uoeuoueo	uoeuoueo	uoeuoaeu
+gangsa p	e.oe.eo.	e.oe.eo.	e.oe.eo.	e.oe.u.e	u.eu.ue.	u.eu.ue.	u.eu.ue.	u.eu.a.u
+gangsa s	.io.i.oi	.io.i.oi	.io.i.oi	.io.i.oe	.oe.o.eo	.oe.o.eo	.oe.o.eo	.oe.o.eu
+calung	e	e	e	u	u	u	u	i
+jegogan	e				u
+gong	G
+
+	## 3:28
+	## GONGAN 20
+ugal	a,---i-a,-	i-o-e-o-	i-e-o-i-	a,-i-o-e-	u--ua---	u--ue-o-	Eu--uu-e-	Ua---i<-a-
+##	a,---i-a,-	i-o-e-o-	ieoieioe	ieoieuoe	uoeuoueo	uoeuoueo	uoeuoueo	uoeuoueo
+gangsa p	a---i-a,-	i-o-e-o-	i.oi.io.	i.oi.u.e	u.eu.ue.	u.eu.ue.	u.eu.ue.	u.eu.ue.
+gangsa s	a---u-e-	u-a-i<-a-	.eo.e.oe	.eo.e.oe	.oe.o.eo	.oe.o.eo	.oe.o.eo	.oe.o.eo
+calung	a---i-a-	i-o-e-o-	i-e-o-i-	a-i-o-e-	u	u	u	a
+jegogan	a				u
+gong	G
+
+	## 3:41
+	{TEMPO 105 beats=5->8}
+ugal	u---Oi---	a,-i-o-a,-	i---o-i-	Oe---u-a-	Ue---u-e-	Ua---u-e-	Ua-----u-	Ai<-a-u-e-
+##	u-------	--------	--------	--------	eioeieoi	eioeiaeu	aeuaeaue	i-a-----
+gangsa p	u-------	--------	--------	--------	e.oe.eo.	e.oe.a.u	a.ua.au.	i-a-----
+gangsa s	u-------	--------	--------	--------	.io.i.oi	.io.i.eu	.eu.e.ue	u-a-----
+calung	u	a	i	e	e	a	a	i
+jegogan	u				e
+gong	G
+	{SEQUENCE [A1, A2, A1, A2, B1, B2, B1, B2, A1, A2, FINAL]}
+
+	## 3:52
+	{PART pengecet}
+	# Melody A
+	{LABEL A1}
+ugal	Ua-u-	a-u-	e-u-	o-e-	u-a-	u-e-	o-e-	u-a-	u---	i-o-	e-u-	e-o-	i---	Ua-u-	u-e-	o-i-
+gangsa p	a.ua	.au.	a.ua	.u.e	u.eu	.ue.	u.eu	.ue.	u.i-	Oe-u-	e.oe	.i.o	i.oi	.io.	i-Oe-	----
+gangsa s	.eu.	e.ue	.eu.	e.oe	.oe.	o.eo	.oe.	o.eo	..u-	Ai<-u-	i<ua.	u.eo	.eo.	e.oe	u-Ai<-	----
+calung	a		e		u		o		u		e		i		u
+jegogan	a				u				u				i
+gong	G
+
+	## 4:01
+	{LABEL A2}
+ugal	o---	e-e-	u-e-	o-i-	a,-e-	u-a-	u-e-	u-a-	u---	i-o-	e---	o---	i---	Ua---	u-a-	i<-u-
+gangsa p	o.eo	.u.e	u.eu	.a.u	a.ua	.au.	a.ua	.u.e	u.eu	.ue.	u.eu	.i.o	i.eu	a.a.	a.a.	a.a.
+gangsa s	.ue.	u.oe	.oe.	o.eu	.eu.	e.ue	.eu.	e.oe	.oe.	o.eo	.oe.	o.eo	.i.u	ai<.i<	.i<.i<	.i<.i<
+calung	o		u		a		u		u		e		i		u
+jegogan	o				a				u				i
+gong	T
+
+	## 4:45
+	# Melody B
+	{LABEL B1}
+ugal	a-i<-	a-u-	e-o-	e-i-	o---	e-o-	Eu-a-	u-e-	u---	ai<a-	i<-a-	u-e-	o-i-	Oe-u-	a-u-	e-o-
+gangsa p	a.ua	.au.	a.oo	.u.e	o.eo	eu.e	u---	----	u.eu	.ue.	u.eu	.o.e	o-io	e---	----	----
+gangsa s	.eu.	e.ue	..aa	e.a.	au.a	i<.ai<	u---	----	.oe.	o.eo	.oe.	oau.	a-ua	i<---	----	----
+##gangsa s	.eu.	e.ue	..aa	.u..	au.a	e.oe	u---	----	.oe.	o.eo	.oe.	oau.	a-ua	i<---	----	----
+##gangsa s	.eu.	e.ue	..aa	.u..	aaea	.au.	u---	----	.oe.	o.eo	.oe.	oau.	a-ua	i<---	----	----
+calung	a		e		o		u		u		i		o		a
+jegogan	a				o				u				o
+gong	G
+
+	## 4:37
+	{LABEL B2}
+	## GONGAN 25
+ugal	e---	i-o-	e---	eo-o	e-o-	e-u-	a-u-	e-o-	e---	o-i-	o-e-	u-e-	o-e-	Ua-i<-	a-i<-	u-i<-
+gangsa p	----	----	--oo	.i-o	e-i-	Oe---	----	----	e.oe	.eo.	e.oe	.o.e	o.eu	a.a.	a.a.	a.a.
+gangsa s	----	----	--aa	.u-a	i<-u-	Ai<---	----	----	.io.	i.oi	.io.	iau.	ai<.u	ai<.i<	.i<.i<	.i<.i<
+calung	e		e		e		a		e		o		o		u
+jegogan	e				e				e				o
+gong	T
+
+	{LABEL FINAL}
+	{TEMPO 70  beats=1->8}
+	{TEMPO 50  beats=11->16}
+ugal	a---	e---	a---	u---	a---	Ue-e-	u-e-	a-u-	e-Ua-	u-e-	o-e-	a-e-	u-a-	u-o-	e...	..e-
+gangsa p	a---	e---	a---	u---	a---	e-e-	u-e-	a-u-	e---	-o.e	oe.o	e.oe	u...	....	e...	..e-
+gangsa s	a---	i<---	a---	u---	a---	i<-i<-	u-i<-	a-u-	i<---	-au.	a.ua	.ua.	u...	....	i<...	..i<-
+##gangsa s	a---	i<---	a---	u---	a---	i<-i<-	u-i<-	a-u-	i<---	-au.	a.ua	.ua.	u/...	....	i</...	..i<-
+calung	a		a		a		u		e		o		u		e
+jegogan	a				a				e				u
+gong	G
+
+	{GONGAN gineman}
+ugal	Oi-i:
+gangsa p	Oi-i:
+gangsa s	Au-u:
+calung	i
+jegogan	i
+gong	G

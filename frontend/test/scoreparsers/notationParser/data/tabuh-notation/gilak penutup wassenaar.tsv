@@ -1,0 +1,72 @@
+{INFO notation="gilak penutup wassenaar" part=full title="Gilak Penutup Wassenaar" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 100}
+	{DYNAMICS mf positions=[gangsa,reyong]}
+	{LABEL REGULAR}
+	{LOOP 3}
+ga/ugal	o-o-	e-e-	u-u-	a-a-	u-u-	a-a-	e-e-	u-u-
+reyong13	o-oe	.oe.	oe.o	e.oe	.o.e	o.eo	.eo.	eo.e
+reyong24	a-a.	ua.u	a.ua	.ua.	uau.	au.a	u.au	.au.
+calung	o	e	u	a	u	a	e	u
+jegogan	o				u
+gong	G				G	P		P
+	{GOTO END pass=3}
+
+	{COPY REGULAR}
+	# Transition
+ceng	----	----	----	----	x--x	x-x-	--x-	x-x-
+
+	{COPY REGULAR}
+	{LOOP 3}
+ceng	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+##ceng-p	x-xx	-xx-	x-xx	-xx-	x-xx	-xx-	x-xx	-xx-
+##ceng-s	-xx-	x-xx	-xx-	x-xx	-xx-	x-xx	-xx-	x-xx
+
+	{COPY REGULAR}
+	{DYNAMICS ff positions=[gangsa,reyong]}
+
+	{COPY REGULAR}
+	# Transition to kotekan gangsa
+ga/rey	o---	----	----	----	----	----	----	----
+ceng	----	----	----	----	x--x	x-x-	--x-	x-x-
+
+	{LABEL KOTEKAN}
+	{COPY REGULAR}
+	{LOOP 4}
+	{DYNAMICS mf positions=[gangsa,reyong]}
+	{DYNAMICS ff positions=[gangsa,reyong] iteration=4}
+	# Kotekan gangsa
+gangsa p	o.i.	e.o.	u.e.	a.o.	u.e.	a.u.	e.i.	i.a,.
+gangsa s	.a,.o	.i.e	.o.u	.i.e	.o.u	.e.o	.a,.a,	.u,.i
+reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+
+	{LABEL CC-SOLO}
+	{COPY REGULAR}
+	# Ceng-ceng and kendang solo
+ga/rey	o---	----	----	----	----	----	----	----
+ceng	x---	----	----	--xx	x---	----	----	---x
+
+	{COPY CC-SOLO}
+ceng	xx--	----	----	--xx	x-x-	x-x-	x-x-	x-xx
+	{GOTO CC-SOLO}
+	{GOTO CC-END pass=[3] nthpass=true}
+
+	{LABEL CC-END}
+	{COPY CC-SOLO}
+ceng	x---	x---	x---	x---	x--x	x-x-	--x-	x-x-
+	{GOTO REGULAR passes=[1,2]}
+
+	{LABEL END}
+	{COPY REGULAR}
+	{DYNAMICS ff positions=[gangsa,reyong] beat=5}
+
+	{COPY REGULAR}
+	{TEMPO 30 beats=1->8}
+
+	{VALIDATION ignore=["beat-duration"]}
+ugal	o
+ga/reyong	o
+calung	o
+jegogan	o
+ceng	x
+gong	G

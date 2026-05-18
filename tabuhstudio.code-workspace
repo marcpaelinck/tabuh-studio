@@ -1,0 +1,46 @@
+{
+    "folders": [
+        { "name": "frontend", "path": "./frontend" },
+        { "name": "backend",  "path": "./backend"  },
+        { "name": "shared",   "path": "./shared"   }
+    ],
+    "settings": {
+        "workbench.colorTheme": "Dark+",
+        "editor.codeActionsOnSave": { "source.organizeImports": "explicit" },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnType": false,
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveMode": "file",
+        "files.autoSave": "onFocusChange",
+        "vs-code-prettier-eslint.prettierLast": false,
+        "[javascript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+	"typescript.tsdk": "frontend/node_modules/typescript/lib"
+        "[typescriptreact]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
+        "js/ts.tsdk.path": "frontend/node_modules/typescript/lib",
+        "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+        "gitblame.inlineMessageEnabled": true
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "type": "node",
+                "request": "launch",
+                "name": "Run Test",
+                "skipFiles": ["<node_internals>/**"],
+                "program": "${workspaceFolder:frontend}/src/scoreparsers/grammars/tabuh/test/test.ts",
+                "outFiles": ["${workspaceFolder:frontend}/**/*.ts"]
+            },
+            {
+                "type": "node",
+                "request": "launch",
+                "name": "Run notationParser test",
+                "skipFiles": ["<node_internals>/**"],
+                "program": "${workspaceFolder:frontend}/test/scoreparsers/notationParser/testnotation.ts",
+                "outFiles": ["${workspaceFolder:frontend}/**/*.ts"]
+            }
+        ]
+    }
+}

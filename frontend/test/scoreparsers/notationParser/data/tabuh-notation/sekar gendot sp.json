@@ -1,0 +1,1084 @@
+{
+    "uuid": "edbad6d8-8796-447b-b626-2f9453297572",
+    "title": "Sekar Gendot SP",
+    "composer": "",
+    "instrumenttype": "SEMAR_PAGULINGAN",
+    "positions": [
+        "TROMPONG",
+        "PEMADE_POLOS",
+        "PEMADE_SANGSIH",
+        "KANTILAN_POLOS",
+        "KANTILAN_SANGSIH",
+        "CALUNG",
+        "JEGOGAN",
+        "GONGS",
+        "KEMPLI"
+    ],
+    "parts": {
+        "kawitan": [
+            "ef95fd2b-1c0c-464d-980f-88206362aa7a",
+            "e47fbd55-74cb-425e-af88-a11bcf9e3fb4",
+            "21a99033-7b1c-417b-94cd-155a417988b8",
+            "6f9d2f33-c44c-46dd-a93b-a11ee7aa8d60",
+            "89ddcea8-e04f-4581-9298-ccd67026d3ba",
+            "875c45f8-5667-48b5-82ae-ee81520dc2a6",
+            "c5b03107-ce29-4873-9b78-8d542c7e676d",
+            "39172e3c-0247-4f7f-9ccc-cdef70e8fb5f"
+        ],
+        "pengawak": [
+            "c6750e7b-a2c3-4016-9009-d61ddfb33434",
+            "fd600c54-eae3-40c9-82d8-2bf7aef6e248",
+            "ee00811e-523f-4a91-afff-45d0f68bdd0e",
+            "665355f5-0e1c-45ed-8d91-4c70629ff369",
+            "52c48f43-b73a-4bce-9f86-7d77a0b439db",
+            "773a371f-3673-4ca7-bbc1-2caaf557a1f3",
+            "1fec4b9c-9fd3-40ef-b052-05a570522459",
+            "a2e9d498-1513-4333-aa77-a9a91b3109ea",
+            "cb83cb2f-0d67-43b9-8f2e-1ee30e00b95e",
+            "fd41de02-0860-4b9d-b9f3-e55f87be00f1",
+            "48ae0c80-5898-4b58-9121-98008a2750c8",
+            "b524a3bc-90cb-40bb-a421-edc9b3bb02f4",
+            "58024aa8-dba3-4271-9cf9-96cc7011a0c1",
+            "c81b94ce-7de3-4e4f-9c95-fc3bb18f77c2"
+        ],
+        "Pengecet": [
+            "7e51fcec-b376-4cb5-9a3e-d98559a70899",
+            "ad9abbce-2f7e-4c73-8c68-ae75b1da7f6f",
+            "7a9c0947-4194-4685-8a48-e2a88725adc3",
+            "17236a5c-8adf-4640-92b2-1de0bc688f69",
+            "7386a8b5-7e04-4bd2-b434-f040d3c0e9a2",
+            "d2927a25-d8f3-4a4c-b25f-89c2de68c5f3",
+            "cd102be9-6580-41c3-bd2f-1eec4796ed07",
+            "317ccdb5-6904-4813-8960-6aea3d746265",
+            "105abbd7-1e64-46f0-b791-307cbc39ac8b"
+        ],
+        "Batel 1": [
+            "73e1a0d3-b96d-42b5-b92a-26ba12bcdfd6",
+            "0e4c6c4f-1178-41ff-9794-b6ecd420b1c9",
+            "6006c254-b777-4b05-9f0e-f938d872e442",
+            "1092c8e5-7cb6-4ef3-aef9-25e54c913f65",
+            "eff6c6c5-b5be-4242-b0ef-0c902ba7444f"
+        ],
+        "Pengecet part 2": [
+            "ce09a4ee-82b1-412f-bf8c-58d9ffb2d1cb",
+            "7f9392a0-73a1-48bf-8c1b-dc2f42cc779e",
+            "8c487b43-add4-47ef-b9ca-1ae8fd1032dc",
+            "7da3797f-e2b7-47ad-913e-5ce98876efbf",
+            "1f26aa5d-d708-4a4f-adaa-48383c3eba63",
+            "f7cd0170-bcc1-4203-b7b6-9a24b419d577"
+        ],
+        "Batel 2": [
+            "a3562d42-66e6-43a7-bb7d-6d1a49e709ec",
+            "f86a65b6-280d-4a40-9e3d-61c02ece0af7",
+            "54d86535-c730-450c-83d7-85d8be23c9e5",
+            "6c08714f-2eef-4153-8f06-8523a1aebd69",
+            "9f511b99-bbbb-47fe-a751-0f3a1b44ee5f"
+        ]
+    },
+    "systems": [
+        {
+            "uuid": "ef95fd2b-1c0c-464d-980f-88206362aa7a",
+            "id": 1,
+            "index": 0,
+            "label": "Trompong_Penyalit",
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 70 BPM", "tooltipshort": "70 BPM", "isGradual": false, "section": 1, "value": 70.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["TROMPONG"]},
+                {"type": "wait", "seqId": 4000, "tooltip": "wait 1 second", "tooltipshort": "1 sec.", "seconds": 1.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-"]}, {"notation": ["E", "u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["U", "u/", "u"]}],
+                "PEMADE_POLOS": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["U", "u/", "u"]}],
+                "PEMADE_SANGSIH": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["U", "u/", "u"]}],
+                "KANTILAN_POLOS": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["U", "u/", "u"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["U", "u/", "u"]}],
+                "CALUNG": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}],
+                "JEGOGAN": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": [".", "."]}, {"notation": [".", "."]}, {"notation": [".", "."]}, {"notation": [".", "."]}, {"notation": [".", "."]}],
+                "KEMPLI": [{"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}]
+            },
+            "colWidths": [2, 3, 2, 2, 3, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "e47fbd55-74cb-425e-af88-a11bcf9e3fb4",
+            "id": 2,
+            "index": 1,
+            "label": "Kawitan",
+            "execution": [
+                {"type": "goto", "seqId": 5020, "passes": [2], "nthpass": false, "tooltip": "go to KAWITAN_TAIL after pass 2", "tooltipshort": "KAWITAN_TAIL", "targetuuid": "6f9d2f33-c44c-46dd-a93b-a11ee7aa8d60", "targetname": "KAWITAN_TAIL"},
+                {"type": "goto", "seqId": 5040, "passes": [4], "nthpass": false, "tooltip": "go to KAWITAN_FINAL after pass 4", "tooltipshort": "KAWITAN_FINAL", "targetuuid": "89ddcea8-e04f-4581-9298-ccd67026d3ba", "targetname": "KAWITAN_FINAL"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a,", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a", "i"]}],
+                "PEMADE_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "u"]}, {"notation": ["e", "u"]}],
+                "KANTILAN_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "i"]}, {"notation": ["a", "i"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "u"]}, {"notation": ["e", "u"]}],
+                "CALUNG": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["i", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}],
+                "JEGOGAN": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["i", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["G", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2],
+            "editorGroup": []
+        },
+        {
+            "uuid": "21a99033-7b1c-417b-94cd-155a417988b8",
+            "id": 3,
+            "index": 2,
+            "execution": [
+                {"type": "goto", "seqId": 5000, "tooltip": "go to KAWITAN", "tooltipshort": "KAWITAN", "targetuuid": "e47fbd55-74cb-425e-af88-a11bcf9e3fb4", "targetname": "KAWITAN"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-"]}, {"notation": ["o", "i"]}, {"notation": ["o", "-"]}, {"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["u", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "PEMADE_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "i"]}, {"notation": ["o", "i"]}, {"notation": ["o", "e"]}, {"notation": ["u", "u"]}, {"notation": ["u", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "u"]}, {"notation": ["a", "u"]}, {"notation": ["a", "s"]}, {"notation": ["u", "u"]}, {"notation": ["u", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "i"]}, {"notation": ["o", "i"]}, {"notation": ["o", "e"]}, {"notation": ["u", "u"]}, {"notation": ["u", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "u"]}, {"notation": ["a", "u"]}, {"notation": ["a", "s"]}, {"notation": ["u", "u"]}, {"notation": ["u", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}],
+                "CALUNG": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["-", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2],
+            "editorGroup": []
+        },
+        {
+            "uuid": "6f9d2f33-c44c-46dd-a93b-a11ee7aa8d60",
+            "id": 4,
+            "index": 3,
+            "label": "Kawitan_Tail",
+            "execution": [
+                {"type": "wait", "seqId": 4000, "tooltip": "wait 3 seconds", "tooltipshort": "3 sec.", "seconds": 3.0},
+                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to TROMPONG_PENYALIT after pass 1", "tooltipshort": "TROMPONG_PENYALIT", "targetuuid": "ef95fd2b-1c0c-464d-980f-88206362aa7a", "targetname": "TROMPONG_PENYALIT"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-"]}, {"notation": ["o", "a,"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}, {"notation": ["i", "-"]}, {"notation": ["e", "i"]}, {"notation": ["e", "-"]}, {"notation": ["O", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["e", "-"]}, {"notation": ["O", "i", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "-"]}, {"notation": ["A", "u", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["e", "-"]}, {"notation": ["O", "i", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "-"]}, {"notation": ["A", "u", "-"]}],
+                "CALUNG": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["i", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}, {"notation": ["i", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["i", "-"]}],
+                "GONGS": [{"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["G", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2, 3, 12],
+            "editorGroup": []
+        },
+        {
+            "uuid": "89ddcea8-e04f-4581-9298-ccd67026d3ba",
+            "id": 5,
+            "index": 4,
+            "label": "Kawitan_Final",
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-"]}, {"notation": ["o", "a,"]}, {"notation": ["i", "o"]}, {"notation": ["a,", "i"]}, {"notation": ["o", "-"]}, {"notation": ["i", "-"]}, {"notation": ["e", "i"]}, {"notation": ["e", "o"]}],
+                "PEMADE_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["e", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", "o"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["a", "i"]}, {"notation": ["o", "a"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["e", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "a"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}],
+                "CALUNG": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["i", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2],
+            "editorGroup": []
+        },
+        {
+            "uuid": "875c45f8-5667-48b5-82ae-ee81520dc2a6",
+            "id": 6,
+            "index": 5,
+            "execution": [
+                {"type": "wait", "seqId": 4000, "tooltip": "wait 3 seconds", "tooltipshort": "3 sec.", "seconds": 3.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-"]}, {"notation": ["i", "o"]}, {"notation": ["e", "-"]}, {"notation": ["o", "-"]}, {"notation": ["E", "u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["a", "e"]}, {"notation": ["a", "-"]}, {"notation": ["U", "e", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "e"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["o", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["a", "-"]}, {"notation": ["U", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "s"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["a", "s"]}, {"notation": ["u", "a"]}, {"notation": ["a", "u"]}, {"notation": ["a", "s"]}, {"notation": ["a", "-"]}, {"notation": ["U", "s", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "e"]}, {"notation": ["i", "o"]}, {"notation": ["e", "i"]}, {"notation": ["o", "e"]}, {"notation": ["u", "a"]}, {"notation": ["e", "u"]}, {"notation": ["a", "e"]}, {"notation": ["a", "-"]}, {"notation": ["U", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "s"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["a", "s"]}, {"notation": ["u", "a"]}, {"notation": ["a", "u"]}, {"notation": ["a", "s"]}, {"notation": ["a", "-"]}, {"notation": ["U", "s", "-"]}],
+                "CALUNG": [{"notation": ["i", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["a", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 3, 2, 2, 2, 3, 12],
+            "editorGroup": []
+        },
+        {
+            "uuid": "c5b03107-ce29-4873-9b78-8d542c7e676d",
+            "id": 7,
+            "index": 6,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
+                {"type": "tempo", "seqId": 2104, "tooltip": "tempo current\u219260 BPM beat 1\u21928 on 4th iteration", "tooltipshort": "\u219260 BPM", "iterations": [4], "isGradual": true, "fromSection": 1, "section": 8, "value": 60.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["a", "-"]}, {"notation": ["u", "-"]}, {"notation": ["o", "-"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "PEMADE_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "o"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}],
+                "KANTILAN_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "o"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}],
+                "CALUNG": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["a", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}],
+                "JEGOGAN": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["G", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+            "editorGroup": []
+        },
+        {
+            "uuid": "39172e3c-0247-4f7f-9ccc-cdef70e8fb5f",
+            "id": 8,
+            "index": 7,
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u219245 BPM beat 1\u21928", "tooltipshort": "\u219245 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 45.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192mp beat 1\u21928", "tooltipshort": "\u2192mp", "isGradual": true, "fromSection": 1, "section": 8, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "wait", "seqId": 4000, "tooltip": "wait 2 seconds", "tooltipshort": "2 sec.", "seconds": 2.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["e", "-"]}, {"notation": ["u", "-"]}, {"notation": ["e", "-"]}, {"notation": ["a", "-"]}, {"notation": ["u", "-"]}, {"notation": ["o", "-"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "-"]}, {"notation": ["O", "e", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "o"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "-"]}, {"notation": ["O", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "-"]}, {"notation": ["A", "s", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "u"]}, {"notation": ["e", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "o"]}, {"notation": ["e", "u"]}, {"notation": ["e", "o"]}, {"notation": ["e", "o"]}, {"notation": ["i", "-"]}, {"notation": ["O", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["u", "a"]}, {"notation": ["u", "a"]}, {"notation": ["s", "u"]}, {"notation": ["s", "a"]}, {"notation": ["s", "a"]}, {"notation": ["u", "-"]}, {"notation": ["A", "s", "-"]}],
+                "CALUNG": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["a", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}],
+                "JEGOGAN": [{"notation": ["e", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["u", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["o", "-"]}, {"notation": ["-", "-"]}, {"notation": ["e", "-"]}],
+                "GONGS": [{"notation": ["G", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["T", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["-", "-"]}, {"notation": ["G", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 8],
+            "editorGroup": []
+        },
+        {
+            "uuid": "c6750e7b-a2c3-4016-9009-d61ddfb33434",
+            "id": 9,
+            "index": 8,
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 70 BPM", "tooltipshort": "70 BPM", "isGradual": false, "section": 1, "value": 70.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["u", "u/", "u", "-"]}, {"notation": ["E", "o", "-", "-", "-"]}, {"notation": ["i", "i/", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-"]}, {"notation": ["u", "u/", "u", "-"]}, {"notation": ["E", "o", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["o", "i", "-", "o"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "-", "a", "a"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "a", "a"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "a", "a"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "a", "a"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "a", "a"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "GONGS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "KEMPLI": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 5, 4, 5, 4, 5, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "fd600c54-eae3-40c9-82d8-2bf7aef6e248",
+            "id": 10,
+            "index": 9,
+            "label": "Pengawak",
+            "execution": [
+                {"type": "goto", "seqId": 5060, "passes": [6, 12], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 6 & 12", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "52c48f43-b73a-4bce-9f86-7d77a0b439db", "targetname": "PENGAWAK_ANGSEL2"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "PEMADE_SANGSIH": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": [".", ".", ".", "."]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "ee00811e-523f-4a91-afff-45d0f68bdd0e",
+            "id": 11,
+            "index": 10,
+            "label": "Pengawak",
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
+                {"type": "dynamics", "seqId": 3101, "tooltip": "dynamics mp on 1st iteration", "tooltipshort": "mp", "iterations": [1], "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3503, "tooltip": "dynamics ff beat 5 on 3rd iteration", "tooltipshort": "ff", "iterations": [3], "isGradual": false, "section": 5, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 5020, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGAWAK_ANGSEL2 after passes 2 & 4", "tooltipshort": "PENGAWAK_ANGSEL2", "targetuuid": "52c48f43-b73a-4bce-9f86-7d77a0b439db", "targetname": "PENGAWAK_ANGSEL2"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "KANTILAN_POLOS": [{"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "665355f5-0e1c-45ed-8d91-4c70629ff369",
+            "id": 12,
+            "index": 11,
+            "execution": [
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "ee00811e-523f-4a91-afff-45d0f68bdd0e", "targetname": "PENGAWAK"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "52c48f43-b73a-4bce-9f86-7d77a0b439db",
+            "id": 13,
+            "index": 12,
+            "label": "Pengawak_Angsel2",
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}, {"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}, {"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}, {"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "."]}, {"notation": ["e", ".", "e", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}, {"notation": [".", "a", "a", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "e", "e", "u"]}, {"notation": [".", "u", ".", "u"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "773a371f-3673-4ca7-bbc1-2caaf557a1f3",
+            "id": 14,
+            "index": 13,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["-", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "a", "a", "u"]}, {"notation": ["a", "-", "s", "-"]}, {"notation": ["-", "o", "i", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "a", "a", "u"]}, {"notation": ["a", "-", "s", "-"]}, {"notation": ["-", "a", "u", "-"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "a", "a", "u"]}, {"notation": ["a", "-", "s", "-"]}, {"notation": ["-", "o", "i", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "a", "a", "u"]}, {"notation": ["a", "-", "s", "-"]}, {"notation": ["-", "a", "u", "-"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["-", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "1fec4b9c-9fd3-40ef-b052-05a570522459",
+            "id": 15,
+            "index": 14,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 5, 4, 4, 4, 5, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "a2e9d498-1513-4333-aa77-a9a91b3109ea",
+            "id": 16,
+            "index": 15,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
+                {"type": "dynamics", "seqId": 3102, "tooltip": "dynamics ff\u2192mf beat 1\u21922 on 2nd iteration", "tooltipshort": "ff\u2192mf", "iterations": [2], "isGradual": true, "fromSection": 1, "section": 2, "fromValue": 1.0, "value": 0.67, "fromDynamics": "ff", "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3600, "tooltip": "dynamics ff beat 6", "tooltipshort": "ff", "isGradual": false, "section": 6, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "o/", "o", "-"]}, {"notation": ["o", "i", "o", "e"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "u"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "a,", "u,"]}, {"notation": ["a,", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "e"]}, {"notation": ["u", "u", "u", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "-", "u"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "a", "-", "i"]}, {"notation": ["a", "i"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", ".", "o"]}, {"notation": ["e", ".", "o", "e"]}, {"notation": ["u", "u", "u", "a"]}, {"notation": [".", "a", "s", "."]}, {"notation": ["a", "s", "a", "."]}, {"notation": ["s", "-", "u", "-"]}, {"notation": ["s", "-", "a", "-"]}, {"notation": ["u", "a", "-", "u"]}, {"notation": ["a", "u"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "e"]}, {"notation": ["u", "u", "u", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "-", "u"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "a", "-", "i"]}, {"notation": ["a", "i"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", ".", "o"]}, {"notation": ["e", ".", "o", "e"]}, {"notation": ["u", "u", "u", "a"]}, {"notation": [".", "a", "s", "."]}, {"notation": ["a", "s", "a", "."]}, {"notation": ["s", "-", "u", "-"]}, {"notation": ["s", "-", "a", "-"]}, {"notation": ["u", "a", "-", "u"]}, {"notation": ["a", "u"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "u", "-"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4, 2],
+            "editorGroup": []
+        },
+        {
+            "uuid": "cb83cb2f-0d67-43b9-8f2e-1ee30e00b95e",
+            "id": 17,
+            "index": 16,
+            "execution": [
+                {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo current\u2192100 BPM beat 1\u21928 on pass 2", "tooltipshort": "\u2192100 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 100.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3120, "passes": [2], "nthpass": false, "tooltip": "dynamics f\u2192mf beat 1\u21928 on pass 2", "tooltipshort": "f\u2192mf", "isGradual": true, "fromSection": 1, "section": 8, "fromValue": 0.83, "value": 0.67, "fromDynamics": "f", "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 5020, "passes": [2], "nthpass": false, "tooltip": "go to TRANSITION_TO_PENGECET after pass 2", "tooltipshort": "TRANSITION_TO_PENGECET", "targetuuid": "b524a3bc-90cb-40bb-a421-edc9b3bb02f4", "targetname": "TRANSITION_TO_PENGECET"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 5, 4, 4, 4, 5, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "fd41de02-0860-4b9d-b9f3-e55f87be00f1",
+            "id": 18,
+            "index": 17,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["o", "i", ".", "o"]}, {"notation": ["i", ".", "o", "i"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "i", ".", "o"]}, {"notation": [".", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "u", "e", "."]}, {"notation": ["u", "e", ".", "u"]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", "i", ".", "o"]}, {"notation": ["i", ".", "o", "i"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "i", ".", "o"]}, {"notation": [".", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "u", "e", "."]}, {"notation": ["u", "e", ".", "u"]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 5, 4, 4, 4, 5, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "48ae0c80-5898-4b58-9121-98008a2750c8",
+            "id": 19,
+            "index": 18,
+            "execution": [
+                {"type": "goto", "seqId": 5000, "tooltip": "go to PENGAWAK", "tooltipshort": "PENGAWAK", "targetuuid": "ee00811e-523f-4a91-afff-45d0f68bdd0e", "targetname": "PENGAWAK"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["a", ".", "u", "a"]}, {"notation": [".", "a", "u", "."]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "b524a3bc-90cb-40bb-a421-edc9b3bb02f4",
+            "id": 20,
+            "index": 19,
+            "label": "Transition_To_Pengecet",
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo current\u2192120 BPM beat 1\u21928", "tooltipshort": "\u2192120 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 120.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3200, "tooltip": "dynamics current\u2192ff beat 2\u21928", "tooltipshort": "\u2192ff", "isGradual": true, "fromSection": 2, "section": 8, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}, {"notation": ["i", "o/", "o", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "O", "i"]}, {"notation": ["i", "e", "o", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["o", "i", ".", "o"]}, {"notation": ["i", ".", "o", "i"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "i", ".", "o"]}, {"notation": [".", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "."]}, {"notation": ["u", "a", ".", "u"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "u", "e", "."]}, {"notation": ["u", "e", ".", "u"]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", "i", ".", "o"]}, {"notation": ["i", ".", "o", "i"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "i", ".", "o"]}, {"notation": [".", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "."]}, {"notation": ["u", "a", ".", "u"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "u", "e", "."]}, {"notation": ["u", "e", ".", "u"]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 5, 4, 4, 4, 5, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "58024aa8-dba3-4271-9cf9-96cc7011a0c1",
+            "id": 21,
+            "index": 20,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
+                {"type": "tempo", "seqId": 2102, "tooltip": "tempo current\u2192100 BPM beat 1\u21928 on 2nd iteration", "tooltipshort": "\u2192100 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "section": 8, "value": 100.0},
+                {"type": "tempo", "seqId": 2103, "tooltip": "tempo current\u219290 BPM beat 1\u21928 on 3rd iteration", "tooltipshort": "\u219290 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "section": 8, "value": 90.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "c81b94ce-7de3-4e4f-9c95-fc3bb18f77c2",
+            "id": 22,
+            "index": 21,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a", "-", "i", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["a", "-", "i", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "-", "i", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["a", "-", "i", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "-", "i", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["i", "-", "a", "-"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "7e51fcec-b376-4cb5-9a3e-d98559a70899",
+            "id": 23,
+            "index": 22,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192mf beat 1\u21928", "tooltipshort": "\u2192mf", "isGradual": true, "fromSection": 1, "section": 8, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", "a", "u", "."]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "CALUNG": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "JEGOGAN": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 5, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "ad9abbce-2f7e-4c73-8c68-ae75b1da7f6f",
+            "id": 24,
+            "index": 23,
+            "label": "Pengecet",
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "a", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 5, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "7a9c0947-4194-4685-8a48-e2a88725adc3",
+            "id": 25,
+            "index": 24,
+            "execution": [
+                {"type": "goto", "seqId": 5030, "passes": [3], "nthpass": false, "tooltip": "go to TRANSITION_TO_BATEL1 after pass 3", "tooltipshort": "TRANSITION_TO_BATEL1", "targetuuid": "317ccdb5-6904-4813-8960-6aea3d746265", "targetname": "TRANSITION_TO_BATEL1"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "a,", "-"]}, {"notation": ["i", "-", "a,", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "u,", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": ["i", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", ".", "s", "."]}, {"notation": ["a", "s", ".", "a"]}, {"notation": ["s", ".", "a", "s"]}, {"notation": [".", "a", "s", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", ".", "e", "o"]}, {"notation": ["i", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", "u", ".", "a"]}, {"notation": ["u", ".", "s", "."]}, {"notation": ["a", "s", ".", "a"]}, {"notation": ["s", ".", "a", "s"]}, {"notation": [".", "a", "s", "."]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "a", "-"]}, {"notation": ["i", "-", "a", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "17236a5c-8adf-4640-92b2-1de0bc688f69",
+            "id": 26,
+            "index": 25,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", ".", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-"]}, {"notation": [".", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", ".", "u", "-"]}, {"notation": ["A", "s", "-", "-", "-"]}, {"notation": [".", "a", ".", "e"]}, {"notation": [".", "a", ".", "e"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", "u", "e", "u"]}, {"notation": [".", ".", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-"]}, {"notation": [".", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", ".", "u", "-"]}, {"notation": ["A", "s", "-", "-", "-"]}, {"notation": [".", "a", ".", "e"]}, {"notation": [".", "a", ".", "e"]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 5, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "7386a8b5-7e04-4bd2-b434-f040d3c0e9a2",
+            "id": 27,
+            "index": 26,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-"]}, {"notation": ["-", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", ".", "u", "-"]}, {"notation": ["A", "s", "-", "-", "-"]}, {"notation": ["-", "a", ".", "e"]}, {"notation": [".", "a", ".", "e"]}],
+                "KANTILAN_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["O", "e", "-", "-", "-"]}, {"notation": ["-", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", ".", "u", "-"]}, {"notation": ["A", "s", "-", "-", "-"]}, {"notation": ["-", "a", ".", "e"]}, {"notation": [".", "a", ".", "e"]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 5, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "d2927a25-d8f3-4a4c-b25f-89c2de68c5f3",
+            "id": 28,
+            "index": 27,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", "e", ".", "o"]}, {"notation": ["e", ".", "o", "e"]}],
+                "PEMADE_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", ".", "a", "."]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "o", "i", "."]}, {"notation": ["o", ".", "o", "e"]}, {"notation": [".", "o", "e", "."]}, {"notation": ["o", "e", ".", "o"]}, {"notation": ["e", ".", "o", "e"]}],
+                "KANTILAN_SANGSIH": [{"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", ".", "u", "e"]}, {"notation": [".", ".", "a", "."]}, {"notation": ["u", "a", ".", "u"]}, {"notation": ["a", ".", "u", "a"]}, {"notation": [".", "u", "a", "."]}],
+                "CALUNG": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "cd102be9-6580-41c3-bd2f-1eec4796ed07",
+            "id": 29,
+            "index": 28,
+            "execution": [
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET after passes 1 & 2", "tooltipshort": "PENGECET", "targetuuid": "ad9abbce-2f7e-4c73-8c68-ae75b1da7f6f", "targetname": "PENGECET"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["u,", "-", "-", "-"]}, {"notation": ["a,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["e,", "-", "-", "-"]}, {"notation": ["u,", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "PEMADE_POLOS": [{"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "KANTILAN_POLOS": [{"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", "e", "o", "e"]}, {"notation": [".", ".", "a", "-"]}, {"notation": ["I", "o", "-", "-", "-"]}, {"notation": ["-", ".", "e", "."]}, {"notation": ["e", ".", "e", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "."]}, {"notation": ["u", ".", "a", "-"]}, {"notation": ["U", "a", "-", "-", "-"]}, {"notation": ["-", "u", ".", "u"]}, {"notation": [".", "u", "s", "a"]}],
+                "CALUNG": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["i", "-", "o", "-"]}, {"notation": ["e", "-", "o", "-"]}],
+                "JEGOGAN": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 5, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "317ccdb5-6904-4813-8960-6aea3d746265",
+            "id": 30,
+            "index": 29,
+            "label": "Transition_To_Batel1",
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["a,", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a,", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
+                "PEMADE_POLOS": [{"notation": [".", "e", "u", "e"]}, {"notation": [".", "e", "u", "e"]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
+                "PEMADE_SANGSIH": [{"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
+                "KANTILAN_POLOS": [{"notation": [".", "e", "u", "e"]}, {"notation": [".", "e", "u", "e"]}, {"notation": [".", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
+                "KANTILAN_SANGSIH": [{"notation": ["a", "s", ".", "s"]}, {"notation": ["a", "s", ".", "s"]}, {"notation": ["a", ".", ".", "."]}, {"notation": [".", ".", ".", "."]}],
+                "CALUNG": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "105abbd7-1e64-46f0-b791-307cbc39ac8b",
+            "id": 31,
+            "index": 30,
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 150 BPM", "tooltipshort": "150 BPM", "isGradual": false, "section": 1, "value": 150.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "73e1a0d3-b96d-42b5-b92a-26ba12bcdfd6",
+            "id": 32,
+            "index": 31,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192mf beat 1\u21925", "tooltipshort": "\u2192mf", "isGradual": true, "fromSection": 1, "section": 5, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "0e4c6c4f-1178-41ff-9794-b6ecd420b1c9",
+            "id": 33,
+            "index": 32,
+            "execution": [
+                {"type": "tempo", "seqId": 2600, "tooltip": "tempo current\u2192120 BPM beat 6\u21928", "tooltipshort": "\u2192120 BPM", "isGradual": true, "fromSection": 6, "section": 8, "value": 120.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", ".", ".", "e"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", ".", ".", "e"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", ".", ".", "e"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", ".", ".", "e"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "6006c254-b777-4b05-9f0e-f938d872e442",
+            "id": 34,
+            "index": 33,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 5X", "tooltipshort": "5X", "count": 5}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}, {"notation": ["i", ".", "i", "o"]}, {"notation": [".", "i", ".", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}, {"notation": ["u", "e", "u", "."]}, {"notation": ["e", "u", "e", "."]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "1092c8e5-7cb6-4ef3-aef9-25e54c913f65",
+            "id": 35,
+            "index": 34,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a,", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "-", "u"]}, {"notation": ["u", "-", "u", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "CALUNG": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "eff6c6c5-b5be-4242-b0ef-0c902ba7444f",
+            "id": 36,
+            "index": 35,
+            "execution": [],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "u,", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a,", "a,", "-", "u,"]}, {"notation": ["e,", "-", "o,", "-"]}, {"notation": ["e,", "e,", "-", "u,"]}, {"notation": ["a,", "-", "e,", "e,"]}, {"notation": ["-", "u,", "a,", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "ce09a4ee-82b1-412f-bf8c-58d9ffb2d1cb",
+            "id": 37,
+            "index": 36,
+            "label": "Pengecet_Repeat",
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "goto", "seqId": 5020, "passes": [2, 4], "nthpass": false, "tooltip": "go to PENGECET_ANGSEL after passes 2 & 4", "tooltipshort": "PENGECET_ANGSEL", "targetuuid": "8c487b43-add4-47ef-b9ca-1ae8fd1032dc", "targetname": "PENGECET_ANGSEL"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["-", "i", "-", "o"]}, {"notation": ["e", "-", "e", "u"]}, {"notation": ["-", "u", "-", "e"]}, {"notation": ["o", "-", "o", "e"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "i", "o"]}, {"notation": ["-", "o", "-", "i"]}, {"notation": ["a,", "-", "a,", "i"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", "i", ".", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "u", "e", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", "i", ".", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "u", "e", "."]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "7f9392a0-73a1-48bf-8c1b-dc2f42cc779e",
+            "id": 38,
+            "index": 37,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
+                {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after passes 1 & 2", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "ce09a4ee-82b1-412f-bf8c-58d9ffb2d1cb", "targetname": "PENGECET_REPEAT"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["-", "i", "a,", "-"]}, {"notation": ["a,", "-", "u,", "a,"]}, {"notation": ["-", "u,", "-", "u,"]}, {"notation": ["e,", "-", "e,", "-"]}, {"notation": ["u,", "e,", "-", "e,"]}, {"notation": ["o,", "-", "e,", "-"]}, {"notation": ["e,", "u,", "-", "a,"]}, {"notation": ["i", "o", ".", "o"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", "i", ".", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "u", "e", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", "i", ".", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "u", "e", "."]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "8c487b43-add4-47ef-b9ca-1ae8fd1032dc",
+            "id": 39,
+            "index": 38,
+            "label": "Pengecet_Angsel",
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["-", "i", "a,", "-"]}, {"notation": ["a,", "-", "u,", "a,"]}, {"notation": ["-", "u,", "-", "u,"]}, {"notation": ["e,", "-", "u,", "-"]}, {"notation": ["a,", "i", "-", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", ".", "u"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": [".", "i", "o", "."]}, {"notation": ["i", "o", ".", "i"]}, {"notation": ["o", ".", "i", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", "u", "."]}, {"notation": ["e", "u", ".", "e"]}, {"notation": ["u", ".", "e", "u"]}, {"notation": [".", "e", ".", "u"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "7da3797f-e2b7-47ad-913e-5ce98876efbf",
+            "id": 40,
+            "index": 39,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "e", "-", "o"]}, {"notation": ["i", "-", "-", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "e", "-", "o"]}, {"notation": ["i", "-", "-", "o"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["o", "-", "e", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "o", "e"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["e", "-", "e", "o"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "o", "e"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["e", "-", "e", "o"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "i", "i"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["u", "-", "a", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "a", "s"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["s", "-", "s", "a"]}, {"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "a", "s"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["s", "-", "s", "a"]}, {"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "u", "u"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["u", "-", "a", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "o", "e"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["e", "-", "e", "o"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "o", "e"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["e", "-", "e", "o"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "i", "i"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["u", "-", "a", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "a", "s"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["s", "-", "s", "a"]}, {"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "a", "s"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["s", "-", "s", "a"]}, {"notation": ["u", "u", "-", "a"]}, {"notation": ["s", "-", "u", "u"]}, {"notation": ["-", "a", "s", "-"]}, {"notation": ["u", "-", "a", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "1f26aa5d-d708-4a4f-adaa-48383c3eba63",
+            "id": 41,
+            "index": 40,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "e"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a,", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["u", "u", "u", "."]}, {"notation": ["u", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "u", "u", "a"]}, {"notation": [".", "a", ".", "a"]}, {"notation": [".", "a", ".", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "-", "a", "-"]}, {"notation": ["-", "s", "u", "-"]}, {"notation": ["-", "s", "-", "a"]}, {"notation": ["u", "-", "a", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["u", "u", "u", "."]}, {"notation": ["u", ".", "u", "."]}, {"notation": ["u", ".", "u", "e"]}, {"notation": ["o", "-", "i", "-"]}, {"notation": ["-", "-", "o", "-"]}, {"notation": ["-", "e", "u", "-"]}, {"notation": ["-", "e", "-", "o"]}, {"notation": ["i", "-", "a", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "u", "u", "a"]}, {"notation": [".", "a", ".", "a"]}, {"notation": [".", "a", ".", "s"]}, {"notation": ["a", "-", "u", "-"]}, {"notation": ["-", "-", "a", "-"]}, {"notation": ["-", "s", "u", "-"]}, {"notation": ["-", "s", "-", "a"]}, {"notation": ["u", "-", "a", "-"]}],
+                "CALUNG": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "f7cd0170-bcc1-4203-b7b6-9a24b419d577",
+            "id": 42,
+            "index": 41,
+            "execution": [
+                {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to PENGECET_REPEAT after pass 1", "tooltipshort": "PENGECET_REPEAT", "targetuuid": "ce09a4ee-82b1-412f-bf8c-58d9ffb2d1cb", "targetname": "PENGECET_REPEAT"}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "u,", "-"]}, {"notation": ["-", "-", "e,", "-"]}, {"notation": ["a,", "a,", "-", "u,"]}, {"notation": ["e,", "-", "o,", "-"]}, {"notation": ["e,", "e,", "-", "u,"]}, {"notation": ["a,", "-", "e,", "e,"]}, {"notation": ["-", "u,", "a,", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "o", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "i", "i"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "u", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["e", "e", "-", "u"]}, {"notation": ["a", "-", "e", "e"]}, {"notation": ["-", "u", "a", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "o", "-"]}, {"notation": ["-", "-", "e", "-"]}, {"notation": ["a", "a", "-", "u"]}, {"notation": ["e", "-", "o", "-"]}, {"notation": ["i", "i", "-", "o"]}, {"notation": ["e", "-", "i", "i"]}, {"notation": ["-", "o", "e", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["a", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "a3562d42-66e6-43a7-bb7d-6d1a49e709ec",
+            "id": 43,
+            "index": 42,
+            "execution": [
+                {"type": "tempo", "seqId": 2100, "tooltip": "tempo 150 BPM", "tooltipshort": "150 BPM", "isGradual": false, "section": 1, "value": 150.0},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1.0, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "-", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "f86a65b6-280d-4a40-9e3d-61c02ece0af7",
+            "id": 44,
+            "index": 43,
+            "execution": [
+                {"type": "loop", "seqId": 1000, "tooltip": "play 5X", "tooltipshort": "5X", "count": 5},
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics current\u2192mf beat 1\u21928", "tooltipshort": "\u2192mf", "isGradual": true, "fromSection": 1, "section": 8, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "54d86535-c730-450c-83d7-85d8be23c9e5",
+            "id": 45,
+            "index": 44,
+            "execution": [
+                {"type": "tempo", "seqId": 2500, "tooltip": "tempo current\u219270 BPM beat 5\u21928", "tooltipshort": "\u219270 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 70.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", ".", ".", "i"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", ".", ".", "u"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", "-", "e", "-"]}, {"notation": ["i", ".", ".", "i"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", "-", "e", "-"]}, {"notation": ["u", ".", ".", "u"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["e", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 4, 4, 4, 4, 4, 4],
+            "editorGroup": []
+        },
+        {
+            "uuid": "6c08714f-2eef-4153-8f06-8523a1aebd69",
+            "id": 46,
+            "index": 45,
+            "execution": [
+                {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
+                {"type": "dynamics", "seqId": 3700, "tooltip": "dynamics f beat 7", "tooltipshort": "f", "isGradual": false, "section": 7, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "-", "o", "-", "e", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-", "a,", "-", "u,", "-"]}, {"notation": ["i", "-", "o", "-", "e", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-", "a,", "-", "u,", "-"]}, {"notation": ["i", "-", "o", "-", "e", "-", "i", "-"]}, {"notation": ["o", "-", "i", "-", "a,", "-", "u,", "-"]}, {"notation": ["i", "o", "e", "-", "o", "e", "-", "o"]}, {"notation": ["i", "a,", "u,", "-", "a,", "i", "-", "o"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "o", ".", "i", "o", "i", ".", "o"]}, {"notation": ["i", "o", ".", "i", "o", "i", ".", "o"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", ".", "e", "u", ".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u", ".", "u", "e", "."]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "-", "o", "-", ".", ".", "i", "-"]}, {"notation": ["o", "-", "i", "-", ".", ".", "o", "-"]}, {"notation": ["i", "o", ".", "i", "o", "i", ".", "o"]}, {"notation": ["i", "o", ".", "i", "o", "i", ".", "o"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", "-", ".", ".", "e", "-", "u", "-"]}, {"notation": [".", ".", "u", "-", "e", "-", ".", "."]}, {"notation": ["u", ".", "e", "u", ".", "u", "e", "."]}, {"notation": ["u", ".", "e", "u", ".", "u", "e", "."]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["o", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "o", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "o", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["i", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["G", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["T", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}, {"notation": ["x?", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            "colWidths": [8, 8, 8, 8, 8, 8, 8, 8],
+            "editorGroup": []
+        },
+        {
+            "uuid": "9f511b99-bbbb-47fe-a751-0f3a1b44ee5f",
+            "id": 47,
+            "index": 46,
+            "execution": [
+                {"type": "tempo", "seqId": 2300, "tooltip": "tempo 50 BPM beat 3", "tooltipshort": "50 BPM", "isGradual": false, "section": 3, "value": 50.0}
+            ],
+            "staffs": {
+                "TROMPONG": [{"notation": ["i", "i", "i", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i:"]}],
+                "PEMADE_POLOS": [{"notation": ["i", "i", "i", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i:"]}],
+                "PEMADE_SANGSIH": [{"notation": ["u", "u", "u", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u:"]}],
+                "KANTILAN_POLOS": [{"notation": ["i", "i", "i", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["i:"]}],
+                "KANTILAN_SANGSIH": [{"notation": ["u", "u", "u", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["u:"]}],
+                "CALUNG": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
+                "JEGOGAN": [{"notation": ["i", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
+                "GONGS": [{"notation": ["G", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}],
+                "KEMPLI": [{"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-"]}, {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]}]
+            },
+            "colWidths": [4, 4, 11],
+            "editorGroup": []
+        }
+    ]
+}

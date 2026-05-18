@@ -1,0 +1,426 @@
+{INFO notation="sekar gendot gk" part=full title="Sekar Gendot GK" composer="I Wayan Lotring" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{AUTOKEMPYUNG off scope=SCORE}
+	{PART kawitan}
+	{VALIDATION ignore=[kempyung] scope=SCORE}
+	{TEMPO 70}
+	{SUPPRESS kempli}
+	{DYNAMICS f positions=[ugal]}
+	{LABEL ugal_PENYALIT}
+ugal	o-	Eu-	e-	u-	Uu/u
+gangsa	--	--	--	u-	Uu/u
+calung				u
+jegogan				u
+	{WAIT 1}
+
+	{LABEL KAWITAN}
+ugal	e-	u-	e-	o-	io	a,i	oi	a,i
+gangsa p	eu	eu	eu	eo	io	a,i	oi	a,i
+gangsa s	i<u	i<u	i<u	i<a	ua	eu	au	eu
+calung	e		e		i		o
+jegogan	e				i
+gong	G
+	{GOTO KAWITAN_TAIL passes=[2]}
+	{GOTO KAWITAN_FINAL passes=[4]}
+
+ugal	o-	oi	o-	e-	u-	uo	eo	io
+gangsa p	oo	oi	oi	oe	uu	uo	eo	io
+gangsa s	aa	au	au	ai<	uu	ua	i<a	ua
+calung	o		o		u		e
+jegogan	o				u
+gong	T
+	{GOTO KAWITAN}
+
+	{LABEL KAWITAN_TAIL}
+ugal	o-	oa,	io	a,i	o-	i-	ei	e-	Oi-
+gangsa p	oo	oa,	io	a,i	oa,	io	ei	e-	Oi-
+gangsa s	aa	ae	ua	eu	ae	ua	i<u	i<-	Au-
+calung	o		i		o		e	o	i
+jegogan	o				o				i
+gong	T								G
+	{WAIT 3}
+	{GOTO ugal_PENYALIT passes=[1]}
+
+	{LABEL KAWITAN_FINAL}
+	# gongan 5
+ugal	o-	oa,	io	a,i	o-	i-	ei	eo
+gangsa p	oo	oa,	io	a,i	oa,	io	ei	eo
+gangsa s	aa	ae	ua	eu	ae	ua	i<u	i<a
+calung	o		i		o		e	o
+jegogan	o				o
+gong	T
+
+ugal	i-	io	e-	o-	Eu-	e-	ae	a-	Ue-
+gangsa p	ie	io	ei	oe	ua	eu	ae	a-	Ue-
+gangsa s	ui<	ua	i<u	ai<	ua	au	ai<	a-	Ui<-
+calung	i		e		u		a	u	e
+jegogan	o				o
+gong	T
+	{WAIT 3}
+
+	{LOOP 6}
+	{TEMPO 60 beats=1->8 passes=[4]}
+	{TEMPO 45 beats=1->8 passes=[5]}
+	{DYNAMICS mp beats=1->8 passes=[5] positions=[gangsa]}
+ugal	e-	u-	e-	a-	u-	o-	eu	eo	eo	io
+gangsa p	eu	eu	eu	ea	ua	uo	eu	eo	eo	io
+gangsa s	i<u	i<u	i<u	i<a	ua	ua	i<u	i<a	i<a	ua
+calung	e		a		u		e		o
+jegogan	e				u				o
+gong	G				T
+	{GOTO PENGAWAK_TAIL passes=[5] from_beat=9}
+	# Skip last beat during last pass
+
+	{LABEL PENGAWAK_TAIL}
+	{GOTO PENGAWAK_ANGSEL2 passes=[6,12]}
+ugal	i-	Oe-
+gangsa p	i-	Oe-
+gangsa s	u-	Ai<-
+calung		e
+jegogan		e
+gong		G
+	{WAIT 2}
+
+	{SUPPRESS kempli}
+	{TEMPO 70}
+	{PART pengawak}
+ugal	uu/u-	Eo---	ii/i-	Oe---	uu/u-	Eo-e-	o-i-	oi-o	i-o-	e-o-	e-aa	----
+gangsa	----	----	----	----	----	----	----	----	----	----	--aa	----
+calung									i
+jegogan									i
+
+	# gongan 10
+ugal	a,---	a,---	u,-a,-	o-i-	a,---	a,---	u,---	o-i-
+calung	a	a	u-a-	o-i-	a	a	u-a-	o-i-
+jegogan	a		u	o	a		u	o
+gong	G		T		G		T
+	{GOTO PENGAWAK_ANGSEL2 passes=[6,12]}
+
+	{LOOP 3}
+	{LABEL PENGAWAK}
+	{DYNAMICS mp passes=[1,4,7,10] positions=[gangsa]}
+	{DYNAMICS ff passes=[3,6,9,12] beat=5 positions=[gangsa]}
+ugal	a,---	a,---	u,-a,-	o-i-	a,---	a,---	u,---	o-i-
+gangsa p	a.ua	.au.	a.ua	.au.	a.ua	.au.	a.ua	.au.
+gangsa s	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue
+calung	a	a	u-a-	o-i-	a	a	u-a-	o-i-
+jegogan	a		u	o	a		u	o
+gong	G		T		G		T
+	{GOTO PENGAWAK_ANGSEL2 passes=[6,12]}
+
+	# PENGAWAK ANGSEL 1
+ugal	a,---	a,---	u,-a,-	o-i-	a,---	a,---	u,---	o-i-
+gangsa p	.aai<	a-u-	-ee.	e.e.	a.ua	.au.	a---	----
+gangsa s	.aai<	a-u-	-eeu	.u.u	.eu.	e.ue	a---	----
+calung	a	a	u-a-	o-i-	a	a	u-a-	o-i-
+jegogan	a		u	o	a		u	o
+gong	G		T		G		T
+	{GOTO PENGAWAK passes=[1,2]}
+
+	{LABEL PENGAWAK_ANGSEL2}
+ugal	a,---	a,---	u,-a,-	o-i-	a,---	a,---	u,---	o-i-
+gangsa p	.aai<	a-u-	-ee.	e.e.	.aai<	a-u-	-ee.	e.e.
+gangsa s	.aai<	a-u-	-eeu	.u.u	.aai<	a-u-	-eeu	.u.u
+calung	a	a	u-a-	o-i-	a	a	u-a-	o-i-
+jegogan	a		u	o	a		u	o
+gong	G		T		G		T
+
+ugal	a,---	a,-i-	--i-
+gangsa p	.aau	a-i<-	-oi-
+gangsa s	.aau	a-i<-	-au-
+calung	a	a-i-	--i-
+jegogan	a
+gong	G		T
+
+	{DYNAMICS mf positions=[gangsa]}
+	# gongan 15
+ugal	o---	e---	o--Oi	ieoi	io/o-	e---	o--Oi	ieoi
+gangsa p	o.io	.oi.	o.io	.oi.	o.io	.oi.	o.io	.oi.
+gangsa s	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue
+calung	o	e	o	i	o	e	o	i
+jegogan	o		o		o		o
+gong	G		T		G		T
+
+	{LOOP 2}
+	{DYNAMICS mf beats=1->2 positions=[gangsa]}
+	{DYNAMICS ff beat=6 positions=[gangsa]}
+ugal	io/o-	oioe	u---	u-eu	a-u-	e-u-	e-o-	i-a,u,	a,i
+gangsa p	o.io	.ioe	uuu.	u.eu	.e-u	e-u-	e-o-	ia-i	ai
+gangsa s	.e.o	e.oe	uuua	.ai<.	ai<a.	i<-u-	i<-a-	ua-u	au
+calung	o	e	u	u	a	e-u-	e-o-	i	i-
+jegogan	o		o		o		o		--
+gong	G							G	--
+
+	{TEMPO 100 beats=1->8 passes=[2]}
+	{DYNAMICS mf beats=1->8 passes=[2] positions=[gangsa]}
+	{DYNAMICS f positions=[gangsa]}
+ugal	o---	e---	o--Oi	ieoi	io/o-	e---	o--Oi	ieoi
+gangsa p	o.io	.oi.	o.io	.oi.	o.io	.oi.	o.io	.oi.
+gangsa s	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue	.eu.	e.ue
+calung	o	e	o	i	o	e	o	i
+jegogan	o		o		o		o
+gong	G		T		G		T
+	{GOTO TRANSITION_TO_PENGECET passes=[2]}
+
+ugal	o---	e---	o--Oi	ieoi	io/o-	e---	o--Oi	ieoi
+gangsa p	oi.o	i.oi	.oi.	oi.o	.a.u	a.ua	.ua-	----
+gangsa s	.ue.	ue.u	e.ue	.ue.	u.eu	.eu.	eua-	----
+calung	o	i	e	o	i	a	u-a-	o-i-
+jegogan	o		o		o		o
+gong	G		T		G		T
+
+ugal	a,---	a,---	u,-a,-	o-i-
+gangsa p	a.ua	.au.	a---	----
+gangsa s	.eu.	e.ue	a---	----
+calung	a	a	u-a-	o-i-
+jegogan	a		u	o
+gong	G		T
+	{GOTO PENGAWAK}
+
+	{LABEL TRANSITION_TO_PENGECET}
+	{TEMPO 120 beats=1->8}
+	{DYNAMICS mf positions=[gangsa]}
+	{DYNAMICS ff beats=2->8 positions=[gangsa]}
+	# gongan 20
+ugal	o---	e---	o--Oi	ieoi	io/o-	e---	o--Oi	ieoi
+gangsa p	oi.o	i.oi	.oi.	oi.o	.a.u	a.ua	.ua.	ua.u
+gangsa s	.ue.	ue.u	e.ue	.ue.	u.eu	.eu.	eu.e	u.eu
+calung	o	i	e	o	i	a	u-a-	o-i-
+jegogan	o		o		o		o
+gong	G		T		G		T
+
+	{LOOP 3}
+	{TEMPO 100 beats=1->8 passes=[2]}
+	{TEMPO 90 beats=1->8 passes=[3]}
+ugal	a---	e---	o-e-	u-e-	o---	i---	a-i-	o-i-
+gangsa	a---	e---	o-e-	u-e-	o---	i---	a-i-	o-i-
+calung	a		o		o		a
+jegogan	a				o
+gong	G				T
+
+ugal	a-i-	u-a-	i-o-	i-a-
+gangsa	a-i-	u-a-	i-o-	i-a-
+calung	a		i
+jegogan	a
+gong	G
+
+	{PART Pengecet}
+	{DYNAMICS mf  beats=1->8 positions=[gangsa]}
+ugal	u,---	a,---	u,---	e,---	u,---	o---	i-o-	e-o-
+gangsa p	.eoe	.eoe	.eoe	.eoe	..a-	Io---	-.e.	e.eo
+gangsa s	uau.	uau.	uau.	uau.	u.a-	Ua---	-u.u	.ui<a
+calung	u	a	u	e	u	o	i-o-	e-o-
+jegogan	u		u		u		i
+gong	G				T
+
+	{LABEL PENGECET}
+ugal	i---	a,---	u,-a,-	i-a,-	u,---	o---	i-o-	e-o-
+gangsa p	ioe.	o.eo	.oe.	o.eo	..a-	Io---	-.e.	e.eo
+gangsa s	ua.u	au.a	ua.u	au.a	u.a-	Ua---	-u.u	.ui<a
+calung	i	a	u-a-	i-a-	u	o	i-o-	e-o-
+jegogan	i		u		u		i
+gong	G				T
+
+	# gongan 25
+ugal	i---	a,---	u,-a,-	i-a,-	u,---	a,-u,-	e,---	u,---
+gangsa p	ioe.	o.eo	.oe.	o.eo	i.eu	.eu.	eu.e	u.eu
+gangsa s	ua.u	au.a	ua.u	au.a	u.i<.	ai<.a	i<.ai<	.ai<.
+calung	i	a	u-a-	i-a-	u	a-u-	e	u
+jegogan	i		u		u		e
+gong	G				T
+	{GOTO TRANSITION_TO_BATEL1 passes=[3]}
+
+ugal	a,---	i---	a,---	u,---	a,---	e---	o-e-	u-e-
+gangsa p	.eue	.eue	.eue	.eue	..i-	Oe---	..u.	u.ue
+gangsa s	ai<.i<	ai<.i<	ai<.i<	ai<.i<	a.u-	Ai<---	.a.e	.a.e
+calung	a	i	a	u	a	e	o-e-	u-e-
+jegogan	a		a		a		o
+gong	G				T
+	# to end pengecet
+
+ugal	o---	i---	a,-i-	o-i-	a,---	e---	o-e-	u-e-
+gangsa p	o.io	.oi.	o.io	.oi.	o-i-	Oe---	-.u.	u.ue
+gangsa s	.eu.	e.ue	.eu.	e.ue	..u-	Ai<---	-a.e	.a.e
+calung	o	i	a-i-	o-i-	a	e	o-e-	u-e-
+jegogan	o		a		a		o
+gong	G				T
+
+ugal	o---	i---	a,-i-	o-i-	a,---	u,---	o,---	e,---
+gangsa p	o.io	.oi.	o.io	.oi.	o.oe	.oe.	oe.o	e.oe
+gangsa s	.eu.	e.ue	.eu.	e.ue	..a.	ua.u	a.ua	.ua.
+calung	o	i	a-i-	o-i-	a	u	o	e
+jegogan	o		a		a		o
+gong	G				T
+
+ugal	u,---	a,---	u,---	e,---	u,---	o---	i-o-	e-o-
+gangsa p	.eoe	.eoe	.eoe	.eoe	..a-	Io---	-.e.	e.eo
+gangsa s	u.a.	u.a.	u.a.	u.a.	u.a-	Ua---	-u.u	.ui<a
+calung	u	a	u	e	u	o	i-o-	e-o-
+jegogan	u		u		u		i
+gong	G				T
+	{GOTO PENGECET passes=[1,2]}
+
+	{LABEL TRANSITION_TO_BATEL1}
+	{SUPPRESS kempli beats=[4]}
+	# gongan 30
+ugal	a,---	i---	a,...	....
+gangsa p	.eue	.eue	....	....
+gangsa s	ai<.i<	ai<.i<	a...	....
+calung	a	i	a
+jegogan	a		a
+gong	G
+
+	{TEMPO 150}
+	{DYNAMICS ff positions=[gangsa]}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i---	i-e-	i---	i-e-	i-e-	i-e-	i-e-	i-e-
+gangsa s	u---	u-e-	u---	u-e-	u-e-	u-e-	u-e-	u-e-
+calung	i	e	i	e	i	e	i	e
+jegogan	i				i		e
+gong	G		T		G		T
+
+	{PART "Batel 1"}
+	{LOOP 3}
+	{DYNAMICS mf beats=1->5 positions=[gangsa]}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-
+gangsa s	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-
+calung	i	e	i	e	i	e	i	e
+jegogan	i				i		e
+gong	G		T		G		T
+
+	{TEMPO 120 beats=6->8}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i-e-	i-e-	i-e-	i-e-	i..e	i---	----	----
+gangsa s	u-e-	u-e-	u-e-	u-e-	u..e	u---	----	----
+calung	i	e	i	e	i	e	i	e
+jegogan	i				i		e
+gong	G		T		G		T
+
+	{LOOP 5}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i.io	.i.o	i.io	.i.o	i.io	.i.o	i.io	.i.o
+gangsa s	ueu.	eue.	ueu.	eue.	ueu.	eue.	ueu.	eue.
+calung	i	e	i	e	i	e	i	e
+jegogan	i		i	e	i		i	e
+gong	G				T
+
+	{DYNAMICS ff positions=[gangsa]}
+	# gongan 35
+ugal	u--u	u-u-	u-e-	o-i-	--o-	-eu-	-e-o	i-a,-
+gangsa p	u--u	u-u-	u-e-	o-i-	--o-	-eu-	-e-o	i-a-
+gangsa s	u--u	u-u-	u-e-	o-i-	--o-	-eu-	-e-o	i-a-
+calung	u	a	u	e	o	u	e	o
+jegogan	u				o
+gong	G				T
+
+ugal	i-u,-	--e-	a,a,-u,	e,-o,-	e,e,-u,	a,-e,e,	-u,a,-	----
+gangsa p	i-u-	--e-	aa-u	e-o-	ee-u	a-ee	-ua-	----
+gangsa s	i-u-	--e-	aa-u	e-o-	ii-o	e-ii	-oe-	----
+calung	i	u	a	o	e	a	e	o
+jegogan	i				e
+gong	G				T
+
+	{PART "Pengecet part 2"}
+	{LABEL PENGECET_REPEAT}
+	{LOOP 2}
+	{DYNAMICS mf positions=[gangsa]}
+ugal	-i-o	e-eu	-u-e	o-oe	-e-o	i-io	-o-i	a,-a,i
+gangsa p	io.i	o.io	.io.	io.i	o.io	.io.	io.i	oi.o
+gangsa s	u.eu	.eu.	eu.e	u.eu	.eu.	eu.e	u.eu	.ue.
+calung	i	e	u	o	e	i	o	a
+jegogan	i				e
+gong	G				T
+	{GOTO PENGECET_ANGSEL passes=[4,8]}
+
+	{LOOP 2}
+ugal	-ia,-	a,-u,a,	-u,-u,	e,-e,-	u,e,-e,	o,-e,-	e,u,-a,	io.o
+gangsa p	io.i	o.io	.io.	io.i	o.io	.io.	io.i	oi.o
+gangsa s	u.eu	.eu.	eu.e	u.eu	.eu.	eu.e	u.eu	.ue.
+calung	i	a	u	e	u	o	e	o
+jegogan	i				e
+gong	G				T
+	{GOTO PENGECET_REPEAT passes=[2,4]}
+
+	{LABEL PENGECET_ANGSEL}
+	{DYNAMICS f positions=[gangsa]}
+ugal	-ia,-	a,-u,a,	-u,-u,	e,-u,-	a,i-o	e---	----	----
+gangsa p	io.i	o.io	.io.	io.i	o.io	e---	----	----
+gangsa s	u.eu	.eu.	eu.e	u.eu	.e.u	e---	----	----
+calung	i	a	u	e	u	o	e	o
+jegogan	i				e
+gong	G				T
+
+	{DYNAMICS ff positions=[gangsa]}
+	# gongan 40
+ugal	i--o	e---	o---	ee-o	i--o	e---	o---	ee-o	i--o	e---	i---	o-e-
+gangsa p	ii-o	e-oe	-oe-	e-eo	ii-o	e-oe	-oe-	e-eo	ii-o	e-ii	-oe-	u-a-
+gangsa s	uu-a	i<-ai<	-ai<-	i<-i<a	uu-a	i<-ai<	-ai<-	i<-i<a	uu-a	i<-uu	-ai<-	u-a-
+calung	i	e	i	e	i	e	i	e	i	e	i	e
+jegogan	i				i		e	i				i
+gong	G				G				G
+
+	{DYNAMICS f positions=[gangsa]}
+ugal	u---	a---	u---	e---	o--e	u---	-e-o	i-a,-
+gangsa p	uuu.	u.u.	u.ue	o-i-	--o-	-eu-	-e-o	i-a-
+gangsa s	uuua	.a.a	.a.i<	a-u-	--a-	-i<u-	-i<-a	u-a-
+calung	u	a	u	e	o	u	e	o
+jegogan					i
+gong	G				T
+
+ugal	i-u,-	--e,-	a,a,-u,	e,-o,-	e,e,-u,	a,-e,e,	-u,a,-	----
+gangsa p	i-u-	--e-	aa-u	e-o-	ee-u	a-ee	-ua-	----
+gangsa s	u-o-	--e-	aa-u	e-o-	ii-o	e-ii	-oe-	----
+calung	i	u	a	o	e	a	e	o
+jegogan	i				e
+gong	G				T
+	{GOTO PENGECET_REPEAT passes=[1]}
+
+
+	{PART "Batel 2"}
+	{TEMPO 150}
+	{DYNAMICS ff positions=[gangsa]}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i---	i-e-	i---	i-e-	i-e-	i-e-	i-e-	i-e-
+gangsa s	u---	u-e-	u---	u-e-	u-e-	u-e-	u-e-	u-e-
+calung	i	e	i	e	i	e	i	e
+jegogan	i				i		e
+gong	G		T		G		T
+
+	{LOOP 4}
+	{DYNAMICS mf beats=1->8 positions=[gangsa]}
+ugal	i---	e---	i---	e---	i---	e---	i---	e---
+gangsa p	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-	i-e-
+gangsa s	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-	u-e-
+calung	i	e	i	e	i	e	i	e
+jegogan	i				i		e
+gong	G		T		G		T
+
+	{TEMPO 70 beats=5->8}
+	# gongan 45
+ugal	i---	e---	i---	e---	i---	e---	----	----
+gangsa p	i-e-	i-e-	i-e-	i-e-	i..i	e---	----	----
+gangsa s	u-e-	u-e-	u-e-	u-e-	u..u	e---	----	----
+calung	i	e	i	e	i	e
+jegogan	i				i
+gong	G		T		G
+
+	{DYNAMICS mp positions=[gangsa]}
+	{DYNAMICS f beat=7 positions=[gangsa]}
+ugal	i-o-e-i-	o-i-a,-u,-	i-o-e-i-	o-i-a,-u,-	i-o-e-i-	o-i-a,-u,-	ioe-oe-o	ia,u,-a,i-o
+gangsa p	i-o-..i-	o-i-..o-	i-o-..i-	o-i-..o-	i-o-..i-	o-i-..o-	io.ioi.o	io.ioi.o
+gangsa s	u-..e-u-	..u-e-..	u-..e-u-	..u-e-..	u-..e-u-	..u-e-..	u.eu.ue.	u.eu.ue.
+calung	i	o	i	o	i	o	i---o---	i---o---
+jegogan	i		i		i
+gong	G		T		G		T
+
+	{GONGAN kebyar}
+	{SUPPRESS kempli}
+	{TEMPO 50 beat=3}
+ugal	iii-	----	i:
+gangsa p	iii-	----	i:
+gangsa s	uuu-	----	u:
+calung	i
+jegogan	i
+gong	G
+

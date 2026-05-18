@@ -1,0 +1,383 @@
+// The FlowManager functions enable to run through the score in the correct sequence.
+// the functions take `loop` and `goto` directives into account.
+// They also keep track of the 'current' tempo and dynamics.
+import type { UUID } from 'crypto'
+import _ from 'lodash'
+import type { BPM } from 'tone/build/esm/core/type/Units'
+import { defaultDynamics, defaultTempo } from '../../config/config'
+import type { Position } from '../../typing/basetypes'
+import type {
+    ExecutionItem,
+    ExecutionItemType,
+    ExpressionItem,
+    GotoItem,
+    LoopItem,
+    SequenceItem,
+    WaitItem
+} from '../../typing/execution'
+import type { PlaybackType } from '../../typing/playback'
+import type { Measure, Score, System } from '../../typing/score'
+import { debug } from '../../utils/debugger'
+
+// Keeps track of pass and loop counters for each system. Also contains lists of
+// directives (goto, loop, tempo and dynamics), sorted by priority.
+interface FlowInfoTable {
+    [idx: string]: {
+        system: System
+        maxSectIdx: number
+        pass: number
+        loop: number
+        executionItems: Record<ExecutionItemType, ExecutionItem[]>
+    }
+}
+
+// Keeps track of the 'current' cursor position
+interface FlowCursor {
+    systemIdx: number // Index of the current system (numbering starts at 0)
+    sectionIdx: number // Index of the current section (numbering starts at 0)
+    newSystem: boolean // True if this system is different than that of the previous step
+    systemStart: boolean // True if this is the first section of the system
+    lastSection: boolean // True if this is the last section of the current system
+    sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx: number | undefined // Current index of the active sequence
+}
+
+// Returned by function nextInFlow.
+// Contains information about the FlowCursor's current system.
+export interface FlowStep {
+    id: number
+    system: System
+    systemIdx: number
+    sectionIdx: number
+    pass: number // Current pass count
+    loop: number // current iteration count
+    measures: Record<Partial<Position>, Measure>
+    positions: Partial<Position>[]
+    tempo: BPM[]
+    dynamics: number[]
+    lastSystem: boolean
+    lastSection: boolean
+    waitMsAfter: number // Delay after the end of the current section in milliseconds
+    sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx?: number // Current index of the active sequence
+}
+
+const itemPriority = (item: ExecutionItem): number => {
+    // prio 1: specific pass number(s).
+    // prio 2: every nth pass number(s) (each==true)
+    // prio 3: no pass specification.
+    var prio = 99
+    if (item.passes != undefined && item.passes.length > 0 && !item.nthpass) prio = 1
+    else if (item.passes != undefined && item.passes.length > 0 && item.nthpass) prio = 2
+    else if ((item.passes == undefined || item.passes.length == 0) && !item.nthpass) prio = 4
+    return prio
+}
+
+// Lower prio number goes first
+const compareItems = (item1: ExecutionItem, item2: ExecutionItem): number => itemPriority(item1) - itemPriority(item2)
+
+// Returns functions that can be used to run throught the score in the correct sequence.
+export function executionManager(
+    score: Score,
+    playbackType: PlaybackType = 'multiple',
+    startAtSystemIndex: number = 0,
+    startAtPass: number = 1
+) {
+    var currentStep: FlowStep | undefined = undefined
+
+    // Create the lookup table and initialize the flow.
+    var flowinfo: FlowInfoTable = Object.fromEntries(
+        score.systems.map((system) => {
+            const firstPos = Object.keys(system.staffs)[0] as Position
+            const sectionCount = system.staffs[firstPos]?.length || 0
+            const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
+            for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
+                executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
+                // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
+            }
+            return [
+                system.index,
+                { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, executionItems: executionItems }
+            ]
+        })
+    )
+
+    var uuidLookup: Record<string, number> = Object.fromEntries(
+        score.systems.map((system) => [system.uuid, system.index])
+    )
+
+    // Fast forward to the requested system and pass
+    // This will set all flow variables correctly
+    if (startAtSystemIndex != 0 || startAtPass != 1) {
+        var quit = false
+        do {
+            const nextStep = nextStepInFlow(true) // get next step but do not change flow variables
+            if (!nextStep) {
+                console.error(`Requested system ${startAtSystemIndex} unreachable from the start of the score`)
+                currentStep = nextStepInFlow()
+                break
+            }
+            if (nextStep.systemIdx != startAtSystemIndex || nextStep.pass != startAtPass) {
+                // Proceed to next step if the requested position is not yet reached
+                // or if the end of the score is reached.
+                currentStep = nextStepInFlow()
+            } else quit = true
+        } while (!quit)
+    }
+
+    function resetFlow() {
+        _.values(flowinfo).forEach((value) => {
+            value.loop = 0
+            value.pass = 0
+        })
+        currentStep = undefined
+    }
+
+    // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/loop count values
+    // or undefined if none was found.
+    function getExecutionItems(type: ExecutionItemType, sysIdx: number): ExecutionItem[] {
+        const matches: ExecutionItem[] = []
+        const items = flowinfo![sysIdx].executionItems[type]
+        const flow = flowinfo![sysIdx]
+        for (const item of items) {
+            var loopMatches =
+                item.type == 'loop'
+                    ? flow.loop <= item.count
+                    : !('iterations' in item) ||
+                      !item.iterations ||
+                      item.iterations.length == 0 ||
+                      item.iterations.includes(flow.loop)
+            if (!loopMatches) continue
+            // if `each`==false or undefined: match=true if no passes are given or if flow.pass
+            //                                matches a pass in item.passes
+            // if `each`==true and one or more passes are given: match=true if flow.pass % maxPassNr
+            //                                matches a pass in item.passes
+            // The case `each`==true and item.passes==undefined or empty is invalid and should not return a match.
+            // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
+            var passMatches = !item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)
+            if (!item.nthpass && passMatches) matches.push(item)
+            else if (item.nthpass && item.passes && item.passes.length > 0 && loopMatches) {
+                const maxPassNr = Math.max(...item.passes)
+                if (item.nthpass && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
+                    // Matching item found
+                    matches.push(item)
+                }
+            }
+        }
+        return matches
+    }
+
+    // Returns the sequence linked to the given system if available
+    function getSequence(currentStep: FlowStep): UUID[] | undefined {
+        const sequenceItems: SequenceItem[] = getExecutionItems('sequence', currentStep.systemIdx) as SequenceItem[]
+        if (sequenceItems.length > 0) {
+            // There should not be more than one sequence item
+            return sequenceItems[0].uuids as UUID[]
+        }
+    }
+
+    // Returns the next index in the current system's sequence if there is a sequence
+    // or undefined if there are no more systems in the sequence.
+    function getNextSequenceIdx(currentStep: FlowStep, sequence: UUID[]): number | undefined {
+        var currSequenceIdx = currentStep.sequenceIdx != undefined ? currentStep.sequenceIdx : -1
+        if (currSequenceIdx < sequence.length - 1) {
+            return currSequenceIdx + 1
+        }
+    }
+
+    function getNextSystemInFlow(
+        currentStep: FlowStep,
+        flowInfo: FlowInfoTable,
+        sequence: UUID[] | undefined,
+        nextSequenceIdx: number | undefined
+    ): number | undefined {
+        var sysIdx = currentStep.systemIdx
+        const loopItems: LoopItem[] = getExecutionItems('loop', sysIdx) as LoopItem[]
+        if (loopItems.length > 0 && flowInfo[sysIdx].loop < loopItems[0].count) {
+            return sysIdx
+        }
+        if (sequence && nextSequenceIdx != undefined) {
+            return uuidLookup[sequence[nextSequenceIdx]]
+        }
+        const gotoItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
+        if (gotoItems.length == 0) return sysIdx == score.systems.length - 1 ? undefined : sysIdx + 1
+        return uuidLookup[gotoItems[0].targetuuid]
+    }
+
+    function getWaitTimeMsAfter(sysIdx: number): number {
+        const waitItems: WaitItem[] = getExecutionItems('wait', sysIdx) as WaitItem[]
+        return waitItems.reduce((subtotal, item) => subtotal + item.seconds * 1000, 0)
+    }
+
+    function getExpressionValue(
+        type: 'tempo' | 'dynamics',
+        sysIdx: number,
+        sectIdx: number,
+        currentValue: number
+    ): number[] {
+        const matches = getExecutionItems(type, sysIdx)
+        // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
+        if (matches.length == 0) return [currentValue, currentValue]
+        // Find an item that matches the given section index.
+        const sectionNbr = sectIdx + 1 // Sections are numbered from 1
+        for (const item of matches) {
+            const exprItem = item as ExpressionItem
+            // debug(`exprItem=${JSON.stringify([exprItem])}, section=${sectionNbr}`)
+            if (!exprItem.isGradual) {
+                if (sectionNbr == exprItem.section) {
+                    // Non-gradual matching item found
+                    // debug(`EXPRESSION(${type}) NON-GRADUAL=${JSON.stringify([exprItem.toValue, exprItem.toValue])}`)
+                    return [exprItem.value, exprItem.value]
+                }
+            } else if (exprItem.fromSection && exprItem.fromSection <= sectionNbr && sectionNbr <= exprItem.section) {
+                // Gradual matching item found: determine start and end values for the given section.
+                if (undefined != exprItem.fromValue) {
+                    // Case 1: fromValue is given
+                    const totalSections = exprItem.section - exprItem.fromSection + 1
+                    const valueRange = exprItem.value - exprItem.fromValue
+                    const startValue =
+                        exprItem.fromValue + valueRange * ((sectionNbr - exprItem.fromSection) / totalSections)
+                    const endValue = startValue + valueRange / totalSections
+                    // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
+                    return [startValue, endValue]
+                } else {
+                    // Case 2: fromValue is undefined.
+                    const remainingSections = exprItem.section - sectionNbr + 1
+                    const fromValue = currentValue
+                    const valueRange = exprItem.value - fromValue
+                    const startValue = fromValue
+                    const endValue = fromValue + valueRange * (1 / remainingSections)
+                    // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
+                    return [startValue, endValue]
+                }
+            }
+        }
+        // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
+        return [currentValue, currentValue]
+    }
+
+    // Returns the next step in the execution flow
+    // peek: if true, state variables (cursor, pass and loop counters) will not be changed
+    function nextStepInFlow(peek: boolean = false): FlowStep | undefined {
+        const next: FlowCursor = {
+            systemIdx: -1,
+            sectionIdx: -1,
+            newSystem: false,
+            systemStart: false,
+            lastSection: false,
+            sequence: undefined,
+            sequenceIdx: undefined
+        }
+        switch (true) {
+            case flowinfo == undefined: {
+                console.error(`missing lookup table`)
+                return undefined
+            }
+            case !currentStep: {
+                // Start of playback sequence: return the first measure
+                _.assign(next, {
+                    systemIdx: 0,
+                    sectionIdx: 0,
+                    newSystem: true,
+                    systemStart: true,
+                    lastSection: flowinfo![0].maxSectIdx == 0
+                } as FlowCursor)
+                break
+            }
+            case currentStep!.sectionIdx < flowinfo![currentStep!.systemIdx].maxSectIdx: {
+                // Next section, same system
+                _.assign(next, {
+                    systemIdx: currentStep.systemIdx,
+                    sectionIdx: currentStep.sectionIdx + 1,
+                    newSystem: false,
+                    systemStart: false,
+                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep.systemIdx].maxSectIdx,
+                    sequence: currentStep.sequence,
+                    sequenceIdx: currentStep.sequenceIdx
+                } as FlowCursor)
+                break
+            }
+            case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
+                // Reached end of system. Determine next system.
+                // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
+                const sequence = currentStep.sequence || getSequence(currentStep)
+                const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
+                const nextSysIdx = getNextSystemInFlow(currentStep, flowinfo, sequence, nextSequenceIdx)
+                // In case of single system playback: quit if we leave the requested system
+                if (
+                    playbackType == 'single' &&
+                    currentStep.systemIdx == startAtSystemIndex &&
+                    nextSysIdx != startAtSystemIndex
+                )
+                    return undefined
+
+                if (nextSysIdx == undefined) return undefined
+                _.assign(next, {
+                    systemIdx: nextSysIdx,
+                    sectionIdx: 0,
+                    newSystem: currentStep.systemIdx != nextSysIdx,
+                    systemStart: true,
+                    lastSection: flowinfo![nextSysIdx].maxSectIdx == 0,
+                    sequence: nextSequenceIdx != undefined ? sequence : undefined,
+                    sequenceIdx: nextSequenceIdx
+                } as FlowCursor)
+                break
+            }
+            default:
+                break
+        }
+        if (next.systemIdx >= 0 && next.sectionIdx >= 0) {
+            debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
+            const nextSystem = flowinfo[next.systemIdx].system
+            const measures = _.fromPairs(
+                _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
+            ) as Record<Position, Measure>
+
+            const nextPass = next.newSystem ? flowinfo[next.systemIdx].pass + 1 : flowinfo[next.systemIdx].pass
+            const nextLoop = next.systemStart ? flowinfo[next.systemIdx].loop + 1 : flowinfo[next.systemIdx].loop
+
+            if (!peek) {
+                // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
+                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
+                if (next.newSystem) flowinfo[next.systemIdx].pass += 1
+                if (next.systemStart) flowinfo[next.systemIdx].loop += 1
+            }
+
+            const nextStep: FlowStep = {
+                id: currentStep ? currentStep.id + 1 : 1,
+                system: nextSystem,
+                systemIdx: nextSystem.index,
+                sectionIdx: next.sectionIdx,
+                pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
+                loop: peek ? nextLoop : flowinfo[next.systemIdx].loop,
+                measures: measures,
+                positions: _.keys(measures) as Position[],
+                tempo: getExpressionValue(
+                    'tempo',
+                    next.systemIdx,
+                    next.sectionIdx,
+                    currentStep?.tempo[1] || defaultTempo
+                ),
+                dynamics: getExpressionValue(
+                    'dynamics',
+                    next.systemIdx,
+                    next.sectionIdx,
+                    currentStep?.dynamics[1] || defaultDynamics
+                ),
+                lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
+                lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
+                waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0,
+                sequence: next.sequence,
+                sequenceIdx: next.sequenceIdx
+            }
+
+            if (!peek) {
+                currentStep = nextStep
+            }
+            return nextStep
+        }
+        return undefined
+    }
+
+    return { nextInFlow: nextStepInFlow, resetFlow }
+}

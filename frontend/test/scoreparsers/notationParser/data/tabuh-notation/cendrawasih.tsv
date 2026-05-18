@@ -1,0 +1,330 @@
+{INFO notation=cendrawasih part=full title=Cendrawasih instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+#	Composer: I Gede Manik
+	{GONGAN gineman}
+	{TEMPO 120}
+ga/ugal	oeu-a-u-eua-u---u/.u/...
+
+ugal	u	a	u	i<	a	i<	a	u-e-
+gangsa p	ua.u	.au.	u.ai<	.ai<.	ai<.a	.i<a.	a.ua	.ua.
+gangsa s	.oe.	eo.e	.u.e	u.eu	.eu.	ue.u	.e.o	e.oe
+calung	u		u		a		a
+jegog	u				a
+
+ugal	u	a	u	i<	a	i<	a	u-e-
+gangsa p	ua.u	.au.	u.ai<	.ai<.	ai<.a	.i<a.	a.u.	i<.u.
+gangsa s	.oe.	eo.e	.u.e	u.eu	.eu.	ue.u	.e.a	.a.e
+reyong							.xxx	xxxx
+calung	u		u		a		a
+jegog	u				a
+
+	{DYNAMICS f positions=[gangsa,ugal]}
+ga/ugal	oo-i	-oe-	a,a,-u,	-a,i-	oo-i	-oe-	a,a,-u,	-a,i-
+reyong	bb-b/	.bb/.	bb-b/	.bb/.	bb-b/	.bb/.	bb-b/	.bb/.
+calung	o		a		o		a
+jegog	o
+gong	G
+
+##	gongan 5
+	{TEMPO 100 beats=1->4}
+ga/ugal	e,---
+reyong13	b--u	a-u-	ee-u	a-u-
+reyong24	b--i	o-i-	ee-i	o-i-
+calung	e
+jegog	e
+
+	{TEMPO 120 beats=1->2}
+	{DYNAMICS mf positions=[gangsa,ugal]}
+ugal					e,-a,i	o.o.	o.o.	o.o.
+gangsa p					e,-a,i	o.o.	o.o.	o.o.
+gangsa s					i-eu	.e.e	.e.e	.e.e
+reyong1	e,-u,a,	.u,a,i	.a,io	.ioe	..a,i	.t.t	.t.t	.t.t
+reyong2	e-o.	i.e.	o.u.	e.a.	u-ei	oeoe	oeoe	oeoe
+reyong3	i<-ua	.uai<	.ai<o<	.i<o<.	..ai<	.i<ai<	.i<ai<	.i<ai<
+reyong4	e<-o<.	i<.e<.	o<.u<.	e<.e<.	u<-e<u<	o<e<o<e<	o<e<o<e<	o<e<o<e<
+calung					u
+jegog					u
+
+	{LABEL PEPESON}
+	{PART pepeson}
+	{LOOP 2}
+ugal	o-e-	o-e-	a---	e-u-	a---	u-a-	i<-i<a	u-e-
+gangsa	.ooo	o-eu	-a-u	e-u-	a-ue	-ua-	i<i</i<a	u-e-
+reyong	.xxx	xxxx	xxx.	b-b/.	b/.bb	-b/b/	.bbb	b-b/.
+calung	o		a		a		i
+jegog	o				a
+gong	G
+
+	{LOOP 2}
+ugal	oia,.	a,.a,.	a,u,.a,	u,.u,a,	i.io	.oe.	..u.	u.u.
+gangsa p	oia,.	a,.a,.	a,u,.a,	u,.u,a,	i.io	.oe.	..u.	u.u.
+gangsa s	oi.i	.i.i	.oi.	oio.	.a,i.	io..	.a.e	.a.e
+reyong	..b/.	b/.b/.	.xx.	...x	x.xx	.xx.	..xx	x.b/.
+calung	o		a		i		e
+jegog	o				i
+gong	G				P
+
+ga/ug	.ooo	o-eo	.iii	i-ue	.ooo	o-eo	.iii	i-ue
+reyong1	.u,a,t	.t.t	.u,u,a,	.a,u,a,	.u,a,t	.t.t	.u,u,a,	.a,u,a,
+reyong2	.ooe	oeoe	oiio	ioio	iooe	oeoe	oiio	ioio
+reyong3	.aai<	.i<ai<	.uua	.aua	.aai<	.i<ai<	.uua	.aua
+reyong4	.o<o<e<	o<e<o<e<	o<i<i<o<	i<o<i<o<	i<o<o<e<	o<e<o<e<	o<i<i<o<	i<o<i<o<
+calung	o		i		o		i
+jegog	o				o
+gong	G				P
+
+##	gongan 10
+ugal	.oo-	Ia,---	--Io-	i-a,-
+gangsa p	.oo-	Ia,---	--Io-	i-a,-
+reyong	.oo.	Ia---	--b/.	b-b/.
+calung	o		i
+jegog	o
+gong	T		P
+
+ugal	u,---	i---	a,-o-	i-a,-	u,---	i---	a,-o-	i-a,-
+gangsa p	..a,i	.ia,.	a,.u,a,	.a,u,.	u,.a,i	.ia,.	a,.u,a,	.a,u,.
+gangsa s	.o.i	oi.i	.i.a,	ia,.a,	.o.i	oi.i	.i.a,	ia,.a,
+reyong	.xxx	xxxx	x.b/b/	.b-b/	.xxx	xxxx	x.b/b/	.b-b/
+calung	u		a		u		a
+jegog	u				u
+gong	G		P		T		P
+
+ugal	u,---	i---	a,-o.	o.oe	u---	a,a,.a,	.ia,a,	.a,.i
+gangsa p	u,.a,i	.ia,.	a,.o.	o.oe	u---	a,a,.a,	.ia,a,	.a,.i
+gangsa s	.o.i	oi.i	.ioe	.e.e	u---	ee.e	o.ee	.eo.
+reyong13	.xxx	xxxx	xxxx	xxxx	x...	aa.a	.iaa	.a.i
+reyong24	.xxx	xxxx	xxxx	xxxx	x...	ee.e	o.ee	.eo.
+calung	u		a		u		o
+jegog	u				u
+gong	G				P
+
+ga/ugal	a,---	--i-	o-e-	u-e-	o-e-	u-a-	--e-	u-e-
+reyong1	a,---				.u,a,t	.t.t	.t.t	.t.t
+reyong2	e---				.eei	oeoe	oeoe	oeoe
+reyong3	a---				.uai<	.i<ai<	.i<ai<	.i<ai<
+reyong4	e<---				.e<e<i<	o<e<o<e<	o<e<o<e<	o<e<o<e<
+calung	a		o		o		u
+jegog	a
+gong	T				P
+	{GOTO PEPESON passes=[1]}
+
+	{GONGAN kebyar}
+	{TEMPO ->70 beats=->1}
+	{TEMPO ->50 beats=2->4}
+ga/ugal	o--eueo	--ioo_i_a,u,a,	e,u,a,ii_a,_ioee_o_eua	i<aueioia,---u,/u,-a,i-o-
+reyong	o--eueo	--ioo_i_aua	euaii_a_ioee_o_eua	i<aueioia---u/u-ai-o-
+calung	o-----o	---o-_-_a-a	---i-_-_i-e-_-_e-a	-a-e-o-a---u---i---
+jegog	o-----o	-----_-_--a	---i-_-_--e-_-_--a	---e---a---u-------
+gong	G-----G	-----_-_--P	-----_-_--T-_-_---	-------P-----------
+
+	{PART pengawak}
+	{LABEL PENGAWAK}
+	{TEMPO 70}
+	{LOOP 2}
+##	gongan 15
+ga/ugal	i-----ii/	i-----ii/	i-----u-	--Ai<-u-Ai<-	a-----u-	e/...u-Ai<-	a-i-o-e-	--u-e-o-
+reyong1	.a,u,a,.a,u,a,	.a,u,a,.a,u,a,	.a,u,a,.u,u,a,	u,a,u,a,u,a,u,a,	..bb.bb/.	b....xxx	x.b-b-b/.	b---b/.b/.
+reyong2	ioioioio	ioioioio	ioioiioe	oeoeoeoe	..bb.bb/.	b....xxx	x.b-b-b/.	b---b/.b/.
+reyong3	.aua.aua	.aua.aua	.aua.uua	uauauaua	..bb.bb/.	b....xxx	x.b-b-b/.	b---b/.b/.
+reyong4	i<o<i<o<i<o<i<o<	i<o<i<o<i<o<i<o<	i<o<i<o<i<i<o<e<	u<e<u<e<u<e<u<e<	..bb.bb/.	b....xxx	x.b-b-b/.	b---b/.b/.
+calung	i	o	i	u	a	e	a	e
+jegog	i		i		a		a
+gong	G				P		T	P
+
+	{TEMPO 90}
+ugal	ia,u,.	u,.u,.	u,ia,.	a,.a,.	a,eo.	o.o.	oe-o	i-a,-
+gangsa p	ia,u,.	u,.u,.	u,ia,.	a,.a,.	a,eo.	o.o.	oe-o	i-a,-
+gangsa s	.a,.a,	.a,.a,	.i.i	.i.i	.e.e	.e.e	.i-a	u-e-
+reyong	.xxx	xxxx	x.b/.	b/.b/.	b.xx	xxxx	.b-b/	b-b/.
+calung	i		u		a		o
+jegog	i				a
+gong	G		P		T		P
+
+ga/ugal	u,-u-	u/.u-	-a-u	e-i-	o---	--e-	uu/ua	i<-a-
+reyong	b/.b-	b/.b-	....	....	-b-b/	b.b/.	b/...	....
+calung	u		u		o		u
+jegog	u				o
+gong	G		P		T		P
+
+ugal	.uuu	uuuu	uuuu	uuuu	u/...	..Ai<-	a-u-	e-o-
+gangsa p	.uuu	uuuu	uuuu	uuuu	u/...	..Ai<-	a-u-	e-o-
+gangsa s	.iii	iiii	iiii	iiii	i/...	..Ai<-	a-u-	i<-a-
+reyong	.xxx	xxxx	xxxx	xxxx	x/...	....	....	....
+calung	u		a		u/		a
+jegog	u				u/
+gong	G		P		T		P
+
+ga/ugal	.eee	eeoi	a,a,a,a,	a,a,io	eeee	eeoi	a,a,a,a,	a,ioe
+reyong	.xxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+calung	e		a		e		a
+jegog	e				e
+gong	G		P		T		P
+
+##	gongan 20
+ugal	uu-a	.ua.	uu-a	.ua.	uu-a	.ua.	.uue	o-i-
+gangsa p	uu-a	.ua.	uu-a	.ua.	uu-a	.ua.	.uue	o-i-
+gangsa s	uu-a	i<.ai<	uu-a	i<.ai<	uu-a	i<.ai<	.uui<	a-u-
+reyong	bb-b/	.bb/.	bb-b/	.bb/.	bb-b/	.bb/.	.bbb/	b-b/.
+calung	u		u		u		u
+jegog	u				u
+gong	G		P		T		P
+
+	{TEMPO 70 beats=2->4 passes=[1]}
+	{GOTO PENGAWAK passes=[1]}
+ga/ugal	o.a,---i-	o.a,---i-	o.a,---i-	.u,-a,i-o-
+reyong	o.a---i-	o.a---i-	o.a---i-	.u-ai-o-
+calung	o-a	o-a	o-a	u
+jegog	o		o
+gong				P
+
+	{PART pengipuk}
+ugal	i-oe	u---	e-u-	o-e-	u-eo	i---	a,-i-	u,-a,-
+gangsa p	i.oe	u.eu	.eu.	eu.e	u.eo	i.oi	.oi.	oi.o
+gangsa s	.ioe	.oe.	oe.o	e.oe	.oeo	.eo.	eo.e	o.eo
+reyong1	u,u,a,.	u,a,.u,	a,.u,a,	.u,a,.	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong2	.ioe	.oe.	oe.o	e.oe	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong3	uua.	ua.u	a.ua	.ua.	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong4	i<.o<e<	.o<e<.	o<e<.o<	e<.o<e<	.bb/.	bb/.b	b/.bb/	.bb/.
+calung	i	u	o	e	u	o	i	o
+jegog	i				u
+gong	G				P
+
+ugal	i-oe	u---	e-u-	o-e-	u-ue	o---	i-o-	a,-i-
+gangsa p	i.oe	u.eu	.eu.	eu.e	u.ue	o.eo	.eo.	eo.e
+gangsa s	.ioe	.oe.	oe.o	e.oe	.au.	au.a	u.au	.au.
+reyong1	u,u,a,.	u,a,.u,	a,.u,a,	.u,a,.	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong2	.ioe	.oe.	oe.o	e.oe	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong3	uua.	ua.u	a.ua	.ua.	.bb/.	bb/.b	b/.bb/	.bb/.
+reyong4	i<.o<e<	.o<e<.	o<e<.o<	e<.o<e<	.bb/.	bb/.b	b/.bb/	.bb/.
+calung	i	u	o	e	u	o	i	e
+jegog	i				u
+gong	T				P
+
+ga/ugal	oo.i	.ioo	.i.i	oi.i	o-a,-	--i-	o-e-	u-a-
+reyong	oo.i	.ioo	.i.i	oi.i	a-b-	--b/.	b-b/.	b-b/.
+calung	o	i	o	i	o-a	--i-	o-e-	u-a-
+jegog	o				o
+gong	G				P
+
+	{LABEL PENGIPUK}
+##	gongan 25
+ugal	-uu.	u.u.	u.u.	u.u.	u.oe	u-e-	u-o/.	....
+gangsa p	-uu.	u.u.	u.u.	u.u.	u.oe	u-e-	u-o/.	....
+gangsa s	-uua	.a.a	.a.a	.a.a	..ai<	u-i<-	u-a/.	....
+reyong	-uua	a/aa/a	a/aa/a	a/aa/a	u.ai<	u-i<-	u-a/.	....
+reyong1	-u,u,a,	u,a,u,a,	u,a,u,a,	u,a,u,a,	u,/.a,e,	u,-e,-	u,-a,/.	....
+reyong2	-ooe	.eoe	.eoe	.eoe	o/.oe	o-e-	o-o/.	....
+reyong3	-uua	uaua	uaua	uaua	u/.ai<	u-i<-	u-a/.	....
+reyong4	-u<u<e<	u<e<u<e<	u<e<u<e<	u<e<u<e<	u</.o<e<	u<-e<-	u<-o</.	....
+calung	u	a	u	a	u	e	u	e
+jegog	u				u
+gong	T				P
+
+ga/ugal	.ooo	o-eu	-a-e	-aue	-uuu	u-eu	-a-e	-aue
+reyong	.ooo	o-eu	-a-e	-aue	-uuu	u-eu	-a-e	-aue
+##reyong1	.a,a,a,	a,-e,u,	-a,-e,	-a,u,e,	-u,u,u,	u,-e,u,	-a,-e,	-a,u,e,
+##reyong2	.ooo	o-ei	-e-e	-eoe	-ooo	o-eo	-e-e	-eoe
+##reyong3	.aaa	a-i<u	-a-i<	-aui<	-uuu	u-i<u	-a-i<	-aui<
+##reyong4	.o<o<o<	o<-e<u<	-e<-e<	-e<u<e<	-u<u<u<	u<-e<u<	-e<-e<	-e<u<e<
+calung	o	e	a	e	u	e	a	e
+jegog	o				u
+gong	G				P
+
+ga/ugal	.ooo	o-eu	-a-e	-aue	-uue	o-i-	o.a,-	----
+reyong	.ooo	o-eu	-a-e	-aue	-uue	o-i-	o.a-	----
+calung	o	e	a	e	u	o	o-a
+jegog	o				u
+gong	T				P
+
+ugal	a,---	o-i-	--e-	o---	a,-u,-	--i-	a,---	o-i-
+gangsa p	--io	.oi.	oe.e	o.u,a,	.a,u,.	a,i.i	a,.io	.oi.
+gangsa s	-e.o	eo.u	.eue	.i.a,	ia,.o	.ioi	.e.o	eo.u
+reyong	..b/.	b/...	b/.b/.	..b/.	b/...	b/.b/.	..b/.	b/...
+calung	a	o-i-	--e-	o---	a-u-	--i-	a---	o-i-
+jegog	a	--i-		o	--u-		a	--i-
+gong	G			P			T
+
+ugal	--e-	o---	u-e-	--a-	.uuu	u.eu	a-u-	e-o-
+gangsa p	oe.e	o.eu	.ue.	ua.a	.uuu	u.eu	a.u.	e.o.
+gangsa s	.eue	.a.u	au.i<	.ai<a	.uuu	uoeu	.e.o	.i.a,
+reyong1	b/.b/.	..b/.	b/...	b/.b/.	.u,u,a,	u,.a,e,	.a,a,u,	a,.u,a,
+reyong2	b/.b/.	..b/.	b/...	b/.b/.	.ooe	o.ei	.eeo	e.oe
+reyong3	b/.b/.	..b/.	b/...	b/.b/.
+reyong4	b/.b/.	..b/.	b/...	b/.b/.
+calung	--e-	o---	u-e-	--a-	u	e	a	o
+jegog		o	--e-		u
+gong		P			G
+
+##	gongan 30
+ga/ugal	i-o-	i-a,a,	-io-	e-o-	i-o-	i-a,a,	-io-	i-a,-
+reyong	.xxx	xxxx	.bb.	b-b.	.xxx	xxxx	.bb.	b-b.
+calung	i	u	a	o	i	u	a	e
+jegog	i				i
+gong	P				T		P
+
+ga/ugal	u,-o-	i-a,a,	-io-	e-o-	i-o-	i-a,a,	-io-	i-a,-
+reyong	.xxx	xxxx	.bb.	b-b.	.xxx	xxxx	.bb.	b-b.
+calung	u	i	a	o	i	u	a	e
+jegog	u				i
+gong	G		P		T		P
+
+ga/ugal	u,u,.a,	.a,ii	.a,.a,	ia,.a,	i-oe	u-e-	u-o/.	....
+reyong	uu.a	.aii	.a.a	ia.a	i-oe	u-e-	u-o/.	....
+calung	u	a	i	o	i	a	u	o-e-
+jegog	u				i
+gong	G				P
+	{GOTO PENGIPUK passes=[1,2]}
+
+	{GONGAN kebyar}
+	{TEMPO 80 beats=->1}
+ga/ugal	u--au_aueo_ei-oeueoia,-eee/.
+reyong	u--au_aueo_ei-oeueoia-eee/.
+calung	u----_-u--_-i-------------
+jegog	u----_----_---------------
+gong	G----_----_---------G-----
+
+	{PART batel}
+	{LOOP 4}
+	{DYNAMICS f positions=[gangsa, reyong] iterations=[1,3]}
+	{DYNAMICS mp positions=[gangsa, reyong] iterations=[2,4]}
+ga/ugal	a,i	a,i	a,i	oi	a,i	a,i	a,i	o-
+reyong	ai	ai	ai	oi	ai	ai	ai	o-
+calung	a	i	a	o	a	i	a	o
+jegog	a				a
+gong	G		P		T		P
+
+	{TEMPO 40 beats=1->8}
+	{DYNAMICS f positions=[gangsa, reyong]}
+	{DYNAMICS mf positions=[gangsa, reyong] beats=2->8}
+##	gongan 35
+ga/ugal	a,i	a,i	a,i	oi	a,i	a,i	a,i	oi
+reyong	ai	ai	ai	oi	ai	ai	ai	oi
+calung	a	i	a	o	a	i	a	o
+jegog	a				a
+gong	G		P		T		P
+
+	{TEMPO 80 beats=->1}
+ga/ugal	a,a,-u,	-u,a,i	oo-a,	-a,-i	a,a,-u,	-u,a,i	oo-e	-e-u
+reyong	aa-u	-uai	oo-a	-a-i	aa-u	-uai	oo-e	-e-u
+calung	a	u	o	i	a	u	o	u
+jegog	a				a
+gong	G				P
+
+	{DYNAMICS mp positions=[ugal, gangsa, reyong] beats=4->8}
+ga/ugal	e---	--u-	Ai<---	e-o-	Ia,-oe	uaua	uaua	uaua
+reyong1	a,---				..a,e,	u,a,u,a,	u,a,u,a,	u,a,u,a,
+reyong2	e---				..oe	.eoe	.eoe	.eoe
+reyong3	a---				..ai<	uaua	uaua	uaua
+reyong4	e<---				..o<e<	u<e<u<e<	u<e<u<e<	u<e<u<e<
+calung	e				a	u	a	u
+jegog	e				a
+gong	T				P
+
+ga/ugal	u---
+reyong1	u,---
+reyong2	----
+reyong3	u---
+reyong4	u<---
+calung	u
+jegog	u
+gong	G

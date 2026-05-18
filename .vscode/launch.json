@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Test",
+            "skipFiles": ["<node_internals>/**"],
+            "program": "${workspaceFolder:frontend}/src/scoreparsers/grammars/tabuh/test/test.ts",
+            "outFiles": ["${workspaceFolder:frontend}/**/*.ts"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run notationParser test",
+            "skipFiles": ["<node_internals>/**"],
+            "program": "${workspaceFolder:frontend}/test/scoreparsers/notationParser/testnotation.ts",
+            "outFiles": ["${workspaceFolder:frontend}/**/*.ts"]
+        }
+    ]
+}
