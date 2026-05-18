@@ -4,6 +4,7 @@ import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
 import type { KeyboardType } from '../config/config'
+import type { AuthUser } from '../context/AuthContext'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from '../context/contexts'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import type { ScoreInfo, ScoreMenuOption } from '../typing/menus'
@@ -48,9 +49,10 @@ interface TabuhEditorMenuProps {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
+    user: AuthUser | null
 }
 
-export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }: TabuhEditorMenuProps) {
+export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard, user }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
@@ -143,7 +145,10 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard }:
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
                 <Nav.Item eventKey="file-import-laras">Import Laras file...</Nav.Item>
                 <Nav.Item eventKey="file-import-tabuh">Import Tabuh file...</Nav.Item>
-                <Nav.Item eventKey="file-save">Save</Nav.Item>
+                <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">
+                    <div className="block width-xl">Save</div>
+                    {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
+                </Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
             </Nav.Menu>
             <Nav.Menu

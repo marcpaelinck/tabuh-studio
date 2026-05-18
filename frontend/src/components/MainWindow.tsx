@@ -388,6 +388,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             loadScore={loadScore}
                             setKeyboard={SetKeyboard}
                             scoreMenuOptions={scoreMenuOptions}
+                            user={user}
                         />
                     </Sidenav.Body>
                     <Sidenav.Footer>
