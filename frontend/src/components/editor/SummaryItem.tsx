@@ -79,7 +79,7 @@ export function SummaryItem({
         hasfield?: boolean // Button is followed by a text field
         formtitle?: string // Title to display in editing mode
         fieldeditor?: FieldEditorType // Field editor type
-        fieldeditwhen?: FieldEditorBehavior // When should editor be activated?
+        fieldeditwhen?: FieldEditorBehavior // When should the field be editable?
         fieldval?: string | number
         textcolor?: string // Field's text color
         buttonTooltip?: string
@@ -342,7 +342,7 @@ export function SummaryItem({
                         onClick={(event: MouseEvent<HTMLElement>) => {
                             buttonAction(event, itemSpecs[item].action)
                         }}
-                        className="pl-0 pr-1 pt-0 pb-0"
+                        className="shrink-0 basis-[1.5rem] pl-0 pr-1 pt-0 pb-0"
                         appearance={itemSpecs[item].appearance}
                     />
                 </Whisper>
@@ -360,7 +360,7 @@ export function SummaryItem({
                             {warning ? warning : itemSpecs[item].fieldTooltip || ''}
                         </Tooltip>
                     }>
-                    <span style={{ color: itemSpecs[item].textcolor, width: '100%' }} className="text-sm pl-3">
+                    <span style={{ color: itemSpecs[item].textcolor, width: '100%' }} className="text-sm pl-1">
                         {editing ? inputMethod : null}
                         {editing &&
                         ['inputfield', 'numberinputpicker', 'stringinputpicker'].includes(
