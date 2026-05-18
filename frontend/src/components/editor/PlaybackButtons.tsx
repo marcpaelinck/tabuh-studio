@@ -1,7 +1,7 @@
 import type { HTMLAttributes, MouseEvent, RefObject } from 'react'
 import { useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
-import { Button, ButtonGroup } from 'rsuite'
+import { Button, ButtonGroup, Tooltip, Whisper } from 'rsuite'
 import type { AudioState, EditorCellCursor, PlaybackAction, PlaybackType } from '../../typing/playback'
 import type { Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
@@ -63,18 +63,32 @@ export function PlaybackButtons({
     const playIconOutline = (pbType: PlaybackType, color: string) =>
         pbType == 'single' ? <IoPlayOutline color={color} /> : <IoPlaySkipForwardOutline color={color} />
 
+    const toolTips: Record<PlaybackType, string> = {
+        single: 'Play a single system',
+        multiple: 'Play from here to the end',
+        none: ''
+    }
+
     const button = (pbType: PlaybackType) => (
-        <Button as="div" onClick={(e) => playStopClicked(e, pbType)} disabled={isDisabled(pbType)}>
-            {playbackAudioState == 'playing' ? (
-                playbackType == pbType ? (
-                    <IoStop color={buttonColor(pbType)} />
+        <Whisper
+            placement="autoVerticalStart"
+            delayClose={50}
+            trigger={'hover'}
+            controlId={`control-id-Whisper-${pbType}`}
+            className="mytooltip"
+            speaker={<Tooltip className="mytooltip">{toolTips[pbType]}</Tooltip>}>
+            <Button as="div" onClick={(e) => playStopClicked(e, pbType)} disabled={isDisabled(pbType)}>
+                {playbackAudioState == 'playing' ? (
+                    playbackType == pbType ? (
+                        <IoStop color={buttonColor(pbType)} />
+                    ) : (
+                        playIconOutline(pbType, buttonColor(pbType))
+                    )
                 ) : (
-                    playIconOutline(pbType, buttonColor(pbType))
-                )
-            ) : (
-                playIcon(pbType, 'gray')
-            )}
-        </Button>
+                    playIcon(pbType, 'gray')
+                )}
+            </Button>
+        </Whisper>
     )
 
     return (
