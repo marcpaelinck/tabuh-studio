@@ -64,7 +64,7 @@ export function PlaybackButtons({
         pbType == 'single' ? <IoPlayOutline color={color} /> : <IoPlaySkipForwardOutline color={color} />
 
     const toolTips: Record<PlaybackType, string> = {
-        single: 'Play a single system',
+        single: 'Play only this system',
         multiple: 'Play from here to the end',
         none: ''
     }

@@ -68,13 +68,13 @@ CREATE INDEX idx_score_permissions_user ON score_permissions(user_id);
 
 In cPanel → **Setup Node.js App** → **Create Application**:
 
-| Setting | Value |
-|---|---|
-| Node.js version | 20.19.4 |
-| Application mode | Production |
-| Application root | `tabuh-studio/backend` |
-| Application URL | `dev.tabuh.studio` (or `tabuh.studio`) |
-| Application startup file | `dist/index.js` |
+| Setting                  | Value                                  |
+| ------------------------ | -------------------------------------- |
+| Node.js version          | 20.19.4                                |
+| Application mode         | Production                             |
+| Application root         | `tabuh-studio/backend`                 |
+| Application URL          | `dev.tabuh.studio` (or `tabuh.studio`) |
+| Application startup file | `dist/index.js`                        |
 
 Click **Create**. Note the virtual environment path shown — something like:
 
@@ -123,9 +123,9 @@ NODE_ENV=production
 PORT=3001
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=tabuhstudio_user
+DB_USER=your-db-user
 DB_PASSWORD=your-database-password
-DB_NAME=tabuhstudio_gamelan
+DB_NAME=tabuhstudio
 JWT_SECRET=your-long-random-secret
 JWT_REFRESH_SECRET=your-different-long-random-secret
 JWT_EXPIRY=15m
@@ -233,6 +233,7 @@ node dist/seed/migrateScores.js
 ```
 
 > **Note:** If your JSON score files are not yet on the server, upload them first from your local machine:
+>
 > ```bash
 > scp -P 26 /path/to/scores/*.json xc113049@tabuh.studio:~/tabuh-studio/backend/scores/
 > ```
@@ -371,7 +372,7 @@ npm run build
 MySQL JSON columns are not always auto-parsed by `mysql2`. The manual parse guard in the `GET /:id` route handles this automatically:
 
 ```typescript
-if (typeof record.content === 'string') {
+if (typeof record.content === "string") {
   record.content = JSON.parse(record.content);
 }
 ```
