@@ -31,7 +31,7 @@ interface EditorSystemProps extends TextareaProps {
     positions: Position[]
     audioState: AudioState
     playbackType: PlaybackType
-    visible: boolean
+    // visible: boolean
     scoreRef: RefObject<Score>
     labels: Record<string, System>
     gotoTargets: Set<UUID>
@@ -46,7 +46,7 @@ export function SystemNode({
     positions,
     audioState,
     playbackType,
-    visible,
+    // visible,
     scoreRef,
     labels,
     gotoTargets,
@@ -86,7 +86,6 @@ export function SystemNode({
     // }
 
     function moveEditorCursor(cursor: EditorCursorParameters) {
-        debug(`moveEditorCursor(${JSON.stringify(cursor)}), currsysuuid=${systemData.uuid}`)
         if (cursor.sysuuid != systemData.uuid) {
             setPlaybackCursor(null)
             return
@@ -176,9 +175,9 @@ export function SystemNode({
     }
 
     useEffect(() => {
-        // console.log('setting update editorcursor function')
+        debug(`System ${systemData.uuid} updating editorcursor function`)
         updateCursorFunction(systemData.uuid, moveEditorCursor)
-    }, [])
+    }, [systemData])
 
     // This will cause the cursor to disappear when playback is stopped
     useEffect(() => {
@@ -192,7 +191,6 @@ export function SystemNode({
     }, [systemData, playbackCursor])
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
-        debug(`re-rendering buttons of system ${systemData.id}`)
         return (
             <Col key={`systemButtons-${systemData.uuid}`} span={3} className="flex">
                 <PlaybackButtons
@@ -239,7 +237,6 @@ export function SystemNode({
 
     const systemHeaderFields: ReactElement | undefined = useMemo(() => {
         if (!systemData) return
-        debug(`re-rendering header fields of system ${systemData.id}`)
 
         const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
         return (
@@ -297,7 +294,7 @@ export function SystemNode({
         const notationFont = `balifontspaced${editorFontSize}`
         const rows = _.keys(systemData.staffs).length
         return (
-            <Grid id={`system ${systemData.uuid}`} className="ml-4">
+            <Grid id={`system ${systemData.uuid}`}>
                 <Row id="SystemHeader">
                     {systemHeaderButtons}
                     {systemHeaderFields}
@@ -328,5 +325,5 @@ export function SystemNode({
         )
     }, [systemData, playbackCursor, audioState, playbackType])
 
-    return visible && notationArea
+    return notationArea
 }

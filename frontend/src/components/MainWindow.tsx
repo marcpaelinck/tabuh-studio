@@ -5,7 +5,7 @@ import EditIcon from '@rsuite/icons/Edit'
 import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
-import { useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
+import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
@@ -179,6 +179,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const screenSize = useScreenSize()
     const { user, login, logout } = useAuth()
 
+    // useEffect(() => {
+    //     setActive('player')
+    // }, [])
+
     useEffect(() => {
         if (user) console.log(`${user} successfully logged in`)
         else console.log(`Logout successful`)
@@ -340,6 +344,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
+    // function Activity({ mode, children }: { mode: 'visible' | 'hidden'; children: ReactNode }) {
+    //     return <div style={{ display: mode === 'visible' ? 'block' : 'none' }}>{children}</div>
+    // }
+
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
             <Container id="header+content" className="flex ">
@@ -363,7 +371,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                     color="violet"
                                     checkedChildren={<PlayOutlineIcon />}
                                     unCheckedChildren={<EditIcon />}
-                                    defaultChecked
+                                    defaultChecked={active == 'player'}
                                     onChange={(checked) => setActive(checked ? 'player' : 'editor')}
                                 />
                             </Col>
@@ -372,8 +380,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 </Header>
                 <Content id="content" px="1rem" className="h-9/10">
                     <div id="editor/player window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
-                        {editorWindow}
-                        {playerWindow}
+                        <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
+                        <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
                     </div>
                 </Content>
             </Container>

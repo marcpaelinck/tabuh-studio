@@ -96,7 +96,7 @@ export interface EditorCursorParameters {
 
 export type PlaybackEditorCursorAction = {
     time: TimeObject
-    function: EditorCursorFunction
+    function: keyof PlaybackCallbackFunctions
     params: EditorCursorParameters
 }
 

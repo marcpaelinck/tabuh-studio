@@ -433,7 +433,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
             var cursorTime = sectionStartTime
             newTimeLine.editorcursoractions.push({
-                function: pbFunctionsRef.current.editorcursor,
+                function: 'editorcursor' as keyof PlaybackCallbackFunctions,
                 time: n2TO(cursorTime),
                 params: {
                     prevsysuuid: prevSystem?.uuid || undefined,
@@ -573,7 +573,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         //Instrument sampler actions (notes)
         timeLine.sampleractions.forEach((action: PlaybackSamplerAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule((time) => pbFunctionsRef.current.play(time, action.params), action.time)
         })
 
         // Tempo actions
@@ -585,12 +585,12 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         }
         Tone.getTransport().schedule((time) => tAction.function(time, tAction.params), tAction.time)
         timeLine.tempoactions.forEach((action: PlaybackTempoAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempo(time, action.params), action.time)
         })
 
         // Animation actions
         timeLine.animationactions.forEach((action: PlaybackAnimationAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule((time) => pbFunctionsRef.current.animate(time, action.params), action.time)
         })
 
         // Player Cursor actions
@@ -603,17 +603,23 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // Editor Cursor actions
         timeLine.editorcursoractions.forEach((action: PlaybackEditorCursorAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.editorcursor(time, action.params),
+                action.time
+            )
         })
 
         // Editor Cursor actions
         timeLine.dashboardactions.forEach((action: PlaybackDashboardAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.updatedashboard(time, action.params),
+                action.time
+            )
         })
 
         // Action for when end of schedule is reached
         timeLine.genericactions.forEach((action: GenericAction) => {
-            Tone.getTransport().schedule((time) => action.function(time, action.params), action.time)
+            Tone.getTransport().schedule((time) => pbFunctionsRef.current.generic(time, action.params), action.time)
         })
 
         // Schedule a progress counter

@@ -59,39 +59,44 @@ export default function EditorWindow({
 
     // In order to minimize re-renders, each SystemNode gets its own cursor update function.
     // const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
-    const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
+    // const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
+
+    const systemCursorFunctions = useRef<Record<UUID, SystemCursorFunction>>({})
+
+    useEffect(() => {
+        console.log(`system cursor functions updated to ${JSON.stringify(_.keys(systemCursorFunctions.current))}`)
+    }, [systemCursorFunctions.current])
 
     // This function is passed to the SystemNode elements, so that they can each add their own cursor function
     // to the systemCursorFunctions record.
     function updateCursorFunction(uuid: UUID, func: SystemCursorFunction) {
-        debug(`updating cursor function for ${uuid}`)
         // See https://react.dev/learn/queueing-a-series-of-state-updates
-        setSystemCursorFunctions((systemCursorFunctions) => {
-            const newFunctions = { ...systemCursorFunctions }
-            newFunctions[uuid] = func
-            return newFunctions
-        })
-        debug(`new CursorFunctions: ${JSON.stringify(_.keys(systemCursorFunctions))}`)
+        const newFunctions = { ...systemCursorFunctions.current }
+        newFunctions[uuid] = func
+        systemCursorFunctions.current = newFunctions
+        debug(`new CursorFunctions: ${JSON.stringify(_.keys(newFunctions))}`)
+        return newFunctions
     }
 
     // This is the actual editor cursor function. It calls the corresponding SystemCursorFunction.
-    const moveEditorCursor = useCallback(
-        (time: number, params: EditorCursorParameters) => {
-            if (params.sysuuid in systemCursorFunctions) {
-                debug(`moving cursor in system ${params.sysuuid}`)
-                systemCursorFunctions[params.sysuuid](params)
-                // Reset cursor animation in the previous system
-                if (params.prevsysuuid) systemCursorFunctions[params.prevsysuuid](params)
-            }
-        },
-        [systemCursorFunctions]
-    )
+    const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
+        if (params.sysuuid in systemCursorFunctions.current) {
+            debug(`moving cursor in system ${params.sysuuid}`)
+            systemCursorFunctions.current[params.sysuuid](params)
+            // Reset cursor animation in the previous system
+            if (params.prevsysuuid) systemCursorFunctions.current[params.prevsysuuid](params)
+        } else {
+            debug(
+                `cannot move cursor: function for system ${params.sysuuid} not found in ${JSON.stringify(_.keys(systemCursorFunctions.current))}`
+            )
+        }
+    }, [])
 
     // Pass the editorcursor function to the playbackManager.
     useEffect(() => {
-        debug(`cursorFunctions=${JSON.stringify(_.keys(systemCursorFunctions))}`)
+        debug(`passing cursorFunction to pbManager`)
         updatePlaybackFunctions({ editorcursor: moveEditorCursor })
-    }, [systemCursorFunctions])
+    }, [])
 
     const dialog = useDialog()
 
@@ -155,7 +160,7 @@ export default function EditorWindow({
                                 positions={score.positions}
                                 playbackType={playbackState.playbackType}
                                 audioState={playbackState.audioState}
-                                visible
+                                // visible={visible}
                                 scoreRef={scoreRef}
                                 labels={labels}
                                 playback={playback}
@@ -173,9 +178,7 @@ export default function EditorWindow({
 
     return (
         // <Profiler id="App" onRender={onRender}>
-        <VStack id="Editor Window" visibility={visible ? 'visible' : 'collapse'}>
-            {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
-        </VStack>
+        <VStack id="Editor Window">{loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}</VStack>
         // </Profiler>
     )
 }
