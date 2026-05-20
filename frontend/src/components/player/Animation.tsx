@@ -45,7 +45,7 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 export const panggulDefaultOption: MenuItemInfo = { key: 'HIDE', displayValue: 'Hide', value: null }
 
 interface AnimationProps {
-    focusRef: RefObject<Position[]>
+    currFocus: Position[]
     notationElement: NotationParagraph[] | null
     panggulMenuItems: MenuItemInfo[]
     // setPanggulOption: Dispatch<MenuItemInfo>
@@ -55,7 +55,7 @@ interface AnimationProps {
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 export default function Animation({
-    focusRef,
+    currFocus,
     notationElement,
     panggulMenuItems,
     activePanggulRef,
@@ -77,8 +77,8 @@ export default function Animation({
     })
 
     useEffect(() => {
-        console.log(`focus=${JSON.stringify(focusRef.current)}`)
-    }, [focusRef.current])
+        console.log(`focus=${JSON.stringify(currFocus)}`)
+    }, [currFocus])
 
     const updateSvgSize = (val: number | number[]) => {
         const size: number = Math.round(typeof val == 'number' ? val : val[0])
@@ -113,22 +113,22 @@ export default function Animation({
     }
 
     useEffect(() => {
-        console.log(`ANIMATION: focus=${JSON.stringify(focusRef.current)}`)
+        console.log(`ANIMATION: focus=${JSON.stringify(currFocus)}`)
     })
 
     const svgImage = useMemo(() => {
         return (
             <ReactSVG
-                src={positionToSvg(focusRef.current)}
+                src={positionToSvg(currFocus)}
                 style={svgSizeStyle}
                 loading={() => <Loader />}
                 useRequestCache={true}
                 afterInjection={setSvgStates}
             />
         )
-    }, [focusRef.current])
+    }, [currFocus])
 
-    return focusRef.current.length > 0 ? (
+    return currFocus.length > 0 ? (
         <div className="m-6 w-full">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
@@ -161,7 +161,7 @@ export default function Animation({
                     <NotationArea
                         notation={notationElement}
                         visible={notationVisible}
-                        focusRef={focusRef}
+                        currFocus={currFocus}
                         updatePlaybackFunctions={updatePlaybackFunctions}
                     />
                 </Row>

@@ -17,7 +17,12 @@ import { debug } from '../../utils/debugger'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'
 
 export type InstrumentSampler = {
-    play: (time: number, params: SamplerFunctionParameters, focusRef: RefObject<Position[]>) => void
+    play: (
+        time: number,
+        params: SamplerFunctionParameters,
+        focusRef: RefObject<Position[]>,
+        activePanggulRef: RefObject<Position[]>
+    ) => void
     mute: (time: number) => void
 }
 
@@ -88,10 +93,21 @@ const createInstrument = (
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
-        play: (time: number, params: SamplerFunctionParameters, focusRef: RefObject<Position[]>) => {
+        play: (
+            time: number,
+            params: SamplerFunctionParameters,
+            focusRef: RefObject<Position[]>,
+            activePanggulRef: RefObject<Position[]>
+        ) => {
+            // dimValue = 1 if
+            // - no focus is selected or
+            // - active panggul is selected and params.position corresponds with a panggul position or
+            // - no active panggul is selecte and params.position corresponds with a focus position or
+            // - position is labeled as 'always focus'
             const dimValue =
                 focusRef.current.length == 0 ||
-                focusRef.current.includes(position) ||
+                (activePanggulRef.current.length > 0 && activePanggulRef.current.includes(position)) ||
+                (activePanggulRef.current.length == 0 && focusRef.current.includes(position)) ||
                 alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
@@ -117,7 +133,11 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (focusRef: RefObject<Position[]>, outroTime: number = defaultOutroTime) => {
+export const useInstruments = (
+    focusRef: RefObject<Position[]>,
+    activePanggulRef: RefObject<Position[]>,
+    outroTime: number = defaultOutroTime
+) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -146,7 +166,7 @@ export const useInstruments = (focusRef: RefObject<Position[]>, outroTime: numbe
         )
         if (params.symbol === '.') instrumentSamplers[params.position].mute(time)
         else {
-            instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef)
+            instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef, activePanggulRef)
         }
     }, [])
 

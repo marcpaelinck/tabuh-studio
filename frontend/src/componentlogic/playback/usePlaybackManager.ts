@@ -76,8 +76,8 @@ export interface SchedulePlaybackParams {
     outro?: number
 }
 
-export function usePlaybackManager(focusRef: RefObject<Position[]>) {
-    const { playInstrument } = useInstruments(focusRef, 0)
+export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggulRef: RefObject<Position[]>) {
+    const { playInstrument } = useInstruments(focusRef, activePanggulRef, 0)
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)

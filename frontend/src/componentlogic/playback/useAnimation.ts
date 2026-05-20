@@ -148,6 +148,16 @@ export const useAnimationEngine = (
         svgInfoRef.current = svgInfo
     }, [svgInfo])
 
+    // Highlight the key(s) if
+    // - active panggul is selected and params.position corresponds with a panggul position or
+    // - no active panggul is selecte and params.position corresponds with a focus position or
+    const shouldHighlight = (position: Position) => {
+        return (
+            (activePanggulRef.current.length != 0 && activePanggulRef.current.includes(position)) ||
+            (activePanggulRef.current.length == 0 && focusRef.current.includes(position))
+        )
+    }
+
     // For the use of Draw.schedule, see
     const animateInstrument = useCallback((time: number, params: AnimmationFunctionParameters): void => {
         if (!pbWindowVisibleRef.current) return
@@ -158,16 +168,18 @@ export const useAnimationEngine = (
         if (currentFocus.includes(params.position)) {
             if (mySvgInfo.svg && params.currnotes) {
                 // Hightighting animation
-                params.currnotes.forEach((note) => {
-                    var keyElement = mySvgInfo.svg?.querySelector(
-                        `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
-                    )
-                    // positionIndex will be used to select the highlight color combinations.
-                    const positionIndex = currentFocus.indexOf(params.position)
-                    if (keyElement) {
-                        Tone.getDraw().schedule(() => highlightNote(keyElement!, note, positionIndex), time)
-                    }
-                })
+                if (shouldHighlight(params.position)) {
+                    params.currnotes.forEach((note) => {
+                        var keyElement = mySvgInfo.svg?.querySelector(
+                            `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
+                        )
+                        // positionIndex will be used to select the highlight color combinations.
+                        const positionIndex = currentFocus.indexOf(params.position)
+                        if (keyElement) {
+                            Tone.getDraw().schedule(() => highlightNote(keyElement!, note, positionIndex), time)
+                        }
+                    })
+                }
                 // Panggul animation
                 // Currently only active for the first of multiple focus positions.
                 // TODO: Set positionIndex according to user selection.

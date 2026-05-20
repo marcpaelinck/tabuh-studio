@@ -10,11 +10,11 @@ import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../ty
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    focusRef: RefObject<Position[]>
+    currFocus: Position[]
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
-export default function NotationArea({ notation, visible, focusRef, updatePlaybackFunctions }: NotationAreaProps) {
+export default function NotationArea({ notation, visible, currFocus, updatePlaybackFunctions }: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
     // Highlighting function: highlights the given range (line and character range)
@@ -47,7 +47,7 @@ export default function NotationArea({ notation, visible, focusRef, updatePlayba
 
     const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {
         // if (currentFocus.includes(cAction.position)) {
-        if (focusRef.current.length > 0 && focusRef.current[0] === params.position) {
+        if (currFocus.length > 0 && currFocus[0] === params.position) {
             highlightCursor({ line: params.line, range: params.range })
         }
     }, [])

@@ -208,12 +208,16 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const focusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
     const activePanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
+    const [currentFocus, setCurrentFocus] = useState<Position[]>([])
+    const [currentPanggul, setCurrentPanggul] = useState<Position[]>([])
 
     function setFocus(newFocus: Position[]) {
+        setCurrentFocus(newFocus)
         focusRef.current = newFocus
     }
 
     function setActivePanggul(newPanggul: Position[]) {
+        setCurrentPanggul(newPanggul)
         activePanggulRef.current = newPanggul
     }
 
@@ -226,7 +230,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
-    } = usePlaybackManager(focusRef)
+    } = usePlaybackManager(focusRef, activePanggulRef)
     const playbackReducer = playbackReducerFactory(schedulePlayback, setPlaybackProgress)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -324,9 +328,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
-            focusRef={focusRef}
+            currFocus={currentFocus}
             setFocus={setFocus}
-            activePanggulRef={activePanggulRef}
+            activePanggul={currentPanggul}
             setActivePanggul={setActivePanggul}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}

@@ -24,9 +24,9 @@ interface PlayerWindowProps {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
-    focusRef: RefObject<Position[]>
+    currFocus: Position[]
     setFocus: Dispatch<Position[]>
-    activePanggulRef: RefObject<Position[]>
+    activePanggul: Position[]
     setActivePanggul: Dispatch<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
@@ -42,9 +42,9 @@ export default function PlayerWindow({
     loadScore,
     totalDurationMs,
     timeLine,
-    focusRef,
+    currFocus,
     setFocus,
-    activePanggulRef,
+    activePanggul,
     setActivePanggul,
     updatePlaybackFunctions,
     playbackProgress,
@@ -58,6 +58,8 @@ export default function PlayerWindow({
 
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
     const visibleRef = useRef<boolean>(visible)
+    const focusRef = useRef<Position[]>([])
+    const activePanggulRef = useRef<Position[]>([])
 
     useEffect(() => {
         visibleRef.current = visible
@@ -66,6 +68,14 @@ export default function PlayerWindow({
     useEffect(() => {
         playbackSpeedRef.current = playbackSpeed
     }, [playbackSpeed])
+
+    useEffect(() => {
+        focusRef.current = currFocus
+    }, [currFocus])
+
+    useEffect(() => {
+        activePanggulRef.current = activePanggul
+    }, [activePanggul])
 
     // HOOKS
     const { animateInstrument, setSvgInfo } = useAnimationEngine(
@@ -78,7 +88,7 @@ export default function PlayerWindow({
 
     const updateFocus = (newFocus: Position[]): void => {
         debug(`request to update focus to ${JSON.stringify(newFocus)}`)
-        if (newFocus !== focusRef.current) {
+        if (newFocus !== currFocus) {
             setFocus(newFocus)
             //TODO currently only displaying notation for the first focus position
             if (timeLine && timeLine.notation && newFocus && newFocus[0] in timeLine.notation)
@@ -93,15 +103,15 @@ export default function PlayerWindow({
     }
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
-        debug(`new focus: ${JSON.stringify(focusRef.current)}`)
+        debug(`new focus: ${JSON.stringify(currFocus)}`)
         const hideItem: MenuItemInfo = panggulDefaultOption
-        const menuItems: MenuItemInfo[] = focusRef.current.map((position) => {
+        const menuItems: MenuItemInfo[] = currFocus.map((position) => {
             return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
         })
         // setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
         setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : []) as Position[])
         return [hideItem].concat(menuItems)
-    }, [focusRef.current])
+    }, [currFocus])
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
@@ -114,9 +124,9 @@ export default function PlayerWindow({
                 panggulUpdater={updatePanggul}
                 speedUpdater={setPlaybackSpeed}
             />
-            {focusRef.current.length > 0 && (
+            {currFocus.length > 0 && (
                 <Animation
-                    focusRef={focusRef}
+                    currFocus={currFocus}
                     notationElement={notationParas}
                     panggulMenuItems={panggulMenuItems}
                     activePanggulRef={activePanggulRef}
