@@ -174,7 +174,6 @@ function singleNoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         {
             time: n2TO(args.time),
             timeMs: args.timeMs,
-            function: args.samplerFunction,
             ismuted: isMutedNote(args.symbol, args.position),
             params: {
                 duration: n2TO(1),
@@ -194,7 +193,6 @@ function halfDurationAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         {
             time: n2TO(args.time),
             timeMs: args.timeMs,
-            function: args.samplerFunction,
             ismuted: false,
             params: {
                 duration: n2TO(0.5),
@@ -214,7 +212,6 @@ function silenceAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         {
             time: n2TO(args.time),
             timeMs: args.timeMs,
-            function: args.samplerFunction,
             ismuted: true,
             params: {
                 duration: n2TO(1),
@@ -270,7 +267,6 @@ function gracenoteAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         {
             time: n2TO(args.time - patterns.gracenote.duration),
             timeMs: args.timeMs - BaseNoteEquiv2Millis(patterns.gracenote.duration, args.bpm),
-            function: args.samplerFunction,
             ismuted: true,
             params: {
                 duration: n2TO(patterns.gracenote.duration),
@@ -305,7 +301,6 @@ function tremoloAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         returnValue.push({
             time: n2TO(args.time + count * duration),
             timeMs: args.timeMs + BaseNoteEquiv2Millis(count * duration, args.bpm),
-            function: args.samplerFunction,
             ismuted: count < totalNotes,
             params: {
                 duration: n2TO(duration),
@@ -344,7 +339,6 @@ function AcceleratingTremoloAction(args: CreatePatternArgs): PlaybackSamplerActi
         returnValue.push({
             time: n2TO(time),
             timeMs: timeMs,
-            function: args.samplerFunction,
             ismuted: count < totalNotes,
             params: {
                 duration: n2TO(duration),
@@ -382,7 +376,6 @@ function rakeAction(args: CreatePatternArgs): PlaybackSamplerAction[] {
         returnValue.push({
             time: n2TO(args.time + offset),
             timeMs: args.timeMs + BaseNoteEquiv2Millis(offset, args.bpm),
-            function: args.samplerFunction,
             ismuted: false,
             params: {
                 duration: n2TO(noteDuration),

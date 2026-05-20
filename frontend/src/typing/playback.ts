@@ -10,7 +10,7 @@ export type PlaybackType = 'single' | 'multiple' | 'none'
 
 export type GenericFunction = (time: number, params: {}) => void
 
-export type GenericAction = { time: TimeObject; function: GenericFunction; params: {} }
+export type GenericAction = { time: TimeObject; params: {} }
 
 export interface TempoFunctionParameters {
     bpm: Tone.Unit.NormalRange
@@ -21,7 +21,6 @@ export type TempoFunction = (time: number, params: TempoFunctionParameters) => v
 
 export interface PlaybackTempoAction {
     time: TimeObject
-    function: TempoFunction
     params: TempoFunctionParameters
 }
 
@@ -40,7 +39,6 @@ export type SamplerFunction = (time: number, params: SamplerFunctionParameters) 
 export interface PlaybackSamplerAction {
     time: TimeObject
     timeMs: number
-    function: SamplerFunction
     ismuted: boolean
     params: SamplerFunctionParameters
 }
@@ -66,7 +64,6 @@ export type AnimationFunction = (time: number, params: AnimmationFunctionParamet
 
 export interface PlaybackAnimationAction {
     time: TimeObject
-    function: AnimationFunction
     params: AnimmationFunctionParameters
 }
 
@@ -81,12 +78,7 @@ export interface PlayerCursorParameters {
 
 export type PlayerCursorFunction = (time: number, params: PlayerCursorParameters) => void
 
-export type PlaybackPlayerCursorAction = {
-    time: TimeObject
-    functionName: string
-    function: PlayerCursorFunction
-    params: PlayerCursorParameters
-}
+export type PlaybackPlayerCursorAction = { time: TimeObject; functionName: string; params: PlayerCursorParameters }
 
 export interface EditorCursorParameters {
     prevsysuuid: UUID | undefined
@@ -94,11 +86,7 @@ export interface EditorCursorParameters {
     section: number
 }
 
-export type PlaybackEditorCursorAction = {
-    time: TimeObject
-    function: keyof PlaybackCallbackFunctions
-    params: EditorCursorParameters
-}
+export type PlaybackEditorCursorAction = { time: TimeObject; params: EditorCursorParameters }
 
 export interface DashboardParameters {
     system: number | undefined
@@ -112,11 +100,11 @@ export type EditorCursorFunction = (time: number, params: EditorCursorParameters
 
 export type DashboardFunction = (time: number, params: DashboardParameters) => void
 
-export type PlaybackDashboardAction = { time: TimeObject; function: DashboardFunction; params: DashboardParameters }
+export type PlaybackDashboardAction = { time: TimeObject; params: DashboardParameters }
 
 export type ProgressFunction = (time: number, params: {}) => void
 
-export type PlaybackProgressFunctionAction = { time: TimeObject; function: ProgressFunction; params: {} }
+export type PlaybackProgressFunctionAction = { time: TimeObject; params: {} }
 
 // Callback functions used when creating a playback schedule in Tone.Transport
 export interface PlaybackCallbackFunctions {

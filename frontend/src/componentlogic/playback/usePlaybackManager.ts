@@ -292,7 +292,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     const newTempo = startTempo
                     newTimeLine.tempoactions.push({
                         time: n2TO(sectionStartTime),
-                        function: pbFunctionsRef.current.tempo,
                         params: { bpm: newTempo, pbSpeed: playbackSpeed }
                     })
                     currentTempo = newTempo
@@ -304,7 +303,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                     if (newTempo != currentTempo) {
                         newTimeLine.tempoactions.push({
                             time: n2TO(sectionStartTime + t),
-                            function: pbFunctionsRef.current.tempo,
                             params: { bpm: newTempo, pbSpeed: playbackSpeed }
                         })
                         currentTempo = newTempo
@@ -413,7 +411,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                 // if (sectIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
                 const span = notation.join('')
                 newTimeLine.playercursoractions.push({
-                    function: pbFunctionsRef.current.playercursor,
                     functionName: 'playercursor',
                     time: n2TO(sectionStartTime),
                     params: {
@@ -433,7 +430,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
             var cursorTime = sectionStartTime
             newTimeLine.editorcursoractions.push({
-                function: 'editorcursor' as keyof PlaybackCallbackFunctions,
                 time: n2TO(cursorTime),
                 params: {
                     prevsysuuid: prevSystem?.uuid || undefined,
@@ -445,7 +441,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // CREATE DASHBOARD ACTION
 
             newTimeLine.dashboardactions.push({
-                function: pbFunctionsRef.current.updatedashboard,
                 time: n2TO(cursorTime),
                 params: {
                     system: currentStep.system.id,
@@ -513,7 +508,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
             // from the starting position to the first note
             if (!samplerActions || samplerActions.length == 0) return
             newTimeLine.animationactions.push({
-                function: pbFunctionsRef.current.animate,
                 time: n2TO(0),
                 params: {
                     position: position,
@@ -534,7 +528,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
                 newTimeLine.animationactions.push({
                     time: action.time,
-                    function: pbFunctionsRef.current.animate,
                     params: { position: position, currnotes: aNotes, nextnotes: nextANotes, timeuntilMs: timeUntilMs }
                 })
             })
@@ -542,7 +535,6 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // ADD DASHBOARD ACTION TO SWITCH OFF THE DASHBOARD PLAYBACK ITEM
         newTimeLine.dashboardactions.push({
-            function: pbFunctionsRef.current.updatedashboard,
             time: newTimeLine.totalDurationTO,
             params: { system: undefined, pass: 0, iteration: 0, tempo: 0, dynamics: 0 }
         })
@@ -551,12 +543,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         newTimeLine.totalDurationMs += outro
         newTimeLine.totalDurationTO = n2TO(sectionStartTime)
         setTotalDurationMs(newTimeLine.totalDurationMs)
-        if (pbFunctionsRef.current.generic)
-            newTimeLine.genericactions.push({
-                function: pbFunctionsRef.current.generic,
-                time: newTimeLine.totalDurationTO,
-                params: {}
-            })
+        newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 
         newTimeLine.notation = getNotationParagraphs(pbAction.score!)
         debug(newTimeLine, true)
@@ -578,12 +565,8 @@ export function usePlaybackManager(selectedFocus: Position[]) {
 
         // Tempo actions
         // Set the initial tempo to 60 (intro time)
-        const tAction: PlaybackTempoAction = {
-            time: { '16n': 0 },
-            function: pbFunctionsRef.current.tempo,
-            params: { bpm: defaultTempo, pbSpeed: pbSpeed }
-        }
-        Tone.getTransport().schedule((time) => tAction.function(time, tAction.params), tAction.time)
+        const tAction: PlaybackTempoAction = { time: { '16n': 0 }, params: { bpm: defaultTempo, pbSpeed: pbSpeed } }
+        Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempo(time, tAction.params), tAction.time)
         timeLine.tempoactions.forEach((action: PlaybackTempoAction) => {
             Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempo(time, action.params), action.time)
         })
