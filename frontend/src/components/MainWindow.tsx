@@ -209,7 +209,18 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
     // PLAYBACK SETTINGS
-    const [focus, setFocus] = useState<Position[]>([])
+    // const [focus, setFocus] = useState<Position[]>([])
+
+    const focusRef = useRef<Position[]>([])
+
+    function setFocus(newFocus: Position[]) {
+        focusRef.current = newFocus
+    }
+
+    // useEffect(() => {
+    //     focusRef.current = focus
+    // }, [focus])
+
     const {
         timeLine,
         updatePlaybackCallbackFunctions,
@@ -219,7 +230,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
-    } = usePlaybackManager(focus)
+    } = usePlaybackManager(focusRef)
     const playbackReducer = playbackReducerFactory(schedulePlayback, setPlaybackProgress)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -318,7 +329,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
-            focus={focus}
+            focusRef={focusRef}
             setFocus={setFocus}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}

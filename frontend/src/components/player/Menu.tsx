@@ -27,8 +27,8 @@ export default function Menu({
     scoreMenuOptions: ScoreMenuOption[]
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    focusUpdater: Function
-    speedUpdater: Function
+    focusUpdater: CallableFunction
+    speedUpdater: CallableFunction
 }): JSX.Element {
     const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])

@@ -13,7 +13,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     ExecutionForm: false,
     ExecutionItemForm: false,
     executionManager: false,
-    Menu: false,
+    Menu: true,
     MeasureNode: false,
     NavigationCell: false,
     notationPatternManager: false,

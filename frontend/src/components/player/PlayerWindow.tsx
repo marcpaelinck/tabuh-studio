@@ -12,6 +12,7 @@ import {
     type TimeLine
 } from '../../typing/playback'
 import { type Score, type ScoreFormat } from '../../typing/score'
+import { debug } from '../../utils/debugger'
 import Animation, { panggulDefaultOption } from './Animation'
 import Menu from './Menu'
 import { Player } from './Player'
@@ -24,7 +25,7 @@ interface PlayerWindowProps {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
-    focus: Position[]
+    focusRef: RefObject<Position[]>
     setFocus: Dispatch<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
@@ -41,7 +42,7 @@ export default function PlayerWindow({
     loadScore,
     totalDurationMs,
     timeLine,
-    focus,
+    focusRef,
     setFocus,
     updatePlaybackFunctions,
     playbackProgress,
@@ -53,7 +54,6 @@ export default function PlayerWindow({
     const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const [notationParas, setNotationParas] = useState<ReactElement[] | null>(null)
 
-    const focusRef: RefObject<Position[]> = useRef<Position[]>(focus)
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
     const visibleRef = useRef<boolean>(visible)
 
@@ -61,9 +61,6 @@ export default function PlayerWindow({
         visibleRef.current = visible
     }, [visible])
 
-    useEffect(() => {
-        focusRef.current = focus
-    }, [focus])
     useEffect(() => {
         playbackSpeedRef.current = playbackSpeed
     }, [playbackSpeed])
@@ -77,7 +74,8 @@ export default function PlayerWindow({
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
     const updateFocus = (newFocus: Position[]): void => {
-        if (newFocus !== focus) {
+        debug(`request to update focus to ${JSON.stringify(newFocus)}`)
+        if (newFocus !== focusRef.current) {
             setFocus(newFocus)
             //TODO currently only displaying notation for the first focus position
             if (timeLine && timeLine.notation && newFocus && newFocus[0] in timeLine.notation)
@@ -86,13 +84,14 @@ export default function PlayerWindow({
     }
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
+        debug(`new focus: ${JSON.stringify(focusRef.current)}`)
         const hideItem: MenuItemInfo = panggulDefaultOption
-        const menuItems: MenuItemInfo[] = focus.map((position) => {
+        const menuItems: MenuItemInfo[] = focusRef.current.map((position) => {
             return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
         })
         setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
         return [hideItem].concat(menuItems)
-    }, [focus])
+    }, [focusRef.current])
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
@@ -104,9 +103,9 @@ export default function PlayerWindow({
                 focusUpdater={updateFocus}
                 speedUpdater={setPlaybackSpeed}
             />
-            {focus.length > 0 && (
+            {focusRef.current.length > 0 && (
                 <Animation
-                    focus={focus}
+                    focusRef={focusRef}
                     notationElement={notationParas}
                     panggulMenuItems={panggulMenuItems}
                     panggulOption={panggulOption}

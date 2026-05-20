@@ -10,11 +10,11 @@ import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../ty
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    focus: Position[]
+    focusRef: RefObject<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
-export default function NotationArea({ notation, visible, focus, updatePlaybackFunctions }: NotationAreaProps) {
+export default function NotationArea({ notation, visible, focusRef, updatePlaybackFunctions }: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
 
     // Highlighting function: highlights the given range (line and character range)
@@ -47,7 +47,7 @@ export default function NotationArea({ notation, visible, focus, updatePlaybackF
 
     const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {
         // if (currentFocus.includes(cAction.position)) {
-        if (focus.length > 0 && focus[0] === params.position) {
+        if (focusRef.current.length > 0 && focusRef.current[0] === params.position) {
             highlightCursor({ line: params.line, range: params.range })
         }
     }, [])
@@ -56,12 +56,15 @@ export default function NotationArea({ notation, visible, focus, updatePlaybackF
 
     return (
         <>
-            <div
-                id="NotationArea"
-                ref={textAreaRef}
-                className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
-                {visible && notation}
-            </div>
+            {' '}
+            {visible && (
+                <div
+                    id="NotationArea"
+                    ref={textAreaRef}
+                    className="mb-2 balifont w-full h-25 text-sm/5 overflow-scroll border rounded-md p-2">
+                    {notation}
+                </div>
+            )}
         </>
     )
 }

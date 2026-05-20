@@ -1,5 +1,5 @@
 import type { Dispatch, JSX, RefObject } from 'react'
-import { useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import { Col, Grid, Loader, Row, Slider, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
@@ -45,7 +45,7 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 export const panggulDefaultOption: MenuItemInfo = { key: 'HIDE', displayValue: 'Hide', value: null }
 
 interface AnimationProps {
-    focus: Position[]
+    focusRef: RefObject<Position[]>
     notationElement: NotationParagraph[] | null
     panggulMenuItems: MenuItemInfo[]
     panggulOption: MenuItemInfo
@@ -54,7 +54,7 @@ interface AnimationProps {
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 export default function Animation({
-    focus,
+    focusRef,
     notationElement,
     panggulMenuItems,
     panggulOption,
@@ -73,6 +73,10 @@ export default function Animation({
         y: null,
         animation: null
     })
+
+    useEffect(() => {
+        console.log(`focus=${JSON.stringify(focusRef.current)}`)
+    }, [focusRef.current])
 
     const updateSvgSize = (val: number | number[]) => {
         const size: number = Math.round(typeof val == 'number' ? val : val[0])
@@ -105,7 +109,23 @@ export default function Animation({
         setNotationVisible(isVisible)
     }
 
-    return focus.length > 0 ? (
+    useEffect(() => {
+        console.log(`ANIMATION: focus=${JSON.stringify(focusRef.current)}`)
+    })
+
+    const svgImage = useMemo(() => {
+        return (
+            <ReactSVG
+                src={positionToSvg(focusRef.current)}
+                style={svgSizeStyle}
+                loading={() => <Loader />}
+                useRequestCache={true}
+                afterInjection={setSvgStates}
+            />
+        )
+    }, [focusRef.current])
+
+    return focusRef.current.length > 0 ? (
         <div className="m-6 w-full">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
@@ -138,7 +158,7 @@ export default function Animation({
                     <NotationArea
                         notation={notationElement}
                         visible={notationVisible}
-                        focus={focus}
+                        focusRef={focusRef}
                         updatePlaybackFunctions={updatePlaybackFunctions}
                     />
                 </Row>
@@ -156,13 +176,7 @@ export default function Animation({
                     />
                 </Row>
                 <Row id="svg-embed-row" className="pt-2 pl-4 pr-4">
-                    <ReactSVG
-                        src={positionToSvg(focus)}
-                        style={svgSizeStyle}
-                        loading={() => <Loader />}
-                        useRequestCache={true}
-                        afterInjection={setSvgStates}
-                    />
+                    {svgImage}
                 </Row>
             </Grid>
         </div>

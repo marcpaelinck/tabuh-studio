@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
     alwaysFocusPositions,
@@ -17,7 +17,7 @@ import { debug } from '../../utils/debugger'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'
 
 export type InstrumentSampler = {
-    play: (time: number, params: SamplerFunctionParameters, focus: Position[]) => void
+    play: (time: number, params: SamplerFunctionParameters, focusRef: RefObject<Position[]>) => void
     mute: (time: number) => void
 }
 
@@ -88,12 +88,15 @@ const createInstrument = (
     const sampler: Tone.Sampler | null = samplers[position]
 
     return {
-        play: (time: number, params: SamplerFunctionParameters, currentFocus: string[]) => {
+        play: (time: number, params: SamplerFunctionParameters, focusRef: RefObject<Position[]>) => {
             const dimValue =
-                currentFocus.length == 0 || currentFocus.includes(position) || alwaysFocusPositions.includes(position)
+                focusRef.current.length == 0 ||
+                focusRef.current.includes(position) ||
+                alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            debug(`focus=${JSON.stringify(currentFocus)} pos=${params.position}, dimvalue=${dimValue}`)
+            console.log(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
+            debug(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
             const indices = lookup[position].symbol2idxs[params.symbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = params.duration
@@ -114,7 +117,7 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (currentFocus: Position[], outroTime: number = defaultOutroTime) => {
+export const useInstruments = (focusRef: RefObject<Position[]>, outroTime: number = defaultOutroTime) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -143,7 +146,7 @@ export const useInstruments = (currentFocus: Position[], outroTime: number = def
         )
         if (params.symbol === '.') instrumentSamplers[params.position].mute(time)
         else {
-            instrumentSamplers[params.position].play(random_attack_deviation(time), params, currentFocus)
+            instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef)
         }
     }, [])
 
