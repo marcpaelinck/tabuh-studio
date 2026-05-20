@@ -1,8 +1,9 @@
-import type { JSX, RefObject } from 'react'
+import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useState } from 'react'
 import { ButtonToolbar } from 'rsuite'
 // import 'rsuite/ButtonToolbar/styles/index.css';
 import { speedList } from '../../config/config'
+import type { Position } from '../../typing/basetypes'
 import type { MenuItemInfo, ScoreInfo, ScoreMenuOption } from '../../typing/menus'
 import type { Score, ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
@@ -21,14 +22,16 @@ export default function Menu({
     score,
     loadScore,
     focusUpdater,
+    panggulUpdater,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreMenuOptions: ScoreMenuOption[]
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    focusUpdater: CallableFunction
-    speedUpdater: CallableFunction
+    focusUpdater: Dispatch<Position[]>
+    panggulUpdater: Dispatch<Position[]>
+    speedUpdater: Dispatch<number>
 }): JSX.Element {
     const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
@@ -79,13 +82,13 @@ export default function Menu({
     const onChangeFocusSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'FOCUS')
         setSelectedFocus(item)
-        focusUpdater(item.value)
+        focusUpdater(item.value as Position[])
     }
 
     const onChangeSpeedSelector = async (item: MenuItemInfo) => {
         debugLog(item, 'SPEED')
         setSelectedSpeed(item)
-        speedUpdater(item.value)
+        speedUpdater(item.value as number)
     }
 
     return (

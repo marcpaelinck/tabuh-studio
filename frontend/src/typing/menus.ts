@@ -1,4 +1,4 @@
-import type { UUID } from './basetypes'
+import type { Position, UUID } from './basetypes'
 
 // MENUS
 // SCORE MENU
@@ -19,7 +19,7 @@ export interface ScoreMenuOption {
     label: string
 }
 
-export type menuValueType = string | number | null | (string | number | null)[] | ScoreInfo | undefined
+export type menuValueType = string | number | null | (Position | number | null)[] | ScoreInfo | undefined
 
 export type MenuInfo = { disabled: Record<MenuName, boolean> }
 

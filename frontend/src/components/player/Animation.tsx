@@ -48,8 +48,9 @@ interface AnimationProps {
     focusRef: RefObject<Position[]>
     notationElement: NotationParagraph[] | null
     panggulMenuItems: MenuItemInfo[]
-    panggulOption: MenuItemInfo
-    setPanggulOption: Dispatch<MenuItemInfo>
+    // setPanggulOption: Dispatch<MenuItemInfo>
+    activePanggulRef: RefObject<Position[]>
+    setActivePanggul: Dispatch<Position[]>
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
@@ -57,8 +58,9 @@ export default function Animation({
     focusRef,
     notationElement,
     panggulMenuItems,
-    panggulOption,
-    setPanggulOption,
+    activePanggulRef,
+    // setPanggulOption,
+    setActivePanggul,
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
@@ -101,7 +103,8 @@ export default function Animation({
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            setPanggulOption(selection)
+            // setPanggulOption(selection)
+            setActivePanggul((selection.value ? [selection.value] : []) as Position[])
         }
     }
 
@@ -145,7 +148,7 @@ export default function Animation({
                             <Col span="auto">
                                 <Selector
                                     id="panggul selector"
-                                    title={'panggul: ' + (panggulOption.value ? panggulOption.displayValue : 'hidden')}
+                                    title={`panggul: ${activePanggulRef.current.length > 0 ? activePanggulRef.current[0] : 'hidden'}`}
                                     className="panggulselector"
                                     valueList={panggulMenuItems}
                                     onChange={setPanggulVisibility}

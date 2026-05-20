@@ -179,10 +179,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const screenSize = useScreenSize()
     const { user, login, logout } = useAuth()
 
-    // useEffect(() => {
-    //     setActive('player')
-    // }, [])
-
     useEffect(() => {
         if (user) console.log(`${user} successfully logged in`)
         else console.log(`Logout successful`)
@@ -209,17 +205,17 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
     // PLAYBACK SETTINGS
-    // const [focus, setFocus] = useState<Position[]>([])
 
-    const focusRef = useRef<Position[]>([])
+    const focusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
+    const activePanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
 
     function setFocus(newFocus: Position[]) {
         focusRef.current = newFocus
     }
 
-    // useEffect(() => {
-    //     focusRef.current = focus
-    // }, [focus])
+    function setActivePanggul(newPanggul: Position[]) {
+        activePanggulRef.current = newPanggul
+    }
 
     const {
         timeLine,
@@ -325,12 +321,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={active == 'player'}
             scoreMenuOptions={scoreMenuOptions}
             score={score}
-            currentScoreId={currentScoreId}
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
             focusRef={focusRef}
             setFocus={setFocus}
+            activePanggulRef={activePanggulRef}
+            setActivePanggul={setActivePanggul}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}

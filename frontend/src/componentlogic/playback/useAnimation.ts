@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { panggulDefaultOption } from '../../components/player/Animation'
 import { animationConfig, colorPalette, type ColorName } from '../../config/config'
 import type { SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import type { MenuItemInfo } from '../../typing/menus'
 import type { AnimationNote, AnimmationFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
@@ -138,21 +136,17 @@ function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, 
 // Arguments are mostly state variables and therefore need to be passed as reference object
 export const useAnimationEngine = (
     focusRef: RefObject<Position[]>,
+    activePanggulRef: RefObject<Position[]>,
     pbSpeedRef: RefObject<number>,
     pbWindowVisibleRef: RefObject<boolean>
 ) => {
     const [svgInfo, setSvgInfo] = useState<SVGInfo>({ svg: null, panggul: null, x: null, y: null, animation: null })
-    const [panggulOption, setPanggulOption] = useState<MenuItemInfo>(panggulDefaultOption)
 
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>(svgInfo)
-    const panggulOptionRef: RefObject<MenuItemInfo> = useRef<MenuItemInfo>(panggulOption)
 
     useEffect(() => {
         svgInfoRef.current = svgInfo
     }, [svgInfo])
-    useEffect(() => {
-        panggulOptionRef.current = panggulOption
-    }, [panggulOption])
 
     // For the use of Draw.schedule, see
     const animateInstrument = useCallback((time: number, params: AnimmationFunctionParameters): void => {
@@ -160,7 +154,6 @@ export const useAnimationEngine = (
         const currentFocus = focusRef.current
         const pbSpeed = pbSpeedRef.current
         const mySvgInfo = svgInfoRef.current
-        const myPanggulOption = panggulOptionRef.current
 
         if (currentFocus.includes(params.position)) {
             if (mySvgInfo.svg && params.currnotes) {
@@ -179,7 +172,7 @@ export const useAnimationEngine = (
                 // Currently only active for the first of multiple focus positions.
                 // TODO: Set positionIndex according to user selection.
                 if (
-                    params.position == myPanggulOption.value &&
+                    activePanggulRef.current.includes(params.position) &&
                     mySvgInfo.panggul &&
                     mySvgInfo.x &&
                     mySvgInfo.y != null &&
@@ -191,5 +184,5 @@ export const useAnimationEngine = (
         }
     }, [])
 
-    return { animateInstrument, svgInfo, setSvgInfo, panggulOption, setPanggulOption }
+    return { animateInstrument, svgInfo, setSvgInfo }
 }

@@ -3,7 +3,7 @@ import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import { positionConfigs } from '../../config/config'
-import type { Position, UUID } from '../../typing/basetypes'
+import type { Position } from '../../typing/basetypes'
 import { type MenuItemInfo, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
 import {
     type PlaybackAction,
@@ -21,12 +21,13 @@ interface PlayerWindowProps {
     visible: boolean
     scoreMenuOptions: ScoreMenuOption[]
     score: Score | undefined
-    currentScoreId: UUID
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
     focusRef: RefObject<Position[]>
     setFocus: Dispatch<Position[]>
+    activePanggulRef: RefObject<Position[]>
+    setActivePanggul: Dispatch<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
     playbackSpeed: number
@@ -38,12 +39,13 @@ export default function PlayerWindow({
     visible,
     scoreMenuOptions,
     score,
-    currentScoreId,
     loadScore,
     totalDurationMs,
     timeLine,
     focusRef,
     setFocus,
+    activePanggulRef,
+    setActivePanggul,
     updatePlaybackFunctions,
     playbackProgress,
     playbackSpeed,
@@ -66,8 +68,9 @@ export default function PlayerWindow({
     }, [playbackSpeed])
 
     // HOOKS
-    const { animateInstrument, setSvgInfo, panggulOption, setPanggulOption } = useAnimationEngine(
+    const { animateInstrument, setSvgInfo } = useAnimationEngine(
         focusRef,
+        activePanggulRef,
         playbackSpeedRef,
         visibleRef
     )
@@ -82,6 +85,12 @@ export default function PlayerWindow({
                 setNotationParas(timeLine.notation[newFocus[0]] || null)
         }
     }
+    const updatePanggul = (newPanggul: Position[]): void => {
+        debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
+        if (newPanggul !== activePanggulRef.current) {
+            setActivePanggul(newPanggul)
+        }
+    }
 
     const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
         debug(`new focus: ${JSON.stringify(focusRef.current)}`)
@@ -89,7 +98,8 @@ export default function PlayerWindow({
         const menuItems: MenuItemInfo[] = focusRef.current.map((position) => {
             return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
         })
-        setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
+        // setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
+        setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : []) as Position[])
         return [hideItem].concat(menuItems)
     }, [focusRef.current])
 
@@ -101,6 +111,7 @@ export default function PlayerWindow({
                 score={score}
                 loadScore={loadScore}
                 focusUpdater={updateFocus}
+                panggulUpdater={updatePanggul}
                 speedUpdater={setPlaybackSpeed}
             />
             {focusRef.current.length > 0 && (
@@ -108,9 +119,10 @@ export default function PlayerWindow({
                     focusRef={focusRef}
                     notationElement={notationParas}
                     panggulMenuItems={panggulMenuItems}
-                    panggulOption={panggulOption}
+                    activePanggulRef={activePanggulRef}
                     updatePlaybackFunctions={updatePlaybackFunctions}
-                    setPanggulOption={setPanggulOption}
+                    // setPanggulOption={setPanggulOption}
+                    setActivePanggul={setActivePanggul}
                     setSVGInfo={setSvgInfo}
                 />
             )}
