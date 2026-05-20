@@ -275,6 +275,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
         newTimeLine.totalDurationMs = intro
 
         while (currentStep) {
+            const lastStep = nextInFlow(true) == undefined
             maxMeasureDuration = 0
 
             // CREATE TEMPO ACTION
@@ -365,7 +366,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                                 currentStep!.dynamics[0] +
                                 (symbolIdx / notation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
                             prevaction: _.last(newTimeLine.sampleractions),
-                            isLast: endOfPosition
+                            isLast: lastStep && endOfMeasure
                         })
                         // Create one or more sampler action(s) for the new note or pattern
                         patternNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
@@ -482,8 +483,7 @@ export function usePlaybackManager(selectedFocus: Position[]) {
                         bpm: currentStep.tempo[0],
                         velocity: dynamicsToNumber['mf'],
                         prevaction: undefined,
-                        isLast:
-                            currentStep.lastSystem && beatOffset + currentStep.system.kempli.frequency! > systemDuration
+                        isLast: lastStep && beatOffset + currentStep.system.kempli.frequency! > systemDuration
                     })
                     // createNoteActions always returns an array containing 1 or more actions
                     if (patternNoteActions) {
