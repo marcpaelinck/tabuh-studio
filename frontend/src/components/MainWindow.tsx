@@ -2,7 +2,6 @@ import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import EditIcon from '@rsuite/icons/Edit'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
-import _ from 'lodash'
 import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
@@ -33,7 +32,7 @@ import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { cycleValidation } from '../componentlogic/validationManager'
-import { editorInitialExpandState, noCursor, type KeyboardType } from '../config/config'
+import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
 import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
@@ -197,8 +196,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
     const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
 
-    const [expanded, setExpanded] = useState<Record<UUID, boolean>>({})
-    const [buttonIsExpand, setButtonIsExpand] = useState<boolean>(!editorInitialExpandState)
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
@@ -309,12 +306,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             })
         }
     }, [score])
-
-    function expandAll(expand: boolean) {
-        const newExpanded = _.mapValues(expanded, () => expand)
-        setExpanded(newExpanded)
-        setButtonIsExpand(!expand)
-    }
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
