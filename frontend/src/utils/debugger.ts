@@ -6,6 +6,7 @@ import _ from 'lodash'
 const mainSwitch = true // easily switch off all logging
 const debugOn: Record<string, boolean | Record<string, boolean>> = {
     UNKNOWN: false,
+    Animation: true,
     castingRulesManager: false,
     createSchedule: false,
     Dashboard: false,

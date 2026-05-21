@@ -131,7 +131,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             const instrType: string = positionConfigs[position].type
             if (!shCode) return null
             const note: Note = noteConfigs[instrType][shCode]
-            if (!note) console.log(`${shCode} ${position}`)
             const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
             result.push({
                 time: action.time,

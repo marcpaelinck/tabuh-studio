@@ -111,7 +111,6 @@ const createInstrument = (
                 alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            console.log(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
             debug(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
             const indices = lookup[position].symbol2idxs[params.symbol]
             if (indices && samplers[position]) {

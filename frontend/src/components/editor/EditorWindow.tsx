@@ -63,10 +63,6 @@ export default function EditorWindow({
 
     const systemCursorFunctions = useRef<Record<UUID, SystemCursorFunction>>({})
 
-    useEffect(() => {
-        console.log(`system cursor functions updated to ${JSON.stringify(_.keys(systemCursorFunctions.current))}`)
-    }, [systemCursorFunctions.current])
-
     // This function is passed to the SystemNode elements, so that they can each add their own cursor function
     // to the systemCursorFunctions record.
     function updateCursorFunction(uuid: UUID, func: SystemCursorFunction) {

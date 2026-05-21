@@ -14,8 +14,8 @@ import {
 import { type Score, type ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import Animation, { panggulDefaultOption } from './Animation'
-import Menu from './PlayerMenu'
 import { Player } from './Player'
+import Menu from './PlayerMenu'
 
 interface PlayerWindowProps {
     visible: boolean
@@ -102,7 +102,7 @@ export default function PlayerWindow({
     }
     const updatePanggul = (newPanggul: Position[]): void => {
         debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
-        if (newPanggul !== activePanggulRef.current) {
+        if (newPanggul !== activePanggul) {
             setActivePanggul(newPanggul)
             updateNotationParas(newPanggul, currFocus || [])
         }

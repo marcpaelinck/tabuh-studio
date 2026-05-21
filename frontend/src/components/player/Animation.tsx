@@ -13,6 +13,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
+import { debug } from '../../utils/debugger'
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.
@@ -65,7 +66,7 @@ export default function Animation({
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
-    const [selectedPanggulOption, setSelectedPanggulOption] = useState<string>()
+    const [selectedPanggulOption, setSelectedPanggulOption] = useState<string>('Hide')
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -75,18 +76,16 @@ export default function Animation({
     })
 
     useEffect(() => {
-        console.log(`focus=${JSON.stringify(currFocus)}`)
-    }, [currFocus])
-
-    useEffect(() => {
         if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1].value as string)
     }, [panggulMenuItems])
 
+    // Initialize the selected pangul option. Dependency svgInfoRef.current is necessary
+    // because it might not be initialized before selectedPanggulOption gets its initial value.
     useEffect(() => {
-        console.log(`focus=${JSON.stringify(selectedPanggulOption)}`)
+        debug(`panggul=${JSON.stringify(selectedPanggulOption)}`)
         const selection = panggulMenuItems.find((item) => item.value == selectedPanggulOption)
-        setPanggulVisibility(selection)
-    }, [selectedPanggulOption])
+        if (selection) setPanggulVisibility(selection)
+    }, [selectedPanggulOption, svgInfoRef.current])
 
     const updateSvgSize = (val: number | number[]) => {
         const size: number = Math.round(typeof val == 'number' ? val : val[0])
@@ -118,10 +117,6 @@ export default function Animation({
     function setNotationVisibility(isVisible: boolean) {
         setNotationVisible(isVisible)
     }
-
-    useEffect(() => {
-        console.log(`ANIMATION: focus=${JSON.stringify(currFocus)}`)
-    })
 
     const svgImage = useMemo(() => {
         return (
