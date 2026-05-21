@@ -1,8 +1,6 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
-import CollaspedOutlineIcon from '@rsuite/icons/CollaspedOutline'
 import EditIcon from '@rsuite/icons/Edit'
-import ExpandOutlineIcon from '@rsuite/icons/ExpandOutline'
 import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import _ from 'lodash'
 import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
@@ -362,22 +360,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
-            <Container id="header+content" className="flex ">
+            <Container id="header+content" className="flex w-full">
                 <Header id="header" className="flex">
                     <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
                         <Row align="middle">
-                            <Col span={1} align="left">
-                                <Button
-                                    appearance="primary"
-                                    startIcon={buttonIsExpand ? <ExpandOutlineIcon /> : <CollaspedOutlineIcon />}
-                                    size="sm"
-                                    onClick={() => expandAll(buttonIsExpand)}
-                                />
-                            </Col>
-                            <Col span={22}>
+                            <Col span={19} id="Dashboard" align="left">
                                 <Dashboard values={dashboardValues} />
                             </Col>
-                            <Col span={1}>
+                            <Col span={5} id="Toolbar" className="flex justify-end">
                                 <Toggle
                                     size={'lg'}
                                     color="violet"
