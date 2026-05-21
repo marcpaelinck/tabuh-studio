@@ -14,7 +14,7 @@ import {
 import { type Score, type ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import Animation, { panggulDefaultOption } from './Animation'
-import Menu from './Menu'
+import Menu from './PlayerMenu'
 import { Player } from './Player'
 
 interface PlayerWindowProps {
