@@ -82,6 +82,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)
+    const [playbackTempo, setPlaybackTempo] = useState<number>(60)
 
     var tempoLookup: Record<number, Record<number, number>> = {}
 
@@ -93,11 +94,23 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
     }, [])
 
-    const changeTempo = useCallback((time: number, params: TempoFunctionParameters): void => {
-        if (params.bpm != undefined) {
-            Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
-        }
-    }, [])
+    useEffect(() => {
+        // Immediately change tempo when playback speed is changed by the user.
+        // Tempo changes that are scheduled to fire after the current time
+        // will take the new playback speed into account.
+        Tone.getTransport().bpm.value = playbackTempo * playbackSpeed
+    }, [playbackSpeed])
+
+    // Callback function for the playback scheduler
+    const changeTempo = useCallback(
+        (time: number, params: TempoFunctionParameters): void => {
+            if (params.bpm != undefined) {
+                Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
+                setPlaybackTempo(params.bpm)
+            }
+        },
+        [playbackSpeed]
+    )
 
     const updateProgress = useCallback(() => {
         setPlaybackProgress(Tone.getTransport().seconds)
