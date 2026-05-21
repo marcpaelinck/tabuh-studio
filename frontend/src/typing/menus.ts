@@ -1,3 +1,4 @@
+import type { Option } from 'rsuite'
 import type { Position, UUID } from './basetypes'
 
 // MENUS
@@ -26,3 +27,10 @@ export type MenuInfo = { disabled: Record<MenuName, boolean> }
 export type MenuItemInfo<T> = { key: string | number | null; displayValue: string; value: T }
 
 export type MenuCollectionInfo = Record<MenuName, MenuInfo>
+
+// Extension of React Suite Option used for SelectPicker elements.
+// This interface allows to link an additional object to an option.
+// The Option's value attribute only accepts string and numbers.
+export interface SelectOption<U> extends Option<string> {
+    objValue: U
+}

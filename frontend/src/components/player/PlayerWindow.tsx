@@ -4,7 +4,7 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import { positionConfigs } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
-import { type MenuItemInfo, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
+import { type ScoreInfo, type ScoreMenuOption, type SelectOption } from '../../typing/menus'
 import {
     type PlaybackAction,
     type PlaybackCallbackFunctions,
@@ -108,32 +108,17 @@ export default function PlayerWindow({
         }
     }
 
-    // const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
-    //     debug(`new focus: ${JSON.stringify(currFocus)}`)
-    //     const hideItem: MenuItemInfo = panggulDefaultOption
-    //     const menuItems: MenuItemInfo[] = currFocus.map((position) => {
-    //         return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
-    //     })
-    //     // setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
-    //     setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : []) as Position[])
-    //     return [hideItem].concat(menuItems)
-    // }, [currFocus])
-
-    const [panggulMenuItems, setPanggulMenuItems] = useState<MenuItemInfo<Position[]>[]>([])
+    const [panggulMenuItems, setPanggulMenuItems] = useState<SelectOption<Position[]>[]>([])
 
     useEffect(() => {
         debug(`new focus: ${JSON.stringify(currFocus)}`)
-        const menuItems: MenuItemInfo<Position[]>[] = currFocus.map((position) => {
-            return { key: position, displayValue: positionConfigs[position as Position].name, value: [position] }
+        const menuItems: SelectOption<Position[]>[] = currFocus.map((position) => {
+            return { label: positionConfigs[position as Position].name, value: position, objValue: [position] }
         })
-        const hideItem: MenuItemInfo<Position[]> = panggulDefaultOption
+        const hideItem: SelectOption<Position[]> = panggulDefaultOption
         setPanggulMenuItems([hideItem].concat(menuItems))
-        setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : hideItem.value) as Position[])
+        setActivePanggul((menuItems.length > 0 ? [menuItems[0].objValue] : hideItem.objValue) as Position[])
     }, [currFocus])
-
-    // useEffect(() => {
-    //     setActivePanggul((panggulMenuItems.length > 0 ? [panggulMenuItems[0].value] : []) as Position[])
-    // }, [panggulMenuItems])
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>

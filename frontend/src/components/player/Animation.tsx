@@ -1,19 +1,18 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import { Col, Grid, Loader, Row, Slider, Toggle } from 'rsuite'
+import { Col, Grid, Loader, Row, SelectPicker, Slider, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import type { MenuItemInfo } from '../../typing/menus'
+import type { SelectOption } from '../../typing/menus'
 import type { PlaybackCallbackFunctions } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
-import Selector from './Selector'
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.
@@ -42,12 +41,12 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
     return { svg: svgElement, panggul: panggul, x: xValues, y: yValues ? yValues.y : 0, animation: animationValues }
 }
 
-export const panggulDefaultOption: MenuItemInfo<Position[]> = { key: 'HIDE', displayValue: 'Hide', value: [] }
+export const panggulDefaultOption: SelectOption<Position[]> = { label: 'Hide', value: 'Hide', objValue: [] }
 
 interface AnimationProps {
     currFocus: Position[]
     notationElement: NotationParagraph[] | null
-    panggulMenuItems: MenuItemInfo<Position[]>[]
+    panggulMenuItems: SelectOption<Position[]>[]
     panggulUpdater: Dispatch<Position[]>
     activePanggul: Position[]
     setSVGInfo: Dispatch<SVGInfo>
@@ -66,6 +65,7 @@ export default function Animation({
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
+    const [selectedPanggulOption, setSelectedPanggulOption] = useState<string>()
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -77,6 +77,16 @@ export default function Animation({
     useEffect(() => {
         console.log(`focus=${JSON.stringify(currFocus)}`)
     }, [currFocus])
+
+    useEffect(() => {
+        if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1].value as string)
+    }, [panggulMenuItems])
+
+    useEffect(() => {
+        console.log(`focus=${JSON.stringify(selectedPanggulOption)}`)
+        const selection = panggulMenuItems.find((item) => item.value == selectedPanggulOption)
+        setPanggulVisibility(selection)
+    }, [selectedPanggulOption])
 
     const updateSvgSize = (val: number | number[]) => {
         const size: number = Math.round(typeof val == 'number' ? val : val[0])
@@ -91,17 +101,17 @@ export default function Animation({
         }
     }
 
-    function setPanggulVisibility(selection: MenuItemInfo<Position[]>) {
-        if (svgInfoRef.current.svg && hasPanggul) {
+    function setPanggulVisibility(selection: SelectOption<Position[]> | undefined) {
+        if (selection && svgInfoRef.current.svg && hasPanggul) {
             const panggul = svgInfoRef.current.panggul
-            if (panggul && selection.value.length != 0) {
+            if (panggul && selection.objValue.length != 0) {
                 if (panggul.classList.contains('invisible')) {
                     panggul.classList.remove('invisible')
                 }
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            panggulUpdater(selection.value as Position[])
+            panggulUpdater(selection.objValue as Position[])
         }
     }
 
@@ -143,12 +153,14 @@ export default function Animation({
                         // The panggul checkbox is only visible if the embedded SVG code has a panggul element
                         hasPanggul && (
                             <Col span="auto">
-                                <Selector
+                                <SelectPicker
                                     id="panggul selector"
-                                    title={`panggul: ${activePanggul.length > 0 ? activePanggul[0] : 'hidden'}`}
-                                    className="panggulselector"
-                                    valueList={panggulMenuItems}
-                                    onChange={setPanggulVisibility}
+                                    searchable={false}
+                                    cleanable={false}
+                                    label="panggul:"
+                                    data={panggulMenuItems}
+                                    value={selectedPanggulOption}
+                                    onChange={(value) => setSelectedPanggulOption(value as string)}
                                 />
                             </Col>
                         )
