@@ -2,7 +2,7 @@ import type { Dispatch, JSX } from 'react'
 import { Dropdown } from 'rsuite'
 import type { MenuItemInfo } from '../../typing/menus'
 
-const DDItem = (item: MenuItemInfo, index: number, menuName: string, onChange: Dispatch<MenuItemInfo>) => {
+const DDItem = (item: MenuItemInfo<any>, index: number, menuName: string, onChange: Dispatch<MenuItemInfo<any>>) => {
     return (
         <Dropdown.Item
             key={`${menuName}-option-${index}`}
@@ -21,11 +21,11 @@ export default function Selector({
     scrollable,
     ...props
 }: {
-    valueList: MenuItemInfo[]
-    [key: string]: any
+    valueList: MenuItemInfo<any>[]
     scrollable?: boolean
+    [key: string]: any
 }) {
-    const items: JSX.Element[] = valueList.map((item: MenuItemInfo, index: number) =>
+    const items: JSX.Element[] = valueList.map((item: MenuItemInfo<any>, index: number) =>
         DDItem(item, index, props.id, props.onChange)
     )
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
+import { useEffect, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
 import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
@@ -86,32 +86,54 @@ export default function PlayerWindow({
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
+    const updateNotationParas = (newPanggul: Position[], newFocus: Position[]) => {
+        if (timeLine && timeLine.notation) {
+            const position = newPanggul.length > 0 ? newPanggul[0] : newFocus.length > 0 ? newFocus[0] : undefined
+            setNotationParas(position ? timeLine.notation[position] || null : null)
+        }
+    }
+
     const updateFocus = (newFocus: Position[]): void => {
         debug(`request to update focus to ${JSON.stringify(newFocus)}`)
         if (newFocus !== currFocus) {
             setFocus(newFocus)
-            //TODO currently only displaying notation for the first focus position
-            if (timeLine && timeLine.notation && newFocus && newFocus[0] in timeLine.notation)
-                setNotationParas(timeLine.notation[newFocus[0]] || null)
+            updateNotationParas(activePanggul || [], newFocus)
         }
     }
     const updatePanggul = (newPanggul: Position[]): void => {
         debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
         if (newPanggul !== activePanggulRef.current) {
             setActivePanggul(newPanggul)
+            updateNotationParas(newPanggul, currFocus || [])
         }
     }
 
-    const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
+    // const panggulMenuItems: MenuItemInfo[] = useMemo(() => {
+    //     debug(`new focus: ${JSON.stringify(currFocus)}`)
+    //     const hideItem: MenuItemInfo = panggulDefaultOption
+    //     const menuItems: MenuItemInfo[] = currFocus.map((position) => {
+    //         return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
+    //     })
+    //     // setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
+    //     setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : []) as Position[])
+    //     return [hideItem].concat(menuItems)
+    // }, [currFocus])
+
+    const [panggulMenuItems, setPanggulMenuItems] = useState<MenuItemInfo<Position[]>[]>([])
+
+    useEffect(() => {
         debug(`new focus: ${JSON.stringify(currFocus)}`)
-        const hideItem: MenuItemInfo = panggulDefaultOption
-        const menuItems: MenuItemInfo[] = currFocus.map((position) => {
-            return { key: position, displayValue: positionConfigs[position as Position].name, value: position }
+        const menuItems: MenuItemInfo<Position[]>[] = currFocus.map((position) => {
+            return { key: position, displayValue: positionConfigs[position as Position].name, value: [position] }
         })
-        // setPanggulOption(menuItems.length > 0 ? menuItems[0] : panggulDefaultOption)
-        setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : []) as Position[])
-        return [hideItem].concat(menuItems)
+        const hideItem: MenuItemInfo<Position[]> = panggulDefaultOption
+        setPanggulMenuItems([hideItem].concat(menuItems))
+        setActivePanggul((menuItems.length > 0 ? [menuItems[0].value] : hideItem.value) as Position[])
     }, [currFocus])
+
+    // useEffect(() => {
+    //     setActivePanggul((panggulMenuItems.length > 0 ? [panggulMenuItems[0].value] : []) as Position[])
+    // }, [panggulMenuItems])
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
@@ -121,7 +143,6 @@ export default function PlayerWindow({
                 score={score}
                 loadScore={loadScore}
                 focusUpdater={updateFocus}
-                panggulUpdater={updatePanggul}
                 speedUpdater={setPlaybackSpeed}
             />
             {currFocus.length > 0 && (
@@ -129,10 +150,9 @@ export default function PlayerWindow({
                     currFocus={currFocus}
                     notationElement={notationParas}
                     panggulMenuItems={panggulMenuItems}
-                    activePanggulRef={activePanggulRef}
+                    activePanggul={activePanggul}
                     updatePlaybackFunctions={updatePlaybackFunctions}
-                    // setPanggulOption={setPanggulOption}
-                    setActivePanggul={setActivePanggul}
+                    panggulUpdater={updatePanggul}
                     setSVGInfo={setSvgInfo}
                 />
             )}

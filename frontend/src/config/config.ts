@@ -128,7 +128,7 @@ export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1
 
 // INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
 
-export type InstrumentConfig = { name: string; positions: string[] }
+export type InstrumentConfig = { name: string; positions: Position[] }
 
 export type PositionConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.

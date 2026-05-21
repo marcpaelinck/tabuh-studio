@@ -23,6 +23,6 @@ export type menuValueType = string | number | null | (Position | number | null)[
 
 export type MenuInfo = { disabled: Record<MenuName, boolean> }
 
-export type MenuItemInfo = { key: string | number | null; displayValue: string; value: menuValueType }
+export type MenuItemInfo<T> = { key: string | number | null; displayValue: string; value: T }
 
 export type MenuCollectionInfo = Record<MenuName, MenuInfo>

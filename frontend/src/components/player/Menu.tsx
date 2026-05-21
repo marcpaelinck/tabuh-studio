@@ -11,7 +11,7 @@ import {
     createFocusMenuItems,
     createSpeedMenuItems,
     focusDefaultOption,
-    tabuhDefaultOption as scoreDefaultOption,
+    scoreDefaultOption,
     speedDefaultOption
 } from '../../utils/selectorsUtils'
 import Selector from './Selector'
@@ -22,7 +22,6 @@ export default function Menu({
     score,
     loadScore,
     focusUpdater,
-    panggulUpdater,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
@@ -30,15 +29,14 @@ export default function Menu({
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     focusUpdater: Dispatch<Position[]>
-    panggulUpdater: Dispatch<Position[]>
     speedUpdater: Dispatch<number>
 }): JSX.Element {
-    const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo[]>([])
-    const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo[]>([])
-    const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo[]>([])
-    const [selectedScore, setSelectedScore] = useState<MenuItemInfo>(scoreDefaultOption)
-    const [selectedFocus, setSelectedFocus] = useState<MenuItemInfo>(focusDefaultOption)
-    const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo>(speedDefaultOption)
+    const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo<Position[]>[]>([])
+    const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo<number>[]>([])
+    const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo<ScoreInfo>[]>([])
+    const [selectedScore, setSelectedScore] = useState<MenuItemInfo<ScoreInfo | null>>(scoreDefaultOption)
+    const [selectedFocus, setSelectedFocus] = useState<MenuItemInfo<Position[]>>(focusDefaultOption)
+    const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo<number>>(speedDefaultOption)
 
     useEffect(() => {
         const updateFixedMenus = async () => {
@@ -51,7 +49,7 @@ export default function Menu({
     // TODO Need to streamline both menu item types.
     useEffect(() => {
         const menuItems = scoreMenuOptions.map((option) => {
-            return { key: option.label, displayValue: option.label, value: option.value } as MenuItemInfo
+            return { key: option.label, displayValue: option.label, value: option.value } as MenuItemInfo<ScoreInfo>
         })
         setScoreMenuItems(menuItems)
     }, [scoreMenuOptions])
@@ -65,27 +63,27 @@ export default function Menu({
         updateFocusMenu()
     }, [score])
 
-    function debugLog(item: MenuItemInfo, menu: string) {
+    function debugLog(item: MenuItemInfo<any>, menu: string) {
         const strValue = Array.isArray(item.value)
             ? item.value.reduce((aggr, val) => aggr + (aggr == '[' ? '' : ', ') + val, '[') + ']'
             : item.value
         debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
     }
 
-    const onChangeScoreSelector = async (item: MenuItemInfo) => {
+    const onChangeScoreSelector = async (item: MenuItemInfo<ScoreInfo>) => {
         debugLog(item, 'TABUH')
         setSelectedScore(item)
         loadScore('JSON', item.value as ScoreInfo)
         onChangeFocusSelector(focusDefaultOption)
     }
 
-    const onChangeFocusSelector = async (item: MenuItemInfo) => {
+    const onChangeFocusSelector = async (item: MenuItemInfo<Position[]>) => {
         debugLog(item, 'FOCUS')
         setSelectedFocus(item)
         focusUpdater(item.value as Position[])
     }
 
-    const onChangeSpeedSelector = async (item: MenuItemInfo) => {
+    const onChangeSpeedSelector = async (item: MenuItemInfo<number>) => {
         debugLog(item, 'SPEED')
         setSelectedSpeed(item)
         speedUpdater(item.value as number)

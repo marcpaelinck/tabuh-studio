@@ -42,15 +42,14 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
     return { svg: svgElement, panggul: panggul, x: xValues, y: yValues ? yValues.y : 0, animation: animationValues }
 }
 
-export const panggulDefaultOption: MenuItemInfo = { key: 'HIDE', displayValue: 'Hide', value: null }
+export const panggulDefaultOption: MenuItemInfo<Position[]> = { key: 'HIDE', displayValue: 'Hide', value: [] }
 
 interface AnimationProps {
     currFocus: Position[]
     notationElement: NotationParagraph[] | null
-    panggulMenuItems: MenuItemInfo[]
-    // setPanggulOption: Dispatch<MenuItemInfo>
-    activePanggulRef: RefObject<Position[]>
-    setActivePanggul: Dispatch<Position[]>
+    panggulMenuItems: MenuItemInfo<Position[]>[]
+    panggulUpdater: Dispatch<Position[]>
+    activePanggul: Position[]
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
@@ -58,9 +57,8 @@ export default function Animation({
     currFocus,
     notationElement,
     panggulMenuItems,
-    activePanggulRef,
-    // setPanggulOption,
-    setActivePanggul,
+    activePanggul,
+    panggulUpdater,
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
@@ -93,18 +91,17 @@ export default function Animation({
         }
     }
 
-    function setPanggulVisibility(selection: MenuItemInfo) {
+    function setPanggulVisibility(selection: MenuItemInfo<Position[]>) {
         if (svgInfoRef.current.svg && hasPanggul) {
             const panggul = svgInfoRef.current.panggul
-            if (panggul && selection.value) {
+            if (panggul && selection.value.length != 0) {
                 if (panggul.classList.contains('invisible')) {
                     panggul.classList.remove('invisible')
                 }
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            // setPanggulOption(selection)
-            setActivePanggul((selection.value ? [selection.value] : []) as Position[])
+            panggulUpdater(selection.value as Position[])
         }
     }
 
@@ -126,7 +123,7 @@ export default function Animation({
                 afterInjection={setSvgStates}
             />
         )
-    }, [currFocus])
+    }, [currFocus, svgSizeStyle])
 
     return currFocus.length > 0 ? (
         <div className="m-6 w-full">
@@ -148,7 +145,7 @@ export default function Animation({
                             <Col span="auto">
                                 <Selector
                                     id="panggul selector"
-                                    title={`panggul: ${activePanggulRef.current.length > 0 ? activePanggulRef.current[0] : 'hidden'}`}
+                                    title={`panggul: ${activePanggul.length > 0 ? activePanggul[0] : 'hidden'}`}
                                     className="panggulselector"
                                     valueList={panggulMenuItems}
                                     onChange={setPanggulVisibility}
