@@ -137,7 +137,7 @@ export default function EditorWindow({
             if (firstOfRange) rangePartName = partName
             return (
                 // <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
-                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0">
+                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0 flex">
                     <Row>
                         <PartIndicator
                             key={`key-${systemData.uuid}`}
@@ -149,8 +149,9 @@ export default function EditorWindow({
                             toggleSelection={toggleSelection}
                             extendSelection={extendSelection}
                         />
-                        <Col span={23}>
+                        <Col span={23} className="flex">
                             <SystemNode
+                                className="flex"
                                 id={systemId(systemData.uuid)}
                                 systemData={systemData}
                                 positions={score.positions}

@@ -351,7 +351,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
-            <Container id="header+content" className="flex w-full">
+            <Container id="header+content" className="flex w-full min-w-0">
                 <Header id="header" className="flex">
                     <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
                         <Row align="middle">
@@ -408,7 +408,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
                 {/* Full application is only displayed on larger screens */}
-                {screenSize.abbr.includes('lg') && <Container id="full-application">{fullApplication}</Container>}
+                {screenSize.abbr.includes('lg') && (
+                    <Container id="full-application" className="min-w-0">
+                        {fullApplication}
+                    </Container>
+                )}
                 {/* Container for small screens only displays the Player Window */}
                 {!screenSize.abbr.includes('lg') && <Container id="player-only">{playerWindow}</Container>}
             </ScoreFunctions>
