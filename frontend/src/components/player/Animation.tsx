@@ -1,7 +1,7 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import { Col, Grid, Loader, Row, SelectPicker, Slider, Toggle } from 'rsuite'
+import { Grid, HStack, Loader, Row, SelectPicker, Slider, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
@@ -66,7 +66,7 @@ export default function Animation({
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
-    const [selectedPanggulOption, setSelectedPanggulOption] = useState<string>('Hide')
+    const [selectedPanggulOption, setSelectedPanggulOption] = useState<SelectOption<Position[]>>(panggulMenuItems[1])
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -76,15 +76,14 @@ export default function Animation({
     })
 
     useEffect(() => {
-        if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1].value as string)
+        if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1])
     }, [panggulMenuItems])
 
     // Initialize the selected pangul option. Dependency svgInfoRef.current is necessary
     // because it might not be initialized before selectedPanggulOption gets its initial value.
     useEffect(() => {
         debug(`panggul=${JSON.stringify(selectedPanggulOption)}`)
-        const selection = panggulMenuItems.find((item) => item.value == selectedPanggulOption)
-        if (selection) setPanggulVisibility(selection)
+        if (selectedPanggulOption) setPanggulVisibility(selectedPanggulOption)
     }, [selectedPanggulOption, svgInfoRef.current])
 
     const updateSvgSize = (val: number | number[]) => {
@@ -134,32 +133,36 @@ export default function Animation({
         <div className="m-6 w-full">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
-                    <Col span="auto">
+                    <HStack>
                         <Toggle
                             id="notation toggle"
+                            label="notation"
+                            labelPlacement="start"
                             disabled={notationElement == null}
                             color={theme.animation}
                             defaultChecked={notationElement != null && notationVisible}
-                            onChange={(checked) => setNotationVisibility(checked)}>
-                            notation
-                        </Toggle>
-                    </Col>
-                    {
-                        // The panggul checkbox is only visible if the embedded SVG code has a panggul element
-                        hasPanggul && (
-                            <Col span="auto">
+                            onChange={(checked) => setNotationVisibility(checked)}></Toggle>
+                        {
+                            // The panggul checkbox is only visible if the embedded SVG code has a panggul element
+                            hasPanggul && (
                                 <SelectPicker
                                     id="panggul selector"
                                     searchable={false}
                                     cleanable={false}
                                     label="panggul:"
                                     data={panggulMenuItems}
-                                    value={selectedPanggulOption}
-                                    onChange={(value) => setSelectedPanggulOption(value as string)}
+                                    value={selectedPanggulOption.value}
+                                    onSelect={(value, item) => {
+                                        setSelectedPanggulOption(item as SelectOption<Position[]>)
+                                    }}
+                                    // Next lines only needed if cleanable==true
+                                    // onChange={(value, e) => {
+                                    //     if (value === null) setSelectedPanggulOption(null)
+                                    // }}
                                 />
-                            </Col>
-                        )
-                    }
+                            )
+                        }
+                    </HStack>
                 </Row>
                 <Row id="notation-area-row" className="p-2">
                     <NotationArea
