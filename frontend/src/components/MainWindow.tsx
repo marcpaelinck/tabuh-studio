@@ -168,7 +168,8 @@ interface MainWindowProps {
     dataSource: 'database' | 'file'
 }
 export function MainWindow({ dataSource }: MainWindowProps) {
-    //NAVIGATION
+    // ── NAVIGATION ─────────────────────────────────────────────
+
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
@@ -181,9 +182,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         else console.log(`Logout successful`)
     }, [user])
 
-    // const [initialize, setInitialize] = useState<boolean>(true)
+    // ── DASHBOARD WARNINGS ─────────────────────────────────────────────
 
-    //DASHBOARD WARNINGS
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
     const { scoreList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
@@ -199,7 +199,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
-    // PLAYBACK SETTINGS
+    // ──  PLAYBACK SETTINGS ─────────────────────────────────────────────
+
     // By keeping these values here, the actual selectors can occur in any child element.
 
     const focusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
@@ -319,7 +320,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             timeLine={timeLine}
             currFocus={currentFocus}
             setFocus={setFocus}
-            activePanggul={selectedPanggulOption.objValue}
+            activePanggulRef={activePanggulRef}
             setSelectedPanggulOption={setSelectedPanggulOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}

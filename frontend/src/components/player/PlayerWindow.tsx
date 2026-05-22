@@ -25,7 +25,7 @@ interface PlayerWindowProps {
     timeLine: TimeLine | undefined
     currFocus: Position[]
     setFocus: Dispatch<Position[]>
-    activePanggul: Position[]
+    activePanggulRef: RefObject<Position[]>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
@@ -43,7 +43,7 @@ export default function PlayerWindow({
     timeLine,
     currFocus,
     setFocus,
-    activePanggul,
+    activePanggulRef,
     setSelectedPanggulOption,
     updatePlaybackFunctions,
     playbackProgress,
@@ -58,7 +58,6 @@ export default function PlayerWindow({
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
     const visibleRef = useRef<boolean>(visible)
     const focusRef = useRef<Position[]>([])
-    const activePanggulRef = useRef<Position[]>([])
 
     useEffect(() => {
         visibleRef.current = visible
@@ -71,10 +70,6 @@ export default function PlayerWindow({
     useEffect(() => {
         focusRef.current = currFocus
     }, [currFocus])
-
-    useEffect(() => {
-        activePanggulRef.current = activePanggul
-    }, [activePanggul])
 
     // HOOKS
     const { animateInstrument, setSvgInfo } = useAnimationEngine(
@@ -96,21 +91,13 @@ export default function PlayerWindow({
         debug(`request to update focus to ${JSON.stringify(newFocus)}`)
         if (newFocus !== currFocus) {
             setFocus(newFocus)
-            updateNotationParas(activePanggul || [], newFocus)
+            updateNotationParas(activePanggulRef.current || [], newFocus)
         }
     }
 
-    // const updatePanggulOption = (newPanggul: Position[]): void => {
-    //     debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
-    //     if (newPanggul !== activePanggul) {
-    //         setSelectedPanggulOption(newPanggul)
-    //         updateNotationParas(newPanggul, currFocus || [])
-    //     }
-    // }
-
     const updatePanggulOption = (newOption: ExtendedOption<Position[]>): void => {
         debug(`request to update panggulOption to ${JSON.stringify(newOption)}`)
-        if (newOption.objValue !== activePanggul) {
+        if (newOption.objValue !== activePanggulRef.current) {
             setSelectedPanggulOption(newOption)
             updateNotationParas(newOption.objValue, currFocus || [])
         }
@@ -130,7 +117,6 @@ export default function PlayerWindow({
                 <Animation
                     currFocus={currFocus}
                     notationElement={notationParas}
-                    activePanggul={activePanggul}
                     updatePlaybackFunctions={updatePlaybackFunctions}
                     panggulUpdater={updatePanggulOption}
                     setSVGInfo={setSvgInfo}

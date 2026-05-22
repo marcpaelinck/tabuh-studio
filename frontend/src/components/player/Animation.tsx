@@ -46,14 +46,12 @@ interface AnimationProps {
     currFocus: Position[]
     notationElement: NotationParagraph[] | null
     panggulUpdater: Dispatch<ExtendedOption<Position[]>>
-    activePanggul: Position[]
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 export default function Animation({
     currFocus,
     notationElement,
-    activePanggul,
     panggulUpdater,
     setSVGInfo,
     updatePlaybackFunctions
