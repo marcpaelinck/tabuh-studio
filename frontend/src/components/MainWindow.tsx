@@ -37,7 +37,7 @@ import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
 import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
-import type { ScoreMenuOption } from '../typing/menus'
+import { panggulDefaultOption, type ExtendedOption, type ScoreMenuOption } from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
@@ -200,21 +200,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
 
     // PLAYBACK SETTINGS
+    // By keeping these values here, the actual selectors can occur in any child element.
 
     const focusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
     const activePanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
     const [currentFocus, setCurrentFocus] = useState<Position[]>([])
-    const [currentPanggul, setCurrentPanggul] = useState<Position[]>([])
+    const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
 
     function setFocus(newFocus: Position[]) {
         setCurrentFocus(newFocus)
         focusRef.current = newFocus
     }
 
-    function setActivePanggul(newPanggul: Position[]) {
-        setCurrentPanggul(newPanggul)
-        activePanggulRef.current = newPanggul
-    }
+    useEffect(() => {
+        activePanggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption])
 
     const {
         timeLine,
@@ -319,8 +319,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             timeLine={timeLine}
             currFocus={currentFocus}
             setFocus={setFocus}
-            activePanggul={currentPanggul}
-            setActivePanggul={setActivePanggul}
+            activePanggul={selectedPanggulOption.objValue}
+            setSelectedPanggulOption={setSelectedPanggulOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}
@@ -344,10 +344,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             playback={playback}
         />
     )
-
-    // function Activity({ mode, children }: { mode: 'visible' | 'hidden'; children: ReactNode }) {
-    //     return <div style={{ display: mode === 'visible' ? 'block' : 'none' }}>{children}</div>
-    // }
 
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">

@@ -2,9 +2,8 @@ import { useEffect, useRef, useState, type ActionDispatch, type Dispatch, type R
 import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
-import { positionConfigs } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
-import { type ScoreInfo, type ScoreMenuOption, type SelectOption } from '../../typing/menus'
+import { type ExtendedOption, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
 import {
     type PlaybackAction,
     type PlaybackCallbackFunctions,
@@ -13,7 +12,7 @@ import {
 } from '../../typing/playback'
 import { type Score, type ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import Animation, { panggulDefaultOption } from './Animation'
+import Animation from './Animation'
 import { Player } from './Player'
 import PlayerMenu from './PlayerMenu'
 
@@ -27,7 +26,7 @@ interface PlayerWindowProps {
     currFocus: Position[]
     setFocus: Dispatch<Position[]>
     activePanggul: Position[]
-    setActivePanggul: Dispatch<Position[]>
+    setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
     playbackSpeed: number
@@ -45,7 +44,7 @@ export default function PlayerWindow({
     currFocus,
     setFocus,
     activePanggul,
-    setActivePanggul,
+    setSelectedPanggulOption,
     updatePlaybackFunctions,
     playbackProgress,
     playbackSpeed,
@@ -100,25 +99,22 @@ export default function PlayerWindow({
             updateNotationParas(activePanggul || [], newFocus)
         }
     }
-    const updatePanggul = (newPanggul: Position[]): void => {
-        debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
-        if (newPanggul !== activePanggul) {
-            setActivePanggul(newPanggul)
-            updateNotationParas(newPanggul, currFocus || [])
+
+    // const updatePanggulOption = (newPanggul: Position[]): void => {
+    //     debug(`request to update panggul to ${JSON.stringify(newPanggul)}`)
+    //     if (newPanggul !== activePanggul) {
+    //         setSelectedPanggulOption(newPanggul)
+    //         updateNotationParas(newPanggul, currFocus || [])
+    //     }
+    // }
+
+    const updatePanggulOption = (newOption: ExtendedOption<Position[]>): void => {
+        debug(`request to update panggulOption to ${JSON.stringify(newOption)}`)
+        if (newOption.objValue !== activePanggul) {
+            setSelectedPanggulOption(newOption)
+            updateNotationParas(newOption.objValue, currFocus || [])
         }
     }
-
-    const [panggulMenuItems, setPanggulMenuItems] = useState<SelectOption<Position[]>[]>([])
-
-    useEffect(() => {
-        debug(`new focus: ${JSON.stringify(currFocus)}`)
-        const menuItems: SelectOption<Position[]>[] = currFocus.map((position) => {
-            return { label: positionConfigs[position as Position].name, value: position, objValue: [position] }
-        })
-        const hideItem: SelectOption<Position[]> = panggulDefaultOption
-        setPanggulMenuItems([hideItem].concat(menuItems))
-        setActivePanggul((menuItems.length > 0 ? [menuItems[0].objValue] : hideItem.objValue) as Position[])
-    }, [currFocus])
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
@@ -134,10 +130,9 @@ export default function PlayerWindow({
                 <Animation
                     currFocus={currFocus}
                     notationElement={notationParas}
-                    panggulMenuItems={panggulMenuItems}
                     activePanggul={activePanggul}
                     updatePlaybackFunctions={updatePlaybackFunctions}
-                    panggulUpdater={updatePanggul}
+                    panggulUpdater={updatePanggulOption}
                     setSVGInfo={setSvgInfo}
                 />
             )}

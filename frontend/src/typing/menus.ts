@@ -31,6 +31,8 @@ export type MenuCollectionInfo = Record<MenuName, MenuInfo>
 // Extension of React Suite Option used for SelectPicker elements.
 // This interface allows to link an additional object to an option.
 // The Option's value attribute only accepts string and numbers.
-export interface SelectOption<U> extends Option<string> {
+export interface ExtendedOption<U> extends Option<string> {
     objValue: U
 }
+
+export const panggulDefaultOption: ExtendedOption<Position[]> = { label: 'Hide', value: 'Hide', objValue: [] }

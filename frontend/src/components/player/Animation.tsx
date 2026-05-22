@@ -6,7 +6,7 @@ import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import type { SelectOption } from '../../typing/menus'
+import { panggulDefaultOption, type ExtendedOption } from '../../typing/menus'
 import type { PlaybackCallbackFunctions } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
@@ -42,13 +42,10 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
     return { svg: svgElement, panggul: panggul, x: xValues, y: yValues ? yValues.y : 0, animation: animationValues }
 }
 
-export const panggulDefaultOption: SelectOption<Position[]> = { label: 'Hide', value: 'Hide', objValue: [] }
-
 interface AnimationProps {
     currFocus: Position[]
     notationElement: NotationParagraph[] | null
-    panggulMenuItems: SelectOption<Position[]>[]
-    panggulUpdater: Dispatch<Position[]>
+    panggulUpdater: Dispatch<ExtendedOption<Position[]>>
     activePanggul: Position[]
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
@@ -56,7 +53,6 @@ interface AnimationProps {
 export default function Animation({
     currFocus,
     notationElement,
-    panggulMenuItems,
     activePanggul,
     panggulUpdater,
     setSVGInfo,
@@ -66,7 +62,7 @@ export default function Animation({
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
-    const [selectedPanggulOption, setSelectedPanggulOption] = useState<SelectOption<Position[]>>(panggulMenuItems[1])
+    const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -74,6 +70,18 @@ export default function Animation({
         y: null,
         animation: null
     })
+
+    const [panggulMenuItems, setPanggulMenuItems] = useState<ExtendedOption<Position[]>[]>([])
+
+    useEffect(() => {
+        debug(`new focus: ${JSON.stringify(currFocus)}`)
+        const menuItems: ExtendedOption<Position[]>[] = currFocus.map((position) => {
+            return { label: positionConfigs[position as Position].name, value: position, objValue: [position] }
+        })
+        const hideItem: ExtendedOption<Position[]> = panggulDefaultOption
+        setPanggulMenuItems([hideItem].concat(menuItems))
+        setSelectedPanggulOption(menuItems.length > 0 ? menuItems[0] : hideItem)
+    }, [currFocus])
 
     useEffect(() => {
         if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1])
@@ -99,7 +107,7 @@ export default function Animation({
         }
     }
 
-    function setPanggulVisibility(selection: SelectOption<Position[]> | undefined) {
+    function setPanggulVisibility(selection: ExtendedOption<Position[]> | undefined) {
         if (selection && svgInfoRef.current.svg && hasPanggul) {
             const panggul = svgInfoRef.current.panggul
             if (panggul && selection.objValue.length != 0) {
@@ -109,7 +117,7 @@ export default function Animation({
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            panggulUpdater(selection.objValue as Position[])
+            panggulUpdater(selection)
         }
     }
 
@@ -153,7 +161,7 @@ export default function Animation({
                                     data={panggulMenuItems}
                                     value={selectedPanggulOption.value}
                                     onSelect={(value, item) => {
-                                        setSelectedPanggulOption(item as SelectOption<Position[]>)
+                                        setSelectedPanggulOption(item as ExtendedOption<Position[]>)
                                     }}
                                     // Next lines only needed if cleanable==true
                                     // onChange={(value, e) => {
