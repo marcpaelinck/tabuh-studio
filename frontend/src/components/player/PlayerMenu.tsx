@@ -1,7 +1,6 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useState } from 'react'
-import { ButtonToolbar } from 'rsuite'
-// import 'rsuite/ButtonToolbar/styles/index.css';
+import { HStack } from 'rsuite'
 import { speedList } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
 import type { MenuItemInfo, ScoreInfo, ScoreMenuOption } from '../../typing/menus'
@@ -16,7 +15,7 @@ import {
 } from '../../utils/selectorsUtils'
 import Selector from './Selector'
 
-export default function Menu({
+export default function PlayerMenu({
     menuDisabled,
     scoreMenuOptions,
     score,
@@ -91,7 +90,7 @@ export default function Menu({
 
     return (
         <div className="selectors flex flex-wrap">
-            <ButtonToolbar>
+            <HStack>
                 {/* Score selector is only visible on small screens where only the player is displayed. */}
                 <Selector
                     id="tabuhselector"
@@ -120,7 +119,7 @@ export default function Menu({
                     valueList={speedMenuItems}
                     onChange={onChangeSpeedSelector}
                 />
-            </ButtonToolbar>
+            </HStack>
         </div>
     )
 }

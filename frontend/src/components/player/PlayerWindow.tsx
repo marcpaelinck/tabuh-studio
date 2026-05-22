@@ -15,7 +15,7 @@ import { type Score, type ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import Animation, { panggulDefaultOption } from './Animation'
 import { Player } from './Player'
-import Menu from './PlayerMenu'
+import PlayerMenu from './PlayerMenu'
 
 interface PlayerWindowProps {
     visible: boolean
@@ -122,7 +122,7 @@ export default function PlayerWindow({
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
-            <Menu
+            <PlayerMenu
                 menuDisabled={menuDisabled}
                 scoreMenuOptions={scoreMenuOptions}
                 score={score}
