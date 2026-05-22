@@ -379,7 +379,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 </Content>
             </Container>
             <Sidebar h="100%" width={isExpandedSidenav ? 200 : 56} collapsible>
-                <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%">
+                {/* rounded-r-md of the Sidenav only rounds the corners on the right. */}
+                <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%" className="rounded-r-md">
                     <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
                         <NavHeader expanded={isExpandedSidenav} user={user} login={login} logout={logout} />
                     </Sidenav.Header>
