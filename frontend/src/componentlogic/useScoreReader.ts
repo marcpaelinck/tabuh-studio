@@ -4,7 +4,7 @@ import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem } from '../services/apiService'
 import { apiGetScore, apiGetScores } from '../services/apiService'
-import type { ScoreInfo } from '../typing/menus'
+import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
 import { readFile } from '../utils/filesystem'
@@ -25,12 +25,12 @@ function toScoreInfo(item: ScoreListItem): ScoreInfo {
 
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader(source: 'database' | 'file'): {
-    scoreList: ScoreInfo[]
+    scoreInfoList: ScoreInfo[]
     loadedScore: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     isLoading: boolean
 } {
-    const [scoreList, setScoreList] = useState<ScoreInfo[]>([])
+    const [scoreInfoList, setScoreInfoList] = useState<ScoreInfo[]>([])
     const [loadedScore, setScore] = useState<Score>()
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -125,7 +125,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             const scores = await apiGetScores()
             if (scores) {
                 const scoreInfoList = scores.map((score) => toScoreInfo(score))
-                setScoreList(scoreInfoList)
+                setScoreInfoList(scoreInfoList)
             } else throw new Error('Did not receive score list')
         } catch (err) {
             console.error('Failed to load score list from database:', err)
@@ -138,9 +138,9 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(true)
         const files = await readFile('scores/content.json')
         const scoreInfoList: ScoreInfo[] = JSON.parse(files)
-        setScoreList(scoreInfoList.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
+        setScoreInfoList(scoreInfoList.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
         setIsLoading(false)
     }
 
-    return { scoreList, loadedScore, loadScore, isLoading }
+    return { scoreInfoList, loadedScore, loadScore, isLoading }
 }

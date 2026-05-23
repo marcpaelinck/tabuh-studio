@@ -23,7 +23,7 @@ import {
 } from '../../config/config'
 import { isExtension, isMuting } from '../../config/configfunctions'
 import type { BPM, NoteSymbol, Position } from '../../typing/basetypes'
-import { speedDefaultOption } from '../../typing/menus'
+import { speedDefaultOption } from '../../typing/interface'
 import type {
     AnimationNote,
     GenericAction,

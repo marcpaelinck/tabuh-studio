@@ -1,8 +1,11 @@
 import type { Option } from 'rsuite'
 import type { Position, UUID } from './basetypes'
 
+// APPEARANCE
+
+export type Appearance = 'full' | 'playerOnly'
+
 // MENUS
-// SCORE MENU
 
 type MenuName = string
 

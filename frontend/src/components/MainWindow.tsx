@@ -41,9 +41,10 @@ import {
     focusDefaultOption,
     panggulDefaultOption,
     speedDefaultOption,
+    type Appearance,
     type ExtendedOption,
-    type ScoreMenuOption
-} from '../typing/menus'
+    type ScoreInfo
+} from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
@@ -181,6 +182,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [active, setActive] = useState<'editor' | 'player'>('player')
     const screenSize = useScreenSize()
+    const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     const { user, login, logout } = useAuth()
 
     useEffect(() => {
@@ -188,11 +190,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         else console.log(`Logout successful`)
     }, [user])
 
+    useEffect(() => {
+        setAppAppearance(screenSize.abbr.includes('lg') ? 'full' : 'playerOnly')
+    }, [screenSize])
+
     // ── DASHBOARD WARNINGS ─────────────────────────────────────────────
 
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { scoreList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
+    const { scoreInfoList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
     const dashboardFunctions: DashboardFunctionsType = {
         setDashboardElement: setDashboardElement,
         clearDashboardElement: clearDashboardElement
@@ -203,12 +209,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
-    const [scoreMenuOptions, setScoreMenuOptions] = useState<ScoreMenuOption[]>([])
+    const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
 
-    // ──  PLAYBACK SETTINGS ─────────────────────────────────────────────
+    // ──  MENU AND SELECTORS SETTINGS ─────────────────────────────────────────────
 
     // By keeping these values here, the actual selectors can occur in any child element.
 
+    const [selectedScoreOption, setSelectedScoreOption] = useState<ExtendedOption<ScoreInfo> | null>(null)
     const [selectedFocusOption, setSelectedFocusOption] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
     const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
     const [selectedSpeedOption, setSelectedSpeedOption] = useState<ExtendedOption<number>>(speedDefaultOption)
@@ -219,6 +226,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         currentFocusRef.current = selectedFocusOption.objValue
         currentPanggulRef.current = selectedPanggulOption.objValue
     }, [selectedPanggulOption, selectedFocusOption])
+
+    useEffect(() => {
+        if (selectedScoreOption && selectedScoreOption.objValue) loadScore('JSON', selectedScoreOption?.objValue)
+    }, [selectedScoreOption])
 
     const {
         timeLine,
@@ -249,11 +260,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     useEffect(() => {
         setScoreMenuOptions(
-            scoreList.map((scoreInfo) => {
-                return { value: scoreInfo, label: scoreInfo.title }
+            scoreInfoList.map((scoreInfo, idx) => {
+                return { label: scoreInfo.title, value: `#${idx} scoreInfo.title`, objValue: scoreInfo }
             })
         )
-    }, [scoreList])
+    }, [scoreInfoList])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -320,15 +331,17 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const playerWindow = (
         <PlayerWindow
+            appAppearance={appAppearance}
             visible={active == 'player'}
-            scoreMenuOptions={scoreMenuOptions}
             score={score}
-            loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
+            scoreMenuOptions={scoreMenuOptions}
+            selectedScoreOption={selectedScoreOption}
             selectedFocusOption={selectedFocusOption}
             selectedPanggulOption={selectedPanggulOption}
             selectedSpeedOption={selectedSpeedOption}
+            setSelectedScoreOption={setSelectedScoreOption}
             setSelectedFocusOption={setSelectedFocusOption}
             setSelectedPanggulOption={setSelectedPanggulOption}
             setSelectedSpeedOption={setSelectedSpeedOption}
@@ -392,6 +405,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                     <Sidenav.Body>
                         <MainMenu
                             keyboard={keyboard}
+                            selectedScoreOption={selectedScoreOption}
+                            setSelectedScoreOption={setSelectedScoreOption}
                             loadScore={loadScore}
                             setKeyboard={SetKeyboard}
                             scoreMenuOptions={scoreMenuOptions}
@@ -414,13 +429,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <DashboardFunctions value={dashboardFunctions}>
             <ScoreFunctions value={scoreFunctions}>
                 {/* Full application is only displayed on larger screens */}
-                {screenSize.abbr.includes('lg') && (
+                {appAppearance == 'full' && (
                     <Container id="full-application" className="min-w-0">
                         {fullApplication}
                     </Container>
                 )}
                 {/* Container for small screens only displays the Player Window */}
-                {!screenSize.abbr.includes('lg') && <Container id="player-only">{playerWindow}</Container>}
+                {appAppearance == 'playerOnly' && <Container id="player-only">{playerWindow}</Container>}
             </ScoreFunctions>
         </DashboardFunctions>
     )

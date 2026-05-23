@@ -7,7 +7,7 @@ import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from '../context/contexts'
 import TsGongIcon from '../reacticons/TsGongIcon'
-import type { ScoreInfo, ScoreMenuOption } from '../typing/menus'
+import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 
@@ -45,14 +45,24 @@ const SimpleTextareaDialog = ({ payload }: { payload: { payload: string } }) => 
 }
 
 interface TabuhEditorMenuProps {
-    scoreMenuOptions: ScoreMenuOption[]
+    scoreMenuOptions: ExtendedOption<ScoreInfo>[]
+    selectedScoreOption: ExtendedOption<ScoreInfo> | null
+    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
     user: AuthUser | null
 }
 
-export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard, user }: TabuhEditorMenuProps) {
+export function MainMenu({
+    scoreMenuOptions,
+    selectedScoreOption,
+    setSelectedScoreOption,
+    loadScore,
+    keyboard,
+    setKeyboard,
+    user
+}: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
@@ -119,13 +129,6 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard, u
         performAction()
     }, [activeKey])
 
-    function scoreSelected(scoreInfo: ScoreInfo | undefined) {
-        setScoreSelector(false)
-        if (scoreInfo) {
-            loadScore('JSON', scoreInfo)
-        }
-    }
-
     const selectScoreDialog = (
         <Modal className="w-[20rem]" open={scoreSelector} onClose={() => setScoreSelector(false)}>
             <Modal.Header>
@@ -133,7 +136,24 @@ export function MainMenu({ scoreMenuOptions, loadScore, keyboard, setKeyboard, u
             </Modal.Header>
             <Modal.Body>
                 <Box className="grid content-center">
-                    <SelectPicker block data={scoreMenuOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} />
+                    {/* <SelectPicker block data={scoreMenuOptions} onSelect={(scoreInfo) => scoreSelected(scoreInfo)} /> */}
+                    <SelectPicker
+                        id="scoreselector"
+                        searchable={false}
+                        cleanable={false}
+                        label="score:"
+                        data={scoreMenuOptions}
+                        value={selectedScoreOption?.value}
+                        onSelect={(value, item) => {
+                            setScoreSelector(false)
+                            setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
+                        }}
+                        // Onchange needed because value can be null / initial selector state is unselected
+                        // (also needed if cleanable==true)
+                        onChange={(value, e) => {
+                            if (value === null) setSelectedScoreOption(null)
+                        }}
+                    />
                 </Box>
             </Modal.Body>
         </Modal>

@@ -3,14 +3,14 @@ import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import type { Position } from '../../typing/basetypes'
-import { type ExtendedOption, type ScoreInfo, type ScoreMenuOption } from '../../typing/menus'
+import { type Appearance, type ExtendedOption, type ScoreInfo } from '../../typing/interface'
 import {
     type PlaybackAction,
     type PlaybackCallbackFunctions,
     type PlaybackState,
     type TimeLine
 } from '../../typing/playback'
-import { type Score, type ScoreFormat } from '../../typing/score'
+import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import Animation from './Animation'
 import { Player } from './Player'
@@ -18,14 +18,16 @@ import PlayerMenu from './PlayerMenu'
 
 interface PlayerWindowProps {
     visible: boolean
-    scoreMenuOptions: ScoreMenuOption[]
+    appAppearance: Appearance
     score: Score | undefined
-    loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
+    scoreMenuOptions: ExtendedOption<ScoreInfo>[]
+    selectedScoreOption: ExtendedOption<ScoreInfo> | null
     selectedFocusOption: ExtendedOption<Position[]>
     selectedPanggulOption: ExtendedOption<Position[]>
     selectedSpeedOption: ExtendedOption<number>
+    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
@@ -37,14 +39,16 @@ interface PlayerWindowProps {
 }
 export default function PlayerWindow({
     visible,
-    scoreMenuOptions,
+    appAppearance,
     score,
-    loadScore,
     totalDurationMs,
     timeLine,
+    scoreMenuOptions,
+    selectedScoreOption,
     selectedFocusOption,
     selectedPanggulOption,
     selectedSpeedOption,
+    setSelectedScoreOption,
     setSelectedFocusOption,
     setSelectedPanggulOption,
     setSelectedSpeedOption,
@@ -54,7 +58,6 @@ export default function PlayerWindow({
     playback,
     playbackState
 }: PlayerWindowProps) {
-    const menuDisabled = useRef<Record<string, boolean>>({ tabuh: false, focus: false })
     const [notationParas, setNotationParas] = useState<ReactElement[] | null>(null)
 
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
@@ -102,12 +105,13 @@ export default function PlayerWindow({
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
             <PlayerMenu
-                menuDisabled={menuDisabled}
+                appAppearance={appAppearance}
                 scoreMenuOptions={scoreMenuOptions}
                 score={score}
+                selectedScoreOption={selectedScoreOption}
                 selectedFocusOption={selectedFocusOption}
                 selectedSpeedOption={selectedSpeedOption}
-                loadScore={loadScore}
+                setSelectedScoreOption={setSelectedScoreOption}
                 setSelectedFocusOption={setSelectedFocusOption}
                 setSelectedSpeedOption={setSelectedSpeedOption}
             />

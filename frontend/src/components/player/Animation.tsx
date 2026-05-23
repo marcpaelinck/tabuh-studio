@@ -6,7 +6,7 @@ import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import { panggulDefaultOption, type ExtendedOption } from '../../typing/menus'
+import { panggulDefaultOption, type ExtendedOption } from '../../typing/interface'
 import type { PlaybackCallbackFunctions } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
