@@ -56,6 +56,7 @@ import {
 } from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
+import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 
@@ -329,10 +330,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
+    const player = (
+        <Player
+            score={score}
+            totalDurationMs={totalDurationMs}
+            playback={playback}
+            playbackState={playbackState}
+            playbackProgress={playbackProgress}
+        />
+    )
+
     const playerWindow = (
         <PlayerWindow
             appAppearance={appAppearance}
             visible={active == 'player'}
+            player={player}
             score={score}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
@@ -370,8 +382,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
             <Container id="header+content" className="flex w-full min-w-0">
-                <Header id="header" className="flex">
-                    <Grid className="ml-4 mr-4 w-full h-12 content-center" align="middle">
+                <Header id="header" className="flex nt-4 bg-[#f7f7fa]">
+                    <Grid className="ml-4 mt-2 w-full content-center" align="middle">
                         <Row align="middle">
                             <Col span={19} id="Dashboard" align="left">
                                 <Dashboard values={dashboardValues} />
@@ -387,6 +399,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                 />
                             </Col>
                         </Row>
+                        <Row className="bg-whte-1000">{player}</Row>
                     </Grid>
                 </Header>
                 <Content id="content" px="1rem" className="h-9/10">

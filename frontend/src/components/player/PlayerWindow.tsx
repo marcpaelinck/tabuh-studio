@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ActionDispatch, type Dispatch, type RefObject } from 'react'
+import { useEffect, useRef, useState, type ActionDispatch, type Dispatch, type JSX, type RefObject } from 'react'
 import { VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
@@ -19,6 +19,7 @@ import PlayerMenu from './PlayerMenu'
 interface PlayerWindowProps {
     visible: boolean
     appAppearance: Appearance
+    player: JSX.Element
     score: Score | undefined
     totalDurationMs: number
     timeLine: TimeLine | undefined
@@ -40,6 +41,7 @@ interface PlayerWindowProps {
 export default function PlayerWindow({
     visible,
     appAppearance,
+    player,
     score,
     totalDurationMs,
     timeLine,
@@ -125,13 +127,15 @@ export default function PlayerWindow({
                     setSVGInfo={setSvgInfo}
                 />
             )}
-            <Player
-                score={score}
-                totalDurationMs={totalDurationMs}
-                playback={playback}
-                playbackState={playbackState}
-                playbackProgress={playbackProgress}
-            />
+            {appAppearance == 'playerOnly' && (
+                <Player
+                    score={score}
+                    totalDurationMs={totalDurationMs}
+                    playback={playback}
+                    playbackState={playbackState}
+                    playbackProgress={playbackProgress}
+                />
+            )}
         </VStack>
     )
 }
