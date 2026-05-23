@@ -43,16 +43,18 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 }
 
 interface AnimationProps {
-    currFocus: Position[]
+    selectedFocusOption: ExtendedOption<Position[]>
+    selectedPanggulOption: ExtendedOption<Position[]>
     notationElement: NotationParagraph[] | null
-    panggulUpdater: Dispatch<ExtendedOption<Position[]>>
+    setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 export default function Animation({
-    currFocus,
+    selectedFocusOption,
+    selectedPanggulOption,
     notationElement,
-    panggulUpdater,
+    setSelectedPanggulOption,
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
@@ -60,7 +62,6 @@ export default function Animation({
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
-    const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -71,18 +72,21 @@ export default function Animation({
 
     const [panggulMenuItems, setPanggulMenuItems] = useState<ExtendedOption<Position[]>[]>([])
 
+    useEffect(() => debug(`SELECTED PANGGUL: ${JSON.stringify(selectedPanggulOption)}`), [selectedPanggulOption])
+
     useEffect(() => {
-        debug(`new focus: ${JSON.stringify(currFocus)}`)
-        const menuItems: ExtendedOption<Position[]>[] = currFocus.map((position) => {
+        debug(`new focus: ${JSON.stringify(selectedFocusOption.objValue)}`)
+        const menuItems: ExtendedOption<Position[]>[] = selectedFocusOption.objValue.map((position) => {
             return { label: positionConfigs[position as Position].name, value: position, objValue: [position] }
         })
         const hideItem: ExtendedOption<Position[]> = panggulDefaultOption
         setPanggulMenuItems([hideItem].concat(menuItems))
         setSelectedPanggulOption(menuItems.length > 0 ? menuItems[0] : hideItem)
-    }, [currFocus])
+    }, [selectedFocusOption])
 
     useEffect(() => {
         if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1])
+        else setSelectedPanggulOption(panggulDefaultOption)
     }, [panggulMenuItems])
 
     // Initialize the selected pangul option. Dependency svgInfoRef.current is necessary
@@ -115,7 +119,7 @@ export default function Animation({
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            panggulUpdater(selection)
+            setSelectedPanggulOption(selection)
         }
     }
 
@@ -126,16 +130,16 @@ export default function Animation({
     const svgImage = useMemo(() => {
         return (
             <ReactSVG
-                src={positionToSvg(currFocus)}
+                src={positionToSvg(selectedFocusOption?.objValue)}
                 style={svgSizeStyle}
                 loading={() => <Loader />}
                 useRequestCache={true}
                 afterInjection={setSvgStates}
             />
         )
-    }, [currFocus, svgSizeStyle])
+    }, [selectedFocusOption, svgSizeStyle])
 
-    return currFocus.length > 0 ? (
+    return selectedFocusOption.objValue.length > 0 ? (
         <div className="m-6 w-full">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
@@ -174,7 +178,8 @@ export default function Animation({
                     <NotationArea
                         notation={notationElement}
                         visible={notationVisible}
-                        currFocus={currFocus}
+                        selectedFocusOption={selectedFocusOption}
+                        selectedPanggulOption={selectedPanggulOption}
                         updatePlaybackFunctions={updatePlaybackFunctions}
                     />
                 </Row>

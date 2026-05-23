@@ -23,9 +23,9 @@ interface PlayerWindowProps {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     totalDurationMs: number
     timeLine: TimeLine | undefined
-    currFocus: Position[]
-    setFocus: Dispatch<Position[]>
-    activePanggulRef: RefObject<Position[]>
+    selectedFocusOption: ExtendedOption<Position[]>
+    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
+    selectedPanggulOption: ExtendedOption<Position[]>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
@@ -41,9 +41,9 @@ export default function PlayerWindow({
     loadScore,
     totalDurationMs,
     timeLine,
-    currFocus,
-    setFocus,
-    activePanggulRef,
+    selectedFocusOption,
+    selectedPanggulOption,
+    setSelectedFocusOption,
     setSelectedPanggulOption,
     updatePlaybackFunctions,
     playbackProgress,
@@ -57,7 +57,8 @@ export default function PlayerWindow({
 
     const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
     const visibleRef = useRef<boolean>(visible)
-    const focusRef = useRef<Position[]>([])
+    const currentFocusRef = useRef<Position[]>([])
+    const currentPanggulRef = useRef<Position[]>([])
 
     useEffect(() => {
         visibleRef.current = visible
@@ -68,38 +69,31 @@ export default function PlayerWindow({
     }, [playbackSpeed])
 
     useEffect(() => {
-        focusRef.current = currFocus
-    }, [currFocus])
+        currentFocusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
+
+    useEffect(() => {
+        currentPanggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption])
 
     // HOOKS
     const { animateInstrument, setSvgInfo } = useAnimationEngine(
-        focusRef,
-        activePanggulRef,
+        currentFocusRef,
+        currentPanggulRef,
         playbackSpeedRef,
         visibleRef
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
+    useEffect(() => {
+        updateNotationParas(selectedPanggulOption.objValue, selectedFocusOption.objValue)
+    }, [selectedFocusOption, selectedPanggulOption])
+
     const updateNotationParas = (newPanggul: Position[], newFocus: Position[]) => {
+        debug(`newPanggul = ${JSON.stringify(newPanggul)}`)
         if (timeLine && timeLine.notation) {
             const position = newPanggul.length > 0 ? newPanggul[0] : newFocus.length > 0 ? newFocus[0] : undefined
             setNotationParas(position ? timeLine.notation[position] || null : null)
-        }
-    }
-
-    const updateFocus = (newFocus: Position[]): void => {
-        debug(`request to update focus to ${JSON.stringify(newFocus)}`)
-        if (newFocus !== currFocus) {
-            setFocus(newFocus)
-            updateNotationParas(activePanggulRef.current || [], newFocus)
-        }
-    }
-
-    const updatePanggulOption = (newOption: ExtendedOption<Position[]>): void => {
-        debug(`request to update panggulOption to ${JSON.stringify(newOption)}`)
-        if (newOption.objValue !== activePanggulRef.current) {
-            setSelectedPanggulOption(newOption)
-            updateNotationParas(newOption.objValue, currFocus || [])
         }
     }
 
@@ -109,16 +103,18 @@ export default function PlayerWindow({
                 menuDisabled={menuDisabled}
                 scoreMenuOptions={scoreMenuOptions}
                 score={score}
+                selectedFocusOption={selectedFocusOption}
                 loadScore={loadScore}
-                focusUpdater={updateFocus}
+                setSelectedFocusOption={setSelectedFocusOption}
                 speedUpdater={setPlaybackSpeed}
             />
-            {currFocus.length > 0 && (
+            {selectedFocusOption.objValue.length > 0 && (
                 <Animation
-                    currFocus={currFocus}
                     notationElement={notationParas}
                     updatePlaybackFunctions={updatePlaybackFunctions}
-                    panggulUpdater={updatePanggulOption}
+                    selectedFocusOption={selectedFocusOption}
+                    selectedPanggulOption={selectedPanggulOption}
+                    setSelectedPanggulOption={setSelectedPanggulOption}
                     setSVGInfo={setSvgInfo}
                 />
             )}

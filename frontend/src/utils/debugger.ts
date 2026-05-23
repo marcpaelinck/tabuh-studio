@@ -32,6 +32,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SummaryItem: false,
     MainWindow: false,
     MainMenu: false,
+    NotationArea: true,
     useScoreManager: false,
     useInstruments: false,
     useKeyboardListener: false,

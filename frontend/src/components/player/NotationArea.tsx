@@ -5,17 +5,35 @@
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import type { HighlightRange, HilightRangeFunction, NotationParagraph } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
+import type { ExtendedOption } from '../../typing/menus'
 import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
+import { debug } from '../../utils/debugger'
 
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    currFocus: Position[]
+    selectedFocusOption: ExtendedOption<Position[]>
+    selectedPanggulOption: ExtendedOption<Position[]>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
-export default function NotationArea({ notation, visible, currFocus, updatePlaybackFunctions }: NotationAreaProps) {
+export default function NotationArea({
+    notation,
+    visible,
+    selectedFocusOption,
+    selectedPanggulOption,
+    updatePlaybackFunctions
+}: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
+    const selectedFocusRef = useRef<Position[]>([])
+    const selectedPanggulRef = useRef<Position[]>([])
+
+    useEffect(() => {
+        selectedFocusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
+    useEffect(() => {
+        selectedPanggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption])
 
     // Highlighting function: highlights the given range (line and character range)
     const highlightCursor: HilightRangeFunction = (hlRange: HighlightRange) => {
@@ -38,16 +56,16 @@ export default function NotationArea({ notation, visible, currFocus, updatePlayb
         }
     }
 
-    // const animateNotationCursor = (time: number, params: PlayerCursorParameters) => {
-    //     // if (currentFocus.includes(cAction.position)) {
-    //     if (focus.length > 0 && focus[0] === params.position) {
-    //         Tone.getDraw().schedule(() => highlightCursor({ line: params.line, range: params.range }), time)
-    //     }
-    // }
-
+    // Callback function used for playback animation
     const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {
-        // if (currentFocus.includes(cAction.position)) {
-        if (currFocus.length > 0 && currFocus[0] === params.position) {
+        const position =
+            selectedPanggulRef.current.length > 0
+                ? selectedPanggulRef.current[0]
+                : selectedFocusRef.current.length > 0
+                  ? selectedFocusRef.current[0]
+                  : undefined
+        debug(`NOTATION CURSOROPTTION: ${JSON.stringify(selectedPanggulRef.current)}`)
+        if (position === params.position) {
             highlightCursor({ line: params.line, range: params.range })
         }
     }, [])

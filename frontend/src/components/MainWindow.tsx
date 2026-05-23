@@ -37,7 +37,7 @@ import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
 import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
-import { panggulDefaultOption, type ExtendedOption, type ScoreMenuOption } from '../typing/menus'
+import { focusDefaultOption, panggulDefaultOption, type ExtendedOption, type ScoreMenuOption } from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
@@ -203,19 +203,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     // By keeping these values here, the actual selectors can occur in any child element.
 
-    const focusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
-    const activePanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
-    const [currentFocus, setCurrentFocus] = useState<Position[]>([])
+    const [selectedFocusOption, setSelectedFocusOption] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
     const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
-
-    function setFocus(newFocus: Position[]) {
-        setCurrentFocus(newFocus)
-        focusRef.current = newFocus
-    }
+    const currentFocusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
+    const currentPanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
 
     useEffect(() => {
-        activePanggulRef.current = selectedPanggulOption.objValue
-    }, [selectedPanggulOption])
+        currentFocusRef.current = selectedFocusOption.objValue
+        currentPanggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption, selectedFocusOption])
 
     const {
         timeLine,
@@ -226,7 +222,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
-    } = usePlaybackManager(focusRef, activePanggulRef)
+    } = usePlaybackManager(currentFocusRef, currentPanggulRef)
     const playbackReducer = playbackReducerFactory(schedulePlayback, setPlaybackProgress)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -318,9 +314,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             loadScore={loadScore}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
-            currFocus={currentFocus}
-            setFocus={setFocus}
-            activePanggulRef={activePanggulRef}
+            selectedFocusOption={selectedFocusOption}
+            setSelectedFocusOption={setSelectedFocusOption}
+            selectedPanggulOption={selectedPanggulOption}
             setSelectedPanggulOption={setSelectedPanggulOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}
@@ -336,7 +332,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={active == 'editor'}
             loading={isLoadingScore}
             score={score}
-            currentScoreId={currentScoreId}
             labels={labels}
             updateParts={updateParts}
             executeItemAction={executeItemAction}

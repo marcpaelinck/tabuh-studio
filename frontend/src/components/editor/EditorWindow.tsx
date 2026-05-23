@@ -23,7 +23,6 @@ interface EditorWindowProps {
     visible: boolean
     loading: boolean
     score: Score
-    currentScoreId: UUID
     labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
@@ -36,7 +35,6 @@ export default function EditorWindow({
     visible,
     loading,
     score,
-    currentScoreId,
     labels,
     updateParts,
     executeItemAction,

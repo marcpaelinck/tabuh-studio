@@ -1,40 +1,47 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useState } from 'react'
-import { HStack } from 'rsuite'
+import { HStack, SelectPicker } from 'rsuite'
 import { speedList } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
-import type { MenuItemInfo, ScoreInfo, ScoreMenuOption } from '../../typing/menus'
+import {
+    focusDefaultOption,
+    type ExtendedOption,
+    type MenuItemInfo,
+    type ScoreInfo,
+    type ScoreMenuOption
+} from '../../typing/menus'
 import type { Score, ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import {
     createFocusMenuItems,
     createSpeedMenuItems,
-    focusDefaultOption,
     scoreDefaultOption,
     speedDefaultOption
 } from '../../utils/selectorsUtils'
 import Selector from './Selector'
 
-export default function PlayerMenu({
+export default function Menu({
     menuDisabled,
     scoreMenuOptions,
     score,
+    selectedFocusOption,
     loadScore,
-    focusUpdater,
+    setSelectedFocusOption,
     speedUpdater
 }: {
     menuDisabled: RefObject<Record<string, boolean>>
     scoreMenuOptions: ScoreMenuOption[]
+    selectedFocusOption: ExtendedOption<Position[]>
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    focusUpdater: Dispatch<Position[]>
+    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     speedUpdater: Dispatch<number>
 }): JSX.Element {
-    const [focusMenuItems, setFocusMenuItems] = useState<MenuItemInfo<Position[]>[]>([])
+    const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
     const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo<number>[]>([])
     const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo<ScoreInfo>[]>([])
     const [selectedScore, setSelectedScore] = useState<MenuItemInfo<ScoreInfo | null>>(scoreDefaultOption)
-    const [selectedFocus, setSelectedFocus] = useState<MenuItemInfo<Position[]>>(focusDefaultOption)
+    const [selectedFocus, setSelectedFocus] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
     const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo<number>>(speedDefaultOption)
 
     useEffect(() => {
@@ -62,28 +69,21 @@ export default function PlayerMenu({
         updateFocusMenu()
     }, [score])
 
-    function debugLog(item: MenuItemInfo<any>, menu: string) {
-        const strValue = Array.isArray(item.value)
-            ? item.value.reduce((aggr, val) => aggr + (aggr == '[' ? '' : ', ') + val, '[') + ']'
-            : item.value
-        debug(`${menu}: ${item.key} ${item.displayValue} ${strValue}`)
-    }
-
     const onChangeScoreSelector = async (item: MenuItemInfo<ScoreInfo>) => {
-        debugLog(item, 'TABUH')
+        debug(`TABUH: ${JSON.stringify(item)}`)
         setSelectedScore(item)
         loadScore('JSON', item.value as ScoreInfo)
-        onChangeFocusSelector(focusDefaultOption)
+        setSelectedFocusOption(focusDefaultOption)
     }
 
-    const onChangeFocusSelector = async (item: MenuItemInfo<Position[]>) => {
-        debugLog(item, 'FOCUS')
-        setSelectedFocus(item)
-        focusUpdater(item.value as Position[])
-    }
+    // const onChangeFocusSelector = async (item: ExtendedOption<Position[]>) => {
+    //     debug(`FOCUS: ${JSON.stringify(item)}`)
+    //     setSelectedFocusOption(item)
+    //     setSelectedFocusOption(item.objValue as Position[])
+    // }
 
     const onChangeSpeedSelector = async (item: MenuItemInfo<number>) => {
-        debugLog(item, 'SPEED')
+        debug(`SPEED: ${JSON.stringify(item)}`)
         setSelectedSpeed(item)
         speedUpdater(item.value as number)
     }
@@ -102,7 +102,7 @@ export default function PlayerMenu({
                     valueList={scoreMenuItems}
                     onChange={onChangeScoreSelector}
                 />
-                <Selector
+                {/* <Selector
                     id="focusselector"
                     scrollable
                     disabled={menuDisabled.current.focus}
@@ -110,6 +110,21 @@ export default function PlayerMenu({
                     width="3/10"
                     valueList={focusMenuItems}
                     onChange={onChangeFocusSelector}
+                /> */}
+                <SelectPicker
+                    id="focusselector"
+                    searchable={false}
+                    cleanable={false}
+                    label="focus:"
+                    data={focusMenuItems}
+                    value={selectedFocusOption.value}
+                    onSelect={(value, item) => {
+                        setSelectedFocusOption(item as ExtendedOption<Position[]>)
+                    }}
+                    // Next lines only needed if cleanable==true
+                    // onChange={(value, e) => {
+                    //     if (value === null) setSelectedPanggulOption(null)
+                    // }}
                 />
                 <Selector
                     id="speedselector"

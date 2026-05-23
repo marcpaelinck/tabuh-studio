@@ -161,11 +161,10 @@ export const useAnimationEngine = (
     // For the use of Draw.schedule, see
     const animateInstrument = useCallback((time: number, params: AnimmationFunctionParameters): void => {
         if (!pbWindowVisibleRef.current) return
-        const currentFocus = focusRef.current
         const pbSpeed = pbSpeedRef.current
         const mySvgInfo = svgInfoRef.current
 
-        if (currentFocus.includes(params.position)) {
+        if (focusRef.current.includes(params.position)) {
             if (mySvgInfo.svg && params.currnotes) {
                 // Hightighting animation
                 if (shouldHighlight(params.position)) {
@@ -174,7 +173,7 @@ export const useAnimationEngine = (
                             `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
                         )
                         // positionIndex will be used to select the highlight color combinations.
-                        const positionIndex = currentFocus.indexOf(params.position)
+                        const positionIndex = focusRef.current.indexOf(params.position)
                         if (keyElement) {
                             Tone.getDraw().schedule(() => highlightNote(keyElement!, note, positionIndex), time)
                         }
