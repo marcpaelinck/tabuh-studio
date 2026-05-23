@@ -10,16 +10,13 @@ import type { Score, System } from '../typing/score'
 // Data for a menu item
 export const scoreDefaultOption: MenuItemInfo<ScoreInfo | null> = { key: null, displayValue: 'Tabuh...', value: null }
 // export const focusDefaultOption: MenuItemInfo<Position[]> = { key: null, displayValue: 'No Focus', value: [] }
-export const speedDefaultOption: MenuItemInfo<number> = { key: 100, displayValue: '100%', value: 1 }
-
-const createItemInfo = (key: string, value: string, values: any): MenuItemInfo<any> => {
-    return { key: key, displayValue: value, value: values }
-}
 
 // Create lists of MenuItemInfo objects that will be used to populate the menus.
 
-export function createSpeedMenuItems(values: number[]): MenuItemInfo<number>[] {
-    return values.map((value: number) => createItemInfo(`${value}`, `${value}%`, value / 100))
+export function createSpeedMenuItems(values: number[]): ExtendedOption<number>[] {
+    return values.map((value: number) => {
+        return { label: `${value}%`, value: `${value}%`, objValue: value / 100 }
+    })
 }
 
 export function createFocusMenuItems(score: Score): ExtendedOption<Position[]>[] {

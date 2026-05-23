@@ -24,13 +24,14 @@ interface PlayerWindowProps {
     totalDurationMs: number
     timeLine: TimeLine | undefined
     selectedFocusOption: ExtendedOption<Position[]>
-    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     selectedPanggulOption: ExtendedOption<Position[]>
+    selectedSpeedOption: ExtendedOption<number>
+    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
+    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
     playbackSpeed: number
-    setPlaybackSpeed: Dispatch<number>
     playback: ActionDispatch<[action: PlaybackAction]>
     playbackState: PlaybackState
 }
@@ -43,12 +44,13 @@ export default function PlayerWindow({
     timeLine,
     selectedFocusOption,
     selectedPanggulOption,
+    selectedSpeedOption,
     setSelectedFocusOption,
     setSelectedPanggulOption,
+    setSelectedSpeedOption,
     updatePlaybackFunctions,
     playbackProgress,
     playbackSpeed,
-    setPlaybackSpeed,
     playback,
     playbackState
 }: PlayerWindowProps) {
@@ -104,9 +106,10 @@ export default function PlayerWindow({
                 scoreMenuOptions={scoreMenuOptions}
                 score={score}
                 selectedFocusOption={selectedFocusOption}
+                selectedSpeedOption={selectedSpeedOption}
                 loadScore={loadScore}
                 setSelectedFocusOption={setSelectedFocusOption}
-                speedUpdater={setPlaybackSpeed}
+                setSelectedSpeedOption={setSelectedSpeedOption}
             />
             {selectedFocusOption.objValue.length > 0 && (
                 <Animation

@@ -23,6 +23,7 @@ import {
 } from '../../config/config'
 import { isExtension, isMuting } from '../../config/configfunctions'
 import type { BPM, NoteSymbol, Position } from '../../typing/basetypes'
+import { speedDefaultOption } from '../../typing/menus'
 import type {
     AnimationNote,
     GenericAction,
@@ -41,7 +42,6 @@ import type { Note, Score, System } from '../../typing/score'
 import { cleanSymbol } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { defaultObject, getSystemDuration } from '../../utils/objectUtils'
-import { speedDefaultOption } from '../../utils/selectorsUtils'
 import {
     BaseNoteEquiv2Millis,
     millis2BaseNoteEquiv,
@@ -78,7 +78,7 @@ export interface SchedulePlaybackParams {
 
 export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggulRef: RefObject<Position[]>) {
     const { playInstrument } = useInstruments(focusRef, activePanggulRef, 0)
-    const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.value as number)
+    const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.objValue as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)

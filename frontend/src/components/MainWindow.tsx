@@ -37,7 +37,13 @@ import { useAuth, type AuthUser } from '../context/AuthContext'
 import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
 import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
-import { focusDefaultOption, panggulDefaultOption, type ExtendedOption, type ScoreMenuOption } from '../typing/menus'
+import {
+    focusDefaultOption,
+    panggulDefaultOption,
+    speedDefaultOption,
+    type ExtendedOption,
+    type ScoreMenuOption
+} from '../typing/menus'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
@@ -205,6 +211,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [selectedFocusOption, setSelectedFocusOption] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
     const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
+    const [selectedSpeedOption, setSelectedSpeedOption] = useState<ExtendedOption<number>>(speedDefaultOption)
     const currentFocusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
     const currentPanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
 
@@ -234,6 +241,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         () => updatePlaybackCallbackFunctions({ generic: stopPlayback, updatedashboard: playbackDashboardFunction }),
         []
     )
+
+    useEffect(() => {
+        setPlaybackSpeed(selectedSpeedOption.objValue)
+        debug(`setting speed to ${selectedSpeedOption.objValue}`)
+    }, [selectedSpeedOption])
 
     useEffect(() => {
         setScoreMenuOptions(
@@ -315,13 +327,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
             selectedFocusOption={selectedFocusOption}
-            setSelectedFocusOption={setSelectedFocusOption}
             selectedPanggulOption={selectedPanggulOption}
+            selectedSpeedOption={selectedSpeedOption}
+            setSelectedFocusOption={setSelectedFocusOption}
             setSelectedPanggulOption={setSelectedPanggulOption}
+            setSelectedSpeedOption={setSelectedSpeedOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}
-            setPlaybackSpeed={setPlaybackSpeed}
             playbackState={playbackState}
             playback={playback}
         />

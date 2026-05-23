@@ -12,37 +12,32 @@ import {
 } from '../../typing/menus'
 import type { Score, ScoreFormat } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import {
-    createFocusMenuItems,
-    createSpeedMenuItems,
-    scoreDefaultOption,
-    speedDefaultOption
-} from '../../utils/selectorsUtils'
+import { createFocusMenuItems, createSpeedMenuItems, scoreDefaultOption } from '../../utils/selectorsUtils'
 import Selector from './Selector'
 
-export default function Menu({
+export default function PlayerMenu({
+    score,
     menuDisabled,
     scoreMenuOptions,
-    score,
     selectedFocusOption,
+    selectedSpeedOption,
     loadScore,
     setSelectedFocusOption,
-    speedUpdater
+    setSelectedSpeedOption
 }: {
+    score: Score | undefined
     menuDisabled: RefObject<Record<string, boolean>>
     scoreMenuOptions: ScoreMenuOption[]
     selectedFocusOption: ExtendedOption<Position[]>
-    score: Score | undefined
+    selectedSpeedOption: ExtendedOption<number>
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
-    speedUpdater: Dispatch<number>
+    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
 }): JSX.Element {
     const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
-    const [speedMenuItems, setSpeedMenuItems] = useState<MenuItemInfo<number>[]>([])
+    const [speedMenuItems, setSpeedMenuItems] = useState<ExtendedOption<number>[]>([])
     const [scoreMenuItems, setScoreMenuItems] = useState<MenuItemInfo<ScoreInfo>[]>([])
     const [selectedScore, setSelectedScore] = useState<MenuItemInfo<ScoreInfo | null>>(scoreDefaultOption)
-    const [selectedFocus, setSelectedFocus] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
-    const [selectedSpeed, setSelectedSpeed] = useState<MenuItemInfo<number>>(speedDefaultOption)
 
     useEffect(() => {
         const updateFixedMenus = async () => {
@@ -50,6 +45,8 @@ export default function Menu({
         }
         updateFixedMenus()
     }, [])
+
+    useEffect(() => debug(`SELECTED SPEED: ${JSON.stringify(selectedSpeedOption)}`), [selectedSpeedOption])
 
     // Temporary fix: player Menu uses a different menu option type than MainMenu.
     // TODO Need to streamline both menu item types.
@@ -82,11 +79,11 @@ export default function Menu({
     //     setSelectedFocusOption(item.objValue as Position[])
     // }
 
-    const onChangeSpeedSelector = async (item: MenuItemInfo<number>) => {
-        debug(`SPEED: ${JSON.stringify(item)}`)
-        setSelectedSpeed(item)
-        speedUpdater(item.value as number)
-    }
+    // const onChangeSpeedSelector = async (item: MenuItemInfo<number>) => {
+    //     debug(`SPEED: ${JSON.stringify(item)}`)
+    //     setSelectedSpeed(item)
+    //     speedUpdater(item.value as number)
+    // }
 
     return (
         <div className="selectors flex flex-wrap">
@@ -102,15 +99,6 @@ export default function Menu({
                     valueList={scoreMenuItems}
                     onChange={onChangeScoreSelector}
                 />
-                {/* <Selector
-                    id="focusselector"
-                    scrollable
-                    disabled={menuDisabled.current.focus}
-                    title={selectedFocus.displayValue || focusDefaultOption.displayValue}
-                    width="3/10"
-                    valueList={focusMenuItems}
-                    onChange={onChangeFocusSelector}
-                /> */}
                 <SelectPicker
                     id="focusselector"
                     searchable={false}
@@ -126,13 +114,20 @@ export default function Menu({
                     //     if (value === null) setSelectedPanggulOption(null)
                     // }}
                 />
-                <Selector
+                <SelectPicker
                     id="speedselector"
-                    scrollable
-                    title={`speed: ${selectedSpeed.displayValue}`}
-                    width="2/10"
-                    valueList={speedMenuItems}
-                    onChange={onChangeSpeedSelector}
+                    searchable={false}
+                    cleanable={false}
+                    label="speed:"
+                    data={speedMenuItems}
+                    value={selectedSpeedOption.value}
+                    onSelect={(value, item) => {
+                        setSelectedSpeedOption(item as ExtendedOption<number>)
+                    }}
+                    // Next lines only needed if cleanable==true
+                    // onChange={(value, e) => {
+                    //     if (value === null) setSelectedPanggulOption(null)
+                    // }}
                 />
             </HStack>
         </div>
