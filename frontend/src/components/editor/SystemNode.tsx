@@ -60,6 +60,7 @@ export function SystemNode({
     const [playbackCursor, setPlaybackCursor] = useState<EditorCellCursor | null>(null)
 
     const notationAreaRef = useRef<HTMLTextAreaElement>(null)
+    const systemGridRef = useRef<HTMLDivElement>(null)
 
     const gridColors = {
         cursor: 'rgba(255, 255, 0, 0.5)',
@@ -92,7 +93,7 @@ export function SystemNode({
         }
         debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`)
         setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.section })
-        notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
     // Sets the background grid and cursor highlighting
@@ -294,7 +295,7 @@ export function SystemNode({
         const notationFont = `balifontspaced${editorFontSize}`
         const rows = _.keys(systemData.staffs).length
         return (
-            <Grid id={`system ${systemData.uuid}`}>
+            <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
                 <Row id="SystemHeader">
                     {systemHeaderButtons}
                     {systemHeaderFields}

@@ -42,7 +42,7 @@ export default function NotationArea({
         // Note: the `container` parameter is not supported yet by all browsers
         // See mdn documentation.
         //@ts-expect-error container option is valid but not recognized
-        para?.scrollIntoView({ behavior: 'smooth', block: 'center', container: 'nearest' })
+        para?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start', container: 'nearest' })
 
         const range1 = new Range()
         if (para1) {

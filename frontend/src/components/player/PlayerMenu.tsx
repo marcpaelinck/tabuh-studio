@@ -48,6 +48,7 @@ export default function PlayerMenu({
             }
         }
         updateFocusMenu()
+        debug(`Resetting focus value`)
         setSelectedFocusOption(focusDefaultOption)
     }, [score])
 

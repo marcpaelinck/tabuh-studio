@@ -24,7 +24,7 @@ export function useEditorCursorManager(systemData: System | undefined) {
         }
         debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`)
         setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.section })
-        notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
     // Sets the background grid and cursor highlighting
