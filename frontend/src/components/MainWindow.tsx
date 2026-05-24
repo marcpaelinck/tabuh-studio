@@ -31,11 +31,10 @@ import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManage
 import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
-import { cycleValidation } from '../componentlogic/validationManager'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
-import type { DashboardFunctionsType, ScoreFunctionsType } from '../context/contexts'
-import { DashboardFunctions, ScoreFunctions } from '../context/contexts'
+import type { ScoreFunctionsType } from '../context/contexts'
+import { ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
 import {
     focusDefaultOption,
@@ -48,6 +47,7 @@ import {
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
+    chars,
     Dashboard,
     dashboardDefaults as defaultDashboardValues,
     type ComponentName,
@@ -200,12 +200,17 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
     const { scoreInfoList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
-    const dashboardFunctions: DashboardFunctionsType = {
-        setDashboardElement: setDashboardElement,
-        clearDashboardElement: clearDashboardElement
-    }
-    const { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction } =
-        useScoreManager(dashboardFunctions)
+    const {
+        score,
+        validation,
+        labels,
+        localCacheState,
+        getScore,
+        updateScore,
+        updateSystem,
+        updateParts,
+        executeItemAction
+    } = useScoreManager()
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
     const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
 
@@ -249,14 +254,40 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         playbackType: 'none'
     })
 
+    // ___________ UPDATE PLAYBACK FUNCTIONS ____________
+
+    // TOD: eliminate `updatedashboard` which is used to change cursor info.
+    // Use cursor state variable instead and update dashboard from MainWindow.
     useEffect(
         () => updatePlaybackCallbackFunctions({ generic: stopPlayback, updatedashboard: playbackDashboardFunction }),
         []
     )
 
+    // ___________ UPDATE DASHBOARD STATES ____________
+
+    useEffect(() => {
+        setDashboardElement('cycle', { visible: validation.hasCycle, tooltip: validation.message, level: 'error' })
+        if (score)
+            setDashboardElement('score', {
+                visible: true,
+                text: score.title,
+                tooltip: `title: ${score.title}\ncomposer: ${score.composer}\nuuid: ${score.uuid}`
+            })
+        if (!['playing', 'paused'].includes(playbackState.audioState)) {
+            setDashboardElement('playback', { ...dashboardValues.playback, visible: false })
+        }
+        setDashboardElement('localCache', {
+            visible: true,
+            level: localCacheState.level,
+            tooltip: localCacheState.message
+        })
+        debug(`PLAYBACKSTATE=${playbackState.audioState}`)
+    }, [playbackState, validation, score, localCacheState])
+
+    // ___________ UPDATE MENU STATES ____________
+
     useEffect(() => {
         setPlaybackSpeed(selectedSpeedOption.objValue)
-        debug(`setting speed to ${selectedSpeedOption.objValue}`)
     }, [selectedSpeedOption])
 
     useEffect(() => {
@@ -266,6 +297,31 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             })
         )
     }, [scoreInfoList])
+
+    // ___________ UPDATE SCORE STATES ____________
+
+    useEffect(() => {
+        // `loadedScore` status is updated after new score is imported
+        if (loadedScore) {
+            updateScore(loadedScore)
+        }
+        playback({ actionType: 'clear' })
+    }, [loadedScore])
+
+    useEffect(() => {
+        // `score` status is updated after each edit to the current score
+        if (score && currentScoreId != score.uuid) {
+            setCurrentScoreId(score.uuid)
+            playback({
+                actionType: 'load',
+                playbackType: 'multiple',
+                score: score,
+                systemIndex: 0,
+                intro: 2000,
+                outro: 5000
+            })
+        }
+    }, [score])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -292,41 +348,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         else
             setDashboardElement('playback', {
                 visible: true,
-                text: `sys[${params.system}] pass[${params.pass}] iter[${params.iteration}] [${params.tempo}]BPM`
+                text: `${chars.system}${params.system} ${chars.pass}${params.pass} ${chars.iteration}${params.iteration} ${chars.tempo}${params.tempo}`
             })
     }
-
-    useEffect(() => {
-        debug(`New score imported, title=${loadedScore?.title} with ${loadedScore?.systems.length} systems`)
-        if (loadedScore) {
-            updateScore(loadedScore)
-            // UPDATE DASHBOARD
-            const validation = cycleValidation(loadedScore)
-            if (!validation.isValid)
-                setDashboardElement('cycle', { visible: true, tooltip: validation.message, level: 'error' })
-            setDashboardElement('score', {
-                visible: true,
-                text: loadedScore.title,
-                tooltip: `title: ${loadedScore.title}\ncomposer: ${loadedScore.composer}\nuuid: ${loadedScore.uuid}`
-            })
-        }
-        playback({ actionType: 'clear' })
-    }, [loadedScore])
-
-    useEffect(() => {
-        debug(`New editor score available, title=${score?.title} with ${score?.systems.length} systems`)
-        if (score && currentScoreId != score.uuid) {
-            setCurrentScoreId(score.uuid)
-            playback({
-                actionType: 'load',
-                playbackType: 'multiple',
-                score: score,
-                systemIndex: 0,
-                intro: 2000,
-                outro: 5000
-            })
-        }
-    }, [score])
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
 
@@ -439,17 +463,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     )
 
     return (
-        <DashboardFunctions value={dashboardFunctions}>
-            <ScoreFunctions value={scoreFunctions}>
-                {/* Full application is only displayed on larger screens */}
-                {appAppearance == 'full' && (
-                    <Container id="full-application" className="min-w-0">
-                        {fullApplication}
-                    </Container>
-                )}
-                {/* Container for small screens only displays the Player Window */}
-                {appAppearance == 'playerOnly' && <Container id="player-only">{playerWindow}</Container>}
-            </ScoreFunctions>
-        </DashboardFunctions>
+        <ScoreFunctions value={scoreFunctions}>
+            {/* Full application is only displayed on larger screens */}
+            {appAppearance == 'full' && (
+                <Container id="full-application" className="min-w-0">
+                    {fullApplication}
+                </Container>
+            )}
+            {/* Container for small screens only displays the Player Window */}
+            {appAppearance == 'playerOnly' && <Container id="player-only">{playerWindow}</Container>}
+        </ScoreFunctions>
     )
 }

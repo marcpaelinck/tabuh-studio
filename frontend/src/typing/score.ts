@@ -61,3 +61,9 @@ export type Score = {
     positions: Position[] // sorted list of positions ordered as displayed in the editor
     systems: System[]
 }
+
+export interface ValidationResult {
+    isValid: boolean
+    hasCycle: boolean
+    message: string
+}

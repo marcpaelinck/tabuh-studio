@@ -12,14 +12,15 @@ import { debug } from '../utils/debugger'
 export type ComponentName = 'cycle' | 'score' | 'localCache' | 'playback'
 
 export type ComponentType = 'icon' | 'text'
-export type Level = 'info' | 'warning' | 'error'
+export type DashboardLevel = 'info' | 'warning' | 'error'
 const defaultColor = 'black'
 const colors = { default: 'black', info: 'green', warning: 'amber', error: 'red' }
+export const chars = { system: '\u2630', pass: '\u21AA', iteration: '\u21BA', tempo: '\u24C9' }
 
 export interface DashboardComponentValues {
     visible: boolean
     text?: string
-    level?: Level
+    level?: DashboardLevel
     tooltip?: string
 }
 export type DashboardValues = Record<ComponentName, DashboardComponentValues>
@@ -27,7 +28,7 @@ export type DashboardValues = Record<ComponentName, DashboardComponentValues>
 interface DashboardElementType {
     type: ComponentType
     icon: IconType
-    tooltips: Partial<Record<Level, string>>
+    tooltips: Partial<Record<DashboardLevel, string>>
     color?: string
 }
 
@@ -50,7 +51,18 @@ const dashboardElements: Record<ComponentName, DashboardElementType> = {
             error: 'Could not save data to the local storage.'
         }
     },
-    playback: { type: 'text', icon: AiFillSound, tooltips: { info: 'Playback' } }
+    playback: {
+        type: 'text',
+        icon: AiFillSound,
+        tooltips: {
+            info:
+                'Playback\n' +
+                `${chars.system}: system\n` +
+                `${chars.pass}: pass\n` +
+                `${chars.iteration}: iteration\n` +
+                `${chars.tempo}: tempo (BPM)\n`
+        }
+    }
 }
 export const dashboardDefaults: DashboardValues = {
     score: { visible: false },

@@ -1,5 +1,4 @@
 import { createContext, type Context, type RefObject } from 'react'
-import type { ComponentName, DashboardComponentValues } from '../components/Dashboard'
 import type { NavigationAction } from '../config/config'
 import type { Score, System } from '../typing/score'
 import type { WpDatabaseReturnValue, WpUserReturnValue } from '../typing/wordpress'
@@ -20,18 +19,6 @@ export const defaultScoreFunc: ScoreFunctionsType = {
     updateParts: () => {}
 }
 export const ScoreFunctions: Context<ScoreFunctionsType> = createContext(defaultScoreFunc)
-
-// DASHBOARD FUNCTIONS
-// Update the status info above the notation frame
-export interface DashboardFunctionsType {
-    setDashboardElement: (name: ComponentName, value: DashboardComponentValues) => void
-    clearDashboardElement: (type: ComponentName) => void
-}
-const defaultDashboardFunc = {
-    setDashboardElement: (name: ComponentName, value: DashboardComponentValues) => {},
-    clearDashboardElement: (type: ComponentName) => {}
-}
-export const DashboardFunctions: Context<DashboardFunctionsType> = createContext(defaultDashboardFunc)
 
 // NAVIGATION FUNCTIONS
 // used by the keyboard listener

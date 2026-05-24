@@ -1,21 +1,29 @@
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
-import { type DashboardFunctionsType } from '../context/contexts'
 import type { ExecutionItem } from '../typing/execution'
-import { kempliStates, type Score, type System } from '../typing/score'
+import { kempliStates, type Score, type System, type ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
-import { cycleValidation } from './validationManager'
+import { cycleValidation, defaultValidationValue } from './validationManager'
+
+export interface LocalCacheInfo {
+    level: DashboardLevel
+    message: string
+}
 
 function gotoItemTargetName(destination: System) {
     return destination.label ? destination.label : `#${destination.id}`
 }
-export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
+
+export function useScoreManager() {
     const [score, setScore] = useState<Score | undefined>(undefined)
     const [labels, setLabels] = useState<Record<string, System>>({})
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
+    const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
+    const [localCacheState, setLocalCacheState] = useState<LocalCacheInfo>({ level: 'info', message: '' })
 
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
@@ -23,6 +31,8 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         const labeldict = Object.fromEntries(
             score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
         )
+        setValidation(cycleValidation(score))
+
         setLabels(labeldict)
     }
 
@@ -45,11 +55,11 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
                 const db = dbOpenRequest.result
                 setIndexedDb(db)
                 // TODO replace this alert with an icon in the Dashboard.
-                dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'info' })
+                setLocalCacheState({ level: 'info', message: '' })
             }
             dbOpenRequest.onerror = () =>
                 // TODO replace this alert with an icon in the Dashboard.
-                dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'warning' })
+                setLocalCacheState({ level: 'warning', message: '' })
         }
     }, [])
 
@@ -67,23 +77,17 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
 
         // Store the score object in the browser's IDB Database, for recovery purposes.
         if (indexedDb) {
-            dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'info' })
+            setLocalCacheState({ level: 'info', message: '' })
             const transaction = indexedDb.transaction('Score', 'readwrite')
             const request = transaction.objectStore('Score').put(score)
             var dateStr = new Date().toString().replace(/ GMT.*$/, '')
-            request.onsuccess = () =>
-                dashboardFunctions.setDashboardElement('localCache', {
-                    visible: true,
-                    level: 'info',
-                    tooltip: `${dateStr}\nSaved to local cache`
-                })
+            request.onsuccess = () => setLocalCacheState({ level: 'info', message: `${dateStr}\nSaved to local cache` })
             request.onerror = () =>
-                dashboardFunctions.setDashboardElement('localCache', {
-                    visible: true,
+                setLocalCacheState({
                     level: 'warning',
-                    tooltip: `${dateStr}\nCould not save the current status to local storage.`
+                    message: `${dateStr}\nCould not save the current status to local storage.`
                 })
-        } else dashboardFunctions.setDashboardElement('localCache', { visible: true, level: 'warning' })
+        } else setLocalCacheState({ level: 'warning', message: '' })
 
         // Update the goto display values.
         debug('updating flow items')
@@ -220,16 +224,8 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
                 break
             }
             case 'execution':
-                // Changes to the system data have been performed by the FlowItemsForm
+                // Changes returned by the FlowItemsForm
                 if (newSystemData.execution) newSystemData.execution.sort((a, b) => a.seqId - b.seqId)
-                const validation = cycleValidation(score)
-                if (!validation.isValid)
-                    dashboardFunctions.setDashboardElement('cycle', {
-                        visible: true,
-                        tooltip: validation.message,
-                        level: 'error'
-                    })
-                else dashboardFunctions.clearDashboardElement('cycle')
                 break
             case 'delete':
                 if (newSystemData.label) {
@@ -281,5 +277,15 @@ export function useScoreManager(dashboardFunctions: DashboardFunctionsType) {
         [score]
     )
 
-    return { score, getScore, updateScore, labels, updateSystem, updateParts, executeItemAction }
+    return {
+        score,
+        validation,
+        labels,
+        localCacheState,
+        getScore,
+        updateScore,
+        updateSystem,
+        updateParts,
+        executeItemAction
+    }
 }

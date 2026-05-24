@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import type { UUID } from '../typing/basetypes'
-import type { Score, System } from '../typing/score'
+import type { Score, System, ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionManager, type FlowStep } from './playback/executionManager'
 
@@ -15,6 +15,8 @@ type StateTransitionMatrix = Record<UUID, GoToTransitions[]> // A system can hav
 type GoToState = Record<UUID, number[]> // Each system has one state value for each goto instruction.
 type State = Record<UUID, GoToState> // The machine state consists of the combination of system ID and goto state.
 // Only include systems that have one or more goto instruction.
+
+export const defaultValidationValue = { isValid: true, hasCycle: false, message: '' }
 
 function createTransitions(score: Score): StateTransitionMatrix {
     // Define the states and transitions for each goto instruction as follows.
@@ -83,10 +85,6 @@ function getId(system: System | undefined): string {
 // Uses the execution manager to iterate through the systems in playback sequence until the end of the score.
 // Updates the playback state accordingly. Returns false if a state is encountered more than once.
 // This is an indication of a closed cycle.
-export interface ValidationResult {
-    isValid: boolean
-    message: string
-}
 function simulatePlayback(score: Score, transitions: StateTransitionMatrix): ValidationResult {
     const states = new Set()
     var uuid = getId(score.systems[0])
@@ -147,13 +145,13 @@ function simulatePlayback(score: Score, transitions: StateTransitionMatrix): Val
         message = `There is a cycle. Check goto instructions of system #${step?.system.id}.`
     }
 
-    return { isValid: !cycle, message: message }
+    return { isValid: !cycle, hasCycle: cycle, message: message }
 }
 
 // Detects the presence of a closed cycle. Returns true if no cycles were detected.
 // updateScoreFlag: updates the .hasCycle flag of the score object.
 export function cycleValidation(score: Score): ValidationResult {
-    if (!score) return { isValid: true, message: '' }
+    if (!score) return defaultValidationValue
     const transitions: StateTransitionMatrix = createTransitions(score)
     const validation = simulatePlayback(score, transitions)
     return validation

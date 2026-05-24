@@ -5,18 +5,11 @@ import { debug } from '../../utils/debugger'
 import { cycleValidation } from '../validationManager'
 import { type SchedulePlaybackParams } from './usePlaybackManager'
 
-// const dialog = useDialog()
-
 const playbackFunctions = {
     schedulePlayback: (parms: SchedulePlaybackParams) => {},
     setPlaybackProgress: (seconds: number) => {},
     playbackSpeed: 1
 }
-
-// const actionFunctions: PlaybackCallbackFunctions = defaultPlaybackFunctions
-// var schedulePlayback: (parms: SchedulePlaybackParams) => void
-// var playbackSpeed: number
-
 async function asyncPlay() {
     if (Tone.getContext().state == 'suspended') {
         Tone.start()
@@ -102,7 +95,7 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
             playbackFunctions.setPlaybackProgress(0)
-            return { ...state, audioState: 'paused' }
+            return { ...state, audioState: 'stopped' }
         }
         case 'jumptotime':
             if (!action.seconds || !['playing', 'paused'].includes(state.audioState)) return { ...state }
