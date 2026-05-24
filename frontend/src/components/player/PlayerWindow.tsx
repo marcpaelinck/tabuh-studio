@@ -8,7 +8,7 @@ import {
     type JSX,
     type RefObject
 } from 'react'
-import { VStack } from 'rsuite'
+import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import type { Position } from '../../typing/basetypes'
@@ -88,6 +88,10 @@ export default function PlayerWindow({
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
     useEffect(() => {
+        currentFocusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
+
+    useEffect(() => {
         updateNotationParas(selectedPanggulOption.objValue, selectedFocusOption.objValue)
     }, [selectedFocusOption, selectedPanggulOption])
 
@@ -111,6 +115,11 @@ export default function PlayerWindow({
                     setSelectedPanggulOption={setSelectedPanggulOption}
                     setSVGInfo={setSvgInfo}
                 />
+            </Activity>
+            <Activity mode={score && selectedFocusOption.objValue.length == 0 ? 'visible' : 'hidden'}>
+                <Box className="justify-items-center inline-grid w-full">
+                    <Text size="lg">Select a Focus value to view animation</Text>
+                </Box>
             </Activity>
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{player}</Activity>
         </VStack>
