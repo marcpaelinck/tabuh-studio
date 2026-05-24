@@ -57,6 +57,7 @@ import {
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
 import { Player } from './player/Player'
+import PlayerMenu from './player/PlayerMenu'
 import PlayerWindow from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 
@@ -364,23 +365,33 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
+    const playerMenu = (
+        <PlayerMenu
+            appAppearance={appAppearance}
+            scoreMenuOptions={scoreMenuOptions}
+            score={score}
+            selectedScoreOption={selectedScoreOption}
+            selectedFocusOption={selectedFocusOption}
+            selectedSpeedOption={selectedSpeedOption}
+            setSelectedScoreOption={setSelectedScoreOption}
+            setSelectedFocusOption={setSelectedFocusOption}
+            setSelectedSpeedOption={setSelectedSpeedOption}
+        />
+    )
+
     const playerWindow = (
         <PlayerWindow
             appAppearance={appAppearance}
+            playerMenu={playerMenu}
             visible={active == 'player'}
             player={player}
             score={score}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
             scoreMenuOptions={scoreMenuOptions}
-            selectedScoreOption={selectedScoreOption}
             selectedFocusOption={selectedFocusOption}
             selectedPanggulOption={selectedPanggulOption}
-            selectedSpeedOption={selectedSpeedOption}
-            setSelectedScoreOption={setSelectedScoreOption}
-            setSelectedFocusOption={setSelectedFocusOption}
             setSelectedPanggulOption={setSelectedPanggulOption}
-            setSelectedSpeedOption={setSelectedSpeedOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}
@@ -413,14 +424,17 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                 <Dashboard values={dashboardValues} />
                             </Col>
                             <Col span={5} id="Toolbar" className="flex justify-end">
-                                <Toggle
-                                    size={'lg'}
-                                    color="violet"
-                                    checkedChildren={<PlayOutlineIcon />}
-                                    unCheckedChildren={<EditIcon />}
-                                    defaultChecked={active == 'player'}
-                                    onChange={(checked) => setActive(checked ? 'player' : 'editor')}
-                                />
+                                <HStack>
+                                    {playerMenu}
+                                    <Toggle
+                                        size={'lg'}
+                                        color="violet"
+                                        checkedChildren={<PlayOutlineIcon />}
+                                        unCheckedChildren={<EditIcon />}
+                                        defaultChecked={active == 'player'}
+                                        onChange={(checked) => setActive(checked ? 'player' : 'editor')}
+                                    />
+                                </HStack>
                             </Col>
                         </Row>
                         <Row className="bg-whte-1000">{player}</Row>
@@ -465,13 +479,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     return (
         <ScoreFunctions value={scoreFunctions}>
             {/* Full application is only displayed on larger screens */}
-            {appAppearance == 'full' && (
+            <Activity mode={appAppearance == 'full' ? 'visible' : 'hidden'}>
                 <Container id="full-application" className="min-w-0">
                     {fullApplication}
                 </Container>
-            )}
+            </Activity>
             {/* Container for small screens only displays the Player Window */}
-            {appAppearance == 'playerOnly' && <Container id="player-only">{playerWindow}</Container>}
+            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
+                <Container id="player-only">{playerWindow}</Container>
+            </Activity>
         </ScoreFunctions>
     )
 }

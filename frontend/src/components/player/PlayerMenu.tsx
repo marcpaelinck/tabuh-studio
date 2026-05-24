@@ -56,24 +56,22 @@ export default function PlayerMenu({
         <div className="selectors flex flex-wrap">
             <HStack>
                 {/* Score selector is only visible on small screens where only the player is displayed. */}
-                {appAppearance == 'playerOnly' && (
-                    <SelectPicker
-                        id="scoreselector"
-                        searchable={false}
-                        cleanable={false}
-                        label="score:"
-                        data={scoreMenuOptions}
-                        value={selectedScoreOption?.value}
-                        onSelect={(value, item) => {
-                            setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
-                        }}
-                        // Onchange needed because value can be null / initial selector state is unselected
-                        // (also needed if cleanable==true)
-                        onChange={(value, e) => {
-                            if (value === null) setSelectedScoreOption(null)
-                        }}
-                    />
-                )}
+                <SelectPicker
+                    id="scoreselector"
+                    searchable={false}
+                    cleanable={false}
+                    label="score:"
+                    data={scoreMenuOptions}
+                    value={selectedScoreOption?.value}
+                    onSelect={(value, item) => {
+                        setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
+                    }}
+                    // Onchange needed because value can be null / initial selector state is unselected
+                    // (also needed if cleanable==true)
+                    onChange={(value, e) => {
+                        if (value === null) setSelectedScoreOption(null)
+                    }}
+                />
                 <SelectPicker
                     id="focusselector"
                     searchable={false}

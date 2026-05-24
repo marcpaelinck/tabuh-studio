@@ -22,24 +22,19 @@ import {
 import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import Animation from './Animation'
-import PlayerMenu from './PlayerMenu'
 
 interface PlayerWindowProps {
     visible: boolean
     appAppearance: Appearance
+    playerMenu: JSX.Element
     player: JSX.Element
     score: Score | undefined
     totalDurationMs: number
     timeLine: TimeLine | undefined
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
-    selectedScoreOption: ExtendedOption<ScoreInfo> | null
     selectedFocusOption: ExtendedOption<Position[]>
     selectedPanggulOption: ExtendedOption<Position[]>
-    selectedSpeedOption: ExtendedOption<number>
-    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
-    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
-    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackProgress: number
     playbackSpeed: number
@@ -49,19 +44,15 @@ interface PlayerWindowProps {
 export default function PlayerWindow({
     visible,
     appAppearance,
+    playerMenu,
     player,
     score,
     totalDurationMs,
     timeLine,
     scoreMenuOptions,
-    selectedScoreOption,
     selectedFocusOption,
     selectedPanggulOption,
-    selectedSpeedOption,
-    setSelectedScoreOption,
-    setSelectedFocusOption,
     setSelectedPanggulOption,
-    setSelectedSpeedOption,
     updatePlaybackFunctions,
     playbackProgress,
     playbackSpeed,
@@ -82,10 +73,6 @@ export default function PlayerWindow({
     useEffect(() => {
         playbackSpeedRef.current = playbackSpeed
     }, [playbackSpeed])
-
-    useEffect(() => {
-        currentFocusRef.current = selectedFocusOption.objValue
-    }, [selectedFocusOption])
 
     useEffect(() => {
         currentPanggulRef.current = selectedPanggulOption.objValue
@@ -114,18 +101,8 @@ export default function PlayerWindow({
 
     return (
         <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
-            <PlayerMenu
-                appAppearance={appAppearance}
-                scoreMenuOptions={scoreMenuOptions}
-                score={score}
-                selectedScoreOption={selectedScoreOption}
-                selectedFocusOption={selectedFocusOption}
-                selectedSpeedOption={selectedSpeedOption}
-                setSelectedScoreOption={setSelectedScoreOption}
-                setSelectedFocusOption={setSelectedFocusOption}
-                setSelectedSpeedOption={setSelectedSpeedOption}
-            />
-            {selectedFocusOption.objValue.length > 0 && (
+            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{playerMenu}</Activity>
+            <Activity mode={selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
                 <Animation
                     notationElement={notationParas}
                     updatePlaybackFunctions={updatePlaybackFunctions}
@@ -134,8 +111,8 @@ export default function PlayerWindow({
                     setSelectedPanggulOption={setSelectedPanggulOption}
                     setSVGInfo={setSvgInfo}
                 />
-            )}
-            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>player</Activity>
+            </Activity>
+            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{player}</Activity>
         </VStack>
     )
 }
