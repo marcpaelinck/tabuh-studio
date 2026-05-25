@@ -200,7 +200,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { scoreInfoList, loadedScore, loadScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
+    const { scoreInfoList, loadedScore, loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
     const {
         score,
         validation,
@@ -336,13 +336,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         })
     }
 
-    function clearDashboardElement(name: ComponentName) {
-        setDashboardValues((currDashboardValues) => {
-            const newDashboardValues: DashboardValues = { ...dashboardValues }
-            newDashboardValues[name] = { visible: false }
-            return currDashboardValues
-        })
-    }
+    // function clearDashboardElement(name: ComponentName) {
+    //     setDashboardValues((currDashboardValues) => {
+    //         const newDashboardValues: DashboardValues = { ...dashboardValues }
+    //         newDashboardValues[name] = { visible: false }
+    //         return currDashboardValues
+    //     })
+    // }
 
     function playbackDashboardFunction(time: number, params: DashboardParameters) {
         if (!params.system) setDashboardElement('playback', { visible: false })
@@ -457,8 +457,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                         <MainMenu
                             keyboard={keyboard}
                             selectedScoreOption={selectedScoreOption}
+                            score={score}
                             setSelectedScoreOption={setSelectedScoreOption}
                             loadScore={loadScore}
+                            saveScore={saveScore}
                             setKeyboard={SetKeyboard}
                             scoreMenuOptions={scoreMenuOptions}
                             user={user}

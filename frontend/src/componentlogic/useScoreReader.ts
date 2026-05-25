@@ -1,13 +1,30 @@
+import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem } from '../services/apiService'
-import { apiGetScore, apiGetScores } from '../services/apiService'
+import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
+import { debug } from '../utils/debugger'
 import { readFile } from '../utils/filesystem'
+import { scoreToFormattedJson } from '../utils/objectUtils'
+
+export function persistCachedChanges(score: Score | undefined): Score | undefined {
+    if (!score) return
+    const newScore = { ...score }
+    newScore.systems.forEach((sys) =>
+        _.toPairs(sys.staffs).forEach(([pos, measures]) =>
+            measures.forEach((measure, measidx) => {
+                if (measure.notation_) measure.notation = measure.notation_
+                delete measure.notation_
+            })
+        )
+    )
+    return newScore
+}
 
 function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
@@ -28,6 +45,7 @@ export function useScoreReader(source: 'database' | 'file'): {
     scoreInfoList: ScoreInfo[]
     loadedScore: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
+    saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
     isLoading: boolean
 } {
     const [scoreInfoList, setScoreInfoList] = useState<ScoreInfo[]>([])
@@ -55,6 +73,17 @@ export function useScoreReader(source: 'database' | 'file'): {
             default:
         }
     }, [])
+
+    const saveScore = useCallback(
+        async (score: Score | undefined, destination: 'database' | 'file'): Promise<boolean> => {
+            // if (!newScoreInfo || same<ScoreInfo>(newScoreInfo, scoreInfo)) return
+            var isSuccess = false
+            if (destination == 'database') isSuccess = await saveScoreToDb(score)
+            else if (destination == 'file') isSuccess = await saveScoreToLocalFile(score)
+            return isSuccess
+        },
+        []
+    )
 
     // Loads a Score object description from a JSON file on the web server.
     async function loadScoreFromFile(newScoreInfo: ScoreInfo | undefined) {
@@ -86,6 +115,75 @@ export function useScoreReader(source: 'database' | 'file'): {
             console.error('Failed to load score from database:', err)
         } finally {
             setIsLoading(false)
+        }
+    }
+
+    // Saves or updates the database with the Score object.
+    async function saveScoreToDb(score: Score | undefined): Promise<boolean> {
+        if (!score) return false
+        setIsLoading(true)
+        var isSuccess = true
+        try {
+            // Find the database id by matching uuid from the score list
+            debug('1')
+            const scores = await apiGetScores()
+            debug('2')
+            const match = scores.find((s) => s.uuid === score.uuid)
+            var returnvalue
+            if (match) {
+                debug('3')
+                returnvalue = await apiUpdateScore(match.id, {
+                    title: score.title,
+                    instrument_set: score.instrumenttype,
+                    content: score
+                })
+            } else {
+                debug('4')
+                returnvalue = await apiCreateScore(score.title, score.instrumenttype, JSON.stringify(score))
+            }
+            console.log(JSON.stringify(returnvalue))
+        } catch (err) {
+            isSuccess = false
+            console.error('Failed to save/update score to database:', err)
+        } finally {
+            setIsLoading(false)
+        }
+        return isSuccess
+    }
+
+    // Saves or updates the database with the Score object.
+    async function saveScoreToLocalFile(score: Score | undefined): Promise<boolean> {
+        if (!score) return false
+
+        try {
+            const json = scoreToFormattedJson(score)
+
+            // Use File System Access API if available (Chrome/Edge)
+            if ('showSaveFilePicker' in window && typeof window.showSaveFilePicker === 'function') {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: `${score.title.replace(/[^a-z0-9]/gi, '_')}.json`,
+                    types: [{ description: 'JSON score file', accept: { 'application/json': ['.json'] } }]
+                })
+                const writable = await handle.createWritable()
+                await writable.write(json)
+                await writable.close()
+                return true
+            }
+
+            // Fallback for Firefox and Safari
+            const blob = new Blob([json], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const anchor = document.createElement('a')
+            anchor.href = url
+            anchor.download = `${score.title.replace(/[^a-z0-9]/gi, '_')}.json`
+            anchor.click()
+            URL.revokeObjectURL(url)
+            return true
+        } catch (err) {
+            // User cancelled the dialog — not a real error
+            if (err instanceof DOMException && err.name === 'AbortError') return false
+            console.error('Failed to save score to local file:', err)
+            return false
         }
     }
 
@@ -142,5 +240,5 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(false)
     }
 
-    return { scoreInfoList, loadedScore, loadScore, isLoading }
+    return { scoreInfoList, loadedScore, loadScore, saveScore, isLoading }
 }

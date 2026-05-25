@@ -10,19 +10,9 @@ const router = Router()
 const scoreSchema = z.object({
     title: z.string().min(1).max(200),
     instrument_set: z.string().min(1),
-    content: z.object({
-        notes: z.array(
-            z.object({
-                pitch: z.enum(['a', 'e', 'i', 'o', 'u']),
-                octave: z.enum(['lower', 'middle', 'upper']),
-                stroke: z.string(),
-                pattern: z.string().optional(),
-                duration: z.number().positive()
-            })
-        ),
-        font: z.string().default('letter')
-    })
+    content: z.record(z.string(), z.unknown())
 })
+const scoreUpdateSchema = scoreSchema.partial()
 
 // ── Public routes ─────────────────────────────────────────────
 
@@ -112,7 +102,7 @@ router.patch(
     '/:id',
     requireAuth,
     requireRole('editor'),
-    validate(scoreSchema.partial()),
+    validate(scoreUpdateSchema.partial()),
     async (req: AuthenticatedRequest, res: Response) => {
         try {
             // Verify ownership or explicit permission
@@ -139,7 +129,12 @@ router.patch(
                 [title ?? null, instrument_set ?? null, content ? JSON.stringify(content) : null, req.params.id]
             )
             const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [req.params.id])
-            res.json(rows[0])
+            const record = rows[0]
+            console.log(JSON.stringify(record))
+            if (typeof record.content === 'string') {
+                record.content = JSON.parse(record.content)
+            }
+            res.json(record)
         } catch (err) {
             console.error(err)
             res.status(500).json({ error: 'Server error' })

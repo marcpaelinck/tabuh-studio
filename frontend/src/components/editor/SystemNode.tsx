@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { defaultBeatFrequency, editorFontSize, positionConfigs } from '../../config/config'
+import { defaultBeatFrequency, editorFontSize, editorSortingOrder, positionConfigs } from '../../config/config'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
@@ -282,11 +282,15 @@ export function SystemNode({
         )
     }, [systemData])
 
-    const positionTitles = Object.keys(systemData.staffs)
-        .map((position) => positionConfigs[position as Position].name)
+    // Generate the content in a fixed sorting order.
+    const sortedStaffEntries = _.entries(systemData.staffs).sort(
+        ([p1, _1], [p2, _2]) => (editorSortingOrder.indexOf(p1) || 0) - (editorSortingOrder.indexOf(p2) || 0)
+    )
+    const positionTitles = sortedStaffEntries
+        .map(([position, _]) => positionConfigs[position as Position].name)
         .join('\n')
-    const notationText = Object.values(systemData.staffs)
-        .map((measures) => measures.map((measure) => measure.notation.join('')).join(''))
+    const notationText = sortedStaffEntries
+        .map(([_, measures]) => measures.map((measure) => measure.notation.join('')).join(''))
         .join('\n')
 
     const notationArea = useMemo(() => {

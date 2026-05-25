@@ -1,21 +1,17 @@
 import dotenv from 'dotenv'
 import fs from 'fs'
-import { RowDataPacket } from 'mysql2'
+import { ResultSetHeader, RowDataPacket } from 'mysql2'
 import path from 'path'
 import pool from '../db/pool'
 
 dotenv.config()
 
 // ── Configuration ─────────────────────────────────────────────
-// Set this to the folder containing your JSON score files
 const SCORES_FOLDER = process.env.SCORES_FOLDER || './scores'
-
-// The owner of all migrated scores (your admin user)
-const OWNER_EMAIL = process.env.ADMIN_EMAIL || 'marc.paelinck@proton.me'
+const OWNER_EMAIL = process.env.ADMIN_EMAIL || 'your@email.com'
 // ─────────────────────────────────────────────────────────────
 
 async function migrateScores() {
-    // Resolve the scores folder path
     const scoresFolderPath = path.resolve(SCORES_FOLDER)
 
     if (!fs.existsSync(scoresFolderPath)) {
@@ -23,7 +19,6 @@ async function migrateScores() {
         process.exit(1)
     }
 
-    // Get the owner's id from the database
     const [ownerRows] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [OWNER_EMAIL])
 
     if (!ownerRows[0]) {
@@ -35,7 +30,6 @@ async function migrateScores() {
     const ownerId = ownerRows[0].id
     console.log(`Migrating scores as user: ${OWNER_EMAIL} (id: ${ownerId})`)
 
-    // Read all JSON files from the scores folder
     const files = fs.readdirSync(scoresFolderPath).filter((f) => f.endsWith('.json'))
 
     if (files.length === 0) {
@@ -45,8 +39,8 @@ async function migrateScores() {
 
     console.log(`Found ${files.length} file(s) to migrate.`)
 
-    let succeeded = 0
-    let skipped = 0
+    let inserted = 0
+    let updated = 0
     let failed = 0
 
     for (const file of files) {
@@ -56,44 +50,52 @@ async function migrateScores() {
             const raw = fs.readFileSync(filePath, 'utf-8')
             const score = JSON.parse(raw)
 
-            // Basic validation — ensure the file looks like a score
             if (!score.uuid || !score.title) {
                 console.warn(`  ⚠ Skipping ${file} — missing uuid or title`)
-                skipped++
+                failed++
                 continue
             }
 
-            // Check if this score has already been migrated (by uuid)
+            // Check if this score already exists in the database
             const [existing] = await pool.query<RowDataPacket[]>(
-                `SELECT id FROM scores WHERE JSON_UNQUOTE(JSON_EXTRACT(content, '$.uuid')) = ?`,
+                `SELECT id FROM scores
+                 WHERE JSON_UNQUOTE(JSON_EXTRACT(content, '$.uuid')) = ?`,
                 [score.uuid]
             )
+
             if (existing[0]) {
-                console.log(`  ↷ Skipping ${file} — already in database (uuid: ${score.uuid})`)
-                skipped++
-                continue
+                // Update the existing record with the file's content
+                await pool.query<ResultSetHeader>(
+                    `UPDATE scores
+                     SET title          = ?,
+                         instrument_set = ?,
+                         content        = ?,
+                         updated_at     = NOW()
+                     WHERE id = ?`,
+                    [score.title, score.instrumenttype ?? 'UNKNOWN', JSON.stringify(score), existing[0].id]
+                )
+                console.log(`  ↺ Updated:  ${score.title} (${file})`)
+                updated++
+            } else {
+                // Insert as a new record
+                await pool.query<ResultSetHeader>(
+                    `INSERT INTO scores (owner_id, instrument_set, title, content)
+                     VALUES (?, ?, ?, ?)`,
+                    [ownerId, score.instrumenttype ?? 'UNKNOWN', score.title, JSON.stringify(score)]
+                )
+                console.log(`  ✓ Inserted: ${score.title} (${file})`)
+                inserted++
             }
-
-            // Insert the score
-            await pool.query(`INSERT INTO scores (owner_id, instrument_set, title, content) VALUES (?, ?, ?, ?)`, [
-                ownerId,
-                score.instrumenttype ?? 'UNKNOWN',
-                score.title,
-                JSON.stringify(score)
-            ])
-
-            console.log(`  ✓ Migrated: ${score.title} (${file})`)
-            succeeded++
         } catch (err) {
-            console.error(`  ✗ Failed: ${file}`, err)
+            console.error(`  ✗ Failed:   ${file}`, err)
             failed++
         }
     }
 
     console.log('\n── Migration complete ──────────────────────')
-    console.log(`  Succeeded : ${succeeded}`)
-    console.log(`  Skipped   : ${skipped}`)
-    console.log(`  Failed    : ${failed}`)
+    console.log(`  Inserted : ${inserted}`)
+    console.log(`  Updated  : ${updated}`)
+    console.log(`  Failed   : ${failed}`)
 
     await pool.end()
     process.exit(failed > 0 ? 1 : 0)
