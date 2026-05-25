@@ -15,6 +15,7 @@ import {
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues } from '../../config/config'
 import type { DynamicsValue, ExecutionItemType } from '../../typing/execution'
+import { debug } from '../../utils/debugger'
 
 export type FlowConditionType = 'pass' | 'nthpass' | 'iteration'
 
@@ -313,7 +314,7 @@ const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
                     accepter={CheckPicker}
                     label="Passes"
                     name={formFieldNames.passes}
-                    onChange={(event: Event) => console.log(event)}
+                    onChange={(event: Event) => debug(event)}
                     countable={false}
                     data={new Array(20).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }
@@ -326,7 +327,7 @@ const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
                     accepter={CheckPicker}
                     label="Iterations"
                     name={formFieldNames.iterations}
-                    onChange={(event: Event) => console.log(event)}
+                    onChange={(event: Event) => debug(event)}
                     countable={false}
                     data={new Array(loop).fill(null).map((_, idx) => {
                         return { label: `${idx + 1}`, value: idx + 1 }

@@ -141,7 +141,6 @@ export function useScoreReader(source: 'database' | 'file'): {
                 debug('4')
                 returnvalue = await apiCreateScore(score.title, score.instrumenttype, JSON.stringify(score))
             }
-            console.log(JSON.stringify(returnvalue))
         } catch (err) {
             isSuccess = false
             console.error('Failed to save/update score to database:', err)

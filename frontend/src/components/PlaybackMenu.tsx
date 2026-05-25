@@ -1,12 +1,12 @@
 import type { Dispatch, JSX } from 'react'
-import { useEffect, useState } from 'react'
+import { Activity, useEffect, useState } from 'react'
 import { HStack, SelectPicker } from 'rsuite'
-import { speedList } from '../../config/config'
-import type { Position } from '../../typing/basetypes'
-import { focusDefaultOption, type Appearance, type ExtendedOption, type ScoreInfo } from '../../typing/interface'
-import type { Score } from '../../typing/score'
-import { debug } from '../../utils/debugger'
-import { createFocusMenuItems, createSpeedMenuItems } from '../../utils/selectorsUtils'
+import { speedList } from '../config/config'
+import type { Position } from '../typing/basetypes'
+import { focusDefaultOption, type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
+import type { Score } from '../typing/score'
+import { debug } from '../utils/debugger'
+import { createFocusMenuItems, createSpeedMenuItems } from '../utils/selectorsUtils'
 
 export default function PlayerMenu({
     appAppearance,
@@ -56,22 +56,24 @@ export default function PlayerMenu({
         <div className="selectors flex flex-wrap">
             <HStack>
                 {/* Score selector is only visible on small screens where only the player is displayed. */}
-                <SelectPicker
-                    id="scoreselector"
-                    searchable={false}
-                    cleanable={false}
-                    label="score:"
-                    data={scoreMenuOptions}
-                    value={selectedScoreOption?.value}
-                    onSelect={(value, item) => {
-                        setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
-                    }}
-                    // Onchange needed because value can be null / initial selector state is unselected
-                    // (also needed if cleanable==true)
-                    onChange={(value, e) => {
-                        if (value === null) setSelectedScoreOption(null)
-                    }}
-                />
+                <Activity mode={appAppearance == 'full' ? 'hidden' : 'visible'}>
+                    <SelectPicker
+                        id="scoreselector"
+                        searchable={false}
+                        cleanable={false}
+                        label="score:"
+                        data={scoreMenuOptions}
+                        value={selectedScoreOption?.value}
+                        onSelect={(value, item) => {
+                            setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
+                        }}
+                        // Onchange needed because value can be null / initial selector state is unselected
+                        // (also needed if cleanable==true)
+                        onChange={(value, e) => {
+                            if (value === null) setSelectedScoreOption(null)
+                        }}
+                    />
+                </Activity>
                 <SelectPicker
                     id="focusselector"
                     searchable={false}

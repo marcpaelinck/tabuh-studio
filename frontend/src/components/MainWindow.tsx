@@ -56,8 +56,8 @@ import {
 } from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
+import PlayerMenu from './PlaybackMenu'
 import { Player } from './player/Player'
-import PlayerMenu from './player/PlayerMenu'
 import PlayerWindow from './player/PlayerWindow'
 import logo from '/dist/icons/tabuh-studio_icon.svg'
 

@@ -629,11 +629,10 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
     }: SchedulePlaybackParams): void {
         // Do nothing if the timeline has already been generated
         // if (timeLine && same<PlaybackAction>(pbAction, timeLine.playbackAction)) {
-        //     console.log('Request to create timeline skipped.')
+        //     debug('Request to create timeline skipped.')
         //     return
         // }
 
-        console.log('Executing request to create timeline.')
         const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
         if (newTimeLine) {
             createPlaybackSchedule(newTimeLine, playbackSpeed)
