@@ -57,7 +57,7 @@ const dashboardElements: Record<ComponentName, DashboardElementType> = {
         tooltips: {
             info:
                 'Playback\n' +
-                `${chars.system}: system\n` +
+                `${chars.system}: system/gongan\n` +
                 `${chars.pass}: pass\n` +
                 `${chars.iteration}: iteration\n` +
                 `${chars.tempo}: tempo (BPM)\n`

@@ -303,7 +303,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     GONGS: {
         name: 'Gongs',
         type: 'percussion', //TODO move type to instrument and grouping info
-        volume: -5,
+        volume: 0,
         svg_file: 'svg/GK_GONGS.svg',
         sampletemplate: 'GK_GONGS_{note}.mp3',
         symbolToNoteNames: { G: ['GIR'], P: ['PUR'], T: ['TONG'] }, //TODO move alphabet info to separate settings

@@ -341,7 +341,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
                     const endOfMeasure = symbolIdx == notation.length - 1
-                    const endOfPosition = currentStep!.lastSystem && currentStep!.lastSection && endOfMeasure
+                    // const endOfPosition = currentStep!.lastSystem && currentStep!.lastSection && endOfMeasure
 
                     // CREATE SAMPLER ACTION
                     // Determine the default duration for a single base note.
