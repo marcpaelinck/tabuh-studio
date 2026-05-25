@@ -222,7 +222,10 @@ export function useScoreReader(source: 'database' | 'file'): {
             // Find the database id by matching uuid from the score list
             const scores = await apiGetScores()
             if (scores) {
-                const scoreInfoList = scores.map((score) => toScoreInfo(score))
+                const scoreInfoList = scores
+                    .filter((score) => score.instrument_set == 'GONG_KEBYAR')
+                    .map((score) => toScoreInfo(score))
+                    .toSorted((i1, i2) => i1.title.localeCompare(i2.title))
                 setScoreInfoList(scoreInfoList)
             } else throw new Error('Did not receive score list')
         } catch (err) {
@@ -236,7 +239,11 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(true)
         const files = await readFile('scores/content.json')
         const scoreInfoList: ScoreInfo[] = JSON.parse(files)
-        setScoreInfoList(scoreInfoList.filter((info) => info.instrumentgroup == 'GONG_KEBYAR'))
+        setScoreInfoList(
+            scoreInfoList
+                .filter((info) => info.instrumentgroup == 'GONG_KEBYAR')
+                .toSorted((i1, i2) => i1.title.localeCompare(i2.title))
+        )
         setIsLoading(false)
     }
 
