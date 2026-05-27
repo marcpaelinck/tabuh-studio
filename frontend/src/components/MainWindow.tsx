@@ -1,7 +1,5 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
-import EditIcon from '@rsuite/icons/Edit'
-import PlayOutlineIcon from '@rsuite/icons/PlayOutline'
 import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
@@ -19,10 +17,10 @@ import {
     Popover,
     Row,
     SchemaModel,
+    SegmentedControl,
     Sidebar,
     Sidenav,
     StringType,
-    Toggle,
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
@@ -176,13 +174,14 @@ function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
 interface MainWindowProps {
     dataSource: 'database' | 'file'
 }
+type ActiveView = 'editor' | 'player'
 export function MainWindow({ dataSource }: MainWindowProps) {
     // ── NAVIGATION ─────────────────────────────────────────────
 
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
-    const [active, setActive] = useState<'editor' | 'player'>('player')
+    const [active, setActive] = useState<ActiveView>('player')
     const screenSize = useScreenSize()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     const { user, login, logout } = useAuth()
@@ -426,13 +425,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             <Col span={5} id="Toolbar" className="flex justify-end">
                                 <HStack>
                                     {playerMenu}
-                                    <Toggle
-                                        size={'lg'}
-                                        color="violet"
-                                        checkedChildren={<PlayOutlineIcon />}
-                                        unCheckedChildren={<EditIcon />}
-                                        defaultChecked={active == 'player'}
-                                        onChange={(checked) => setActive(checked ? 'player' : 'editor')}
+                                    <SegmentedControl
+                                        value={active}
+                                        data={[
+                                            { label: 'player', value: 'player' },
+                                            { label: 'editor', value: 'editor' }
+                                        ]}
+                                        onChange={(value) => setActive(value as ActiveView)}
+                                        className="border border-purple-900"
                                     />
                                 </HStack>
                             </Col>
