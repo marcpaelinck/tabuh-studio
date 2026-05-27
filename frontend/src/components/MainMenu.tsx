@@ -16,6 +16,7 @@ type Action =
     | '4'
     | 'login'
     | 'file-open'
+    | 'file-import'
     | 'file-import-laras'
     | 'file-import-tabuh'
     | 'file-save'
@@ -79,6 +80,10 @@ export function MainMenu({
                 }
                 break
             }
+            case 'file-import': {
+                loadScore('JSON-file')
+                break
+            }
             case 'file-import-laras': {
                 loadScore('Laras')
                 break
@@ -128,6 +133,7 @@ export function MainMenu({
         <Nav activeKey={activeKey} onSelect={setActiveKey}>
             <Nav.Menu eventKey="1" title="Notation" icon={<IoFolderOpenOutline />}>
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
+                <Nav.Item eventKey="file-import">Import...</Nav.Item>
                 <Nav.Item eventKey="file-import-laras">Import Laras file...</Nav.Item>
                 <Nav.Item eventKey="file-import-tabuh">Import Tabuh file...</Nav.Item>
                 <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">

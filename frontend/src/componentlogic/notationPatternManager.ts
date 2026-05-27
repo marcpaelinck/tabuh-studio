@@ -2,7 +2,7 @@
 
 import { MutingChars } from '../config/config'
 import type { NoteSymbol, Position } from '../typing/basetypes'
-import type { Measure } from '../typing/score'
+import type { Staff } from '../typing/score'
 import { splitTone } from '../utils/alphabet'
 import { getPatternType } from '../utils/patterns'
 
@@ -217,11 +217,12 @@ export function notationWidth(notation: NoteSymbol[], position: Position) {
 // Arguments `prevsymbol` and `nextsymbol` are required because some patterns can consist of two consecutive symbols.
 // The 'grace note' pattern requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
-export function applyPatterns(position: Position, staff: Measure[]): Measure[] {
-    const newStaff: Measure[] = []
-    staff.forEach((measure, measureIdx) => {
+// staff is an array of Staffs, one per kempli beat (as produced by the parser before flattening).
+export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
+    const newStaff: Staff[] = []
+    staff.forEach((beat, measureIdx) => {
         const expandedNotation: NoteSymbol[] = []
-        measure.notation.forEach((symbol, symbolIdx) => {
+        beat.notation.forEach((symbol, symbolIdx) => {
             const pattern = getPatternType(symbol, position)
             switch (pattern) {
                 case 'SINGLENOTE':
@@ -242,7 +243,7 @@ export function applyPatterns(position: Position, staff: Measure[]): Measure[] {
                     expandedNotation.push(symbol)
             }
         })
-        newStaff.push({ notation: expandedNotation } as Measure)
+        newStaff.push({ notation: expandedNotation } as Staff)
     })
     return newStaff
 }
@@ -251,7 +252,7 @@ function silenceSymbol(): NoteSymbol[] {
     return [MutingChars[0]]
 }
 
-function norotPattern(position: Position, staff: Measure[], measureIdx: number, symbolIdx: number): NoteSymbol[] {
+function norotPattern(position: Position, staff: Staff[], measureIdx: number, symbolIdx: number): NoteSymbol[] {
     // Check if norot applies to the current position.
     if (!(position in patterns.norot.patterns)) {
         console.error(`Unexpected norot symbol in ${position} notation.`)

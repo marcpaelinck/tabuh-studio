@@ -7,3 +7,4 @@ backend/dist
 shared/README-PRODUCTION.md
 .env
 *.env.local
+CLAUDE.md

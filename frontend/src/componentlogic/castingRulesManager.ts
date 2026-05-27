@@ -3,7 +3,6 @@
 
 import { NorotChars } from '../config/config.ts'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
-import type { Measure } from '../typing/score.ts'
 import { splitTone } from '../utils/alphabet.ts'
 import { debug } from '../utils/debugger.ts'
 import { isEvenByIndex as isEvenPositionByIndex } from '../utils/objectUtils.ts'
@@ -117,7 +116,6 @@ function selectRule(
 // measureId starts with 0
 export function castNotation(
     notation: string[],
-    staff: Measure[],
     groupedPositions: Position[],
     measureIdx: number,
     posIdx: number,

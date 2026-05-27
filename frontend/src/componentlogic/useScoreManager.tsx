@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
 import type { ExecutionItem } from '../typing/execution'
-import { kempliStates, type Score, type System, type ValidationResult } from '../typing/score'
+import { kempliStates, type Score, type Staff, type System, type ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
 import { cycleValidation, defaultValidationValue } from './validationManager'
@@ -169,11 +169,9 @@ export function useScoreManager() {
         value?: string | number
     ): Score | undefined {
         var newSystemData: System | null = _.cloneDeep(systemData)
-        // Reset the edit buffers of the measures.
-        Object.values(newSystemData.staffs).forEach((measures) => {
-            measures.forEach((measure) => {
-                measure.notation_ = undefined
-            })
+        // Reset the edit buffers of the staffs.
+        Object.values(newSystemData.staffs).forEach((staff) => {
+            if (staff) delete (staff as Staff).notation_
         })
         if (!score) return undefined
         // Determines where to insert the new system data item. Default is set to replace current.
@@ -194,13 +192,11 @@ export function useScoreManager() {
                 }
                 break
             case 'new': {
-                // Creates an empty system based on the measure settings of the current systemn.
-                Object.values(newSystemData.staffs).forEach((measures) => {
-                    // clear existing values
-                    measures.forEach((measure) => {
-                        measure.notation_ = undefined
-                        measure.notation = []
-                    })
+                // Creates an empty system based on the staff settings of the current system.
+                Object.values(newSystemData.staffs).forEach((staff) => {
+                    if (!staff) return
+                    delete (staff as Staff).notation_
+                    ;(staff as Staff).notation = []
                 })
                 newSystemData.label = undefined
                 newSystemData.execution = undefined

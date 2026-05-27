@@ -8,9 +8,10 @@ export type Note = {
     muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 
-// 'JSON': standard score format
+// 'JSON': standard score format (loaded from server/database)
+// 'JSON-file': standard score format loaded from a local file chosen by the user
 // 'Laras'or 'Notation': text versions that can be imported. Each format needs its own parser.
-export type ScoreFormat = 'JSON' | 'Laras' | 'Notation'
+export type ScoreFormat = 'JSON' | 'JSON-file' | 'Laras' | 'Notation'
 // 'on': kempli will be added during playback. 'notation': system contains a kempli staff.
 // See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
 export const kempliStates = ['on', 'off', 'notation']
@@ -22,17 +23,19 @@ export interface KempliSetting {
     beatAtEnd?: boolean
 }
 
-export type Measure = {
+// Notation of one instrument position within a System (flat, not subdivided into measures)
+export interface Staff {
     notation: NoteSymbol[]
     notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet. Enables to revert changes.
 }
 
-// Notation of one instrument position within a System
-export type Staffs = Partial<Record<Position, Measure[]>>
+export type Staffs = Partial<Record<Position, Staff>>
 
+// Used during parsing only: staff is an array of Staffs, one per kempli beat (measure).
+// After parsing, these are flattened into a single Staff per position.
 export interface GroupedNotation {
     positions: Position[]
-    staff: Measure[]
+    staff: Staff[]
 }
 // Subdivision of a score, typically spans one gongan
 
@@ -43,9 +46,8 @@ export type System = {
     line?: number // in case the score was parsed from a text file, the first line of the system
     notationGroups?: GroupedNotation[] // Staves of an imported Notation assigned to multiple positions.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
-    staffs: Staffs // Contains the notation as a sequence of measures for each position.
+    staffs: Partial<Record<Position, Staff>> // Contains the flat notation for each position.
     kempli: KempliSetting
-    colWidths: number[]
     label?: string
     execution?: ExecutionItem[]
     copyfrom?: string // label or id of copied system

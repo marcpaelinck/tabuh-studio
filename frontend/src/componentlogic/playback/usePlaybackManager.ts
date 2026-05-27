@@ -41,7 +41,7 @@ import type {
 import type { Note, Score, System } from '../../typing/score'
 import { cleanSymbol } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import { defaultObject, getSystemDuration } from '../../utils/objectUtils'
+import { defaultObject, getSectionStart, getSystemDuration } from '../../utils/objectUtils'
 import {
     BaseNoteEquiv2Millis,
     millis2BaseNoteEquiv,
@@ -152,9 +152,11 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             for (const system of score.systems) {
                 var line: string
                 if (position in system.staffs) {
-                    line = system.staffs[position]!.map((measure) => measure.notation.join('')).join(' ')
+                    line = system.staffs[position]!.notation.join('')
                 } else {
-                    line = system.colWidths.map((width) => ' '.repeat(width)).join(' ')
+                    // Position not present: fill with spaces matching first staff length
+                    const firstStaff = Object.values(system.staffs)[0]
+                    line = ' '.repeat(firstStaff?.notation.length ?? 0)
                 }
 
                 posNotation.push(
@@ -256,9 +258,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             if (currIdx + 1 < notation.length) return notation[currIdx + 1]
             const nextStep = nextInFlow(true)
             if (nextStep && pos in nextStep.measures) {
-                const measure = nextStep.measures[pos]
-                const notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
-                return notation.length > 0 ? notation[0] : undefined
+                const sectionStaff = nextStep.measures[pos as Position]
+                const sectionNotation = useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation
+                return sectionNotation && sectionNotation.length > 0 ? sectionNotation[0] : undefined
             }
             return undefined
         }
@@ -334,9 +336,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
                 // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
-                const measure = currentStep.measures[position]
-                var notation = useCache && measure.notation_ ? measure.notation_ : measure.notation
-                if (!notation) notation = Array(4).fill(defaultObject('NoteSymbol'))
+                const sectionStaff = currentStep.measures[position]
+                var notation: NoteSymbol[] = (useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation) ?? Array(4).fill(defaultObject('NoteSymbol'))
                 var prevSymbol: NoteSymbol | undefined = undefined
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
@@ -418,9 +419,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
                 const system = currentStep!.system
                 const sectIdx = currentStep!.sectionIdx
-                var cursorPos = _.concat(system.staffs[position]!.slice(0, sectIdx))
-                    .map((measure) => measure.notation.join('') + ' ') // measures are spearated by space characters.
-                    .join('').length
+                // Character offset = start index of current section in the flat notation
+                var cursorPos = getSectionStart(sectIdx, system)
                 // if (sectIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
                 const span = notation.join('')
                 newTimeLine.playercursoractions.push({

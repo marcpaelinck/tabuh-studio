@@ -26,7 +26,7 @@ import type {
     PostProcessing,
     ProcessingInstruction
 } from '../typing/parsers.ts'
-import type { GroupedNotation, Measure, Score, Staffs, System } from '../typing/score.ts'
+import type { GroupedNotation, Score, Staff, Staffs, System } from '../typing/score.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { lineNr, tagLookup } from './tabuhUtils.ts'
@@ -94,7 +94,6 @@ export function parseNotation(content: string): ParserReturnValue {
                     editorGroup: [],
                     staffs: {},
                     kempli: { state: 'on', frequency: 4 },
-                    colWidths: [],
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
                 } as System
@@ -113,8 +112,8 @@ export function parseNotation(content: string): ParserReturnValue {
                 const castInstructions: CastingInstruction[] = metaData
                     .filter((item) => item.type == 'castinginstruction')
                     .map((item) => item.value) as CastingInstruction[]
-                system.staffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
-                system.colWidths = getColwidths(system.staffs)
+                const parsedStaffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
+                system.staffs = parsedStaffs as Staffs // temporarily holds Staff[] per position until postProcess
                 parsedScore.systems.push(system)
                 break
             }
@@ -135,38 +134,43 @@ export function parseNotation(content: string): ParserReturnValue {
     return { score, errors, postProcessing, tree }
 }
 
+// Intermediate type: array of beat-grouped staffs per position (used only during parsing).
+type ParsedStaffs = Partial<Record<Position, Staff[]>>
+
 // When a staff notation applies to a group of positions, this function converts
 // the common staff notation to individual staff notation for each position, using 'casting' rules.
-// staffs: contains staffs of non-grouped positions.
-// groupedNotation: groups of positions with corresponding notation
+// groupedNotation: groups of positions with corresponding notation (one Staff per kempli beat)
 // castInstructions: contains AUTOKEMPYUNG metadata which indicates whether homophonic notation
 //                   should be converted to kempyung equivalent for sangsih positions.
 function castGroupedNotationToPositions(
     groupedNotations: GroupedNotation[],
     castInstructions: CastingInstruction[]
-): Staffs {
-    const staffs: Staffs = {}
+): ParsedStaffs {
+    const staffs: ParsedStaffs = {}
     for (const group of groupedNotations) {
         group.positions.forEach((position, posIdx) => {
-            const staff: Measure[] = []
+            const beats: Staff[] = []
             var measureIdx = 0
-            for (const measure of group.staff) {
+            for (const beat of group.staff) {
                 if (group.positions.length > 1) {
-                    const castedMeasure = { ...measure }
-                    castedMeasure.notation = castNotation(
-                        measure.notation,
-                        staff,
-                        group.positions,
-                        measureIdx,
-                        posIdx,
-                        castInstructions
-                    )
-                    staff.push(castedMeasure)
-                } else staff.push({ ...measure })
+                    beats.push({
+                        notation: castNotation(beat.notation, group.positions, measureIdx, posIdx, castInstructions)
+                    })
+                } else beats.push({ ...beat })
                 measureIdx++
             }
-            staffs[position] = staff
+            staffs[position] = beats
         })
+    }
+    return staffs
+}
+
+// Flattens an array of beat-grouped staffs into a single flat Staff per position.
+function flattenParsedStaffs(parsedStaffs: ParsedStaffs): Staffs {
+    const staffs: Staffs = {}
+    for (const [pos, beats] of Object.entries(parsedStaffs)) {
+        if (!beats) continue
+        staffs[pos as Position] = { notation: beats.flatMap((beat) => beat.notation) }
     }
     return staffs
 }
@@ -220,37 +224,45 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         }
     }
 
-    // Expand shorthand pattern symbols
+    // At this point system.staffs temporarily holds Staff[] per position (ParsedStaffs).
+    // We need to: (1) expand pattern symbols, (2) pad beats to equal width, (3) set kempli, (4) flatten to Staff.
     for (const system of score.systems) {
-        _.entries(system.staffs).forEach(([position, staff]) => {
-            system.staffs[position as Position] = applyPatterns(position as Position, staff)
+        // Cast to ParsedStaffs for intermediate processing
+        const parsedStaffs = system.staffs as unknown as ParsedStaffs
+
+        // Step 1: Expand shorthand pattern symbols (e.g. norot) within each beat
+        _.entries(parsedStaffs).forEach(([position, beats]) => {
+            if (beats) parsedStaffs[position as Position] = applyPatterns(position as Position, beats)
         })
-    }
 
-    // Expand all measures to the beat's duration.
-    // Note: this is necessary because the notation system allows to omit trailing extension symbols or spaces.
-    for (const system of score.systems) {
-        for (const measures of _.values(system.staffs)) {
-            measures.forEach((measure, colIdx) => {
-                const diff = system.colWidths[colIdx] - measure.notation.length
-                if (diff > 0) measure.notation.push(...Array(diff).fill(' '))
+        // Step 2: Compute column widths (max notation width per beat across all positions) and pad beats
+        const colWidths = getColwidths(parsedStaffs)
+        _.values(parsedStaffs).forEach((beats) => {
+            if (!beats) return
+            beats.forEach((beat, colIdx) => {
+                const diff = (colWidths[colIdx] ?? 0) - beat.notation.length
+                if (diff > 0) beat.notation.push(...Array(diff).fill(' '))
             })
-        }
-    }
+        })
 
-    // TODO Add kempli
-    for (const system of score.systems) {
-        // Note that a default value for system.kempli had been assigned on system creation.
-        system.kempli.frequency = system.colWidths && system.colWidths.length > 0 ? system.colWidths[0] : 4
+        // Step 3: Set kempli frequency from the beat width and apply kempli execution items
+        if (colWidths.length == 0) {
+            system.kempli.state = 'notation'
+        } else {
+            // Set kempli state to 'on' if all measures have the same duration
+            if (colWidths.every((w) => w == colWidths[0])) system.kempli.state = 'on'
+            system.kempli.frequency = colWidths.length > 0 ? colWidths[0] : 4
+        }
         if (system.execution) {
             const kempliItem: KempliItem = system.execution.find((exec) => exec.type == 'kempli') as KempliItem
             if (kempliItem) {
-                if (kempliItem.value == 'off') {
-                    system.kempli.state = 'off'
-                }
-                if ((kempliItem.value = 'double')) system.kempli.frequency = system.kempli.frequency! / 2
+                if (kempliItem.value == 'off') system.kempli.state = 'off'
+                if (kempliItem.value === 'double') system.kempli.frequency = system.kempli.frequency! / 2
             }
         }
+
+        // Step 4: Flatten beats into a single Staff per position
+        system.staffs = flattenParsedStaffs(parsedStaffs)
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -407,19 +419,19 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
     const staffNodes = gonganNode.getChildren('StaffLine')
 
     for (const child of staffNodes) {
-        var staff: Measure[] = []
+        var staff: Staff[] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
         const positions = tagsToPositions(positionTag.split('/'))
         var groupedNotation: GroupedNotation
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
-            const measure: Measure = { notation: [] }
+            const beat: Staff = { notation: [] }
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
-                measure.notation.push(getText(noteNode, content))
+                beat.notation.push(getText(noteNode, content))
                 noteNode = noteNode.nextSibling
             }
-            staff.push(measure)
+            staff.push(beat)
         }
         groupedNotation = { positions: positions, staff: staff } as GroupedNotation
         notationGroups.push(groupedNotation)
@@ -428,21 +440,20 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
     const maxMeasures = Math.max(...notationGroups.map((ng) => ng.staff.length))
     for (const ng of notationGroups) {
         const shortage = maxMeasures - ng.staff.length
-        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [] }) as Measure[]))
+        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [] }) as Staff[]))
     }
 
     return notationGroups
 }
 
 // Returns the maximum width of vertically aligned sections.
-function getColwidths(staffs: Staffs): number[] {
-    // Convert the Staffs dict to a table containing the measure widths for each position
-    const sizes = _.entries(staffs)
-        .filter(([position, measures]) => measures != undefined)
-        .map(([position, measures]) => measures.map((measure) => notationWidth(measure.notation, position as Position)))
-    // Transpose the resulting table
+// Takes ParsedStaffs (Staff[] per position) as input — only valid during parsing.
+function getColwidths(parsedStaffs: ParsedStaffs): number[] {
+    const sizes = _.entries(parsedStaffs)
+        .filter(([_position, beats]) => beats != undefined)
+        .map(([position, beats]) => beats!.map((beat) => notationWidth(beat.notation, position as Position)))
+    // Transpose to get widths per column
     const widthsByColumn = _.zip(...sizes)
-    // Determine the maximum measure width per column
     const columnWidths: number[] = widthsByColumn.map((widths) =>
         widths.reduce((max, width) => Math.max(max || 0, width || 0), 0)
     ) as number[]

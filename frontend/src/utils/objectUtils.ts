@@ -4,7 +4,7 @@
 
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/playbackPatternManager'
-import type { BPM, Position } from '../typing/basetypes'
+import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
 type DefaultType = 'NoteSymbol' | 'Score'
@@ -31,16 +31,16 @@ export function defaultObject<T>(otype: DefaultType): T {
 
 export function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
     const flatten = (key: string, value: any) => {
-        if (/^([A-Z][A-Z\d_]+|execution|staff|group|positions)$/.test(key) && value) {
-            var json = value.map((meas: any) => {
-                return JSON.stringify(meas)
+        if (/^(execution|staff|group|positions)$/.test(key) && value) {
+            var json = value.map((item: any) => {
+                return JSON.stringify(item)
             })
             if (key != 'execution') json = '[' + json.join(', ') + ']'
             return json
         }
-        if (key == 'colWidths') {
-            const json = JSON.stringify(value)
-            return json
+        if (/^[A-Z][A-Z\d_]+$/.test(key) && value && typeof value === 'object' && 'notation' in value) {
+            // Staff object: inline it
+            return JSON.stringify(value)
         }
         if (key == 'starttime') {
             return undefined
@@ -49,7 +49,9 @@ export function scoreToFormattedJson(score: Score, clearCache: boolean = true): 
     }
     if (clearCache) {
         score.systems.forEach((sys) =>
-            _.toPairs(sys.staffs).forEach(([_, measures]) => measures.forEach((measure) => delete measure.notation_))
+            _.toPairs(sys.staffs).forEach(([_, staff]) => {
+                if (staff) delete staff.notation_
+            })
         )
     }
 
@@ -75,23 +77,50 @@ export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
 }
 
-// Returns the maximum duration of the measures at the given index.
-export function getSectionDuration(system: System, sectionIdx: number, bpm: BPM) {
-    const measures = _.flatten(
-        _.values(system.staffs).map((posMeasures) => (posMeasures.length > sectionIdx ? posMeasures[sectionIdx] : []))
-    )
-    return Object.entries(measures).reduce(
-        (maxDur, [position, measure]) =>
-            Math.max(maxDur, totalDuration(measure.notation, position as Position, bpm, 'basenote')),
-        0
-    )
+// Returns the number of kempli sections (beats) in the system.
+export function getSystemSectionCount(system: System): number {
+    const firstStaff = Object.values(system.staffs)[0]
+    if (!firstStaff) return 0
+    if (system.kempli.state === 'on' && system.kempli.frequency) {
+        return Math.ceil(firstStaff.notation.length / system.kempli.frequency)
+    } else if (system.kempli.state === 'notation') {
+        const kempliNotation = system.staffs['KEMPLI']?.notation || []
+        return Math.max(1, kempliNotation.filter((n) => n === 'x?').length)
+    }
+    return 1
+}
+
+// Returns the start index (in the flat notation) of the given section.
+export function getSectionStart(sectionIdx: number, system: System): number {
+    if (system.kempli.state === 'on' && system.kempli.frequency) {
+        return sectionIdx * system.kempli.frequency
+    } else if (system.kempli.state === 'notation') {
+        if (sectionIdx === 0) return 0
+        const kempliNotation = system.staffs['KEMPLI']?.notation || []
+        const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
+        return sectionIdx <= beatPositions.length ? beatPositions[sectionIdx - 1] + 1 : 0
+    }
+    return 0
+}
+
+// Returns the notation for a specific section (kempli beat) from a flat notation array.
+export function getSectionNotation(notation: NoteSymbol[], sectionIdx: number, system: System): NoteSymbol[] {
+    if (system.kempli.state === 'on' && system.kempli.frequency) {
+        const start = sectionIdx * system.kempli.frequency
+        return notation.slice(start, start + system.kempli.frequency)
+    } else if (system.kempli.state === 'notation') {
+        const kempliNotation = system.staffs['KEMPLI']?.notation || []
+        const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
+        const start = sectionIdx > 0 && sectionIdx <= beatPositions.length ? beatPositions[sectionIdx - 1] + 1 : 0
+        const end = sectionIdx < beatPositions.length ? beatPositions[sectionIdx] + 1 : notation.length
+        return notation.slice(start, end)
+    }
+    return notation
 }
 
 // Returns the maximum duration of the system's staffs.
 export function getSystemDuration(system: System, bpm: BPM) {
-    return Math.max(
-        ..._.entries(system.staffs).map(([pos, measures]) =>
-            _.sum(measures.map((measure) => totalDuration(measure.notation, pos as Position, bpm, 'basenote')))
-        )
-    )
+    const entries = _.entries(system.staffs).filter(([_, staff]) => staff != null)
+    if (entries.length === 0) return 0
+    return Math.max(...entries.map(([pos, staff]) => totalDuration(staff!.notation, pos as Position, bpm, 'basenote')))
 }

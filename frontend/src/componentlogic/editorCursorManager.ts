@@ -41,9 +41,7 @@ export function useEditorCursorManager(systemData: System | undefined) {
                 }
                 case 'notation': {
                     // Get the kempli notation for the entire system
-                    const notation: string[] = _.flatten(
-                        _.flatten(systemData.staffs['KEMPLI'] || []).map((measure) => measure.notation)
-                    )
+                    const notation: string[] = systemData.staffs['KEMPLI']?.notation || []
                     // Determine the positions of the kempli characters
                     const indices = notation.reduce(
                         (aggr: number[], note, idx) => (note == 'x?' ? aggr.concat([idx]) : aggr),
@@ -69,19 +67,20 @@ export function useEditorCursorManager(systemData: System | undefined) {
         }
 
         function cursorHighlight(cursor: EditorCellCursor | null): string {
-            if (!cursor) return ''
-            const cursorMeasureSize = systemData.colWidths[cursor.measure]
-            const cursorOffset = _.sum(systemData.colWidths.slice(0, cursor.measure))
+            if (!cursor || !systemData.kempli.frequency) return ''
+            const freq = systemData.kempli.frequency
+            const cursorOffset = cursor.measure * freq
             const highlight = `linear-gradient(
                 to right,
                 transparent 0 calc(${cursorOffset}ch - 2px),
-                ${gridColors.cursor} calc(${cursorOffset}ch - 2px) calc(${cursorOffset + cursorMeasureSize}ch - 2px),
-                transparent calc(${cursorOffset + cursorMeasureSize}ch) 100%),`
+                ${gridColors.cursor} calc(${cursorOffset}ch - 2px) calc(${cursorOffset + freq}ch - 2px),
+                transparent calc(${cursorOffset + freq}ch) 100%),`
             return highlight
         }
 
         if (!notationAreaRef.current) return
-        const totalWidth = _.sum(systemData.colWidths)
+        const firstStaff = Object.values(systemData.staffs)[0]
+        const totalWidth = firstStaff?.notation.length ?? 0
 
         const highlight = cursorHighlight(cursor)
         const kempliLines = kempliGrid(systemData)

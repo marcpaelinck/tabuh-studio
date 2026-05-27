@@ -6,16 +6,16 @@ import { v4 as uuidv4 } from 'uuid'
 import type { Position } from '../typing/basetypes'
 import type { TempoItem } from '../typing/execution'
 import type { ParserReturnValue } from '../typing/parsers'
-import type { Measure, Score, System } from '../typing/score'
+import type { Score, Staff, System } from '../typing/score'
 import { labelToPosition, symbolLookup } from './grammars/laras/config'
 import { parser } from './grammars/laras/laras'
 
-function parseStave(position: Position, stave: string): Measure[] {
+function parseStave(position: Position, stave: string): Staff {
     var tabuhNotation: string[] = []
     for (const char of stave) {
         tabuhNotation.push(symbolLookup[position][char] || '-')
     }
-    return [{ notation: tabuhNotation }]
+    return { notation: tabuhNotation }
 }
 
 function postProcess(score: Score): Score {
@@ -23,16 +23,15 @@ function postProcess(score: Score): Score {
         _.keys(system.staffs).forEach((pos) => {
             if (!score.positions.includes(pos as Position)) score.positions.push(pos as Position)
         })
-        system.colWidths = [Object.values(system.staffs)[0][0].notation.length]
     })
 
-    // Add missing positions
+    // Add missing positions (fill with dashes matching the first staff's length)
     score.systems.forEach((system: System) => {
+        const firstStaff = _.values(system.staffs)[0]
+        const notationLen = firstStaff?.notation.length ?? 0
         score.positions.forEach((pos) => {
             if (!(pos in system.staffs)) {
-                const newStaff: Measure[] = _.cloneDeep(_.values(system.staffs)[0])
-                newStaff.forEach((measure) => (measure.notation = measure.notation.map(() => '-')))
-                system.staffs[pos] = newStaff
+                system.staffs[pos] = { notation: Array(notationLen).fill('-') }
             }
         })
     })
@@ -81,7 +80,6 @@ export function parseLaras(content: string): ParserReturnValue {
                     editorGroup: [],
                     staffs: {},
                     kempli: { state: 'notation' },
-                    colWidths: [],
                     execution: [
                         {
                             type: 'tempo',
@@ -105,8 +103,8 @@ export function parseLaras(content: string): ParserReturnValue {
                 const label = getText(node.getChild('Name')!)
                 const positions: Position[] = label in labelToPosition ? labelToPosition[label] : []
                 const notation: string = cleanCode(getText(node.getChild('Code')!))
-                const measureData: Measure[] = parseStave(positions[0], notation)
-                positions.forEach((pos) => (currentSystem!.staffs[pos] = measureData))
+                const staffData: Staff = parseStave(positions[0], notation)
+                positions.forEach((pos) => (currentSystem!.staffs[pos] = staffData))
                 break
             }
         }

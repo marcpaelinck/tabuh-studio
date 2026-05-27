@@ -16,8 +16,9 @@ import type {
     WaitItem
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
-import type { Measure, Score, System } from '../../typing/score'
+import type { Score, Staff, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { getSectionNotation, getSystemSectionCount } from '../../utils/objectUtils'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
@@ -51,7 +52,7 @@ export interface FlowStep {
     sectionIdx: number
     pass: number // Current pass count
     loop: number // current iteration count
-    measures: Record<Partial<Position>, Measure>
+    measures: Partial<Record<Position, Staff>>
     positions: Partial<Position>[]
     tempo: BPM[]
     dynamics: number[]
@@ -88,8 +89,7 @@ export function executionManager(
     // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
-            const firstPos = Object.keys(system.staffs)[0] as Position
-            const sectionCount = system.staffs[firstPos]?.length || 0
+            const sectionCount = getSystemSectionCount(system)
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
@@ -329,9 +329,15 @@ export function executionManager(
         if (next.systemIdx >= 0 && next.sectionIdx >= 0) {
             debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
             const nextSystem = flowinfo[next.systemIdx].system
+            // Build a Staff per position containing only the current section's notation
             const measures = _.fromPairs(
-                _.toPairs(nextSystem.staffs).map(([key, staff]) => [key, staff[next.sectionIdx]])
-            ) as Record<Position, Measure>
+                _.toPairs(nextSystem.staffs)
+                    .filter(([_key, staff]) => staff != null)
+                    .map(([key, staff]) => [
+                        key,
+                        { notation: getSectionNotation(staff!.notation, next.sectionIdx, nextSystem) } as Staff
+                    ])
+            ) as Partial<Record<Position, Staff>>
 
             const nextPass = next.newSystem ? flowinfo[next.systemIdx].pass + 1 : flowinfo[next.systemIdx].pass
             const nextLoop = next.systemStart ? flowinfo[next.systemIdx].loop + 1 : flowinfo[next.systemIdx].loop

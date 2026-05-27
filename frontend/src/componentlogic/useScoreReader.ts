@@ -15,12 +15,11 @@ export function persistCachedChanges(score: Score | undefined): Score | undefine
     if (!score) return
     const newScore = { ...score }
     newScore.systems.forEach((sys) =>
-        _.toPairs(sys.staffs).forEach(([pos, measures]) =>
-            measures.forEach((measure, measidx) => {
-                if (measure.notation_) measure.notation = measure.notation_
-                delete measure.notation_
-            })
-        )
+        _.toPairs(sys.staffs).forEach(([_pos, staff]) => {
+            if (!staff) return
+            if (staff.notation_) staff.notation = staff.notation_
+            delete staff.notation_
+        })
     )
     return newScore
 }
@@ -63,7 +62,9 @@ export function useScoreReader(source: 'database' | 'file'): {
             case 'JSON':
                 if (source == 'database') loadScoreFromDb(newScoreInfo)
                 else if (source == 'file') loadScoreFromFile(newScoreInfo)
-
+                break
+            case 'JSON-file':
+                importJsonScore()
                 break
             case 'Laras':
             case 'Notation':
@@ -183,6 +184,25 @@ export function useScoreReader(source: 'database' | 'file'): {
             console.error('Failed to save score to local file:', err)
             return false
         }
+    }
+
+    // Loads a Score directly from a JSON file chosen by the user.
+    async function importJsonScore() {
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.accept = '.json'
+        fileInput.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0]
+            if (!file) return
+            try {
+                const content = await file.text()
+                const parsed: Score = JSON.parse(content)
+                setScore(postprocessScore(parsed))
+            } catch (err) {
+                console.error('Failed to parse imported JSON score:', err)
+            }
+        }
+        fileInput.click()
     }
 
     // Imports a file with an alternative format and parses it to a Score object.
