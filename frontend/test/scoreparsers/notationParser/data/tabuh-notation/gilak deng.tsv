@@ -13,7 +13,7 @@ reyong1	.io.	io.i	o.io	.o.o	.a,i.	a,i.a,	i.a,i	.a,io
 reyong2	eu.e	u.eu	.eu.	e.e.	oe.o	e.oe	.oe.	oe.o
 calung	e	a	u	e	o	a	i	o
 jegogan	e		u		o		i
-gong	G			G	P		P
+gong	G				G	P		P
 
 	# angsel
 	{LOOP 2}
@@ -28,7 +28,7 @@ gong	G			G	P		P
 ugal	e---	a---	u---	e---	o---	a,---	i---	o---
 calung	e	a	u	e	o	a	i	o
 jegogan	e		u		o		i
-gong	G			G	P		P
+gong	G				G	P		P
 
 	{LOOP 4}
 	{DYNAMICS mp positions=[gangsa, reyong] iteration=1}
@@ -42,7 +42,7 @@ reyong1	.io.	io.i	o.io	.o.o	.a,i.	a,i.a,	i.a,i	.a,i.
 reyong2	eu.e	u.eu	.eu.	e.e.	oe.o	e.oe	.oe.	oe.o
 calung	e	a	u	e	o	a	i	o
 jegogan	e		u		o		i
-gong	G			G	P		P
+gong	G				G	P		P
 	{GOTO END pass=3}
 
 	# angsel
@@ -54,12 +54,12 @@ reyong1	.io.	io.i	o.io	.o.o	u,u,-a,	-e,-u,	a,---	----
 reyong2	eu.e	u.eu	.eu.	e.e.	oo-e	-i-o	e---	----
 calung	e	a	u	e	o	a	i	o
 jegogan	e		u		o		i
-gong	G			G	P		P
+gong	G				G	P		P
 
 ugal	e---	a---	u---	e---	o---	a,---	i---	o---
 calung	e	a	u	e	o	a	i	o
 jegogan	e		u		o		i
-gong	G			G	P		P
+gong	G				G	P		P
 	{GOTO REGULAR_GONGAN passes=[1,2]}
 
 	{LABEL END}
