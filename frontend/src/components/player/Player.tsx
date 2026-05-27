@@ -3,7 +3,7 @@ import { type PlaybackAction, type PlaybackState } from '../../typing/playback'
 import { type Score } from '../../typing/score'
 //-------------------------CONTROLS--------------------------------------
 import { FaPause, FaPlay } from 'react-icons/fa'
-import { FaBackwardFast } from 'react-icons/fa6'
+import { FaStop } from 'react-icons/fa6'
 import { Slider } from 'rsuite'
 import 'rsuite/Slider/styles/index.css'
 
@@ -58,12 +58,16 @@ export function Player({
         <div className="px-4 pt-3 pb-4 flex w-full items-center gap-5 justify-center select-none">
             <div className="h-4 w-4 shrink-0">
                 <button onClick={() => playback({ actionType: 'rewind' })}>
-                    <FaBackwardFast color="orange" />
+                    <FaStop />
                 </button>
             </div>
             <div className="h-4 w-4 shrink-0">
                 <button onClick={() => playPause()}>
-                    {playbackState.audioState == 'playing' ? <FaPause color="orange" /> : <FaPlay color="orange" />}
+                    {playbackState.audioState == 'playing' ? (
+                        <FaPause color="orange" />
+                    ) : (
+                        <FaPlay color={playbackState.audioState == 'paused' ? 'orange' : 'black'} />
+                    )}
                 </button>
             </div>
             <span className="flex w-12 shrink-0 justify-center">

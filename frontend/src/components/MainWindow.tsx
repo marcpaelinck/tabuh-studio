@@ -321,6 +321,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 outro: 5000
             })
         }
+        setPlaybackProgress(0)
     }, [score])
 
     async function stopPlayback(time: number) {
