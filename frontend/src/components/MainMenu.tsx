@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState, type Dispatch } from 'react'
+import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
-import { Box, Button, Modal, Nav, SelectPicker, Textarea, useDialog } from 'rsuite'
+import { Box, Modal, Nav, SelectPicker, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
-import { ScoreFunctions, WpApiFunctions, type ScoreFunctionsType } from '../context/contexts'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
@@ -25,23 +24,6 @@ type Action =
     | 'settings-instruments'
     | 'settings-keyboard'
     | 'settings-colors'
-
-// Temporary solution for saving scores manually
-const SimpleTextareaDialog = ({ payload }: { payload: { payload: string } }) => {
-    const [isOpen, setIsOpen] = useState(true)
-    return (
-        <Modal open={isOpen} onClose={() => setIsOpen(false)} className="h-100 w-200">
-            <Modal.Body>
-                <Textarea value={payload.payload} className="h-90 w-180" />
-            </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={() => setIsOpen(false)} appearance="primary">
-                    Close
-                </Button>
-            </Modal.Footer>
-        </Modal>
-    )
-}
 
 interface TabuhEditorMenuProps {
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
@@ -68,14 +50,7 @@ export function MainMenu({
 }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
-    const scoreFunc: ScoreFunctionsType = useContext(ScoreFunctions)
     const dialog = useDialog()
-    const wpFunc = useContext(WpApiFunctions)
-
-    const showTextInDialog = async (payload: string) => {
-        //@ts-ignore
-        await dialog.open(SimpleTextareaDialog, { payload })
-    }
 
     async function performAction() {
         switch (activeKey) {

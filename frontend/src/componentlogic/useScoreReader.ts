@@ -3,12 +3,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
-import type { ScoreListItem } from '../services/apiService'
+import type { ScoreListItem, ScoreRecord } from '../services/apiService'
 import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
-import { debug } from '../utils/debugger'
 import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 
@@ -125,21 +124,21 @@ export function useScoreReader(source: 'database' | 'file'): {
         var isSuccess = true
         try {
             // Find the database id by matching uuid from the score list
-            debug('1')
             const scores = await apiGetScores()
-            debug('2')
             const match = scores.find((s) => s.uuid === score.uuid)
-            var returnvalue
+            var returnvalue: ScoreRecord
             if (match) {
-                debug('3')
                 returnvalue = await apiUpdateScore(match.id, {
                     title: score.title,
                     instrument_set: score.instrumenttype,
                     content: score
                 })
             } else {
-                debug('4')
                 returnvalue = await apiCreateScore(score.title, score.instrumenttype, JSON.stringify(score))
+            }
+            if (!returnvalue) {
+                isSuccess = false
+                console.error('Failed to save/update score to database, error unknown')
             }
         } catch (err) {
             isSuccess = false
