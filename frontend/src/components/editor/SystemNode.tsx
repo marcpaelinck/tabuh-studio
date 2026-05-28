@@ -288,9 +288,7 @@ export function SystemNode({
     const positionTitles = sortedStaffEntries
         .map(([position, _]) => positionConfigs[position as Position].name)
         .join('\n')
-    const notationText = sortedStaffEntries
-        .map(([_, staff]) => staff.notation.join(''))
-        .join('\n')
+    const notationText = sortedStaffEntries.map(([_, staff]) => staff.notation.join('')).join('\n')
 
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
