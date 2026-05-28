@@ -9,6 +9,30 @@ import type { ExtendedOption } from '../../typing/interface'
 import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
+function scrollIntoContainerView(element: HTMLElement | null, container: HTMLElement | null) {
+    if (!element || !container) return
+    const elementRect = element.getBoundingClientRect()
+    const containerRect = container.getBoundingClientRect()
+
+    // Vertical
+    const offsetTop = elementRect.top - containerRect.top
+    const offsetBottom = elementRect.bottom - containerRect.bottom
+    if (offsetTop < 0) {
+        container.scrollTop += offsetTop
+    } else if (offsetBottom > 0) {
+        container.scrollTop += offsetBottom
+    }
+
+    // Horizontal
+    const offsetLeft = elementRect.left - containerRect.left
+    const offsetRight = elementRect.right - containerRect.right
+    if (offsetLeft < 0) {
+        container.scrollLeft += offsetLeft
+    } else if (offsetRight > 0) {
+        container.scrollLeft += offsetRight
+    }
+}
+
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
@@ -37,12 +61,11 @@ export default function NotationArea({
 
     // Highlighting function: highlights the given range (line and character range)
     const highlightCursor: HilightRangeFunction = (hlRange: HighlightRange) => {
-        const para = textAreaRef.current?.children[hlRange.line]
-        const para1 = textAreaRef.current?.childNodes[hlRange.line]
-        // Note: the `container` parameter is not supported yet by all browsers
-        // See mdn documentation.
-        //@ts-expect-error container option is valid but not recognized
-        para?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start', container: 'nearest' })
+        const para: HTMLParagraphElement = textAreaRef.current?.children[hlRange.line] as HTMLParagraphElement
+        const para1: HTMLParagraphElement = textAreaRef.current?.childNodes[hlRange.line] as HTMLParagraphElement
+        // Not using scrollIntoView method because the `container` parameter
+        // is not treated the same way by all browsers.
+        scrollIntoContainerView(para, textAreaRef.current)
 
         const range1 = new Range()
         if (para1) {
