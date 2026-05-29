@@ -27,9 +27,9 @@
       "index": 0,
       "label": "Regular",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 80 BPM", "tooltipshort": "80 BPM", "isGradual": false, "section": 1, "value": 80},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]},
-        {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": true, "tooltip": "dynamics f on every 3rd pass", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"]}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 80 BPM", "tooltipshort": "80 BPM", "isGradual": false, "value": 80, "fromBeat": 1},
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"], "fromBeat": 1},
+        {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": true, "tooltip": "dynamics f on every 3rd pass", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "UGAL"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["u", "-", "-", "-", "u", "-", "-", "-", "u", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-"]},
@@ -83,7 +83,7 @@
       "id": 3,
       "index": 2,
       "execution": [
-        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →50 BPM beat 1→8 on pass 5", "tooltipshort": "→50 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 50},
+        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →50 BPM beat 1→8 on pass 5", "tooltipshort": "→50 BPM", "isGradual": true, "value": 50, "toBeat": 8, "fromBeat": 1},
         {"type": "goto", "seqId": 5000, "tooltip": "go to REGULAR", "tooltipshort": "REGULAR", "targetuuid": "f0e58586-a1ea-44fc-92f9-8d11a8bf1aff", "targetname": "REGULAR"},
         {"type": "goto", "seqId": 5050, "passes": [5], "nthpass": false, "tooltip": "go to END after pass 5", "tooltipshort": "END", "targetuuid": "28e5f615-9a6b-4bb6-9f5c-a8446a4cd136", "targetname": "END"}
       ],

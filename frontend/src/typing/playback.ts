@@ -69,7 +69,7 @@ export interface PlaybackAnimationAction {
 
 export interface PlayerCursorParameters {
     position: Position
-    section: number
+    beat: number
     sysuuid: UUID
     symbol: NoteSymbol
     line: number
@@ -83,7 +83,7 @@ export type PlaybackPlayerCursorAction = { time: TimeObject; functionName: strin
 export interface EditorCursorParameters {
     prevsysuuid: UUID | undefined
     sysuuid: UUID
-    section: number
+    beat: number
 }
 
 export type PlaybackEditorCursorAction = { time: TimeObject; params: EditorCursorParameters }

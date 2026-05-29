@@ -91,8 +91,8 @@ export function SystemNode({
             setPlaybackCursor(null)
             return
         }
-        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.section })}`)
-        setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.section })
+        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beat })}`)
+        setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.beat })
         systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 

@@ -34,7 +34,7 @@
       "id": 1,
       "index": 0,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 45 BPM", "tooltipshort": "45 BPM", "isGradual": false, "section": 1, "value": 45}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 45 BPM", "tooltipshort": "45 BPM", "isGradual": false, "value": 45, "fromBeat": 1}
       ],
       "staffs": {
         "TROMPONG": {"notation": [".", ".", ".", ".", ".", ".", ".", "."]},
@@ -127,7 +127,7 @@
       "index": 4,
       "label": "Pengawak_1",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 50 BPM", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50},
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 50 BPM", "tooltipshort": "50 BPM", "isGradual": false, "value": 50, "fromBeat": 1},
         {"type": "goto", "seqId": 5000, "tooltip": "go to CONTINUE", "tooltipshort": "CONTINUE", "targetuuid": "7a1be3b2-2f49-4e83-a6c5-5ba75bec8ab6", "targetname": "CONTINUE"}
       ],
       "staffs": {
@@ -153,9 +153,9 @@
       "index": 5,
       "label": "Pengawak",
       "execution": [
-        {"type": "tempo", "seqId": 2110, "passes": [1], "nthpass": false, "tooltip": "tempo 50 BPM on pass 1", "tooltipshort": "50 BPM", "isGradual": false, "section": 1, "value": 50},
-        {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo 60 BPM on pass 2", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60},
-        {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current →50 BPM beat 8→9 on pass 2", "tooltipshort": "→50 BPM", "isGradual": true, "fromSection": 8, "section": 9, "value": 50}
+        {"type": "tempo", "seqId": 2110, "passes": [1], "nthpass": false, "tooltip": "tempo 50 BPM on pass 1", "tooltipshort": "50 BPM", "isGradual": false, "value": 50, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2120, "passes": [2], "nthpass": false, "tooltip": "tempo 60 BPM on pass 2", "tooltipshort": "60 BPM", "isGradual": false, "value": 60, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2820, "passes": [2], "nthpass": false, "tooltip": "tempo current →50 BPM beat 8→9 on pass 2", "tooltipshort": "→50 BPM", "isGradual": true, "value": 50, "toBeat": 9, "fromBeat": 8}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["u", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "u", "-", "a", "-", "u", "-", "e", "-", "u", "u", "e", "-", "U", "a", "-", "-", "a", "u", "-", "-", "-", "u", "-", "u", "e", "u", "u", "e", "u", "a", "-", "u", "-", "e", "-", "-", "-", "u", "u", "e", "u", "a", "-", "-", "u", "e", "u", "a", "a"]},
@@ -202,7 +202,7 @@
       "id": 8,
       "index": 7,
       "execution": [
-        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current →65 BPM beat 1→8 on pass 3", "tooltipshort": "→65 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 65}
+        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current →65 BPM beat 1→8 on pass 3", "tooltipshort": "→65 BPM", "isGradual": true, "value": 65, "toBeat": 8, "fromBeat": 1}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["o", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "a,", "u,", "a,", "i", "o", "-", "-", "-", "e", "-", "u", "-", "e", "-", "o", "-", "i", "-", "a,", "-", "u,", "-", "-", "-", "u", "-", "u", ".", "u", "-", "a", "-", "u", "-", "e", "u", "a", "-", "-", "-", "u", "-", "-", "u", "e", "-", "-", "e", "o", "e", "u", "u"]},
@@ -226,8 +226,8 @@
       "id": 9,
       "index": 8,
       "execution": [
-        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current →90 BPM beat 1→8 on pass 3", "tooltipshort": "→90 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 90},
-        {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current →47 BPM beat 5→8 on passes 1 & 2", "tooltipshort": "→47 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 47},
+        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo current →90 BPM beat 1→8 on pass 3", "tooltipshort": "→90 BPM", "isGradual": true, "value": 90, "toBeat": 8, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2510, "passes": [1, 2], "nthpass": false, "tooltip": "tempo current →47 BPM beat 5→8 on passes 1 & 2", "tooltipshort": "→47 BPM", "isGradual": true, "value": 47, "toBeat": 8, "fromBeat": 5},
         {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGAWAK after passes 1 & 2", "tooltipshort": "PENGAWAK", "targetuuid": "52196c81-5785-4005-b904-9809e2edcf9e", "targetname": "PENGAWAK"}
       ],
       "staffs": {
@@ -252,8 +252,8 @@
       "id": 10,
       "index": 9,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "section": 1, "value": 90},
-        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo 95 BPM on pass 3", "tooltipshort": "95 BPM", "isGradual": false, "section": 1, "value": 95}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "value": 90, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo 95 BPM on pass 3", "tooltipshort": "95 BPM", "isGradual": false, "value": 95, "fromBeat": 1}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["u", "-", "-", "-", "-", "-", "a", "-", "u", "-", "e", "-", "u", "-", "a", "-", "-", "-", "u", "-", "-", "-", "a", "-", "u", "-", "e", "-", "u", "-", "a", "-"]},
@@ -278,8 +278,8 @@
       "index": 10,
       "label": "Pengecet_Loop",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "section": 1, "value": 90},
-        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo 95 BPM on pass 3", "tooltipshort": "95 BPM", "isGradual": false, "section": 1, "value": 95}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "value": 90, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2130, "passes": [3], "nthpass": false, "tooltip": "tempo 95 BPM on pass 3", "tooltipshort": "95 BPM", "isGradual": false, "value": 95, "fromBeat": 1}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["u", "-", "-", "-", "-", "-", "a", "-", "u", "-", "e", "-", "u", "-", "a", "-", "-", "-", "u", "-", "-", "-", "a", "-", "u", "-", "e", "-", "u", "-", "a", "-"]},
@@ -459,7 +459,7 @@
       "id": 19,
       "index": 18,
       "execution": [
-        {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current →95 BPM beat 3→8 on pass 2", "tooltipshort": "→95 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 95},
+        {"type": "tempo", "seqId": 2320, "passes": [2], "nthpass": false, "tooltip": "tempo current →95 BPM beat 3→8 on pass 2", "tooltipshort": "→95 BPM", "isGradual": true, "value": 95, "toBeat": 8, "fromBeat": 3},
         {"type": "goto", "seqId": 5010, "passes": [1, 2], "nthpass": false, "tooltip": "go to PENGECET_LOOP after passes 1 & 2", "tooltipshort": "PENGECET_LOOP", "targetuuid": "bd04dc67-8000-40bf-a00c-e0fb3d69f38f", "targetname": "PENGECET_LOOP"}
       ],
       "staffs": {
@@ -485,7 +485,7 @@
       "index": 19,
       "label": "Final",
       "execution": [
-        {"type": "tempo", "seqId": 2300, "tooltip": "tempo current →70 BPM beat 3→8", "tooltipshort": "→70 BPM", "isGradual": true, "fromSection": 3, "section": 8, "value": 70}
+        {"type": "tempo", "seqId": 2300, "tooltip": "tempo current →70 BPM beat 3→8", "tooltipshort": "→70 BPM", "isGradual": true, "value": 70, "toBeat": 8, "fromBeat": 3}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["a", "-", "-", "a", "a", "-", "a", "-", "a", "-", "s", "-", "a", "-", "u", "-", "a", "-", "-", "e", "e", "-", "e", "-", "-", "-", "o", "-", "e", "-", "u", "-"]},
@@ -509,7 +509,7 @@
       "id": 21,
       "index": 20,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →60 BPM beat 1→6", "tooltipshort": "→60 BPM", "isGradual": true, "fromSection": 1, "section": 6, "value": 60}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →60 BPM beat 1→6", "tooltipshort": "→60 BPM", "isGradual": true, "value": 60, "toBeat": 6, "fromBeat": 1}
       ],
       "staffs": {
         "TROMPONG": {"notation": ["e", "-", "-", "-", "u", "-", "e", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "o", "-", "E", "u", "-", "-", "-", "e", "-", "u", "-", "a", "-", "e", "-"]},

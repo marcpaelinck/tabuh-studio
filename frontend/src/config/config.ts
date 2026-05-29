@@ -105,7 +105,7 @@ export const dynamicsToNumber: Record<DynamicsValue, number> = {
     f: 0.83,
     ff: 1.0
 }
-export const defaultBeatFrequency = 4
+export const defaultBeatFrequency = 4 // Default beat (kempli) frequency used for systems where kempli.state === 'off'
 
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]

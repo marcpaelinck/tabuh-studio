@@ -41,7 +41,7 @@ import type {
 import type { Note, Score, System } from '../../typing/score'
 import { cleanSymbol } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import { defaultObject, getSectionStart, getSystemDuration } from '../../utils/objectUtils'
+import { defaultObject, getBeatStart, getSystemDuration } from '../../utils/objectUtils'
 import {
     BaseNoteEquiv2Millis,
     millis2BaseNoteEquiv,
@@ -183,12 +183,12 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         if (!(currentStep.id in tempoLookup)) tempoLookup[currentStep.id] = []
 
         const [startTempo, endTempo] = currentStep.tempo
-        const sectionDuration = Object.entries(currentStep.measures).reduce(
+        const beatDuration = Object.entries(currentStep.measures).reduce(
             (maxDur, [position, measure]) =>
                 Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
             0
         )
-        if (timeFromSectionStartInTO > sectionDuration) {
+        if (timeFromSectionStartInTO > beatDuration) {
             console.error('Requesting tempo outside of current measure.')
         }
         if (startTempo == endTempo) {
@@ -196,7 +196,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         } else {
             // Gradual change
             tempoLookup[currentStep.id][timeFromSectionStartInTO] =
-                startTempo + (timeFromSectionStartInTO / sectionDuration) * (endTempo - startTempo)
+                startTempo + (timeFromSectionStartInTO / beatDuration) * (endTempo - startTempo)
         }
         return tempoLookup[currentStep.id][timeFromSectionStartInTO]
     }
@@ -276,8 +276,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         // the same length but in case they don't, this value will be used to resync the following system.
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
-        var sectionStartTime: number = millis2BaseNoteEquiv(intro, introTempo)
-        debug(`Intro=${sectionStartTime}`)
+        var beatStartTime: number = millis2BaseNoteEquiv(intro, introTempo)
+        debug(`Intro=${beatStartTime}`)
 
         // This dict will be used to create animation actions
         // @ts-ignore
@@ -296,7 +296,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             // Gradual changes will be implemented by changing the tempo at the start of each symbol in the measure.
             // first determine the max. measure length
             const [startTempo, endTempo] = currentStep.tempo
-            const sectionDuration = Object.entries(currentStep.measures).reduce(
+            const beatDuration = Object.entries(currentStep.measures).reduce(
                 (maxDur, [position, measure]) =>
                     Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
                 0
@@ -306,18 +306,18 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     // Immediate change
                     const newTempo = startTempo
                     newTimeLine.tempoactions.push({
-                        time: n2TO(sectionStartTime),
+                        time: n2TO(beatStartTime),
                         params: { bpm: newTempo, pbSpeed: playbackSpeed }
                     })
                     currentTempo = newTempo
                 }
             } else {
                 // Gradual change
-                for (var t = 0; t < sectionDuration; t++) {
-                    const newTempo = startTempo + (t / sectionDuration) * (endTempo - startTempo)
+                for (var t = 0; t < beatDuration; t++) {
+                    const newTempo = startTempo + (t / beatDuration) * (endTempo - startTempo)
                     if (newTempo != currentTempo) {
                         newTimeLine.tempoactions.push({
-                            time: n2TO(sectionStartTime + t),
+                            time: n2TO(beatStartTime + t),
                             params: { bpm: newTempo, pbSpeed: playbackSpeed }
                         })
                         currentTempo = newTempo
@@ -331,7 +331,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     break
                 }
 
-                var currTime: number = sectionStartTime
+                var currTime: number = beatStartTime
                 var currTimeMs = newTimeLine.totalDurationMs
 
                 // var cursorPos: number = 0
@@ -342,13 +342,13 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
                     const endOfMeasure = symbolIdx == notation.length - 1
-                    // const endOfPosition = currentStep!.lastSystem && currentStep!.lastSection && endOfMeasure
+                    // const endOfPosition = currentStep!.lastSystem && currentStep!.lastBeat && endOfMeasure
 
                     // CREATE SAMPLER ACTION
                     // Determine the default duration for a single base note.
                     // Add the given delay time if we reached the last note of the measure.
                     var symbolDuration = 1
-                    var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - sectionStartTime, currentStep!))
+                    var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - beatStartTime, currentStep!))
                     var waitTime = 0
                     if (symbolIdx == 0) {
                         // Start of new measure: extend the last note until the current time. This ensures that
@@ -367,7 +367,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
                             timeMs: currTimeMs,
-                            measureIdx: currentStep!.sectionIdx,
+                            measureIdx: currentStep!.beatIdx,
                             position,
                             prevsymbol: prevSymbol,
                             symbol: cleanSymbol(symbol),
@@ -404,7 +404,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
                         symbolDurationMs = To2Millis(
                             n2TO(symbolDuration),
-                            tempoAt(currTime - sectionStartTime, currentStep!)
+                            tempoAt(currTime - beatStartTime, currentStep!)
                         )
                         if (endOfMeasure && currentStep!.waitMsAfter) {
                             waitTime = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
@@ -418,17 +418,17 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
                 const system = currentStep!.system
-                const sectIdx = currentStep!.sectionIdx
+                const beatIdx = currentStep!.beatIdx
                 // Character offset = start index of current section in the flat notation
-                var cursorPos = getSectionStart(sectIdx, system)
-                // if (sectIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
+                var cursorPos = getBeatStart(beatIdx, system, position)
+                // if (beatIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
                 const span = notation.join('')
                 newTimeLine.playercursoractions.push({
                     functionName: 'playercursor',
-                    time: n2TO(sectionStartTime),
+                    time: n2TO(beatStartTime),
                     params: {
                         sysuuid: currentStep!.system.uuid,
-                        section: currentStep!.sectionIdx,
+                        beat: currentStep!.beatIdx,
                         position: position,
                         symbol: notation.join(''),
                         line: currentStep!.system.index,
@@ -436,18 +436,18 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     }
                 })
 
-                maxMeasureDuration = Math.max(currTime - sectionStartTime, maxMeasureDuration)
+                maxMeasureDuration = Math.max(currTime - beatStartTime, maxMeasureDuration)
             }
 
             // CREATE EDITOR CURSOR ACTION
 
-            var cursorTime = sectionStartTime
+            var cursorTime = beatStartTime
             newTimeLine.editorcursoractions.push({
                 time: n2TO(cursorTime),
                 params: {
                     prevsysuuid: prevSystem?.uuid || undefined,
                     sysuuid: currentStep.system.uuid,
-                    section: currentStep.sectionIdx
+                    beat: currentStep.beatIdx
                 }
             })
 
@@ -471,7 +471,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             // which should not be used in combination with implicit kempli beats
             const systemDuration = getSystemDuration(currentStep.system, currentStep.tempo[0])
             if (
-                currentStep.sectionIdx == 0 &&
+                currentStep.beatIdx == 0 &&
                 currentStep.system.kempli.state == 'on' &&
                 currentStep.system.kempli.frequency != undefined
             ) {
@@ -482,11 +482,11 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 ) {
                     const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
                         samplerFunction: pbFunctionsRef.current.play,
-                        time: sectionStartTime + beatOffset, // Note that this is equal to the system start
+                        time: beatStartTime + beatOffset, // Note that this is equal to the system start
                         // The tempo given for the following calculation is not precise
                         // but this is irrelevent because there is no kempli animation
-                        timeMs: BaseNoteEquiv2Millis(sectionStartTime + beatOffset, currentStep.tempo[0]),
-                        measureIdx: currentStep!.sectionIdx,
+                        timeMs: BaseNoteEquiv2Millis(beatStartTime + beatOffset, currentStep.tempo[0]),
+                        measureIdx: currentStep!.beatIdx,
                         position: 'KEMPLI',
                         prevsymbol: undefined,
                         symbol: cleanSymbol('x?'),
@@ -506,9 +506,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             }
 
-            newTimeLine.totalDurationTO = TOplusNumber(newTimeLine.totalDurationTO, sectionDuration)
-            newTimeLine.totalDurationMs += BaseNoteEquiv2Millis(sectionDuration, currentStep.tempo)
-            sectionStartTime += maxMeasureDuration
+            newTimeLine.totalDurationTO = TOplusNumber(newTimeLine.totalDurationTO, beatDuration)
+            newTimeLine.totalDurationMs += BaseNoteEquiv2Millis(beatDuration, currentStep.tempo[0])
+            beatStartTime += maxMeasureDuration
             prevSystem = currentStep.system
             currentStep = nextInFlow()
         }
@@ -553,7 +553,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
         // Determine the total playback duration
         newTimeLine.totalDurationMs += outro
-        newTimeLine.totalDurationTO = n2TO(sectionStartTime)
+        newTimeLine.totalDurationTO = n2TO(beatStartTime)
         setTotalDurationMs(newTimeLine.totalDurationMs)
         newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 

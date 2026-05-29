@@ -83,7 +83,8 @@ export function parseLaras(content: string): ParserReturnValue {
                     execution: [
                         {
                             type: 'tempo',
-                            section: 1,
+                            isGradual: false,
+                            fromBeat: 1,
                             value: currTempo,
                             seqId: 1,
                             tooltip: `tempo ${currTempo} BPM beat 1`,

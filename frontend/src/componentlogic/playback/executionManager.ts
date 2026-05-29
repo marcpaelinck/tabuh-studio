@@ -18,14 +18,14 @@ import type {
 import type { PlaybackType } from '../../typing/playback'
 import type { Score, Staff, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { getSectionNotation, getSystemSectionCount } from '../../utils/objectUtils'
+import { getBeatNotation, getSystemBeatCount } from '../../utils/objectUtils'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
 interface FlowInfoTable {
     [idx: string]: {
         system: System
-        maxSectIdx: number
+        maxBeatIdx: number
         pass: number
         loop: number
         executionItems: Record<ExecutionItemType, ExecutionItem[]>
@@ -35,10 +35,10 @@ interface FlowInfoTable {
 // Keeps track of the 'current' cursor position
 interface FlowCursor {
     systemIdx: number // Index of the current system (numbering starts at 0)
-    sectionIdx: number // Index of the current section (numbering starts at 0)
+    beatIdx: number // Index of the current kempli beat (numbering starts at 0)
     newSystem: boolean // True if this system is different than that of the previous step
     systemStart: boolean // True if this is the first section of the system
-    lastSection: boolean // True if this is the last section of the current system
+    lastBeat: boolean // True if this is the last kempli beat of the current system
     sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
     sequenceIdx: number | undefined // Current index of the active sequence
 }
@@ -49,7 +49,7 @@ export interface FlowStep {
     id: number
     system: System
     systemIdx: number
-    sectionIdx: number
+    beatIdx: number
     pass: number // Current pass count
     loop: number // current iteration count
     measures: Partial<Record<Position, Staff>>
@@ -57,7 +57,7 @@ export interface FlowStep {
     tempo: BPM[]
     dynamics: number[]
     lastSystem: boolean
-    lastSection: boolean
+    lastBeat: boolean
     waitMsAfter: number // Delay after the end of the current section in milliseconds
     sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
     sequenceIdx?: number // Current index of the active sequence
@@ -89,7 +89,7 @@ export function executionManager(
     // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
-            const sectionCount = getSystemSectionCount(system)
+            const beatCount = getSystemBeatCount(system)
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
@@ -97,7 +97,7 @@ export function executionManager(
             }
             return [
                 system.index,
-                { system: system, maxSectIdx: sectionCount - 1, pass: 0, loop: 0, executionItems: executionItems }
+                { system: system, maxBeatIdx: beatCount - 1, pass: 0, loop: 0, executionItems: executionItems }
             ]
         })
     )
@@ -212,41 +212,41 @@ export function executionManager(
     function getExpressionValue(
         type: 'tempo' | 'dynamics',
         sysIdx: number,
-        sectIdx: number,
+        beatIdx: number,
         currentValue: number
     ): number[] {
         const matches = getExecutionItems(type, sysIdx)
         // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
         if (matches.length == 0) return [currentValue, currentValue]
         // Find an item that matches the given section index.
-        const sectionNbr = sectIdx + 1 // Sections are numbered from 1
+        const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
             const exprItem = item as ExpressionItem
-            // debug(`exprItem=${JSON.stringify([exprItem])}, section=${sectionNbr}`)
+            // debug(`exprItem=${JSON.stringify([exprItem])}, section=${beatNbr}`)
             if (!exprItem.isGradual) {
-                if (sectionNbr == exprItem.section) {
+                if (beatNbr == exprItem.fromBeat) {
                     // Non-gradual matching item found
                     // debug(`EXPRESSION(${type}) NON-GRADUAL=${JSON.stringify([exprItem.toValue, exprItem.toValue])}`)
                     return [exprItem.value, exprItem.value]
                 }
-            } else if (exprItem.fromSection && exprItem.fromSection <= sectionNbr && sectionNbr <= exprItem.section) {
+            } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
                 // Gradual matching item found: determine start and end values for the given section.
                 if (undefined != exprItem.fromValue) {
                     // Case 1: fromValue is given
-                    const totalSections = exprItem.section - exprItem.fromSection + 1
+                    const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
                     const valueRange = exprItem.value - exprItem.fromValue
                     const startValue =
-                        exprItem.fromValue + valueRange * ((sectionNbr - exprItem.fromSection) / totalSections)
-                    const endValue = startValue + valueRange / totalSections
+                        exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
+                    const endValue = startValue + valueRange / totalBeats
                     // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
                     return [startValue, endValue]
                 } else {
                     // Case 2: fromValue is undefined.
-                    const remainingSections = exprItem.section - sectionNbr + 1
+                    const remainingBeats = exprItem.toBeat! - beatNbr + 1
                     const fromValue = currentValue
                     const valueRange = exprItem.value - fromValue
                     const startValue = fromValue
-                    const endValue = fromValue + valueRange * (1 / remainingSections)
+                    const endValue = fromValue + valueRange * (1 / remainingBeats)
                     // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
                     return [startValue, endValue]
                 }
@@ -261,10 +261,10 @@ export function executionManager(
     function nextStepInFlow(peek: boolean = false): FlowStep | undefined {
         const next: FlowCursor = {
             systemIdx: -1,
-            sectionIdx: -1,
+            beatIdx: -1,
             newSystem: false,
             systemStart: false,
-            lastSection: false,
+            lastBeat: false,
             sequence: undefined,
             sequenceIdx: undefined
         }
@@ -277,27 +277,27 @@ export function executionManager(
                 // Start of playback sequence: return the first measure
                 _.assign(next, {
                     systemIdx: 0,
-                    sectionIdx: 0,
+                    beatIdx: 0,
                     newSystem: true,
                     systemStart: true,
-                    lastSection: flowinfo![0].maxSectIdx == 0
+                    lastBeat: flowinfo![0].maxBeatIdx == 0
                 } as FlowCursor)
                 break
             }
-            case currentStep!.sectionIdx < flowinfo![currentStep!.systemIdx].maxSectIdx: {
+            case currentStep!.beatIdx < flowinfo![currentStep!.systemIdx].maxBeatIdx: {
                 // Next section, same system
                 _.assign(next, {
                     systemIdx: currentStep.systemIdx,
-                    sectionIdx: currentStep.sectionIdx + 1,
+                    beatIdx: currentStep.beatIdx + 1,
                     newSystem: false,
                     systemStart: false,
-                    lastSection: currentStep.sectionIdx + 1 == flowinfo![currentStep.systemIdx].maxSectIdx,
+                    lastBeat: currentStep.beatIdx + 1 == flowinfo![currentStep.systemIdx].maxBeatIdx,
                     sequence: currentStep.sequence,
                     sequenceIdx: currentStep.sequenceIdx
                 } as FlowCursor)
                 break
             }
-            case currentStep!.sectionIdx >= flowinfo![currentStep!.systemIdx].maxSectIdx: {
+            case currentStep!.beatIdx >= flowinfo![currentStep!.systemIdx].maxBeatIdx: {
                 // Reached end of system. Determine next system.
                 // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
                 const sequence = currentStep.sequence || getSequence(currentStep)
@@ -314,10 +314,10 @@ export function executionManager(
                 if (nextSysIdx == undefined) return undefined
                 _.assign(next, {
                     systemIdx: nextSysIdx,
-                    sectionIdx: 0,
+                    beatIdx: 0,
                     newSystem: currentStep.systemIdx != nextSysIdx,
                     systemStart: true,
-                    lastSection: flowinfo![nextSysIdx].maxSectIdx == 0,
+                    lastBeat: flowinfo![nextSysIdx].maxBeatIdx == 0,
                     sequence: nextSequenceIdx != undefined ? sequence : undefined,
                     sequenceIdx: nextSequenceIdx
                 } as FlowCursor)
@@ -326,7 +326,7 @@ export function executionManager(
             default:
                 break
         }
-        if (next.systemIdx >= 0 && next.sectionIdx >= 0) {
+        if (next.systemIdx >= 0 && next.beatIdx >= 0) {
             debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
             const nextSystem = flowinfo[next.systemIdx].system
             // Build a Staff per position containing only the current section's notation
@@ -335,7 +335,7 @@ export function executionManager(
                     .filter(([_key, staff]) => staff != null)
                     .map(([key, staff]) => [
                         key,
-                        { notation: getSectionNotation(staff!.notation, next.sectionIdx, nextSystem) } as Staff
+                        { notation: getBeatNotation(staff!.notation, next.beatIdx, nextSystem, key as Position) } as Staff
                     ])
             ) as Partial<Record<Position, Staff>>
 
@@ -353,7 +353,7 @@ export function executionManager(
                 id: currentStep ? currentStep.id + 1 : 1,
                 system: nextSystem,
                 systemIdx: nextSystem.index,
-                sectionIdx: next.sectionIdx,
+                beatIdx: next.beatIdx,
                 pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
                 loop: peek ? nextLoop : flowinfo[next.systemIdx].loop,
                 measures: measures,
@@ -361,18 +361,18 @@ export function executionManager(
                 tempo: getExpressionValue(
                     'tempo',
                     next.systemIdx,
-                    next.sectionIdx,
+                    next.beatIdx,
                     currentStep?.tempo[1] || defaultTempo
                 ),
                 dynamics: getExpressionValue(
                     'dynamics',
                     next.systemIdx,
-                    next.sectionIdx,
+                    next.beatIdx,
                     currentStep?.dynamics[1] || defaultDynamics
                 ),
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
-                lastSection: next.sectionIdx == flowinfo[next.systemIdx].maxSectIdx,
-                waitMsAfter: next.lastSection ? getWaitTimeMsAfter(next.systemIdx) : 0,
+                lastBeat: next.beatIdx == flowinfo[next.systemIdx].maxBeatIdx,
+                waitMsAfter: next.lastBeat ? getWaitTimeMsAfter(next.systemIdx) : 0,
                 sequence: next.sequence,
                 sequenceIdx: next.sequenceIdx
             }

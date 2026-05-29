@@ -745,20 +745,23 @@ function getGradualValues(node: SyntaxNode | null, type: ValueType, content: str
 ***********/
 
 interface BeatsParameter {
-    fromSection: number | undefined
-    section: number
+    fromBeat: number | undefined
+    toBeat: number | undefined
     isGradual: boolean
 }
 // Grammar definition:
 // BeatsParameter { ("beat=" | "beats=") IntegerValue (Arrow IntegerValue)?}
 // valueGradual: whether the (dynamics or tempo) value is gradual (contains a `->`).
+// For non-gradual items: fromBeat = apply-at beat (defaults to 1), toBeat = undefined.
+// For gradual items: fromBeat = start beat, toBeat = end beat.
 function getGradualBeatsParameters(node: SyntaxNode, content: string, valueGradual: boolean): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
     const gradual: boolean = valueGradual || values.isGradual
     const param: BeatsParameter = {
-        fromSection: (values.fromValue as number) || (gradual ? (values.value as number) : undefined),
-        // fromSection: values.isGradual ? (values.fromValue as number) || 1 : (values.fromValue as number),
-        section: (values.value as number) || 1,
+        fromBeat: gradual
+            ? (values.fromValue as number) || (values.value as number) || 1 // gradual: start beat
+            : (values.value as number) || 1, // non-gradual: apply-at beat (default 1)
+        toBeat: gradual ? (values.value as number) || undefined : undefined, // gradual end beat; undefined for non-gradual
         isGradual: values.isGradual
     }
     return param

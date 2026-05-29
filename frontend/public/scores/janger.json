@@ -11,7 +11,7 @@
       "id": 1,
       "index": 0,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 45 BPM", "tooltipshort": "45 BPM", "isGradual": false, "section": 1, "value": 45}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 45 BPM", "tooltipshort": "45 BPM", "isGradual": false, "value": 45, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]},
@@ -156,7 +156,7 @@
       "index": 6,
       "label": "Song_Start",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 40 BPM", "tooltipshort": "40 BPM", "isGradual": false, "section": 1, "value": 40}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 40 BPM", "tooltipshort": "40 BPM", "isGradual": false, "value": 40, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "-", "-", "i", "-", "o", "-", "e", "-", "u", "-", "-", "u", "a", "-", "e", "-", "u", "-", "u", "a", "i<", "-", "a", "-", "u", "-", "-", "-", "a", "-", "e", "-", "u", "-", "u", "a", "i<", "-", "a", "-", "u", "-", "e", "o", "i", "-", "-", "-", "o", "-", "-", "u", "e", "-", "o", "-"]},
@@ -228,7 +228,7 @@
       "index": 9,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-        {"type": "tempo", "seqId": 2123, "passes": [2], "nthpass": false, "tooltip": "tempo 30 BPM on pass 2, 3rd iteration", "tooltipshort": "30 BPM", "iterations": [3], "isGradual": false, "section": 1, "value": 30},
+        {"type": "tempo", "seqId": 2123, "passes": [2], "nthpass": false, "tooltip": "tempo 30 BPM on pass 2, 3rd iteration", "tooltipshort": "30 BPM", "iterations": [3], "isGradual": false, "value": 30, "fromBeat": 1},
         {"type": "goto", "seqId": 5010, "passes": [1], "nthpass": false, "tooltip": "go to SONG_START after pass 1", "tooltipshort": "SONG_START", "targetuuid": "962c9ca9-901e-4a33-b778-de95ba2a9f18", "targetname": "SONG_START"}
       ],
       "staffs": {
@@ -255,7 +255,7 @@
       "index": 10,
       "label": "Chorus",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "value": 120, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", ".", ".", "i", "-", "o", "-", "e", "-", "u", "-", "-", "u", "e", "-", "u", "-", "a", "-", "u", "a", "i<", "-", "a", "-", "u", "-", "-", "u", "u", "-", "u", "-", "u", "-", "i", "-", "o", "-", "e", "-", "u", "-", "-", "u", "e", "-", "u", "-", "a", "-", "u", "a", "i<", "-", "a", "-"]},
@@ -304,8 +304,8 @@
       "index": 12,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-        {"type": "tempo", "seqId": 2141, "passes": [4], "nthpass": false, "tooltip": "tempo 65 BPM on pass 4, 1st iteration", "tooltipshort": "65 BPM", "iterations": [1], "isGradual": false, "section": 1, "value": 65},
-        {"type": "tempo", "seqId": 2142, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM on pass 4, 2nd iteration", "tooltipshort": "50 BPM", "iterations": [2], "isGradual": false, "section": 1, "value": 50},
+        {"type": "tempo", "seqId": 2141, "passes": [4], "nthpass": false, "tooltip": "tempo 65 BPM on pass 4, 1st iteration", "tooltipshort": "65 BPM", "iterations": [1], "isGradual": false, "value": 65, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2142, "passes": [4], "nthpass": false, "tooltip": "tempo 50 BPM on pass 4, 2nd iteration", "tooltipshort": "50 BPM", "iterations": [2], "isGradual": false, "value": 50, "fromBeat": 1},
         {"type": "goto", "seqId": 5010, "passes": [1, 2, 3], "nthpass": false, "tooltip": "go to CHORUS after passes 1, 2 & 3", "tooltipshort": "CHORUS", "targetuuid": "aa45de67-ab57-4c92-aae1-5bb2c1c36eba", "targetname": "CHORUS"}
       ],
       "staffs": {

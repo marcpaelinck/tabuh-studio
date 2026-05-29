@@ -28,8 +28,8 @@ export interface FormValueType {
     toBPM?: number
     fromDynamics?: DynamicsValue
     toDynamics?: DynamicsValue
-    fromSection?: number
-    toSection?: number
+    fromBeat?: number
+    toBeat?: number
     isGradual?: boolean
     passes?: number[]
     iterations?: number[]
@@ -88,10 +88,10 @@ export const formModel = SchemaModel({
         .when(If({ type: 'tempo' }, 'isRequired', NumberType)),
     fromDynamics: StringType(),
     toDynamics: StringType().when(If({ type: 'dynamics' }, 'isRequired', StringType)),
-    fromSection: NumberType()
+    fromBeat: NumberType()
         .isInteger()
         .when(If({ isGradual: true }, 'isRequired', NumberType)),
-    toSection: NumberType()
+    toBeat: NumberType()
         .isInteger()
         .when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', NumberType)),
     isGradual: BooleanType().when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', BooleanType)),
@@ -113,8 +113,8 @@ const formFieldNames = {
     toBPM: 'toBPM',
     fromDynamics: 'fromDynamics',
     toDynamics: 'toDynamics',
-    fromSection: 'fromSection',
-    toSection: 'toSection',
+    fromBeat: 'fromBeat',
+    toBeat: 'toBeat',
     isGradual: 'isGradual',
     conditions: 'conditions',
     passes: 'passes',
@@ -130,8 +130,8 @@ const emptyForm = {
     toBPM: undefined,
     fromDynamics: undefined,
     toDynamics: undefined,
-    fromSection: undefined,
-    toSection: undefined,
+    fromBeat: undefined,
+    toBeat: undefined,
     isGradual: undefined,
     conditions: undefined,
     passes: undefined,
@@ -400,7 +400,7 @@ const TempoForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                     />
                     <InputField
                         label="Starting from beat"
-                        name={formFieldNames.toSection}
+                        name={formFieldNames.toBeat}
                         formValue={formValue}
                         placeholder={'Beat number'}
                         {...props}
@@ -418,7 +418,7 @@ const TempoForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                     <RangeField
                         labels={['From beat', 'to']}
                         formValue={formValue}
-                        names={[formFieldNames.fromSection, formFieldNames.toSection]}
+                        names={[formFieldNames.fromBeat, formFieldNames.toBeat]}
                         placeholders={['1', '']}
                         {...props}
                     />
@@ -446,7 +446,7 @@ const DynamicsForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                     />
                     <InputField
                         label="Starting from beat"
-                        name={formFieldNames.toSection}
+                        name={formFieldNames.toBeat}
                         formValue={formValue}
                         placeholder={'Beat number'}
                         {...props}
@@ -471,7 +471,7 @@ const DynamicsForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
                     <RangeField
                         labels={['From beat', 'to']}
                         formValue={formValue}
-                        names={[formFieldNames.fromSection, formFieldNames.toSection]}
+                        names={[formFieldNames.fromBeat, formFieldNames.toBeat]}
                         placeholders={['1', '']}
                         {...props}
                     />

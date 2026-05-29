@@ -32,7 +32,7 @@ type ExecutionItemDefault = {
     tooltipshort?: string
     toBPM?: number
     toDynamics?: string
-    toSection?: number
+    toBeat?: number
 }
 
 const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
@@ -42,7 +42,7 @@ const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     tempo: {
         type: 'tempo',
         isGradual: undefined,
-        toSection: undefined,
+        toBeat: undefined,
         toBPM: undefined,
         tooltip: 'tempo',
         tooltipshort: ''
@@ -50,7 +50,7 @@ const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
     dynamics: {
         type: 'dynamics',
         isGradual: undefined,
-        toSection: undefined,
+        toBeat: undefined,
         toDynamics: undefined,
         tooltip: 'dynamics',
         tooltipshort: ''
@@ -204,15 +204,15 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newFormValue.fromBPM = selectedItem.fromValue
             newFormValue.toBPM = selectedItem.value
             newFormValue.isGradual = selectedItem.isGradual
-            newFormValue.fromSection = selectedItem.fromSection
-            newFormValue.toSection = selectedItem.section
+            newFormValue.fromBeat = selectedItem.fromBeat
+            newFormValue.toBeat = selectedItem.toBeat
         }
         if (selectedItem.type == 'dynamics') {
             newFormValue.fromDynamics = selectedItem.fromDynamics
             newFormValue.toDynamics = selectedItem.dynamics
             newFormValue.isGradual = selectedItem.isGradual
-            newFormValue.fromSection = selectedItem.fromSection
-            newFormValue.toSection = selectedItem.section
+            newFormValue.fromBeat = selectedItem.fromBeat
+            newFormValue.toBeat = selectedItem.toBeat
         }
         debug(`UPDATE FIELDS2=${JSON.stringify(newFormValue)}`)
         setFormValue(newFormValue)
@@ -249,10 +249,10 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             newItem.fromValue = formValue.fromBPM ? Number(formValue.fromBPM) : undefined
             newItem.value = Number(formValue.toBPM)
             newItem.isGradual = formValue.isGradual || false
-            newItem.fromSection = formValue.fromSection
+            newItem.fromBeat = formValue.fromBeat
             if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
             else newItem.iterations = undefined
-            if (formValue.toSection != undefined) newItem.section = formValue.toSection
+            if (formValue.toBeat != undefined) newItem.toBeat = formValue.toBeat
             debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.value}`)
         }
         if (selectedItem.type == 'dynamics') {
@@ -262,10 +262,10 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
             if (formValue.toDynamics != undefined) newItem.dynamics = formValue.toDynamics
             newItem.value = dynamicsToNumber[newItem.dynamics]
             newItem.isGradual = formValue.isGradual || false
-            newItem.fromSection = formValue.fromSection
+            newItem.fromBeat = formValue.fromBeat
             if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
             else newItem.iterations = undefined
-            if (formValue.toSection != undefined) newItem.section = formValue.toSection
+            if (formValue.toBeat != undefined) newItem.toBeat = formValue.toBeat
         }
         newItem = {
             ...newItem,

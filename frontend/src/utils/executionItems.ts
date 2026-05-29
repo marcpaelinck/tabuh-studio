@@ -12,7 +12,7 @@ export function executionItemSeqId(item: ExecutionItem) {
         suppress: 7000,
         kempli: 8000
     }[item.type]
-    const beatSeq = 100 * ('fromSection' in item ? item.fromSection || item.section : 0)
+    const beatSeq = 100 * ('fromBeat' in item ? (item.fromBeat ?? 0) || (item.toBeat ?? 0) : 0)
     const passesSeq = 10 * (_.min(item.passes) || 0)
     const iterSeq = 'iterations' in item ? _.min(item.iterations) || 0 : 0
     return typeSeq + beatSeq + passesSeq + iterSeq
@@ -85,14 +85,14 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
                 const isGradual = item.isGradual && item.fromDynamics != item.dynamics
                 shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.dynamics}`
             }
-            const multipleSections = item.isGradual && item.fromSection != item.section
-            const startFromSection1 = !item.isGradual && !item.fromSection && item.section == 1
+            const multipleSections = item.isGradual && item.fromBeat != item.toBeat
+            const startFromSection1 = !item.isGradual && !item.fromBeat && item.toBeat == 1
             if (startFromSection1) {
                 instruction = shortTooltip
             } else {
                 instruction =
                     shortTooltip +
-                    ` beat ${multipleSections ? (!item.fromSection ? '1→' : item.fromSection + '→') : ''}${item.section}`
+                    ` beat ${multipleSections ? (!item.fromBeat ? '1→' : item.fromBeat + '→') : ''}${item.toBeat}`
             }
             preposition = 'on'
             break

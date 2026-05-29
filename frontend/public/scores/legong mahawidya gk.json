@@ -44,7 +44,7 @@
       "id": 1,
       "index": 0,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 75 BPM", "tooltipshort": "75 BPM", "isGradual": false, "section": 1, "value": 75},
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 75 BPM", "tooltipshort": "75 BPM", "isGradual": false, "value": 75, "fromBeat": 1},
         {"type": "wait", "seqId": 4000, "tooltip": "wait 2 seconds", "tooltipshort": "2 sec.", "seconds": 2}
       ],
       "staffs": {
@@ -68,7 +68,7 @@
       "id": 2,
       "index": 1,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 150 BPM", "tooltipshort": "150 BPM", "isGradual": false, "section": 1, "value": 150}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 150 BPM", "tooltipshort": "150 BPM", "isGradual": false, "value": 150, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "a,", "u,", "-", "-", "-", "-", "-", "-", "-", "a,", "-", "-", "-", "-", "-", "-", "-", "i", "-", "-", "-", "-", "-", "-", "o", "e", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "-", "-", "-", "e", "o", "-", "-", "-", "-", "-", "-", "-", "a", "-", "-", "-", "-", "-", "-", "-"]},
@@ -196,7 +196,7 @@
       "id": 8,
       "index": 7,
       "execution": [
-        {"type": "tempo", "seqId": 2300, "tooltip": "tempo current →90 BPM beat 3→15", "tooltipshort": "→90 BPM", "isGradual": true, "fromSection": 3, "section": 15, "value": 90}
+        {"type": "tempo", "seqId": 2300, "tooltip": "tempo current →90 BPM beat 3→15", "tooltipshort": "→90 BPM", "isGradual": true, "value": 90, "toBeat": 15, "fromBeat": 3}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "a,", "u,", "-", "-", "-", "-", "-", "-", "-", "a,", "-", "-", "-", "-", "-", "-", "-", "i", "-", "-", "-", "-", "-", "-", "o", "e", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "-", "-", "-", "e", "o", "-", "-", "-", "-", "-", "-", "-", "a", "-", "-", "-", "-", "-", "e", "-"]},
@@ -242,7 +242,7 @@
       "id": 10,
       "index": 9,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 75 BPM", "tooltipshort": "75 BPM", "isGradual": false, "section": 1, "value": 75}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 75 BPM", "tooltipshort": "75 BPM", "isGradual": false, "value": 75, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "-", "-", "-", "-", "o", "o/", "o", "-", "-", "-", "o", "-", "i", "-", "O", "e", "-", "-", "-", "u", "-", "a", "-", "U", "e", "-", "-", "-", "o", "-", "i", "-", "O", "e", "-", "-", "-", "e", "-", "o", "-", "I", "a,", "-", "-", "-", "i", "-", "o", "-"]},
@@ -475,7 +475,7 @@
       "id": 21,
       "index": 20,
       "execution": [
-        {"type": "tempo", "seqId": 2500, "tooltip": "tempo current →105 BPM beat 5→9", "tooltipshort": "→105 BPM", "isGradual": true, "fromSection": 5, "section": 9, "value": 105}
+        {"type": "tempo", "seqId": 2500, "tooltip": "tempo current →105 BPM beat 5→9", "tooltipshort": "→105 BPM", "isGradual": true, "value": 105, "toBeat": 9, "fromBeat": 5}
       ],
       "staffs": {
         "UGAL": {"notation": ["u", "-", "-", "-", "O", "i", "-", "-", "-", "a,", "-", "i", "-", "o", "-", "a,", "-", "i", "-", "-", "-", "o", "-", "i", "-", "O", "e", "-", "-", "-", "u", "-", "a", "-", "U", "e", "-", "-", "-", "u", "-", "e", "-", "U", "a", "-", "-", "-", "u", "-", "e", "-", "U", "a", "-", "-", "-", "-", "-", "u", "-", "A", "i<", "-", "a", "-", "u", "-", "e", "-"]},
@@ -582,8 +582,8 @@
       "id": 26,
       "index": 25,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →70 BPM beat 1→9", "tooltipshort": "→70 BPM", "isGradual": true, "fromSection": 1, "section": 9, "value": 70},
-        {"type": "tempo", "seqId": 3100, "tooltip": "tempo current →50 BPM beat 11→16", "tooltipshort": "→50 BPM", "isGradual": true, "fromSection": 11, "section": 16, "value": 50}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →70 BPM beat 1→9", "tooltipshort": "→70 BPM", "isGradual": true, "value": 70, "toBeat": 9, "fromBeat": 1},
+        {"type": "tempo", "seqId": 3100, "tooltip": "tempo current →50 BPM beat 11→16", "tooltipshort": "→50 BPM", "isGradual": true, "value": 50, "toBeat": 16, "fromBeat": 11}
       ],
       "staffs": {
         "UGAL": {"notation": ["a", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "a", "-", "-", "-", "U", "e", "-", "e", "-", "u", "-", "e", "-", "a", "-", "u", "-", "e", "-", "U", "a", "-", "u", "-", "e", "-", "o", "-", "e", "-", "a", "-", "e", "-", "u", "-", "a", "-", "u", "-", "o", "-", "e", ".", ".", ".", ".", ".", "e", "-"]},

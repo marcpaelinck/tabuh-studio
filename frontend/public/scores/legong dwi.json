@@ -72,7 +72,7 @@
       "id": 1,
       "index": 0,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "section": 1, "value": 120}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 120 BPM", "tooltipshort": "120 BPM", "isGradual": false, "value": 120, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["o", "-", "-", "o", "o", "-", "e", "-", "o", "-", "i", "-", "a,", "-", "i", "-", "o", "-", "e", "-", "o", "-", "i", "-", "a,", "-", "i", "-", "o", "-", "e", "-"]},
@@ -142,7 +142,7 @@
       "id": 4,
       "index": 3,
       "execution": [
-        {"type": "tempo", "seqId": 3600, "tooltip": "tempo current →100 BPM beat 16→17", "tooltipshort": "→100 BPM", "isGradual": true, "fromSection": 16, "section": 17, "value": 100}
+        {"type": "tempo", "seqId": 3600, "tooltip": "tempo current →100 BPM beat 16→17", "tooltipshort": "→100 BPM", "isGradual": true, "value": 100, "toBeat": 17, "fromBeat": 16}
       ],
       "staffs": {
         "UGAL": {"notation": ["o", "-", "e", "-", "o", "-", "e", "-", "o", "-", "e", "-", "o", "-", "i", "-", "o", "-", "e", "-", "o", "-", "i", "-", "o", "-", "e", "-", "i", "-", "o", "-", "e", "-", "u", "-", "e", "-", "u", "-", "e", "-", "u", "-", "e", "-", "o", "-", "e", "-", "u", "-", "e", "-", "o", "-", "e", "-", "u", "-", "e", "-", "o", "-"]},
@@ -166,7 +166,7 @@
       "id": 5,
       "index": 4,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →75 BPM beat 1→8", "tooltipshort": "→75 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 75}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →75 BPM beat 1→8", "tooltipshort": "→75 BPM", "isGradual": true, "value": 75, "toBeat": 8, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["e", "-", "u", "-", "e", "-", "u", "-", "e", "-", "u", "-", "e", "-", "o", "-", "e", "-", "u", "-", "e", "-", "o", "-", "e", "-", "u", "-", "e", "-", "o", "-"]},
@@ -214,11 +214,11 @@
       "id": 7,
       "index": 6,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 60 BPM", "tooltipshort": "60 BPM", "isGradual": false, "section": 1, "value": 60},
-        {"type": "tempo", "seqId": 2200, "tooltip": "tempo 30.0→120 BPM beat 2", "tooltipshort": "30.0→120 BPM", "isGradual": true, "fromSection": 2, "section": 2, "fromValue": 30, "value": 120},
-        {"type": "tempo", "seqId": 2300, "tooltip": "tempo 60 BPM beat 3", "tooltipshort": "60 BPM", "isGradual": false, "section": 3, "value": 60},
-        {"type": "tempo", "seqId": 2400, "tooltip": "tempo 30.0→120 BPM beat 4", "tooltipshort": "30.0→120 BPM", "isGradual": true, "fromSection": 4, "section": 4, "fromValue": 30, "value": 120},
-        {"type": "tempo", "seqId": 2500, "tooltip": "tempo 60 BPM beat 5", "tooltipshort": "60 BPM", "isGradual": false, "section": 5, "value": 60}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 60 BPM", "tooltipshort": "60 BPM", "isGradual": false, "value": 60, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2200, "tooltip": "tempo 30.0→120 BPM beat 2", "tooltipshort": "30.0→120 BPM", "isGradual": true, "fromValue": 30, "value": 120, "toBeat": 2, "fromBeat": 2},
+        {"type": "tempo", "seqId": 2300, "tooltip": "tempo 60 BPM beat 3", "tooltipshort": "60 BPM", "isGradual": false, "value": 60, "fromBeat": 3},
+        {"type": "tempo", "seqId": 2400, "tooltip": "tempo 30.0→120 BPM beat 4", "tooltipshort": "30.0→120 BPM", "isGradual": true, "fromValue": 30, "value": 120, "toBeat": 4, "fromBeat": 4},
+        {"type": "tempo", "seqId": 2500, "tooltip": "tempo 60 BPM beat 5", "tooltipshort": "60 BPM", "isGradual": false, "value": 60, "fromBeat": 5}
       ],
       "staffs": {
         "UGAL": {"notation": ["O", "e", "-", "-", "-", "-", "-", "-", "-", "u", "e", "u", "e", "u", "e", "u/", "-", "-", "-", "-", "i", "-", "O", "e", "-", "-", "-", "-", "-", "-", "a", "u", "e", "a", "u", "e", "u/", "-", "-", "-", "-", "e", "-", "O", "i", "-", "-", "-", "-", "-", "-"]},
@@ -290,7 +290,7 @@
       "id": 10,
       "index": 9,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 65 BPM", "tooltipshort": "65 BPM", "isGradual": false, "section": 1, "value": 65}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 65 BPM", "tooltipshort": "65 BPM", "isGradual": false, "value": 65, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "a,", "-", "I", "o", "-", "e", "-", "o", "-", "i", "-", "e", "-", "-", "-", "-", "i", "-", "-"]},
@@ -314,7 +314,7 @@
       "id": 11,
       "index": 10,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "section": 1, "value": 130}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "value": 130, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -338,7 +338,7 @@
       "id": 12,
       "index": 11,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -362,7 +362,7 @@
       "id": 13,
       "index": 12,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -386,7 +386,7 @@
       "id": 14,
       "index": 13,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -410,8 +410,8 @@
       "id": 15,
       "index": 14,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-        {"type": "dynamics", "seqId": 4500, "tooltip": "dynamics current →f beat 15→16", "tooltipshort": "→f", "isGradual": true, "fromSection": 15, "section": 16, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1},
+        {"type": "dynamics", "seqId": 4500, "tooltip": "dynamics current →f beat 15→16", "tooltipshort": "→f", "isGradual": true, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "toBeat": 16, "fromBeat": 15}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -435,8 +435,8 @@
       "id": 16,
       "index": 15,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]},
-        {"type": "dynamics", "seqId": 4500, "tooltip": "dynamics current →mp beat 15→16", "tooltipshort": "→mp", "isGradual": true, "fromSection": 15, "section": 16, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1},
+        {"type": "dynamics", "seqId": 4500, "tooltip": "dynamics current →mp beat 15→16", "tooltipshort": "→mp", "isGradual": true, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "toBeat": 16, "fromBeat": 15}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -461,7 +461,7 @@
       "index": 16,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -485,8 +485,8 @@
       "id": 18,
       "index": 17,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →75 BPM beat 1→16", "tooltipshort": "→75 BPM", "isGradual": true, "fromSection": 1, "section": 16, "value": 75},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →75 BPM beat 1→16", "tooltipshort": "→75 BPM", "isGradual": true, "value": 75, "toBeat": 16, "fromBeat": 1},
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -534,7 +534,7 @@
       "id": 20,
       "index": 19,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 55 BPM", "tooltipshort": "55 BPM", "isGradual": false, "section": 1, "value": 55}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 55 BPM", "tooltipshort": "55 BPM", "isGradual": false, "value": 55, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "-", "-", "-", "-", "e,", "-"]},
@@ -581,7 +581,7 @@
       "index": 21,
       "label": "Pengawak",
       "execution": [
-        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →65 BPM beat 1→4 on pass 5", "tooltipshort": "→65 BPM", "isGradual": true, "fromSection": 1, "section": 4, "value": 65}
+        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →65 BPM beat 1→4 on pass 5", "tooltipshort": "→65 BPM", "isGradual": true, "value": 65, "toBeat": 4, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["I", "o", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "-", "-", "-", "-", "e", "-", "o", "-", "u", "-", "e", "-", "o", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "-", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "u,", "-"]},
@@ -605,7 +605,7 @@
       "id": 23,
       "index": 22,
       "execution": [
-        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →70 BPM beat 1→6 on pass 5", "tooltipshort": "→70 BPM", "isGradual": true, "fromSection": 1, "section": 6, "value": 70}
+        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →70 BPM beat 1→6 on pass 5", "tooltipshort": "→70 BPM", "isGradual": true, "value": 70, "toBeat": 6, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["a,", "-", "-", "-", "-", "-", "u,", "u,/", "u,", "-", "a,", "a,", "u,", "a,", "e,", ".", "U,", "a,", "-", "-", "-", "i", "a,", "i", ".", "O", "e", "-", "u/", "u", "e", "u", "o", ".", "E", "u", "-", "a", "-", "u", "-", "e", "-", "o", "-", "a", "a", "-", "-", "e", "."]},
@@ -629,7 +629,7 @@
       "id": 24,
       "index": 23,
       "execution": [
-        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →75 BPM beat 1→8 on pass 5", "tooltipshort": "→75 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 75},
+        {"type": "tempo", "seqId": 2150, "passes": [5], "nthpass": false, "tooltip": "tempo current →75 BPM beat 1→8 on pass 5", "tooltipshort": "→75 BPM", "isGradual": true, "value": 75, "toBeat": 8, "fromBeat": 1},
         {"type": "goto", "seqId": 5050, "passes": [5], "nthpass": false, "tooltip": "go to TRANSITION after pass 5", "tooltipshort": "TRANSITION", "targetuuid": "d0e9d0b4-326b-47af-9478-cf606c2d9974", "targetname": "TRANSITION"}
       ],
       "staffs": {
@@ -679,7 +679,7 @@
       "index": 25,
       "label": "Transition",
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →90 BPM beat 1→3", "tooltipshort": "→90 BPM", "isGradual": true, "fromSection": 1, "section": 3, "value": 90}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo current →90 BPM beat 1→3", "tooltipshort": "→90 BPM", "isGradual": true, "value": 90, "toBeat": 3, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["e", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "-", "-", "-", "-", "i", "-", "-", "-", "-", "-", "-", "-"]},
@@ -704,9 +704,9 @@
       "index": 26,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 3X", "tooltipshort": "3X", "count": 3},
-        {"type": "tempo", "seqId": 2101, "tooltip": "tempo current →110 BPM beat 1→4 on 1st iteration", "tooltipshort": "→110 BPM", "iterations": [1], "isGradual": true, "fromSection": 1, "section": 4, "value": 110},
-        {"type": "tempo", "seqId": 2102, "tooltip": "tempo current →135 BPM beat 1→4 on 2nd iteration", "tooltipshort": "→135 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "section": 4, "value": 135},
-        {"type": "tempo", "seqId": 2103, "tooltip": "tempo current →160 BPM beat 1→4 on 3rd iteration", "tooltipshort": "→160 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "section": 4, "value": 160}
+        {"type": "tempo", "seqId": 2101, "tooltip": "tempo current →110 BPM beat 1→4 on 1st iteration", "tooltipshort": "→110 BPM", "iterations": [1], "isGradual": true, "value": 110, "toBeat": 4, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2102, "tooltip": "tempo current →135 BPM beat 1→4 on 2nd iteration", "tooltipshort": "→135 BPM", "iterations": [2], "isGradual": true, "value": 135, "toBeat": 4, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2103, "tooltip": "tempo current →160 BPM beat 1→4 on 3rd iteration", "tooltipshort": "→160 BPM", "iterations": [3], "isGradual": true, "value": 160, "toBeat": 4, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["a,", "-", "-", "-", "-", "-", "-", "-", "e", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "-", "-", "-", "-", "i", "-", "-", "-", "-", "-", "-", "-"]},
@@ -731,10 +731,10 @@
       "index": 27,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 4X", "tooltipshort": "4X", "count": 4},
-        {"type": "tempo", "seqId": 2101, "tooltip": "tempo 80.0→100 BPM beat 1→4 on 1st iteration", "tooltipshort": "80.0→100 BPM", "iterations": [1], "isGradual": true, "fromSection": 1, "section": 4, "fromValue": 80, "value": 100},
-        {"type": "tempo", "seqId": 2102, "tooltip": "tempo current →120 BPM beat 1→4 on 2nd iteration", "tooltipshort": "→120 BPM", "iterations": [2], "isGradual": true, "fromSection": 1, "section": 4, "value": 120},
-        {"type": "tempo", "seqId": 2103, "tooltip": "tempo current →140 BPM beat 1→4 on 3rd iteration", "tooltipshort": "→140 BPM", "iterations": [3], "isGradual": true, "fromSection": 1, "section": 4, "value": 140},
-        {"type": "tempo", "seqId": 2104, "tooltip": "tempo current →160 BPM beat 1→4 on 4th iteration", "tooltipshort": "→160 BPM", "iterations": [4], "isGradual": true, "fromSection": 1, "section": 4, "value": 160}
+        {"type": "tempo", "seqId": 2101, "tooltip": "tempo 80.0→100 BPM beat 1→4 on 1st iteration", "tooltipshort": "80.0→100 BPM", "iterations": [1], "isGradual": true, "fromValue": 80, "value": 100, "toBeat": 4, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2102, "tooltip": "tempo current →120 BPM beat 1→4 on 2nd iteration", "tooltipshort": "→120 BPM", "iterations": [2], "isGradual": true, "value": 120, "toBeat": 4, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2103, "tooltip": "tempo current →140 BPM beat 1→4 on 3rd iteration", "tooltipshort": "→140 BPM", "iterations": [3], "isGradual": true, "value": 140, "toBeat": 4, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2104, "tooltip": "tempo current →160 BPM beat 1→4 on 4th iteration", "tooltipshort": "→160 BPM", "iterations": [4], "isGradual": true, "value": 160, "toBeat": 4, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["a,", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-"]},
@@ -829,11 +829,11 @@
       "index": 31,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 16X", "tooltipshort": "16X", "count": 16},
-        {"type": "tempo", "seqId": 2113, "tooltip": "tempo current →145 BPM beat 1→8 on 13th iteration", "tooltipshort": "→145 BPM", "iterations": [13], "isGradual": true, "fromSection": 1, "section": 8, "value": 145},
-        {"type": "tempo", "seqId": 2114, "tooltip": "tempo current →127 BPM beat 1→8 on 14th iteration", "tooltipshort": "→127 BPM", "iterations": [14], "isGradual": true, "fromSection": 1, "section": 8, "value": 127},
-        {"type": "tempo", "seqId": 2115, "tooltip": "tempo current →110 BPM beat 1→8 on 15th iteration", "tooltipshort": "→110 BPM", "iterations": [15], "isGradual": true, "fromSection": 1, "section": 8, "value": 110},
-        {"type": "tempo", "seqId": 2116, "tooltip": "tempo current →100 BPM beat 1→8 on 16th iteration", "tooltipshort": "→100 BPM", "iterations": [16], "isGradual": true, "fromSection": 1, "section": 8, "value": 100},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["JEGOGAN"]}
+        {"type": "tempo", "seqId": 2113, "tooltip": "tempo current →145 BPM beat 1→8 on 13th iteration", "tooltipshort": "→145 BPM", "iterations": [13], "isGradual": true, "value": 145, "toBeat": 8, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2114, "tooltip": "tempo current →127 BPM beat 1→8 on 14th iteration", "tooltipshort": "→127 BPM", "iterations": [14], "isGradual": true, "value": 127, "toBeat": 8, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2115, "tooltip": "tempo current →110 BPM beat 1→8 on 15th iteration", "tooltipshort": "→110 BPM", "iterations": [15], "isGradual": true, "value": 110, "toBeat": 8, "fromBeat": 1},
+        {"type": "tempo", "seqId": 2116, "tooltip": "tempo current →100 BPM beat 1→8 on 16th iteration", "tooltipshort": "→100 BPM", "iterations": [16], "isGradual": true, "value": 100, "toBeat": 8, "fromBeat": 1},
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["JEGOGAN"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", ".", ".", ".", "."]},
@@ -857,7 +857,7 @@
       "id": 33,
       "index": 32,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 100 BPM", "tooltipshort": "100 BPM", "isGradual": false, "section": 1, "value": 100}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 100 BPM", "tooltipshort": "100 BPM", "isGradual": false, "value": 100, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]},
@@ -881,7 +881,7 @@
       "id": 34,
       "index": 33,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["JEGOGAN"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["JEGOGAN"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]},
@@ -1060,7 +1060,7 @@
       "id": 42,
       "index": 41,
       "execution": [
-        {"type": "tempo", "seqId": 2540, "passes": [4], "nthpass": false, "tooltip": "tempo current →80 BPM beat 5→8 on pass 4", "tooltipshort": "→80 BPM", "isGradual": true, "fromSection": 5, "section": 8, "value": 80}
+        {"type": "tempo", "seqId": 2540, "passes": [4], "nthpass": false, "tooltip": "tempo current →80 BPM beat 5→8 on pass 4", "tooltipshort": "→80 BPM", "isGradual": true, "value": 80, "toBeat": 8, "fromBeat": 5}
       ],
       "staffs": {
         "UGAL": {"notation": ["e", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "a,", "-", "-", "-", "i", "-", "-", "-"]},
@@ -1218,7 +1218,7 @@
       "id": 49,
       "index": 48,
       "execution": [
-        {"type": "tempo", "seqId": 2140, "passes": [4], "nthpass": false, "tooltip": "tempo current →45 BPM beat 1→8 on pass 4", "tooltipshort": "→45 BPM", "isGradual": true, "fromSection": 1, "section": 8, "value": 45},
+        {"type": "tempo", "seqId": 2140, "passes": [4], "nthpass": false, "tooltip": "tempo current →45 BPM beat 1→8 on pass 4", "tooltipshort": "→45 BPM", "isGradual": true, "value": 45, "toBeat": 8, "fromBeat": 1},
         {"type": "goto", "seqId": 5000, "tooltip": "go to PENGECET_LOOP", "tooltipshort": "PENGECET_LOOP", "targetuuid": "1312dc09-f3ac-4a9b-a855-2683e7bdf69f", "targetname": "PENGECET_LOOP"},
         {"type": "goto", "seqId": 5040, "passes": [4], "nthpass": false, "tooltip": "go to END after pass 4", "tooltipshort": "END", "targetuuid": "1716fdfc-96bf-49d4-a97f-edb0c705219f", "targetname": "END"}
       ],

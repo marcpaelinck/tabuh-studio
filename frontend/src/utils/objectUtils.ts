@@ -3,7 +3,8 @@
  */
 
 import _ from 'lodash'
-import { totalDuration } from '../componentlogic/playback/playbackPatternManager'
+import { defaultBeatFrequency, defaultTempo } from '../config/config'
+import { symbolDuration, totalDuration } from '../componentlogic/playback/playbackPatternManager'
 import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
@@ -77,12 +78,39 @@ export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
 }
 
-// Returns the number of kempli sections (beats) in the system.
-export function getSystemSectionCount(system: System): number {
-    const firstStaff = Object.values(system.staffs)[0]
-    if (!firstStaff) return 0
-    if (system.kempli.state === 'on' && system.kempli.frequency) {
-        return Math.ceil(firstStaff.notation.length / system.kempli.frequency)
+// Finds the [startIdx, endIdx) array slice for beat beatIdx, where each beat accumulates
+// exactly `freq` units of symbolDuration. Grace notes (duration=0) do not advance the
+// beat budget, so beats containing them include one extra symbol to fill the beat.
+function getBeatSlice(notation: NoteSymbol[], position: Position, beatIdx: number, freq: number): [number, number] {
+    let accum = 0
+    let start = 0
+    let beatCount = 0
+    for (let i = 0; i < notation.length; i++) {
+        accum += symbolDuration(notation[i], position, defaultTempo, 'basenote')
+        if (accum >= freq) {
+            if (beatCount === beatIdx) return [start, i + 1]
+            beatCount++
+            accum = 0
+            start = i + 1
+        }
+    }
+    // Last partial beat (total notation duration is not a multiple of freq)
+    if (beatCount === beatIdx && start < notation.length) return [start, notation.length]
+    return [0, 0]
+}
+
+// Returns the number of kempli beats in the system.
+// For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) are correctly excluded
+// from the beat budget, keeping the beat count consistent with the kempli timing.
+export function getSystemBeatCount(system: System): number {
+    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+        const freq = system.kempli.frequency || defaultBeatFrequency
+        const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
+        if (!staffEntries.length) return 0
+        const maxDuration = Math.max(
+            ...staffEntries.map(([pos, staff]) => totalDuration(staff!.notation, pos as Position, defaultTempo, 'basenote'))
+        )
+        return Math.max(1, Math.ceil(maxDuration / freq))
     } else if (system.kempli.state === 'notation') {
         const kempliNotation = system.staffs['KEMPLI']?.notation || []
         return Math.max(1, kempliNotation.filter((n) => n === 'x?').length)
@@ -90,29 +118,45 @@ export function getSystemSectionCount(system: System): number {
     return 1
 }
 
-// Returns the start index (in the flat notation) of the given section.
-export function getSectionStart(sectionIdx: number, system: System): number {
-    if (system.kempli.state === 'on' && system.kempli.frequency) {
-        return sectionIdx * system.kempli.frequency
+// Returns the start index (array position) of beat beatIdx in the flat notation.
+// For 'on'/'off' state, uses symbolDuration so grace-note beats shift the boundary correctly.
+// Pass the position of the staff being displayed for the most accurate cursor placement.
+export function getBeatStart(beatIdx: number, system: System, position?: Position): number {
+    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+        const freq = system.kempli.frequency || defaultBeatFrequency
+        const refPosition = position ?? (Object.keys(system.staffs)[0] as Position)
+        const refNotation = system.staffs[refPosition]?.notation ?? []
+        const [start] = getBeatSlice(refNotation, refPosition, beatIdx, freq)
+        return start
     } else if (system.kempli.state === 'notation') {
-        if (sectionIdx === 0) return 0
+        // x? marks the START of each kempli beat.
         const kempliNotation = system.staffs['KEMPLI']?.notation || []
         const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
-        return sectionIdx <= beatPositions.length ? beatPositions[sectionIdx - 1] + 1 : 0
+        return beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
     }
     return 0
 }
 
-// Returns the notation for a specific section (kempli beat) from a flat notation array.
-export function getSectionNotation(notation: NoteSymbol[], sectionIdx: number, system: System): NoteSymbol[] {
-    if (system.kempli.state === 'on' && system.kempli.frequency) {
-        const start = sectionIdx * system.kempli.frequency
-        return notation.slice(start, start + system.kempli.frequency)
+// Returns the notation symbols for beat beatIdx from a flat notation array.
+// For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) do not terminate
+// the beat early — an extra symbol is included to fill the beat to the full kempli frequency.
+export function getBeatNotation(notation: NoteSymbol[], beatIdx: number, system: System, position?: Position): NoteSymbol[] {
+    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+        const freq = system.kempli.frequency || defaultBeatFrequency
+        if (position) {
+            const [start, end] = getBeatSlice(notation, position, beatIdx, freq)
+            return notation.slice(start, end)
+        }
+        // Fallback if no position provided (avoids symbolDuration dependency)
+        const start = beatIdx * freq
+        return notation.slice(start, start + freq)
     } else if (system.kempli.state === 'notation') {
+        // x? marks the START of each kempli beat.
+        // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
         const kempliNotation = system.staffs['KEMPLI']?.notation || []
         const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
-        const start = sectionIdx > 0 && sectionIdx <= beatPositions.length ? beatPositions[sectionIdx - 1] + 1 : 0
-        const end = sectionIdx < beatPositions.length ? beatPositions[sectionIdx] + 1 : notation.length
+        const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
+        const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : notation.length
         return notation.slice(start, end)
     }
     return notation

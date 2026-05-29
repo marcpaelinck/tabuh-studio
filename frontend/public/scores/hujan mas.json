@@ -81,7 +81,7 @@
       "id": 1,
       "index": 0,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "section": 1, "value": 130}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "value": 130, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["u,", "-", "-", "u,", "u,", "-", "u,", "-", "u,", "-", "a,", "-", "u,", "-", "e,", "-", ".", ".", "a,", "-", "u,", "-", "e,", "-", "u,", "-", "a,", "-", "i", "-", "a,", "-", "u,", "-", "-", "u,", "u,", "-", "u,", "-", "u,", "-", "a,", "-", "u,", "-", "e,", "-", ".", ".", "a,", "-", "u,", "-", "e,", "-", "u,", "-", "a,", "-", "i", "-", "a,", "-"]},
@@ -222,7 +222,7 @@
       "id": 6,
       "index": 5,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "section": 1, "value": 90},
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 90 BPM", "tooltipshort": "90 BPM", "isGradual": false, "value": 90, "fromBeat": 1},
         {"type": "wait", "seqId": 4000, "tooltip": "wait 2 seconds", "tooltipshort": "2 sec.", "seconds": 2}
       ],
       "staffs": {
@@ -252,7 +252,7 @@
       "id": 7,
       "index": 6,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "section": 1, "value": 130}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 130 BPM", "tooltipshort": "130 BPM", "isGradual": false, "value": 130, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "i", "-", "o", "-", "e", "-"]},
@@ -704,7 +704,7 @@
       "index": 22,
       "label": "Loop9",
       "execution": [
-        {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": false, "tooltip": "dynamics f on pass 3", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"]}
+        {"type": "dynamics", "seqId": 3130, "passes": [3], "nthpass": false, "tooltip": "dynamics f on pass 3", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["e", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -789,7 +789,7 @@
       "id": 26,
       "index": 25,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "section": 1, "value": 1, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4", "UGAL"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics ff", "tooltipshort": "ff", "isGradual": false, "value": 1, "dynamics": "ff", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4", "UGAL"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["e", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-", "i", "-", "-", "-", "o", "-", "-", "-"]},
@@ -847,7 +847,7 @@
       "id": 28,
       "index": 27,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4", "UGAL"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["PEMADE_POLOS", "PEMADE_SANGSIH", "KANTILAN_POLOS", "KANTILAN_SANGSIH", "REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4", "UGAL"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", ".", ".", ".", "."]},
@@ -903,7 +903,7 @@
       "id": 30,
       "index": 29,
       "execution": [
-        {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics p beat 5", "tooltipshort": "p", "isGradual": false, "section": 5, "value": 0.35, "dynamics": "p", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3500, "tooltip": "dynamics p beat 5", "tooltipshort": "p", "isGradual": false, "value": 0.35, "dynamics": "p", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 5}
       ],
       "staffs": {
         "UGAL": {"notation": [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]},
@@ -932,7 +932,7 @@
       "id": 31,
       "index": 30,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]},
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1},
         {"type": "wait", "seqId": 4000, "tooltip": "wait 0.3 second", "tooltipshort": "0.3 sec.", "seconds": 0.3}
       ],
       "staffs": {
@@ -1018,7 +1018,7 @@
       "id": 34,
       "index": 33,
       "execution": [
-        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 110 BPM", "tooltipshort": "110 BPM", "isGradual": false, "section": 1, "value": 110}
+        {"type": "tempo", "seqId": 2100, "tooltip": "tempo 110 BPM", "tooltipshort": "110 BPM", "isGradual": false, "value": 110, "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i/", ".", ".", ".", ".", ".", ".", "."]},
@@ -1047,7 +1047,7 @@
       "id": 35,
       "index": 34,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "section": 1, "value": 0.51, "dynamics": "mp", "positions": ["UGAL"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mp", "tooltipshort": "mp", "isGradual": false, "value": 0.51, "dynamics": "mp", "positions": ["UGAL"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": [".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", "."]},
@@ -1105,7 +1105,7 @@
       "id": 37,
       "index": 36,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1134,7 +1134,7 @@
       "id": 38,
       "index": 37,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1163,7 +1163,7 @@
       "id": 39,
       "index": 38,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1192,7 +1192,7 @@
       "id": 40,
       "index": 39,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1221,7 +1221,7 @@
       "id": 41,
       "index": 40,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1250,7 +1250,7 @@
       "id": 42,
       "index": 41,
       "execution": [
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1280,7 +1280,7 @@
       "index": 42,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "section": 1, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics mf", "tooltipshort": "mf", "isGradual": false, "value": 0.67, "dynamics": "mf", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},
@@ -1310,7 +1310,7 @@
       "index": 43,
       "execution": [
         {"type": "loop", "seqId": 1000, "tooltip": "play 2X", "tooltipshort": "2X", "count": 2},
-        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "section": 1, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"]}
+        {"type": "dynamics", "seqId": 3100, "tooltip": "dynamics f", "tooltipshort": "f", "isGradual": false, "value": 0.83, "dynamics": "f", "positions": ["REYONG_1", "REYONG_2", "REYONG_3", "REYONG_4"], "fromBeat": 1}
       ],
       "staffs": {
         "UGAL": {"notation": ["i", "-", "-", "-", "-", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "o", "-", "-", "-", "e", "-", "-", "-", "i", "-", "-", "-", "a", "-", "-", "-", "u", "-", "-", "-", "e", "-", "-", "-", "o", "-", "-", "-"]},

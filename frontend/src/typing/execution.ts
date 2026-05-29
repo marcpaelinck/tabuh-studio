@@ -69,13 +69,11 @@ export interface SuppressItem extends ExecutionItemBase {
 export interface ExpressionItemBase extends ExecutionItemBase {
     type: ExecutionItemType
     iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
-    isGradual: boolean // True: the expression value should increase / decrease over one or more Section.
-    fromSection?: number // If isGradual==true: Gradual change starts at the beginning of this Section. Otherwise undefined.
-    section: number // If isGradual==true: the gradual change should continue until the end of this section (numbering starts from 1).
-
-    // Otherwise the gradual change should be effective immediately at the start of this section (numbering starts from 1).
-    fromValue?: number // If isGradual==true: starting value of the gradual change. Otherwise undefined.
-    value: number // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
+    isGradual: boolean // True: the expression value should increase / decrease over one or more kempli beats.
+    fromBeat?: number // isGradual=false: the beat where the change takes effect (1-based). isGradual=true: first beat of the gradual ramp.
+    toBeat?: number  // isGradual=true only: last beat of the gradual ramp (1-based). Undefined for immediate changes.
+    fromValue?: number // isGradual=true: starting value of the gradual change. If undefined, the current value is used.
+    value: number // isGradual=true: end value of the gradual change. isGradual=false: new immediate value.
 }
 
 export interface TempoItem extends ExpressionItemBase {
