@@ -92,7 +92,7 @@ export function SystemNode({
             return
         }
         debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beat })}`)
-        setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.beat })
+        setPlaybackCursor({ sysUuid: cursor.sysuuid, beat: cursor.beat })
         systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
@@ -137,8 +137,8 @@ export function SystemNode({
 
         function cursorHighlight(cursor: EditorCellCursor | null): string {
             if (!cursor || !systemData.kempli.frequency) return ''
-            const freq = systemData.kempli.frequency
-            const cursorOffset = cursor.measure * freq
+            const freq = systemData.kempli.frequency || defaultBeatFrequency
+            const cursorOffset = cursor.beat * freq
             const highlight = `linear-gradient(
                 to right,
                 transparent 0 calc(${cursorOffset}ch - 2px),

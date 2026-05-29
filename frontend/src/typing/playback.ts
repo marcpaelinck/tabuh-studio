@@ -165,4 +165,4 @@ export type PlaybackAction = {
     outro?: number // silence after end of playback in ms
 }
 
-export type EditorCellCursor = { sysUuid: UUID; measure: number }
+export type EditorCellCursor = { sysUuid: UUID; beat: number }

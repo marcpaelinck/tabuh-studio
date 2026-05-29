@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import { useRef, useState } from 'react'
 import { defaultBeatFrequency } from '../config/config'
 import type { EditorCellCursor, EditorCursorParameters } from '../typing/playback'
@@ -23,7 +22,7 @@ export function useEditorCursorManager(systemData: System | undefined) {
             return
         }
         debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beat })}`)
-        setPlaybackCursor({ sysUuid: cursor.sysuuid, measure: cursor.beat })
+        setPlaybackCursor({ sysUuid: cursor.sysuuid, beat: cursor.beat })
         notationAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
@@ -69,7 +68,7 @@ export function useEditorCursorManager(systemData: System | undefined) {
         function cursorHighlight(cursor: EditorCellCursor | null): string {
             if (!cursor || !systemData.kempli.frequency) return ''
             const freq = systemData.kempli.frequency
-            const cursorOffset = cursor.measure * freq
+            const cursorOffset = cursor.beat * freq
             const highlight = `linear-gradient(
                 to right,
                 transparent 0 calc(${cursorOffset}ch - 2px),
