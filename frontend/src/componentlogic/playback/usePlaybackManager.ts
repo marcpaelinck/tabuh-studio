@@ -451,6 +451,21 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             })
 
+            // For 'off' kempli: add virtual cursor updates at defaultBeatFrequency intervals
+            // so the editor cursor advances through the system even without a kempli beat.
+            if (currentStep.system.kempli.state === 'off') {
+                for (let virtualBeat = 1; virtualBeat * defaultBeatFrequency < maxMeasureDuration; virtualBeat++) {
+                    newTimeLine.editorcursoractions.push({
+                        time: n2TO(beatStartTime + virtualBeat * defaultBeatFrequency),
+                        params: {
+                            prevsysuuid: prevSystem?.uuid || undefined,
+                            sysuuid: currentStep.system.uuid,
+                            beat: virtualBeat
+                        }
+                    })
+                }
+            }
+
             // CREATE DASHBOARD ACTION
 
             newTimeLine.dashboardactions.push({
@@ -604,7 +619,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             )
         })
 
-        // Editor Cursor actions
+        // Dashboard actions
         timeLine.dashboardactions.forEach((action: PlaybackDashboardAction) => {
             Tone.getTransport().schedule(
                 (time) => pbFunctionsRef.current.updatedashboard(time, action.params),
@@ -627,12 +642,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         intro = defaultIntroTime,
         outro = defaultOutroTime
     }: SchedulePlaybackParams): void {
-        // Do nothing if the timeline has already been generated
-        // if (timeLine && same<PlaybackAction>(pbAction, timeLine.playbackAction)) {
-        //     debug('Request to create timeline skipped.')
-        //     return
-        // }
-
         const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
         if (newTimeLine) {
             createPlaybackSchedule(newTimeLine, playbackSpeed)
