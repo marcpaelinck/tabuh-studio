@@ -136,7 +136,7 @@ export function SystemNode({
         }
 
         function cursorHighlight(cursor: EditorCellCursor | null): string {
-            if (!cursor || !systemData.kempli.frequency) return ''
+            if (!cursor || cursor.sysUuid != systemData.uuid) return ''
             const freq = systemData.kempli.frequency || defaultBeatFrequency
             const cursorOffset = cursor.beat * freq
             const highlight = `linear-gradient(

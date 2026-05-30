@@ -101,7 +101,7 @@ export function createNoteActions(args: CreatePatternArgs): PlaybackSamplerActio
         case 'RAKE':
             return rakeAction(args)
         case 'INVALID': {
-            console.error(`invalid pattern ${args.symbol} for ${args.position}`)
+            console.error(`invalid pattern '${args.symbol}' for ${args.position}`)
             return silenceAction(args)
         }
         case 'UNHANDLED': {

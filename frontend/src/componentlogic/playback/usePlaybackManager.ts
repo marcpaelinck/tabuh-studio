@@ -259,7 +259,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             const nextStep = nextInFlow(true)
             if (nextStep && pos in nextStep.measures) {
                 const sectionStaff = nextStep.measures[pos as Position]
-                const sectionNotation = useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation
+                const sectionNotation =
+                    useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation
                 return sectionNotation && sectionNotation.length > 0 ? sectionNotation[0] : undefined
             }
             return undefined
@@ -337,7 +338,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
                 const sectionStaff = currentStep.measures[position]
-                var notation: NoteSymbol[] = (useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation) ?? Array(4).fill(defaultObject('NoteSymbol'))
+                var notation: NoteSymbol[] =
+                    (useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation) ??
+                    Array(4).fill(defaultObject('NoteSymbol'))
                 var prevSymbol: NoteSymbol | undefined = undefined
 
                 notation.forEach((symbol: NoteSymbol, symbolIdx) => {
@@ -450,21 +453,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     beat: currentStep.beatIdx
                 }
             })
-
-            // For 'off' kempli: add virtual cursor updates at defaultBeatFrequency intervals
-            // so the editor cursor advances through the system even without a kempli beat.
-            if (currentStep.system.kempli.state === 'off') {
-                for (let virtualBeat = 1; virtualBeat * defaultBeatFrequency < maxMeasureDuration; virtualBeat++) {
-                    newTimeLine.editorcursoractions.push({
-                        time: n2TO(beatStartTime + virtualBeat * defaultBeatFrequency),
-                        params: {
-                            prevsysuuid: prevSystem?.uuid || undefined,
-                            sysuuid: currentStep.system.uuid,
-                            beat: virtualBeat
-                        }
-                    })
-                }
-            }
 
             // CREATE DASHBOARD ACTION
 
@@ -647,7 +635,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             createPlaybackSchedule(newTimeLine, playbackSpeed)
             setTimeline(newTimeLine)
         }
-        console.log('Done.')
     }
 
     return {

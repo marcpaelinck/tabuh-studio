@@ -232,7 +232,7 @@ export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
                     expandedNotation.push(...norotPattern(position, staff, measureIdx, symbolIdx))
                     break
                 case 'INVALID':
-                    console.error(`invalid pattern ${symbol} for ${position} staff=${JSON.stringify(staff)}`)
+                    console.error(`invalid pattern '${symbol}' for ${position} staff=${JSON.stringify(staff)}`)
                     expandedNotation.push(...silenceSymbol())
                     break
                 case 'UNHANDLED':
