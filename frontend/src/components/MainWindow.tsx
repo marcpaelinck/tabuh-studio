@@ -416,8 +416,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
-            <Container id="header+content" className="flex w-full min-w-0">
-                <Header id="header" className="flex nt-4 bg-[#f7f7fa]">
+            <Container id="header+content" className="flex w-full min-w-0 min-h-0">
+                <Header id="header" className="flex bg-[#f7f7fa]">
                     <Grid className="ml-4 mt-2 w-full content-center" align="middle">
                         <Row align="middle">
                             <Col span={19} id="Dashboard" align="left">
@@ -441,7 +441,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                         <Row className="bg-whte-1000">{player}</Row>
                     </Grid>
                 </Header>
-                <Content id="content" px="1rem" className="h-9/10">
+                <Content id="content" px="1rem" className="h-9/10 min-h-0">
                     <div id="editor/player window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
                         <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
                         <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
