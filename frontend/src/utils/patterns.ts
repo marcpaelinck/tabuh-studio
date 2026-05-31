@@ -28,7 +28,7 @@ export function getPatternType(symbol: NoteSymbol, position: Position): PatternT
     switch (true) {
         case validSymbols.includes(symbol):
             return 'SINGLENOTE'
-        case HalfDurationChars.some((char) => symbol.endsWith(char)):
+        case HalfDurationChars.some((char) => symbol.includes(char)):
             return 'HALF_DURATION'
         case !positionConfigs[position].validPatterns.includes(symbol):
             return 'INVALID'

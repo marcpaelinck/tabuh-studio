@@ -91,7 +91,6 @@ export function parseNotation(content: string): ParserReturnValue {
                     index: gonganCounter - 1,
                     line: lineNr(content, node.from),
                     notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
-                    editorGroup: [],
                     staffs: {},
                     kempli: { state: 'on', frequency: 4 },
                     label: undefined,
@@ -428,7 +427,7 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
             const beat: Staff = { notation: [] }
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
-                beat.notation.push(getText(noteNode, content))
+                beat.notation.push(getText(noteNode, content).trim())
                 noteNode = noteNode.nextSibling
             }
             staff.push(beat)

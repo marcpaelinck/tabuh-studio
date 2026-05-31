@@ -3,8 +3,8 @@
  */
 
 import _ from 'lodash'
-import { defaultBeatFrequency, defaultTempo } from '../config/config'
 import { symbolDuration, totalDuration } from '../componentlogic/playback/playbackPatternManager'
+import { defaultBeatFrequency, defaultTempo } from '../config/config'
 import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
@@ -30,7 +30,35 @@ export function defaultObject<T>(otype: DefaultType): T {
     return DefaultObjectFactory[otype]() as T
 }
 
+const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
+const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'staffs', 'kempli']
+
+function reorderKeys<T extends object>(obj: T, keyOrder: string[]): T {
+    const reordered: any = {}
+    for (const key of keyOrder) {
+        if (key in obj) reordered[key] = (obj as any)[key]
+    }
+    for (const key of Object.keys(obj)) {
+        if (!keyOrder.includes(key)) reordered[key] = (obj as any)[key]
+    }
+    return reordered as T
+}
+
 export function scoreToFormattedJson(score: Score, clearCache: boolean = true): string {
+    if (clearCache) {
+        score.systems.forEach((sys) =>
+            _.toPairs(sys.staffs).forEach(([_, staff]) => {
+                if (staff) delete staff.notation_
+            })
+        )
+    }
+
+    // Reorder Score and System keys before serialisation
+    const orderedScore = reorderKeys(
+        { ...score, systems: score.systems.map((sys) => reorderKeys(sys, systemKeyOrder)) },
+        scoreKeyOrder
+    )
+
     const flatten = (key: string, value: any) => {
         if (/^(execution|staff|group|positions)$/.test(key) && value) {
             var json = value.map((item: any) => {
@@ -48,20 +76,13 @@ export function scoreToFormattedJson(score: Score, clearCache: boolean = true): 
         }
         return value
     }
-    if (clearCache) {
-        score.systems.forEach((sys) =>
-            _.toPairs(sys.staffs).forEach(([_, staff]) => {
-                if (staff) delete staff.notation_
-            })
-        )
-    }
 
-    const json = JSON.stringify(score, flatten, 2)
+    const json = JSON.stringify(orderedScore, flatten, 2)
     return json
         .replace(/"([\{\[])/g, '$1')
         .replace(/([\}\]])"/g, '$1')
         .replace(/\\"/g, '"')
-        .replace(/:(?! )/g, ': ')
+        .replace(/(?<="):(?! )/g, ': ')
         .replace(/([\]\}\d"]),"/g, '$1, "')
         .replace(/(true|false),(?![ \n\r])/g, '$1, ')
         .replace(/([\d]),(?=\d)/g, '$1, ')
@@ -108,7 +129,9 @@ export function getSystemBeatCount(system: System): number {
         const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
         if (!staffEntries.length) return 0
         const maxDuration = Math.max(
-            ...staffEntries.map(([pos, staff]) => totalDuration(staff!.notation, pos as Position, defaultTempo, 'basenote'))
+            ...staffEntries.map(([pos, staff]) =>
+                totalDuration(staff!.notation, pos as Position, defaultTempo, 'basenote')
+            )
         )
         return Math.max(1, Math.ceil(maxDuration / freq))
     } else if (system.kempli.state === 'notation') {
@@ -131,7 +154,10 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
     } else if (system.kempli.state === 'notation') {
         // x? marks the START of each kempli beat.
         const kempliNotation = system.staffs['KEMPLI']?.notation || []
-        const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
+        const beatPositions = kempliNotation.reduce(
+            (pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos),
+            []
+        )
         return beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
     }
     return 0
@@ -140,7 +166,12 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
 // Returns the notation symbols for beat beatIdx from a flat notation array.
 // For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) do not terminate
 // the beat early — an extra symbol is included to fill the beat to the full kempli frequency.
-export function getBeatNotation(notation: NoteSymbol[], beatIdx: number, system: System, position?: Position): NoteSymbol[] {
+export function getBeatNotation(
+    notation: NoteSymbol[],
+    beatIdx: number,
+    system: System,
+    position?: Position
+): NoteSymbol[] {
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
         const freq = system.kempli.frequency || defaultBeatFrequency
         if (position) {
@@ -154,7 +185,10 @@ export function getBeatNotation(notation: NoteSymbol[], beatIdx: number, system:
         // x? marks the START of each kempli beat.
         // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
         const kempliNotation = system.staffs['KEMPLI']?.notation || []
-        const beatPositions = kempliNotation.reduce((pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos), [])
+        const beatPositions = kempliNotation.reduce(
+            (pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos),
+            []
+        )
         const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
         const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : notation.length
         return notation.slice(start, end)

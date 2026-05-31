@@ -44,25 +44,11 @@ export const rsStyleSheet = () => {
 // DYNAMICS
 export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 
-// EDITOR
+// JSON FORMATTING, EDITOR SORTING
 
-export const editorFontSize = 12
-export const pixelsPerPoint = 1.3333
-export const editorDoNotDisplay = ['KEMPLI']
-export const editorInitialExpandState = false
-export type KeyboardType = 'regular' | 'laras'
-
-export type NavigationAction =
-    | 'cellup'
-    | 'celldown'
-    | 'cellleft'
-    | 'cellright'
-    | 'rowstart'
-    | 'rowend'
-    | 'firstrow'
-    | 'lastrow'
-
-export const editorSortingOrder = [
+export const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
+export const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'staffs', 'kempli', 'notationGroups']
+export const positionOrder = [
     'UGAL',
     'GENDER_RAMBAT',
     'PEMADE_POLOS',
@@ -81,6 +67,24 @@ export const editorSortingOrder = [
     'KENDANG',
     'KEMPLI'
 ]
+// EDITOR
+
+export const editorFontSize = 12
+export const pixelsPerPoint = 1.3333
+export const editorDoNotDisplay = ['KEMPLI']
+export const editorInitialExpandState = false
+export type KeyboardType = 'regular' | 'laras'
+
+export type NavigationAction =
+    | 'cellup'
+    | 'celldown'
+    | 'cellleft'
+    | 'cellright'
+    | 'rowstart'
+    | 'rowend'
+    | 'firstrow'
+    | 'lastrow'
+
 export const partColorPalette: ColorName[] = [
     'darkseagreen',
     'aquamarine',

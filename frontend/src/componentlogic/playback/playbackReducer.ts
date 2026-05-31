@@ -91,7 +91,6 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
             return { ...state, cursor: noCursor, audioState: 'nodata', playbackType: 'none' }
         }
         case 'rewind': {
-            if (!['playing', 'paused'].includes(state.audioState)) return { ...state }
             Tone.getTransport().stop()
             Tone.getTransport().seconds = 0
             playbackFunctions.setPlaybackProgress(0)

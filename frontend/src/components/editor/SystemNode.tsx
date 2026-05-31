@@ -11,7 +11,7 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { defaultBeatFrequency, editorFontSize, editorSortingOrder, positionConfigs } from '../../config/config'
+import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
@@ -283,7 +283,7 @@ export function SystemNode({
 
     // Generate the content in a fixed sorting order.
     const sortedStaffEntries = _.entries(systemData.staffs).sort(
-        ([p1, _1], [p2, _2]) => (editorSortingOrder.indexOf(p1) || 0) - (editorSortingOrder.indexOf(p2) || 0)
+        ([p1, _1], [p2, _2]) => (positionOrder.indexOf(p1) || 0) - (positionOrder.indexOf(p2) || 0)
     )
     const positionTitles = sortedStaffEntries
         .map(([position, _]) => positionConfigs[position as Position].name)
