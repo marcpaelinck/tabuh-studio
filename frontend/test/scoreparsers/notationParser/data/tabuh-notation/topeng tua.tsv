@@ -1,0 +1,165 @@
+{INFO notation="topeng tua" part=full title="Topeng Tua" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 90->60 beats=1->6}
+	{TEMPO 95->110 beats=13->16}
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	i-i-	e-e-	i-i-	e-e-	ioa,i	o-e-	uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	iia-	Io-io	e-o-
+gangsa							uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	
+calung							u	u	i	i	u	i	a
+jegogan							u		i		u		a
+reyong							xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	b---
+gong							G		P				P
+kempli	....	....	....	....	....	....	x?...	x?...	x?...	x?...	x?...	x?...	x?...	x?...	x?...	x?...
+	{SEQUENCE [KOTEKAN1, KOTEKAN2_TRANSITION, REGULAR3, REGULAR1, REGULAR2, REGULAR3_FASTER, REGULAR1, REGULAR2, REGULAR3,
+	REGULAR1, REGULAR2_TRANSITION, KOTEKAN3, KOTEKAN1, KOTEKAN2, KOTEKAN3_TRANSITION, REGULAR1, REGULAR2, REGULAR3, REGULAR1_FASTER, REGULAR2,
+	REGULAR3, REGULAR1, REGULAR2, REGULAR3_TRANSITION, KOTEKAN1, KOTEKAN2, KOTEKAN3_END]}
+
+	{LABEL KOTEKAN1}
+	{TEMPO 105}
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	i---	i-ii	i-o-	i-a,-	Io---	o-ii	i-a,-	Io-i-	a,---	a,-i-	Oe---	u-a-	Ue---	e-oo	o-i-	a,-u,-
+ga p	iii.	i.i.	i.i.	ioo.	o.o.	oii.	i.i.	ia,a,.	a,.a,.	a,ee.	e.e.	e.e.	e.e.	eoo.	o.o.	oii.
+ga s	iiio	.o.o	.o.o	.ooe	.e.e	.iio	.o.o	.a,a,i	.i.i	.eeu	.u.u	.u.u	.u.u	.ooe	.e.e	.iio
+calung	i		i		o		i		a		e		e		o
+jegogan	i				o				a				e
+gong	G								G		P				P
+
+	{LABEL KOTEKAN2}
+	{TEMPO 105}
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	Ai---	i-a,-	Io-Eu-	a-e-	u---	u-a-	Ue-o-	i-a,-	Io---	e-o-	Eu-e-	Ua-u-	e---	u-e-	Ua-u-	Ai<-a-
+ga p	iii.	ioo.	o.o.	ouu.	u.u.	uee.	e.e.	eoo.	o.o.	ouu.	u.u.	uee.	e.e.	eaa.	a.a.	auu.
+ga s	iiio	.ooe	.e.e	.uua	.a.a	.eeu	.u.u	.ooe	.e.e	.uua	.a.a	.eeu	.u.u	.aai<	.i<.i<	.uua
+calung	i		o		u		e		o		u		e		a
+jegogan	i				u				o				e
+gong	G								G		P				P
+
+	{LABEL KOTEKAN3}
+	{TEMPO 105}
+	{DYNAMICS f positions=[gangsa,ugal]}
+ugal	u---	u-ee	e-o-	i-u,-	Ai---	i-ii	e-Ua-	i<-a-	u---	e-o-	i-a,i	o-i-	a,---	i-a,-	Io-i-	Oe-o-
+ga p	uuu.	u.u.	u.u.	uii.	i.i.	ioo.	o.o.	ouu.	u.u.	uii.	i.i.	ia,a,.	a,.a,.	a,oo.	o.o.	oii.
+ga s	uuua	.a.a	.a.a	.iio	.o.o	.ooe	.e.e	.uua	.a.a	.iio	.o.o	.a,a,i	.i.i	.ooe	.e.e	.iio
+calung	u		u		i		i		u		i		a		o
+jegogan	u				i				u				a
+gong	G								G		P				P
+
+	{LABEL REGULAR1}
+	{DYNAMICS p positions=[gangsa]}
+	{DYNAMICS mf positions=[ugal]}
+ugal	i--oi-ia,	i--oiooe	o--eoiio	i-Oe-oia,u,	a,--ia,a,io	e--ueoeu	e--ueooe	o-Eu-eoio
+gangsa	ii/ioioio	ioioiooe	oeoeoiio	ioioia,a,i	a,ia,ia,a,io	eueueueu	eueueooe	oeoeoiio
+calung	i	i	o	i	a	e	e	o
+jegogan	i		o		a		e
+gong	G				G	P		P
+
+	{LABEL REGULAR2}
+	{DYNAMICS p positions=[gangsa]}
+	{DYNAMICS mf positions=[ugal]}
+ugal	i--oiooe	o-Eu-euoe	u--aueau	e-Ua-ueoe	o--eoeua	u--aueau	e--ueuai<	a--i<auua
+gangsa	ii/ioiooe	oeoeoeua	uauaueeu	eueueooe	oeoeoeua	uauaueeu	eueueuai<	ai<ai<auua
+calung	i	o	u	e	o	u	e	a
+jegogan	i		u		o		e
+gong	G				G	P		P
+
+	{LABEL REGULAR3}
+	{DYNAMICS p positions=[gangsa]}
+	{DYNAMICS mf positions=[ugal]}
+ugal	u--au-ue	u-Oiiaiu,a,	i--oi-o-	i-Euueuoe	u--auiio	i-Oe-oia,u,	a,--ia,ioe	e-Eu-eoio
+gangsa	uu/uauaua	uauauueo	ioioiooe	oeoeouua	uauauiio	ioioia,a,i	a,ia,ia,ioe	oeoeoiio
+calung	u	u	i	o	u	i	a	o
+jegogan	u		i		u		a
+gong	G				G	P		P
+
+	{LABEL KOTEKAN1_TRANSITION}
+	{TEMPO 105->35 beats=5->12}
+	{DYNAMICS f->mf positions=[gangsa,ugal] beats=1->8}
+ugal	i---	i-ii	i-o-	i-a,-	Io---	o-ii	i-a,-	Io-i-	a,--ia,a,io	e--ueoeu	e--ueooe	o-Eu-eoio
+ga p	iii.	i.i.	i.i.	ioo.	o.o.	oii.	i.i.	ia,a,.	a-------	eueueueu	e-------	--------
+ga s	iiio	.o.o	.o.o	.ooe	.e.e	.iio	.o.o	.a,a,i	e-------	i<ui<ui<ui<u	i<-------	--------
+calung	i		i		o		i		a	e	e	o
+jegogan	i				o				a				e
+gong	G								G	P	 	P
+
+	{LABEL KOTEKAN2_TRANSITION}
+	{TEMPO 105->35 beats=5->12}
+	{DYNAMICS f->mf positions=[gangsa,ugal] beats=1->8}
+ugal	Ai---	i-a,-	Io-Eu-	a-e-	u---	u-a-	Ue-o-	i-a,-	o--eoeua	u--aueau	e--ueuai<	a--i<auua
+ga p	iii.	ioo.	o.o.	ouu.	u.u.	uee.	e.e.	eoo.	o----uua	uauaueeu	e-------	--------
+ga s	iiio	.ooe	.e.e	.uua	.a.a	.eeu	.u.u	.ooe	o----uua	uauaui<i<u	i<-------	--------
+calung	i		o		u		e		o	u	e	a
+jegogan	i				u				o		e
+gong	G								G	P		P
+
+	{LABEL KOTEKAN3_TRANSITION}
+	{TEMPO 105->35 beats=5->12}
+	{DYNAMICS f->mf positions=[gangsa,ugal] beats=1->8}
+ugal	u---	u-ee	e-o-	i-u,-	Ai---	i-ii	e-Ua-	i<-a-	u--auiio	i-Oe-oia,u,	a,--ia,ioe	e-Eu-eoio
+ga p	uuu.	u.u.	u.u.	uii.	i.i.	ioo.	o.o.	ouu.	u----iio	ioioia,a,i	a,-------	--------
+ga s	uuua	.a.a	.a.a	.iio	.o.o	.ooe	.e.e	.uua	u----uua	uauaueeu	e,-------	--------
+calung	u		u		i		i		u	i	a	o
+jegogan	u				u		a
+gong	G				G	P		P
+
+	{LABEL KOTEKAN3_END}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{TEMPO 105->35 beats=5->12}
+ugal	u---	u-ee	e-o-	i-u,-	Ai---	i-ii	e-Ua-	i<-a-	u--auiio	i-Oe-oia,u,	a,--ia,ioe	e-Eu-eoio	
+ga p	uuu.	u.u.	u.u.	uii.	i.i.	ioo.	o.o.	ouu.	uauauiio	ioioia,a,i	a,ia,ia,ioe	oeoeoiio
+ga s	uuua	.a.a	.a.a	.iio	.o.o	.ooe	.e.e	.uua	uauauuua	uauaueeu	eueueuai<	ai<ai<auua
+	{GOTO END}
+
+	{LABEL REGULAR1_FASTER}
+	{COPY REGULAR1}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{DYNAMICS ->p positions=[gangsa] beats=7->8}
+	{DYNAMICS ->mf positions=[ugal] beats=7->8}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->75 beats=3}
+	{TEMPO ->35 beats=4->8}
+
+	{LABEL REGULAR2_FASTER}
+	{COPY REGULAR2}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{DYNAMICS ->p positions=[gangsa] beats=7->8}
+	{DYNAMICS ->mf positions=[ugal] beats=7->8}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->75 beats=3}
+	{TEMPO ->35 beats=4->8}
+
+	{LABEL REGULAR3_FASTER}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{DYNAMICS ->p positions=[gangsa] beats=7->8}
+	{DYNAMICS ->mf positions=[ugal] beats=7->8}
+	{COPY REGULAR3}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->75 beats=3}
+	{TEMPO ->35 beats=4->8}
+
+	{LABEL REGULAR1_TRANSITION}
+	{COPY REGULAR1}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->80 beats=3->5}
+	{TEMPO ->95 beats=6->8}
+
+	{LABEL REGULAR2_TRANSITION}
+	{COPY REGULAR2}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->80 beats=3->5}
+	{TEMPO ->95 beats=6->8}
+
+	{LABEL REGULAR3_TRANSITION}
+	{COPY REGULAR3}
+	{DYNAMICS f positions=[gangsa,ugal]}
+	{TEMPO 45->60 beats=1}
+	{TEMPO ->80 beats=3->5}
+	{TEMPO ->95 beats=6->8}
+
+	{LABEL END}
+ga/ugal	i
+calung	i
+jegogan	i
+gong	G
+
