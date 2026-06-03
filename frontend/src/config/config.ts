@@ -293,7 +293,7 @@ export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1
 // ALPHABET + SAMPLES
 //TODO separate alphabet info from samples info. Same for instrument type.
 export const MelodicNoteChars = ['i', 'o', 'e', 'r', 'u', 'a', 's']
-export const ExtensionChars = ['-', ' ']
+export const ExtensionChars = ['-', ' ', '!'] // '!' = incorrect symbol value.
 export const MutingChars = ['.']
 export const OctavationChars = [',', '<']
 //Patterns
