@@ -32,11 +32,11 @@ export {
  * - `'invalidSymbol'`  — structural error: the input string contains
  *   unrecognised or incorrectly ordered characters. The NoteObject's
  *   decomposed properties (`pitch`, `octave`, …) hold empty fallback values
- *   and `normSymbol` is `'!'`.
+ *   and `symbol` is `'!'`.
  *
  * - `'invalidCasting'` — semantic error: the symbol is structurally valid but
  *   is not playable on the bound position (set by `castingRulesManager`). All
- *   decomposed properties are correctly populated; `normSymbol` retains the
+ *   decomposed properties are correctly populated; `symbol` retains the
  *   normalised form.
  *
  * In both cases the calling code (e.g. `tabuhParser`) is responsible for
@@ -86,7 +86,7 @@ export class NoteObject {
     // --- Raw and normalised strings ---
 
     /** The input string exactly as passed to the constructor. */
-    readonly symbol: string
+    readonly inputSymbol: string
 
     /**
      * The canonical, normalised form of the symbol.
@@ -96,9 +96,9 @@ export class NoteObject {
      * - When `error === 'invalidSymbol'`: `'!'` (the symbol could not be
      *   parsed; no meaningful normalisation is possible).
      *
-     * Always use `normSymbol` for storage, comparison, and rendering.
+     * Always use `symbol` for storage, comparison, and rendering.
      */
-    readonly normSymbol: string
+    readonly symbol: string
 
     // --- Decomposed components ---
 
@@ -194,7 +194,7 @@ export class NoteObject {
      *   is not, `'invalidSymbol'` takes precedence.
      */
     constructor(input: string, position?: Position, fault?: NoteObjectFault) {
-        this.symbol = input
+        this.inputSymbol = input
         this.position = position
         this.isBound = position !== undefined
 
@@ -235,7 +235,7 @@ export class NoteObject {
             this.octave = ''
             this.stroke = ''
             this.pattern = ''
-            this.normSymbol = '!'
+            this.symbol = '!'
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
             this.error = fault
@@ -244,7 +244,7 @@ export class NoteObject {
             this.octave = octave
             this.stroke = stroke
             this.pattern = pattern
-            this.normSymbol = prefix + pitch + octave + stroke + pattern
+            this.symbol = prefix + pitch + octave + stroke + pattern
         }
 
         this.hasGraceNote = this.prefix !== ''
@@ -278,14 +278,14 @@ export class NoteObject {
      * - At most one pattern modifier
      * - No unrecognised characters
      *
-     * @param symbol    The raw symbol string to validate.
+     * @param rawSymbol    The raw symbol string to validate.
      * @param position  Optional. Reserved for future position-specific
      *   validation: once valid-note sets per position are defined, this method
      *   will also verify the note is playable on the given instrument.
      */
-    static validate(symbol: string, position?: Position): void {
-        if (!symbol || symbol.length === 0) {
-            throw new NoteObjectError('empty symbol', symbol ?? '')
+    static validate(rawSymbol: string, position?: Position): void {
+        if (!rawSymbol || rawSymbol.length === 0) {
+            throw new NoteObjectError('empty symbol', rawSymbol ?? '')
         }
 
         let prefixCount = 0
@@ -294,29 +294,29 @@ export class NoteObject {
         let patternCount = 0
         let hasPitch = false
 
-        for (const ch of symbol) {
+        for (const ch of rawSymbol) {
             if (!hasPitch && GRACE_NOTE_PREFIXES.has(ch)) {
                 prefixCount++
-                if (prefixCount > 1) throw new NoteObjectError('symbol has multiple grace note prefixes', symbol)
+                if (prefixCount > 1) throw new NoteObjectError('symbol has multiple grace note prefixes', rawSymbol)
             } else if (!hasPitch && PITCH_CHARS.has(ch)) {
                 hasPitch = true
             } else if (hasPitch && OCTAVE_MODIFIERS.has(ch)) {
                 octaveCount++
-                if (octaveCount > 1) throw new NoteObjectError('symbol has multiple octave modifiers', symbol)
+                if (octaveCount > 1) throw new NoteObjectError('symbol has multiple octave modifiers', rawSymbol)
             } else if (hasPitch && STROKE_MODIFIERS.has(ch)) {
                 strokeCount++
-                if (strokeCount > 1) throw new NoteObjectError('symbol has multiple stroke modifiers', symbol)
+                if (strokeCount > 1) throw new NoteObjectError('symbol has multiple stroke modifiers', rawSymbol)
             } else if (hasPitch && PATTERN_MODIFIERS.has(ch)) {
                 patternCount++
-                if (patternCount > 1) throw new NoteObjectError('symbol has multiple pattern modifiers', symbol)
+                if (patternCount > 1) throw new NoteObjectError('symbol has multiple pattern modifiers', rawSymbol)
                 if (patternCount + strokeCount > 1)
-                    throw new NoteObjectError('symbol has both stroke and pattern modifiers', symbol)
+                    throw new NoteObjectError('symbol has both stroke and pattern modifiers', rawSymbol)
             } else {
-                throw new NoteObjectError(`unrecognised character '${ch}'`, symbol)
+                throw new NoteObjectError(`unrecognised character '${ch}'`, rawSymbol)
             }
         }
 
-        if (!hasPitch) throw new NoteObjectError('no pitch character found', symbol)
+        if (!hasPitch) throw new NoteObjectError('no pitch character found', rawSymbol)
 
         // TODO: position-specific validation.
         // When implemented, verify that `symbol` belongs to the set of notes
@@ -348,7 +348,7 @@ export class NoteObject {
      * Notes with `error !== undefined` are serialised as `'!'`.
      */
     static toNotation(notes: NoteObject[]): string[] {
-        return notes.map((n) => (n.error !== undefined ? '!' : n.normSymbol))
+        return notes.map((n) => (n.error !== undefined ? '!' : n.symbol))
     }
 
     /**
@@ -384,11 +384,11 @@ export class NoteObject {
     // ---------------------------------------------------------------------------
 
     /**
-     * Returns `normSymbol`, or `'!'` if this note has an error.
+     * Returns `symbol`, or `'!'` if this note has an error.
      * This matches the serialisation behaviour of `toNotation()`.
      */
     toString(): string {
-        return this.error !== undefined ? '!' : this.normSymbol
+        return this.error !== undefined ? '!' : this.symbol
     }
 }
 
