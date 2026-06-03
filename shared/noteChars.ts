@@ -33,7 +33,7 @@ export const PITCH_CHARS: ReadonlySet<string> = new Set([
  * - `,` lower octave (octave 0)
  * - `<` upper octave (octave 2)
  */
-export const OCTAVE_MODIFIERS: ReadonlySet<string> = new Set([",", "<"]);
+export const OCTAVE_MODIFIERS: ReadonlySet<string> = new Set([',', '<'])
 
 /**
  * Stroke / articulation modifier characters. Appear after the pitch character.
@@ -57,11 +57,29 @@ export const STROKE_MODIFIERS: ReadonlySet<string> = new Set([
  *
  * - `n` norot
  */
-export const PATTERN_MODIFIERS: ReadonlySet<string> = new Set(["n"]);
+export const PATTERN_MODIFIERS: ReadonlySet<string> = new Set(['n'])
 
 /** Union of all characters that may follow the pitch character. */
 export const AFTER_MODIFIERS: ReadonlySet<string> = new Set([
-  ...OCTAVE_MODIFIERS,
-  ...STROKE_MODIFIERS,
-  ...PATTERN_MODIFIERS,
-]);
+    ...OCTAVE_MODIFIERS,
+    ...STROKE_MODIFIERS,
+    ...PATTERN_MODIFIERS
+])
+
+/**
+ * Generate types from the constants defined above.
+ */
+const _grace_note_prefixes_ = [...GRACE_NOTE_PREFIXES]
+export type GracenotePrefix = (typeof _grace_note_prefixes_)[number] | ''
+
+const _pitch_chars_ = [...PITCH_CHARS]
+export type PitchChar = (typeof _pitch_chars_)[number]
+
+const _octave_mod_ = [...OCTAVE_MODIFIERS]
+export type OctaveModifier = (typeof _octave_mod_)[number] | ''
+
+const _stroke_modifiers_ = [...STROKE_MODIFIERS]
+export type StrokeModifier = (typeof _stroke_modifiers_)[number] | ''
+
+const _pattern_modifiers_ = [...PATTERN_MODIFIERS]
+export type PatternModifiers = (typeof _pattern_modifiers_)[number] | ''
