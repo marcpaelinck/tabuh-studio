@@ -235,8 +235,7 @@ export function executionManager(
                     // Case 1: fromValue is given
                     const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
                     const valueRange = exprItem.value - exprItem.fromValue
-                    const startValue =
-                        exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
+                    const startValue = exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
                     const endValue = startValue + valueRange / totalBeats
                     // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
                     return [startValue, endValue]
@@ -335,7 +334,9 @@ export function executionManager(
                     .filter(([_key, staff]) => staff != null)
                     .map(([key, staff]) => [
                         key,
-                        { notation: getBeatNotation(staff!.notation, next.beatIdx, nextSystem, key as Position) } as Staff
+                        {
+                            notation: getBeatNotation(staff!.notation, next.beatIdx, nextSystem, key as Position)
+                        } as Staff
                     ])
             ) as Partial<Record<Position, Staff>>
 
@@ -358,12 +359,7 @@ export function executionManager(
                 loop: peek ? nextLoop : flowinfo[next.systemIdx].loop,
                 measures: measures,
                 positions: _.keys(measures) as Position[],
-                tempo: getExpressionValue(
-                    'tempo',
-                    next.systemIdx,
-                    next.beatIdx,
-                    currentStep?.tempo[1] || defaultTempo
-                ),
+                tempo: getExpressionValue('tempo', next.systemIdx, next.beatIdx, currentStep?.tempo[1] || defaultTempo),
                 dynamics: getExpressionValue(
                     'dynamics',
                     next.systemIdx,
