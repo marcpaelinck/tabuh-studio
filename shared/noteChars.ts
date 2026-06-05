@@ -24,7 +24,7 @@ export const GRACE_NOTE_PREFIXES: ReadonlySet<string> = new Set([
  */
 // prettier-ignore
 export const PITCH_CHARS: ReadonlySet<string> = new Set([
-  "a","e","i","o","u","r","s","t","b","x","y","G","P","T","-",".","(",")","*","0","8","9"
+  "a","e","i","o","u","r","s","t","b","x","y","G","P","T","-"," ", ".","(",")","*","0","8","9"
 ]);
 
 /**
