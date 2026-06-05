@@ -1,9 +1,8 @@
 // This module contains the rules that are used for the automatic generation of notation for grouped staves.
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
-import { NorotChars } from '../config/config.ts'
+import { NoteObject } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
-import { splitTone } from '../utils/alphabet.ts'
 import { debug } from '../utils/debugger.ts'
 import { isEvenByIndex as isEvenPositionByIndex } from '../utils/objectUtils.ts'
 
@@ -115,12 +114,12 @@ function selectRule(
 // assuming that the measure is a basic (polos) melody.
 // measureId starts with 0
 export function castNotation(
-    notation: string[],
+    notation: NoteObject[],
     groupedPositions: Position[],
     measureIdx: number,
     posIdx: number,
     castingInstructions?: CastingInstruction[]
-): string[] {
+): NoteObject[] {
     if (posIdx < 0 || posIdx >= groupedPositions.length) {
         console.error(`Instrument index ${posIdx} too large.`)
         return []
@@ -137,31 +136,34 @@ export function castNotation(
     // Apply pokok rules
     if (onlyOddMeasures.includes(position) && isEvenPositionByIndex(measureIdx)) {
         // Clear even numbered measures. Note that measure numbering starts with 0.
-        updatedNotation = updatedNotation.map((_) => '-')
+        updatedNotation = updatedNotation.map((_) => new NoteObject(' '))
         debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
     }
     if (onlyOddNotes.includes(position)) {
-        updatedNotation = updatedNotation.map((sym, idx) =>
+        updatedNotation = updatedNotation.map((note, idx) =>
             // Remove even numbered notes.
-            (idx + 1) % 2 == 0 ? '-' : sym
+            (idx + 1) % 2 == 0 ? new NoteObject(' ') : note
         )
         debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
     }
     if (onlyFirstNote.includes(position)) {
-        updatedNotation = updatedNotation.map((sym, idx) =>
+        updatedNotation = updatedNotation.map((note, idx) =>
             // Remove all but first note.
-            idx > 0 ? '-' : sym
+            idx > 0 ? new NoteObject(' ') : note
         )
         debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
     }
 
-    // Apply casting rules
-    const result = updatedNotation.map((symbol) => {
-        const [tone, rest] = splitTone(symbol)
-        const isNorot = NorotChars.some((char) => symbol.includes(char))
-        var cast = isNorot ? norotconversion[tone] : conversion[tone]
-        const newSymbol = cast ? cast + rest : ' '
-        return newSymbol
+    // Apply casting rules using NoteObject for tone/norot classification.
+    // Invalid symbols (error !== undefined) pass through as '!'.
+    // Symbols not found in the casting table are also replaced with '!'.
+    const result = updatedNotation.map((note) => {
+        if (note.error !== undefined) return new NoteObject('!')
+        const tone = note.pitch + note.octave
+        const cast = note.isNorot ? norotconversion[tone] : conversion[tone]
+        const symbol = cast !== undefined ? note.prefix + cast + note.stroke + note.pattern : '!'
+        
+        return new NoteObject(symbol)
     })
 
     return result

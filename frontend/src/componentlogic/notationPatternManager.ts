@@ -1,10 +1,8 @@
 // Converts (shorthand) symbols that represent a sequence of base notes to the corresponding base note symbols.
 
-import { MutingChars } from '../config/config'
+import { NoteObject } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '../typing/basetypes'
 import type { Staff } from '../typing/score'
-import { splitTone } from '../utils/alphabet'
-import { getPatternType } from '../utils/patterns'
 
 type NorotSubPattern = 'ngubeng' | 'majalan'
 type NorotType = 'homophonic' | 'kotekan'
@@ -194,106 +192,97 @@ const patterns = {
         }
 }
 
-// Returns the number of notes of a pattern of 1 if the symbol is not a notation pattern.
-export function patternSize(symbol: NoteSymbol, position: Position): number {
-    const pattern = getPatternType(symbol, position)
-    switch (pattern) {
-        case 'NOROT':
-            return patterns.norot.size
-        case 'GRACENOTE':
-            return 0
-        default:
-            return 1
-    }
+// Returns the number of notes a symbol expands to during pattern resolution.
+// Norot symbols expand to 4 notes. All other symbols (including combined
+// grace-note symbols) occupy exactly one notation column.
+export function patternSize(note: NoteObject, position: Position): number {
+    void position // reserved for future position-specific logic
+    return note.isNorot ? patterns.norot.size : 1
 }
 
 // Returns the width of the notation after expanding notation pattern symbols.
-export function notationWidth(notation: NoteSymbol[], position: Position) {
-    return notation.reduce((sum, symbol) => sum + patternSize(symbol, position), 0)
+export function notationWidth(notation: NoteObject[], position: Position) {
+    return notation.reduce((sum, note) => sum + patternSize(note, position), 0)
 }
 
-// Converts specific symbols that represent a sequence of notes to a list of PlaybackSamplerAction objects.
-// Function `createNoteActions` expects a `CreatePatternArgs` object as argument.
-// Arguments `prevsymbol` and `nextsymbol` are required because some patterns can consist of two consecutive symbols.
-// The 'grace note' pattern requires information about the next symbol to determine its octave.
-// WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
+// Converts an array of NoteSymbol strings to an array of NoteObject objects.
+function symbolArrayToNoteArray(symbols: NoteSymbol[]): NoteObject[] {
+    return symbols.map((sym) => new NoteObject(sym))
+}
+
+// Expands shorthand notation symbols (norot) into their full note sequences.
 // staff is an array of Staffs, one per kempli beat (as produced by the parser before flattening).
 export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
     const newStaff: Staff[] = []
     staff.forEach((beat, measureIdx) => {
-        const expandedNotation: NoteSymbol[] = []
-        beat.notation.forEach((symbol, symbolIdx) => {
-            const pattern = getPatternType(symbol, position)
-            switch (pattern) {
-                case 'SINGLENOTE':
-                    expandedNotation.push(symbol)
-                    break
-                case 'NOROT':
-                    expandedNotation.push(...norotPattern(position, staff, measureIdx, symbolIdx))
-                    break
-                case 'INVALID':
-                    console.error(`invalid pattern '${symbol}' for ${position} staff=${JSON.stringify(staff)}`)
-                    expandedNotation.push(...silenceSymbol())
-                    break
-                case 'UNHANDLED':
-                    console.error(`Unhandled pattern ${symbol} for ${position}`)
-                    expandedNotation.push(...silenceSymbol())
-                    break
-                default:
-                    expandedNotation.push(symbol)
+        const expandedObjNotation: NoteObject[] = []
+        beat.objNotation.forEach((note, noteIdx) => {
+            if (note.error !== undefined) {
+                // Structurally invalid symbol — replace with silence
+                console.error(`invalid symbol '${note.symbol}' for ${position}`)
+                expandedObjNotation.push(new NoteObject(' '))
+            } else if (note.isNorot) {
+                expandedObjNotation.push(...norotPattern(position, staff, measureIdx, noteIdx))
+            } else {
+                // Single note (including combined grace-note symbols, strokes, etc.)
+                expandedObjNotation.push(new NoteObject(note.symbol))
             }
         })
-        newStaff.push({ notation: expandedNotation } as Staff)
+        const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.symbol)
+        newStaff.push({ notation: expandedNotation, objNotation: expandedObjNotation } as Staff)
     })
     return newStaff
 }
 
-function silenceSymbol(): NoteSymbol[] {
-    return [MutingChars[0]]
-}
-
-function norotPattern(position: Position, staff: Staff[], measureIdx: number, symbolIdx: number): NoteSymbol[] {
-    // Check if norot applies to the current position.
+function norotPattern(position: Position, staff: Staff[], measureIdx: number, symbolIdx: number): NoteObject[] {
     if (!(position in patterns.norot.patterns)) {
         console.error(`Unexpected norot symbol in ${position} notation.`)
         return []
     }
-    // Remove any space symbols and determine the norot type
-    const notation = staff[measureIdx].notation.filter((symbol) => symbol.replace(' ', '') != '')
-    const norotType: NorotType = notation.length == 1 ? 'kotekan' : 'homophonic'
+    // Remove any space symbols and determine the norot type.
+    // Norot style rule: if the measure contains only one note, assume kotekan style.
+    // Rationale: in general the kempli doubles the beat frequency when norot is played kotekan style.
+    const objNotation = staff[measureIdx].objNotation.filter((note) => note.symbol != '')
+    const norotType: NorotType = objNotation.length == 1 ? 'kotekan' : 'homophonic'
 
-    // Determine the current and previous tone
-    // Assume that the first symbol of the staff coincides with the GIR and set its prevSymbol value to undefined.
-    const symbol = staff[measureIdx].notation[symbolIdx]
-    var prevSymbol =
+    // Current note
+    const note = new NoteObject(staff[measureIdx].notation[symbolIdx])
+    const currTone = note.pitch + note.octave
+
+    // Previous symbol: from the same beat (if symbolIdx > 0) or the last symbol of the previous beat
+    let prevNote: NoteObject | undefined
+    const rawPrev =
         symbolIdx > 0
-            ? staff[measureIdx].notation[symbolIdx - 1] // previous symbol is in the same measure
+            ? staff[measureIdx].notation[symbolIdx - 1]
             : measureIdx > 0
-              ? staff[measureIdx - 1].notation.at(-1) // previous symbol is the last symbol of the previous measure
+              ? staff[measureIdx - 1].notation.at(-1)
               : undefined
 
-    // Ignore the previous symbol if it not a norot symbol.
-    if (prevSymbol && getPatternType(prevSymbol, position) != 'NOROT') prevSymbol = undefined
-
-    // The norot pattern is set to majalan if there is a change in tone, at the beginning of a norot sequence or on the GIR.
-    const norotPattern: NorotSubPattern = prevSymbol == symbol ? 'ngubeng' : 'majalan'
-
-    // Ngubeng
-    const [currTone, _rest1] = splitTone(symbol)
-    if (norotPattern == 'ngubeng') {
-        return patterns.norot.patterns[position]![currTone][norotType].ngubeng
+    if (rawPrev !== undefined) {
+        const p = new NoteObject(rawPrev)
+        if (p.isNorot) prevNote = p
     }
 
-    // Majalan: set the first pattern note to the last norot pokok if it exists, otherwise set it to a muting symbol.
-    // The previous note is either the first note of the measure (homophonic) or the (last) note of the previous measure (kotekan).
-    // In the latter case the previous measure is in the current staff (majalan can not occur in the first beat of the staff).
-    var firstNote: NoteSymbol
-    if (measureIdx == 0 && symbolIdx == 0)
-        firstNote = patterns.norot.patterns[position]![currTone][norotType].basenote // subpattern on GIR
-    else if (prevSymbol) {
-        const [prevTone, _rest2] = splitTone(prevSymbol)
+    // Ngubeng when the previous norot note has the same tone; majalan on a tone change,
+    // at the start of a norot sequence, or on the GIR.
+    const subPattern: NorotSubPattern =
+        prevNote !== undefined && prevNote.symbol === note.symbol ? 'ngubeng' : 'majalan'
+
+    if (subPattern === 'ngubeng') {
+        return symbolArrayToNoteArray(patterns.norot.patterns[position]![currTone][norotType].ngubeng)
+    }
+
+    // Majalan: derive the first pattern note from the previous norot basenote (if any)
+    let firstNote: NoteSymbol
+    if (measureIdx === 0 && symbolIdx === 0) {
+        firstNote = patterns.norot.patterns[position]![currTone][norotType].basenote // on GIR
+    } else if (prevNote !== undefined) {
+        const prevTone = prevNote.pitch + prevNote.octave
         firstNote = patterns.norot.patterns[position]![prevTone][norotType].basenote
-    } else firstNote = '.' // start of a norot sequence
-    // Return the majalan pattern with the first note replaced
-    return patterns.norot.patterns[position]![currTone][norotType].majalan.toSpliced(0, 1, firstNote)
+    } else {
+        firstNote = '.' // start of a norot sequence
+    }
+    return symbolArrayToNoteArray(
+        patterns.norot.patterns[position]![currTone][norotType].majalan.toSpliced(0, 1, firstNote)
+    )
 }

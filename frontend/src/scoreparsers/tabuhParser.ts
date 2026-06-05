@@ -1,5 +1,6 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -151,10 +152,16 @@ function castGroupedNotationToPositions(
             const beats: Staff[] = []
             var measureIdx = 0
             for (const beat of group.staff) {
+                const objNotation = castNotation(
+                    beat.objNotation,
+                    group.positions,
+                    measureIdx,
+                    posIdx,
+                    castInstructions
+                )
+                const strNotation = objNotation.map((note) => note.symbol)
                 if (group.positions.length > 1) {
-                    beats.push({
-                        notation: castNotation(beat.notation, group.positions, measureIdx, posIdx, castInstructions)
-                    })
+                    beats.push({ notation: strNotation, objNotation: objNotation })
                 } else beats.push({ ...beat })
                 measureIdx++
             }
@@ -169,7 +176,9 @@ function flattenParsedStaffs(parsedStaffs: ParsedStaffs): Staffs {
     const staffs: Staffs = {}
     for (const [pos, beats] of Object.entries(parsedStaffs)) {
         if (!beats) continue
-        staffs[pos as Position] = { notation: beats.flatMap((beat) => beat.notation) }
+        const notation = beats.flatMap((beat) => beat.notation)
+        const objNotation = notation.map((symbol) => new NoteObject(symbol, pos as Position))
+        staffs[pos as Position] = { notation: notation, objNotation: objNotation }
     }
     return staffs
 }
@@ -236,11 +245,15 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
 
         // Step 2: Compute column widths (max notation width per beat across all positions) and pad beats
         const colWidths = getColwidths(parsedStaffs)
-        _.values(parsedStaffs).forEach((beats) => {
+        _.entries(parsedStaffs).forEach(([position, beats]) => {
             if (!beats) return
             beats.forEach((beat, colIdx) => {
                 const diff = (colWidths[colIdx] ?? 0) - beat.notation.length
-                if (diff > 0) beat.notation.push(...Array(diff).fill(' '))
+                if (diff > 0) {
+                    const padding = Array(diff).fill(' ')
+                    beat.notation.push(...padding)
+                    beat.objNotation.push(...padding.map((symbol) => new NoteObject(symbol, position as Position)))
+                }
             })
         })
 
@@ -424,10 +437,12 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
         var groupedNotation: GroupedNotation
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
-            const beat: Staff = { notation: [] }
+            const beat: Staff = { notation: [], objNotation: [] }
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
-                beat.notation.push(getText(noteNode, content).trim())
+                const note = new NoteObject(getText(noteNode, content).trim())
+                beat.notation.push(note.symbol)
+                beat.objNotation.push(note)
                 noteNode = noteNode.nextSibling
             }
             staff.push(beat)
@@ -439,7 +454,7 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
     const maxMeasures = Math.max(...notationGroups.map((ng) => ng.staff.length))
     for (const ng of notationGroups) {
         const shortage = maxMeasures - ng.staff.length
-        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [] }) as Staff[]))
+        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [], objNotation: [] }) as Staff[]))
     }
 
     return notationGroups
@@ -450,7 +465,7 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
 function getColwidths(parsedStaffs: ParsedStaffs): number[] {
     const sizes = _.entries(parsedStaffs)
         .filter(([_position, beats]) => beats != undefined)
-        .map(([position, beats]) => beats!.map((beat) => notationWidth(beat.notation, position as Position)))
+        .map(([position, beats]) => beats!.map((beat) => notationWidth(beat.objNotation, position as Position)))
     // Transpose to get widths per column
     const widthsByColumn = _.zip(...sizes)
     const columnWidths: number[] = widthsByColumn.map((widths) =>
@@ -756,12 +771,9 @@ interface BeatsParameter {
 function getGradualBeatsParameters(node: SyntaxNode, content: string, valueGradual: boolean): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
     const gradual: boolean = valueGradual || values.isGradual
-    const param: BeatsParameter = {
-        fromBeat: gradual
-            ? (values.fromValue as number) || (values.value as number) || 1 // gradual: start beat
-            : (values.value as number) || 1, // non-gradual: apply-at beat (default 1)
-        toBeat: gradual ? (values.value as number) || undefined : undefined, // gradual end beat; undefined for non-gradual
-        isGradual: values.isGradual
-    }
+    const param: BeatsParameter =
+        gradual
+            ? { fromBeat: values.fromValue as number | undefined, toBeat: values.value as number | undefined, isGradual: true }
+            : { fromBeat: values.value as number | undefined, toBeat: undefined, isGradual: false }
     return param
 }

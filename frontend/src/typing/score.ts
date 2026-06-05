@@ -1,3 +1,4 @@
+import type { NoteObject } from '@tabuhstudio/shared/NoteObject'
 import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeType, ToneType, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
 
@@ -29,6 +30,16 @@ export interface Staff {
     notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet. Enables to revert changes.
 }
 
+// Notation of one instrument position within a System (flat, not subdivided into measures)
+// 'notation' and 'notation_' are kept for backward compatibility until the entire codebase has been
+// refactored to use the NoteObject class exclusively.
+export interface Staff {
+    notation: NoteSymbol[]
+    notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet. Enables to revert changes.
+    objNotation: NoteObject[]
+    objNotation_?: NoteObject[]
+}
+
 export type Staffs = Partial<Record<Position, Staff>>
 
 // Used during parsing only: staff is an array of Staffs, one per kempli beat (measure).
@@ -50,8 +61,7 @@ export type System = {
     kempli: KempliSetting
     label?: string
     execution?: ExecutionItem[]
-    copyfrom?: string // label or id of copied system
-    copyfromkey?: UUID // uuid copied system
+    staffs_?: Staffs
 }
 
 export type Score = {
@@ -59,13 +69,7 @@ export type Score = {
     title: string
     composer: string
     instrumenttype: InstrumentType
-    parts: Record<string, UUID[]> // <`part name`, `system uuid`[]>
-    positions: Position[] // sorted list of positions ordered as displayed in the editor
+    parts: Record<string, UUID[]>
+    positions: Position[]
     systems: System[]
-}
-
-export interface ValidationResult {
-    isValid: boolean
-    hasCycle: boolean
-    message: string
 }
