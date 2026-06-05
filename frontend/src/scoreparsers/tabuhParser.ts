@@ -4,7 +4,7 @@ import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
-import { applyPatterns, notationWidth } from '../componentlogic/notationPatternManager.ts'
+import { applyPatterns, notationWidth } from '../componentlogic/patternManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
 import type { Position, UUID } from '../typing/basetypes.ts'
 import type {
@@ -771,9 +771,12 @@ interface BeatsParameter {
 function getGradualBeatsParameters(node: SyntaxNode, content: string, valueGradual: boolean): BeatsParameter {
     const values = getGradualValues(node.getChild('BeatsGradualParameter'), 'IntegerValue', content)
     const gradual: boolean = valueGradual || values.isGradual
-    const param: BeatsParameter =
-        gradual
-            ? { fromBeat: values.fromValue as number | undefined, toBeat: values.value as number | undefined, isGradual: true }
-            : { fromBeat: values.value as number | undefined, toBeat: undefined, isGradual: false }
+    const param: BeatsParameter = gradual
+        ? {
+              fromBeat: values.fromValue as number | undefined,
+              toBeat: values.value as number | undefined,
+              isGradual: true
+          }
+        : { fromBeat: values.value as number | undefined, toBeat: undefined, isGradual: false }
     return param
 }

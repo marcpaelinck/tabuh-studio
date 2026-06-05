@@ -53,7 +53,7 @@ import {
 } from '../../utils/timeunits'
 import { cycleValidation } from '../validationManager'
 import { executionManager, type FlowStep } from './executionManager'
-import { createNoteActions, totalDuration } from './playbackPatternManager'
+import { createNoteActions, totalDuration } from './strokeManager'
 import { useInstruments } from './useInstruments'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
@@ -365,8 +365,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     } else if (isMuting(symbol)) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
-                        // Convert potential patterns to individual note actions.
-                        const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
+                        // Convert potential motifs to individual note actions.
+                        const motifNoteActions: PlaybackSamplerAction[] = createNoteActions({
                             samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
                             timeMs: currTimeMs,
@@ -384,10 +384,10 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             prevaction: _.last(newTimeLine.sampleractions),
                             isLast: lastStep && endOfMeasure
                         })
-                        // Create one or more sampler action(s) for the new note or pattern
-                        patternNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
+                        // Create one or more sampler action(s) for the new note or motif
+                        motifNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
                             currAction[position] = noteAction
-                            if (endOfMeasure && noteAction.params.isLastOfPattern && currentStep!.waitMsAfter) {
+                            if (endOfMeasure && noteAction.params.isLastOfMotif && currentStep!.waitMsAfter) {
                                 // Extend the last note of the section with wait time if it is indicated in the score.
                                 currAction[position].params.duration = TOplusNumber(
                                     currAction[position].params.duration,
@@ -470,7 +470,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             // CREATE KEMPLI ACTION
 
             // Generate kempli actions once at the start of the system.
-            // Note: the tempo is currently only used for rake patterns
+            // Note: the tempo is currently only used for rake motifs
             // which should not be used in combination with implicit kempli beats
             const systemDuration = getSystemDuration(currentStep.system, currentStep.tempo[0])
             if (
@@ -483,7 +483,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     beatOffset < systemDuration;
                     beatOffset += currentStep.system.kempli.frequency || defaultBeatFrequency
                 ) {
-                    const patternNoteActions: PlaybackSamplerAction[] = createNoteActions({
+                    const strokeNoteActions: PlaybackSamplerAction[] = createNoteActions({
                         samplerFunction: pbFunctionsRef.current.play,
                         time: beatStartTime + beatOffset, // Note that this is equal to the system start
                         // The tempo given for the following calculation is not precise
@@ -501,8 +501,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         isLast: lastStep && beatOffset + currentStep.system.kempli.frequency! > systemDuration
                     })
                     // createNoteActions always returns an array containing 1 or more actions
-                    if (patternNoteActions) {
-                        newTimeLine.sampleractions.push(...patternNoteActions)
+                    if (strokeNoteActions) {
+                        newTimeLine.sampleractions.push(...strokeNoteActions)
                     } else {
                         console.log('what`s going on here?')
                     }

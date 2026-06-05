@@ -12,7 +12,7 @@ import {
 import type { NoteSymbol, Position } from '../typing/basetypes'
 import { getValidSymbols } from './alphabet'
 
-type PatternType =
+type StrokeType =
     | 'SINGLENOTE'
     | 'HALF_DURATION'
     | 'TREMOLO'
@@ -23,14 +23,14 @@ type PatternType =
     | 'UNHANDLED'
     | 'INVALID'
 
-export function getPatternType(symbol: NoteSymbol, position: Position): PatternType {
+export function getStrokeType(symbol: NoteSymbol, position: Position): StrokeType {
     const validSymbols = getValidSymbols(position, true, false)
     switch (true) {
         case validSymbols.includes(symbol):
             return 'SINGLENOTE'
         case HalfDurationChars.some((char) => symbol.includes(char)):
             return 'HALF_DURATION'
-        case !positionConfigs[position].validPatterns.includes(symbol):
+        case !positionConfigs[position].validStrokes.includes(symbol):
             return 'INVALID'
         case symbol.length > 0 && GraceNoteChars.includes(symbol[0]):
             return 'GRACENOTE'

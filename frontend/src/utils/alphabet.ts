@@ -5,11 +5,11 @@ import type { NoteSymbol, Position } from '../typing/basetypes'
 export const getValidSymbols = (
     position: Position,
     includeSilences: boolean = false,
-    includePatterns: boolean = false
+    includeStrokes: boolean = false
 ): string[] => {
     const valids = _.concat(
         Object.keys(positionConfigs[position].symbolToNoteNames),
-        includePatterns ? positionConfigs[position].validPatterns : [],
+        includeStrokes ? positionConfigs[position].validStrokes : [],
         includeSilences ? _.concat(MutingChars, ExtensionChars) : []
     )
     return valids

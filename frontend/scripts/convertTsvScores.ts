@@ -63,7 +63,7 @@ function postProcess(score: Score): void {
 
 // ---------------------------------------------------------------------------
 // JSON formatting (mirrors scoreToFormattedJson in objectUtils.ts, without
-// the playbackPatternManager dependency that would pull in Tone.js)
+// the playbackStrokeManager dependency that would pull in Tone.js)
 // ---------------------------------------------------------------------------
 
 function scoreToFormattedJson(score: Score): string {

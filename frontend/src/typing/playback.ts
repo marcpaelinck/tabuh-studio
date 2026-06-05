@@ -31,7 +31,7 @@ export interface SamplerFunctionParameters {
     velocity: Tone.Unit.NormalRange
     duration: TimeObject
     isLast: boolean
-    isLastOfPattern: boolean
+    isLastOfMotif: boolean
 }
 
 export type SamplerFunction = (time: number, params: SamplerFunctionParameters) => void

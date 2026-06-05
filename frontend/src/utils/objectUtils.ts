@@ -3,7 +3,7 @@
  */
 
 import _ from 'lodash'
-import { symbolDuration, totalDuration } from '../componentlogic/playback/playbackPatternManager'
+import { symbolDuration, totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency, defaultTempo } from '../config/config'
 import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
