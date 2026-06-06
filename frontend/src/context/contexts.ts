@@ -1,8 +1,6 @@
 import { createContext, type Context, type RefObject } from 'react'
 import type { NavigationAction } from '../config/config'
 import type { Score, System } from '../typing/score'
-import type { WpDatabaseReturnValue, WpUserReturnValue } from '../typing/wordpress'
-import { emulateAsync } from '../utils/async'
 
 // SCORE FUNCTIONS
 // modify / save score
@@ -36,45 +34,3 @@ export const defaultNavFunc: NavigationFunctionsType = {
     applyRules: () => {}
 }
 export const NavigationFunctions: Context<NavigationFunctionsType> = createContext(defaultNavFunc)
-
-// WORDPRESS API FUNCTIONS
-export interface WordPressApiType {
-    user: {
-        login: (username: string, password: string) => Promise<WpUserReturnValue>
-        logout: () => Promise<WpUserReturnValue>
-        getUser: () => Promise<WpUserReturnValue>
-    }
-    database: {
-        saveScore: (uuid: string, title: string, json: string) => Promise<WpDatabaseReturnValue>
-        getScore: (uuid: string) => Promise<WpDatabaseReturnValue>
-        getScoreList: () => Promise<WpDatabaseReturnValue>
-    }
-}
-export const defaultWpApiFunc: WordPressApiType = {
-    user: {
-        login: () =>
-            emulateAsync<WpUserReturnValue>({
-                logged_in: false,
-                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
-                nonce: ''
-            }),
-        logout: () =>
-            emulateAsync<WpUserReturnValue>({
-                logged_in: false,
-                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
-                nonce: ''
-            }),
-        getUser: () =>
-            emulateAsync<WpUserReturnValue>({
-                logged_in: true,
-                user: { ID: '-1', display_name: 'Develop Mode', roles: [] },
-                nonce: ''
-            })
-    },
-    database: {
-        saveScore: async () => new Promise(Object()),
-        getScore: async () => new Promise(Object()),
-        getScoreList: async () => new Promise(Object())
-    }
-}
-export const WpApiFunctions: Context<WordPressApiType> = createContext(defaultWpApiFunc)
