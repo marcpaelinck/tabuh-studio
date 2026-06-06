@@ -193,10 +193,10 @@ export function useScoreManager() {
                 break
             case 'new': {
                 // Creates an empty system based on the staff settings of the current system.
-                Object.values(newSystemData.staffs).forEach((staff) => {
+                Object.values(newSystemData.staffs).forEach((staff: Staff) => {
                     if (!staff) return
-                    delete (staff as Staff).notation_
-                    ;(staff as Staff).notation = []
+                    delete staff.objNotation_
+                    staff.objNotation = []
                 })
                 newSystemData.label = undefined
                 newSystemData.execution = undefined

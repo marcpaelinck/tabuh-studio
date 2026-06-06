@@ -17,7 +17,7 @@ export function persistCachedChanges(score: Score | undefined): Score | undefine
     newScore.systems.forEach((sys) =>
         _.toPairs(sys.staffs).forEach(([_pos, staff]) => {
             if (!staff) return
-            if (staff.notation_) staff.notation = staff.notation_
+            if (staff.objNotation_) staff.objNotation = staff.objNotation_
             delete staff.notation_
         })
     )

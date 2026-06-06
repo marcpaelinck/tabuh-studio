@@ -150,11 +150,11 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             for (const system of score.systems) {
                 var line: string
                 if (position in system.staffs) {
-                    line = system.staffs[position]!.notation.join('')
+                    line = system.staffs[position]!.objNotation.map((note) => note.toString()).join('')
                 } else {
                     // Position not present: fill with spaces matching first staff length
                     const firstStaff = Object.values(system.staffs)[0]
-                    line = ' '.repeat(firstStaff?.notation.length ?? 0)
+                    line = ' '.repeat(firstStaff?.objNotation.length ?? 0)
                 }
 
                 posNotation.push(

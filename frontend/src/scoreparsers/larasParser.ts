@@ -122,5 +122,5 @@ export function parseLaras(content: string): ParserReturnValue {
     }
 
     traverse(tree.topNode)
-    return score
+    return { score, errors: [], postProcessing: [], tree }
 }

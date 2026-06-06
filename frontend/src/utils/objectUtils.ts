@@ -134,8 +134,8 @@ export function getSystemBeatCount(system: System): number {
         )
         return Math.max(1, Math.ceil(maxDuration / freq))
     } else if (system.kempli.state === 'notation') {
-        const kempliNotation = system.staffs['KEMPLI']?.notation || []
-        return Math.max(1, kempliNotation.filter((n) => n === 'x?').length)
+        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
+        return Math.max(1, kempliNotation.filter((n) => n.canonicalSymbol === 'x?').length)
     }
     return 1
 }
@@ -152,9 +152,9 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
         return start
     } else if (system.kempli.state === 'notation') {
         // x? marks the START of each kempli beat.
-        const kempliNotation = system.staffs['KEMPLI']?.notation || []
+        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
         const beatPositions = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos),
+            (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
             []
         )
         return beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
@@ -183,9 +183,9 @@ export function getBeatNotation(
     } else if (system.kempli.state === 'notation') {
         // x? marks the START of each kempli beat.
         // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
-        const kempliNotation = system.staffs['KEMPLI']?.notation || []
+        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
         const beatPositions = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note === 'x?' ? [...pos, idx] : pos),
+            (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
             []
         )
         const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0

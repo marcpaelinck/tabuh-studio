@@ -55,7 +55,7 @@ export type System = {
     kempli: KempliSetting
     label?: string
     execution?: ExecutionItem[]
-    staffs_?: Staffs
+    staffs_?: Staffs // Reserved to contain the original staffs of a copied system
     copyFrom?: string // Label of the system of which the current system is a copy
     copyFromUuid?: string // UUID of the system of which the current system is a copy
 }

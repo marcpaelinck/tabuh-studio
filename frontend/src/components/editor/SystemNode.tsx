@@ -1,3 +1,4 @@
+import type { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import {
     useEffect,
@@ -69,23 +70,6 @@ export function SystemNode({
         background: 'rgba(255, 255, 255, 0.9)'
     }
 
-    // Fills the notation of the given measure (colId) for all grouped instruments
-    // by casting the given notation for each instrument.
-    // function applyRules(notation: string[], rowIdx: number, colIdx: number, cached: boolean) {
-    //     // Input should currently come from Pemade polos part
-    //     // TODO add a separate input field for grouped positions
-    //     if (positions[rowIdx] != 'PEMADE_POLOS') return
-    //     const newSystemData = { ...systemData }
-    //     positions.forEach((position) => {
-    //         if (!systemData.editorGroup.includes(position)) return
-    //         const newNotation = castNotation(notation, newSystemData.staffs[position]!, positions, colIdx, rowIdx)
-    //         if (cached) newSystemData.staffs[position]![colIdx].notation_ = newNotation
-    //         else newSystemData.staffs[position]![colIdx].notation = newNotation
-    //         debug(`updated notation of ${position} to ${notation2text(newNotation)}`)
-    //     })
-    //     scoreFunc.updateSystem(newSystemData)
-    // }
-
     function moveEditorCursor(cursor: EditorCursorParameters) {
         if (cursor.sysuuid != systemData.uuid) {
             setPlaybackCursor(null)
@@ -110,10 +94,10 @@ export function SystemNode({
                 }
                 case 'notation': {
                     // Get the kempli notation for the entire system
-                    const notation: string[] = systemData.staffs['KEMPLI']?.notation || []
+                    const objNotation: NoteObject[] = systemData.staffs['KEMPLI']?.objNotation || []
                     // Determine the positions of the kempli characters
-                    const indices = notation.reduce(
-                        (aggr: number[], note, idx) => (note == 'x?' ? aggr.concat([idx]) : aggr),
+                    const indices = objNotation.reduce(
+                        (aggr: number[], note, idx) => (note.canonicalSymbol == 'x?' ? aggr.concat([idx]) : aggr),
                         []
                     )
                     if (indices.length == 0) return ''
@@ -149,7 +133,7 @@ export function SystemNode({
 
         if (!notationAreaRef.current) return
         const firstStaff = Object.values(systemData.staffs)[0]
-        const totalWidth = firstStaff?.notation.length ?? 0
+        const totalWidth = firstStaff?.objNotation.length ?? 0
 
         const highlight = cursorHighlight(cursor)
         const kempliLines = kempliGrid(systemData)
@@ -288,7 +272,9 @@ export function SystemNode({
     const positionTitles = sortedStaffEntries
         .map(([position, _]) => positionConfigs[position as Position].name)
         .join('\n')
-    const notationText = sortedStaffEntries.map(([_, staff]) => staff.notation.join('')).join('\n')
+    const notationText = sortedStaffEntries
+        .map(([_, staff]) => staff.objNotation.map((note) => note.toString()).join(''))
+        .join('\n')
 
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)

@@ -264,7 +264,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         })
 
         // Step 3: Set kempli frequency from the beat width and apply kempli execution items
-        if (colWidths.length == 0) {
+        if (colWidths.length == 0 || 'KEMPLI' in system.staffs) {
             system.kempli.state = 'notation'
         } else {
             // Set kempli state to 'on' if all measures have the same duration
