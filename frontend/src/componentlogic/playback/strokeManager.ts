@@ -1,7 +1,5 @@
-// Converts symbols to one or more playback actions.
-//
-// This module handles single note symbols and special stroke characters that cannot be written
-// accurately as a sequence of base notes, such as tremolo or rake.
+// This module converts all symbols to playback actions. A symbol can stand for a single base note or for a sequence of
+// notes that can not be written accurately as a series of base notes, such as tremolo or rake.
 //
 // Stroke modifiers that are shorthand notation for sequences of base notes --e.g. 'norot' patterns--
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
