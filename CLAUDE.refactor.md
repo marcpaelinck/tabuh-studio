@@ -57,8 +57,6 @@ PATTERN_MODIFIERS  = ['n']                    // norot — appears AFTER pitch c
                                                // BEFORE to AFTER modifier
 ```
 
-**Important reclassification:** The `n` (norot) character was initially considered a BEFORE modifier but has been reclassified as an AFTER modifier in its own category `PATTERN_MODIFIERS`.
-
 ---
 
 ## Canonical Ordering
@@ -66,10 +64,10 @@ PATTERN_MODIFIERS  = ['n']                    // norot — appears AFTER pitch c
 The normalised order of characters within a symbol is:
 
 ```
-[grace note prefix A/E/I/O/U/S/B/X] [pitch char] [octave ,/<] [stroke modifiers //?/;/:/[/]] [pattern modifiers n]
+[grace note prefix A/E/I/O/U/S/B/X/G/P/T/(/)/*/0/8/9] [pitch char] [octave ,/<] [stroke modifiers //?/;/:/[/]] [pattern modifiers n]
 ```
 
-1. Grace note prefix (BEFORE — uppercase character)
+1. Grace note prefix (BEFORE — uppercase character equivalent of a melodic pitch)
 2. Pitch character (always present)
 3. Octave modifier (`,` or `<`)
 4. Stroke/articulation modifiers (`/`, `?`, `;`, `:`, `[`, `]`)
@@ -210,8 +208,7 @@ The `parseStaff` static method handles converting existing staff strings (from t
 
 ## What Is NOT Yet Implemented
 
-- The `NoteObject` class itself (design agreed, code not yet written into the codebase)
-- The virtual cursor editor that uses `NoteObject[]` as its state
 - Integration of `NoteObject` into the save/load pipeline
+- The virtual cursor editor that uses `NoteObject[]` as its state
 
 The current codebase stores notation as flat `NoteSymbol[]` (alias for `string[]`) with no normalisation. `NoteObject` will be introduced as a second refactoring step after the data model simplification (`Measure[]` → flat `NoteSymbol[]`) is complete and verified.

@@ -25,12 +25,6 @@ export interface KempliSetting {
 }
 
 // Notation of one instrument position within a System (flat, not subdivided into measures)
-export interface Staff {
-    notation: NoteSymbol[]
-    notation_?: NoteSymbol[] // cache used to keep user edits that have not been saved yet. Enables to revert changes.
-}
-
-// Notation of one instrument position within a System (flat, not subdivided into measures)
 // 'notation' and 'notation_' are kept for backward compatibility until the entire codebase has been
 // refactored to use the NoteObject class exclusively.
 export interface Staff {

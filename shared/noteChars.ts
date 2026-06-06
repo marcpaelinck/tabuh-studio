@@ -66,6 +66,9 @@ export const AFTER_MODIFIERS: ReadonlySet<string> = new Set([
     ...PATTERN_MODIFIERS
 ])
 
+/** Union of all modifier characters (preceding or following) */
+export const MODIFIER_CHARS: ReadonlySet<string> = new Set([...GRACE_NOTE_PREFIXES, ...AFTER_MODIFIERS])
+
 /**
  * Generate types from the constants defined above.
  */
