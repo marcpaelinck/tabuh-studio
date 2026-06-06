@@ -2,14 +2,26 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
+import { ExtensionChars, MelodicNoteChars, MutingChars, OctavationChars } from '../frontend/src/config/config.ts'
+import { noteRange } from '../frontend/src/utils/alphabet.ts'
 import type {
-    GracenotePrefix,
-    OctaveModifier,
-    PatternModifiers as PatternModifier,
+    GracenoteChar,
+    OctaveChar,
+    PatternModifier,
+    PatternType,
     PitchChar,
-    StrokeModifier
+    StrokeModifier,
+    StrokeType
 } from './noteChars.ts'
-import { GRACE_NOTE_PREFIXES, OCTAVE_MODIFIERS, PATTERN_MODIFIERS, PITCH_CHARS, STROKE_MODIFIERS } from './noteChars.ts'
+import {
+    GRACE_NOTE_PREFIXES,
+    OCTAVE_MODIFIERS,
+    PATTERN_MODIFIER_MAP,
+    PATTERN_MODIFIERS,
+    PITCH_CHARS,
+    STROKE_MODIFIER_MAP,
+    STROKE_MODIFIERS
+} from './noteChars.ts'
 import type { Position } from './position.ts'
 
 // Re-export so that consumers can import everything from a single file if needed.
@@ -88,6 +100,10 @@ export class NoteObject {
     /** The input string exactly as passed to the constructor. */
     readonly inputSymbol: string
 
+    /** The canonical, normalised form of the symbol.
+     * Use this value to compare note objects
+     * **/
+    readonly canonicalSymbol: string
     /**
      * The canonical, normalised form of the symbol.
      *
@@ -96,43 +112,50 @@ export class NoteObject {
      * - When `error === 'invalidSymbol'`: `'!'` (the symbol could not be
      *   parsed; no meaningful normalisation is possible).
      *
-     * Always use `symbol` for storage, comparison, and rendering.
+     * prefix: can currently only contain a grace note character
+     * pitch: note pitch character. Empty string `''` when `error === 'invalidSymbol'`.
+     * octave: Octave: `','` -> lower, octave -1, `'<'` -> upper, octave 1,
+     *         or `''`-> middle, octave 0 — also the fallback for `'invalidSymbol'`).
+     * modifier:  Single stroke / articulation modifier character:
+     *                  '/': dampted
+     *                  '?': muted
+     *                  ';': tremolo
+     *                  ':': accelerated tremolo
+     *                  '[': rake left
+     *                  ']': rake right
+     *            or pattern:
+     *                  'n': norot
+     *            or `''` if none (or if `error === 'invalidSymbol'`).
      */
-    readonly symbol: string
-
-    // --- Decomposed components ---
+    readonly symbol: {
+        prefix: string
+        pitch: PitchChar
+        octave: OctaveChar
+        modifier: PatternModifier | StrokeModifier
+    }
 
     /**
      * Grace note prefix character, or `''` if the note is not a grace note
      * (or if `error === 'invalidSymbol'`).
      */
-    readonly prefix: GracenotePrefix
+    readonly graceNote?: { pitch: PitchChar; octave: OctaveChar }
 
     /**
-     * The pitch character.
-     * Empty string `''` when `error === 'invalidSymbol'`.
-     */
-    readonly pitch: PitchChar
-
-    /**
-     * Octave modifier: `','` (lower, octave 0), `'<'` (upper, octave 2),
-     * or `''` (middle, octave 1 — also the fallback for `'invalidSymbol'`).
-     */
-    readonly octave: OctaveModifier
-
-    /**
-     * Single stroke / articulation modifier character (`/ ? ; : [ ]`),
+     * Single stroke / articulation modifier character:
+     *  '/': dampted
+     *  '?': muted
+     *  ';': tremolo
+     *  ':': accelerated tremolo
+     *  '[': rake left
+     *  ']': rake right
+     * or pattern:
+     *  'n': norot
      * or `''` if none (or if `error === 'invalidSymbol'`).
      */
-    readonly stroke: StrokeModifier
-
-    /**
-     * Single pattern modifier character (currently only `'n'` for norot),
-     * or `''` if none (or if `error === 'invalidSymbol'`).
-     */
-    readonly pattern: PatternModifier
-
-    // --- Binding ---
+    readonly stroke: Record<StrokeType, boolean>
+    readonly pattern: Record<PatternType, boolean>
+    readonly hasStroke: boolean
+    readonly hasPattern: boolean
 
     /**
      * The instrument position this note is bound to, or `undefined` if the
@@ -163,24 +186,11 @@ export class NoteObject {
 
     /** True if this note is bound to a specific instrument position. */
     readonly isBound: boolean
-
-    /** True if the note has a grace note prefix. */
-    readonly hasGraceNote: boolean
-
-    /** True if the stroke modifier is `'/'` (damped). */
-    readonly isDamped: boolean
-
-    /** True if the stroke modifier is `'?'` (muted). */
-    readonly isMuted: boolean
-
-    /** True if the stroke modifier is `';'` or `':'` (tremolo). */
-    readonly isTremolo: boolean
-
-    /** True if the pattern modifier is `'n'` (norot). */
-    readonly isNorot: boolean
+    readonly isExtensionSilence: boolean
+    readonly isMutingSilence: boolean
 
     /** Octave as a number: `0` (lower), `1` (middle), `2` (upper). */
-    readonly octaveNumber: 0 | 1 | 2
+    readonly octaveNumber: -1 | 0 | 1
 
     // ---------------------------------------------------------------------------
 
@@ -197,30 +207,44 @@ export class NoteObject {
         this.inputSymbol = input
         this.position = position
         this.isBound = position !== undefined
+        this.isExtensionSilence = false
+        this.isMutingSilence = false
+        this.octaveNumber = 0
 
         // Attempt structural parsing regardless of any supplied fault, so that
         // decomposed properties are populated whenever the symbol is parseable.
-        let prefix = ''
-        let pitch = ''
-        let octave: OctaveModifier = ''
-        let stroke = ''
-        let pattern = ''
+        this.symbol = { prefix: '', pitch: '', octave: '', modifier: '' }
         let structurallyValid = true
+        this.hasStroke = false
+        this.hasPattern = false
+        this.stroke = {
+            damped: false,
+            muted: false,
+            halfduration: false,
+            tremolo: false,
+            acceleratingtremolo: false,
+            rakeleft: false,
+            rakeright: false
+        }
+        this.pattern = { norot: false }
 
         try {
             NoteObject.validate(input, position)
 
             for (const ch of input) {
                 if (GRACE_NOTE_PREFIXES.has(ch)) {
-                    prefix = ch
+                    this.symbol.prefix = ch as GracenoteChar
+                    this.graceNote = { pitch: this.symbol.prefix[0].toLocaleLowerCase() as PitchChar, octave: '' }
                 } else if (PITCH_CHARS.has(ch)) {
-                    pitch = ch
+                    this.symbol.pitch = ch as PitchChar
                 } else if (OCTAVE_MODIFIERS.has(ch)) {
-                    octave = ch as OctaveModifier
+                    this.symbol.octave = ch as OctaveChar
                 } else if (STROKE_MODIFIERS.has(ch)) {
-                    stroke = ch
+                    this.symbol.modifier = ch as StrokeModifier
+                    this.hasStroke = true
                 } else if (PATTERN_MODIFIERS.has(ch)) {
-                    pattern = ch
+                    this.symbol.modifier = ch as PatternModifier
+                    this.hasPattern = true
                 }
             }
         } catch {
@@ -230,31 +254,24 @@ export class NoteObject {
         if (!structurallyValid) {
             // Structural error takes precedence over any externally supplied fault.
             this.error = 'invalidSymbol'
-            this.prefix = ''
-            this.pitch = ''
-            this.octave = ''
-            this.stroke = ''
-            this.pattern = ''
-            this.symbol = '!'
+            this.symbol.pitch = '!'
+            this.canonicalSymbol = '!'
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
             this.error = fault
-            this.prefix = prefix
-            this.pitch = pitch
-            this.octave = octave
-            this.stroke = stroke
-            this.pattern = pattern
-            this.symbol = prefix + pitch + octave + stroke + pattern
+
+            this.canonicalSymbol = this.symbol.prefix + this.symbol.pitch + this.symbol.octave + this.symbol.modifier
+            this.octaveNumber = this.symbol.octave === ',' ? -1 : this.symbol.octave === '<' ? 1 : 0
+            const stroke = STROKE_MODIFIER_MAP.get(this.symbol.modifier as StrokeModifier)
+            if (stroke) this.stroke[stroke] = true
+            const pattern = PATTERN_MODIFIER_MAP.get(this.symbol.modifier as PatternModifier)
+            if (pattern) this.stroke[pattern] = true
+
+            this.isExtensionSilence = ExtensionChars.includes(this.symbol.pitch)
+            this.isMutingSilence = MutingChars.includes(this.symbol.pitch)
+
+            Object.freeze(this)
         }
-
-        this.hasGraceNote = this.prefix !== ''
-        this.isDamped = this.stroke === '/'
-        this.isMuted = this.stroke === '?'
-        this.isTremolo = this.stroke === ';' || this.stroke === ':'
-        this.isNorot = this.pattern === 'n'
-        this.octaveNumber = this.octave === ',' ? 0 : this.octave === '<' ? 2 : 1
-
-        Object.freeze(this)
     }
 
     // ---------------------------------------------------------------------------
@@ -328,6 +345,50 @@ export class NoteObject {
     }
 
     // ---------------------------------------------------------------------------
+    // Calculated values
+    // ---------------------------------------------------------------------------
+
+    /**
+     * Determine the octave for the grace note (if it exists)
+     * **/
+
+    static isMelodic(pitch: PitchChar) {
+        return pitch.length > 0 && MelodicNoteChars.includes(pitch)
+    }
+
+    // Returns a new NoteObject where the grace note is resolved to the correct octave
+    resolveGraceNoteOctave(): void {
+        // Determine the correct octave for the grace note
+        if (
+            !this.graceNote ||
+            !this.position ||
+            NoteObject.isMelodic(this.symbol.pitch) ||
+            NoteObject.isMelodic(this.graceNote.pitch)
+        )
+            return
+
+        const pitchChar = this.symbol.prefix.toLocaleLowerCase()
+        var nearestOctave = pitchChar // grace tone (note + octave) nearest to the 'main' tone.
+        const instrumentRange = noteRange(this.position)
+        const nextSymbolIndex = instrumentRange.indexOf(this.symbol.pitch)
+        var shortestDistance = 99
+
+        // Try different octavations and keep the value that is 'nearest' to the next this.
+        const octaveOptions = [''].concat(OctavationChars)
+        for (const octaveChar of octaveOptions) {
+            const tryNote = pitchChar + octaveChar
+            if (instrumentRange.includes(tryNote)) {
+                const tryDistance = Math.abs(instrumentRange.indexOf(tryNote) - nextSymbolIndex)
+                if (tryDistance < shortestDistance) {
+                    nearestOctave = octaveChar
+                    shortestDistance = tryDistance
+                }
+            }
+        }
+        this.graceNote.octave = nearestOctave
+    }
+
+    // ---------------------------------------------------------------------------
     // Static factory / serialisation helpers
     // ---------------------------------------------------------------------------
 
@@ -348,7 +409,7 @@ export class NoteObject {
      * Notes with `error !== undefined` are serialised as `'!'`.
      */
     static toNotation(notes: NoteObject[]): string[] {
-        return notes.map((n) => (n.error !== undefined ? '!' : n.symbol))
+        return notes.map((n) => (n.error !== undefined ? '!' : n.canonicalSymbol))
     }
 
     /**
@@ -384,11 +445,11 @@ export class NoteObject {
     // ---------------------------------------------------------------------------
 
     /**
-     * Returns `symbol`, or `'!'` if this note has an error.
+     * Returns the canonical symbol string, or `'!'` if this note has an error.
      * This matches the serialisation behaviour of `toNotation()`.
      */
     toString(): string {
-        return this.error !== undefined ? '!' : this.symbol
+        return this.error !== undefined ? '!' : this.canonicalSymbol
     }
 }
 

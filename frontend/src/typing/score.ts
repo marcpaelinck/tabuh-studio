@@ -1,11 +1,11 @@
 import type { NoteObject } from '@tabuhstudio/shared/NoteObject'
-import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeType, ToneType, UUID } from './basetypes'
+import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeLocation, ToneType, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
 
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
     octave: number | null // 0, 1 or 2: relative to the instrument. Scale always start with DING.
-    stroke: StrokeType | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
+    stroke: StrokeLocation | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
     muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 

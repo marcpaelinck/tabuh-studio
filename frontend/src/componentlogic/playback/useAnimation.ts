@@ -167,6 +167,7 @@ export const useAnimationEngine = (
         if (focusRef.current.includes(params.position)) {
             if (mySvgInfo.svg && params.currnotes) {
                 // Hightighting animation
+                debug(`ANIMATION: ${JSON.stringify(params)}`)
                 if (shouldHighlight(params.position)) {
                     params.currnotes.forEach((note) => {
                         var keyElement = mySvgInfo.svg?.querySelector(

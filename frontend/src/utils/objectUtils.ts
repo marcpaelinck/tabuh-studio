@@ -2,10 +2,11 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
-import { symbolDuration, totalDuration } from '../componentlogic/playback/strokeManager'
+import { noteDuration, totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency, defaultTempo } from '../config/config'
-import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
+import type { BPM, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
 type DefaultType = 'NoteSymbol' | 'Score'
@@ -102,12 +103,12 @@ export function isEvenByIndex(index: number) {
 // Finds the [startIdx, endIdx) array slice for beat beatIdx, where each beat accumulates
 // exactly `freq` units of symbolDuration. Grace notes (duration=0) do not advance the
 // beat budget, so beats containing them include one extra symbol to fill the beat.
-function getBeatSlice(notation: NoteSymbol[], position: Position, beatIdx: number, freq: number): [number, number] {
+function getBeatSlice(objNotation: NoteObject[], beatIdx: number, freq: number): [number, number] {
     let accum = 0
     let start = 0
     let beatCount = 0
-    for (let i = 0; i < notation.length; i++) {
-        accum += symbolDuration(notation[i], position, defaultTempo, 'basenote')
+    for (let i = 0; i < objNotation.length; i++) {
+        accum += noteDuration(objNotation[i], defaultTempo, 'basenote')
         if (accum >= freq) {
             if (beatCount === beatIdx) return [start, i + 1]
             beatCount++
@@ -116,7 +117,7 @@ function getBeatSlice(notation: NoteSymbol[], position: Position, beatIdx: numbe
         }
     }
     // Last partial beat (total notation duration is not a multiple of freq)
-    if (beatCount === beatIdx && start < notation.length) return [start, notation.length]
+    if (beatCount === beatIdx && start < objNotation.length) return [start, objNotation.length]
     return [0, 0]
 }
 
@@ -129,9 +130,7 @@ export function getSystemBeatCount(system: System): number {
         const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
         if (!staffEntries.length) return 0
         const maxDuration = Math.max(
-            ...staffEntries.map(([pos, staff]) =>
-                totalDuration(staff!.notation, pos as Position, defaultTempo, 'basenote')
-            )
+            ...staffEntries.map(([pos, staff]) => totalDuration(staff!.objNotation, defaultTempo, 'basenote'))
         )
         return Math.max(1, Math.ceil(maxDuration / freq))
     } else if (system.kempli.state === 'notation') {
@@ -148,8 +147,8 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
         const freq = system.kempli.frequency || defaultBeatFrequency
         const refPosition = position ?? (Object.keys(system.staffs)[0] as Position)
-        const refNotation = system.staffs[refPosition]?.notation ?? []
-        const [start] = getBeatSlice(refNotation, refPosition, beatIdx, freq)
+        const refNotation = system.staffs[refPosition]?.objNotation ?? []
+        const [start] = getBeatSlice(refNotation, beatIdx, freq)
         return start
     } else if (system.kempli.state === 'notation') {
         // x? marks the START of each kempli beat.
@@ -167,20 +166,20 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
 // For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) do not terminate
 // the beat early — an extra symbol is included to fill the beat to the full kempli frequency.
 export function getBeatNotation(
-    notation: NoteSymbol[],
+    objNotation: NoteObject[],
     beatIdx: number,
     system: System,
     position?: Position
-): NoteSymbol[] {
+): NoteObject[] {
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
         const freq = system.kempli.frequency || defaultBeatFrequency
         if (position) {
-            const [start, end] = getBeatSlice(notation, position, beatIdx, freq)
-            return notation.slice(start, end)
+            const [start, end] = getBeatSlice(objNotation, beatIdx, freq)
+            return objNotation.slice(start, end)
         }
         // Fallback if no position provided (avoids symbolDuration dependency)
         const start = beatIdx * freq
-        return notation.slice(start, start + freq)
+        return objNotation.slice(start, start + freq)
     } else if (system.kempli.state === 'notation') {
         // x? marks the START of each kempli beat.
         // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
@@ -190,15 +189,15 @@ export function getBeatNotation(
             []
         )
         const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
-        const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : notation.length
-        return notation.slice(start, end)
+        const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : objNotation.length
+        return objNotation.slice(start, end)
     }
-    return notation
+    return objNotation
 }
 
 // Returns the maximum duration of the system's staffs.
 export function getSystemDuration(system: System, bpm: BPM) {
     const entries = _.entries(system.staffs).filter(([_, staff]) => staff != null)
     if (entries.length === 0) return 0
-    return Math.max(...entries.map(([pos, staff]) => totalDuration(staff!.notation, pos as Position, bpm, 'basenote')))
+    return Math.max(...entries.map(([pos, staff]) => totalDuration(staff!.objNotation, bpm, 'basenote')))
 }

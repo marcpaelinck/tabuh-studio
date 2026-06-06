@@ -33,6 +33,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SystemContextMenu: false,
     SystemNode: false,
     SummaryItem: false,
+    useAnimation: true,
     useScoreManager: false,
     useInstruments: false,
     useKeyboardListener: false,

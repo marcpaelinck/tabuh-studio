@@ -112,7 +112,7 @@ const createInstrument = (
                     ? 1
                     : dimRateNonFocusedInstruments
             debug(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
-            const indices = lookup[position].symbol2idxs[params.symbol]
+            const indices = lookup[position].symbol2idxs[params.note.canonicalSymbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = params.duration
                 // Extend the last note to allow the sound to attenuate
@@ -124,7 +124,7 @@ const createInstrument = (
                 try {
                     sampler?.triggerAttackRelease(indices, duration, time, params.velocity * dimValue)
                 } catch {
-                    console.error(`ERROR: could not play sound ${params.position} ${params.symbol} `)
+                    console.error(`ERROR: could not play sound ${params.position} ${params.toString()} `)
                 }
             }
         },
@@ -161,9 +161,9 @@ export const useInstruments = (
 
     const playInstrument = useCallback((time: number, params: SamplerFunctionParameters) => {
         debug(
-            `playing ${params.position} ${params.symbol} ${time} ${params.duration['16n']} ${params.velocity} ${time}`
+            `playing ${params.position} ${params.note.toString()} ${time} ${params.duration['16n']} ${params.velocity} ${time}`
         )
-        if (params.symbol === '.') instrumentSamplers[params.position].mute(time)
+        if (params.note.isMutingSilence) instrumentSamplers[params.position].mute(time)
         else {
             instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef, activePanggulRef)
         }

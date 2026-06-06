@@ -1,7 +1,8 @@
+import type { NoteObject } from '@tabuhstudio/shared'
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
-import type { MutingType, NoteSymbol, Position, StrokeType, ToneType, UUID } from './basetypes'
+import type { MutingType, Position, StrokeLocation, ToneType, UUID } from './basetypes'
 import type { Score } from './score'
 
 // PLAYBACK SCHEDULING
@@ -26,7 +27,7 @@ export interface PlaybackTempoAction {
 
 export interface SamplerFunctionParameters {
     position: Position
-    symbol: NoteSymbol
+    note: NoteObject
     bpm: number
     velocity: Tone.Unit.NormalRange
     duration: TimeObject
@@ -47,7 +48,7 @@ export interface AnimationNote {
     time: TimeObject
     keyname: string
     tone: ToneType
-    stroke: StrokeType | null
+    stroke: StrokeLocation | null
     muting: MutingType
     duration: TimeObject
     isLast: boolean
@@ -71,7 +72,6 @@ export interface PlayerCursorParameters {
     position: Position
     beat: number
     sysuuid: UUID
-    symbol: NoteSymbol
     line: number
     range: number[]
 }

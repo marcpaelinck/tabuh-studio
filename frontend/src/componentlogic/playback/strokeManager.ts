@@ -4,24 +4,14 @@
 // Stroke modifiers that are shorthand notation for sequences of base notes --e.g. 'norot' patterns--
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
-import {
-    AcceleratingTremoloChars,
-    ExtensionChars,
-    MelodicNoteChars,
-    MutingChars,
-    noteConfigs,
-    OctavationChars,
-    positionConfigs,
-    RakeDownChars,
-    TremoloChars
-} from '../../config/config'
-import type { BPM, DurationInBasenoteEquiv, NoteSymbol, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
+import { AcceleratingTremoloChars, ExtensionChars, MutingChars, RakeDownChars, TremoloChars } from '../../config/config'
+import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
 import { noteRange } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import { getStrokeType } from '../../utils/strokes'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../../utils/timeunits'
 
 // prettier-ignore
@@ -58,7 +48,7 @@ const strokes = {
             motif_duration_in_millis: 120, // Total duration of the motif.
             note_duration_in_millis: 5000 // sustain time of the notes: this will make the notes overlap.
         },
-    gracenote: { duration: 0.5 }
+    gracenote: { duration: 0.45 }
 }
 
 export interface CreateStrokeArgs {
@@ -67,9 +57,9 @@ export interface CreateStrokeArgs {
     timeMs: number
     measureIdx: number
     position: Position
-    prevsymbol: NoteSymbol | undefined // previous symbol in the notation
-    symbol: NoteSymbol // current symbol in the notation
-    nextsymbol: NoteSymbol | undefined // symbol following the current symbol
+    prevnote: NoteObject | undefined // previous symbol in the notation
+    note: NoteObject // current symbol in the notation
+    nextnote: NoteObject | undefined // symbol following the current symbol
     bpm: BPM // current tempo in BPM
     velocity: ToneJS.Unit.NormalRange // current velocity
     prevaction: PlaybackSamplerAction | undefined // previous action created for this position
@@ -77,105 +67,73 @@ export interface CreateStrokeArgs {
 }
 // Converts specific symbols that represent a sequence of notes to a list of PlaybackSamplerAction objects.
 // Function `createNoteActions` expects a `CreateStrokeArgs` object as argument.
-// Arguments `prevsymbol` and `nextsymbol` are required because some motifs can consist of two consecutive symbols.
+// Arguments `prevnote` and `nextnote` are required because some motifs can consist of two consecutive symbols.
 // The 'grace note' motif requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
 export function createNoteActions(args: CreateStrokeArgs): PlaybackSamplerAction[] {
-    const strokeType = getStrokeType(args.symbol, args.position)
-    debug(`${args.symbol} is ${strokeType}`)
-
-    switch (strokeType) {
-        case 'SINGLENOTE':
-            return singleNoteAction(args)
-        case 'HALF_DURATION':
-            return halfDurationAction(args)
-        case 'GRACENOTE':
-            return gracenoteAction(args)
-        case 'TREMOLO':
-            return tremoloAction(args)
-        case 'TREMOLO_ACC':
-            return AcceleratingTremoloAction(args)
-        case 'RAKE':
-            return rakeAction(args)
-        case 'INVALID': {
-            console.error(`invalid stroke type '${args.symbol}' for ${args.position}`)
-            return silenceAction(args)
-        }
-        case 'UNHANDLED': {
-            console.error(`Unhandled stroke type ${args.symbol} for ${args.position}`)
-            return silenceAction(args)
-        }
-        default: {
-            console.error(`Unexpected stroke type ${args.symbol} for ${args.position}`)
-            return silenceAction(args)
-        }
+    const returnValue: PlaybackSamplerAction[] = []
+    // Assume that grace notes will only be combined with unmuted, damped or muted note
+    if (args.note.error) {
+        console.error(`invalid stroke type '${args.note.toString()}' for ${args.position}`)
+        return silenceAction(args)
     }
-}
-
-export function symbolDuration(
-    symbol: NoteSymbol,
-    position: Position,
-    bpm: number,
-    unit: 'millisecond' | 'basenote'
-): number {
-    const strokeType = getStrokeType(symbol, position)
-    switch (strokeType) {
-        case 'SINGLENOTE':
-        case 'TREMOLO':
-            return unit == 'basenote' ? 1 : BaseNoteEquiv2Millis(1, bpm)
-        case 'HALF_DURATION':
-            return unit == 'basenote' ? 0.5 : BaseNoteEquiv2Millis(0.5, bpm)
-        case 'TREMOLO_ACC':
-            const durationBn =
-                strokes.tremolo.accelerating_motif.reduce((sum, n) => sum + n, 0) /
-                strokes.tremolo.accelerating_motif[0]
-            return unit == 'basenote' ? durationBn : BaseNoteEquiv2Millis(durationBn, bpm)
-        case 'RAKE':
-            return (
-                unit == 'basenote'
-                    ? millis2BaseNoteEquiv(strokes.rake.motif_duration_in_millis, bpm)
-                    : strokes.rake.motif_duration_in_millis,
-                bpm
-            )
-        case 'GRACENOTE':
-        // The duration of a gracenote is subtracted from the preceding note,
-        // so its nett duration is 0.
-        case 'INVALID':
-        case 'UNHANDLED':
-        default:
-            return 0
+    if (args.note.graceNote) returnValue.push(...gracenoteAction(args))
+    if (!args.note.hasStroke || args.note.stroke.muted || args.note.stroke.damped) {
+        returnValue.push(...singleNoteAction(args))
+        return returnValue
     }
+
+    if (args.note.stroke.halfduration) return halfDurationAction(args)
+    if (args.note.stroke.tremolo) return tremoloAction(args)
+    if (args.note.stroke.acceleratingtremolo) return AcceleratingTremoloAction(args)
+    if (args.note.stroke.rakeleft || args.note.pattern.rakeright) return rakeAction(args)
+
+    console.error(`Unexpected stroke type ${args.note.toString()} for ${args.position}`)
+    return silenceAction(args)
 }
 
-export function totalDuration(
-    symbols: NoteSymbol[],
-    position: Position,
-    bpm: number,
-    unit: 'millisecond' | 'basenote'
-) {
-    return _.sum(symbols.map((sym) => symbolDuration(sym, position, bpm, unit)))
+export function noteDuration(note: NoteObject, bpm: number, unit: 'millisecond' | 'basenote'): number {
+    if (note.error) {
+        // Error note is treated as silence with duration 1
+        return 1
+    }
+    if (!note.hasStroke || note.stroke.damped || note.stroke.muted || note.stroke.tremolo) {
+        return unit == 'basenote' ? 1 : BaseNoteEquiv2Millis(1, bpm)
+    }
+    if (note.stroke.halfduration) {
+        return unit == 'basenote' ? 0.5 : BaseNoteEquiv2Millis(0.5, bpm)
+    }
+    if (note.stroke.acceleratingtremolo) {
+        const durationBn =
+            strokes.tremolo.accelerating_motif.reduce((sum, n) => sum + n, 0) / strokes.tremolo.accelerating_motif[0]
+        return unit == 'basenote' ? durationBn : BaseNoteEquiv2Millis(durationBn, bpm)
+    }
+    if (note.stroke.rakeleft || note.stroke.rakeright) {
+        return (
+            unit == 'basenote'
+                ? millis2BaseNoteEquiv(strokes.rake.motif_duration_in_millis, bpm)
+                : strokes.rake.motif_duration_in_millis,
+            bpm
+        )
+    }
+    return 1
 }
 
-function isMutedNote(symbol: NoteSymbol, position: Position): boolean {
-    if (!(position in positionConfigs)) return false
-    const noteName = positionConfigs[position].symbolToNoteNames[symbol]
-    if (!noteName) return false
-    const instrType = positionConfigs[position].type
-    if (!(instrType in noteConfigs)) return false
-    if (!(noteName[0] in noteConfigs[instrType]) || noteName.length == 0) return false
-    return ['ABBREVIATED', 'MUTED'].includes(noteConfigs[instrType][noteName[0]].muting)
+export function totalDuration(notes: NoteObject[], bpm: number, unit: 'millisecond' | 'basenote') {
+    return _.sum(notes.map((note) => noteDuration(note, bpm, unit)))
 }
 
 function singleNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
+    const symbol = args.note.symbol
     return [
         {
             time: n2TO(args.time),
             timeMs: args.timeMs,
-            ismuted: isMutedNote(args.symbol, args.position),
+            ismuted: args.note.pattern.damped || args.note.pattern.muted,
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                symbol: args.symbol,
+                note: new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -194,7 +152,7 @@ function halfDurationAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(0.5),
                 position: args.position,
-                symbol: args.symbol.substring(0, args.symbol.length - 1),
+                note: new NoteObject(args.note.canonicalSymbol.substring(0, args.note.canonicalSymbol.length - 1)),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -213,7 +171,7 @@ function silenceAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                symbol: MutingChars[0],
+                note: new NoteObject(MutingChars[0]),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -227,39 +185,13 @@ function silenceAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 // from the previous note's duration.
 // A grace notes doesn't have an octave modifier, so its octave is derived from the following note.
 function gracenoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
-    const isMelodic = (s: NoteSymbol) => s.length > 0 && MelodicNoteChars.includes(s[0])
-
+    // const isMelodic = (s: NoteSymbol) => s.length > 0 && MelodicNoteChars.includes(s[0])
+    if (!args.note.graceNote) return []
     // Subtract the grace note's duration from the previous note action
     if (args.prevaction) {
         args.prevaction.params.duration = n2TO(TO2n(args.prevaction.params.duration) - strokes.gracenote.duration)
     }
 
-    // Determine the correct octave for the grace note
-    const baseSymbol = args.symbol.toLowerCase()
-    var nearest = baseSymbol
-    if (isMelodic(nearest) && args.nextsymbol && isMelodic(args.nextsymbol)) {
-        const instrumentRange = _.concat(
-            noteRange(args.position),
-            _.fill(Array(strokes.rake.number_of_notes), ExtensionChars[0])
-        )
-        const nextSymbolIndex = instrumentRange.indexOf(args.nextsymbol)
-        var shortestDistance = 99
-        // Try different octavations and keep the value that is 'nearest' to the next note.
-        const octaveOptions = _.concat(
-            [baseSymbol],
-            OctavationChars.map((oct) => baseSymbol + oct)
-        )
-        for (const tryNote of octaveOptions) {
-            if (instrumentRange.includes(tryNote)) {
-                const tryDistance = Math.abs(instrumentRange.indexOf(tryNote) - nextSymbolIndex)
-                if (tryDistance < shortestDistance) {
-                    nearest = tryNote
-                    shortestDistance = tryDistance
-                }
-            }
-        }
-    }
-    const graceSymbol: NoteSymbol = nearest
     return [
         {
             time: n2TO(args.time - strokes.gracenote.duration),
@@ -268,27 +200,27 @@ function gracenoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(strokes.gracenote.duration),
                 position: args.position,
-                symbol: graceSymbol,
+                note: new NoteObject(args.note.graceNote.pitch + args.note.graceNote.octave),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
-                isLastOfMotif: true
+                isLastOfMotif: false
             } as SamplerFunctionParameters
         }
     ]
 }
 
 function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
-    // Skip if the previous symbol is also a tremolo note.
-    // In that case the motif has already been created.
-    if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
+    // Skip if the next symbol is also a tremolo note.
+    // In that case the motif will be generated when the next note is being processed.
+    if (args.nextnote && TremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char))) return []
 
     const duration = 1 / strokes.tremolo.notes_per_basenote
     const returnValue: PlaybackSamplerAction[] = []
-    const notes = [args.symbol.slice(0, -1)]
+    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1))]
     // Include the next symbol if it is also a tremolo note
-    if (args.nextsymbol && TremoloChars.some((char) => args.nextsymbol!.includes(char)))
-        notes.push(args.nextsymbol.slice(0, -1))
+    if (args.nextnote?.canonicalSymbol && TremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char)))
+        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1)))
     const totalNotes = notes.length * strokes.tremolo.notes_per_basenote
 
     for (var idx = 0; idx <= totalNotes; idx++) {
@@ -302,7 +234,7 @@ function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(duration),
                 position: args.position,
-                symbol: notes[noteIdx],
+                note: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast && count == totalNotes,
@@ -316,13 +248,17 @@ function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     // Skip if the previous symbol is also an accelerating tremolo note.
     // In that case the motif has already been created.
-    if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char))) return []
+    if (args.nextnote && AcceleratingTremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char)))
+        return []
 
     const returnValue: PlaybackSamplerAction[] = []
-    const notes = [args.symbol.slice(0, -1)]
+    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1))]
     // Include the next symbol if it is also an accelerating tremolo note
-    if (args.nextsymbol && AcceleratingTremoloChars.some((char) => args.nextsymbol!.includes(char)))
-        notes.push(args.nextsymbol.slice(0, -1))
+    if (
+        args.nextnote?.canonicalSymbol &&
+        AcceleratingTremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char))
+    )
+        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1)))
     const totalNotes = notes.length * strokes.tremolo.accelerating_motif.length
 
     var time = args.time
@@ -340,7 +276,7 @@ function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerActio
             params: {
                 duration: n2TO(duration),
                 position: args.position,
-                symbol: notes[noteIdx],
+                note: notes[noteIdx],
                 bpm: args.bpm,
                 velocity: velocity,
                 isLast: args.isLast && count == totalNotes,
@@ -355,13 +291,13 @@ function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerActio
 
 function rakeAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
-    const invert = RakeDownChars.includes(args.symbol.slice(-1))
+    const invert = RakeDownChars.includes(args.note.canonicalSymbol.slice(-1))
     const instrumentRange = _.concat(
         noteRange(args.position, invert),
         _.fill(Array(strokes.rake.number_of_notes), ExtensionChars[0])
     )
     debug(`result: ${JSON.stringify(instrumentRange)}`)
-    const startIdx = instrumentRange.indexOf(args.symbol.slice(0, -1))
+    const startIdx = instrumentRange.indexOf(args.note.canonicalSymbol.slice(0, -1))
     const noteSpacing: DurationInBasenoteEquiv =
         strokes.rake.motif_duration_in_millis / BaseNoteEquiv2Millis(strokes.rake.number_of_notes - 1, args.bpm)
     const noteDuration: DurationInBasenoteEquiv = millis2BaseNoteEquiv(strokes.rake.note_duration_in_millis, args.bpm)
@@ -377,7 +313,7 @@ function rakeAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(noteDuration),
                 position: args.position,
-                symbol: instrumentRange[startIdx + idx],
+                note: new NoteObject(instrumentRange[startIdx + idx]),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast && count == strokes.rake.number_of_notes,

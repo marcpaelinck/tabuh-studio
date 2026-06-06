@@ -159,10 +159,10 @@ export function castNotation(
     // Symbols not found in the casting table are also replaced with '!'.
     const result = updatedNotation.map((note) => {
         if (note.error !== undefined) return new NoteObject('!')
-        const tone = note.pitch + note.octave
-        const cast = note.isNorot ? norotconversion[tone] : conversion[tone]
-        const symbol = cast !== undefined ? note.prefix + cast + note.stroke + note.pattern : '!'
-        
+        const tone = note.symbol.pitch + note.symbol.octave
+        const cast = note.pattern.norot ? norotconversion[tone] : conversion[tone]
+        const symbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : '!'
+
         return new NoteObject(symbol)
     })
 

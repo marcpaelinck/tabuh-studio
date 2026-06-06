@@ -17,7 +17,7 @@ const _tones_ = ['DING','DONG','DENG','DUNG','DANG','GIR','PUR','TONG','X','X','
 export type ToneType = (typeof _tones_)[number] // 'DING' | 'DONG' | 'DENG' | ...
 
 const _strokes_ = ['KNOB', 'RIM'] as const
-export type StrokeType = (typeof _strokes_)[number]
+export type StrokeLocation = (typeof _strokes_)[number]
 
 const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = (typeof _mutings_)[number]

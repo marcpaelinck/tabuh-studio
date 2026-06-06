@@ -148,25 +148,31 @@ function castGroupedNotationToPositions(
 ): ParsedStaffs {
     const staffs: ParsedStaffs = {}
     for (const group of groupedNotations) {
-        group.positions.forEach((position, posIdx) => {
-            const beats: Staff[] = []
-            var measureIdx = 0
-            for (const beat of group.staff) {
-                const objNotation = castNotation(
-                    beat.objNotation,
-                    group.positions,
-                    measureIdx,
-                    posIdx,
-                    castInstructions
-                )
-                const strNotation = objNotation.map((note) => note.symbol)
-                if (group.positions.length > 1) {
-                    beats.push({ notation: strNotation, objNotation: objNotation })
-                } else beats.push({ ...beat })
-                measureIdx++
-            }
-            staffs[position] = beats
-        })
+        if (group.positions.length == 1) {
+            // Single position: leave notation unchanged
+            staffs[group.positions[0]] = group.staff
+        } else if (group.positions.length > 1) {
+            // Multiple positions: cast notation to each position
+            group.positions.forEach((position, posIdx) => {
+                const beats: Staff[] = []
+                var measureIdx = 0
+                for (const beat of group.staff) {
+                    const objNotation = castNotation(
+                        beat.objNotation,
+                        group.positions,
+                        measureIdx,
+                        posIdx,
+                        castInstructions
+                    )
+                    const strNotation = objNotation.map((note) => note.toString())
+                    if (group.positions.length > 1) {
+                        beats.push({ notation: strNotation, objNotation: objNotation })
+                    } else beats.push({ ...beat })
+                    measureIdx++
+                }
+                staffs[position] = beats
+            })
+        }
     }
     return staffs
 }
@@ -441,7 +447,7 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
                 const note = new NoteObject(getText(noteNode, content).trim())
-                beat.notation.push(note.symbol)
+                beat.notation.push(note.toString())
                 beat.objNotation.push(note)
                 noteNode = noteNode.nextSibling
             }

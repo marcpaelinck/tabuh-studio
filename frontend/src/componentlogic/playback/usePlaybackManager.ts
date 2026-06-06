@@ -8,6 +8,7 @@
 // createPlaybackSchedule:
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -21,8 +22,7 @@ import {
     noteConfigs,
     positionConfigs
 } from '../../config/config'
-import { isExtension, isMuting } from '../../config/configfunctions'
-import type { BPM, NoteSymbol, Position } from '../../typing/basetypes'
+import type { BPM, Position } from '../../typing/basetypes'
 import { speedDefaultOption } from '../../typing/interface'
 import type {
     AnimationNote,
@@ -39,9 +39,8 @@ import type {
     TimeLine
 } from '../../typing/playback'
 import type { Note, Score, System } from '../../typing/score'
-import { cleanSymbol } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
-import { defaultObject, getBeatStart, getSystemDuration } from '../../utils/objectUtils'
+import { getBeatStart, getSystemDuration } from '../../utils/objectUtils'
 import {
     BaseNoteEquiv2Millis,
     millis2BaseNoteEquiv,
@@ -124,8 +123,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
         if (!(position in positionConfigs)) return []
         if (!action) debug(`samplerAction2AnimationNotes ${position} ${action}`)
-        const cleanedSymbol = cleanSymbol(action.params.symbol)
-        const shorthandCodes = positionConfigs[position].symbolToNoteNames[cleanedSymbol] || []
+        const shorthandCodes = positionConfigs[position].symbolToNoteNames[action.params.note.canonicalSymbol] || []
         const result: AnimationNote[] = []
         shorthandCodes.forEach((shCode) => {
             const instrType: string = positionConfigs[position].type
@@ -185,7 +183,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         const [startTempo, endTempo] = currentStep.tempo
         const beatDuration = Object.entries(currentStep.measures).reduce(
             (maxDur, [position, measure]) =>
-                Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
+                Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
             0
         )
         if (timeFromSectionStartInTO > beatDuration) {
@@ -249,18 +247,18 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
         const { nextInFlow } = executionManager(pbAction.score, pbAction.playbackType, pbAction.systemIndex)
 
-        function nextSymbol(
-            notation: NoteSymbol[],
+        function nextNote(
+            objNotation: NoteObject[],
             currIdx: number,
             pos: Position,
             useCache: boolean
-        ): NoteSymbol | undefined {
-            if (currIdx + 1 < notation.length) return notation[currIdx + 1]
+        ): NoteObject | undefined {
+            if (currIdx + 1 < objNotation.length) return objNotation[currIdx + 1]
             const nextStep = nextInFlow(true)
             if (nextStep && pos in nextStep.measures) {
                 const sectionStaff = nextStep.measures[pos as Position]
                 const sectionNotation =
-                    useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation
+                    useCache && sectionStaff?.objNotation_ ? sectionStaff.objNotation_ : sectionStaff?.objNotation
                 return sectionNotation && sectionNotation.length > 0 ? sectionNotation[0] : undefined
             }
             return undefined
@@ -299,7 +297,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             const [startTempo, endTempo] = currentStep.tempo
             const beatDuration = Object.entries(currentStep.measures).reduce(
                 (maxDur, [position, measure]) =>
-                    Math.max(maxDur, totalDuration(measure.notation, position as Position, startTempo, 'basenote')),
+                    Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
                 0
             )
             if (startTempo == endTempo) {
@@ -338,19 +336,19 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
                 const sectionStaff = currentStep.measures[position]
-                var notation: NoteSymbol[] =
-                    (useCache && sectionStaff?.notation_ ? sectionStaff.notation_ : sectionStaff?.notation) ??
-                    Array(4).fill(defaultObject('NoteSymbol'))
-                var prevSymbol: NoteSymbol | undefined = undefined
+                var objNotation: NoteObject[] =
+                    (useCache && sectionStaff?.objNotation_ ? sectionStaff.objNotation_ : sectionStaff?.objNotation) ??
+                    Array(4).fill(new NoteObject(' ', position))
+                var prevNote: NoteObject | undefined = undefined
 
-                notation.forEach((symbol: NoteSymbol, symbolIdx) => {
-                    const endOfMeasure = symbolIdx == notation.length - 1
+                objNotation.forEach((note: NoteObject, symbolIdx) => {
+                    const endOfMeasure = symbolIdx == objNotation.length - 1
                     // const endOfPosition = currentStep!.lastSystem && currentStep!.lastBeat && endOfMeasure
 
                     // CREATE SAMPLER ACTION
                     // Determine the default duration for a single base note.
                     // Add the given delay time if we reached the last note of the measure.
-                    var symbolDuration = 1
+                    var noteDuration = 1
                     var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - beatStartTime, currentStep!))
                     var waitTime = 0
                     if (symbolIdx == 0) {
@@ -359,10 +357,10 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         // to which it belongs.
                         setLastSamplerActionEndtime(currAction[position], currTime)
                     }
-                    if (isExtension(symbol)) {
+                    if (note.isExtensionSilence) {
                         // Extend the last note of the current position with one basenote duration.
-                        extendLastSamplerAction(currAction[position], symbolDuration)
-                    } else if (isMuting(symbol)) {
+                        extendLastSamplerAction(currAction[position], noteDuration)
+                    } else if (note.isMutingSilence) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
                         // Convert potential motifs to individual note actions.
@@ -372,15 +370,16 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             timeMs: currTimeMs,
                             measureIdx: currentStep!.beatIdx,
                             position,
-                            prevsymbol: prevSymbol,
-                            symbol: cleanSymbol(symbol),
-                            nextsymbol: nextSymbol(notation, symbolIdx, position, useCache),
+                            prevnote: prevNote,
+                            note: note,
+                            nextnote: nextNote(objNotation, symbolIdx, position, useCache),
                             bpm:
                                 currentStep!.tempo[0] +
-                                (symbolIdx / notation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
+                                (symbolIdx / objNotation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
                             velocity:
                                 currentStep!.dynamics[0] +
-                                (symbolIdx / notation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
+                                (symbolIdx / objNotation.length) *
+                                    (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
                             prevaction: _.last(newTimeLine.sampleractions),
                             isLast: lastStep && endOfMeasure
                         })
@@ -403,10 +402,10 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             newTimeLine.sampleractions.push(currAction[position])
                             samplerActionsByPos[position].push(currAction[position])
                         })
-                        symbolDuration =
+                        noteDuration =
                             TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
                         symbolDurationMs = To2Millis(
-                            n2TO(symbolDuration),
+                            n2TO(noteDuration),
                             tempoAt(currTime - beatStartTime, currentStep!)
                         )
                         if (endOfMeasure && currentStep!.waitMsAfter) {
@@ -415,9 +414,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         }
                     }
 
-                    currTime += symbolDuration + waitTime
+                    currTime += noteDuration + waitTime
                     currTimeMs += symbolDurationMs
-                    prevSymbol = symbol
+                    prevNote = note
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
                 const system = currentStep!.system
@@ -425,7 +424,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 // Character offset = start index of current section in the flat notation
                 var cursorPos = getBeatStart(beatIdx, system, position)
                 // if (beatIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
-                const span = notation.join('')
+                const span = objNotation.map((note) => note.toString()).join('')
                 newTimeLine.playercursoractions.push({
                     functionName: 'playercursor',
                     time: n2TO(beatStartTime),
@@ -433,7 +432,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         sysuuid: currentStep!.system.uuid,
                         beat: currentStep!.beatIdx,
                         position: position,
-                        symbol: notation.join(''),
                         line: currentStep!.system.index,
                         range: [cursorPos, cursorPos + span.length]
                     }
@@ -491,9 +489,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         timeMs: BaseNoteEquiv2Millis(beatStartTime + beatOffset, currentStep.tempo[0]),
                         measureIdx: currentStep!.beatIdx,
                         position: 'KEMPLI',
-                        prevsymbol: undefined,
-                        symbol: cleanSymbol('x?'),
-                        nextsymbol: undefined,
+                        prevnote: undefined,
+                        note: new NoteObject('x?'),
+                        nextnote: undefined,
                         // The tempo is not precise but irrelevant for single notes
                         bpm: currentStep.tempo[0],
                         velocity: dynamicsToNumber['mf'],

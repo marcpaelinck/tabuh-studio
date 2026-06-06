@@ -83,7 +83,7 @@ export function parseNotationText(text: string, validRegExpCell: RegExp): string
     return notation
 }
 
-export function sortNotes(values: NoteSymbol[], ascending: boolean = true) {
+export function sortNotes(values: NoteSymbol[], ascending: boolean = true): NoteSymbol[] {
     const order = ['i,', 'o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i>', 'o>', 'e>', 'u>', 'a>']
     const compare = (n1: string, n2: string) => {
         n1 = n1.length == 1 ? n1 : n1[1] in [',', '<'] ? n1.slice(0, 2) : n1[0]
@@ -94,7 +94,7 @@ export function sortNotes(values: NoteSymbol[], ascending: boolean = true) {
     return values.sort(compare)
 }
 
-export function noteRange(position: Position, invert: boolean = false) {
+export function noteRange(position: Position, invert: boolean = false): NoteSymbol[] {
     const range = _.keys(positionConfigs[position].symbolToNoteNames).filter((sym) => /^[aeiou][,<]{0,1}$/.test(sym))
     return sortNotes(range)
 }

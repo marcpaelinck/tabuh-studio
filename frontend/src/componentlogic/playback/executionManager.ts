@@ -332,12 +332,18 @@ export function executionManager(
             const measures = _.fromPairs(
                 _.toPairs(nextSystem.staffs)
                     .filter(([_key, staff]) => staff != null)
-                    .map(([key, staff]) => [
-                        key,
-                        {
-                            notation: getBeatNotation(staff!.notation, next.beatIdx, nextSystem, key as Position)
-                        } as Staff
-                    ])
+                    .map(([key, staff]) => {
+                        const objNotation = getBeatNotation(
+                            staff!.objNotation,
+                            next.beatIdx,
+                            nextSystem,
+                            key as Position
+                        )
+                        return [
+                            key,
+                            { notation: objNotation.map((note) => note.canonicalSymbol), objNotation } as Staff
+                        ]
+                    })
             ) as Partial<Record<Position, Staff>>
 
             const nextPass = next.newSystem ? flowinfo[next.systemIdx].pass + 1 : flowinfo[next.systemIdx].pass
