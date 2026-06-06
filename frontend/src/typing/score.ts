@@ -56,6 +56,8 @@ export type System = {
     label?: string
     execution?: ExecutionItem[]
     staffs_?: Staffs
+    copyFrom?: string // Label of the system of which the current system is a copy
+    copyFromUuid?: string // UUID of the system of which the current system is a copy
 }
 
 export type Score = {
@@ -66,4 +68,11 @@ export type Score = {
     parts: Record<string, UUID[]>
     positions: Position[]
     systems: System[]
+}
+
+// Return type for the validation of a Score object
+export interface ValidationResult {
+    isValid: boolean
+    hasCycle: boolean
+    message: string
 }

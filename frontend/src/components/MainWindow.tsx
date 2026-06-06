@@ -31,8 +31,6 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
-import type { ScoreFunctionsType } from '../context/contexts'
-import { ScoreFunctions } from '../context/contexts'
 import type { Position, UUID } from '../typing/basetypes'
 import {
     focusDefaultOption,
@@ -212,7 +210,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         executeItemAction
     } = useScoreManager()
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
-    const scoreFunctions: ScoreFunctionsType = { getScore, updateScore, updateSystem, updateParts }
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
@@ -480,7 +477,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     )
 
     return (
-        <ScoreFunctions value={scoreFunctions}>
+        <>
             {/* Full application is only displayed on larger screens */}
             <Activity mode={appAppearance == 'full' ? 'visible' : 'hidden'}>
                 <Container id="full-application" className="min-w-0">
@@ -491,6 +488,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
                 <Container id="player-only">{playerWindow}</Container>
             </Activity>
-        </ScoreFunctions>
+        </>
     )
 }

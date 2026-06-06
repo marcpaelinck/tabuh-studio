@@ -129,15 +129,15 @@ export function useScoreManager() {
     function updatePointers(newSystemData: System[]) {
         // Update fields that depend on pointers to another system
         newSystemData.map((systemData) => {
-            if (systemData.copyfromkey) {
-                const source = newSystemData.find((sysData) => sysData.uuid == systemData.copyfromkey)
+            if (systemData.copyFromUuid) {
+                const source = newSystemData.find((sysData) => sysData.uuid == systemData.copyFromUuid)
                 if (source && source.uuid != systemData.uuid)
-                    systemData.copyfrom = source.label ? source.label : `#${source.id}`
+                    systemData.copyFrom = source.label ? source.label : `#${source.id}`
                 else {
-                    systemData.copyfrom = undefined
-                    systemData.copyfromkey = undefined
+                    systemData.copyFrom = undefined
+                    systemData.copyFromUuid = undefined
                 }
-            } else systemData.copyfrom = undefined
+            } else systemData.copyFrom = undefined
             if (systemData.execution) {
                 systemData.execution
                     .filter((item) => item.type == 'goto')
@@ -214,7 +214,7 @@ export function useScoreManager() {
                 newSystemData = _.cloneDeep(source)
                 newSystemData.uuid = uuidv4()
                 newSystemData.label = undefined
-                newSystemData.copyfromkey = source.uuid
+                newSystemData.copyFromUuid = source.uuid
                 // newSystemData.copyfrom = source.label || `#${source.index}`
                 sliceIndex1 = systemData.index + 1 // Copy after the current system
                 break

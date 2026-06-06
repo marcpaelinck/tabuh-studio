@@ -133,7 +133,7 @@ export function SummaryItem({
             fieldeditor: 'stringinputpicker',
             fieldeditwhen: 'afterbuttonclick',
             formtitle: 'copy',
-            fieldval: sysData.copyfrom || '',
+            fieldval: sysData.copyFrom || '',
             textcolor: 'blue',
             buttonTooltip: 'Select a system that should be copied below this one.',
             fieldTooltip: 'Label or number of the system from which this system was copied.'
