@@ -20,7 +20,7 @@ penyacah	u,	i	a,	o	i	e	o	a,	i	u,	a,
 calung	u		a		i		o		i		a
 jegogan	u				i				i		a
 gongs																			G
-	{WAIT 3}
+	{WAIT 2}
 
 	{PART 2}
 	{GONGAN kebyar}
@@ -44,7 +44,7 @@ gongs													G
 	{TEMPO 90}
 ga/ugal	u,/....u,u,/....u,/.u,/.u,:---	u,-----	e,-u,-a,-i-a,	u,------	a,/....a,a,/....a,/.a,/.a,:---	a,-----	u,-a,-e,-u,	a,
 pen/cal/jeg	...................	u,		u,	...................	a,		a,
-	{WAIT 2}
+	{WAIT 1}
 
 	{PART 4}
 	{GONGAN kebyar}
@@ -72,7 +72,7 @@ penyacah	u	o	e	i	o	a	o	e	u	o	e	i	o	a	o	e	u
 calung	u		e		o		a		u		e		o		a		u
 jegogan	u				o				u				o				u
 gongs																	G
-	{WAIT 3}
+	{WAIT 2}
 
 	{PART 5}
 	{GONGAN kebyar}
@@ -87,7 +87,7 @@ penyacah	u	a	e	i	u	a	e	i	u
 calung	u		e		u		e		u
 jegogan	u		e		u		e		u
 gongs									G
-	{WAIT 2}
+	{WAIT 1.5}
 
 	{PART 6}
 	{GONGAN kebyar}
@@ -129,7 +129,7 @@ penyacah	u	o	e	i	o	a,	i	u,	a,
 calung	u		e		o		i		a
 jegogan	u				o				a
 gongs									G
-	{WAIT 2}
+	{WAIT 1.5}
 
 	{PART 8}
 	{GONGAN kebyar}
@@ -138,16 +138,15 @@ gangsa_p	--u,-	--a,-	i-a,-	u,.a,.	o.i.
 gangsa_s	--o-	--e-	u-ee	.u,.i	.a,.o
 
 	{LABEL LOOP8}
-	{SUPPRESS kempli beats=[6,7,9]}
 	{VALIDATION ignore=beat-duration}
 ugal	e	u	e	u	e/...			a,
 gangsa_p	e.oe	.eo.	e.oe	.eo.	e.o.	..a,.	a,.i	a,a,.a,	.a,.i
 gangsa_s	.ua.	u.au	.ua.	u.au	e.a.	..e.	eo.	ee.e	.eo.
-penyacah	e	u	e	u	e/...			a,
+penyacah	e	u	e	u	e/			a,
 calung	e		e		e			a
 jegogan	e		e		e			a
+kempli	x?	x?	x?	x?	x?			x?	x?
 
-	{SUPPRESS kempli beats=[2]}
 ugal	a,		a,	a,	u,	a,	u,	a,	o
 gangsa_p	a,a,.a,	.a,.i	a,.e,.	a,.u,a,	.a,u,.	a,.u,a,	.a,u,.	a,.a,.	o.i.
 gangsa_s	ee.e	.eoi	.o,.u,	.io.	i.oi	.io.	i.oi	.u,.i	.a,.o
@@ -160,7 +159,7 @@ ga/ugal	e...
 calung	e
 jegogan	e
 gongs	G
-	{WAIT 1}
+	{WAIT 0.5}
 
 	{PART 9}
 	{LABEL LOOP9}
@@ -212,7 +211,7 @@ calung	e		i		e		a		u		e		u
 jegogan	e		i		e		a		u		e		u
 kendang	9...	((.(	9.(.	9.(.	.8*8	*0)0	)8*0	)9(0	)9-(	(9(9	(9.8	*(9(	9
 gongs	G				G		P		T		P		G
-	{WAIT 3}
+	{WAIT 2}
 
 	{PART reyongan}
 	{GONGAN kebyar}
@@ -227,28 +226,28 @@ reyong_24	e-e.	oe.o	.eo.	eoe.	o.i.	a,.o.	i.i.	a,.o.	i.e.	oe.e	o.u.	e.e.	o.u.	e.e
 	{GONGAN kebyar}
 	{DYNAMICS p beat=5 positions=reyong}
 reyong_13	u,-u,a,	.u,.a,	u,-u,a,	....	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	....
-reyong_24	o-o.	ioi.	o-o.	i---	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o-o.	i---
+reyong_24	oio.	ioi.	oio.	i---	oio.	ioi.	oio.	ioi.	oio.	ioi.	oio.	i---
 
 	{GONGAN kebyar}
 	{DYNAMICS f positions=reyong}
 reyong_13	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,---
-reyong_24	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o-o.	ioi.	o---
+reyong_24	oio.	ioi.	oio.	ioi.	oio.	ioi.	oio.	ioi.	o---
 	{WAIT 0.3}
 
 	{GONGAN kebyar}
 reyong_13	..e,u,	.e,u,.	u,-u,a,	.u,a,.	a,-e,u,	.e,u,.	u,-a,i	.a,i.	ia,.i	a,.a,i	..io	.io.	oi.o	i.io	....	.i.o
-reyong_24	..i.	a,.ia,	..o.	i.oi	..i.	a,.ia,	..e.	oe.o	.eo.	eoe.	o.u.	eu.e	.ue.	ueu.	e...	.ue.
+reyong_24	..i.	a,.ia,	..o.	i.oi	..i.	a,.ia,	..e.	oe.o	.eo.	eoe.	o-u.	eu.e	.ue.	ueu.	e---	-ue.
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 reyong_13	i
 reyong_24	u
-	{WAIT  3}
+	{WAIT  2}
 
 	{PART pengecet}
 	{TEMPO 110}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	i/...	....
-gangs	i/...	....
+gangsa	i/...	....
 
 	{DYNAMICS mp positions=ugal}
 calung	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
@@ -273,7 +272,7 @@ penyacah	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
 calung	i		o		a		i		u		o		a		e
 jegogan	i		o		a		i		u		o		a		e
 kendang	.8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	(9-(	(9(9	(9.8	*(9(
-gongs	G				P				T				P
+gongs	G				P				T				P			
 
 	{LABEL REYONG1}
 	{COPY REGULAR}
@@ -291,13 +290,13 @@ kendang	-8*8	*0)8	*(99	----	-8*8	*0)8	*(99	----	-9(9	((9(	(9(9	((9(	(9((?	9-9-	-
 
 	{LABEL REYONG1_NOGANGSA}
 	{COPY REYONG1}
-	{SUPPRESS gangsa}
 	{DYNAMICS f positions=reyong}
+gangsa	
 
 	{LABEL REYONG1_NOGANGSA_AFTER3}
 	{COPY REYONG1_AFTER3}
-	{SUPPRESS gangsa}
 	{DYNAMICS f positions=reyong}
+gangsa	
 
 	{LABEL REYONG2}
 	{COPY REGULAR}
@@ -308,7 +307,7 @@ kendang	-8*8	*0)8	*.99	---8	*(99	9999	9.((	-8*.	9(((	((((	(9(9	((9(	(9(9?	9-9-	-
 	{LABEL REYONG2_NOGANGSA}
 	{COPY REYONG2}
 	{DYNAMICS f positions=reyong}
-	{SUPPRESS gangsa}
+gangsa	
 
 	{LABEL REYONG3}
 	{COPY REGULAR}
@@ -320,8 +319,8 @@ reyong_24	.xxx	xxxx	x.e.	oeo.	e-xx	xxxx	x.o.	ioi.	o-xx	xxxx	x.e.	oeo.	euu.	e---	
 	{LABEL REYONG3_NOGANGSA}
 	{COPY REYONG3}
 	{LOOP 2}
-	{SUPPRESS gangsa}
 	{DYNAMICS f positions=reyong}
+gangsa	
 
 	{LABEL END}
 ga/ugal	i

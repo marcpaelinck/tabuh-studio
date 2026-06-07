@@ -2,12 +2,12 @@
 
 	{AUTOKEMPYUNG off scope=SCORE}
 	{TEMPO 80}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{PART "reyong intro"}
 reyong1+3	a-.ia-i-	..ai..i-	a.ai.ai.	ia.ia.ai	.aa-a-eu	-e-ua.ua	.a.uee-e	-uua.ua.
 reyong2+4	e-o.e-.-	o-e.o-..	eoe.oe.o	.eo.eoe.	.oo-o-eo	-e-o.io.	i.ioee-e	-ooei.ei
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 50  beats=3->8}
 reyong1+3	.aa-aua.	aa-ua.ua	.a.uee-e	-uueueeu	e-ua.ua.	au.au.ua	..ai.ai.	ia.ia.ai
 reyong2+4	.ee-eoei	oo-o.io.	i.ioee-e	-ooeoeeo	e-o.io.i	.oi.oio.	i-e.oe.o	.eo.eoe.

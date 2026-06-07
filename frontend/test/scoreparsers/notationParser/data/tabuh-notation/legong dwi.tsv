@@ -5,7 +5,7 @@
 	{VALIDATION ignore=[kempyung] scope=SCORE}
 	{PART Kawitan}
 	{TEMPO 120}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{AUTOKEMPYUNG on}
 ga/ugal	o--o	o-e-	o-i-	a,-i-	o-e-	o-i-	a,-i-	o-e-
 cal/jeg	o				o
@@ -17,7 +17,7 @@ calung	o	i	a	i	o	i	a	i	o
 jegogan	o				o				o
 	{WAIT 1}
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 kendang	0--0	0-0-	0-0-	0---
 
 	{TEMPO ->100 beat=16}
@@ -112,7 +112,7 @@ gong	G
 	##gongan 20
 	{TEMPO 55}
 	{AUTOKEMPYUNG off}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ga/ugal	------e,-
 kendang	9--8*8*9
 
@@ -204,7 +204,7 @@ calung	e---	----	----	----	o-e-	o-i-	a-i-
 jegogan	e				o
 gong	G				T
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{LABEL P2b}
 calung	----	----	----
 

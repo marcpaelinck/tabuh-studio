@@ -65,7 +65,7 @@ gong	G---------G-------------	-------------------	G
 	{PART intro}
 	{DYNAMICS mf positions=[gangsa,ugal,reyong,kendang,gong]}
 	{TEMPO 180}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ##	0:45
 gangsa	..e,.	....
 

@@ -24,7 +24,7 @@ gong	G
 	{GOTO KAWITAN passes=[1,2]}
 
 	{LABEL TRANSITION_TO_PENGAWAK}
-	{SUPPRESS kempli beats=[14,15,16]}
+	{KEMPLI off beats=[14,15,16]}
 	{TEMPO 130 beats=14->16}
 trompong	i---	o---	i---	a,---	i---	o---	e---	o---	i---	o---	e---	o---	i-io	e---	e---	o---
 gangsa p	i.io	.i.o	i.io	.i.o	io.i	o.io	.oi.	oi.o	io.i	o.io	.oi.	oi.o	i/.io	e-o-	e---	o---
@@ -34,14 +34,14 @@ jegogan	i		i		i		e		i		e		i
 gong	G
 
 	{TEMPO 80 beats=7->16}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 trompong	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 ga/ca	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
 jegogan	e								e
 
 
 	{TEMPO 50 beats=1->8}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 trompong	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---
 ga/ca	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---
 jegogan	i
@@ -76,7 +76,7 @@ jegogan	u	a	u	e	e	a	u	e
 	# Transition to pengecet
 	{TEMPO 120->150 beats=1->2}
 	{TEMPO 120 beats=5->8}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 trompong	u,---a,---	i---o-i-	a,-i-o---	i---a,---	e/...e---	o---e/...	e---o---	e---o---
 ga/ca	u---a---	i---o-i-	a-i-o---	i---a---	e/...e---	o---e/...	e---o---	e---o---
 jegogan	u				e
@@ -84,7 +84,7 @@ gong	G
 
 
 	{TEMPO 100 beats=7->8}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 trompong	e/...e---	o---e/...	e---o---	e-o-i-a,-	i---i-ii?	i-o-i-a,-	u,-a,-i-a,-	i---o---
 ga/ca	e/...e---	o---e/...	e---o---	e-o-i-a-	i---i-ii?	i-o-i-a-	u-a-i-a-	i---o---
 jegogan	e				i
@@ -115,13 +115,13 @@ calung	--i-	--o-	e-o-	i-o-	--e-	--o-	e-o-	i-a-	i---	u-a-	i---	a---	u/.io	e-o-	e-
 jegogan	a		e		o		e		i		i		u
 
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 trompong	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a,-
 tr/ga/ca	e/...	e---	o---	e/...	e---	o---	e---	o---	e/...	e---	o---	e/...	e---	o---	e-o-	i-a-
 jegogan	e								e
 
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 60 beats=1->8}
 trompong	i---	i-ii?	i-o-	i-a,-	u,-a,-	u,---	e-u,-	a,---	u,---
 ga/ca	i---	i-ii?	i-o-	i-a-	u-a-	u---	e-u-	a---	u---

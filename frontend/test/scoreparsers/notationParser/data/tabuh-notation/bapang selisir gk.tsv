@@ -1,7 +1,7 @@
 {INFO notation="bapang selisir gk" part=full title="Bapang Selisir GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 100}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	..o-	Eu---	e---	a---	e---	o---	e--u	a-u-	e-uu?
 
 	{LOOP 3}

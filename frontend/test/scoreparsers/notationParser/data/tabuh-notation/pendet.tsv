@@ -2,7 +2,7 @@
 
 ##	Kempli beat at end of each measure (gong at end of gongan)
 	{AUTOKEMPYUNG off scope=SCORE}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 60}
 ugal	----	----	----	-o-Eu	-u-Eo	-o-Eu	-u--	ee?-o
 gangsa p	----	----	----	----	----	----	----	ee?-o
@@ -33,11 +33,11 @@ reyong3	----	uuau	auau	.au.	----	aaua	uaua	uuau
 reyong4	----	u<u<e<u<	e<u<e<u<	e<e<u<e<	----	.o<i<.	i<o<i<.	u<u<e<u<
 
 	{TEMPO ->60 beat=2}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	----	----	-o-Eu
 
 	## GONGAN 5
-	{SUPPRESS kempli}
+	{KEMPLI off}
 ugal	-u-a	-a-u	-u-e	aueo	-o-Eu	-u--	-e-Ee/	e--u
 gangsa p	----	----	----	----	----	----	-e-Ee/	e---
 gangsa s	----	----	----	----	----	----	-i<-Ii</	i<---

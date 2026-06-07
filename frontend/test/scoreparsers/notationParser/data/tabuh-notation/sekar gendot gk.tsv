@@ -4,7 +4,7 @@
 	{PART kawitan}
 	{VALIDATION ignore=[kempyung] scope=SCORE}
 	{TEMPO 70}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{DYNAMICS f positions=[ugal]}
 	{LABEL ugal_PENYALIT}
 ugal	o-	Eu-	e-	u-	Uu/u
@@ -81,7 +81,7 @@ jegogan		e
 gong		G
 	{WAIT 2}
 
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 70}
 	{PART pengawak}
 ugal	uu/u-	Eo---	ii/i-	Oe---	uu/u-	Eo-e-	o-i-	oi-o	i-o-	e-o-	e-aa	----
@@ -261,7 +261,6 @@ gong	G				T
 	{GOTO PENGECET passes=[1,2]}
 
 	{LABEL TRANSITION_TO_BATEL1}
-	{SUPPRESS kempli beats=[4]}
 	# gongan 30
 ugal	a,---	i---	a,...	....
 gangsa p	.eue	.eue	....	....
@@ -269,6 +268,7 @@ gangsa s	ai<.i<	ai<.i<	a...	....
 calung	a	i	a
 jegogan	a		a
 gong	G
+kempli	x?	x?	x?	
 
 	{TEMPO 150}
 	{DYNAMICS ff positions=[gangsa]}
@@ -415,7 +415,7 @@ jegogan	i		i		i
 gong	G		T		G		T
 
 	{GONGAN kebyar}
-	{SUPPRESS kempli}
+	{KEMPLI off}
 	{TEMPO 50 beat=3}
 ugal	iii-	----	i:
 gangsa p	iii-	----	i:
