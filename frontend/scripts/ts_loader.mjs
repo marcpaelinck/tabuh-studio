@@ -5,6 +5,10 @@
  *  - Bare module specifiers (lodash, uuid, @lezer/common, …) resolved from
  *    the frontend/node_modules directory.
  *  - Relative imports with missing file extensions (.ts and .js tried in order).
+ *  - Local TypeScript packages symlinked into node_modules (e.g. via a
+ *    "file:../shared" workspace dependency) — Node's built-in type-stripping
+ *    refuses to process .ts files under node_modules, so we transpile them
+ *    explicitly with esbuild.
  *
  * Usage (run from the frontend/ directory):
  *   node --experimental-transform-types \
@@ -12,18 +16,17 @@
  *        ./scripts/<your-script>.ts [args...]
  */
 
+import { transform } from 'esbuild'
 import { existsSync, readFileSync } from 'fs'
+import { dirname, join, resolve as pathResolve } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
-import { dirname, resolve as pathResolve, join } from 'path'
 
 // Resolve bare specifiers from this directory's node_modules.
 const LOADER_DIR = dirname(fileURLToPath(import.meta.url))
 const NODE_MODULES = join(LOADER_DIR, '..', 'node_modules')
 
 function resolveNodeModule(specifier) {
-    const parts = specifier.startsWith('@')
-        ? specifier.split('/').slice(0, 2).join('/')
-        : specifier.split('/')[0]
+    const parts = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0]
 
     const subpath = specifier.substring(parts.length)
     const pkgJsonPath = join(NODE_MODULES, parts, 'package.json')
@@ -102,9 +105,24 @@ export async function resolve(specifier, context, nextResolve) {
         if (!resolved.match(/\.[a-zA-Z]+$/)) {
             if (existsSync(resolved + '.ts')) return { url: pathToFileURL(resolved + '.ts').href, shortCircuit: true }
             if (existsSync(resolved + '.js')) return { url: pathToFileURL(resolved + '.js').href, shortCircuit: true }
-            if (existsSync(resolved + '/index.js')) return { url: pathToFileURL(resolved + '/index.js').href, shortCircuit: true }
+            if (existsSync(resolved + '/index.js'))
+                return { url: pathToFileURL(resolved + '/index.js').href, shortCircuit: true }
         }
     }
 
     return nextResolve(specifier, context)
+}
+
+// ---------------------------------------------------------------------------
+// load hook — transpile .ts files inside node_modules with esbuild, since
+// Node's built-in type-stripping explicitly refuses to handle those.
+// ---------------------------------------------------------------------------
+export async function load(url, context, nextLoad) {
+    if (url.includes('/node_modules/') && url.endsWith('.ts')) {
+        const filePath = fileURLToPath(url)
+        const source = readFileSync(filePath, 'utf-8')
+        const { code } = await transform(source, { loader: 'ts', format: 'esm', sourcefile: filePath })
+        return { format: 'module', source: code, shortCircuit: true }
+    }
+    return nextLoad(url, context)
 }
