@@ -207,8 +207,8 @@ export function notationWidth(notation: NoteObject[], position: Position) {
 }
 
 // Converts an array of NoteSymbol strings to an array of NoteObject objects.
-function symbolArrayToNoteArray(symbols: NoteSymbol[]): NoteObject[] {
-    return symbols.map((sym) => new NoteObject(sym))
+function symbolArrayToNoteArray(symbols: NoteSymbol[], position: Position): NoteObject[] {
+    return symbols.map((sym) => new NoteObject(sym, position))
 }
 
 // Expands shorthand notation symbols (norot) into their full note sequences.
@@ -220,13 +220,13 @@ export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
         beat.objNotation.forEach((note, noteIdx) => {
             if (note.error !== undefined) {
                 // Structurally invalid symbol — replace with silence
-                console.error(`invalid symbol '${note.toString()}' for ${position}`)
-                expandedObjNotation.push(new NoteObject(' '))
+                console.error(`invalid symbol '${note.inputSymbol}' for ${position}`)
+                expandedObjNotation.push(new NoteObject(' ', position))
             } else if (note.pattern.norot) {
                 expandedObjNotation.push(...norotPattern(position, staff, measureIdx, noteIdx))
             } else {
                 // Single note (including combined grace-note symbols, strokes, etc.)
-                expandedObjNotation.push(new NoteObject(note.toString()))
+                expandedObjNotation.push(new NoteObject(note.toString(), position))
             }
         })
         const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.toString())
@@ -266,7 +266,7 @@ function norotPattern(position: Position, staff: Staff[], measureIdx: number, sy
         prevNorotNote !== undefined && prevNorotNote.toString() === note.toString() ? 'ngubeng' : 'majalan'
 
     if (subPattern === 'ngubeng') {
-        return symbolArrayToNoteArray(patterns.norot.patterns[position]![currTone][norotType].ngubeng)
+        return symbolArrayToNoteArray(patterns.norot.patterns[position]![currTone][norotType].ngubeng, position)
     }
 
     // Majalan: derive the first pattern note from the previous norot basenote (if any)
@@ -280,6 +280,7 @@ function norotPattern(position: Position, staff: Staff[], measureIdx: number, sy
         firstNote = '.' // start of a norot sequence
     }
     return symbolArrayToNoteArray(
-        patterns.norot.patterns[position]![currTone][norotType].majalan.toSpliced(0, 1, firstNote)
+        patterns.norot.patterns[position]![currTone][norotType].majalan.toSpliced(0, 1, firstNote),
+        position
     )
 }

@@ -402,7 +402,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         svg_file: 'svg/GK_PENYACAH.svg',
         sampletemplate: 'GK_PENYACAH_{note}.mp3',
         symbolToNoteNames: {'u,': ['DUNG0'],'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 
-                           'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR']},
+                       /*     'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'] */}, 
         validStrokes: [],
         modifiers:{before:[], after:[]}
 

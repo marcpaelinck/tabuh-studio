@@ -343,6 +343,9 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
                 objNotation.forEach((note: NoteObject, symbolIdx) => {
                     const endOfMeasure = symbolIdx == objNotation.length - 1
+                    const waitTimeAfter = endOfMeasure
+                        ? millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
+                        : 0
                     // const endOfPosition = currentStep!.lastSystem && currentStep!.lastBeat && endOfMeasure
 
                     // CREATE SAMPLER ACTION
@@ -350,16 +353,15 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     // Add the given delay time if we reached the last note of the measure.
                     var noteDuration = 1
                     var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - beatStartTime, currentStep!))
-                    var waitTime = 0
                     if (symbolIdx == 0) {
                         // Start of new measure: extend the last note until the current time. This ensures that
                         // if the previous measure was incomplete, it gets extended to the length of the beat
                         // to which it belongs.
                         setLastSamplerActionEndtime(currAction[position], currTime)
                     }
-                    if (note.isExtensionSilence) {
+                    if (note.isExtensionSilence && currAction[position]) {
                         // Extend the last note of the current position with one basenote duration.
-                        extendLastSamplerAction(currAction[position], noteDuration)
+                        extendLastSamplerAction(currAction[position], noteDuration + waitTimeAfter)
                     } else if (note.isMutingSilence) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
@@ -408,13 +410,12 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             n2TO(noteDuration),
                             tempoAt(currTime - beatStartTime, currentStep!)
                         )
-                        if (endOfMeasure && currentStep!.waitMsAfter) {
-                            waitTime = millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
-                            if (currAction[position]) extendLastSamplerAction(currAction[position], waitTime)
+                        if (waitTimeAfter > 0 && currAction[position]) {
+                            extendLastSamplerAction(currAction[position], waitTimeAfter)
                         }
                     }
 
-                    currTime += noteDuration + waitTime
+                    currTime += noteDuration + waitTimeAfter
                     currTimeMs += symbolDurationMs
                     prevNote = note
                 })
@@ -490,7 +491,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         measureIdx: currentStep!.beatIdx,
                         position: 'KEMPLI',
                         prevnote: undefined,
-                        note: new NoteObject('x?'),
+                        note: new NoteObject('x?', 'KEMPLI'),
                         nextnote: undefined,
                         // The tempo is not precise but irrelevant for single notes
                         bpm: currentStep.tempo[0],

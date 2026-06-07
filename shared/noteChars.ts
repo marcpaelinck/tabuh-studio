@@ -28,6 +28,12 @@ export const PITCH_CHARS: ReadonlySet<string> = new Set([
 ]);
 
 /**
+ * Characters that do not produce sound during playback.
+ *
+ */
+export const SILENCE_CHARS: ReadonlySet<string> = new Set([' ', '-', '.'])
+
+/**
  * Octave modifier characters. Appear after the pitch character.
  *
  * - `,` lower octave (octave 0)

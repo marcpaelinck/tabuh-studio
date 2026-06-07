@@ -446,7 +446,8 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
             const beat: Staff = { notation: [], objNotation: [] }
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
-                const note = new NoteObject(getText(noteNode, content).trim())
+                // The NoteObject is not bound to any instrument
+                const note = new NoteObject(getText(noteNode, content).trim(), undefined)
                 beat.notation.push(note.toString())
                 beat.objNotation.push(note)
                 noteNode = noteNode.nextSibling

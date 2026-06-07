@@ -124,7 +124,7 @@ const createInstrument = (
                 try {
                     sampler?.triggerAttackRelease(indices, duration, time, params.velocity * dimValue)
                 } catch {
-                    console.error(`ERROR: could not play sound ${params.position} ${params.toString()} `)
+                    console.error(`ERROR: could not play sound ${params.position} ${JSON.stringify(params)} `)
                 }
             }
         },

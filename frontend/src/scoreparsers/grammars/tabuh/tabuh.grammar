@@ -7,7 +7,7 @@
    space {" "}
    Eol { ("\n" |  "\r\n") }
    Eof { @eof }
-   Note { $[ABEGIOPSTUX]?$[()*-.089abeiorstuxy]$[,/:;<=?n_\[\]]* }
+   Note { $[ABEIOSUX]?$[()*-.089abeiorstuxyGPT]$[,/:;<=?n_\[\]]* }
    PositionLabel { $[a-z0-9/] $[a-z0-9/_+ ]+ }
    Arrow { '->' }
    EmptyLine { tab* space* Eol }

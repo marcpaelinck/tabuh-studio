@@ -16,6 +16,11 @@ import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../../ut
 
 // prettier-ignore
 const strokes = {
+    /** DAMPED AND MUTED 
+     * These values are used to emulate the strokes if no separate samples are available
+    */
+    damped: { duration: 0.4, silence: 0.6 },
+    muted: { duration: 0.15, silence: 0.85 },
     tremolo:
         // TREMOLO
         // Repeated striking of the same note.
@@ -65,24 +70,34 @@ export interface CreateStrokeArgs {
     prevaction: PlaybackSamplerAction | undefined // previous action created for this position
     isLast: boolean // true if this is the last symbol in the current position's notation
 }
-// Converts specific symbols that represent a sequence of notes to a list of PlaybackSamplerAction objects.
+// Checks if there is a sample for the note's stroke. If not, the stroke is emulated.
+// Returns a list of PlaybackSamplerAction objects.
 // Function `createNoteActions` expects a `CreateStrokeArgs` object as argument.
 // Arguments `prevnote` and `nextnote` are required because some motifs can consist of two consecutive symbols.
 // The 'grace note' motif requires information about the next symbol to determine its octave.
 // WARNING: GRACE NOTES WILL MODIFY THE LAST `SamplerAction` OBJECT, MAKING `createNoteActions` AN 'IMPURE FUNCTION'.
 export function createNoteActions(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const returnValue: PlaybackSamplerAction[] = []
-    // Assume that grace notes will only be combined with unmuted, damped or muted note
     if (args.note.error) {
         console.error(`invalid stroke type '${args.note.toString()}' for ${args.position}`)
         return silenceAction(args)
     }
+    // Assume that grace notes will only be combined with unmuted, damped or muted note
     if (args.note.graceNote) returnValue.push(...gracenoteAction(args))
-    if (!args.note.hasStroke || args.note.stroke.muted || args.note.stroke.damped) {
-        returnValue.push(...singleNoteAction(args))
+    if (!args.note.hasStroke) {
+        returnValue.push(...openNoteAction(args))
+        return returnValue
+    }
+    if (args.note.stroke.damped) {
+        returnValue.push(...dampedNoteAction(args))
+        return returnValue
+    }
+    if (args.note.stroke.muted) {
+        returnValue.push(...mutedNoteAction(args))
         return returnValue
     }
 
+    // The following strokes are emulated with a sequence of notes.
     if (args.note.stroke.halfduration) return halfDurationAction(args)
     if (args.note.stroke.tremolo) return tremoloAction(args)
     if (args.note.stroke.acceleratingtremolo) return AcceleratingTremoloAction(args)
@@ -123,7 +138,34 @@ export function totalDuration(notes: NoteObject[], bpm: number, unit: 'milliseco
     return _.sum(notes.map((note) => noteDuration(note, bpm, unit)))
 }
 
-function singleNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
+const DEFAULT_DURATION = 1
+const DEFAULT_OFFSET = 0
+const DEFAULT_LASTOFMOTIF = false
+interface NewActionParams {
+    args: CreateStrokeArgs
+    offset?: number // Offset from args.time.
+    duration?: number // Duration of the note in basenote units.
+    note?: NoteObject // Note to play.
+    isLastOfMotif?: boolean // Last note of the stroke's motif.
+}
+function newAction({ args, offset, duration, note, isLastOfMotif }: NewActionParams): PlaybackSamplerAction {
+    return {
+        time: n2TO(args.time + (offset ?? DEFAULT_OFFSET)),
+        timeMs: args.timeMs + BaseNoteEquiv2Millis(offset ?? DEFAULT_OFFSET, args.bpm),
+        ismuted: args.note.pattern.damped || args.note.pattern.muted,
+        params: {
+            duration: n2TO(duration ?? DEFAULT_DURATION),
+            position: args.position,
+            note: note ?? args.note,
+            bpm: args.bpm,
+            velocity: args.velocity,
+            isLast: args.isLast && (isLastOfMotif ?? DEFAULT_LASTOFMOTIF),
+            isLastOfMotif: isLastOfMotif ?? DEFAULT_LASTOFMOTIF
+        } as SamplerFunctionParameters
+    }
+}
+
+function openNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
     return [
         {
@@ -133,7 +175,7 @@ function singleNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                note: new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position),
+                note: new NoteObject(symbol.pitch + symbol.octave, args.note.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -141,6 +183,50 @@ function singleNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             } as SamplerFunctionParameters
         }
     ]
+}
+
+function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
+    const symbol = args.note.symbol
+    if (args.note.hasSample) {
+        const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
+        return [newAction({ args: args, note })]
+    } else {
+        // Emulate using note without modifier
+        debug(`emulating damped note for ${args.position}`)
+        const note = new NoteObject(symbol.pitch + symbol.octave, args.note.position)
+        return [
+            newAction({ args: args, note, duration: strokes.damped.duration }),
+            newAction({
+                args: args,
+                note: new NoteObject(' ', args.position),
+                offset: strokes.damped.duration,
+                duration: strokes.damped.silence,
+                isLastOfMotif: true
+            })
+        ]
+    }
+}
+
+function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
+    const symbol = args.note.symbol
+    if (args.note.hasSample) {
+        const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
+        return [newAction({ args: args, note })]
+    } else {
+        // Emulate using note without modifier
+        debug(`emulating muted note for ${args.position}`)
+        const note = new NoteObject(symbol.pitch + symbol.octave, args.note.position)
+        return [
+            newAction({ args: args, note, duration: strokes.muted.duration }),
+            newAction({
+                args: args,
+                note: new NoteObject(' ', args.position),
+                offset: strokes.muted.duration,
+                duration: strokes.muted.silence,
+                isLastOfMotif: true
+            })
+        ]
+    }
 }
 
 function halfDurationAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
@@ -152,7 +238,10 @@ function halfDurationAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(0.5),
                 position: args.position,
-                note: new NoteObject(args.note.canonicalSymbol.substring(0, args.note.canonicalSymbol.length - 1)),
+                note: new NoteObject(
+                    args.note.canonicalSymbol.substring(0, args.note.canonicalSymbol.length - 1),
+                    args.position
+                ),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -171,7 +260,7 @@ function silenceAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                note: new NoteObject(MutingChars[0]),
+                note: new NoteObject(MutingChars[0], args.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -200,10 +289,10 @@ function gracenoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(strokes.gracenote.duration),
                 position: args.position,
-                note: new NoteObject(args.note.graceNote.pitch + args.note.graceNote.octave),
+                note: new NoteObject(args.note.graceNote.pitch + args.note.graceNote.octave, args.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
-                isLast: args.isLast,
+                isLast: false,
                 isLastOfMotif: false
             } as SamplerFunctionParameters
         }
@@ -217,10 +306,10 @@ function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
     const duration = 1 / strokes.tremolo.notes_per_basenote
     const returnValue: PlaybackSamplerAction[] = []
-    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1))]
+    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1), args.position)]
     // Include the next symbol if it is also a tremolo note
     if (args.nextnote?.canonicalSymbol && TremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char)))
-        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1)))
+        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1), args.position))
     const totalNotes = notes.length * strokes.tremolo.notes_per_basenote
 
     for (var idx = 0; idx <= totalNotes; idx++) {
@@ -252,13 +341,13 @@ function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerActio
         return []
 
     const returnValue: PlaybackSamplerAction[] = []
-    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1))]
+    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1), args.position)]
     // Include the next symbol if it is also an accelerating tremolo note
     if (
         args.nextnote?.canonicalSymbol &&
         AcceleratingTremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char))
     )
-        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1)))
+        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1), args.position))
     const totalNotes = notes.length * strokes.tremolo.accelerating_motif.length
 
     var time = args.time
@@ -313,7 +402,7 @@ function rakeAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(noteDuration),
                 position: args.position,
-                note: new NoteObject(instrumentRange[startIdx + idx]),
+                note: new NoteObject(instrumentRange[startIdx + idx], args.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast && count == strokes.rake.number_of_notes,

@@ -17,7 +17,6 @@ import type {
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
 import type { Score, Staff, System } from '../../typing/score'
-import { debug } from '../../utils/debugger'
 import { getBeatNotation, getSystemBeatCount } from '../../utils/objectUtils'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
@@ -188,20 +187,25 @@ export function executionManager(
     function getNextSystemInFlow(
         currentStep: FlowStep,
         flowInfo: FlowInfoTable,
-        sequence: UUID[] | undefined,
-        nextSequenceIdx: number | undefined
-    ): number | undefined {
-        var sysIdx = currentStep.systemIdx
-        const loopItems: LoopItem[] = getExecutionItems('loop', sysIdx) as LoopItem[]
-        if (loopItems.length > 0 && flowInfo[sysIdx].loop < loopItems[0].count) {
-            return sysIdx
+        sequence: UUID[] | undefined
+    ): { systemIdx: number | undefined; sequenceIdx: number | undefined } {
+        var systemIdx: number | undefined = currentStep.systemIdx
+        var sequenceIdx: number | undefined = undefined
+        const loopItems: LoopItem[] = getExecutionItems('loop', systemIdx) as LoopItem[]
+        if (loopItems.length > 0 && flowInfo[systemIdx].loop < loopItems[0].count) {
+            return { systemIdx, sequenceIdx }
         }
-        if (sequence && nextSequenceIdx != undefined) {
-            return uuidLookup[sequence[nextSequenceIdx]]
+        if (sequence) {
+            sequenceIdx = getNextSequenceIdx(currentStep, sequence)
+            if (sequenceIdx != undefined) return { systemIdx: uuidLookup[sequence[sequenceIdx]], sequenceIdx }
         }
-        const gotoItems: GotoItem[] = getExecutionItems('goto', sysIdx) as GotoItem[]
-        if (gotoItems.length == 0) return sysIdx == score.systems.length - 1 ? undefined : sysIdx + 1
-        return uuidLookup[gotoItems[0].targetuuid]
+        const gotoItems: GotoItem[] = getExecutionItems('goto', systemIdx) as GotoItem[]
+        if (gotoItems.length == 0) {
+            systemIdx = systemIdx == score.systems.length - 1 ? undefined : systemIdx + 1
+        } else {
+            systemIdx = uuidLookup[gotoItems[0].targetuuid]
+        }
+        return { systemIdx, sequenceIdx }
     }
 
     function getWaitTimeMsAfter(sysIdx: number): number {
@@ -300,8 +304,12 @@ export function executionManager(
                 // Reached end of system. Determine next system.
                 // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
                 const sequence = currentStep.sequence || getSequence(currentStep)
-                const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
-                const nextSysIdx = getNextSystemInFlow(currentStep, flowinfo, sequence, nextSequenceIdx)
+                // const nextSequenceIdx = sequence ? getNextSequenceIdx(currentStep, sequence) : undefined
+                const { systemIdx: nextSysIdx, sequenceIdx: nextSequenceIdx } = getNextSystemInFlow(
+                    currentStep,
+                    flowinfo,
+                    sequence
+                )
                 // In case of single system playback: quit if we leave the requested system
                 if (
                     playbackType == 'single' &&
@@ -326,7 +334,7 @@ export function executionManager(
                 break
         }
         if (next.systemIdx >= 0 && next.beatIdx >= 0) {
-            debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
+            // debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
             const nextSystem = flowinfo[next.systemIdx].system
             // Build a Staff per position containing only the current section's notation
             const measures = _.fromPairs(
@@ -381,6 +389,9 @@ export function executionManager(
 
             if (!peek) {
                 currentStep = nextStep
+                // debug(
+                //     `NEXTSTEP: #${nextStep.system.id} beat:${nextStep.beatIdx} lastBeat:${nextStep.lastBeat} waitMsAfter:${nextStep.waitMsAfter}`
+                // )
             }
             return nextStep
         }

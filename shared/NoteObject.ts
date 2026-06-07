@@ -2,8 +2,15 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
-import { ExtensionChars, MelodicNoteChars, MutingChars, OctavationChars } from '../frontend/src/config/config.ts'
+import {
+    ExtensionChars,
+    MelodicNoteChars,
+    MutingChars,
+    OctavationChars,
+    positionConfigs
+} from '../frontend/src/config/config.ts'
 import { noteRange } from '../frontend/src/utils/alphabet.ts'
+import { debug } from '../frontend/src/utils/debugger.ts'
 import type {
     GracenoteChar,
     OctaveChar,
@@ -19,6 +26,7 @@ import {
     PATTERN_MODIFIER_MAP,
     PATTERN_MODIFIERS,
     PITCH_CHARS,
+    SILENCE_CHARS,
     STROKE_MODIFIER_MAP,
     STROKE_MODIFIERS
 } from './noteChars.ts'
@@ -188,6 +196,7 @@ export class NoteObject {
     readonly isBound: boolean
     readonly isExtensionSilence: boolean
     readonly isMutingSilence: boolean
+    readonly hasSample: boolean
 
     /** Octave as a number: `0` (lower), `1` (middle), `2` (upper). */
     readonly octaveNumber: -1 | 0 | 1
@@ -203,12 +212,13 @@ export class NoteObject {
      *   still be structurally valid when `'invalidCasting'` is supplied; if it
      *   is not, `'invalidSymbol'` takes precedence.
      */
-    constructor(input: string, position?: Position, fault?: NoteObjectFault) {
+    constructor(input: string, position: Position | undefined, fault?: NoteObjectFault) {
         this.inputSymbol = input
         this.position = position
         this.isBound = position !== undefined
         this.isExtensionSilence = false
         this.isMutingSilence = false
+        this.hasSample = false
         this.octaveNumber = 0
 
         // Attempt structural parsing regardless of any supplied fault, so that
@@ -256,6 +266,7 @@ export class NoteObject {
             this.error = 'invalidSymbol'
             this.symbol.pitch = '!'
             this.canonicalSymbol = '!'
+            console.error(`invalid symbol ${input} for ${position}`)
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
             this.error = fault
@@ -269,6 +280,12 @@ export class NoteObject {
 
             this.isExtensionSilence = ExtensionChars.includes(this.symbol.pitch)
             this.isMutingSilence = MutingChars.includes(this.symbol.pitch)
+            if (this.position) {
+                const symbol = this.symbol.pitch + this.symbol.octave + this.symbol.modifier
+                this.hasSample = symbol in positionConfigs[this.position].symbolToNoteNames
+                if (!this.hasSample && !SILENCE_CHARS.has(symbol))
+                    debug(`Sample not found for '${symbol}' on ${this.position}`)
+            }
 
             Object.freeze(this)
         }
