@@ -17,6 +17,7 @@ import type {
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
 import type { Score, Staff, System } from '../../typing/score'
+import { debug } from '../../utils/debugger'
 import { getBeatNotation, getSystemBeatCount } from '../../utils/objectUtils'
 
 // Keeps track of pass and loop counters for each system. Also contains lists of
@@ -193,10 +194,13 @@ export function executionManager(
         var sequenceIdx: number | undefined = undefined
         const loopItems: LoopItem[] = getExecutionItems('loop', systemIdx) as LoopItem[]
         if (loopItems.length > 0 && flowInfo[systemIdx].loop < loopItems[0].count) {
-            return { systemIdx, sequenceIdx }
+            return { systemIdx, sequenceIdx: currentStep.sequenceIdx }
         }
         if (sequence) {
             sequenceIdx = getNextSequenceIdx(currentStep, sequence)
+            debug(
+                `next in sequence: ${sequenceIdx != undefined ? sequence[sequenceIdx] : 'undefined'} systemId: ${sequenceIdx != undefined ? uuidLookup[sequence[sequenceIdx]] : 'undefined'}`
+            )
             if (sequenceIdx != undefined) return { systemIdx: uuidLookup[sequence[sequenceIdx]], sequenceIdx }
         }
         const gotoItems: GotoItem[] = getExecutionItems('goto', systemIdx) as GotoItem[]
@@ -235,7 +239,7 @@ export function executionManager(
                 }
             } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
                 // Gradual matching item found: determine start and end values for the given section.
-                if (undefined != exprItem.fromValue) {
+                if (undefined !== exprItem.fromValue) {
                     // Case 1: fromValue is given
                     const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
                     const valueRange = exprItem.value - exprItem.fromValue

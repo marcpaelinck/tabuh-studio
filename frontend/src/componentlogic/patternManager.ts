@@ -221,12 +221,12 @@ export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
             if (note.error !== undefined) {
                 // Structurally invalid symbol — replace with silence
                 console.error(`invalid symbol '${note.inputSymbol}' for ${position}`)
-                expandedObjNotation.push(new NoteObject(' ', position))
+                expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
             } else if (note.pattern.norot) {
                 expandedObjNotation.push(...norotPattern(position, staff, measureIdx, noteIdx))
             } else {
                 // Single note (including combined grace-note symbols, strokes, etc.)
-                expandedObjNotation.push(new NoteObject(note.toString(), position))
+                expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
             }
         })
         const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.toString())

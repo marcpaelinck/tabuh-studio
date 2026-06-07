@@ -293,8 +293,8 @@ export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1
 // ALPHABET + SAMPLES
 //TODO separate alphabet info from samples info. Same for instrument type.
 export const MelodicNoteChars = ['i', 'o', 'e', 'r', 'u', 'a', 's']
-export const ExtensionChars = ['-', ' ', '!'] // '!' = incorrect symbol value.
-export const MutingChars = ['.']
+export const ExtensionChars = ['-', ' ']
+export const MutingChars = ['.', '!'] // '!' = `incorrect symbol` value.
 export const OctavationChars = [',', '<']
 //Strokes
 export const HalfDurationChars = ['_']
@@ -330,7 +330,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     CENGCENG: {
         name: 'Cengceng',
         type: 'percussion',
-        volume: -14,
+        volume: -5,
         svg_file: '',
         sampletemplate: 'GK_CENGCENG_{note}.mp3',
         symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
@@ -340,7 +340,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     KENDANG: {
         name: 'Kendang',
         type: 'percussion',
-        volume: 0,
+        volume: -5,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
         symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
@@ -352,7 +352,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     KENDANG_WADON: {
         name: 'Kendang',
         type: 'percussion',
-        volume: 0,
+        volume: -5,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
         symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
@@ -364,7 +364,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     KENDANG_LANANG: {
         name: 'Kendang',
         type: 'percussion',
-        volume: 0,
+        volume: -5,
         svg_file: 'svg/GK_KENDANG.svg',
         sampletemplate: 'GK_KENDANG_{note}.wav',
         symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
@@ -410,7 +410,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     KANTILAN_POLOS: {
         name: 'Kantilan polos',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_KANTILAN_{note}.mp3',
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
@@ -430,7 +430,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     KANTILAN_SANGSIH: {
         name: 'Kantilan sangsih',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_KANTILAN_{note}.mp3',
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
@@ -450,7 +450,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     PEMADE_POLOS: {
         name: 'Pemade polos',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_PEMADE_{note}.mp3',
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
@@ -471,7 +471,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     PEMADE_SANGSIH: {
         name: 'Pemade sangsih',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_GANGSA.svg',
         sampletemplate: 'GK_PEMADE_{note}.mp3',
         symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
@@ -511,7 +511,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     TROMPONG: {
         name: 'Ugal',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_UGAL.svg',
         sampletemplate: 'GK_UGAL_{note}.mp3',
         symbolToNoteNames: { 'a,': ['DANG0'], 'i,': ['DING0'], 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a': ['DANG1'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'],
@@ -524,7 +524,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     GENDER_RAMBAT: {
         name: 'Gender rambat',
         type: 'daun',
-        volume: -14,
+        volume: -5,
         svg_file: '',
         sampletemplate: 'GK_GENDERRAMBAT_{note}.mp3',
         symbolToNoteNames: { 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
@@ -545,7 +545,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     REYONG_1: {
         name: 'Reyong 1',
         type: 'chimes',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
         symbolToNoteNames: {'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], 
@@ -568,7 +568,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     REYONG_2: {
         name: 'Reyong 2',
         type: 'chimes',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
         symbolToNoteNames: {'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 
@@ -591,7 +591,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     REYONG_3: {
         name: 'Reyong 3',
         type: 'chimes',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
         symbolToNoteNames: {o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 
@@ -613,7 +613,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     REYONG_4: {
         name: 'Reyong 4',
         type: 'chimes',
-        volume: -14,
+        volume: -5,
         svg_file: 'svg/GK_REYONG.svg',
         sampletemplate: 'GK_REYONG_{note}.mp3',
         symbolToNoteNames: {u: ['DUNG1'], 'a': ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 'u<': ['DUNG2'], 

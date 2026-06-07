@@ -6,7 +6,7 @@
 ga/ugal	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-
 pen/cal/jeg	u								u
 
-ugal	u	a	e	i	u	a	e	i
+ugal	u|	a	e	i	u	a	e	i
 gangsa_p	u,.e,.	u,e,.u,	e,.i.	i.i.	u,.e,.	u,e,.u,	e,.i.	i.i.
 gangsa_s	.u,.a,	u,.a,u,	.o.a,	.o.a,	.u,.a,	u,.a,u,	.o.a,	.o.a,
 penyacah	u	a	e	i	u	a	e	i
@@ -250,6 +250,7 @@ ugal	i/...	....
 gangsa	i/...	....
 
 	{DYNAMICS mp positions=ugal}
+	{DYNAMICS f positions=gangsa}
 calung	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
 gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.oi	a,a,.i	a,a,.i	a,.e.	e.eo
 gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
@@ -259,11 +260,14 @@ calung	i		o		a		i		u		o		a		e
 jegogan	i				a				u				a
 kendang															.8*8	*(9.
 gongs	G				P				T				P
-	{SEQUENCE [REGULAR, REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA_AFTER3, REYONG2_NOGANGSA, REGULAR,
-	REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA_AFTER3, REYONG2_NOGANGSA, REYONG3, REYONG1_AFTER3, REYONG2, END]}
+	{SEQUENCE [REGULAR, REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA, REYONG2_NOGANGSA, REGULAR,
+	REYONG1, REYONG2, REYONG3_NOGANGSA, REYONG1_NOGANGSA, REYONG2_NOGANGSA, REYONG3, REYONG1_AFTER3, REYONG2, END]}
 
 	{LABEL REGULAR}
 	{LOOP 2}
+	{DYNAMICS f positions=gangsa iteration=1}
+	{DYNAMICS mp positions=gangsa iteration=2}
+	{DYNAMICS ->f positions=gangsa iteration=2 beats=15->16}
 ugal	i		u	e	a	u	e	a	u	o	e	i	a	u	e	o
 gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.oi	a,a,.i	a,a,.i	a,.e.	e.eo
 gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
@@ -276,50 +280,48 @@ gongs	G				P				T				P
 
 	{LABEL REYONG1}
 	{COPY REGULAR}
-	{DYNAMICS mf positions=reyong}
+	{DYNAMICS mf positions=gangsa}
+	{DYNAMICS f positions=reyong}
 reyong	xxxx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
 kendang	-8*8	*0)8	*(99	----	-8*8	*0)8	*(99	----	-9(9	((9(	(9(9	((9(	(9((?	9-9-	-9(9	(9(-
 
 	{LABEL REYONG1_AFTER3}
 	{COPY REYONG1}
-	{DYNAMICS mf position=reyong}
+	{DYNAMICS mf positions=gangsa}
+	{DYNAMICS f position=reyong}
 reyong_13	..xx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
 reyong_24	i-xx	xxxx	x.bb	----	xxxx	xxxx	x.bb	----	.b-b	b/.bb/	.bb/b	b/.bb/	.bb/.	b-b-	--b/.	b/.b/.
 kendang	-8*8	*0)8	*(99	----	-8*8	*0)8	*(99	----	-9(9	((9(	(9(9	((9(	(9((?	9-9-	-9(9	(9(-
 
 
 	{LABEL REYONG1_NOGANGSA}
-	{COPY REYONG1}
-	{DYNAMICS f positions=reyong}
-gangsa	
-
-	{LABEL REYONG1_NOGANGSA_AFTER3}
-	{COPY REYONG1_AFTER3}
-	{DYNAMICS f positions=reyong}
+	{COPY REYONG1_AFTER3 include=dynamics}
 gangsa	
 
 	{LABEL REYONG2}
 	{COPY REGULAR}
+	{DYNAMICS mf positions=gangsa}
 	{DYNAMICS f positions=reyong}
 reyong	.xxx	xxxx	x.bb	-xx.	bbbb	bbbb	b/.bb/	.xx.	xxxx	xxxx	xbb/b	b/.bb/	.bb/.	b-b-	..b/.	b/.b/.
 kendang	-8*8	*0)8	*.99	---8	*(99	9999	9.((	-8*.	9(((	((((	(9(9	((9(	(9(9?	9-9-	-9(9	(9(-
 
 	{LABEL REYONG2_NOGANGSA}
 	{COPY REYONG2}
-	{DYNAMICS f positions=reyong}
-gangsa	
+	{DYNAMICS f positions=[reyong, gangsa]}
+gangsa p													..i.	Oe-e-	--u.	e.o.
+gangsa s													..u.	Ai<-i<-	-e.o	.i.a
 
 	{LABEL REYONG3}
 	{COPY REGULAR}
-	{LOOP 2}
-	{DYNAMICS mf positions=reyong}
+	{LOOP 3}
+	{DYNAMICS f positions=[reyong, gangsa] iterations=[1,3]}
+	{DYNAMICS mp positions=[reyong, gangsa] iterations=2}
 reyong_13	.xxx	xxxx	x.a,i	.a,.i	a,-xx	xxxx	x.u,a,	.u,.a,	u,-xx	xxxx	x.a,i	.a,.i	a,iio	....	.u,u,a,	.u,u,a,
 reyong_24	.xxx	xxxx	x.e.	oeo.	e-xx	xxxx	x.o.	ioi.	o-xx	xxxx	x.e.	oeo.	euu.	e---	-oo.	ioo.
 
 	{LABEL REYONG3_NOGANGSA}
-	{COPY REYONG3}
-	{LOOP 2}
-	{DYNAMICS f positions=reyong}
+	{COPY REYONG3 include=dynamics}
+	{LOOP 3}
 gangsa	
 
 	{LABEL END}
