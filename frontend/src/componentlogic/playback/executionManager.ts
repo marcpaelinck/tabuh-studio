@@ -20,14 +20,14 @@ import type { Score, Staff, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { getBeatNotation, getSystemBeatCount } from '../../utils/objectUtils'
 
-// Keeps track of pass and loop counters for each system. Also contains lists of
+// Keeps track of pass and iteration counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
 interface FlowInfoTable {
     [idx: string]: {
         system: System
         maxBeatIdx: number
         pass: number
-        loop: number
+        iteration: number
         executionItems: Record<ExecutionItemType, ExecutionItem[]>
     }
 }
@@ -51,7 +51,7 @@ export interface FlowStep {
     systemIdx: number
     beatIdx: number
     pass: number // Current pass count
-    loop: number // current iteration count
+    iteration: number // current iteration count
     measures: Partial<Record<Position, Staff>>
     positions: Partial<Position>[]
     tempo: BPM[]
@@ -97,7 +97,7 @@ export function executionManager(
             }
             return [
                 system.index,
-                { system: system, maxBeatIdx: beatCount - 1, pass: 0, loop: 0, executionItems: executionItems }
+                { system: system, maxBeatIdx: beatCount - 1, pass: 0, iteration: 0, executionItems: executionItems }
             ]
         })
     )
@@ -127,27 +127,27 @@ export function executionManager(
 
     function resetFlow() {
         _.values(flowinfo).forEach((value) => {
-            value.loop = 0
+            value.iteration = 0
             value.pass = 0
         })
         currentStep = undefined
     }
 
-    // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/loop count values
+    // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/iteration count values
     // or undefined if none was found.
     function getExecutionItems(type: ExecutionItemType, sysIdx: number): ExecutionItem[] {
         const matches: ExecutionItem[] = []
         const items = flowinfo![sysIdx].executionItems[type]
         const flow = flowinfo![sysIdx]
         for (const item of items) {
-            var loopMatches =
+            var iterationMatches =
                 item.type == 'loop'
-                    ? flow.loop <= item.count
+                    ? flow.iteration <= item.count
                     : !('iterations' in item) ||
                       !item.iterations ||
                       item.iterations.length == 0 ||
-                      item.iterations.includes(flow.loop)
-            if (!loopMatches) continue
+                      item.iterations.includes(flow.iteration)
+            if (!iterationMatches) continue
             // if `each`==false or undefined: match=true if no passes are given or if flow.pass
             //                                matches a pass in item.passes
             // if `each`==true and one or more passes are given: match=true if flow.pass % maxPassNr
@@ -156,7 +156,7 @@ export function executionManager(
             // The case `each`==true and gotoItem.passes==undefined or empty is invalid and should not return a match.
             var passMatches = !item.passes || item.passes.length == 0 || item.passes.includes(flow.pass)
             if (!item.nthpass && passMatches) matches.push(item)
-            else if (item.nthpass && item.passes && item.passes.length > 0 && loopMatches) {
+            else if (item.nthpass && item.passes && item.passes.length > 0 && iterationMatches) {
                 const maxPassNr = Math.max(...item.passes)
                 if (item.nthpass && item.passes && item.passes.includes(((flow.pass - 1) % maxPassNr) + 1)) {
                     // Matching item found
@@ -193,7 +193,7 @@ export function executionManager(
         var systemIdx: number | undefined = currentStep.systemIdx
         var sequenceIdx: number | undefined = undefined
         const loopItems: LoopItem[] = getExecutionItems('loop', systemIdx) as LoopItem[]
-        if (loopItems.length > 0 && flowInfo[systemIdx].loop < loopItems[0].count) {
+        if (loopItems.length > 0 && flowInfo[systemIdx].iteration < loopItems[0].count) {
             return { systemIdx, sequenceIdx: currentStep.sequenceIdx }
         }
         if (sequence) {
@@ -264,7 +264,7 @@ export function executionManager(
     }
 
     // Returns the next step in the execution flow
-    // peek: if true, state variables (cursor, pass and loop counters) will not be changed
+    // peek: if true, state variables (cursor, pass and iteration counters) will not be changed
     function nextStepInFlow(peek: boolean = false): FlowStep | undefined {
         const next: FlowCursor = {
             systemIdx: -1,
@@ -359,13 +359,15 @@ export function executionManager(
             ) as Partial<Record<Position, Staff>>
 
             const nextPass = next.newSystem ? flowinfo[next.systemIdx].pass + 1 : flowinfo[next.systemIdx].pass
-            const nextLoop = next.systemStart ? flowinfo[next.systemIdx].loop + 1 : flowinfo[next.systemIdx].loop
+            const nextIteration = next.systemStart
+                ? flowinfo[next.systemIdx].iteration + 1
+                : flowinfo[next.systemIdx].iteration
 
             if (!peek) {
-                // Set/reset loop and pass counters unless only a preview (peek) of the next step was requested
-                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].loop = 0
+                // Set/reset iteration and pass counters unless only a preview (peek) of the next step was requested
+                if (currentStep && next.newSystem) flowinfo[currentStep.systemIdx].iteration = 0
                 if (next.newSystem) flowinfo[next.systemIdx].pass += 1
-                if (next.systemStart) flowinfo[next.systemIdx].loop += 1
+                if (next.systemStart) flowinfo[next.systemIdx].iteration += 1
             }
 
             const nextStep: FlowStep = {
@@ -374,7 +376,7 @@ export function executionManager(
                 systemIdx: nextSystem.index,
                 beatIdx: next.beatIdx,
                 pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
-                loop: peek ? nextLoop : flowinfo[next.systemIdx].loop,
+                iteration: peek ? nextIteration : flowinfo[next.systemIdx].iteration,
                 measures: measures,
                 positions: _.keys(measures) as Position[],
                 tempo: getExpressionValue('tempo', next.systemIdx, next.beatIdx, currentStep?.tempo[1] || defaultTempo),

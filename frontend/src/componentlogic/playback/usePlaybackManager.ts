@@ -460,7 +460,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 params: {
                     system: currentStep.system.id,
                     pass: currentStep.pass,
-                    iteration: currentStep.loop,
+                    iteration: currentStep.iteration,
                     tempo: currentStep.tempo[0],
                     dynamics: currentStep.dynamics[0]
                 }
