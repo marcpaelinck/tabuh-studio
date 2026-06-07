@@ -86,13 +86,11 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
                 shortTooltip = `${itemtype}${isGradual ? (!item.fromDynamics ? `${current}→` : item.fromDynamics + '→') : ''}${item.dynamics}`
             }
             const multipleSections = item.isGradual && item.fromBeat != item.toBeat
-            const startFromSection1 = !item.isGradual && !item.fromBeat && item.toBeat == 1
+            const startFromSection1 = !item.isGradual && item.fromBeat == 1
             if (startFromSection1) {
                 instruction = shortTooltip
             } else {
-                instruction =
-                    shortTooltip +
-                    ` beat ${multipleSections ? (!item.fromBeat ? '1→' : item.fromBeat + '→') : ''}${item.toBeat}`
+                instruction = shortTooltip + ` beat ${item.fromBeat}${multipleSections ? '→' + item.toBeat : ''}`
             }
             preposition = 'on'
             break
