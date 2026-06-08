@@ -198,17 +198,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
     const { scoreInfoList, loadedScore, loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
-    const {
-        score,
-        validation,
-        labels,
-        localCacheState,
-        getScore,
-        updateScore,
-        updateSystem,
-        updateParts,
-        executeItemAction
-    } = useScoreManager()
+    const { score, validation, labels, localCacheState, updateScore, updateSystem, updateParts, executeItemAction } =
+        useScoreManager()
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
