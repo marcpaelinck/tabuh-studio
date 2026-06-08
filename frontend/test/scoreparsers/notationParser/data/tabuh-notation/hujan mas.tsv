@@ -6,7 +6,7 @@
 ga/ugal	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-	u,--u,	u,-u,-	u,-a,-	u,-e,-	..a,-	u,-e,-	u,-a,-	i-a,-
 pen/cal/jeg	u								u
 
-ugal	u|	a	e	i	u	a	e	i
+ugal	u	a	e	i	u	a	e	i
 gangsa_p	u,.e,.	u,e,.u,	e,.i.	i.i.	u,.e,.	u,e,.u,	e,.i.	i.i.
 gangsa_s	.u,.a,	u,.a,u,	.o.a,	.o.a,	.u,.a,	u,.a,u,	.o.a,	.o.a,
 penyacah	u	a	e	i	u	a	e	i
@@ -190,7 +190,7 @@ jegogan	u		o		e		a
 	{PART Transition}
 	{DYNAMICS ff positions=[gangsa, reyong, ugal]}
 ugal	e	u	e	o	i	o	i	o	e	u	e	o	i	o	i	o
-gangs	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.
+gangsa	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.	ee.e	u.ee	.eu.	e.o.	ii.i	o.ii	.io.	i.o.
 reyong_13	.io.	io.i	o.io	..u,a,	.u,a,.	u,a,.u,	a,.u,a,	..io	.io.	io.i	o.io	..u,a,	.u,a,.	u,a,.u,	a,.u,a,	..u,.
 reyong_24	eu.e	u.eu	.eu.	e.o.	io.i	o.io	.io.	i.u.	eu.e	u.eu	.eu.	e.o.	io.i	o.io	.io.	i.u.
 penyacah	e	u	e	o	i	o	i	o	e	u	e	o	i	o	i	o
