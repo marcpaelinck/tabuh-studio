@@ -257,3 +257,11 @@ If a user clicks inside a rendered symbol, you need to snap the cursor to the ne
   </span>
 ))}
 ```
+
+## Keyboard Mapping
+It should be possible in a later stage to introduce keyboard settings that map keystrokes to an action of the input state machine. Users should be able to design their personal keyboard mapping. 
+
+As an example: the default mapping of the keyboard letter 'A' (capital 'a') should add a grace note to the symbol next to the cursor. An alternative mapping of the same keystroke would be to insert the symbol 'a,' (pitch 'a' and octave ',') at the cursor location.
+
+## Note
+The application currently has an input state machine (`editorCursorManager.ts`) and a keyboard handler (`useKeyboardListener.ts`) that are based on an outdated concept. These will need to be replaced with the new code.

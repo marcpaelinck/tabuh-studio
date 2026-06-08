@@ -49,8 +49,9 @@ tabuh-studio/
   backend/            ← Node.js + Express
   shared/             ← shared TypeScript types
   frontend-dist/      ← built React app (uploaded via rsync, not in git)
-  deploy-local.sh     ← run locally to build and deploy
-  deploy-server.sh    ← run on server to pull and build backend
+  deployment-scripts/
+    local-deploy.sh   ← run locally to build and deploy
+    server-deploy.sh  ← run on server to pull and build backend
 ```
 
 ---
@@ -221,6 +222,9 @@ The textarea approach will be replaced with a virtual cursor system:
 | `frontend/src/typing/score.ts` | Core Score/System/Staff type definitions |
 | `frontend/src/components/SystemNode.tsx` | Renders one system (textarea + toolbar) |
 | `frontend/src/hooks/useScoreManager.ts` | Score state management, `updateSystem()` |
+| `frontend/src/hooks/useplaybackReducer.ts` | Playback state management, `playbackReducer()` |
+| `frontend/src/hooks/usePlaybackManager.ts` | Playback scheduler, `createTimelineFromScore()` |
+| `frontend/src/hooks/executionManager.ts` | Determines the playback sequence of a score (flow), `nextStepInFlow()` |
 
 ---
 
