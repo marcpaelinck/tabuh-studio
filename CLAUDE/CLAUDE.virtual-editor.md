@@ -21,7 +21,7 @@ Summary of what this gives you
 ## The Solution
 An input state machine handles the distinction between pitch characters (which open a new symbol) and modifiers (which attach to the previous one). A keyboard and mouse handler process the user input. 
 
-- The state is an array of NoteObject objects.
+- The state is an array of NoteObject objects. Each NoteObject represents one (combined) symbol in the BaliMusic font.s
 - A React component renders that array into a visual representation using the BaliMusic font.
 - A custom cursor (a blinking line rendered between symbols) is defined as a React state variable — just an index into the symbol array.
 - All keyboard input is intercepted and handled by specific logic, never by the browser's native text editing.
