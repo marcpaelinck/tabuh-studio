@@ -19,6 +19,8 @@
 export type EditorActionType =
     | 'cursorLeft'
     | 'cursorRight'
+    | 'cursorUp' // move to the staff above (multi-staff editor only)
+    | 'cursorDown' // move to the staff below (multi-staff editor only)
     | 'cursorStart'
     | 'cursorEnd'
     | 'deleteLeft'
@@ -52,14 +54,24 @@ export type KeyMap = (ks: Keystroke) => EditorAction | undefined
 
 /** The built-in default mapping. */
 export const defaultKeyMap: KeyMap = (ks) => {
-    // Reserve Ctrl/Meta combinations for future shortcuts (copy, paste, undo …).
-    if (ks.ctrl || ks.meta) return undefined
+    if (ks.ctrl || ks.meta) {
+        // Copy (Ctrl/Cmd+C) is left to the browser's native selection copy.
+        // Paste (Ctrl/Cmd+V) is handled by the editor's onPaste event.
+        // Cut is swallowed for now to avoid desyncing the DOM from editor state
+        // (selection-based cut is a later feature).
+        if (ks.key === 'x' || ks.key === 'X') return { type: 'ignore' }
+        return undefined
+    }
 
     switch (ks.key) {
         case 'ArrowLeft':
             return { type: 'cursorLeft' }
         case 'ArrowRight':
             return { type: 'cursorRight' }
+        case 'ArrowUp':
+            return { type: 'cursorUp' }
+        case 'ArrowDown':
+            return { type: 'cursorDown' }
         case 'Home':
             return { type: 'cursorStart' }
         case 'End':

@@ -408,6 +408,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackState={playbackState}
             playback={playback}
+            updateSystem={updateSystem}
         />
     )
 

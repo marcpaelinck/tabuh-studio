@@ -1,4 +1,4 @@
-import type { NoteObject } from '@tabuhstudio/shared'
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import {
     useEffect,
@@ -21,10 +21,12 @@ import type {
     PlaybackAction,
     PlaybackType
 } from '../../typing/playback'
-import type { Score, System } from '../../typing/score'
+import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
+import { SystemNotationEditor } from './SystemNotationEditor'
 import { SCol, SummaryItem } from './SummaryItem'
 
 interface EditorSystemProps extends TextareaProps {
@@ -39,6 +41,7 @@ interface EditorSystemProps extends TextareaProps {
     playback: ActionDispatch<[action: PlaybackAction]>
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
     updateCursorFunction: (uuid: UUID, func: SystemCursorFunction) => void
+    updateSystem: (sysData: System) => void
 }
 
 // Creates a grid containing the notation of one system/gongan.
@@ -54,6 +57,7 @@ export function SystemNode({
     playback,
     executeItemAction,
     updateCursorFunction,
+    updateSystem,
     ...props
 }: EditorSystemProps): ReactNode {
     const systemUuid = systemData.uuid
@@ -87,8 +91,8 @@ export function SystemNode({
             switch (systemData.kempli.state) {
                 case 'on': {
                     return `repeating-linear-gradient(
-                        to right, 
-                        ${gridColors.kempli} 0px 2px, 
+                        to right,
+                        ${gridColors.kempli} 0px 2px,
                         transparent 2px ${systemData.kempli.frequency || defaultBeatFrequency}ch
                         ),`
                 }
@@ -140,8 +144,8 @@ export function SystemNode({
         // Hides the superfluous gridlines which are generated with a recurring pattern
         const gridlineHider = `linear-gradient(to right, transparent 0 calc(${totalWidth}ch - 1px), ${gridColors.background} ${totalWidth}ch 100%),`
         const gridlines = `repeating-linear-gradient(
-            to right, 
-            ${gridColors.grid} 0px 1px, 
+            to right,
+            ${gridColors.grid} 0px 1px,
             transparent 1px 1ch
         )`
         notationAreaRef.current.style.setProperty('background', highlight + gridlineHider + kempliLines + gridlines)
@@ -276,6 +280,23 @@ export function SystemNode({
         .map(([_, staff]) => staff.objNotation.map((note) => note.toString()).join(''))
         .join('\n')
 
+    // Staves handed to the virtual editor, in the same display order as the textarea.
+    const editorStaves: EditorStaff[] = sortedStaffEntries.map(([position, staff]) => ({
+        position: position as Position,
+        symbols: staff.objNotation
+    }))
+
+    // Commit an edit: rebuild the affected staffs and push the new system upstream.
+    function handleStavesChange(staves: EditorStaff[]) {
+        const newStaffs: Staffs = { ...systemData.staffs }
+        staves.forEach(({ position, symbols }) => {
+            const prev = newStaffs[position]
+            if (!prev) return
+            newStaffs[position] = { ...prev, objNotation: symbols, notation: NoteObject.toNotation(symbols) }
+        })
+        updateSystem({ ...systemData, staffs: newStaffs })
+    }
+
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
         const positionTitlesFont = `courierfont${10}`
@@ -297,16 +318,33 @@ export function SystemNode({
                         />
                     </Col>
                     <Col span={20} id="Notation">
-                        <Textarea
-                            disabled
-                            ref={notationAreaRef}
-                            id={props.id}
-                            rows={rows}
-                            className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                            style={{ position: 'relative', zIndex: 1, backgroundColor: gridColors.background }}
-                            spellCheck="false"
-                            defaultValue={notationText}
-                        />
+                        {/* The textarea stays as the playback animation surface (background
+                            highlight + grid). Its text is transparent so only the highlight
+                            shows; the SystemNotationEditor on top supplies the glyphs, the
+                            cursor and editing, aligned by matching font / line metrics. */}
+                        <div style={{ position: 'relative' }}>
+                            <Textarea
+                                disabled
+                                ref={notationAreaRef}
+                                id={props.id}
+                                rows={rows}
+                                className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                                style={{
+                                    position: 'relative',
+                                    zIndex: 1,
+                                    backgroundColor: gridColors.background,
+                                    color: 'transparent'
+                                }}
+                                spellCheck="false"
+                                defaultValue={notationText}
+                            />
+                            <SystemNotationEditor
+                                initialStaves={editorStaves}
+                                onChange={handleStavesChange}
+                                className="leading-5.5 border-1 border-solid border-transparent p-0"
+                                style={{ position: 'absolute', inset: 0, zIndex: 2 }}
+                            />
+                        </div>
                     </Col>
                 </Row>
             </Grid>

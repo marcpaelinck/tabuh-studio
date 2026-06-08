@@ -29,6 +29,7 @@ interface EditorWindowProps {
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
+    updateSystem: (sysData: System) => void
 }
 
 export default function EditorWindow({
@@ -40,7 +41,8 @@ export default function EditorWindow({
     executeItemAction,
     updatePlaybackFunctions,
     playbackState,
-    playback
+    playback,
+    updateSystem
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
     const { selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } = usePartManager(
         score,
@@ -161,6 +163,7 @@ export default function EditorWindow({
                                 playback={playback}
                                 executeItemAction={executeItemAction}
                                 updateCursorFunction={updateCursorFunction}
+                                updateSystem={updateSystem}
                                 gotoTargets={gotoTargets}
                             />
                         </Col>
