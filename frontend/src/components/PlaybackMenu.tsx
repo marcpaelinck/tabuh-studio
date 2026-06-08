@@ -1,6 +1,6 @@
 import type { Dispatch, JSX } from 'react'
 import { Activity, useEffect, useState } from 'react'
-import { HStack, SelectPicker } from 'rsuite'
+import { SelectPicker, Stack } from 'rsuite'
 import { speedList } from '../config/config'
 import type { Position } from '../typing/basetypes'
 import { focusDefaultOption, type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
@@ -54,7 +54,7 @@ export default function PlayerMenu({
 
     return (
         <div className="selectors flex flex-wrap">
-            <HStack>
+            <Stack direction={{ xs: 'column', sm: 'row' }}>
                 {/* Score selector is only visible on small screens where only the player is displayed. */}
                 <Activity mode={appAppearance == 'full' ? 'hidden' : 'visible'}>
                     <SelectPicker
@@ -96,7 +96,7 @@ export default function PlayerMenu({
                         setSelectedSpeedOption(item as ExtendedOption<number>)
                     }}
                 />
-            </HStack>
+            </Stack>
         </div>
     )
 }

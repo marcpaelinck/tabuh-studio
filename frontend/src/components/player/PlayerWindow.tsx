@@ -21,7 +21,7 @@ import {
 } from '../../typing/playback'
 import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import Animation from './Animation'
+import { Animation } from './Animation'
 
 interface PlayerWindowProps {
     visible: boolean
@@ -104,7 +104,10 @@ export default function PlayerWindow({
     }
 
     return (
-        <VStack id="Player Window" className="pt-6 pl-6 pr-18" visibility={visible ? 'visible' : 'collapse'}>
+        <VStack
+            id="Player Window"
+            className="pt-6 pl-0 md:pl-6 pr-0 md:pr-18"
+            visibility={visible ? 'visible' : 'collapse'}>
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{playerMenu}</Activity>
             <Activity mode={selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
                 <Animation

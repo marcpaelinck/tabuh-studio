@@ -50,7 +50,7 @@ interface AnimationProps {
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
-export default function Animation({
+export function Animation({
     selectedFocusOption,
     selectedPanggulOption,
     notationElement,
