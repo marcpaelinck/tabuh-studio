@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
@@ -24,6 +24,15 @@ export function useScoreManager() {
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
     const [localCacheState, setLocalCacheState] = useState<LocalCacheInfo>({ level: 'info', message: '' })
+
+    // Debounce timer for the (heavy) IndexedDB recovery write.
+    const idbTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+    useEffect(
+        () => () => {
+            if (idbTimer.current !== null) clearTimeout(idbTimer.current)
+        },
+        []
+    )
 
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
@@ -76,17 +85,23 @@ export function useScoreManager() {
         })
 
         // Store the score object in the browser's IDB Database, for recovery purposes.
+        // Writing the whole score is expensive, so it is debounced: rapid score
+        // changes coalesce into a single write of the latest score once edits settle.
         if (indexedDb) {
-            setLocalCacheState({ level: 'info', message: '' })
-            const transaction = indexedDb.transaction('Score', 'readwrite')
-            const request = transaction.objectStore('Score').put(score)
-            var dateStr = new Date().toString().replace(/ GMT.*$/, '')
-            request.onsuccess = () => setLocalCacheState({ level: 'info', message: `${dateStr}\nSaved to local cache` })
-            request.onerror = () =>
-                setLocalCacheState({
-                    level: 'warning',
-                    message: `${dateStr}\nCould not save the current status to local storage.`
-                })
+            if (idbTimer.current !== null) clearTimeout(idbTimer.current)
+            idbTimer.current = setTimeout(() => {
+                idbTimer.current = null
+                const transaction = indexedDb.transaction('Score', 'readwrite')
+                const request = transaction.objectStore('Score').put(score)
+                const dateStr = new Date().toString().replace(/ GMT.*$/, '')
+                request.onsuccess = () =>
+                    setLocalCacheState({ level: 'info', message: `${dateStr}\nSaved to local cache` })
+                request.onerror = () =>
+                    setLocalCacheState({
+                        level: 'warning',
+                        message: `${dateStr}\nCould not save the current status to local storage.`
+                    })
+            }, 800)
         } else setLocalCacheState({ level: 'warning', message: '' })
 
         // Update the goto display values.
@@ -110,14 +125,18 @@ export function useScoreManager() {
         return score
     }
 
-    function updateSystem(sysData: System) {
-        if (!score) return
-        const sysIdx = sysData.index
-        const newScore: Score = { ...score }
-        const systems = score.systems
-        newScore.systems = [...systems.slice(0, sysIdx), sysData, ...systems.slice(sysIdx + 1)]
-        setScore(newScore)
-    }
+    // Stable identity (empty deps) so memoised SystemNodes are not all re-rendered
+    // when one system is committed. Uses functional setScore to read the latest score.
+    const updateSystem = useCallback((sysData: System) => {
+        setScore((current) => {
+            if (!current) return current
+            const sysIdx = sysData.index
+            return {
+                ...current,
+                systems: [...current.systems.slice(0, sysIdx), sysData, ...current.systems.slice(sysIdx + 1)]
+            }
+        })
+    }, [])
 
     const updateParts = useCallback((parts: Record<string, string[]>) => {
         if (!score) return
@@ -270,7 +289,9 @@ export function useScoreManager() {
             // access to the current value of that state.
             setScore((currentScore) => updateScoreFromItemAction(currentScore, fieldname, systemData, value))
         },
-        [score]
+        // Depends only on `labels` (used by updateScoreFromItemAction); the score is
+        // read via the functional setScore above, so editing does not change identity.
+        [labels]
     )
 
     return {

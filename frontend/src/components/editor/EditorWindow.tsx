@@ -64,15 +64,16 @@ export default function EditorWindow({
     const systemCursorFunctions = useRef<Record<UUID, SystemCursorFunction>>({})
 
     // This function is passed to the SystemNode elements, so that they can each add their own cursor function
-    // to the systemCursorFunctions record.
-    function updateCursorFunction(uuid: UUID, func: SystemCursorFunction) {
+    // to the systemCursorFunctions record. Stable identity (empty deps) so it does not
+    // defeat React.memo on SystemNode.
+    const updateCursorFunction = useCallback((uuid: UUID, func: SystemCursorFunction) => {
         // See https://react.dev/learn/queueing-a-series-of-state-updates
         const newFunctions = { ...systemCursorFunctions.current }
         newFunctions[uuid] = func
         systemCursorFunctions.current = newFunctions
         debug(`new CursorFunctions: ${JSON.stringify(_.keys(newFunctions))}`)
         return newFunctions
-    }
+    }, [])
 
     // This is the actual editor cursor function. It calls the corresponding SystemCursorFunction.
     const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
@@ -115,7 +116,12 @@ export default function EditorWindow({
                     .filter((item) => item.type == 'goto')
                     .forEach((goto) => newGotoTargets.add(goto.targetuuid))
         })
-        setGotoTargets(newGotoTargets)
+        // Keep the same Set reference when the contents are unchanged, so this does
+        // not change the gotoTargets prop identity on every score edit (defeats memo).
+        setGotoTargets((prev) => {
+            if (prev.size === newGotoTargets.size && [...newGotoTargets].every((t) => prev.has(t))) return prev
+            return newGotoTargets
+        })
     }, [score])
 
     const scoreRef = useRef<Score>(score)

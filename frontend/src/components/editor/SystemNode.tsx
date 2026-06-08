@@ -1,6 +1,7 @@
 import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import {
+    memo,
     useEffect,
     useMemo,
     useRef,
@@ -23,6 +24,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -45,7 +47,10 @@ interface EditorSystemProps extends TextareaProps {
 }
 
 // Creates a grid containing the notation of one system/gongan.
-export function SystemNode({
+// Memoised so that committing an edit to one system does not re-render every other
+// system: this only helps if the props from EditorWindow keep a stable identity
+// (see updateSystem / executeItemAction / updateCursorFunction / gotoTargets).
+export const SystemNode = memo(function SystemNode({
     systemData,
     positions,
     audioState,
@@ -286,8 +291,12 @@ export function SystemNode({
         symbols: staff.objNotation
     }))
 
-    // Commit an edit: rebuild the affected staffs and push the new system upstream.
-    function handleStavesChange(staves: EditorStaff[]) {
+    // Committing an edit re-renders the whole score and rewrites the local cache,
+    // so it is debounced: the editor shows changes instantly (it owns its state);
+    // the score only catches up once typing pauses. The pending edit is flushed on
+    // unmount so nothing is lost when navigating away. The commit closure always
+    // sees the current systemData (useDebouncedCommit keeps the latest version).
+    const { schedule: handleStavesChange } = useDebouncedCommit((staves: EditorStaff[]) => {
         const newStaffs: Staffs = { ...systemData.staffs }
         staves.forEach(({ position, symbols }) => {
             const prev = newStaffs[position]
@@ -295,7 +304,7 @@ export function SystemNode({
             newStaffs[position] = { ...prev, objNotation: symbols, notation: NoteObject.toNotation(symbols) }
         })
         updateSystem({ ...systemData, staffs: newStaffs })
-    }
+    }, 300)
 
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
@@ -352,4 +361,4 @@ export function SystemNode({
     }, [systemData, playbackCursor, audioState, playbackType])
 
     return notationArea
-}
+})
