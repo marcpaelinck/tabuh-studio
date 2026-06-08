@@ -118,7 +118,10 @@
     display: inline-block;
     width: 2px;
     height: 1em;
+    /* Negative margins on both sides give the cursor zero net width, so it does
+       not shift the symbols after it. */
     margin-left: -1px;
+    margin-right: -1px;
     vertical-align: text-bottom;
     background: black;
     animation: notation-cursor-blink 1s step-end infinite;

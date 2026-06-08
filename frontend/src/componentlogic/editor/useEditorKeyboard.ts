@@ -15,6 +15,7 @@ import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
 import type { NoteObject, Position } from '@tabuhstudio/shared'
 import {
     attachModifier,
+    changeOctave,
     deleteLeft,
     deleteRight,
     insertSymbol,
@@ -72,6 +73,12 @@ export function useEditorKeyboard({
                     break
                 case 'cursorEnd':
                     next = { ...state, cursorIndex: state.symbols.length }
+                    break
+                case 'octaveUp':
+                    next = changeOctave(state, 1, position)
+                    break
+                case 'octaveDown':
+                    next = changeOctave(state, -1, position)
                     break
                 case 'deleteLeft':
                     next = deleteLeft(state)

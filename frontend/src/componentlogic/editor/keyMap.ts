@@ -23,6 +23,8 @@ export type EditorActionType =
     | 'cursorDown' // move to the staff below (multi-staff editor only)
     | 'cursorStart'
     | 'cursorEnd'
+    | 'octaveUp' // raise the octave of the melodic note left of the cursor
+    | 'octaveDown' // lower the octave of the melodic note left of the cursor
     | 'deleteLeft'
     | 'deleteRight'
     | 'insertChar' // insert/attach the literal character that was typed
@@ -55,6 +57,9 @@ export type KeyMap = (ks: Keystroke) => EditorAction | undefined
 /** The built-in default mapping. */
 export const defaultKeyMap: KeyMap = (ks) => {
     if (ks.ctrl || ks.meta) {
+        // Ctrl/Cmd + Up/Down octavate the melodic note left of the cursor.
+        if (ks.key === 'ArrowUp') return { type: 'octaveUp' }
+        if (ks.key === 'ArrowDown') return { type: 'octaveDown' }
         // Copy (Ctrl/Cmd+C) is left to the browser's native selection copy.
         // Paste (Ctrl/Cmd+V) is handled by the editor's onPaste event.
         // Cut is swallowed for now to avoid desyncing the DOM from editor state

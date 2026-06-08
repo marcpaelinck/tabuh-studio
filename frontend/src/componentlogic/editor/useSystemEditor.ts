@@ -23,6 +23,7 @@ import { NoteObject } from '@tabuhstudio/shared'
 import type { Position } from '@tabuhstudio/shared'
 import {
     attachModifier,
+    changeOctave,
     clampCursor,
     deleteLeft,
     deleteRight,
@@ -153,6 +154,10 @@ export function useSystemEditor({
                         return applyToActiveStaff(st, (s) => ({ ...s, cursorIndex: 0 }))
                     case 'cursorEnd':
                         return applyToActiveStaff(st, (s) => ({ ...s, cursorIndex: s.symbols.length }))
+                    case 'octaveUp':
+                        return applyToActiveStaff(st, (s) => changeOctave(s, 1, pos(st)))
+                    case 'octaveDown':
+                        return applyToActiveStaff(st, (s) => changeOctave(s, -1, pos(st)))
                     case 'deleteLeft':
                         return applyToActiveStaff(st, deleteLeft)
                     case 'deleteRight':
