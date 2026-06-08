@@ -108,6 +108,21 @@
     font-style: normal;
     font-size: 12pt;
 }
+/* Virtual-editor cursor: a blinking line drawn between symbols. */
+@keyframes notation-cursor-blink {
+    50% {
+        opacity: 0;
+    }
+}
+.notation-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: -1px;
+    vertical-align: text-bottom;
+    background: black;
+    animation: notation-cursor-blink 1s step-end infinite;
+}
 .balifont14 {
     font-family: 'BaliMusic5';
     font-size: 14pt;
