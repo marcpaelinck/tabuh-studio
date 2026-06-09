@@ -4,8 +4,6 @@
 import { NoteObject } from '@tabuhstudio/shared'
 import { ERROR_PITCH_CHAR } from '@tabuhstudio/shared/noteChars'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
-import { debug } from '../utils/debugger.ts'
-import { isEvenByIndex as isEvenPositionByIndex } from '../utils/objectUtils.ts'
 
 type CastingInstructionType = 'nokempyung' | 'norot'
 export interface CastingInstruction {
@@ -137,26 +135,27 @@ export function castNotation(
 
     var updatedNotation = [...notation]
 
-    // Apply pokok rules
-    if (onlyOddMeasures.includes(position) && isEvenPositionByIndex(measureIdx)) {
-        // Clear even numbered measures. Note that measure numbering starts with 0.
-        updatedNotation = updatedNotation.map((_) => new NoteObject(' ', position))
-        debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
-    }
-    if (onlyOddNotes.includes(position)) {
-        updatedNotation = updatedNotation.map((note, idx) =>
-            // Remove even numbered notes.
-            (idx + 1) % 2 == 0 ? new NoteObject(' ', position) : note
-        )
-        debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
-    }
-    if (onlyFirstNote.includes(position)) {
-        updatedNotation = updatedNotation.map((note, idx) =>
-            // Remove all but first note.
-            idx > 0 ? new NoteObject(' ', position) : note
-        )
-        debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
-    }
+    // Apply pokok rules if the group contains multiple positions and kempli is 'on'
+    // SUPPRESS TEMPORARILY: need to refactor tabuhParser - kempli status is not available.
+    // if (onlyOddMeasures.includes(position) && isEvenPositionByIndex(measureIdx)) {
+    //     // Clear even numbered measures. Note that measure numbering starts with 0.
+    //     updatedNotation = updatedNotation.map((_) => new NoteObject(' ', position))
+    //     debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
+    // }
+    // if (onlyOddNotes.includes(position)) {
+    //     updatedNotation = updatedNotation.map((note, idx) =>
+    //         // Remove even numbered notes.
+    //         (idx + 1) % 2 == 0 ? new NoteObject(' ', position) : note
+    //     )
+    //     debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
+    // }
+    // if (onlyFirstNote.includes(position)) {
+    //     updatedNotation = updatedNotation.map((note, idx) =>
+    //         // Remove all but first note.
+    //         idx > 0 ? new NoteObject(' ', position) : note
+    //     )
+    //     debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
+    // }
 
     // Apply casting rules using NoteObject for tone/norot classification.
     // Invalid symbols (error !== undefined) pass through as ERROR_PITCH_CHAR (error character).

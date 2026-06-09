@@ -52,7 +52,7 @@ export interface FlowStep {
     beatIdx: number
     pass: number // Current pass count
     iteration: number // current iteration count
-    measures: Partial<Record<Position, Staff>>
+    beats: Partial<Record<Position, Staff>>
     positions: Partial<Position>[]
     tempo: BPM[]
     dynamics: number[]
@@ -341,7 +341,7 @@ export function executionManager(
             // debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
             const nextSystem = flowinfo[next.systemIdx].system
             // Build a Staff per position containing only the current section's notation
-            const measures = _.fromPairs(
+            const beats = _.fromPairs(
                 _.toPairs(nextSystem.staffs)
                     .filter(([_key, staff]) => staff != null)
                     .map(([key, staff]) => {
@@ -377,8 +377,8 @@ export function executionManager(
                 beatIdx: next.beatIdx,
                 pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
                 iteration: peek ? nextIteration : flowinfo[next.systemIdx].iteration,
-                measures: measures,
-                positions: _.keys(measures) as Position[],
+                beats: beats,
+                positions: _.keys(beats) as Position[],
                 tempo: getExpressionValue('tempo', next.systemIdx, next.beatIdx, currentStep?.tempo[1] || defaultTempo),
                 dynamics: getExpressionValue(
                     'dynamics',

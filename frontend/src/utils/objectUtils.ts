@@ -5,8 +5,8 @@
 import { NoteObject } from '@tabuhstudio/shared'
 import { EXTENDING_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
-import { noteDuration, totalDuration } from '../componentlogic/playback/strokeManager'
-import { defaultBeatFrequency, defaultTempo } from '../config/config'
+import { totalDuration } from '../componentlogic/playback/strokeManager'
+import { defaultBeatFrequency } from '../config/config'
 import type { BPM, Position } from '../typing/basetypes'
 import type { Score, System } from '../typing/score'
 
@@ -101,42 +101,22 @@ export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
 }
 
-// Finds the [startIdx, endIdx) array slice for beat beatIdx, where each beat accumulates
-// exactly `freq` units of symbolDuration. Grace notes (duration=0) do not advance the
-// beat budget, so beats containing them include one extra symbol to fill the beat.
+// Finds the [startIdx, endIdx) array slice for beat beatIdx
 function getBeatSlice(objNotation: NoteObject[], beatIdx: number, freq: number): [number, number] {
-    let accum = 0
-    let start = 0
-    let beatCount = 0
-    for (let i = 0; i < objNotation.length; i++) {
-        accum += noteDuration(objNotation[i], defaultTempo, 'basenote')
-        if (accum >= freq) {
-            if (beatCount === beatIdx) return [start, i + 1]
-            beatCount++
-            accum = 0
-            start = i + 1
-        }
-    }
-    // Last partial beat (total notation duration is not a multiple of freq)
-    if (beatCount === beatIdx && start < objNotation.length) return [start, objNotation.length]
+    if ((beatIdx + 1) * freq <= objNotation.length) return [beatIdx * freq, (beatIdx + 1) * freq]
+    if (beatIdx * freq < objNotation.length) return [beatIdx * freq, objNotation.length]
     return [0, 0]
 }
 
 // Returns the number of kempli beats in the system.
-// For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) are correctly excluded
-// from the beat budget, keeping the beat count consistent with the kempli timing.
+// For 'on'/'off' state, uses the maximum number of columns
 export function getSystemBeatCount(system: System): number {
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
         const freq = system.kempli.frequency || defaultBeatFrequency
         const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
         if (!staffEntries.length) return 0
-        const maxDuration = Math.max(
-            ...staffEntries.map(([pos, staff]) => totalDuration(staff!.objNotation, defaultTempo, 'basenote'))
-        )
-        return Math.max(1, Math.ceil(maxDuration / freq))
-    } else if (system.kempli.state === 'notation') {
-        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
-        return Math.max(1, kempliNotation.filter((n) => n.canonicalSymbol === 'x?').length)
+        const maxColumnCount = Math.max(...staffEntries.map(([pos, staff]) => staff!.objNotation.length))
+        return Math.ceil(maxColumnCount / freq)
     }
     return 1
 }

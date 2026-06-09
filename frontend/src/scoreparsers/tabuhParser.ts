@@ -94,7 +94,7 @@ export function parseNotation(content: string): ParserReturnValue {
                     line: lineNr(content, node.from),
                     notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
                     staffs: {},
-                    kempli: { state: 'on', frequency: 4 },
+                    kempli: { state: 'on' },
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
                 } as System

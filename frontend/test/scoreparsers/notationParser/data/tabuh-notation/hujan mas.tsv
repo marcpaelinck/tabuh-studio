@@ -42,8 +42,8 @@ gongs													G
 	{GONGAN kebyar}
 	{SUPPRESS [penyacah, calung, jegogan] beat=1}
 	{TEMPO 90}
-ga/ugal	u,/....u,u,/....u,/.u,/.u,:---	u,-----	e,-u,-a,-i-a,	u,------	a,/....a,a,/....a,/.a,/.a,:---	a,-----	u,-a,-e,-u,	a,
-pen/cal/jeg	...................	u,		u,	...................	a,		a,
+ga/ugal	u,/....u,u,/....u,/.u,/.u,:---	u,-----e,-u,-a,-i-a,	u,------a,/....a,a,/....a,/.a,/.a,:---	a,-----u,-a,-e,-u,	a,
+pen/cal/jeg		u,	u,	a,	a,
 	{WAIT 1}
 
 	{PART 4}

@@ -42,18 +42,10 @@ import type {
 import type { Note, Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { getBeatStart, getSystemDuration } from '../../utils/objectUtils'
-import {
-    BaseNoteEquiv2Millis,
-    millis2BaseNoteEquiv,
-    n2TO,
-    To2Millis,
-    TO2n,
-    TOplusNumber,
-    TOplusTO
-} from '../../utils/timeunits'
+import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOplusNumber } from '../../utils/timeunits'
 import { cycleValidation } from '../validationManager'
 import { executionManager, type FlowStep } from './executionManager'
-import { createNoteActions, totalDuration } from './strokeManager'
+import { createNoteActions, noteDuration, totalDuration } from './strokeManager'
 import { useInstruments } from './useInstruments'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
@@ -181,7 +173,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         if (!(currentStep.id in tempoLookup)) tempoLookup[currentStep.id] = []
 
         const [startTempo, endTempo] = currentStep.tempo
-        const beatDuration = Object.entries(currentStep.measures).reduce(
+        const beatDuration = Object.entries(currentStep.beats).reduce(
             (maxDur, [position, measure]) =>
                 Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
             0
@@ -252,8 +244,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         ): NoteObject | undefined {
             if (currIdx + 1 < objNotation.length) return objNotation[currIdx + 1]
             const nextStep = nextInFlow(true)
-            if (nextStep && pos in nextStep.measures) {
-                const sectionStaff = nextStep.measures[pos as Position]
+            if (nextStep && pos in nextStep.beats) {
+                const sectionStaff = nextStep.beats[pos as Position]
                 const sectionNotation =
                     useCache && sectionStaff?.objNotation_ ? sectionStaff.objNotation_ : sectionStaff?.objNotation
                 return sectionNotation && sectionNotation.length > 0 ? sectionNotation[0] : undefined
@@ -291,7 +283,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             // Gradual changes will be implemented by changing the tempo at the start of each symbol in the measure.
             // first determine the max. measure length
             const [startTempo, endTempo] = currentStep.tempo
-            const beatDuration = Object.entries(currentStep.measures).reduce(
+            const beatDuration = Object.entries(currentStep.beats).reduce(
                 (maxDur, [position, measure]) =>
                     Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
                 0
@@ -320,6 +312,39 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             }
 
+            // All vertically aligned notes (=column) should start simultaneously.
+            // The note with the longest duration determines the duration of a column.
+            const beatNotationArrays = _.values(currentStep.beats).map((s) =>
+                useCache ? (s.objNotation_ ?? s.objNotation) : s.objNotation
+            )
+            const columnCount = Math.max(...beatNotationArrays.map((n) => n.length))
+            const columnDurations: number[] = []
+            const columnDurationsMs: number[] = []
+            let cumDuration = 0
+            for (let col = 0; col < columnCount; col++) {
+                const colTempo = tempoAt(cumDuration, currentStep!)
+                // when calculating the column duration, space characters get a zero duration.
+                // But if the entire column consists of space characters, the column gets length 1.
+                let colDuration =
+                    Math.max(
+                        ...beatNotationArrays.map((notation) =>
+                            col >= notation.length || notation[col].canonicalSymbol == SPACE_CHAR
+                                ? 0
+                                : noteDuration(notation[col], colTempo, 'basenote')
+                        )
+                    ) || 1
+                columnDurations.push(colDuration)
+                columnDurationsMs.push(To2Millis(n2TO(colDuration), colTempo))
+                cumDuration += colDuration
+            }
+            /// DEBUG
+            if (currentStep.system.id == 6) {
+                console.log(
+                    `SYS[${currentStep.system.id}] BEAT[${currentStep.beatIdx + 1}] ${columnCount} columns ${JSON.stringify(columnDurations)}`
+                )
+                // _.entries(currentStep.beats).forEach(([p, n]) => console.log(`${p} ${JSON.stringify(n.notation)}`))
+            }
+            /// END DEBUG
             for (const position of currentStep.positions) {
                 if (position == 'KEMPLI' && currentStep.system.kempli.state != 'notation') {
                     // Kempli will be generated separately based on 'on' or 'off' state.
@@ -331,14 +356,14 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
                 // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
-                const sectionStaff = currentStep.measures[position]
+                const sectionStaff = currentStep.beats[position]
                 var objNotation: NoteObject[] =
                     (useCache && sectionStaff?.objNotation_ ? sectionStaff.objNotation_ : sectionStaff?.objNotation) ??
                     Array(4).fill(new NoteObject(SPACE_CHAR, position))
                 var prevNote: NoteObject | undefined = undefined
 
-                objNotation.forEach((note: NoteObject, symbolIdx) => {
-                    const endOfMeasure = symbolIdx == objNotation.length - 1
+                objNotation.forEach((note: NoteObject, noteIdx) => {
+                    const endOfMeasure = noteIdx == objNotation.length - 1
                     const waitTimeAfter = endOfMeasure
                         ? millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
                         : 0
@@ -347,9 +372,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     // CREATE SAMPLER ACTION
                     // Determine the default duration for a single base note.
                     // Add the given delay time if we reached the last note of the measure.
-                    var noteDuration = 1
-                    var symbolDurationMs = To2Millis(n2TO(1), tempoAt(currTime - beatStartTime, currentStep!))
-                    if (symbolIdx == 0) {
+                    if (noteIdx == 0) {
                         // Start of new measure: extend the last note until the current time. This ensures that
                         // if the previous measure was incomplete, it gets extended to the length of the beat
                         // to which it belongs.
@@ -357,7 +380,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     }
                     if (note.isExtensionSilence && currAction[position]) {
                         // Extend the last note of the current position with one basenote duration.
-                        extendLastSamplerAction(currAction[position], noteDuration + waitTimeAfter)
+                        extendLastSamplerAction(currAction[position], columnDurations[noteIdx] + waitTimeAfter)
                     } else if (note.isMutingSilence) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
@@ -370,14 +393,13 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             position,
                             prevnote: prevNote,
                             note: note,
-                            nextnote: nextNote(objNotation, symbolIdx, position, useCache),
+                            nextnote: nextNote(objNotation, noteIdx, position, useCache),
                             bpm:
                                 currentStep!.tempo[0] +
-                                (symbolIdx / objNotation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
+                                (noteIdx / objNotation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
                             velocity:
                                 currentStep!.dynamics[0] +
-                                (symbolIdx / objNotation.length) *
-                                    (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
+                                (noteIdx / objNotation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
                             prevaction: _.last(newTimeLine.sampleractions),
                             isLast: lastStep && endOfMeasure
                         })
@@ -400,19 +422,12 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             newTimeLine.sampleractions.push(currAction[position])
                             samplerActionsByPos[position].push(currAction[position])
                         })
-                        noteDuration =
-                            TO2n(TOplusTO(currAction[position]!.time, currAction[position]!.params.duration)) - currTime
-                        symbolDurationMs = To2Millis(
-                            n2TO(noteDuration),
-                            tempoAt(currTime - beatStartTime, currentStep!)
-                        )
                         if (waitTimeAfter > 0 && currAction[position]) {
                             extendLastSamplerAction(currAction[position], waitTimeAfter)
                         }
                     }
-
-                    currTime += noteDuration + waitTimeAfter
-                    currTimeMs += symbolDurationMs
+                    currTime += columnDurations[noteIdx] + waitTimeAfter
+                    currTimeMs += columnDurationsMs[noteIdx] + waitTimeAfter > 0 ? currentStep!.waitMsAfter : 0
                     prevNote = note
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)

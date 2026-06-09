@@ -124,12 +124,9 @@ export function noteDuration(note: NoteObject, bpm: number, unit: 'millisecond' 
         return unit == 'basenote' ? durationBn : BaseNoteEquiv2Millis(durationBn, bpm)
     }
     if (note.stroke.rakeleft || note.stroke.rakeright) {
-        return (
-            unit == 'basenote'
-                ? millis2BaseNoteEquiv(strokes.rake.motif_duration_in_millis, bpm)
-                : strokes.rake.motif_duration_in_millis,
-            bpm
-        )
+        return unit == 'basenote'
+            ? millis2BaseNoteEquiv(strokes.rake.motif_duration_in_millis, bpm)
+            : strokes.rake.motif_duration_in_millis
     }
     return 1
 }
