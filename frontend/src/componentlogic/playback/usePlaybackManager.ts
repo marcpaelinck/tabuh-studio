@@ -123,7 +123,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
 
     const samplerAction2AnimationNotes = (position: Position, action: PlaybackSamplerAction): AnimationNote[] => {
         if (!(position in positionConfigs)) return []
-        if (!action) debug(`samplerAction2AnimationNotes ${position} ${action}`)
         const shorthandCodes = positionConfigs[position].symbolToNoteNames[action.params.note.canonicalSymbol] || []
         const result: AnimationNote[] = []
         shorthandCodes.forEach((shCode) => {
@@ -221,9 +220,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         outro: number = defaultOutroTime
     ): TimeLine | undefined {
         // Check that all necessary data is being passed
-        debug(
-            `creating timeline ${pbAction.playbackType} totSystems=${pbAction.score?.systems.length} startAtIndex=${pbAction.systemIndex} in/out=${JSON.stringify([intro, outro])}`
-        )
         if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined)) return undefined
 
         const validation = cycleValidation(pbAction.score)
@@ -277,7 +273,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
         var beatStartTime: number = millis2BaseNoteEquiv(intro, introTempo)
-        debug(`Intro=${beatStartTime}`)
 
         // This dict will be used to create animation actions
         // @ts-ignore
@@ -561,7 +556,12 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 
         newTimeLine.notation = getNotationParagraphs(pbAction.score!)
-        debug(newTimeLine, true)
+        debug(
+            newTimeLine.sampleractions.filter(
+                (act: PlaybackSamplerAction) => act.params.position == 'PEMADE_POLOS' && act.params.velocity != 0.67
+            ),
+            true
+        )
         return newTimeLine
     }
 
