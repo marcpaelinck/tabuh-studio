@@ -430,8 +430,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                         <Row className="bg-whte-1000">{player}</Row>
                     </Grid>
                 </Header>
-                <Content id="content" px="1rem" className="h-9/10 min-h-0">
-                    <div id="editor/player window box" className={`h-19/20 border rounded-md p-2 overflow-scroll`}>
+                <Content id="content" px="1rem" className="h-9/10 min-h-0 p-4">
+                    <div id="editor/player window box" className={`h-[100%] border rounded-md p-2 overflow-scroll`}>
                         <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
                         <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
                     </div>
