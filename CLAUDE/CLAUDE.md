@@ -31,11 +31,13 @@ The following documents in the CLAUDE folder contain additional documentation
 | Beat | Same as `kempli beat`. This term is also used to denote a range of notes from one kempli beat up to (but not including) the next kempli beat. |
 | Key | Brass tuned stave mounted above a bamboo resonator. The term `key` is sometimes used to denote in general the sound-producing elements of any melodic instruments such as the chimes of a reyong. |
 | Notation | Human-readable transcription of (part of a) a composition. A notation consists of `Note` objects which are visualized using the BaliMusic font. |
+| BaliMusic font | A custom, monospaced font for Balinese gamelan cipher notation. Uses **negative spacing** on modifier characters so they visually combine with the preceding pitch character (displayed as diacritics). |
 | Score | Document containing the notation for an entire composition. A score is represented internally by a `Score` object |
 | Gongan | Part of a score that spans one gong cycle. |
 | System | Visual and logical subdivision of a score. A system usually corresponds with a `gongan`. |
 | Section | This term is deprecated but still occurs in the code. It is equivalent to `beat` when used to denote a range of notes. |
-| BaliMusic font | A custom font for Balinese gamelan cipher notation. Uses **negative spacing** on modifier characters so they visually combine with the preceding pitch character (displayed as diacritics). |
+| Measure | Same as Section. |
+| Column | The list of notes in a system's staffs that are visually aligned vertically. Every note takes the same horizontal space when viewed with the BaliMusic font because the font is monospaced. As a consequence a column contains all the notes from the system's staffs with the same `notation` index. All the notes in the same column should be played simultaneously during playback. |
 | Pitch | For melodic instruments, the pitch indicates the note name (DING, DONG, DENG, DUNG, DANG). For melodic instruments that span multiple octaves, an octave indicator can be used |
 | Symbol | A string of one or more characters in a notation. A symbol represents a single note and is represented as one `glyph` when the `BaliMusic` font is used. |
 | Note | A note is the logical representation of a `symbol` and is represented internally by a `NoteObject`. A note is defined by a `pitch`, an optional `grace note`, an optional `octave` indicator and an optional `modifier`. There are two types of modifiers: `stroke modifiers` and `pattern modifiers`. A stroke modifier is a playback instruction indicating how the note should be played, e.g.  damped, muted, tremolo (rapidly repeated stroke). A pattern modifier is a shorthand notation for a sequence of notes. |
