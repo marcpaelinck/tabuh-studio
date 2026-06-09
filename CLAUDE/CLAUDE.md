@@ -11,6 +11,43 @@ The app is live at `https://dev.tabuh.studio` (development) and will move to `ht
 
 ---
 
+## Documentation
+The following documents in the CLAUDE folder contain additional documentation
+
+| File Name | Content |
+|---|---|
+| CLAUDE.md | This document. General description of the application. |
+| CLAUDE.deployment.md | Describes how to deploy the application (both front end and back end). |
+| CLAUDE.virtual-editor.md | Requirements for the editing of notation within the `Editor view`. |  
+| CLAUDE.editor.md | Describes the solution that is implemented for the virtual editor (notation editing). |
+| CLAUDE.NoteObject.md | Description of the object that is used to store each `symbol`. |
+
+## Terminology
+| Term | Definition |
+|---|---|
+| Instrument | An instrument type, such as PEMADE or JEGOGAN |
+| Instrument Group | Orchestra type, e.g. GONG_KEBYAR, SEMAR_PAGULINGAN. |
+| Kempli | Instrument that gives the beat (`kempli beat`) in a Balinese gamelan orchestra. |
+| Beat | Same as `kempli beat`. This term is also used to denote a range of notes from one kempli beat up to (but not including) the next kempli beat. |
+| Key | Brass tuned stave mounted above a bamboo resonator. The term `key` is sometimes used to denote in general the sound-producing elements of any melodic instruments such as the chimes of a reyong. |
+| Notation | Human-readable transcription of (part of a) a composition. A notation consists of `Note` objects which are visualized using the BaliMusic font. |
+| Score | Document containing the notation for an entire composition. A score is represented internally by a `Score` object |
+| Gongan | Part of a score that spans one gong cycle. |
+| System | Visual and logical subdivision of a score. A system usually corresponds with a `gongan`. |
+| Section | This term is deprecated but still occurs in the code. It is equivalent to `beat` when used to denote a range of notes. |
+| BaliMusic font | A custom font for Balinese gamelan cipher notation. Uses **negative spacing** on modifier characters so they visually combine with the preceding pitch character (displayed as diacritics). |
+| Pitch | For melodic instruments, the pitch indicates the note name (DING, DONG, DENG, DUNG, DANG). For melodic instruments that span multiple octaves, an octave indicator can be used |
+| Symbol | A string of one or more characters in a notation. A symbol represents a single note and is represented as one `glyph` when the `BaliMusic` font is used. |
+| Note | A note is the logical representation of a `symbol` and is represented internally by a `NoteObject`. A note is defined by a `pitch`, an optional `grace note`, an optional `octave` indicator and an optional `modifier`. There are two types of modifiers: `stroke modifiers` and `pattern modifiers`. A stroke modifier is a playback instruction indicating how the note should be played, e.g.  damped, muted, tremolo (rapidly repeated stroke). A pattern modifier is a shorthand notation for a sequence of notes. |
+| Grace note | Note that is played briefly before striking the actual note. A grace note is represented as a modifier character before a pitch character. |
+| Position | This term is used when two or more players play different melodies on the same type op instrument. For instance, the instrument `pemade` can have two positions: `PEMADE_POLOS` and `PEMADE_SANGSIH`. The instrument `reyong` has four positions: `REYONG_1`, `REYONG_2`, `REYONG_3`,`REYONG_4` |
+| Staff | notation within a `system` that corresponds with a single `position`. |
+| Execution | playback instructions, such as tempo changes, dynamics, loops and repeats. There are four categories of execution items: `FlowItem`, `ExpressionItem`,  `SuppressItem`and  `KempliItem` |
+| FlowItem | the sequence in which the gongans (systems) should be played. By default, the flow runs through the gongans in the sequence given by the system's `id`. The flow can be modified with the use of `goto`, `loop` and `sequence` execution items. These can be used to repeat systems of the score or to skip to a specific system. The `wait` item indicates a pause after a `system`. |
+| ExpressionItem | Contains playback `tempo` and `dynamics` changes. |
+| SuppressItem | Indicates that one or more `positions` should not be played back in specific conditions. |
+| KempliItem | Sets the kempli beat frequency. |
+
 ## Technology Stack
 
 ### Frontend
@@ -73,7 +110,7 @@ Authentication state is managed via `AuthContext` (`frontend/src/context/AuthCon
 ### Key types (`frontend/src/typing/score.ts`)
 
 ```typescript
-type NoteSymbol = string   // one font character, e.g. 'u', ',', '<', '/'
+type NoteObject = class   // one font character, e.g. 'u', ',', '<', '/'
 
 interface Staff {
     notation: NoteSymbol[]
@@ -120,20 +157,17 @@ When `state === 'notation'`, the kempli staff is included in `staffs['KEMPLI']` 
 
 ---
 
-## The BaliMusic Font
-
-A custom font for Balinese gamelan cipher notation. Uses **negative spacing** on modifier characters so they visually combine with the preceding pitch character (displayed as diacritics).
-
 ### Character categories
 
 | Category | Characters | Notes |
 |---|---|---|
 | Pitch (middle octave) | `a e i o u r s t b x G P T ( ) * 0 8 9` | open stroke |
-| Grace note modifier | `A E I O U S B X` | BEFORE pitch character |
-| Octave modifier | `,` (octave 0) `<` (octave 2) | AFTER pitch char |
+| Error | | `!` | pitch value for notes that could not be parsed correctly from a symbol (invalid symbol) |
+| Grace note modifier | `A E I O U S B X` | BEFORE pitch character. A grace note has a pitch, which is the lowercase equivalent of the grace note's character |
+| Octave modifier | `,` (octave -1), `` (octave 0), `<` (octave 1) | AFTER pitch char |
 | Stroke modifiers | `/` (damped) `?` (mute) `;` (tremolo) `:` (tremolo accel) `[` (left rake) `]` (right rake)  | AFTER pitch char |
 | Pattern modifiers | `n` (norot) | AFTER pitch char |
-| Duration | `-` (extension) `.` (silence) | standalone |
+| Duration | `-` or ` ` (extension) `.` (silence) | standalone |
 
 Pitches can be classified as follows.
 | Category | Characters | Notes |
