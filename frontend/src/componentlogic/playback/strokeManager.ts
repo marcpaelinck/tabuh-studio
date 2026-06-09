@@ -5,9 +5,9 @@
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
 import { NoteObject } from '@tabuhstudio/shared'
+import { EXTENDING_CHAR, MUTING_PITCH_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
-import { AcceleratingTremoloChars, ExtensionChars, MutingChars, RakeDownChars, TremoloChars } from '../../config/config'
 import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
 import { noteRange } from '../../utils/alphabet'
@@ -198,7 +198,7 @@ function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             newAction({ args: args, note, duration: strokes.damped.duration }),
             newAction({
                 args: args,
-                note: new NoteObject(' ', args.position),
+                note: new NoteObject(SPACE_CHAR, args.position),
                 offset: strokes.damped.duration,
                 duration: strokes.damped.silence,
                 isLastOfMotif: true
@@ -220,7 +220,7 @@ function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             newAction({ args: args, note, duration: strokes.muted.duration }),
             newAction({
                 args: args,
-                note: new NoteObject(' ', args.position),
+                note: new NoteObject(SPACE_CHAR, args.position),
                 offset: strokes.muted.duration,
                 duration: strokes.muted.silence,
                 isLastOfMotif: true
@@ -260,7 +260,7 @@ function silenceAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                note: new NoteObject(MutingChars[0], args.position),
+                note: new NoteObject(MUTING_PITCH_CHAR, args.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,
@@ -300,15 +300,15 @@ function gracenoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 }
 
 function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
-    // Skip if the next symbol is also a tremolo note.
-    // In that case the motif will be generated when the next note is being processed.
-    if (args.nextnote && TremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char))) return []
+    // Skip if the previous symbol is also a tremolo note.
+    // In that case the motif has already been generated.
+    if (args.prevnote && args.prevnote.stroke.tremolo) return []
 
     const duration = 1 / strokes.tremolo.notes_per_basenote
     const returnValue: PlaybackSamplerAction[] = []
     const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1), args.position)]
     // Include the next symbol if it is also a tremolo note
-    if (args.nextnote?.canonicalSymbol && TremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char)))
+    if (args.nextnote && args.nextnote.stroke.tremolo)
         notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1), args.position))
     const totalNotes = notes.length * strokes.tremolo.notes_per_basenote
 
@@ -337,16 +337,12 @@ function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     // Skip if the previous symbol is also an accelerating tremolo note.
     // In that case the motif has already been created.
-    if (args.nextnote && AcceleratingTremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char)))
-        return []
+    if (args.prevnote && args.prevnote.stroke.acceleratingtremolo) return []
 
     const returnValue: PlaybackSamplerAction[] = []
     const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1), args.position)]
     // Include the next symbol if it is also an accelerating tremolo note
-    if (
-        args.nextnote?.canonicalSymbol &&
-        AcceleratingTremoloChars.some((char) => args.nextnote?.canonicalSymbol.includes(char))
-    )
+    if (args.nextnote && args.nextnote.stroke.acceleratingtremolo)
         notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1), args.position))
     const totalNotes = notes.length * strokes.tremolo.accelerating_motif.length
 
@@ -380,10 +376,10 @@ function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerActio
 
 function rakeAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     // Create a range of unmuted notes in the required direction and append dashes for potential overflow
-    const invert = RakeDownChars.includes(args.note.canonicalSymbol.slice(-1))
+    const invert = args.note.stroke.rakeleft
     const instrumentRange = _.concat(
         noteRange(args.position, invert),
-        _.fill(Array(strokes.rake.number_of_notes), ExtensionChars[0])
+        _.fill(Array(strokes.rake.number_of_notes), EXTENDING_CHAR)
     )
     debug(`result: ${JSON.stringify(instrumentRange)}`)
     const startIdx = instrumentRange.indexOf(args.note.canonicalSymbol.slice(0, -1))

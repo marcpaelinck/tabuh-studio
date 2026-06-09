@@ -146,7 +146,7 @@ const FlowElementList = ({
                     })}
             </List>
             <IconButton onClick={() => handleAdd()} icon={<PlusIcon />} />
-            <IconButton onClick={() => handleDelete()} icon={<MinusIcon />} />{' '}
+            <IconButton onClick={() => handleDelete()} icon={<MinusIcon />} />
         </>
     )
 }

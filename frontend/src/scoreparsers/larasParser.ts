@@ -1,6 +1,7 @@
 // Parser for imported scores with Laras formatting.
 
 import type { SyntaxNode } from '@lezer/common'
+import { EXTENDING_CHAR } from '@tabuhstudio/shared/noteChars'
 import { NoteObject } from '@tabuhstudio/shared/NoteObject'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
@@ -14,7 +15,7 @@ import { parser } from './grammars/laras/laras'
 function parseStave(position: Position, stave: string): Staff {
     var tabuhNotation: string[] = []
     for (const char of stave) {
-        tabuhNotation.push(symbolLookup[position][char] || '-')
+        tabuhNotation.push(symbolLookup[position][char] || EXTENDING_CHAR)
     }
     const objNotation = tabuhNotation.map((symbol) => new NoteObject(symbol, position))
     return { notation: tabuhNotation, objNotation }
@@ -33,7 +34,7 @@ function postProcess(score: Score): Score {
         const notationLen = firstStaff?.notation.length ?? 0
         score.positions.forEach((pos) => {
             if (!(pos in system.staffs)) {
-                const notation = Array(notationLen).fill('-')
+                const notation = Array(notationLen).fill(EXTENDING_CHAR)
                 const objNotation = notation.map((symbol) => new NoteObject(symbol, pos))
                 system.staffs[pos] = { notation: notation, objNotation: objNotation }
             }

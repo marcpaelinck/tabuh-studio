@@ -2,13 +2,9 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
-import {
-    ExtensionChars,
-    MelodicNoteChars,
-    MutingChars,
-    OctavationChars,
-    positionConfigs
-} from '../frontend/src/config/config.ts'
+import { positionConfigs } from '../frontend/src/config/config.ts'
+import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from './noteChars'
+
 import { noteRange } from '../frontend/src/utils/alphabet.ts'
 import { debug } from '../frontend/src/utils/debugger.ts'
 import type {
@@ -22,6 +18,7 @@ import type {
 } from './noteChars.ts'
 import {
     GRACE_NOTE_PREFIXES,
+    MELODIC_PITCH_CHARS,
     OCTAVE_MODIFIERS,
     PATTERN_MODIFIER_MAP,
     PATTERN_MODIFIERS,
@@ -52,7 +49,7 @@ export {
  * - `'invalidSymbol'`  — structural error: the input string contains
  *   unrecognised or incorrectly ordered characters. The NoteObject's
  *   decomposed properties (`pitch`, `octave`, …) hold empty fallback values
- *   and `symbol` is `'!'`.
+ *   and `symbol` is `ERROR_PITCH_CHAR`.
  *
  * - `'invalidCasting'` — semantic error: the symbol is structurally valid but
  *   is not playable on the bound position (set by `castingRulesManager`). All
@@ -60,7 +57,8 @@ export {
  *   normalised form.
  *
  * In both cases the calling code (e.g. `tabuhParser`) is responsible for
- * substituting `'!'` in the `NoteSymbol[]` output when `error !== undefined`.
+ * substituting `ERROR_PITCH_CHAR` in the `NoteSymbol[]` output when
+ * `error !== undefined`.
  */
 export type NoteObjectFault = 'invalidSymbol' | 'invalidCasting'
 
@@ -117,8 +115,8 @@ export class NoteObject {
      *
      * - When `error === undefined` or `error === 'invalidCasting'`: the
      *   normalised character sequence, e.g. `'u,/'`.
-     * - When `error === 'invalidSymbol'`: `'!'` (the symbol could not be
-     *   parsed; no meaningful normalisation is possible).
+     * - When `error === 'invalidSymbol'`: `ERROR_PITCH_CHAR` (the symbol could not
+     *   be parsed; no meaningful normalisation is possible).
      *
      * prefix: can currently only contain a grace note character
      * pitch: note pitch character. Empty string `''` when `error === 'invalidSymbol'`.
@@ -181,7 +179,7 @@ export class NoteObject {
      * - `'invalidSymbol'`: structural error detected during construction.
      * - `'invalidCasting'`: semantic error set externally by `castingRulesManager`.
      *
-     * Check `note.error !== undefined` to decide whether to substitute `'!'`
+     * Check `note.error !== undefined` to decide whether to substitute `ERROR_PITCH_CHAR`
      * when converting back to `NoteSymbol[]`.
      */
     readonly error: NoteObjectFault | undefined
@@ -264,8 +262,8 @@ export class NoteObject {
         if (!structurallyValid) {
             // Structural error takes precedence over any externally supplied fault.
             this.error = 'invalidSymbol'
-            this.symbol.pitch = '!'
-            this.canonicalSymbol = '!'
+            this.symbol.pitch = ERROR_PITCH_CHAR
+            this.canonicalSymbol = ERROR_PITCH_CHAR
             console.error(`invalid symbol ${input} for ${position}`)
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
@@ -278,8 +276,8 @@ export class NoteObject {
             const pattern = PATTERN_MODIFIER_MAP.get(this.symbol.modifier as PatternModifier)
             if (pattern) this.stroke[pattern] = true
 
-            this.isExtensionSilence = ExtensionChars.includes(this.symbol.pitch)
-            this.isMutingSilence = MutingChars.includes(this.symbol.pitch)
+            this.isExtensionSilence = SILENCE_EXTENDING_CHARS.has(this.symbol.pitch)
+            this.isMutingSilence = SILENCE_MUTING_CHARS.has(this.symbol.pitch)
             if (this.position) {
                 const symbol = this.symbol.pitch + this.symbol.octave + this.symbol.modifier
                 this.hasSample = symbol in positionConfigs[this.position].symbolToNoteNames
@@ -370,7 +368,7 @@ export class NoteObject {
      * **/
 
     static isMelodic(pitch: PitchChar) {
-        return pitch.length > 0 && MelodicNoteChars.includes(pitch)
+        return pitch.length > 0 && MELODIC_PITCH_CHARS.has(pitch)
     }
 
     // Returns a new NoteObject where the grace note is resolved to the correct octave
@@ -391,7 +389,7 @@ export class NoteObject {
         var shortestDistance = 99
 
         // Try different octavations and keep the value that is 'nearest' to the next this.
-        const octaveOptions = [''].concat(OctavationChars)
+        const octaveOptions = new Set(['']).union(OCTAVE_MODIFIERS)
         for (const octaveChar of octaveOptions) {
             const tryNote = pitchChar + octaveChar
             if (instrumentRange.includes(tryNote)) {
@@ -423,10 +421,10 @@ export class NoteObject {
 
     /**
      * Serialises `NoteObject[]` back to a `NoteSymbol[]` notation array.
-     * Notes with `error !== undefined` are serialised as `'!'`.
+     * Notes with `error !== undefined` are serialised as `ERROR_PITCH_CHAR`.
      */
     static toNotation(notes: NoteObject[]): string[] {
-        return notes.map((n) => (n.error !== undefined ? '!' : n.canonicalSymbol))
+        return notes.map((n) => (n.error !== undefined ? ERROR_PITCH_CHAR : n.canonicalSymbol))
     }
 
     /**
@@ -462,11 +460,11 @@ export class NoteObject {
     // ---------------------------------------------------------------------------
 
     /**
-     * Returns the canonical symbol string, or `'!'` if this note has an error.
+     * Returns the canonical symbol string, or `ERROR_PITCH_CHAR` if this note has an error.
      * This matches the serialisation behaviour of `toNotation()`.
      */
     toString(): string {
-        return this.error !== undefined ? '!' : this.canonicalSymbol
+        return this.error !== undefined ? ERROR_PITCH_CHAR : this.canonicalSymbol
     }
 }
 

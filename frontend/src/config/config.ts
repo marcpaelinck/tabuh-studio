@@ -290,20 +290,7 @@ export const polosPositions = [
 
 export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
 
-// ALPHABET + SAMPLES
-//TODO separate alphabet info from samples info. Same for instrument type.
-export const MelodicNoteChars = ['i', 'o', 'e', 'r', 'u', 'a', 's']
-export const ExtensionChars = ['-', ' ']
-export const MutingChars = ['.', '!'] // '!' = `incorrect symbol` value.
-export const OctavationChars = [',', '<']
-//Strokes
-export const HalfDurationChars = ['_']
-export const TremoloChars = [';']
-export const AcceleratingTremoloChars = [':']
-export const RakeUpChars = [']']
-export const RakeDownChars = ['[']
-export const GraceNoteChars = ['I', 'O', 'E', 'R', 'U', 'A', 'S', 'X', 'B']
-export const NorotChars = ['n']
+// SAMPLES
 
 //prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {

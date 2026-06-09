@@ -97,7 +97,6 @@ export default function NotationArea({
 
     return (
         <>
-            {' '}
             {visible && (
                 <div
                     id="NotationArea"

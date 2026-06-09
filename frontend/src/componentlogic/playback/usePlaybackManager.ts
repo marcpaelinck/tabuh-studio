@@ -9,6 +9,7 @@
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
 import { NoteObject } from '@tabuhstudio/shared'
+import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -154,7 +155,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 } else {
                     // Position not present: fill with spaces matching first staff length
                     const firstStaff = Object.values(system.staffs)[0]
-                    line = ' '.repeat(firstStaff?.objNotation.length ?? 0)
+                    line = SPACE_CHAR.repeat(firstStaff?.objNotation.length ?? 0)
                 }
 
                 posNotation.push(
@@ -338,7 +339,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 const sectionStaff = currentStep.measures[position]
                 var objNotation: NoteObject[] =
                     (useCache && sectionStaff?.objNotation_ ? sectionStaff.objNotation_ : sectionStaff?.objNotation) ??
-                    Array(4).fill(new NoteObject(' ', position))
+                    Array(4).fill(new NoteObject(SPACE_CHAR, position))
                 var prevNote: NoteObject | undefined = undefined
 
                 objNotation.forEach((note: NoteObject, symbolIdx) => {

@@ -2,6 +2,7 @@
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
 import { NoteObject } from '@tabuhstudio/shared'
+import { ERROR_PITCH_CHAR } from '@tabuhstudio/shared/noteChars'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
 import { debug } from '../utils/debugger.ts'
 import { isEvenByIndex as isEvenPositionByIndex } from '../utils/objectUtils.ts'
@@ -158,13 +159,13 @@ export function castNotation(
     }
 
     // Apply casting rules using NoteObject for tone/norot classification.
-    // Invalid symbols (error !== undefined) pass through as '!'.
-    // Symbols not found in the casting table are also replaced with '!'.
+    // Invalid symbols (error !== undefined) pass through as ERROR_PITCH_CHAR (error character).
+    // Symbols not found in the casting table are also replaced with an error character.
     const result = updatedNotation.map((note, idx) => {
-        if (note.error !== undefined) return new NoteObject('!', position)
+        if (note.error !== undefined) return new NoteObject(ERROR_PITCH_CHAR, position)
         const tone = note.symbol.pitch + note.symbol.octave
         const cast = note.pattern.norot ? norotconversion[tone] : conversion[tone]
-        const symbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : '!'
+        const symbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : ERROR_PITCH_CHAR
 
         return new NoteObject(symbol, position)
     })

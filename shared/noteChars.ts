@@ -22,16 +22,27 @@ export const GRACE_NOTE_PREFIXES: ReadonlySet<string> = new Set([
  * - Duration / silence: `- .`
  * - Kendang strokes: `( ) * 0 8 9`
  */
-// prettier-ignore
+export const MELODIC_PITCH_CHARS = new Set(['i', 'o', 'e', 'r', 'u', 'a', 's'])
+export const NONMELODIC_PITCH_CHARS = ['t', 'b', 'x', 'y', 'G', 'P', 'T', '(', ')', '*', '0', '8', '9']
+export const EXTENDING_CHAR = '-'
+export const SPACE_CHAR = ' '
+export const SILENCE_EXTENDING_CHARS = new Set([EXTENDING_CHAR, SPACE_CHAR])
+export const MUTING_PITCH_CHAR = '.'
+export const ERROR_PITCH_CHAR = '!' // `incorrect symbol` value.
+export const SILENCE_MUTING_CHARS = new Set([MUTING_PITCH_CHAR])
+
 export const PITCH_CHARS: ReadonlySet<string> = new Set([
-  "a","e","i","o","u","r","s","t","b","x","y","G","P","T","-"," ", ".","(",")","*","0","8","9"
-]);
+    ...MELODIC_PITCH_CHARS,
+    ...NONMELODIC_PITCH_CHARS,
+    ...SILENCE_EXTENDING_CHARS,
+    ...SILENCE_MUTING_CHARS
+])
 
 /**
  * Characters that do not produce sound during playback.
  *
  */
-export const SILENCE_CHARS: ReadonlySet<string> = new Set([' ', '-', '.'])
+export const SILENCE_CHARS: ReadonlySet<string> = SILENCE_EXTENDING_CHARS.union(SILENCE_MUTING_CHARS)
 
 /**
  * Octave modifier characters. Appear after the pitch character.

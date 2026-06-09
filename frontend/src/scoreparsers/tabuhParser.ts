@@ -1,6 +1,7 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import { NoteObject } from '@tabuhstudio/shared'
+import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -256,7 +257,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
             beats.forEach((beat, colIdx) => {
                 const diff = (colWidths[colIdx] ?? 0) - beat.notation.length
                 if (diff > 0) {
-                    const padding = Array(diff).fill(' ')
+                    const padding = Array(diff).fill(SPACE_CHAR)
                     beat.notation.push(...padding)
                     beat.objNotation.push(...padding.map((symbol) => new NoteObject(symbol, position as Position)))
                 }

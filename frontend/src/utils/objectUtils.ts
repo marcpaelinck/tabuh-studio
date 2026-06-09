@@ -3,6 +3,7 @@
  */
 
 import { NoteObject } from '@tabuhstudio/shared'
+import { EXTENDING_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { noteDuration, totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency, defaultTempo } from '../config/config'
@@ -12,7 +13,7 @@ import type { Score, System } from '../typing/score'
 type DefaultType = 'NoteSymbol' | 'Score'
 const DefaultObjectFactory = {
     NoteSymbol: () => {
-        return '-'
+        return EXTENDING_CHAR
     },
     Score: () => {
         return {

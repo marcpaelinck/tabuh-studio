@@ -1,19 +1,7 @@
 import _ from 'lodash'
-import { ExtensionChars, ignoreChars, MutingChars, positionConfigs } from '../config/config'
-import type { NoteSymbol, Position } from '../typing/basetypes'
+import { ignoreChars, positionConfigs } from '../config/config'
 
-export const getValidSymbols = (
-    position: Position,
-    includeSilences: boolean = false,
-    includeStrokes: boolean = false
-): string[] => {
-    const valids = _.concat(
-        Object.keys(positionConfigs[position].symbolToNoteNames),
-        includeStrokes ? positionConfigs[position].validStrokes : [],
-        includeSilences ? _.concat(MutingChars, ExtensionChars) : []
-    )
-    return valids
-}
+import type { NoteSymbol, Position } from '../typing/basetypes'
 
 // Remove chars that should be ignored. See remark in configs.ts
 export const cleanSymbol = (symbol: string) => ignoreChars.reduce((sym, char) => sym.replace(char, ''), symbol)
