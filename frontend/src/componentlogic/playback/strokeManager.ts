@@ -353,7 +353,7 @@ function AcceleratingTremoloAction(args: CreateStrokeArgs): PlaybackSamplerActio
         const count = idx + 1
         const noteIdx = idx % notes.length
         const duration = strokes.tremolo.accelerating_motif[idx] / strokes.tremolo.accelerating_motif[0]
-        const velocity = strokes.tremolo.accelerating_velocity[idx]
+        const velocity = strokes.tremolo.accelerating_velocity[idx] * args.velocity
         returnValue.push({
             time: n2TO(time),
             timeMs: timeMs,
