@@ -265,18 +265,23 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         })
 
         // Step 3: Set kempli frequency from the beat width and apply kempli execution items
-        if (colWidths.length == 0 || 'KEMPLI' in system.staffs) {
-            system.kempli.state = 'notation'
-        } else {
-            // Set kempli state to 'on' if all measures have the same duration
-            if (colWidths.every((w) => w == colWidths[0])) system.kempli.state = 'on'
-            system.kempli.frequency = colWidths.length > 0 ? colWidths[0] : 4
-        }
+        // Default value
+        system.kempli.state = 'on'
         if (system.execution) {
             const kempliItem: KempliItem = system.execution.find((exec) => exec.type == 'kempli') as KempliItem
             if (kempliItem) {
                 if (kempliItem.value == 'off') system.kempli.state = 'off'
                 if (kempliItem.value === 'double') system.kempli.frequency = system.kempli.frequency! / 2
+            }
+        }
+        if (system.kempli.state != 'off') {
+            if (colWidths.length == 0 || 'KEMPLI' in system.staffs) {
+                system.kempli.state = 'notation'
+            } else {
+                // Set kempli frequency if all measures have the same duration
+                if (colWidths.every((w) => w == colWidths[0])) {
+                    system.kempli.frequency = colWidths.length > 0 ? colWidths[0] : 4
+                }
             }
         }
 
