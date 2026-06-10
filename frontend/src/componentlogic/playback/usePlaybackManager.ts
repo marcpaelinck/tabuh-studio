@@ -337,14 +337,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 columnDurationsMs.push(To2Millis(n2TO(colDuration), colTempo))
                 cumDuration += colDuration
             }
-            /// DEBUG
-            if (currentStep.system.id == 6) {
-                console.log(
-                    `SYS[${currentStep.system.id}] BEAT[${currentStep.beatIdx + 1}] ${columnCount} columns ${JSON.stringify(columnDurations)}`
-                )
-                // _.entries(currentStep.beats).forEach(([p, n]) => console.log(`${p} ${JSON.stringify(n.notation)}`))
-            }
-            /// END DEBUG
             for (const position of currentStep.positions) {
                 if (position == 'KEMPLI' && currentStep.system.kempli.state != 'notation') {
                     // Kempli will be generated separately based on 'on' or 'off' state.
