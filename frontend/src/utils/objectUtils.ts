@@ -79,6 +79,8 @@ export function scoreToFormattedJson(score: Score, clearCache: boolean = true): 
         return value
     }
 
+    // Replace quotes and add spaces after `:` and `,`.
+    // NOTE: the latter can cause a space to be added to
     const json = JSON.stringify(orderedScore, flatten, 2)
     return json
         .replace(/"([\{\[])/g, '$1')
