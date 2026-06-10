@@ -78,6 +78,9 @@
     font-weight: normal;
     font-style: normal;
     font-display: swap;
+    ascent-override: 80%; /* adjust until lines are equal */
+    descent-override: 20%; /* adjust until lines are equal */
+    line-gap-override: 0%; /* eliminate built-in line gap */
 }
 .balifont {
     font-family: 'BaliMusic5';
@@ -107,6 +110,8 @@
     font-weight: normal;
     font-style: normal;
     font-size: 12pt;
+    line-height: 22px;
+    font-size-adjust: none; /* prevent browser from adjusting for fallback fonts */
 }
 /* Virtual-editor cursor: a blinking line drawn between symbols. */
 @keyframes notation-cursor-blink {

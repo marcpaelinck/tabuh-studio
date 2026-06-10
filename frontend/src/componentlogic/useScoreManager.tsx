@@ -190,7 +190,10 @@ export function useScoreManager() {
         var newSystemData: System | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the staffs.
         Object.values(newSystemData.staffs).forEach((staff) => {
-            if (staff) delete (staff as Staff).notation_
+            if (staff) {
+                delete (staff as Staff).notation_
+                delete (staff as Staff).objNotation_
+            }
         })
         if (!score) return undefined
         // Determines where to insert the new system data item. Default is set to replace current.

@@ -1,3 +1,4 @@
+import { NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -5,6 +6,7 @@ import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem, ScoreRecord } from '../services/apiService'
 import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
+import type { NoteSymbol } from '../typing/basetypes'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
@@ -24,8 +26,14 @@ export function persistCachedChanges(score: Score | undefined): Score | undefine
     return newScore
 }
 
+// Seta the score's UUID if missing and creates NoteObject notation
 function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
+    for (const system of score.systems) {
+        _.entries(system.staffs).forEach(([_pos, staff]) => {
+            staff.objNotation = NoteObject.fromNotation(staff.notation)
+        })
+    }
     return score
 }
 
@@ -74,12 +82,31 @@ export function useScoreReader(source: 'database' | 'file'): {
         }
     }, [])
 
+    interface StaffNoObject {
+        notation: NoteSymbol[]
+        objNotation?: NoteObject[]
+        objNotation_?: NoteObject[]
+    }
+
     const saveScore = useCallback(
         async (score: Score | undefined, destination: 'database' | 'file'): Promise<boolean> => {
             // if (!newScoreInfo || same<ScoreInfo>(newScoreInfo, scoreInfo)) return
             var isSuccess = false
-            if (destination == 'database') isSuccess = await saveScoreToDb(score)
-            else if (destination == 'file') isSuccess = await saveScoreToLocalFile(score)
+            // Create a copy of the score object and remove the object versions of the notation
+            const scoreNoObject = structuredClone(score)
+            scoreNoObject?.systems.forEach((system) => {
+                _.values(system.staffs).forEach((staff) => {
+                    if (staff) delete (staff as StaffNoObject).objNotation
+                    if (staff) delete (staff as StaffNoObject).objNotation_
+                })
+                system.notationGroups?.forEach((group) => {
+                    group.staff.forEach((staff) => {
+                        delete (staff as StaffNoObject).objNotation
+                    })
+                })
+            })
+            if (destination == 'database') isSuccess = await saveScoreToDb(scoreNoObject)
+            else if (destination == 'file') isSuccess = await saveScoreToLocalFile(scoreNoObject)
             return isSuccess
         },
         []
@@ -96,6 +123,53 @@ export function useScoreReader(source: 'database' | 'file'): {
             setScore(score)
             setIsLoading(false)
         }
+    }
+
+    // Loads a Score directly from a JSON file chosen by the user.
+    async function importJsonScore() {
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.accept = '.json'
+        fileInput.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0]
+            if (!file) return
+            try {
+                const content = await file.text()
+                const parsed: Score = JSON.parse(content)
+                setScore(postprocessScore(parsed))
+            } catch (err) {
+                console.error('Failed to parse imported JSON score:', err)
+            }
+        }
+        fileInput.click()
+    }
+
+    // Imports a file with an alternative format and parses it to a Score object.
+    async function importScore(format: ScoreFormat) {
+        const parse =
+            format == 'Laras'
+                ? parseLaras
+                : format == 'Notation'
+                  ? parseNotation
+                  : () => {
+                        return { errors: [], postProcessing: [] }
+                    }
+        const fileInput = document.createElement('input')
+        fileInput.type = 'file'
+        fileInput.accept = format == 'Notation' ? '.tsv' : '.laras'
+        fileInput.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0]
+            if (file) {
+                const content = await file.text()
+                const parserReturnValue: ParserReturnValue = parse(content)
+                if (parserReturnValue.score) {
+                    setScore(parserReturnValue.score)
+                }
+
+                // Process content as needed
+            }
+        }
+        fileInput.click()
     }
 
     // Loads a JSON Score object description from the website's database.
@@ -156,6 +230,7 @@ export function useScoreReader(source: 'database' | 'file'): {
 
         try {
             const json = scoreToFormattedJson(score)
+            // const json = JSON.stringify(score, null, 4)
 
             // Use File System Access API if available (Chrome/Edge)
             if ('showSaveFilePicker' in window && typeof window.showSaveFilePicker === 'function') {
@@ -184,53 +259,6 @@ export function useScoreReader(source: 'database' | 'file'): {
             console.error('Failed to save score to local file:', err)
             return false
         }
-    }
-
-    // Loads a Score directly from a JSON file chosen by the user.
-    async function importJsonScore() {
-        const fileInput = document.createElement('input')
-        fileInput.type = 'file'
-        fileInput.accept = '.json'
-        fileInput.onchange = async (e: Event) => {
-            const file = (e.target as HTMLInputElement).files?.[0]
-            if (!file) return
-            try {
-                const content = await file.text()
-                const parsed: Score = JSON.parse(content)
-                setScore(postprocessScore(parsed))
-            } catch (err) {
-                console.error('Failed to parse imported JSON score:', err)
-            }
-        }
-        fileInput.click()
-    }
-
-    // Imports a file with an alternative format and parses it to a Score object.
-    async function importScore(format: ScoreFormat) {
-        const parse =
-            format == 'Laras'
-                ? parseLaras
-                : format == 'Notation'
-                  ? parseNotation
-                  : () => {
-                        return { errors: [], postProcessing: [] }
-                    }
-        const fileInput = document.createElement('input')
-        fileInput.type = 'file'
-        fileInput.accept = format == 'Notation' ? '.tsv' : '.laras'
-        fileInput.onchange = async (e: Event) => {
-            const file = (e.target as HTMLInputElement).files?.[0]
-            if (file) {
-                const content = await file.text()
-                const parserReturnValue: ParserReturnValue = parse(content)
-                if (parserReturnValue.score) {
-                    setScore(parserReturnValue.score)
-                }
-
-                // Process content as needed
-            }
-        }
-        fileInput.click()
     }
 
     async function loadScoreListFromDb() {
