@@ -43,7 +43,7 @@ async function highlightNote(keyElement: Element, note: AnimationNote, positionI
 }
 
 function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, pbSpeed: number) {
-    var keyframes, options
+    var keyframes: Keyframe[], options: KeyframeAnimationOptions
     if (!params || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !params.currnotes)
         return
 
@@ -72,6 +72,8 @@ function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, 
             return
         }
         // var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
+        if (!params.timeuntilMs) console.error(`params.timeuntilMs is ${params.timeuntilMs}`)
+        if (!pbSpeed) console.error(`pbSpeed is ${pbSpeed}`)
         var millisToNextNote = Math.round(params.timeuntilMs / pbSpeed)
         // Convert time durations to fractions (keyframe time indicators run from 0 to 1)
         var move_to_fraction = moveToDuration / millisToNextNote
@@ -121,7 +123,6 @@ function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, 
         options = { duration: millisToNextNote, fill: 'forwards', easing: bezier, composite: 'replace' }
     }
 
-    // @ts-expect-error
     svgInfo.panggul.animate(keyframes, options).finished.then((a) => {
         try {
             a.commitStyles() // Persist the final position of the animation

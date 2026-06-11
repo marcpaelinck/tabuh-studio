@@ -103,6 +103,51 @@ export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
 }
 
+export interface BeatSliceInfo {
+    start: number
+    end: number
+}
+// Returns the start and end indices of each beat of the system.
+// - For 'on' state use the beat frequency.
+// - For 'off' state use the default beat length.
+// - For 'notation' state use the beat strokes in the notation.
+// TODO: not used yet. This function should be used by as basis for getSystemBeatCount, getBeatSlice and getBeatStart
+export function getBeatSlices(system: System): BeatSliceInfo[] {
+    const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
+
+    if (!staffEntries.length) return []
+    const maxColumnCount = Math.max(...staffEntries.map(([pos, staff]) => staff!.objNotation.length))
+
+    const beatSliceInfo: BeatSliceInfo[] = []
+
+    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+        // Slice the notation in beats of freq length
+        const freq = system.kempli.frequency || defaultBeatFrequency
+        const totalBeats = Math.ceil(maxColumnCount / freq)
+        for (var idx = 0; idx < totalBeats; idx++) {
+            beatSliceInfo.push({ start: idx * freq, end: Math.min((idx + 1) * freq, maxColumnCount) })
+        }
+    } else if (system.kempli.state === 'notation') {
+        // x? marks the START of each kempli beat.
+        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
+        const beatStartIndices = kempliNotation.reduce(
+            (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
+            []
+        )
+        if (!beatStartIndices.length) beatSliceInfo.push({ start: 0, end: maxColumnCount })
+        else
+            beatStartIndices.forEach((start, idx) => {
+                beatSliceInfo.push({
+                    start,
+                    end: idx < beatStartIndices.length - 1 ? beatStartIndices[idx + 1] : maxColumnCount
+                })
+            })
+    } else {
+        beatSliceInfo.push({ start: 0, end: maxColumnCount })
+    }
+    return beatSliceInfo
+}
+
 // Finds the [startIdx, endIdx) array slice for beat beatIdx
 function getBeatSlice(objNotation: NoteObject[], beatIdx: number, freq: number): [number, number] {
     if ((beatIdx + 1) * freq <= objNotation.length) return [beatIdx * freq, (beatIdx + 1) * freq]
@@ -112,20 +157,37 @@ function getBeatSlice(objNotation: NoteObject[], beatIdx: number, freq: number):
 
 // Returns the number of kempli beats in the system.
 // For 'on'/'off' state, uses the maximum number of columns
-export function getSystemBeatCount(system: System): number {
-    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
-        const freq = system.kempli.frequency || defaultBeatFrequency
-        const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
-        if (!staffEntries.length) return 0
-        const maxColumnCount = Math.max(...staffEntries.map(([pos, staff]) => staff!.objNotation.length))
-        return Math.ceil(maxColumnCount / freq)
-    }
-    return 1
-}
+// export function getSystemBeatCount(system: System): number {
+//     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+//         const freq = system.kempli.frequency || defaultBeatFrequency
+//         const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
+//         if (!staffEntries.length) return 0
+//         const maxColumnCount = Math.max(...staffEntries.map(([pos, staff]) => staff!.objNotation.length))
+//         return Math.ceil(maxColumnCount / freq)
+//     } else if (system.kempli.state === 'notation') {
+//         // x? marks the START of each kempli beat.
+//         const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
+//         const beatPositions = kempliNotation.reduce(
+//             (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
+//             []
+//         )
+//         return beatPositions.length
+//     }
+//     return 1
+// }
 
 // Returns the start index (array position) of beat beatIdx in the flat notation.
-// For 'on'/'off' state, uses symbolDuration so grace-note beats shift the boundary correctly.
-// Pass the position of the staff being displayed for the most accurate cursor placement.
+// export function getBeatStart(beatIdx: number, system: System, position: Position): number {
+//     const beatSlices = getBeatSlices(system)
+//     if (
+//         position in system.staffs &&
+//         beatIdx < beatSlices.length &&
+//         beatSlices[beatIdx].start <= system.staffs[position]!.notation.length
+//     ) {
+//         return beatSlices[beatIdx].start
+//     }
+//     return 0
+// }
 export function getBeatStart(beatIdx: number, system: System, position?: Position): number {
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
         const freq = system.kempli.frequency || defaultBeatFrequency
@@ -145,38 +207,56 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
     return 0
 }
 
-// Returns the notation symbols for beat beatIdx from a flat notation array.
-// For 'on'/'off' state, uses symbolDuration so grace notes (duration=0) do not terminate
-// the beat early — an extra symbol is included to fill the beat to the full kempli frequency.
+// Returns the notation symbols for beat beatIdx from a NoteObject array.
 export function getBeatNotation(
     objNotation: NoteObject[],
     beatIdx: number,
     system: System,
-    position?: Position
+    position: Position
 ): NoteObject[] {
-    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
-        const freq = system.kempli.frequency || defaultBeatFrequency
-        if (position) {
-            const [start, end] = getBeatSlice(objNotation, beatIdx, freq)
-            return objNotation.slice(start, end)
-        }
-        // Fallback if no position provided (avoids symbolDuration dependency)
-        const start = beatIdx * freq
-        return objNotation.slice(start, start + freq)
-    } else if (system.kempli.state === 'notation') {
-        // x? marks the START of each kempli beat.
-        // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
-        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
-        const beatPositions = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
-            []
-        )
-        const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
-        const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : objNotation.length
+    const beatSlices = getBeatSlices(system)
+    if (
+        objNotation.length &&
+        position in system.staffs &&
+        beatIdx < beatSlices.length &&
+        beatSlices[beatIdx].start <= objNotation.length
+    ) {
+        const start = beatSlices[beatIdx].start
+        const end = Math.min(beatSlices[beatIdx].end, objNotation.length)
         return objNotation.slice(start, end)
     }
-    return objNotation
+    return []
 }
+
+// export function getBeatNotation(
+//     objNotation: NoteObject[],
+//     beatIdx: number,
+//     system: System,
+//     position?: Position
+// ): NoteObject[] {
+//     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
+//         const freq = system.kempli.frequency || defaultBeatFrequency
+//         if (position) {
+//             const [start, end] = getBeatSlice(objNotation, beatIdx, freq)
+//             return objNotation.slice(start, end)
+//         }
+//         // Fallback if no position provided (avoids symbolDuration dependency)
+//         const start = beatIdx * freq
+//         return objNotation.slice(start, start + freq)
+//     } else if (system.kempli.state === 'notation') {
+//         // x? marks the START of each kempli beat.
+//         // beat beatIdx spans from beatPositions[beatIdx] up to (but not including) beatPositions[beatIdx+1].
+//         const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
+//         const beatPositions = kempliNotation.reduce(
+//             (pos: number[], note, idx) => (note.canonicalSymbol === 'x?' ? [...pos, idx] : pos),
+//             []
+//         )
+//         const start = beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
+//         const end = beatIdx + 1 < beatPositions.length ? beatPositions[beatIdx + 1] : objNotation.length
+//         return objNotation.slice(start, end)
+//     }
+//     return objNotation
+// }
 
 // Returns the maximum duration of the system's staffs.
 export function getSystemDuration(system: System, bpm: BPM) {

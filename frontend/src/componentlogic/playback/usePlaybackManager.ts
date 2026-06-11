@@ -376,7 +376,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     } else if (note.isMutingSilence) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
-                        // Convert potential motifs to individual note actions.
+                        // Convert potential motifs to individual note sampler actions.
                         const motifNoteActions: PlaybackSamplerAction[] = createNoteActions({
                             samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
@@ -395,7 +395,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             prevaction: _.last(newTimeLine.sampleractions),
                             isLast: lastStep && endOfMeasure
                         })
-                        // Create one or more sampler action(s) for the new note or motif
+                        // Update note's duration
+                        // and push the note in the `sampleractions` array.
                         motifNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
                             currAction[position] = noteAction
                             if (endOfMeasure && noteAction.params.isLastOfMotif && currentStep!.waitMsAfter) {
@@ -418,8 +419,15 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                             extendLastSamplerAction(currAction[position], waitTimeAfter)
                         }
                     }
+                    /** DEBUG */
+                    var [prevCurrTime, prevCurrTimeMs] = [currTime, currTimeMs]
                     currTime += columnDurations[noteIdx] + waitTimeAfter
-                    currTimeMs += columnDurationsMs[noteIdx] + waitTimeAfter > 0 ? currentStep!.waitMsAfter : 0
+                    currTimeMs += columnDurationsMs[noteIdx] + (waitTimeAfter > 0 ? currentStep!.waitMsAfter : 0)
+                    if (position == 'PEMADE_POLOS' && waitTimeAfter)
+                        debug(
+                            `time ${JSON.stringify(prevCurrTime)} -> ${JSON.stringify(currTime)}  timeMs ${prevCurrTimeMs} -> ${currTimeMs} waittime=${waitTimeAfter} waittimeMs=${currentStep!.waitMsAfter} tempo=${JSON.stringify(currentStep?.tempo)}`
+                        )
+                    /** END DEBUG */
                     prevNote = note
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
@@ -517,7 +525,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             prevSystem = currentStep.system
             currentStep = nextInFlow()
         }
-        // CREATE ANIMATION ACTIONS
+        // CREATE ANIMATION ACTIONS FROM THE SAMPLER ACTIONS
         _.keys(samplerActionsByPos).forEach((pos) => {
             const position = pos as Position
             const samplerActions: PlaybackSamplerAction[] = samplerActionsByPos[position]
@@ -543,10 +551,11 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     : samplerAction2AnimationNotes(position, samplerActions[index + 1])
                 const timeUntilMs: number = currIsLast ? outro : nextAction!.timeMs - action!.timeMs
 
-                newTimeLine.animationactions.push({
+                const animationAction = {
                     time: action.time,
                     params: { position: position, currnotes: aNotes, nextnotes: nextANotes, timeuntilMs: timeUntilMs }
-                })
+                }
+                newTimeLine.animationactions.push(animationAction)
             })
         })
 
@@ -563,12 +572,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 
         newTimeLine.notation = getNotationParagraphs(pbAction.score!)
-        debug(
-            newTimeLine.sampleractions.filter(
-                (act: PlaybackSamplerAction) => act.params.position == 'PEMADE_POLOS' && act.params.velocity != 0.67
-            ),
-            true
-        )
         return newTimeLine
     }
 

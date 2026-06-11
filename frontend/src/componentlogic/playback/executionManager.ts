@@ -18,7 +18,7 @@ import type {
 import type { PlaybackType } from '../../typing/playback'
 import type { Score, Staff, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { getBeatNotation, getSystemBeatCount } from '../../utils/objectUtils'
+import { getBeatNotation, getBeatSlices } from '../../utils/objectUtils'
 
 // Keeps track of pass and iteration counters for each system. Also contains lists of
 // directives (goto, loop, tempo and dynamics), sorted by priority.
@@ -89,7 +89,7 @@ export function executionManager(
     // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
-            const beatCount = getSystemBeatCount(system)
+            const beatCount = getBeatSlices(system).length
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
