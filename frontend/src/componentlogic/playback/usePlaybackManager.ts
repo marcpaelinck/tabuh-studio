@@ -265,6 +265,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
         var beatStartTime: number = millis2BaseNoteEquiv(intro, introTempo)
+        var beatStartTimeMs: number = intro
 
         // This dict will be used to create animation actions
         // @ts-ignore
@@ -337,6 +338,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 columnDurationsMs.push(To2Millis(n2TO(colDuration), colTempo))
                 cumDuration += colDuration
             }
+            var maxEndTime = 0
+            var maxEndTimeMs = 0
             for (const position of currentStep.positions) {
                 if (position == 'KEMPLI' && currentStep.system.kempli.state != 'notation') {
                     // Kempli will be generated separately based on 'on' or 'off' state.
@@ -450,6 +453,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 })
 
                 maxMeasureDuration = Math.max(currTime - beatStartTime, maxMeasureDuration)
+                maxEndTime = currTime > maxEndTime ? currTime : maxEndTime
+                maxEndTimeMs = currTimeMs > maxEndTimeMs ? currTimeMs : maxEndTimeMs
             }
 
             // CREATE EDITOR CURSOR ACTION
@@ -519,12 +524,14 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             }
 
-            newTimeLine.totalDurationTO = TOplusNumber(newTimeLine.totalDurationTO, beatDuration)
-            newTimeLine.totalDurationMs += BaseNoteEquiv2Millis(beatDuration, currentStep.tempo[0])
-            beatStartTime += maxMeasureDuration
+            newTimeLine.totalDurationTO = n2TO(maxEndTime)
+            newTimeLine.totalDurationMs = maxEndTimeMs
+            beatStartTime = maxEndTime
+            beatStartTimeMs = maxEndTimeMs
             prevSystem = currentStep.system
             currentStep = nextInFlow()
         }
+
         // CREATE ANIMATION ACTIONS FROM THE SAMPLER ACTIONS
         _.keys(samplerActionsByPos).forEach((pos) => {
             const position = pos as Position
@@ -554,6 +561,17 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 const animationAction = {
                     time: action.time,
                     params: { position: position, currnotes: aNotes, nextnotes: nextANotes, timeuntilMs: timeUntilMs }
+                }
+                if (
+                    position == 'PEMADE_POLOS' &&
+                    TO2n(action.params.duration) >= 3 &&
+                    action.params.note.canonicalSymbol == 'a,' &&
+                    143 < TO2n(action.time) &&
+                    TO2n(action.time) < 148
+                ) {
+                    debug('--')
+                    debug(action)
+                    debug(nextAction)
                 }
                 newTimeLine.animationactions.push(animationAction)
             })
