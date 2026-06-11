@@ -347,7 +347,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
 
                 var currTime: number = beatStartTime
-                var currTimeMs = newTimeLine.totalDurationMs
+                var currTimeMs = beatStartTimeMs
 
                 // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
@@ -524,13 +524,15 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             }
 
-            newTimeLine.totalDurationTO = n2TO(maxEndTime)
-            newTimeLine.totalDurationMs = maxEndTimeMs
             beatStartTime = maxEndTime
             beatStartTimeMs = maxEndTimeMs
             prevSystem = currentStep.system
             currentStep = nextInFlow()
         }
+
+        // Note that `beatStartTime` is now equal to maxEndTime
+        newTimeLine.totalDurationTO = n2TO(beatStartTime)
+        newTimeLine.totalDurationMs = beatStartTimeMs
 
         // CREATE ANIMATION ACTIONS FROM THE SAMPLER ACTIONS
         _.keys(samplerActionsByPos).forEach((pos) => {
@@ -584,8 +586,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         })
 
         // Determine the total playback duration
-        newTimeLine.totalDurationMs += outro
-        newTimeLine.totalDurationTO = n2TO(beatStartTime)
         setTotalDurationMs(newTimeLine.totalDurationMs)
         newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 
