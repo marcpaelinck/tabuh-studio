@@ -29,6 +29,7 @@ import type {
     ProcessingInstruction
 } from '../typing/parsers.ts'
 import type { GroupedNotation, Score, Staff, Staffs, System } from '../typing/score.ts'
+import { debug } from '../utils/debugger.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
 import { lineNr, tagLookup } from './tabuhUtils.ts'
@@ -44,7 +45,7 @@ type ValueType =
     | 'KempliValue'
     | 'OnOffValue'
     | 'ScopeValue'
-type ListType = 'IntegerList' | 'StringList' | 'ExecutionList'
+type ListType = 'IntegerList' | 'StringList' | 'ExecutiontypeList'
 
 // Returns a Score object
 // Grammar: @top Document { InfoMetadataLine Gongan+ }
@@ -229,8 +230,9 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         if (source && target) {
             // Target staffs should be applied to the copy of source
             target.staffs = { ...source.staffs, ...target.staffs }
-            if (copyInstr.include && target.execution) {
-                const copyItems: ExecutionItem[] = target.execution.filter((item) =>
+            debug(`INCLUDE source=${source.label ?? source.id} include=${JSON.stringify(copyInstr.include ?? [])}`)
+            if (copyInstr.include && source.execution) {
+                const copyItems: ExecutionItem[] = source.execution.filter((item) =>
                     copyInstr.include!.includes(item.type)
                 )
                 target.execution = target.execution || []
@@ -682,7 +684,7 @@ function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], co
                 param = {
                     include: getValueList<string>(
                         metadatanode.getChild('IncludeExecutionTypesParameter'),
-                        'ExecutionList',
+                        'ExecutiontypeList',
                         content
                     )
                 }

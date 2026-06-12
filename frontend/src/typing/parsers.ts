@@ -31,13 +31,6 @@ export interface PostProcessing {
     part?: PartInstruction
 }
 
-interface CopyInstruction {
-    label: string
-    targetid: number
-    targetuuid: string
-    include?: ExecutionItemType[]
-}
-
 export interface PostProcessing {
     copy?: CopyInstruction
     part?: PartInstruction

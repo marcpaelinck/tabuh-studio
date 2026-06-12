@@ -34,11 +34,12 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     SystemContextMenu: false,
     SystemNode: false,
     SummaryItem: false,
+    tabuhParser: true,
     useAnimation: false,
     useScoreManager: false,
     useInstruments: false,
     usePartManager: false,
-    usePlaybackManager: true,
+    usePlaybackManager: false,
     useScoreReader: false,
     validationManager: false
 }
