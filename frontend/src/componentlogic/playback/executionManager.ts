@@ -3,65 +3,26 @@
 // They also keep track of the 'current' tempo and dynamics.
 import type { UUID } from 'crypto'
 import _ from 'lodash'
-import type { BPM } from 'tone/build/esm/core/type/Units'
 import { defaultDynamics, defaultTempo } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
 import type {
+    BeatSliceInfo,
     ExecutionItem,
     ExecutionItemType,
     ExpressionItem,
+    FlowCursor,
+    FlowInfoTable,
+    FlowStep,
     GotoItem,
     LoopItem,
     SequenceItem,
     WaitItem
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
-import type { Score, Staff, System } from '../../typing/score'
+import type { Score, Staff } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { getBeatNotation, getBeatSlices } from '../../utils/objectUtils'
-
-// Keeps track of pass and iteration counters for each system. Also contains lists of
-// directives (goto, loop, tempo and dynamics), sorted by priority.
-interface FlowInfoTable {
-    [idx: string]: {
-        system: System
-        maxBeatIdx: number
-        pass: number
-        iteration: number
-        executionItems: Record<ExecutionItemType, ExecutionItem[]>
-    }
-}
-
-// Keeps track of the 'current' cursor position
-interface FlowCursor {
-    systemIdx: number // Index of the current system (numbering starts at 0)
-    beatIdx: number // Index of the current kempli beat (numbering starts at 0)
-    newSystem: boolean // True if this system is different than that of the previous step
-    systemStart: boolean // True if this is the first section of the system
-    lastBeat: boolean // True if this is the last kempli beat of the current system
-    sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
-    sequenceIdx: number | undefined // Current index of the active sequence
-}
-
-// Returned by function nextInFlow.
-// Contains information about the FlowCursor's current system.
-export interface FlowStep {
-    id: number
-    system: System
-    systemIdx: number
-    beatIdx: number
-    pass: number // Current pass count
-    iteration: number // current iteration count
-    beats: Partial<Record<Position, Staff>>
-    positions: Partial<Position>[]
-    tempo: BPM[]
-    dynamics: number[]
-    lastSystem: boolean
-    lastBeat: boolean
-    waitMsAfter: number // Delay after the end of the current section in milliseconds
-    sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
-    sequenceIdx?: number // Current index of the active sequence
-}
+import { totalDuration } from './strokeManager'
 
 const itemPriority = (item: ExecutionItem): number => {
     // prio 1: specific pass number(s).
@@ -89,16 +50,13 @@ export function executionManager(
     // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
-            const beatCount = getBeatSlices(system).length
+            const beatSlices: BeatSliceInfo[] = getBeatSlices(system)
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
                 // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
             }
-            return [
-                system.index,
-                { system: system, maxBeatIdx: beatCount - 1, pass: 0, iteration: 0, executionItems: executionItems }
-            ]
+            return [system.index, { system, beatSlices, pass: 0, iteration: 0, executionItems }]
         })
     )
 
@@ -287,24 +245,24 @@ export function executionManager(
                     beatIdx: 0,
                     newSystem: true,
                     systemStart: true,
-                    lastBeat: flowinfo![0].maxBeatIdx == 0
+                    lastBeat: flowinfo![0].beatSlices.length <= 1
                 } as FlowCursor)
                 break
             }
-            case currentStep!.beatIdx < flowinfo![currentStep!.systemIdx].maxBeatIdx: {
+            case currentStep!.beatIdx < flowinfo![currentStep!.systemIdx].beatSlices.length - 1: {
                 // Next section, same system
                 _.assign(next, {
                     systemIdx: currentStep.systemIdx,
                     beatIdx: currentStep.beatIdx + 1,
                     newSystem: false,
                     systemStart: false,
-                    lastBeat: currentStep.beatIdx + 1 == flowinfo![currentStep.systemIdx].maxBeatIdx,
+                    lastBeat: currentStep.beatIdx + 1 == flowinfo![currentStep.systemIdx].beatSlices.length - 1,
                     sequence: currentStep.sequence,
                     sequenceIdx: currentStep.sequenceIdx
                 } as FlowCursor)
                 break
             }
-            case currentStep!.beatIdx >= flowinfo![currentStep!.systemIdx].maxBeatIdx: {
+            case currentStep!.beatIdx >= flowinfo![currentStep!.systemIdx].beatSlices.length - 1: {
                 // Reached end of system. Determine next system.
                 // Check if a sequence or goto or loop item is applicable. Otherwise, take next system in sequence.
                 const sequence = currentStep.sequence || getSequence(currentStep)
@@ -312,7 +270,7 @@ export function executionManager(
                 const { systemIdx: nextSysIdx, sequenceIdx: nextSequenceIdx } = getNextSystemInFlow(
                     currentStep,
                     flowinfo,
-                    sequence
+                    sequence as UUID[] | undefined
                 )
                 // In case of single system playback: quit if we leave the requested system
                 if (
@@ -328,7 +286,7 @@ export function executionManager(
                     beatIdx: 0,
                     newSystem: currentStep.systemIdx != nextSysIdx,
                     systemStart: true,
-                    lastBeat: flowinfo![nextSysIdx].maxBeatIdx == 0,
+                    lastBeat: flowinfo![nextSysIdx].beatSlices.length - 1 == 0,
                     sequence: nextSequenceIdx != undefined ? sequence : undefined,
                     sequenceIdx: nextSequenceIdx
                 } as FlowCursor)
@@ -342,17 +300,17 @@ export function executionManager(
             const nextSystem = flowinfo[next.systemIdx].system
             // Build a Staff per position containing only the current section's notation
             const beats = _.fromPairs(
-                _.toPairs(nextSystem.staffs)
-                    .filter(([_key, staff]) => staff != null)
-                    .map(([key, staff]) => {
-                        const objNotation = getBeatNotation(
-                            staff!.objNotation,
-                            next.beatIdx,
-                            nextSystem,
-                            key as Position
-                        )
+                _.keys(nextSystem.staffs)
+                    .filter((pos) => nextSystem.staffs[pos as Position] != null)
+                    .map((position) => {
+                        const objNotation = getBeatNotation({
+                            system: nextSystem,
+                            position: position as Position,
+                            beatIdx: next.beatIdx,
+                            beatSlices: flowinfo[nextSystem.index].beatSlices
+                        })
                         return [
-                            key,
+                            position,
                             { notation: objNotation.map((note) => note.canonicalSymbol), objNotation } as Staff
                         ]
                     })
@@ -370,16 +328,30 @@ export function executionManager(
                 if (next.systemStart) flowinfo[next.systemIdx].iteration += 1
             }
 
+            const tempo = getExpressionValue(
+                'tempo',
+                next.systemIdx,
+                next.beatIdx,
+                currentStep?.tempo[1] || defaultTempo
+            )
+            const stepDuration = Object.entries(beats).reduce(
+                (maxDur, [position, measure]) =>
+                    Math.max(maxDur, totalDuration(measure.objNotation, tempo[0], 'basenote')),
+                0
+            )
+
             const nextStep: FlowStep = {
                 id: currentStep ? currentStep.id + 1 : 1,
                 system: nextSystem,
                 systemIdx: nextSystem.index,
                 beatIdx: next.beatIdx,
+                beatSlices: flowinfo[next.systemIdx].beatSlices,
+                beats: beats,
+                duration: stepDuration,
                 pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
                 iteration: peek ? nextIteration : flowinfo[next.systemIdx].iteration,
-                beats: beats,
                 positions: _.keys(beats) as Position[],
-                tempo: getExpressionValue('tempo', next.systemIdx, next.beatIdx, currentStep?.tempo[1] || defaultTempo),
+                tempo: tempo,
                 dynamics: getExpressionValue(
                     'dynamics',
                     next.systemIdx,
@@ -387,7 +359,7 @@ export function executionManager(
                     currentStep?.dynamics[1] || defaultDynamics
                 ),
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
-                lastBeat: next.beatIdx == flowinfo[next.systemIdx].maxBeatIdx,
+                lastBeat: next.beatIdx == flowinfo[next.systemIdx].beatSlices.length - 1,
                 waitMsAfter: next.lastBeat ? getWaitTimeMsAfter(next.systemIdx) : 0,
                 sequence: next.sequence,
                 sequenceIdx: next.sequenceIdx

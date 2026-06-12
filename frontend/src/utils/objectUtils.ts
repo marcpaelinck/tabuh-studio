@@ -8,6 +8,7 @@ import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'
 import type { BPM, Position } from '../typing/basetypes'
+import type { BeatSliceInfo } from '../typing/execution'
 import type { Score, System } from '../typing/score'
 
 type DefaultType = 'NoteSymbol' | 'Score'
@@ -103,10 +104,6 @@ export function isEvenByIndex(index: number) {
     return (index + 1) % 2 == 0
 }
 
-export interface BeatSliceInfo {
-    start: number
-    end: number
-}
 // Returns the start and end indices of each beat of the system.
 // - For 'on' state use the beat frequency.
 // - For 'off' state use the default beat length.
@@ -207,23 +204,24 @@ export function getBeatStart(beatIdx: number, system: System, position?: Positio
     return 0
 }
 
-// Returns the notation symbols for beat beatIdx from a NoteObject array.
-export function getBeatNotation(
-    objNotation: NoteObject[],
-    beatIdx: number,
-    system: System,
+export interface GetBeatNotationArgs {
+    beatIdx: number
+    system: System
     position: Position
-): NoteObject[] {
-    const beatSlices = getBeatSlices(system)
-    if (
-        objNotation.length &&
-        position in system.staffs &&
-        beatIdx < beatSlices.length &&
-        beatSlices[beatIdx].start <= objNotation.length
-    ) {
-        const start = beatSlices[beatIdx].start
-        const end = Math.min(beatSlices[beatIdx].end, objNotation.length)
-        return objNotation.slice(start, end)
+    beatSlices: BeatSliceInfo[]
+}
+// Returns the notation symbols for beat beatIdx from a NoteObject array.
+export function getBeatNotation({ system, position, beatIdx, beatSlices }: GetBeatNotationArgs): NoteObject[] {
+    // Check if notation is available for the position
+    if (position in system.staffs && system.staffs[position]) {
+        const objNotation = system.staffs[position].objNotation
+
+        // Check if the notation has content within the beat's range
+        if (objNotation.length && beatIdx < beatSlices.length && beatSlices[beatIdx].start <= objNotation.length) {
+            const start = beatSlices[beatIdx].start
+            const end = Math.min(beatSlices[beatIdx].end, objNotation.length)
+            return objNotation.slice(start, end)
+        }
     }
     return []
 }

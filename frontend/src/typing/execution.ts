@@ -1,4 +1,5 @@
-import type { Position, UUID } from './basetypes'
+import type { BPM, Position, UUID } from './basetypes'
+import type { Staff, System } from './score'
 
 // EXECUTION
 // These objects contain information for playing the notation.
@@ -71,7 +72,7 @@ export interface ExpressionItemBase extends ExecutionItemBase {
     iterations?: number[] // In case the System has a LoopItem, specifies for which iterations the expression applies.
     isGradual: boolean // True: the expression value should increase / decrease over one or more kempli beats.
     fromBeat?: number // isGradual=false: the beat where the change takes effect (1-based). isGradual=true: first beat of the gradual ramp.
-    toBeat?: number  // isGradual=true only: last beat of the gradual ramp (1-based). Undefined for immediate changes.
+    toBeat?: number // isGradual=true only: last beat of the gradual ramp (1-based). Undefined for immediate changes.
     fromValue?: number // isGradual=true: starting value of the gradual change. If undefined, the current value is used.
     value: number // isGradual=true: end value of the gradual change. isGradual=false: new immediate value.
 }
@@ -85,6 +86,56 @@ export interface DynamicsItem extends ExpressionItemBase {
     fromDynamics?: DynamicsValue // If isGradual==true: starting value for gradual change. Otherwise undefined.
     dynamics: DynamicsValue // If isGradual==true: end value of the gradual change. Otherwise: new immediate value.
     positions: Position[] // Positions for which the dynamics apply
+}
+
+export interface BeatSliceInfo {
+    start: number
+    end: number
+}
+
+// Keeps track of pass and iteration counters for each system. Also contains lists of
+// directives (goto, loop, tempo and dynamics), sorted by priority.
+export interface FlowInfoTable {
+    [idx: string]: {
+        system: System
+        beatSlices: BeatSliceInfo[]
+        pass: number
+        iteration: number
+        executionItems: Record<ExecutionItemType, ExecutionItem[]>
+    }
+}
+
+// Keeps track of the 'current' cursor position
+export interface FlowCursor {
+    systemIdx: number // Index of the current system (numbering starts at 0)
+    beatIdx: number // Index of the current kempli beat (numbering starts at 0)
+    newSystem: boolean // True if this system is different than that of the previous step
+    systemStart: boolean // True if this is the first section of the system
+    lastBeat: boolean // True if this is the last kempli beat of the current system
+    sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx: number | undefined // Current index of the active sequence
+}
+
+// Returned by function nextInFlow.
+// Contains information about the FlowCursor's current system.
+export interface FlowStep {
+    id: number
+    system: System
+    systemIdx: number
+    beatSlices: BeatSliceInfo[]
+    beatIdx: number
+    beats: Partial<Record<Position, Staff>>
+    duration: number // Total duration of the beat (excluding optional WAIT item)
+    pass: number // Current pass count
+    iteration: number // current iteration count
+    positions: Partial<Position>[]
+    tempo: BPM[]
+    dynamics: number[]
+    lastSystem: boolean
+    lastBeat: boolean
+    waitMsAfter: number // Delay after the end of the current section in milliseconds
+    sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
+    sequenceIdx?: number // Current index of the active sequence
 }
 
 export type FlowItem = GotoItem | LoopItem | SequenceItem | WaitItem

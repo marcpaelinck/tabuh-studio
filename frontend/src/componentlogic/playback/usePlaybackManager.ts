@@ -24,6 +24,7 @@ import {
     positionConfigs
 } from '../../config/config'
 import type { BPM, Position } from '../../typing/basetypes'
+import type { FlowStep } from '../../typing/execution'
 import { speedDefaultOption } from '../../typing/interface'
 import type {
     AnimationNote,
@@ -41,11 +42,11 @@ import type {
 } from '../../typing/playback'
 import type { Note, Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { getBeatStart, getSystemDuration } from '../../utils/objectUtils'
+import { getSystemDuration } from '../../utils/objectUtils'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOplusNumber } from '../../utils/timeunits'
 import { cycleValidation } from '../validationManager'
-import { executionManager, type FlowStep } from './executionManager'
-import { createNoteActions, noteDuration, totalDuration } from './strokeManager'
+import { executionManager } from './executionManager'
+import { createNoteActions, noteDuration } from './strokeManager'
 import { useInstruments } from './useInstruments'
 
 // Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
@@ -173,12 +174,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         if (!(currentStep.id in tempoLookup)) tempoLookup[currentStep.id] = []
 
         const [startTempo, endTempo] = currentStep.tempo
-        const beatDuration = Object.entries(currentStep.beats).reduce(
-            (maxDur, [position, measure]) =>
-                Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
-            0
-        )
-        if (timeFromSectionStartInTO > beatDuration) {
+        if (timeFromSectionStartInTO > currentStep.duration) {
             console.error('Requesting tempo outside of current measure.')
         }
         if (startTempo == endTempo) {
@@ -186,7 +182,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
         } else {
             // Gradual change
             tempoLookup[currentStep.id][timeFromSectionStartInTO] =
-                startTempo + (timeFromSectionStartInTO / beatDuration) * (endTempo - startTempo)
+                startTempo + (timeFromSectionStartInTO / currentStep.duration) * (endTempo - startTempo)
         }
         return tempoLookup[currentStep.id][timeFromSectionStartInTO]
     }
@@ -284,11 +280,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             // Gradual changes will be implemented by changing the tempo at the start of each symbol in the measure.
             // first determine the max. measure length
             const [startTempo, endTempo] = currentStep.tempo
-            const beatDuration = Object.entries(currentStep.beats).reduce(
-                (maxDur, [position, measure]) =>
-                    Math.max(maxDur, totalDuration(measure.objNotation, startTempo, 'basenote')),
-                0
-            )
             if (startTempo == endTempo) {
                 if (currentStep.tempo[0] != currentTempo) {
                     // Immediate change
@@ -301,8 +292,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 }
             } else {
                 // Gradual change
-                for (var t = 0; t < beatDuration; t++) {
-                    const newTempo = startTempo + (t / beatDuration) * (endTempo - startTempo)
+                for (var t = 0; t < currentStep.duration; t++) {
+                    const newTempo = startTempo + (t / currentStep.duration) * (endTempo - startTempo)
                     if (newTempo != currentTempo) {
                         newTimeLine.tempoactions.push({
                             time: n2TO(beatStartTime + t),
@@ -349,7 +340,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 var currTime: number = beatStartTime
                 var currTimeMs = beatStartTimeMs
 
-                // var cursorPos: number = 0
                 newTimeLine.notation[position] = []
                 const sectionStaff = currentStep.beats[position]
                 var objNotation: NoteObject[] =
@@ -434,23 +424,33 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     prevNote = note
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
-                const system = currentStep!.system
-                const beatIdx = currentStep!.beatIdx
-                // Character offset = start index of current section in the flat notation
-                var cursorPos = getBeatStart(beatIdx, system, position)
-                // if (beatIdx > 0) cursorPos += 1 // Additional offset for space after previous measure.
-                const span = objNotation.map((note) => note.toString()).join('')
-                newTimeLine.playercursoractions.push({
-                    functionName: 'playercursor',
-                    time: n2TO(beatStartTime),
-                    params: {
-                        sysuuid: currentStep!.system.uuid,
-                        beat: currentStep!.beatIdx,
-                        position: position,
-                        line: currentStep!.system.index,
-                        range: [cursorPos, cursorPos + span.length]
-                    }
-                })
+
+                // Default values removes cursor highlighting
+                var cursorStart = 0
+                var cursorWidth = 0
+                if (position in currentStep.system.staffs) {
+                    // Character offset = start index of current section in the flat notation
+                    const beatIdx = currentStep!.beatIdx
+                    const noteIdx = currentStep.beatSlices[beatIdx]
+                    const posNotation = currentStep.system.staffs[position]!.notation
+                    const notationBeforeCursor = noteIdx.start
+                        ? posNotation.slice(0, Math.min(noteIdx.start, posNotation.length))
+                        : []
+                    cursorStart = notationBeforeCursor.map((note) => note.toString()).join('').length
+
+                    cursorWidth = objNotation.map((note) => note.toString()).join('').length
+                    newTimeLine.playercursoractions.push({
+                        functionName: 'playercursor',
+                        time: n2TO(beatStartTime),
+                        params: {
+                            sysuuid: currentStep!.system.uuid,
+                            beat: currentStep!.beatIdx,
+                            position: position,
+                            line: currentStep!.system.index,
+                            range: [cursorStart, cursorStart + cursorWidth]
+                        }
+                    })
+                }
 
                 maxMeasureDuration = Math.max(currTime - beatStartTime, maxMeasureDuration)
                 maxEndTime = currTime > maxEndTime ? currTime : maxEndTime
