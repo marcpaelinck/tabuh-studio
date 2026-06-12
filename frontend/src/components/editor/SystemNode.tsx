@@ -13,6 +13,8 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
+import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
@@ -24,12 +26,10 @@ import type {
 } from '../../typing/playback'
 import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
-import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
-import { SystemNotationEditor } from './SystemNotationEditor'
 import { SCol, SummaryItem } from './SummaryItem'
+import { SystemNotationEditor } from './SystemNotationEditor'
 
 interface EditorSystemProps extends TextareaProps {
     systemData: System
@@ -84,8 +84,8 @@ export const SystemNode = memo(function SystemNode({
             setPlaybackCursor(null)
             return
         }
-        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beat })}`)
-        setPlaybackCursor({ sysUuid: cursor.sysuuid, beat: cursor.beat })
+        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beatSlice })}`)
+        setPlaybackCursor({ sysUuid: cursor.sysuuid, beatSlice: cursor.beatSlice })
         systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
@@ -131,12 +131,11 @@ export const SystemNode = memo(function SystemNode({
         function cursorHighlight(cursor: EditorCellCursor | null): string {
             if (!cursor || cursor.sysUuid != systemData.uuid) return ''
             const freq = systemData.kempli.frequency || defaultBeatFrequency
-            const cursorOffset = cursor.beat * freq
             const highlight = `linear-gradient(
                 to right,
-                transparent 0 calc(${cursorOffset}ch - 2px),
-                ${gridColors.cursor} calc(${cursorOffset}ch - 2px) calc(${cursorOffset + freq}ch - 2px),
-                transparent calc(${cursorOffset + freq}ch) 100%),`
+                transparent 0 calc(${cursor.beatSlice.start}ch - 2px),
+                ${gridColors.cursor} calc(${cursor.beatSlice.start}ch - 2px) calc(${cursor.beatSlice.end}ch - 2px),
+                transparent calc(${cursor.beatSlice.start + freq}ch) 100%),`
             return highlight
         }
 

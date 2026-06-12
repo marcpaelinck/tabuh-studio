@@ -465,7 +465,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 params: {
                     prevsysuuid: prevSystem?.uuid || undefined,
                     sysuuid: currentStep.system.uuid,
-                    beat: currentStep.beatIdx
+                    beatSlice: currentStep.beatSlices[currentStep.beatIdx]
                 }
             })
 

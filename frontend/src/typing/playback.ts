@@ -3,6 +3,7 @@ import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
 import type { MutingType, Position, StrokeLocation, ToneType, UUID } from './basetypes'
+import type { BeatSliceInfo } from './execution'
 import type { Score } from './score'
 
 // PLAYBACK SCHEDULING
@@ -83,7 +84,7 @@ export type PlaybackPlayerCursorAction = { time: TimeObject; functionName: strin
 export interface EditorCursorParameters {
     prevsysuuid: UUID | undefined
     sysuuid: UUID
-    beat: number
+    beatSlice: BeatSliceInfo
 }
 
 export type PlaybackEditorCursorAction = { time: TimeObject; params: EditorCursorParameters }
@@ -165,4 +166,4 @@ export type PlaybackAction = {
     outro?: number // silence after end of playback in ms
 }
 
-export type EditorCellCursor = { sysUuid: UUID; beat: number }
+export type EditorCellCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo }
