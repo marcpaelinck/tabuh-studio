@@ -425,7 +425,6 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                 })
                 // CREATE PLAYER NOTATION CURSOR ACTION (CURSOR HIGHLIGHTS ENTIRE MEASURE)
 
-                // Default values removes cursor highlighting
                 var cursorStart = 0
                 var cursorWidth = 0
                 if (position in currentStep.system.staffs) {
@@ -436,20 +435,37 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                     const notationBeforeCursor = noteIdx.start
                         ? posNotation.slice(0, Math.min(noteIdx.start, posNotation.length))
                         : []
-                    cursorStart = notationBeforeCursor.map((note) => note.toString()).join('').length
 
+                    cursorStart = notationBeforeCursor.map((note) => note.toString()).join('').length
                     cursorWidth = objNotation.map((note) => note.toString()).join('').length
-                    newTimeLine.playercursoractions.push({
-                        functionName: 'playercursor',
-                        time: n2TO(beatStartTime),
-                        params: {
-                            sysuuid: currentStep!.system.uuid,
-                            beat: currentStep!.beatIdx,
-                            position: position,
-                            line: currentStep!.system.index,
-                            range: [cursorStart, cursorStart + cursorWidth]
-                        }
-                    })
+                    newTimeLine.playercursoractions.push(
+                        ...[
+                            // Highlight on
+                            {
+                                functionName: 'playercursor',
+                                time: n2TO(beatStartTime),
+                                params: {
+                                    sysuuid: currentStep!.system.uuid,
+                                    beat: currentStep!.beatIdx,
+                                    position: position,
+                                    line: currentStep!.system.index,
+                                    range: [cursorStart, cursorStart + cursorWidth]
+                                }
+                            },
+                            // Highlight off
+                            {
+                                functionName: 'playercursor',
+                                time: n2TO(currTime),
+                                params: {
+                                    sysuuid: currentStep!.system.uuid,
+                                    beat: currentStep!.beatIdx,
+                                    position: position,
+                                    line: currentStep!.system.index,
+                                    range: [0, 0]
+                                }
+                            }
+                        ]
+                    )
                 }
 
                 maxMeasureDuration = Math.max(currTime - beatStartTime, maxMeasureDuration)
