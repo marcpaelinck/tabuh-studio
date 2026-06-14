@@ -3,11 +3,13 @@ import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
+import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { UUID } from '../../typing/basetypes'
 import type {
     EditorCursorParameters,
     PlaybackAction,
     PlaybackCallbackFunctions,
+    PlaybackSettings,
     PlaybackState
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
@@ -27,6 +29,7 @@ interface EditorWindowProps {
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
+    playbackSettings: PlaybackSettings
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
     updateSystem: (sysData: System) => void
@@ -40,6 +43,7 @@ export default function EditorWindow({
     updateParts,
     executeItemAction,
     updatePlaybackFunctions,
+    playbackSettings,
     playbackState,
     playback,
     updateSystem
@@ -50,10 +54,15 @@ export default function EditorWindow({
     )
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
+    const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
 
     useEffect(() => {
         visibleRef.current = visible
     }, [visible])
+
+    useEffect(() => {
+        cursorStyleRef.current = playbackSettings.selectedCursorStyle
+    }, [playbackSettings.selectedCursorStyle])
 
     const systemId = (uuid: UUID) => 'system-' + uuid
 
@@ -77,14 +86,16 @@ export default function EditorWindow({
 
     // This is the actual editor cursor function. It calls the corresponding SystemCursorFunction.
     const moveEditorCursor = useCallback((time: number, params: EditorCursorParameters) => {
-        if (params.sysuuid in systemCursorFunctions.current) {
-            debug(`moving cursor in system ${params.sysuuid}`)
-            systemCursorFunctions.current[params.sysuuid](params)
+        if (params.cursor.sysUuid in systemCursorFunctions.current) {
+            debug(`moving cursor in system ${params.cursor.sysUuid}`)
+            // The cursor function is defined in each system node and passed back to the EditorWindow.
+            // See updateCursorFunction.
+            systemCursorFunctions.current[params.cursor.sysUuid](params)
             // Reset cursor animation in the previous system
-            if (params.prevsysuuid) systemCursorFunctions.current[params.prevsysuuid](params)
+            if (params.prevSysUuid) systemCursorFunctions.current[params.prevSysUuid](params)
         } else {
             debug(
-                `cannot move cursor: function for system ${params.sysuuid} not found in ${JSON.stringify(_.keys(systemCursorFunctions.current))}`
+                `cannot move cursor: function for system ${params.cursor.sysUuid} not found in ${JSON.stringify(_.keys(systemCursorFunctions.current))}`
             )
         }
     }, [])
@@ -163,7 +174,7 @@ export default function EditorWindow({
                                 positions={score.positions}
                                 playbackType={playbackState.playbackType}
                                 audioState={playbackState.audioState}
-                                // visible={visible}
+                                cursorStyleRef={cursorStyleRef}
                                 scoreRef={scoreRef}
                                 labels={labels}
                                 playback={playback}

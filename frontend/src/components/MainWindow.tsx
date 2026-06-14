@@ -31,6 +31,7 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
+import type { PlaybackCursorStyle } from '../typing/animation'
 import type { Position, UUID } from '../typing/basetypes'
 import {
     focusDefaultOption,
@@ -40,7 +41,7 @@ import {
     type ExtendedOption,
     type ScoreInfo
 } from '../typing/interface'
-import type { DashboardParameters } from '../typing/playback'
+import type { DashboardParameters, PlaybackSettings } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
     chars,
@@ -213,6 +214,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [selectedFocusOption, setSelectedFocusOption] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
     const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
     const [selectedSpeedOption, setSelectedSpeedOption] = useState<ExtendedOption<number>>(speedDefaultOption)
+    const [selectedCursorStyle, setSelectedCursorStyle] = useState<PlaybackCursorStyle>('Beat')
     const currentFocusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
     const currentPanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
 
@@ -251,6 +253,37 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         []
     )
 
+    const playbackSettings: PlaybackSettings = {
+        selectedScoreOption,
+        selectedFocusOption,
+        selectedSpeedOption,
+        selectedPanggulOption,
+        selectedCursorStyle,
+        setSelectedScoreOption,
+        setSelectedFocusOption,
+        setSelectedSpeedOption,
+        setSelectedPanggulOption,
+        setSelectedCursorStyle
+    }
+
+    useEffect(() => {
+        // Update user's playback choices
+        if (playbackSettings.selectedScoreOption?.value != selectedScoreOption?.value)
+            playbackSettings.selectedScoreOption = selectedScoreOption
+        if (playbackSettings.selectedFocusOption?.value != selectedFocusOption?.value)
+            playbackSettings.selectedFocusOption = selectedFocusOption
+        if (playbackSettings.selectedSpeedOption?.value != selectedSpeedOption?.value)
+            playbackSettings.selectedSpeedOption = selectedSpeedOption
+        if (playbackSettings.selectedPanggulOption?.value != selectedPanggulOption?.value)
+            playbackSettings.selectedPanggulOption = selectedPanggulOption
+        if (playbackSettings.selectedCursorStyle != selectedCursorStyle)
+            playbackSettings.selectedCursorStyle = selectedCursorStyle
+    }, [selectedScoreOption, selectedFocusOption, selectedSpeedOption, selectedCursorStyle])
+
+    async function stopPlayback(time: number) {
+        playback({ actionType: 'stop' })
+    }
+
     // ___________ UPDATE DASHBOARD STATES ____________
 
     useEffect(() => {
@@ -271,6 +304,23 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         })
         debug(`PLAYBACKSTATE=${playbackState.audioState}`)
     }, [playbackState, validation, score, localCacheState])
+
+    function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
+        setDashboardValues((currDashboardValues) => {
+            const newDashboardValues: DashboardValues = { ...currDashboardValues }
+            newDashboardValues[name] = value
+            return newDashboardValues
+        })
+    }
+
+    function playbackDashboardFunction(time: number, params: DashboardParameters) {
+        if (!params.system) setDashboardElement('playback', { visible: false })
+        else
+            setDashboardElement('playback', {
+                visible: true,
+                text: `${chars.system}${params.system} ${chars.pass}${params.pass} ${chars.iteration}${params.iteration} ${chars.tempo}${params.tempo}`
+            })
+    }
 
     // ___________ UPDATE MENU STATES ____________
 
@@ -312,36 +362,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setPlaybackProgress(0)
     }, [score])
 
-    async function stopPlayback(time: number) {
-        playback({ actionType: 'stop' })
-    }
-
-    function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
-        setDashboardValues((currDashboardValues) => {
-            const newDashboardValues: DashboardValues = { ...currDashboardValues }
-            newDashboardValues[name] = value
-            return newDashboardValues
-        })
-    }
-
-    // function clearDashboardElement(name: ComponentName) {
-    //     setDashboardValues((currDashboardValues) => {
-    //         const newDashboardValues: DashboardValues = { ...dashboardValues }
-    //         newDashboardValues[name] = { visible: false }
-    //         return currDashboardValues
-    //     })
-    // }
-
-    function playbackDashboardFunction(time: number, params: DashboardParameters) {
-        if (!params.system) setDashboardElement('playback', { visible: false })
-        else
-            setDashboardElement('playback', {
-                visible: true,
-                text: `${chars.system}${params.system} ${chars.pass}${params.pass} ${chars.iteration}${params.iteration} ${chars.tempo}${params.tempo}`
-            })
-    }
-
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
+
+    useEffect(() => {
+        console.log(selectedCursorStyle)
+    }, [selectedCursorStyle])
 
     const player = (
         <Player
@@ -358,12 +383,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             appAppearance={appAppearance}
             scoreMenuOptions={scoreMenuOptions}
             score={score}
-            selectedScoreOption={selectedScoreOption}
-            selectedFocusOption={selectedFocusOption}
-            selectedSpeedOption={selectedSpeedOption}
-            setSelectedScoreOption={setSelectedScoreOption}
-            setSelectedFocusOption={setSelectedFocusOption}
-            setSelectedSpeedOption={setSelectedSpeedOption}
+            playbackSettings={playbackSettings}
         />
     )
 
@@ -376,11 +396,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             score={score}
             totalDurationMs={totalDurationMs}
             timeLine={timeLine}
-            scoreMenuOptions={scoreMenuOptions}
-            selectedFocusOption={selectedFocusOption}
-            selectedPanggulOption={selectedPanggulOption}
-            setSelectedPanggulOption={setSelectedPanggulOption}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+            playbackSettings={playbackSettings}
             playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}
             playbackState={playbackState}
@@ -397,6 +414,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             updateParts={updateParts}
             executeItemAction={executeItemAction}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
+            playbackSettings={playbackSettings}
             playbackState={playbackState}
             playback={playback}
             updateSystem={updateSystem}
@@ -422,7 +440,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                             { label: 'editor', value: 'editor' }
                                         ]}
                                         onChange={(value) => setActive(value as ActiveView)}
-                                        className="border border-purple-900"
+                                        className="bg-[#2196f3]"
                                     />
                                 </HStack>
                             </Col>

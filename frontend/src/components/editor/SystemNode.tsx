@@ -16,10 +16,11 @@ import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
+import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
-    EditorCellCursor,
+    EditorCursor,
     EditorCursorParameters,
     PlaybackAction,
     PlaybackType
@@ -36,7 +37,7 @@ interface EditorSystemProps extends TextareaProps {
     positions: Position[]
     audioState: AudioState
     playbackType: PlaybackType
-    // visible: boolean
+    cursorStyleRef: RefObject<PlaybackCursorStyle>
     scoreRef: RefObject<Score>
     labels: Record<string, System>
     gotoTargets: Set<UUID>
@@ -55,7 +56,7 @@ export const SystemNode = memo(function SystemNode({
     positions,
     audioState,
     playbackType,
-    // visible,
+    cursorStyleRef,
     scoreRef,
     labels,
     gotoTargets,
@@ -67,7 +68,7 @@ export const SystemNode = memo(function SystemNode({
 }: EditorSystemProps): ReactNode {
     const systemUuid = systemData.uuid
 
-    const [playbackCursor, setPlaybackCursor] = useState<EditorCellCursor | null>(null)
+    const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
 
     const notationAreaRef = useRef<HTMLTextAreaElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
@@ -79,18 +80,18 @@ export const SystemNode = memo(function SystemNode({
         background: 'rgba(255, 255, 255, 0.9)'
     }
 
-    function moveEditorCursor(cursor: EditorCursorParameters) {
-        if (cursor.sysuuid != systemData.uuid) {
+    function moveEditorCursor(cursorParams: EditorCursorParameters) {
+        if (cursorParams.cursor.sysUuid != systemData.uuid) {
             setPlaybackCursor(null)
             return
         }
-        debug(`setting playback cursor to ${JSON.stringify({ sysUuid: cursor.sysuuid, measure: cursor.beatSlice })}`)
-        setPlaybackCursor({ sysUuid: cursor.sysuuid, beatSlice: cursor.beatSlice })
+        debug(`setting playback cursor to ${JSON.stringify(cursorParams.cursor)}`)
+        setPlaybackCursor(cursorParams.cursor)
         systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
     // Sets the background grid and cursor highlighting
-    function setGrid(systemData: System, cursor: EditorCellCursor | null) {
+    function setGrid(systemData: System, cursor: EditorCursor | null) {
         // Generates a gradient function for the kempli lines
         function kempliGrid(systemData: System): string {
             switch (systemData.kempli.state) {
@@ -128,14 +129,22 @@ export const SystemNode = memo(function SystemNode({
             }
         }
 
-        function cursorHighlight(cursor: EditorCellCursor | null): string {
+        function cursorHighlight(cursor: EditorCursor | null): string {
             if (!cursor || cursor.sysUuid != systemData.uuid) return ''
-            const freq = systemData.kempli.frequency || defaultBeatFrequency
+            var start = cursor.beatSlice.start
+            var end = cursor.beatSlice.end
+            // If user cursor setting is system, highlight the entire system.
+            // Do nothing if end==0: this is the 'cursor off' message.
+            if (cursorStyleRef.current == 'System' && end != 0) {
+                start = 0
+                end = cursor.lastColumn
+            }
+
             const highlight = `linear-gradient(
                 to right,
-                transparent 0 calc(${cursor.beatSlice.start}ch - 2px),
-                ${gridColors.cursor} calc(${cursor.beatSlice.start}ch - 2px) calc(${cursor.beatSlice.end}ch - 2px),
-                transparent calc(${cursor.beatSlice.start + freq}ch) 100%),`
+                transparent 0 calc(${start}ch - 2px),
+                ${gridColors.cursor} calc(${start}ch - 2px) calc(${end}ch - 2px),
+                transparent calc(${end}ch) 100%),`
             return highlight
         }
 

@@ -1,7 +1,7 @@
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { MutingType, Position, ToneType } from '../typing/basetypes'
 import type { DynamicsValue } from '../typing/execution'
-import type { EditorCellCursor } from '../typing/playback'
+import type { EditorCursor } from '../typing/playback'
 import type { Note } from '../typing/score'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 
@@ -95,7 +95,7 @@ export const partColorPalette: ColorName[] = [
     'cornsilk',
     'khaki'
 ]
-export const noCursor: EditorCellCursor = { sysUuid: '', beat: -1 } // 'null' value for the playback cursor of the editor
+export const noCursor: EditorCursor = { sysUuid: '', beat: -1 } // 'null' value for the playback cursor of the editor
 
 // PLAYER
 

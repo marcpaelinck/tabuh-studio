@@ -2,7 +2,7 @@ import type { HTMLAttributes, MouseEvent, RefObject } from 'react'
 import { useRef } from 'react'
 import { IoPlay, IoPlayOutline, IoPlaySkipForward, IoPlaySkipForwardOutline, IoStop } from 'react-icons/io5'
 import { Button, ButtonGroup, Tooltip, Whisper } from 'rsuite'
-import type { AudioState, EditorCellCursor, PlaybackAction, PlaybackType } from '../../typing/playback'
+import type { AudioState, EditorCursor, PlaybackAction, PlaybackType } from '../../typing/playback'
 import type { Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 
@@ -17,7 +17,7 @@ export function PlaybackButtons({
 }: {
     scoreRef: RefObject<Score>
     sysUuid: string
-    playbackCursor: EditorCellCursor | null
+    playbackCursor: EditorCursor | null
     playbackType: PlaybackType
     playbackAudioState: AudioState
     playback: (action: PlaybackAction) => void

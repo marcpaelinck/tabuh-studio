@@ -479,9 +479,14 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
             newTimeLine.editorcursoractions.push({
                 time: n2TO(cursorTime),
                 params: {
-                    prevsysuuid: prevSystem?.uuid || undefined,
-                    sysuuid: currentStep.system.uuid,
-                    beatSlice: currentStep.beatSlices[currentStep.beatIdx]
+                    prevSysUuid: prevSystem?.uuid || undefined,
+                    cursor: {
+                        sysUuid: currentStep.system.uuid,
+                        beatSlice: currentStep.beatSlices[currentStep.beatIdx],
+                        lastColumn: currentStep.beatSlices.length
+                            ? currentStep.beatSlices[currentStep.beatSlices.length - 1].end
+                            : 0
+                    }
                 }
             })
 

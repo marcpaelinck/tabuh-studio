@@ -1,34 +1,28 @@
-import type { Dispatch, JSX } from 'react'
+import type { JSX } from 'react'
 import { Activity, useEffect, useState } from 'react'
-import { SelectPicker, Stack } from 'rsuite'
+import { HStack, Radio, RadioGroup, SelectPicker, Stack, Text } from 'rsuite'
 import { speedList } from '../config/config'
+import type { PlaybackCursorStyle } from '../typing/animation'
 import type { Position } from '../typing/basetypes'
 import { focusDefaultOption, type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
+import type { PlaybackSettings } from '../typing/playback'
 import type { Score } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { createFocusMenuItems, createSpeedMenuItems } from '../utils/selectorsUtils'
+
+export interface PlayerMenuProps {
+    appAppearance: Appearance
+    score: Score | undefined
+    scoreMenuOptions: ExtendedOption<ScoreInfo>[]
+    playbackSettings: PlaybackSettings
+}
 
 export default function PlayerMenu({
     appAppearance,
     score,
     scoreMenuOptions,
-    selectedScoreOption,
-    selectedFocusOption,
-    selectedSpeedOption,
-    setSelectedScoreOption,
-    setSelectedFocusOption,
-    setSelectedSpeedOption
-}: {
-    appAppearance: Appearance
-    score: Score | undefined
-    scoreMenuOptions: ExtendedOption<ScoreInfo>[]
-    selectedScoreOption: ExtendedOption<ScoreInfo> | null
-    selectedFocusOption: ExtendedOption<Position[]>
-    selectedSpeedOption: ExtendedOption<number>
-    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
-    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
-    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
-}): JSX.Element {
+    playbackSettings
+}: PlayerMenuProps): JSX.Element {
     const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
     const [speedMenuItems, setSpeedMenuItems] = useState<ExtendedOption<number>[]>([])
 
@@ -39,7 +33,10 @@ export default function PlayerMenu({
         updateFixedMenus()
     }, [])
 
-    useEffect(() => debug(`SELECTED SPEED: ${JSON.stringify(selectedSpeedOption)}`), [selectedSpeedOption])
+    useEffect(
+        () => debug(`SELECTED SPEED: ${JSON.stringify(playbackSettings.selectedSpeedOption)}`),
+        [playbackSettings.selectedSpeedOption]
+    )
 
     useEffect(() => {
         const updateFocusMenu = async () => {
@@ -49,7 +46,7 @@ export default function PlayerMenu({
         }
         updateFocusMenu()
         debug(`Resetting focus value`)
-        setSelectedFocusOption(focusDefaultOption)
+        playbackSettings.setSelectedFocusOption(focusDefaultOption)
     }, [score])
 
     return (
@@ -63,14 +60,14 @@ export default function PlayerMenu({
                         cleanable={false}
                         label="score:"
                         data={scoreMenuOptions}
-                        value={selectedScoreOption?.value}
+                        value={playbackSettings.selectedScoreOption?.value}
                         onSelect={(value, item) => {
-                            setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
+                            playbackSettings.setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
                         }}
                         // Onchange needed because value can be null / initial selector state is unselected
                         // (also needed if cleanable==true)
                         onChange={(value, e) => {
-                            if (value === null) setSelectedScoreOption(null)
+                            if (value === null) playbackSettings.setSelectedScoreOption(null)
                         }}
                     />
                 </Activity>
@@ -80,9 +77,9 @@ export default function PlayerMenu({
                     cleanable={false}
                     label="focus:"
                     data={focusMenuItems}
-                    value={selectedFocusOption.value}
+                    value={playbackSettings.selectedFocusOption.value}
                     onSelect={(value, item) => {
-                        setSelectedFocusOption(item as ExtendedOption<Position[]>)
+                        playbackSettings.setSelectedFocusOption(item as ExtendedOption<Position[]>)
                     }}
                 />
                 <SelectPicker
@@ -91,11 +88,22 @@ export default function PlayerMenu({
                     cleanable={false}
                     label="speed:"
                     data={speedMenuItems}
-                    value={selectedSpeedOption.value}
+                    value={playbackSettings.selectedSpeedOption.value}
                     onSelect={(value, item) => {
-                        setSelectedSpeedOption(item as ExtendedOption<number>)
+                        playbackSettings.setSelectedSpeedOption(item as ExtendedOption<number>)
                     }}
                 />
+                <HStack className="pl-2 pr-2 rs-picker-toggle rs-btn bg-white border border-solid border-(--rs-border-primary)">
+                    <Text className="text-(--rs-text-secondary)">cursor:</Text>
+                    <RadioGroup
+                        name="radio-group-controlled"
+                        inline
+                        value={playbackSettings.selectedCursorStyle}
+                        onChange={(value) => playbackSettings.setSelectedCursorStyle(value as PlaybackCursorStyle)}>
+                        <Radio value="Beat">beat</Radio>
+                        <Radio value="System">system</Radio>
+                    </RadioGroup>
+                </HStack>
             </Stack>
         </div>
     )

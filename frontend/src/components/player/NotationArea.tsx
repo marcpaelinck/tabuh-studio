@@ -3,10 +3,14 @@
 // notation while the corresponding notes are being played.
 
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
-import type { HighlightRange, HilightRangeFunction, NotationParagraph } from '../../typing/animation'
+import type {
+    HighlightRange,
+    HilightRangeFunction,
+    NotationParagraph,
+    PlaybackCursorStyle
+} from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import type { ExtendedOption } from '../../typing/interface'
-import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
+import type { PlaybackCallbackFunctions, PlaybackSettings, PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
 function scrollIntoContainerView(element: HTMLElement | null, container: HTMLElement | null) {
@@ -36,48 +40,61 @@ function scrollIntoContainerView(element: HTMLElement | null, container: HTMLEle
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    selectedFocusOption: ExtendedOption<Position[]>
-    selectedPanggulOption: ExtendedOption<Position[]>
+    playbackSettings: PlaybackSettings
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
 export default function NotationArea({
     notation,
     visible,
-    selectedFocusOption,
-    selectedPanggulOption,
+    playbackSettings,
     updatePlaybackFunctions
 }: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
     const selectedFocusRef = useRef<Position[]>([])
     const selectedPanggulRef = useRef<Position[]>([])
+    const selectedCursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
 
     useEffect(() => {
-        selectedFocusRef.current = selectedFocusOption.objValue
-    }, [selectedFocusOption])
+        selectedFocusRef.current = playbackSettings.selectedFocusOption.objValue
+    }, [playbackSettings.selectedFocusOption])
     useEffect(() => {
-        selectedPanggulRef.current = selectedPanggulOption.objValue
-    }, [selectedPanggulOption])
+        selectedPanggulRef.current = playbackSettings.selectedPanggulOption.objValue
+    }, [playbackSettings.selectedPanggulOption])
+    useEffect(() => {
+        selectedCursorStyleRef.current = playbackSettings.selectedCursorStyle
+    }, [playbackSettings.selectedCursorStyle])
 
     // Highlighting function: highlights the given range (line and character range)
-    const highlightCursor: HilightRangeFunction = (hlRange: HighlightRange) => {
-        const para: HTMLParagraphElement = textAreaRef.current?.children[hlRange.line] as HTMLParagraphElement
-        const para1: Node = textAreaRef.current?.childNodes[hlRange.line] as Node
-        // Not using scrollIntoView method because the `container` parameter
-        // is not treated the same way by all browsers.
-        scrollIntoContainerView(para, textAreaRef.current)
+    const highlightCursor: HilightRangeFunction = useCallback(
+        (hlRange: HighlightRange) => {
+            const para: HTMLParagraphElement = textAreaRef.current?.children[hlRange.line] as HTMLParagraphElement
+            const para1: Node = textAreaRef.current?.childNodes[hlRange.line] as Node
+            // Not using scrollIntoView method because the `container` parameter
+            // is not treated the same way by all browsers.
+            scrollIntoContainerView(para, textAreaRef.current)
 
-        const range1 = new Range()
-        if (para1) {
-            const text = para1.firstChild
-            if (text && visible) {
-                range1.setStart(text, hlRange.range[0])
-                range1.setEnd(text, hlRange.range[1])
-                const highlight = new Highlight(range1)
-                CSS.highlights.set('notation-highlight', highlight)
+            const range1 = new Range()
+            if (para1) {
+                var start = hlRange.range[0]
+                var end = hlRange.range[1]
+                // If user cursor setting is system, highlight the entire system.
+                // Do nothing if end==0: this is the 'cursor off' message.
+                if (selectedCursorStyleRef.current == 'System' && end != 0) {
+                    start = 0
+                    end = para.textContent.length
+                }
+                const text = para1.firstChild
+                if (text && visible) {
+                    range1.setStart(text, start)
+                    range1.setEnd(text, end)
+                    const highlight = new Highlight(range1)
+                    CSS.highlights.set('notation-highlight', highlight)
+                }
             }
-        }
-    }
+        },
+        [playbackSettings.selectedCursorStyle]
+    )
 
     // Callback function used for playback animation
     const animateNotationCursor = useCallback((time: number, params: PlayerCursorParameters) => {

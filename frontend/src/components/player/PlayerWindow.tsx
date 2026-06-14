@@ -11,11 +11,13 @@ import {
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
+import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import { type Appearance, type ExtendedOption, type ScoreInfo } from '../../typing/interface'
+import { type Appearance } from '../../typing/interface'
 import {
     type PlaybackAction,
     type PlaybackCallbackFunctions,
+    type PlaybackSettings,
     type PlaybackState,
     type TimeLine
 } from '../../typing/playback'
@@ -31,11 +33,8 @@ interface PlayerWindowProps {
     score: Score | undefined
     totalDurationMs: number
     timeLine: TimeLine | undefined
-    scoreMenuOptions: ExtendedOption<ScoreInfo>[]
-    selectedFocusOption: ExtendedOption<Position[]>
-    selectedPanggulOption: ExtendedOption<Position[]>
-    setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
+    playbackSettings: PlaybackSettings
     playbackProgress: number
     playbackSpeed: number
     playback: ActionDispatch<[action: PlaybackAction]>
@@ -49,11 +48,8 @@ export default function PlayerWindow({
     score,
     totalDurationMs,
     timeLine,
-    scoreMenuOptions,
-    selectedFocusOption,
-    selectedPanggulOption,
-    setSelectedPanggulOption,
     updatePlaybackFunctions,
+    playbackSettings,
     playbackProgress,
     playbackSpeed,
     playback,
@@ -65,6 +61,7 @@ export default function PlayerWindow({
     const visibleRef = useRef<boolean>(visible)
     const currentFocusRef = useRef<Position[]>([])
     const currentPanggulRef = useRef<Position[]>([])
+    const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
 
     useEffect(() => {
         visibleRef.current = visible
@@ -75,8 +72,11 @@ export default function PlayerWindow({
     }, [playbackSpeed])
 
     useEffect(() => {
-        currentPanggulRef.current = selectedPanggulOption.objValue
-    }, [selectedPanggulOption])
+        currentPanggulRef.current = playbackSettings.selectedPanggulOption.objValue
+    }, [playbackSettings.selectedPanggulOption])
+    useEffect(() => {
+        cursorStyleRef.current = playbackSettings.selectedCursorStyle
+    }, [playbackSettings.selectedCursorStyle])
 
     // HOOKS
     const { animateInstrument, setSvgInfo } = useAnimationEngine(
@@ -88,12 +88,15 @@ export default function PlayerWindow({
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
 
     useEffect(() => {
-        currentFocusRef.current = selectedFocusOption.objValue
-    }, [selectedFocusOption])
+        currentFocusRef.current = playbackSettings.selectedFocusOption.objValue
+    }, [playbackSettings.selectedFocusOption])
 
     useEffect(() => {
-        updateNotationParas(selectedPanggulOption.objValue, selectedFocusOption.objValue)
-    }, [selectedFocusOption, selectedPanggulOption])
+        updateNotationParas(
+            playbackSettings.selectedPanggulOption.objValue,
+            playbackSettings.selectedFocusOption.objValue
+        )
+    }, [playbackSettings.selectedFocusOption, playbackSettings.selectedPanggulOption])
 
     const updateNotationParas = (newPanggul: Position[], newFocus: Position[]) => {
         debug(`newPanggul = ${JSON.stringify(newPanggul)}`)
@@ -109,17 +112,15 @@ export default function PlayerWindow({
             className="pt-6 pl-0 md:pl-6 pr-0 md:pr-18"
             visibility={visible ? 'visible' : 'collapse'}>
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{playerMenu}</Activity>
-            <Activity mode={selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
+            <Activity mode={playbackSettings.selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
                 <Animation
                     notationElement={notationParas}
                     updatePlaybackFunctions={updatePlaybackFunctions}
-                    selectedFocusOption={selectedFocusOption}
-                    selectedPanggulOption={selectedPanggulOption}
-                    setSelectedPanggulOption={setSelectedPanggulOption}
+                    playbackSettings={playbackSettings}
                     setSVGInfo={setSvgInfo}
                 />
             </Activity>
-            <Activity mode={score && selectedFocusOption.objValue.length == 0 ? 'visible' : 'hidden'}>
+            <Activity mode={score && playbackSettings.selectedFocusOption.objValue.length == 0 ? 'visible' : 'hidden'}>
                 <Box className="justify-items-center inline-grid w-full">
                     <Text size="lg">Select a Focus value to view animation</Text>
                 </Box>

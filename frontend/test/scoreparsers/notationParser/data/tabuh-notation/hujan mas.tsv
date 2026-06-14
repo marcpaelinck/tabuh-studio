@@ -214,33 +214,29 @@ gongs	G				G		P		T		P		G
 	{WAIT 2}
 
 	{PART reyongan}
-	{GONGAN kebyar}
+	{KEMPLI off}
 	{DYNAMICS mf positions=[gangsa, reyong, ugal]}
 reyong_13	i-io	.io.	....	....	i-io	.io.	....	....
 reyong_24	u-u.	eu.e	u---	----	u-u.	eu.e	u---	----
 
-	{GONGAN kebyar}
+	{KEMPLI off}
 reyong_13	a,-a,i	.a,i.	ia,.i	a,.a,i	..e,u,	..u,a,	..e,u,	..u,a,	..a,i	.ia,i	..io	..a,i	..io	..a,i	..u,a,	....
 reyong_24	e-e.	oe.o	.eo.	eoe.	o.i.	a,.o.	i.i.	a,.o.	i.e.	oe.e	o.u.	e.e.	o.u.	e.e.	o.o.	i---
 
-	{GONGAN kebyar}
+	{KEMPLI off}
 	{DYNAMICS p beat=5 positions=reyong}
 reyong_13	u,-u,a,	.u,.a,	u,-u,a,	....	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	....
 reyong_24	oio.	ioi.	oio.	i---	oio.	ioi.	oio.	ioi.	oio.	ioi.	oio.	i---
 
-	{GONGAN kebyar}
+	{KEMPLI off}
 	{DYNAMICS f positions=reyong}
 reyong_13	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,-u,a,	.u,.a,	u,---
 reyong_24	oio.	ioi.	oio.	ioi.	oio.	ioi.	oio.	ioi.	o---
 	{WAIT 0.3}
 
-	{GONGAN kebyar}
-reyong_13	..e,u,	.e,u,.	u,-u,a,	.u,a,.	a,-e,u,	.e,u,.	u,-a,i	.a,i.	ia,.i	a,.a,i	..io	.io.	oi.o	i.io	....	.i.o
-reyong_24	..i.	a,.ia,	..o.	i.oi	..i.	a,.ia,	..e.	oe.o	.eo.	eoe.	o-u.	eu.e	.ue.	ueu.	e---	-ue.
-
 	{KEMPLI off}
-reyong_13	i
-reyong_24	u
+reyong_13	..e,u,	.e,u,.	u,-u,a,	.u,a,.	a,-e,u,	.e,u,.	u,-a,i	.a,i.	ia,.i	a,.a,i	..io	.io.	oi.o	i.io	....	.i.o	i
+reyong_24	..i.	a,.ia,	..o.	i.oi	..i.	a,.ia,	..e.	oe.o	.eo.	eoe.	o-u.	eu.e	.ue.	ueu.	e---	-ue.	u
 	{WAIT  2}
 
 	{PART pengecet}
@@ -256,7 +252,7 @@ gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.o
 gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
 reyong															.xxx	x.b.
 penyacah	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
-calung	i		o		a		i		u		o		a		e
+calung	i		u		a		e		u		e		a		e
 jegogan	i				a				u				a
 kendang															.8*8	*(9.
 gongs	G				P				T				P
@@ -274,8 +270,8 @@ gangsa_p	ii.o	ii.o	i.o.	o.oi	a,a,.i	a,a,.i	a,.i.	i.ia,	u,u,.a,	u,u,.a,	u,.o.	o.o
 gangsa_s	uue.	uue.	ue.e	.eo.	eeo.	eeo.	eo.o	.oi.	ooi.	ooi.	oe.e	.eo.	eeo.	eeo.	eu.u	.ue.
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxx.	b-xx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
 penyacah	i	e	u	e	a	u	e	a	u	o	e	i	a	u	e	o
-calung	i		o		a		i		u		o		a		e
-jegogan	i		o		a		i		u		o		a		e
+calung	i		u		a		e		u		e		a		e
+jegogan	i				a				u				a		
 kendang	.8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	-8*8	*0)8	*(9(	((9(	(9-(	(9(9	(9.8	*(9(
 gongs	G				P				T				P			
 

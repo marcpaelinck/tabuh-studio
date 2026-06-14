@@ -1,9 +1,11 @@
 import type { NoteObject } from '@tabuhstudio/shared'
-import type { HTMLAttributes, ReactElement } from 'react'
+import type { Dispatch, HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
+import type { PlaybackCursorStyle } from './animation'
 import type { MutingType, Position, StrokeLocation, ToneType, UUID } from './basetypes'
 import type { BeatSliceInfo } from './execution'
+import type { ExtendedOption, ScoreInfo } from './interface'
 import type { Score } from './score'
 
 // PLAYBACK SCHEDULING
@@ -82,9 +84,8 @@ export type PlayerCursorFunction = (time: number, params: PlayerCursorParameters
 export type PlaybackPlayerCursorAction = { time: TimeObject; functionName: string; params: PlayerCursorParameters }
 
 export interface EditorCursorParameters {
-    prevsysuuid: UUID | undefined
-    sysuuid: UUID
-    beatSlice: BeatSliceInfo
+    prevSysUuid: UUID | undefined
+    cursor: EditorCursor
 }
 
 export type PlaybackEditorCursorAction = { time: TimeObject; params: EditorCursorParameters }
@@ -149,7 +150,7 @@ export type ActionType =
 export type AudioState = 'playing' | 'paused' | 'stopped' | 'nodata' | 'error'
 
 export type PlaybackState = {
-    cursor: EditorCellCursor
+    cursor: EditorCursor
     audioState: AudioState
     playbackType: PlaybackType
     message?: string
@@ -161,9 +162,22 @@ export type PlaybackAction = {
     score?: Score
     systemIndex?: number // system from which the playback should start.
     seconds?: number // used with actionType='jumptotime': new cursor position relative to start.
-    cursor?: EditorCellCursor
+    cursor?: EditorCursor
     intro?: number // silence before start of playback in ms
     outro?: number // silence after end of playback in ms
 }
 
-export type EditorCellCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo }
+export type EditorCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo; lastColumn: number }
+
+export interface PlaybackSettings {
+    selectedScoreOption: ExtendedOption<ScoreInfo> | null
+    selectedFocusOption: ExtendedOption<Position[]>
+    selectedSpeedOption: ExtendedOption<number>
+    selectedPanggulOption: ExtendedOption<Position[]>
+    selectedCursorStyle: PlaybackCursorStyle
+    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
+    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
+    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
+    setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
+    setSelectedCursorStyle: Dispatch<PlaybackCursorStyle>
+}
