@@ -133,13 +133,7 @@ router.patch(
              uuid           = COALESCE(?, uuid),
              content        = COALESCE(?, content)
          WHERE id = ?`,
-                [
-                    title ?? null,
-                    instrument_set ?? null,
-                    uuid,
-                    content ? JSON.stringify(content) : null,
-                    req.params.id
-                ]
+                [title ?? null, instrument_set ?? null, uuid, content ? JSON.stringify(content) : null, req.params.id]
             )
             const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [req.params.id])
             const record = rows[0]

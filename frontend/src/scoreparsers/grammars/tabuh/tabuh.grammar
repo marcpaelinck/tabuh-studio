@@ -29,9 +29,10 @@
 @top Document { InfoMetadataLine MetadataLine* (EmptyLine Gongan?)+ }
 
 InfoMetadataLine { (space|tab)* lbrace space* InfoMetadata rbrace space* }
-InfoMetadata { "INFO" ( space (ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter | DisplayParameter))+ }
+InfoMetadata { "INFO" ( space (UuidParameter | ScoreParameter | PartParameter | TitleParameter | ComposerParameter | InstrumentgroupParameter | FontParameter | RuntypesParameter | DoLoopParameter | BeatAtEndParameter | DisplayParameter))+ }
 
 // InfoMetadata parameters
+UuidParameter { "uuid" "=" StringValue}
 ScoreParameter { "notation" "=" StringValue}
 PartParameter { "part" "=" StringValue}
 TitleParameter { "title" "=" StringValue}

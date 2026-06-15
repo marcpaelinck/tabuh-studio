@@ -56,7 +56,7 @@ export function parseNotation(content: string): ParserReturnValue {
     const errors: string[] = []
 
     const parsedScore = {
-        uuid: uuidv4(),
+        uuid: '',
         title: '',
         composer: '',
         instrumenttype: 'UNDEFINED',
@@ -73,6 +73,7 @@ export function parseNotation(content: string): ParserReturnValue {
         switch (node.name) {
             case 'InfoMetadata': {
                 const scoreSettings = {
+                    uuid: getValue<string>(node.getChild('UuidParameter'), 'StringValue', content) ?? uuidv4(),
                     title: getValue<string>(node.getChild('TitleParameter'), 'StringValue', content),
                     composer: getValue<string>(node.getChild('ComposerParameter'), 'StringValue', content) || '',
                     instrumenttype: getValue<string>(node.getChild('InstrumentgroupParameter'), 'StringValue', content)
