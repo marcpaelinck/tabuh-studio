@@ -220,7 +220,7 @@ export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
         beat.objNotation.forEach((note, noteIdx) => {
             if (note.error !== undefined) {
                 // Structurally invalid symbol — replace with silence
-                console.error(`invalid symbol '${note.inputSymbol}' for ${position}`)
+                // console.error(`invalid symbol '${note.inputSymbol}' for ${position}`)
                 expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
             } else if (note.pattern.norot) {
                 expandedObjNotation.push(...norotPattern(position, staff, measureIdx, noteIdx))

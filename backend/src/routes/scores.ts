@@ -42,14 +42,16 @@ router.get('/', async (_req, res: Response) => {
     }
 })
 
-router.get('/:id', async (req, res: Response) => {
+// Scores are addressed by their uuid (the stable identity shared with the .tsv
+// notation files and the score's JSON content), not by the numeric primary key.
+router.get('/:uuid', async (req, res: Response) => {
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
             `SELECT s.*, u.email AS owner_email
        FROM scores s
        JOIN users u ON u.id = s.owner_id
-       WHERE s.id = ?`,
-            [req.params.id]
+       WHERE s.uuid = ?`,
+            [req.params.uuid]
         )
         if (!rows[0]) {
             res.status(404).json({ error: 'Score not found' })
@@ -88,12 +90,12 @@ router.post(
             const { title, instrument_set, content } = req.body
             // The score's uuid lives in content.uuid; mirror it into the dedicated column.
             const uuid = (content as Record<string, unknown>).uuid as string
-            const [result] = await pool.query<ResultSetHeader>(
+            await pool.query<ResultSetHeader>(
                 `INSERT INTO scores (owner_id, uuid, instrument_set, title, content)
          VALUES (?, ?, ?, ?, ?)`,
                 [req.user!.id, uuid, instrument_set, title, JSON.stringify(content)]
             )
-            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [result.insertId])
+            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE uuid = ?', [uuid])
             res.status(201).json(rows[0])
         } catch (err) {
             console.error(err)
@@ -103,7 +105,7 @@ router.post(
 )
 
 router.patch(
-    '/:id',
+    '/:uuid',
     requireAuth,
     requireRole('editor'),
     validate(scoreUpdateSchema.partial()),
@@ -114,9 +116,9 @@ router.patch(
                 `SELECT 1 FROM scores s
          LEFT JOIN score_permissions sp
            ON sp.score_id = s.id AND sp.user_id = ? AND sp.can_edit = 1
-         WHERE s.id = ?
+         WHERE s.uuid = ?
            AND (s.owner_id = ? OR sp.user_id IS NOT NULL)`,
-                [req.user!.id, req.params.id, req.user!.id]
+                [req.user!.id, req.params.uuid, req.user!.id]
             )
             if (!check[0]) {
                 res.status(403).json({ error: 'Not allowed to edit this score' })
@@ -132,10 +134,13 @@ router.patch(
              instrument_set = COALESCE(?, instrument_set),
              uuid           = COALESCE(?, uuid),
              content        = COALESCE(?, content)
-         WHERE id = ?`,
-                [title ?? null, instrument_set ?? null, uuid, content ? JSON.stringify(content) : null, req.params.id]
+         WHERE uuid = ?`,
+                [title ?? null, instrument_set ?? null, uuid, content ? JSON.stringify(content) : null, req.params.uuid]
             )
-            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [req.params.id])
+            // Re-read by the (possibly updated) uuid so the response reflects the new value.
+            const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE uuid = ?', [
+                (uuid as string) ?? req.params.uuid
+            ])
             const record = rows[0]
             console.log(JSON.stringify(record))
             if (typeof record.content === 'string') {
@@ -149,17 +154,17 @@ router.patch(
     }
 )
 
-router.delete('/:id', requireAuth, requireRole('editor'), async (req: AuthenticatedRequest, res: Response) => {
+router.delete('/:uuid', requireAuth, requireRole('editor'), async (req: AuthenticatedRequest, res: Response) => {
     try {
-        const [check] = await pool.query<RowDataPacket[]>('SELECT 1 FROM scores WHERE id = ? AND owner_id = ?', [
-            req.params.id,
+        const [check] = await pool.query<RowDataPacket[]>('SELECT 1 FROM scores WHERE uuid = ? AND owner_id = ?', [
+            req.params.uuid,
             req.user!.id
         ])
         if (!check[0]) {
             res.status(403).json({ error: 'Only the owner can delete a score' })
             return
         }
-        await pool.query('DELETE FROM scores WHERE id = ?', [req.params.id])
+        await pool.query('DELETE FROM scores WHERE uuid = ?', [req.params.uuid])
         res.status(204).send()
     } catch (err) {
         console.error(err)

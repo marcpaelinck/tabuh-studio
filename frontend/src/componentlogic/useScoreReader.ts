@@ -177,12 +177,8 @@ export function useScoreReader(source: 'database' | 'file'): {
         if (!newScoreInfo) return
         setIsLoading(true)
         try {
-            // Find the database id by matching uuid from the score list
-            const scores = await apiGetScores()
-            const match = scores.find((s) => s.uuid === newScoreInfo.uuid)
-            if (!match) throw new Error(`Score not found: ${newScoreInfo.uuid}`)
-
-            const record = await apiGetScore(match.id)
+            // Scores are addressed by uuid, so fetch directly (404 if not found).
+            const record = await apiGetScore(newScoreInfo.uuid)
             const score = postprocessScore(record.content as Score)
             setScore(score)
         } catch (err) {
@@ -198,18 +194,20 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(true)
         var isSuccess = true
         try {
-            // Find the database id by matching uuid from the score list
+            // Decide create vs update by checking whether the uuid already exists.
             const scores = await apiGetScores()
-            const match = scores.find((s) => s.uuid === score.uuid)
+            const exists = scores.some((s) => s.uuid === score.uuid)
             var returnvalue: ScoreRecord
-            if (match) {
-                returnvalue = await apiUpdateScore(match.id, {
+            if (exists) {
+                returnvalue = await apiUpdateScore(score.uuid, {
                     title: score.title,
                     instrument_set: score.instrumenttype,
                     content: score
                 })
             } else {
-                returnvalue = await apiCreateScore(score.title, score.instrumenttype, JSON.stringify(score))
+                // Pass the score object (not a JSON string): the API stringifies it,
+                // and the backend validates content.uuid.
+                returnvalue = await apiCreateScore(score.title, score.instrumenttype, score)
             }
             if (!returnvalue) {
                 isSuccess = false

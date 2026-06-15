@@ -164,6 +164,9 @@ export function castNotation(
         if (note.error !== undefined) return new NoteObject(ERROR_PITCH_CHAR, position)
         const tone = note.symbol.pitch + note.symbol.octave
         const cast = note.pattern.norot ? norotconversion[tone] : conversion[tone]
+        if (cast == undefined) {
+            console.error(`invalid symbol '${note.canonicalSymbol}' for ${position}`)
+        }
         const symbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : ERROR_PITCH_CHAR
 
         return new NoteObject(symbol, position)

@@ -36,6 +36,8 @@ export async function apiRefreshToken() {
 }
 
 // ── Scores ────────────────────────────────────────────────────
+// Scores are addressed by their uuid (the stable identity shared with the score
+// JSON content and the .tsv notation files), not by the numeric primary key.
 
 export interface ScoreListItem {
     id: number
@@ -54,8 +56,8 @@ export async function apiGetScores(): Promise<ScoreListItem[]> {
     return request<ScoreListItem[]>('/scores')
 }
 
-export async function apiGetScore(id: number): Promise<ScoreRecord> {
-    return request<ScoreRecord>(`/scores/${id}`)
+export async function apiGetScore(uuid: string): Promise<ScoreRecord> {
+    return request<ScoreRecord>(`/scores/${uuid}`)
 }
 
 export async function apiCreateScore(title: string, instrument_set: string, content: unknown): Promise<ScoreRecord> {
@@ -63,12 +65,12 @@ export async function apiCreateScore(title: string, instrument_set: string, cont
 }
 
 export async function apiUpdateScore(
-    id: number,
+    uuid: string,
     updates: Partial<{ title: string; instrument_set: string; content: unknown }>
 ): Promise<ScoreRecord> {
-    return request<ScoreRecord>(`/scores/${id}`, { method: 'PATCH', body: JSON.stringify(updates) })
+    return request<ScoreRecord>(`/scores/${uuid}`, { method: 'PATCH', body: JSON.stringify(updates) })
 }
 
-export async function apiDeleteScore(id: number): Promise<void> {
-    return request<void>(`/scores/${id}`, { method: 'DELETE' })
+export async function apiDeleteScore(uuid: string): Promise<void> {
+    return request<void>(`/scores/${uuid}`, { method: 'DELETE' })
 }

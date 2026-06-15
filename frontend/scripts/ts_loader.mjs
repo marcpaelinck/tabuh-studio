@@ -17,7 +17,7 @@
  */
 
 import { transform } from 'esbuild'
-import { existsSync, readFileSync } from 'fs'
+import { existsSync, readFileSync, statSync } from 'fs'
 import { dirname, join, resolve as pathResolve } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 
@@ -69,10 +69,14 @@ function resolveNodeModule(specifier) {
             const idx = join(NODE_MODULES, parts, 'index.js')
             if (existsSync(idx)) return idx
         } else {
-            // Subpath import, e.g. 'lodash/fp'.
+            // Subpath import, e.g. 'lodash/fp' or '@tabuhstudio/shared/noteChars'.
+            // Try the literal path, then .ts/.js, then an index file — so subpaths
+            // of local TypeScript packages (e.g. shared/noteChars.ts) resolve too.
             const full = join(NODE_MODULES, parts, subpath)
-            if (existsSync(full)) return full
-            if (existsSync(full + '.js')) return full + '.js'
+            const candidates = [full, full + '.ts', full + '.js', join(full, 'index.ts'), join(full, 'index.js')]
+            for (const candidate of candidates) {
+                if (existsSync(candidate) && statSync(candidate).isFile()) return candidate
+            }
         }
     } catch (e) {
         console.error('ts_loader: error resolving', specifier, e.message)
