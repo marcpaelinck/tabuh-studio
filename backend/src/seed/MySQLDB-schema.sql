@@ -18,6 +18,7 @@ CREATE TABLE scores (
   owner_id       INT NOT NULL,
   instrument_set VARCHAR(100) NOT NULL,
   title          VARCHAR(200) NOT NULL,
+  uuid           CHAR(36) NOT NULL UNIQUE,
   content        JSON NOT NULL,
   created_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

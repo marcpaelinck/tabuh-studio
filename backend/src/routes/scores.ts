@@ -10,7 +10,9 @@ const router = Router()
 const scoreSchema = z.object({
     title: z.string().min(1).max(200),
     instrument_set: z.string().min(1),
-    content: z.record(z.string(), z.unknown())
+    // The score's uuid is stored inside content; require it (and a valid format)
+    // so a missing/invalid uuid is rejected before reaching the database.
+    content: z.object({ uuid: z.uuid() }).catchall(z.unknown())
 })
 const scoreUpdateSchema = scoreSchema.partial()
 
@@ -26,7 +28,7 @@ router.get('/', async (_req, res: Response) => {
          s.instrument_set,
          s.created_at,
          u.email AS owner_email,
-         JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.uuid')) AS uuid,
+         s.uuid,
          JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.notationversion')) AS notationversion
        FROM scores s
        JOIN users u ON u.id = s.owner_id
@@ -84,10 +86,12 @@ router.post(
     async (req: AuthenticatedRequest, res: Response) => {
         try {
             const { title, instrument_set, content } = req.body
+            // The score's uuid lives in content.uuid; mirror it into the dedicated column.
+            const uuid = (content as Record<string, unknown>).uuid as string
             const [result] = await pool.query<ResultSetHeader>(
-                `INSERT INTO scores (owner_id, instrument_set, title, content)
-         VALUES (?, ?, ?, ?)`,
-                [req.user!.id, instrument_set, title, JSON.stringify(content)]
+                `INSERT INTO scores (owner_id, uuid, instrument_set, title, content)
+         VALUES (?, ?, ?, ?, ?)`,
+                [req.user!.id, uuid, instrument_set, title, JSON.stringify(content)]
             )
             const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [result.insertId])
             res.status(201).json(rows[0])
@@ -120,13 +124,22 @@ router.patch(
             }
 
             const { title, instrument_set, content } = req.body
+            // Keep the uuid column in sync with content.uuid when content is updated.
+            const uuid = content ? ((content as Record<string, unknown>).uuid ?? null) : null
             await pool.query(
                 `UPDATE scores
          SET title          = COALESCE(?, title),
              instrument_set = COALESCE(?, instrument_set),
+             uuid           = COALESCE(?, uuid),
              content        = COALESCE(?, content)
          WHERE id = ?`,
-                [title ?? null, instrument_set ?? null, content ? JSON.stringify(content) : null, req.params.id]
+                [
+                    title ?? null,
+                    instrument_set ?? null,
+                    uuid,
+                    content ? JSON.stringify(content) : null,
+                    req.params.id
+                ]
             )
             const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM scores WHERE id = ?', [req.params.id])
             const record = rows[0]

@@ -79,9 +79,9 @@ async function migrateScores() {
             } else {
                 // Insert as a new record
                 await pool.query<ResultSetHeader>(
-                    `INSERT INTO scores (owner_id, instrument_set, title, content)
-                     VALUES (?, ?, ?, ?)`,
-                    [ownerId, score.instrumenttype ?? 'UNKNOWN', score.title, JSON.stringify(score)]
+                    `INSERT INTO scores (owner_id, uuid, instrument_set, title, content)
+                     VALUES (?, ?, ?, ?, ?)`,
+                    [ownerId, score.uuid, score.instrumenttype ?? 'UNKNOWN', score.title, JSON.stringify(score)]
                 )
                 console.log(`  ✓ Inserted: ${score.title} (${file})`)
                 inserted++

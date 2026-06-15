@@ -186,11 +186,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const { user, login, logout } = useAuth()
 
     useEffect(() => {
-        if (user) console.log(`${user} successfully logged in`)
-        else console.log(`Logout successful`)
-    }, [user])
-
-    useEffect(() => {
         setAppAppearance(screenSize.abbr.includes('lg') ? 'full' : 'playerOnly')
     }, [screenSize])
 
@@ -302,7 +297,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             level: localCacheState.level,
             tooltip: localCacheState.message
         })
-        debug(`PLAYBACKSTATE=${playbackState.audioState}`)
+        // debug(`PLAYBACKSTATE=${playbackState.audioState}`)
     }, [playbackState, validation, score, localCacheState])
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
@@ -334,6 +329,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 return { label: scoreInfo.title, value: `#${idx} scoreInfo.title`, objValue: scoreInfo }
             })
         )
+        debug('ScoreInfoList changed')
     }, [scoreInfoList])
 
     // ___________ UPDATE SCORE STATES ____________
@@ -363,10 +359,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }, [score])
 
     const ToggleIcon = sidenavExpanded ? ArrowRightLineIcon : ArrowLeftLineIcon
-
-    useEffect(() => {
-        console.log(selectedCursorStyle)
-    }, [selectedCursorStyle])
 
     const player = (
         <Player
