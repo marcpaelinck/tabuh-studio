@@ -1,4 +1,4 @@
-{INFO notation="legong dwi" part=full title="Legong Dwi Bhumi" composer="Kadek Dwi Putra" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false display=false beat_at_end=false}
+{INFO uuid=84e8e37f-4a33-4e07-87dd-06f564017e61 notation="legong dwi" part=full title="Legong Dwi Bhumi" composer="Kadek Dwi Putra" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false display=false beat_at_end=false}
 
 	## 39:00
 	{AUTOKEMPYUNG off scope=SCORE}

@@ -1,4 +1,4 @@
-{INFO notation="godek miring sp" part=full title="Godek Miring SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=53d0d265-28a1-45c0-9a87-a17513b75b61 notation="godek miring sp" part=full title="Godek Miring SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{GONGAN gineman}
 	{TEMPO 110}

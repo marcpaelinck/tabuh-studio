@@ -1,4 +1,4 @@
-{INFO notation="legong mahawidya gk" part=full title="Legong Mahawidya GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=3733e160-dc2f-4d00-9751-5cc9b4dc5d0e notation="legong mahawidya gk" part=full title="Legong Mahawidya GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	# https://www.youtube.com/watch?v=gILdibv6Jos
 	{GONGAN gineman}

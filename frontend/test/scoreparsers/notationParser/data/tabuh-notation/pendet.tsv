@@ -1,4 +1,4 @@
-{INFO notation=pendet part=full title=Pendet instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=true}
+{INFO uuid=cd03073f-4610-4c13-9a60-26443b732fc3 notation=pendet part=full title=Pendet instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=true}
 
 ##	Kempli beat at end of each measure (gong at end of gongan)
 	{AUTOKEMPYUNG off scope=SCORE}

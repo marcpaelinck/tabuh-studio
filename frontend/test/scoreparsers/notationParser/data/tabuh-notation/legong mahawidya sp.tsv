@@ -1,4 +1,4 @@
-{INFO notation="legong mahawidya sp" part=full title="Legong Mahawidya SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=8b396ba8-31e7-498a-bbf6-157df393f656 notation="legong mahawidya sp" part=full title="Legong Mahawidya SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	#  https://www.youtube.com/watch?v=gILdibv6Jos
 	{AUTOKEMPYUNG off scope=SCORE}

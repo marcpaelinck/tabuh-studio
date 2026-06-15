@@ -1,4 +1,4 @@
-{INFO notation="puspa mekar" part=full title="Puspa Mekar" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=d12cbd7b-645a-40c3-b9d7-9f0a8b83f48f notation="puspa mekar" part=full title="Puspa Mekar" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{PART kawitan}
 	{DYNAMICS mf positions=[gangsa]}

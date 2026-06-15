@@ -1,4 +1,4 @@
-{INFO notation="sinom ladrang gk" part=full title="Sinom Ladrang GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=b59acf7d-ab8c-400f-8880-951a2a803186 notation="sinom ladrang gk" part=full title="Sinom Ladrang GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{GONGAN gineman}
 	{TEMPO 45}

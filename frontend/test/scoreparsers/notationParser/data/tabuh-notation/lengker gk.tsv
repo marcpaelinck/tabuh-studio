@@ -1,4 +1,4 @@
-{INFO notation="lengker gk" part=full title="Lengker GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=1c573f8a-a2b3-413f-aec6-87cb510fdff9 notation="lengker gk" part=full title="Lengker GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	# see video 2011-07 Ubud Lenker polos
 	{AUTOKEMPYUNG off scope=SCORE}

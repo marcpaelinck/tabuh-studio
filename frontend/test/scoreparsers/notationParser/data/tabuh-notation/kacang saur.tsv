@@ -1,4 +1,4 @@
-{INFO notation="kacang saur" part=full title="Kacang Saur" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=888f36d2-c7cd-48b6-abdc-f4ae956e6297 notation="kacang saur" part=full title="Kacang Saur" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{PART kebyar1}
 	{TEMPO 90}

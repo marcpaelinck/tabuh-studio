@@ -1,4 +1,4 @@
-{INFO notation="sekar gendot sp" part=full title="Sekar Gendot SP" composer="I Wayan Lotring" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=095e53a6-d7a4-4428-ade1-5051ac13d1ac notation="sekar gendot sp" part=full title="Sekar Gendot SP" composer="I Wayan Lotring" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{AUTOKEMPYUNG off scope=SCORE}
 	{PART kawitan}

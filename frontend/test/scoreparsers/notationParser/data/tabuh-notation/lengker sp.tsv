@@ -1,4 +1,4 @@
-{INFO notation="lengker sp" part=full title="Lengker SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=ddd32f26-e0f2-4ebf-873b-021600775538 notation="lengker sp" part=full title="Lengker SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	## see video 2011-07 Ubud Lenker polos
 	{AUTOKEMPYUNG off scope=SCORE}

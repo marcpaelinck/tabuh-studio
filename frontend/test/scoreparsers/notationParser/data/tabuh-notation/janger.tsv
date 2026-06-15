@@ -1,4 +1,4 @@
-{INFO notation=janger part=full title=Janger instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=41861d08-ec04-4858-ab90-aebac6ed8e3d notation=janger part=full title=Janger instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{AUTOKEMPYUNG off scope=SCORE}
 	{GONGAN gineman}

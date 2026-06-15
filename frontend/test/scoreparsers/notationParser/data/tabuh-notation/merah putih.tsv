@@ -1,4 +1,4 @@
-{INFO notation="merah putih" part=full title="Merah Putih" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=22520bbe-405b-42fd-942d-2b2080a23bf8 notation="merah putih" part=full title="Merah Putih" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 60}
 	{DYNAMICS mp position=gangsa}

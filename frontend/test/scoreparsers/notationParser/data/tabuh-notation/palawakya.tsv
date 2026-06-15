@@ -1,4 +1,4 @@
-{INFO notation=palawakya part=full title=Palawakya instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=f73b8e8e-1338-446e-a7f8-03371905a987 notation=palawakya part=full title=Palawakya instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 80}
 	{PART pepeson}

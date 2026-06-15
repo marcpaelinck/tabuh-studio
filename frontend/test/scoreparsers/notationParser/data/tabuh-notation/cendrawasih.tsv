@@ -1,4 +1,4 @@
-{INFO notation=cendrawasih part=full title=Cendrawasih instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=7b707053-e641-4011-a803-21683e2ce28c notation=cendrawasih part=full title=Cendrawasih instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 #	Composer: I Gede Manik
 	{GONGAN gineman}

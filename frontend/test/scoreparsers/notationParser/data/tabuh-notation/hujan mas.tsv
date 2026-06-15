@@ -1,4 +1,4 @@
-{INFO notation="hujan mas" part=full title="Hujan Mas" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=cfb5599b-2f6c-43bf-a850-fbc1334084c2 notation="hujan mas" part=full title="Hujan Mas" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{PART 1}
 	{TEMPO 130}

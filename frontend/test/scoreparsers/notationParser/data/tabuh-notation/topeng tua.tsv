@@ -1,4 +1,4 @@
-{INFO notation="topeng tua" part=full title="Topeng Tua" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=be6a13cf-7979-4084-9e63-49008470948f notation="topeng tua" part=full title="Topeng Tua" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 90->60 beats=1->6}
 	{TEMPO 95->110 beats=13->16}

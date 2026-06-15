@@ -1,4 +1,4 @@
-{INFO notation="bapang selisir gk" part=full title="Bapang Selisir GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=f7feb19a-386c-4966-bcc8-17d4d7dea86b notation="bapang selisir gk" part=full title="Bapang Selisir GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 100}
 	{KEMPLI off}

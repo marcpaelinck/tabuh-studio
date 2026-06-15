@@ -1,4 +1,4 @@
-{INFO notation="godek miring gk" part=full title="Godek Miring GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=a2dfb9f4-e763-4f81-bbe3-2e01a98f8dfc notation="godek miring gk" part=full title="Godek Miring GK" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 
 	{GONGAN gineman}

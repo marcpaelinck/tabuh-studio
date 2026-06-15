@@ -1,4 +1,4 @@
-{INFO notation="sinom ladrang sp" part=full title="Sinom Ladrang SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=d4cce960-6a1a-4082-8196-9479f0620466 notation="sinom ladrang sp" part=full title="Sinom Ladrang SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{AUTOKEMPYUNG off scope=SCORE}
 	{GONGAN gineman}

@@ -1,4 +1,4 @@
-{INFO notation="gilak penutup wassenaar" part=full title="Gilak Penutup Wassenaar" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=a692316d-172c-487d-9240-30a7b7192a59 notation="gilak penutup wassenaar" part=full title="Gilak Penutup Wassenaar" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 100}
 	{DYNAMICS mf positions=[gangsa,reyong]}

@@ -1,4 +1,4 @@
-{INFO notation="gilak penutup" part=full title="Gilak Penutup" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=737c1fb8-59a3-4e92-934f-cfdcacdb11d0 notation="gilak penutup" part=full title="Gilak Penutup" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{TEMPO 80}
 	{DYNAMICS mf positions=[gangsa, ugal]}

@@ -1,4 +1,4 @@
-{INFO notation=kahayangan part=full title="Kahayangan" composer="Bagus Krishna Sutedja" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=46c0a4ee-dfaf-420b-8126-baa1d32e52a9 notation=kahayangan part=full title="Kahayangan" composer="Bagus Krishna Sutedja" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{AUTOKEMPYUNG off scope=SCORE positions=gangsa}
 	{TEMPO 70}

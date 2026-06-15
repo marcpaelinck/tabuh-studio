@@ -1,4 +1,4 @@
-{INFO notation="bapang selisir sp" part=full title="Bapang Selisir SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=404a25bb-428e-441a-93bc-839df8349676 notation="bapang selisir sp" part=full title="Bapang Selisir SP" instrumentgroup=SEMAR_PAGULINGAN font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	# Bapang Selisir for semar pagulingan
 	{TEMPO 100}

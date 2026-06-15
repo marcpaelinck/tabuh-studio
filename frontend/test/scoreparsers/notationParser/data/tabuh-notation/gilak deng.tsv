@@ -1,4 +1,4 @@
-{INFO notation="gilak deng" part=full title="Gilak Deng" composer="Bagus Krishna Sutedja" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=e1f3520f-80db-45e1-a3c9-3914034512d2 notation="gilak deng" part=full title="Gilak Deng" composer="Bagus Krishna Sutedja" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	##  Composed for the instruments of Nova (small reyong with 7 chimes dang0-dung1)
 	{TEMPO 120}

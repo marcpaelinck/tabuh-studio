@@ -1,4 +1,4 @@
-{INFO notation="rejang dewa" part=full title="Rejang Dewa" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=afc8e419-5ec9-4084-8611-1b215374dfda notation="rejang dewa" part=full title="Rejang Dewa" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{AUTOKEMPYUNG off scope=SCORE}
 	{TEMPO 80}
