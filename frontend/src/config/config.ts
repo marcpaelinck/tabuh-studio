@@ -95,7 +95,7 @@ export const partColorPalette: ColorName[] = [
     'cornsilk',
     'khaki'
 ]
-export const noCursor: EditorCursor = { sysUuid: '', beat: -1 } // 'null' value for the playback cursor of the editor
+export const noCursor: EditorCursor = { sysUuid: '', beatSlice: { start: 0, end: 0 }, lastColumn: 0 } // 'null' value for the playback cursor of the editor
 
 // PLAYER
 

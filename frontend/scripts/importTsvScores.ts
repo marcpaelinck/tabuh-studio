@@ -14,30 +14,67 @@
  * Run from the frontend/ directory:
  *
  *   node --experimental-transform-types --loader ./scripts/ts_loader.mjs \
- *        ./scripts/importTsvScores.ts <file|db> [folder]
+ *        ./scripts/importTsvScores.ts <file|db> [folder] [--target=<name>]
  *
  * Examples:
  *   # Write .json files next to the .tsv files (default folder):
  *   node ... ./scripts/importTsvScores.ts file
  *
- *   # Save/update scores in the database:
- *   TABUH_EMAIL=you@example.com TABUH_PASSWORD=secret \
- *   node ... ./scripts/importTsvScores.ts db ./test/scoreparsers/notationParser/data/tabuh-notation
+ *   # Save/update scores in the local DB (loads scripts/.env.local):
+ *   node ... ./scripts/importTsvScores.ts db --target=local
  *
- * Environment variables (DB mode only):
+ *   # Save/update scores in the remote DB (loads scripts/.env.remote):
+ *   node ... ./scripts/importTsvScores.ts db --target=remote
+ *
+ * Connection settings (DB mode) come from scripts/.env.<target> — see
+ * scripts/.env.example. Any variable already set in the shell takes precedence,
+ * so you can also override ad hoc. Recognised variables:
  *   TABUH_API_BASE   API base URL        (default http://localhost:3001/api)
  *   TABUH_EMAIL      editor/admin email  (required)
  *   TABUH_PASSWORD   password            (required)
+ *
+ * The target defaults to the TABUH_TARGET env var, or 'local'.
  */
 
-import { readdirSync, readFileSync, writeFileSync } from 'fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import _ from 'lodash'
-import { basename, extname, join } from 'path'
+import { basename, dirname, extname, join } from 'path'
+import { fileURLToPath } from 'url'
 import { positionOrder, scoreKeyOrder, systemKeyOrder } from '../src/config/config.ts'
 import { parseNotation } from '../src/scoreparsers/tabuhParser.ts'
 import type { Score, System } from '../src/typing/score.ts'
 
+const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_FOLDER = './test/scoreparsers/notationParser/data/tabuh-notation'
+
+// ---------------------------------------------------------------------------
+// Environment files — scripts/.env.<target>
+// ---------------------------------------------------------------------------
+
+/**
+ * Loads KEY=VALUE pairs from an env file into process.env. Existing environment
+ * variables are NOT overwritten, so a value set in the shell always wins. Simple
+ * parser (no interpolation); surrounding single/double quotes are stripped.
+ */
+function loadEnvFile(path: string): boolean {
+    if (!existsSync(path)) return false
+    for (const rawLine of readFileSync(path, 'utf-8').split(/\r?\n/)) {
+        const line = rawLine.trim()
+        if (!line || line.startsWith('#')) continue
+        const eq = line.indexOf('=')
+        if (eq === -1) continue
+        const key = line.slice(0, eq).trim()
+        let value = line.slice(eq + 1).trim()
+        if (
+            (value.startsWith('"') && value.endsWith('"')) ||
+            (value.startsWith("'") && value.endsWith("'"))
+        ) {
+            value = value.slice(1, -1)
+        }
+        if (!(key in process.env)) process.env[key] = value
+    }
+    return true
+}
 
 // ---------------------------------------------------------------------------
 // Post-processing — produce a clean, storable Score
@@ -191,17 +228,27 @@ class Api {
     }
 }
 
-async function saveToDatabase(scores: { file: string; score: Score }[]): Promise<{ ok: number; failed: number }> {
+async function saveToDatabase(
+    scores: { file: string; score: Score }[],
+    target: string
+): Promise<{ ok: number; failed: number }> {
+    // Load connection settings for the chosen target (shell env still wins).
+    const envFile = join(SCRIPT_DIR, `.env.${target}`)
+    if (loadEnvFile(envFile)) console.log(`Using connection settings from ${envFile}`)
+    else console.log(`No ${envFile} found; using existing environment variables.`)
+
     const base = process.env.TABUH_API_BASE ?? 'http://localhost:3001/api'
     const email = process.env.TABUH_EMAIL
     const password = process.env.TABUH_PASSWORD
     if (!email || !password) {
-        console.error('DB mode requires TABUH_EMAIL and TABUH_PASSWORD environment variables.')
+        console.error(
+            `DB mode requires TABUH_EMAIL and TABUH_PASSWORD (set them in ${envFile} or in the shell environment).`
+        )
         process.exit(1)
     }
 
     const api = new Api(base)
-    console.log(`Logging in to ${base} as ${email} …`)
+    console.log(`Target '${target}': logging in to ${base} as ${email} …`)
     await api.login(email, password)
     const existing = await api.listUuids()
 
@@ -230,13 +277,18 @@ async function saveToDatabase(scores: { file: string; score: Score }[]): Promise
 // ---------------------------------------------------------------------------
 
 async function main() {
-    const destination = process.argv[2]
-    const folder = process.argv[3] ?? DEFAULT_FOLDER
+    const args = process.argv.slice(2)
+    const flags = args.filter((a) => a.startsWith('--'))
+    const positionals = args.filter((a) => !a.startsWith('--'))
+
+    const destination = positionals[0]
+    const folder = positionals[1] ?? DEFAULT_FOLDER
+    const target = flags.find((f) => f.startsWith('--target='))?.split('=')[1] ?? process.env.TABUH_TARGET ?? 'local'
 
     if (destination !== 'file' && destination !== 'db') {
         console.error(
             'Usage: node --experimental-transform-types --loader ./scripts/ts_loader.mjs ' +
-                './scripts/importTsvScores.ts <file|db> [folder]'
+                './scripts/importTsvScores.ts <file|db> [folder] [--target=<name>]'
         )
         process.exit(1)
     }
@@ -284,8 +336,8 @@ async function main() {
         console.log(`\nfile mode: ${ok} written, ${parseFailed} failed to parse`)
         process.exit(parseFailed > 0 ? 1 : 0)
     } else {
-        const { ok, failed } = await saveToDatabase(parsed)
-        console.log(`\ndb mode: ${ok} saved, ${failed} failed to save, ${parseFailed} failed to parse`)
+        const { ok, failed } = await saveToDatabase(parsed, target)
+        console.log(`\ndb mode (${target}): ${ok} saved, ${failed} failed to save, ${parseFailed} failed to parse`)
         process.exit(failed > 0 || parseFailed > 0 ? 1 : 0)
     }
 }

@@ -11,6 +11,10 @@ dist
 dist-ssr
 *.local
 
+# Per-target connection settings for scripts (contain credentials)
+scripts/.env.*
+!scripts/.env.example
+
 # Editor directories and files
 src/nocommit/*
 .vscode/*

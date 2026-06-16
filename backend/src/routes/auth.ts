@@ -8,7 +8,7 @@ import { validate } from '../middleware/validate'
 
 const router = Router()
 
-const loginSchema = z.object({ email: z.string().email(), password: z.string().min(8) })
+const loginSchema = z.object({ email: z.email(), password: z.string().min(8) })
 
 router.post('/login', validate(loginSchema), async (req: Request, res: Response) => {
     const { email, password } = req.body

@@ -6,11 +6,13 @@
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
-        "wpbuild": "copy .\\buildfiles\\prod\\index-wordpress.css .\\src\\index.css /y & tsc -b && vite build && copy .\\dist\\assets\\*.* ..\\..\\WordPressProjects\\tabuh-studio-wp\\wp-content\\plugins\\tabuh-studio\\assets /y ",
         "lint": "eslint .",
         "preview": "vite preview",
         "test": "node .\\src\\scoreparsers\\grammars\\tabuh\\test.ts",
-        "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts"
+        "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts",
+        "import:scores:file": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts file",
+        "import:scores:local": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=local",
+        "import:scores:remote": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=remote"
     },
     "dependencies": {
         "@tabuhstudio/shared": "file:../shared",
