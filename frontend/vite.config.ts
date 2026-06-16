@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => {
         base: '',
         server: { proxy: { '/api': { target: 'http://localhost:3001', changeOrigin: true } } },
         build: {
+            // The bundle is dominated by rsuite/tone/react; the >500 kB chunk-size
+            // warning is expected here and not a problem. Raise the threshold to silence it.
+            chunkSizeWarningLimit: 1500,
             rollupOptions: {
                 output: {
                     entryFileNames: `assets/[name].js`,
