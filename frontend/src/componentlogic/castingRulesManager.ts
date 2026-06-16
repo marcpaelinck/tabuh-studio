@@ -63,11 +63,11 @@ const castingRules: CastingRuleSet = {
 
 // POKOK RULES - the pokok instruments play a selection of the full notation.
 // Keep only the first note of a measure. Other notes will be translated to dashes (extension).
-const onlyFirstNote: Partial<Position>[] = ['JEGOGAN', 'CALUNG']
+// const onlyFirstNote: Partial<Position>[] = ['JEGOGAN', 'CALUNG']
 // Keep only the odd numbered notes (1st, 3rd, etc.) of a measure. Other notes will be translated to dashes (extension).
-const onlyOddNotes: Partial<Position>[] = ['PENYACAH']
+// const onlyOddNotes: Partial<Position>[] = ['PENYACAH']
 // Only prcess even numbered measures
-const onlyOddMeasures: Partial<Position>[] = ['JEGOGAN']
+// const onlyOddMeasures: Partial<Position>[] = ['JEGOGAN']
 // Staves with these position groups should not be converted to kempyung.
 // Rationale: the groups contain similar positions so the notation should be interpreted as-is.
 const nokempyung: Partial<Position>[][] = [

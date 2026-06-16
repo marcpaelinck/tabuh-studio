@@ -1,8 +1,9 @@
 import _ from 'lodash'
 import type { UUID } from '../typing/basetypes'
+import type { FlowStep } from '../typing/execution'
 import type { Score, System, ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'
-import { executionManager, type FlowStep } from './playback/executionManager'
+import { executionManager } from './playback/executionManager'
 
 // CYCLE DETECTION
 
