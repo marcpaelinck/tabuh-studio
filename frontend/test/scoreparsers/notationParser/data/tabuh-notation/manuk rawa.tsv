@@ -1,4 +1,4 @@
-{INFO notation="manuk rawa" part=full title="Manuk Rawa" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+{INFO uuid=f0afa80d-7958-4630-86f0-fe92d3739a0e notation="manuk rawa" part=full title="Manuk Rawa" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
 	{DYNAMICS f positions=[ugal,gangsa,reyong,calung]}
 	{GONGAN kebyar}
