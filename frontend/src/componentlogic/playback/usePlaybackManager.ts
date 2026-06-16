@@ -156,7 +156,8 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         {
                             key: `${position}-${system.index}`,
                             id: `${position}-${system.index}`,
-                            className: 'appearance-none p-[0px] m-0 text-sm/6 balifont'
+                            className:
+                                'appearance-none p-[0px] m-0 text-sm/6 balifont wrap-break-word break-all whitespace-normal'
                         },
                         line
                     )

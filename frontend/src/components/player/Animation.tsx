@@ -1,7 +1,7 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
-import { Grid, HStack, Loader, Row, SelectPicker, Slider, Toggle } from 'rsuite'
+import { Grid, Loader, Row, SelectPicker, Slider, Stack, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
@@ -141,10 +141,10 @@ export function Animation({
     }, [playbackSettings.selectedFocusOption, svgSizeStyle])
 
     return playbackSettings.selectedFocusOption.objValue.length > 0 ? (
-        <div className="m-6 w-full">
+        <div className="m-6 w-full min-w-0">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
-                    <HStack>
+                    <Stack direction={{ xs: 'column', sm: 'row' }}>
                         <Toggle
                             id="notation toggle"
                             label="notation"
@@ -173,7 +173,7 @@ export function Animation({
                                 />
                             )
                         }
-                    </HStack>
+                    </Stack>
                 </Row>
                 <Row id="notation-area-row" className="p-2">
                     <NotationArea
