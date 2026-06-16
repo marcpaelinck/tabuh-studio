@@ -141,7 +141,7 @@ export function Animation({
     }, [playbackSettings.selectedFocusOption, svgSizeStyle])
 
     return playbackSettings.selectedFocusOption.objValue.length > 0 ? (
-        <div className="m-6 w-full min-w-0">
+        <div className="m-0 md:m-6 w-full min-w-0">
             <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1">
                     <Stack direction={{ xs: 'column', sm: 'row' }}>
