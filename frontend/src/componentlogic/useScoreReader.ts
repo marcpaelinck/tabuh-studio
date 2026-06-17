@@ -1,4 +1,4 @@
-import { NoteObject } from '@tabuhstudio/shared'
+import { NoteObject, type Position } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -31,7 +31,7 @@ function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
     for (const system of score.systems) {
         _.entries(system.staffs).forEach(([_pos, staff]) => {
-            staff.objNotation = NoteObject.fromNotation(staff.notation)
+            staff.objNotation = NoteObject.fromNotation(staff.notation, _pos as Position)
         })
     }
     return score
