@@ -139,9 +139,9 @@ gangsa_s	--o-	--e-	u-ee	.u,.i	.a,.o
 
 	{LABEL LOOP8}
 	{VALIDATION ignore=beat-duration}
-ugal	e	u	e	u	e/...			a,
-gangsa_p	e.oe	.eo.	e.oe	.eo.	e.o.	..a,.	a,.i	a,a,.a,	.a,.i
-gangsa_s	.ua.	u.au	.ua.	u.au	e.a.	..e.	eo.	ee.e	.eo.
+ugal	e	u	e	u	e/			a,
+gangsa_p	e.oe	.eo.	e.oe	.eo.	e.o.	.a,.	a,.i	a,a,.a,	.a,.i
+gangsa_s	.ua.	u.au	.ua.	u.au	e.a.	.e.	eo.	ee.e	.eo.
 penyacah	e	u	e	u	e/			a,
 calung	e		e		e			a
 jegogan	e		e		e			a
