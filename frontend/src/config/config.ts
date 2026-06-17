@@ -1,3 +1,4 @@
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/noteChars'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { MutingType, Position, ToneType } from '../typing/basetypes'
 import type { DynamicsValue } from '../typing/execution'
@@ -310,8 +311,8 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         volume: -15,
         svg_file: '',
         sampletemplate: 'GK_KEMPLI_{note}.mp3',
-        symbolToNoteNames: { 'x?': ['X_MUTED'] },
-        validStrokes: ['x?;', 'x?:'],
+        symbolToNoteNames: { 'x': ['X_MUTED'] },
+        validStrokes: [KEMPLI_BEAT_CHAR + ';', KEMPLI_BEAT_CHAR + ':'],
         modifiers: {before: [], after:[';', ':']}
     },
     CENGCENG: {

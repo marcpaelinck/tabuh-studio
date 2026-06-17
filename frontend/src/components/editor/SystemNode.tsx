@@ -1,4 +1,5 @@
 import { NoteObject } from '@tabuhstudio/shared'
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import {
     memo,
@@ -107,7 +108,8 @@ export const SystemNode = memo(function SystemNode({
                     const objNotation: NoteObject[] = systemData.staffs['KEMPLI']?.objNotation || []
                     // Determine the positions of the kempli characters
                     const indices = objNotation.reduce(
-                        (aggr: number[], note, idx) => (note.canonicalSymbol == 'x?' ? aggr.concat([idx]) : aggr),
+                        (aggr: number[], note, idx) =>
+                            note.canonicalSymbol == KEMPLI_BEAT_CHAR ? aggr.concat([idx]) : aggr,
                         []
                     )
                     if (indices.length == 0) return ''

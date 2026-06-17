@@ -1,3 +1,4 @@
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/noteChars'
 import type { Position } from '../../../typing/basetypes'
 
 // Instrument tag conversion (tag -> )
@@ -49,7 +50,7 @@ export const symbolLookup: Record<Position, Record<string, string>> = {
     CALUNG: { I: 'i', O: 'o', E: 'e', U: 'u', A: 'a' },
     JEGOGAN: { I: 'i', O: 'o', E: 'e', U: 'u', A: 'a' },
     GONGS: { G: 'G', L: 'G', P: 'P', T: 'T' },
-    KEMPLI: { x: 'x?' },
+    KEMPLI: { x: KEMPLI_BEAT_CHAR },
     CENGCENG: { x: 'x', c: 'x?' },
     KENDANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(' },
     KENDANG_WADON: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(' },

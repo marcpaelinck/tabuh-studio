@@ -38,6 +38,8 @@ export const PITCH_CHARS: ReadonlySet<string> = new Set([
     ...SILENCE_MUTING_CHARS
 ])
 
+export const KEMPLI_BEAT_CHAR = 'x'
+
 /**
  * Characters that do not produce sound during playback.
  *

@@ -9,7 +9,7 @@
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
 import { NoteObject } from '@tabuhstudio/shared'
-import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
+import { KEMPLI_BEAT_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -529,7 +529,7 @@ export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggu
                         measureIdx: currentStep!.beatIdx,
                         position: 'KEMPLI',
                         prevnote: undefined,
-                        note: new NoteObject('x?', 'KEMPLI'),
+                        note: new NoteObject(KEMPLI_BEAT_CHAR, 'KEMPLI'),
                         nextnote: undefined,
                         // The tempo is not precise but irrelevant for single notes
                         bpm: currentStep.tempo[0],
