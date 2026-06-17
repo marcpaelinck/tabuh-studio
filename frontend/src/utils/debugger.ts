@@ -14,7 +14,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     ExecutionForm: false,
     ExecutionItemForm: false,
     executionManager: false,
-    MainWindow: true,
+    MainWindow: false,
     MainMenu: false,
     MeasureNode: false,
     NavigationCell: false,
