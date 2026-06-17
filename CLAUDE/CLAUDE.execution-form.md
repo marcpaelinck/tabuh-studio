@@ -30,4 +30,4 @@ Files `/CLAUDE/Execution-form-x.png` (x = 1, 2, 3) contain snapshots of the form
 | `src/typing/execution.ts` | The type definitions of the execution item types. |
 | `src/typing/score.ts` | The definition of the `System` type, which has the attribute `execution` containing the execution items. |
 | `src/components/editor/ExecutionForm.tsx` | Generates the `ExecutionForm` | 
-| `src/components/editor/ExecutionItemForm.tsx` | Generates the `ExecutionForm` | 
+| `src/components/editor/ExecutionItemForm.tsx` | Generates the `ExecutionItemForm` | 
