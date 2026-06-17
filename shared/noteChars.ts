@@ -27,9 +27,9 @@ export const NONMELODIC_PITCH_CHARS = ['t', 'b', 'x', 'y', 'G', 'P', 'T', '(', '
 export const EXTENDING_CHAR = '-'
 export const SPACE_CHAR = ' '
 export const SILENCE_EXTENDING_CHARS = new Set([EXTENDING_CHAR, SPACE_CHAR])
-export const MUTING_PITCH_CHAR = '.'
+export const MUTING_CHAR = '.'
 export const ERROR_PITCH_CHAR = '!' // `incorrect symbol` value.
-export const SILENCE_MUTING_CHARS = new Set([MUTING_PITCH_CHAR])
+export const SILENCE_MUTING_CHARS = new Set([MUTING_CHAR])
 
 export const PITCH_CHARS: ReadonlySet<string> = new Set([
     ...MELODIC_PITCH_CHARS,
