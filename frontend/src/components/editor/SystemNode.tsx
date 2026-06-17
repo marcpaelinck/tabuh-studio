@@ -114,7 +114,9 @@ export const SystemNode = memo(function SystemNode({
                     )
                     if (indices.length == 0) return ''
                     // Generate the gradient functions
-                    const gradients = indices
+                    // Fill transparent color until the first
+                    var gradients = indices[0] != 0 ? `transparent 0 calc(${indices[0]}ch), ` : ''
+                    gradients += indices
                         .map((index, idx, arr) => {
                             const transpEnd = idx < arr.length - 1 ? `calc(${arr[idx + 1]}ch)` : '100%'
                             const css =

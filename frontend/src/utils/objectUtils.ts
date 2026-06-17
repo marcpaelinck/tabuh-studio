@@ -128,7 +128,7 @@ export function getBeatSlices(system: System): BeatSliceInfo[] {
         // KEMPLI_BEAT_CHAR marks the START of each kempli beat.
         const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
         const beatStartIndices = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note.canonicalSymbol === KEMPLI_BEAT_CHAR ? [...pos, idx] : pos),
+            (pos: number[], note, idx) => (note.canonicalSymbol === KEMPLI_BEAT_CHAR || idx == 0 ? [...pos, idx] : pos),
             []
         )
         if (!beatStartIndices.length) beatSliceInfo.push({ start: 0, end: maxColumnCount })

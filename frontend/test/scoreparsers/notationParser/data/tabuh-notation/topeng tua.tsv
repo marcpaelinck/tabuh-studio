@@ -1,15 +1,15 @@
 {INFO uuid=be6a13cf-7979-4084-9e63-49008470948f notation="topeng tua" part=full title="Topeng Tua" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
 
-	{TEMPO 90->60 beats=1->6}
-	{TEMPO 95->110 beats=13->16}
+	{TEMPO 90->60 beats=1}
+	{TEMPO 95->110 beats=8->12}
 	{DYNAMICS f positions=[gangsa,ugal]}
-ugal	i-i-	e-e-	i-i-	e-e-	ioa,i	o-e-	uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	iia-	Io-io	e-o-
-gangsa							uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	
-calung							u	u	i	i	u	i	a
-jegogan							u		i		u		a
-reyong							xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	b---
-gong							G		P				P
-kempli	....	....	....	....	....	....	x...	x...	x...	x...	x...	x...	x...	x...	x...	x...
+ugal	i-i-e-e-i-i-e-e-ioa,io-e-	uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	iia-	Io-io	e-o-
+gangsa	                           	uuuu	uueo	iiii	iioe	uuue	Oiioi	a,---	
+calung	                           	u	u	i	i	u	i	a
+jegogan	                           	u		i		u		a
+reyong	                           	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	b---
+gong	                           	G		P				P
+kempli	                           	x	x	x	x	x	x	x	x	x	x
 	{SEQUENCE [KOTEKAN1, KOTEKAN2_TRANSITION, REGULAR3, REGULAR1, REGULAR2, REGULAR3_FASTER, REGULAR1, REGULAR2, REGULAR3,
 	REGULAR1, REGULAR2_TRANSITION, KOTEKAN3, KOTEKAN1, KOTEKAN2, KOTEKAN3_TRANSITION, REGULAR1, REGULAR2, REGULAR3, REGULAR1_FASTER, REGULAR2,
 	REGULAR3, REGULAR1, REGULAR2, REGULAR3_TRANSITION, KOTEKAN1, KOTEKAN2, KOTEKAN3_END]}
