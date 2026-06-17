@@ -5,7 +5,7 @@
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
 import { NoteObject } from '@tabuhstudio/shared'
-import { EXTENDING_CHAR, MUTING_PITCH_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
+import { EXTENDING_CHAR, MUTING_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
 import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
@@ -184,12 +184,12 @@ function openNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample) {
+    if (args.note.hasSample()) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {
         // Emulate using note without modifier
-        debug(`emulating damped note for ${args.position}`)
+        debug(`emulating damped note ${args.note.canonicalSymbol} for ${args.position}`)
         const note = new NoteObject(symbol.pitch + symbol.octave, args.note.position)
         return [
             newAction({ args: args, note, duration: strokes.damped.duration }),
@@ -206,12 +206,12 @@ function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample) {
+    if (args.note.hasSample()) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {
         // Emulate using note without modifier
-        debug(`emulating muted note for ${args.position}`)
+        debug(`emulating muted note ${args.note.canonicalSymbol} for ${args.position}`)
         const note = new NoteObject(symbol.pitch + symbol.octave, args.note.position)
         return [
             newAction({ args: args, note, duration: strokes.muted.duration }),
@@ -257,7 +257,7 @@ function silenceAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
             params: {
                 duration: n2TO(1),
                 position: args.position,
-                note: new NoteObject(MUTING_PITCH_CHAR, args.position),
+                note: new NoteObject(MUTING_CHAR, args.position),
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast,

@@ -6,7 +6,6 @@ import { positionConfigs } from '../frontend/src/config/config.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from './noteChars'
 
 import { noteRange } from '../frontend/src/utils/alphabet.ts'
-import { debug } from '../frontend/src/utils/debugger.ts'
 import type {
     GracenoteChar,
     OctaveChar,
@@ -23,7 +22,6 @@ import {
     PATTERN_MODIFIER_MAP,
     PATTERN_MODIFIERS,
     PITCH_CHARS,
-    SILENCE_CHARS,
     STROKE_MODIFIER_MAP,
     STROKE_MODIFIERS
 } from './noteChars.ts'
@@ -194,7 +192,6 @@ export class NoteObject {
     readonly isBound: boolean
     readonly isExtensionSilence: boolean
     readonly isMutingSilence: boolean
-    readonly hasSample: boolean
 
     /** Octave as a number: `0` (lower), `1` (middle), `2` (upper). */
     readonly octaveNumber: -1 | 0 | 1
@@ -216,7 +213,6 @@ export class NoteObject {
         this.isBound = position !== undefined
         this.isExtensionSilence = false
         this.isMutingSilence = false
-        this.hasSample = false
         this.octaveNumber = 0
 
         // Attempt structural parsing regardless of any supplied fault, so that
@@ -278,12 +274,6 @@ export class NoteObject {
 
             this.isExtensionSilence = SILENCE_EXTENDING_CHARS.has(this.symbol.pitch)
             this.isMutingSilence = SILENCE_MUTING_CHARS.has(this.symbol.pitch)
-            if (this.position) {
-                const symbol = this.symbol.pitch + this.symbol.octave + this.symbol.modifier
-                this.hasSample = symbol in positionConfigs[this.position].symbolToNoteNames
-                if (!this.hasSample && !SILENCE_CHARS.has(symbol))
-                    debug(`Sample not found for '${symbol}' on ${this.position}`)
-            }
 
             Object.freeze(this)
         }
@@ -369,6 +359,10 @@ export class NoteObject {
 
     static isMelodic(pitch: PitchChar) {
         return pitch.length > 0 && MELODIC_PITCH_CHARS.has(pitch)
+    }
+
+    hasSample() {
+        return this.position ? this.canonicalSymbol in positionConfigs[this.position].symbolToNoteNames : undefined
     }
 
     // Returns a new NoteObject where the grace note is resolved to the correct octave
