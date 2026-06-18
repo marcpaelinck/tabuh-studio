@@ -33,9 +33,6 @@ export default defineConfig(({ mode }) => {
         }
     }
     if (mode == 'production') {
-        //     // This tells Vite that wpApiSettings is a global variable
-        //     // It will be set by the tabuh-studio WordPress plugin
-        config['define'] = { wpApiSettings: 'wpApiSettings' }
         config.build.sourcemap = false
     }
     return config
