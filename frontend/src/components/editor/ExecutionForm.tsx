@@ -4,72 +4,36 @@ import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { dynamicsToNumber } from '../../config/config'
-import type {
-    DynamicsItem,
-    ExecutionItem,
-    ExecutionItemType,
-    GotoItem,
-    KempliValue,
-    LoopItem,
-    TempoItem
-} from '../../typing/execution'
+import type { ExecutionItem, LoopItem } from '../../typing/execution'
 import type { System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { executionItemTooltip } from '../../utils/executionItems'
-import ExecutionItemForm, { formModel, type FlowConditionType, type FormValueType } from './ExecutionItemForm'
+import ExecutionItemForm, {
+    executionItemRegistry,
+    executionTypeOptions,
+    formModel,
+    positionOptionsForSystem,
+    type ExecutionItemDraft,
+    type FlowConditionType,
+    type FormValueType
+} from './ExecutionItemForm'
 
-type ExecutionItemDefault = {
-    type?: ExecutionItemType
-    value?: KempliValue | number
-    targetuuid?: string
-    targetname?: string
-    isGradual?: boolean
-    count?: number
-    seconds?: number
-    seqId?: number
-    tooltip?: string
-    tooltipshort?: string
-    toBPM?: number
-    toDynamics?: string
-    toBeat?: number
-}
-
-const defaultItem: Record<ExecutionItemType | 'new', ExecutionItemDefault> = {
-    goto: { type: 'goto', targetuuid: '', targetname: '', tooltip: 'goto', tooltipshort: '' },
-    loop: { type: 'loop', count: undefined, tooltip: 'loop', tooltipshort: '' },
-    wait: { type: 'wait', seconds: 0, tooltip: 'wait', tooltipshort: '' },
-    tempo: {
-        type: 'tempo',
-        isGradual: undefined,
-        toBeat: undefined,
-        toBPM: undefined,
-        tooltip: 'tempo',
-        tooltipshort: ''
-    },
-    dynamics: {
-        type: 'dynamics',
-        isGradual: undefined,
-        toBeat: undefined,
-        toDynamics: undefined,
-        tooltip: 'dynamics',
-        tooltipshort: ''
-    },
-    sequence: { type: 'sequence', tooltip: 'specify type', tooltipshort: '' },
-    suppress: { type: 'suppress', tooltip: 'specify type', tooltipshort: '' },
-    kempli: { type: 'kempli', tooltip: 'specify type', tooltipshort: '' },
-    new: { type: undefined, seqId: 0, tooltip: 'specify type', tooltipshort: '' }
-}
+const newPlaceholder = (seqId: number): ExecutionItemDraft => ({
+    type: undefined,
+    seqId,
+    tooltip: 'specify type',
+    tooltipshort: ''
+})
 
 interface FlowElementListProps {
     label: string
-    itemList: ExecutionItemDefault[]
-    setItemList: Dispatch<ExecutionItemDefault[]>
+    itemList: ExecutionItemDraft[]
+    setItemList: Dispatch<ExecutionItemDraft[]>
     selectedElement: number | undefined
     setSelectedElement: Dispatch<number | undefined>
 }
 
-// Editable list of execution items (goto, loop, tempo and dynamics)
+// Editable list of execution items.
 const FlowElementList = ({
     label,
     itemList,
@@ -82,10 +46,8 @@ const FlowElementList = ({
         if (itemList && itemList.length > 0) setSelectedElement(0)
     }, [])
 
-    async function handleAdd() {
-        const newItem: ExecutionItemDefault = { ...defaultItem['new'] }
-        newItem.seqId = itemList.length
-        const newItemList = [...itemList, newItem]
+    function handleAdd() {
+        const newItemList = [...itemList, newPlaceholder(itemList.length)]
         setItemList(newItemList)
         setSelectedElement(itemList.length)
     }
@@ -98,13 +60,10 @@ const FlowElementList = ({
         setSelectedElement(undefined)
     }
 
-    const typeOptions: { label: string; value: ExecutionItemType }[] = [
-        { label: 'go to', value: 'goto' },
-        { label: 'loop', value: 'loop' },
-        { label: 'wait', value: 'wait' },
-        { label: 'tempo', value: 'tempo' },
-        { label: 'dynamics', value: 'dynamics' }
-    ]
+    function cutoff(strValue: string, maxLength: number) {
+        return strValue.length <= maxLength ? strValue : strValue.slice(0, maxLength) + '...'
+    }
+
     return (
         <>
             <div>{label}</div>
@@ -120,21 +79,20 @@ const FlowElementList = ({
                                     'h-9 pt-0 pb-0 items-center flex ' +
                                     (idx == selectedElement ? 'font-bold bg-amber-100' : '')
                                 }>
-                                <div
-                                    onClick={(e) => {
-                                        setSelectedElement(idx)
-                                    }}>
-                                    {val.type && val.tooltip}
+                                <div onClick={() => setSelectedElement(idx)}>
+                                    {val.type && cutoff(val.tooltip, 45)}
                                     {!val.type && (
                                         <SelectPicker
-                                            data={typeOptions}
+                                            data={executionTypeOptions}
                                             searchable={false}
                                             w={224}
                                             placeholder="Select a type"
                                             onChange={(value) => {
                                                 if (value) {
+                                                    const created = executionItemRegistry[value].createDefault()
+                                                    created.seqId = idx
                                                     const newList = [...itemList]
-                                                    newList.splice(idx, 1, defaultItem[value])
+                                                    newList.splice(idx, 1, created)
                                                     setItemList(newList)
                                                 }
                                             }}
@@ -160,113 +118,64 @@ interface ExecutionFormProps extends FormProps {
     onSave: () => void
 }
 
-// Main form Component
-// The form consists of a list of flow items and several input fields. The field values corresponds
-// with the properties of the selected list item.
-export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, onSave, ...props }: ExecutionFormProps) {
-    const [itemList, setItemList] = useState<ExecutionItemDefault[]>(systemData.execution || [])
+// Main form component: a list of execution items plus a detail form whose fields
+// reflect the selected item. Both halves are driven by the descriptor registry.
+export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, onSave }: ExecutionFormProps) {
+    const [itemList, setItemList] = useState<ExecutionItemDraft[]>(systemData.execution || [])
     const [selectedListElement, setSelectedListElement] = useState<number | undefined>(undefined)
-    const [formValue, setFormValue] = useState<FormValueType>({} as FormValueType)
+    const [formValue, setFormValue] = useState<FormValueType>({ type: '', conditions: [] })
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
-    const [loop, setLoop] = useState<number | undefined>(undefined) // loop value if a loop item occurs in the itemList
+    const [loop, setLoop] = useState<number | undefined>(undefined) // loop count if a loop item exists
 
-    const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label]))
+    const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label as string]))
+    const positionOptions = positionOptionsForSystem(systemData.staffs)
 
     useEffect(() => debug(`ITEMLIST=${JSON.stringify(itemList)}`), [itemList])
-    useEffect(() => debug(`ExecutionForm is ${open ? 'open' : 'closed'}`), [open])
 
-    // Set the loop state value
+    // Track the loop count so the condition form can offer per-iteration scoping.
     useEffect(() => {
-        const loopElement = itemList.find((el) => el.type == 'loop')
-        if (loopElement) {
-            setLoop(loopElement.count)
-        } else {
-            setLoop(undefined)
-        }
+        const loopElement = itemList.find((el) => el.type == 'loop') as LoopItem | undefined
+        setLoop(loopElement ? loopElement.count : undefined)
     }, [itemList])
 
-    // Populates the forms fields with the values of the selected item
+    // Populate the form fields from the selected item (delegated to its descriptor).
     function updateFieldsFromSelected() {
         if (selectedListElement == undefined) return
-        const selectedItem = itemList[selectedListElement] as ExecutionItem
-        var conditions: FlowConditionType[] = []
-        if (selectedItem.nthpass != undefined) conditions.push(selectedItem.nthpass ? 'nthpass' : 'pass')
-        if ('iterations' in selectedItem && selectedItem.iterations != undefined) {
-            conditions.push('iteration')
+        const selected = itemList[selectedListElement]
+        if (!selected.type) {
+            setFormValue({ type: '', conditions: [] })
+            return
         }
-        // if (conditions.length == 0) conditions = undefined
-        var newFormValue: FormValueType = { ...selectedItem, conditions: conditions, passes: selectedItem.passes }
-        debug(`UPDATE FIELDS=${JSON.stringify(newFormValue)}`)
-        if (selectedItem.type == 'goto') newFormValue.targetuuid = selectedItem.targetuuid || ''
-        if (selectedItem.type == 'loop') newFormValue.count = selectedItem.count
-        if (selectedItem.type == 'wait') newFormValue.count = selectedItem.seconds
-        if (selectedItem.type == 'tempo') {
-            newFormValue.fromBPM = selectedItem.fromValue
-            newFormValue.toBPM = selectedItem.value
-            newFormValue.isGradual = selectedItem.isGradual
-            newFormValue.fromBeat = selectedItem.fromBeat
-            newFormValue.toBeat = selectedItem.toBeat
-        }
-        if (selectedItem.type == 'dynamics') {
-            newFormValue.fromDynamics = selectedItem.fromDynamics
-            newFormValue.toDynamics = selectedItem.dynamics
-            newFormValue.isGradual = selectedItem.isGradual
-            newFormValue.fromBeat = selectedItem.fromBeat
-            newFormValue.toBeat = selectedItem.toBeat
-        }
-        debug(`UPDATE FIELDS2=${JSON.stringify(newFormValue)}`)
-        setFormValue(newFormValue)
+        const item = selected as ExecutionItem
+        const conditions: FlowConditionType[] = []
+        if (item.nthpass != undefined) conditions.push(item.nthpass ? 'nthpass' : 'pass')
+        if ('iterations' in item && item.iterations != undefined) conditions.push('iteration')
+        setFormValue({
+            type: item.type,
+            conditions,
+            passes: item.passes,
+            iterations: 'iterations' in item ? item.iterations : undefined,
+            ...executionItemRegistry[item.type].toForm(item)
+        })
     }
 
-    // Updates the selected list item with the form values
+    // Write the form values back into the selected item (delegated to its descriptor).
     function updateSelectedFromFields() {
-        debug(`ITEMTYPE=${formValue.type}`)
         if (selectedListElement == undefined) return
-        const selectedItem = itemList[selectedListElement] as ExecutionItem
-        var newItem: ExecutionItem = {
-            ...selectedItem,
-            passes: formValue.conditions?.some((val) => ['pass', 'nthpass'].includes(val))
-                ? formValue.passes || []
-                : undefined,
+        const selected = itemList[selectedListElement]
+        if (!selected.type) return
+        const item = selected as ExecutionItem
+        const hasPassCondition = formValue.conditions?.some((v) => ['pass', 'nthpass'].includes(v))
+        const base = {
+            ...item,
+            passes: hasPassCondition ? formValue.passes || [] : undefined,
             nthpass: formValue.conditions?.includes('nthpass')
                 ? true
                 : formValue.conditions?.includes('pass')
                   ? false
                   : undefined
-        }
-        debug(`EDITING`)
-        if (selectedItem.type == 'goto') {
-            newItem = newItem as GotoItem
-            newItem.targetuuid = formValue.targetuuid || ''
-            if (formValue.targetuuid) newItem.targetname = uuidToNameLookup[formValue.targetuuid]
-        }
-        if (selectedItem.type == 'loop') {
-            newItem = newItem as LoopItem
-            if (formValue.count) newItem.count = formValue.count
-        }
-        if (selectedItem.type == 'tempo') {
-            newItem = newItem as TempoItem
-            newItem.fromValue = formValue.fromBPM ? Number(formValue.fromBPM) : undefined
-            newItem.value = Number(formValue.toBPM)
-            newItem.isGradual = formValue.isGradual || false
-            newItem.fromBeat = formValue.fromBeat
-            if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
-            else newItem.iterations = undefined
-            if (formValue.toBeat != undefined) newItem.toBeat = formValue.toBeat
-            debug(`TEMPO=${formValue.toBPM} NewItem=${newItem.value}`)
-        }
-        if (selectedItem.type == 'dynamics') {
-            newItem = newItem as DynamicsItem
-            newItem.fromDynamics = formValue.fromDynamics
-            newItem.fromValue = newItem.fromDynamics ? dynamicsToNumber[newItem.fromDynamics] : undefined
-            if (formValue.toDynamics != undefined) newItem.dynamics = formValue.toDynamics
-            newItem.value = dynamicsToNumber[newItem.dynamics]
-            newItem.isGradual = formValue.isGradual || false
-            newItem.fromBeat = formValue.fromBeat
-            if (formValue.conditions?.includes('iteration')) newItem.iterations = formValue.iterations || []
-            else newItem.iterations = undefined
-            if (formValue.toBeat != undefined) newItem.toBeat = formValue.toBeat
-        }
+        } as ExecutionItem
+        let newItem = executionItemRegistry[item.type].fromForm(formValue, base, { uuidToName: uuidToNameLookup })
         newItem = {
             ...newItem,
             tooltip: executionItemTooltip(newItem, 'long'),
@@ -277,12 +186,12 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         setItemList(newItemList)
     }
 
-    // Populate fields from new selected item
+    // Populate fields when the selection changes.
     useEffect(() => {
         updateFieldsFromSelected()
     }, [selectedListElement])
 
-    // Update item when user modifies a field
+    // Write back when the user edits a (valid) field.
     useEffect(() => {
         if (dirtyForm) {
             setDirtyForm(false)
@@ -290,41 +199,25 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         }
     }, [dirtyForm])
 
-    function validate(itemList: ExecutionItemDefault[]): ExecutionItem[] | undefined {
-        return itemList ? (itemList.filter((item) => item.type != undefined) as ExecutionItem[]) : undefined
-    }
-
-    const handleSave = () => {
-        if (itemList) {
-            const validatedList = validate(itemList)
-            if (validatedList) if (itemList) systemData.execution = validatedList
-        }
+    function handleSave() {
+        const validated = itemList.filter((item) => item.type != undefined) as ExecutionItem[]
+        systemData.execution = validated
         onSave()
         setOpen(false)
     }
 
     return (
-        <Drawer open={open} backdrop="static" onClose={() => setOpen(false)}>
+        <Drawer open={open} backdrop={false} enforceFocus={false} onClose={() => setOpen(false)}>
             <Drawer.Header>
                 <Drawer.Title>{title}</Drawer.Title>
                 <Drawer.Actions>
-                    <Button
-                        onClick={(e) => {
-                            setOpen(false)
-                        }}>
-                        Cancel
-                    </Button>
-                    <Button
-                        onClick={(e) => {
-                            handleSave()
-                        }}
-                        appearance="primary">
+                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={() => handleSave()} appearance="primary">
                         Confirm
                     </Button>
                 </Drawer.Actions>
             </Drawer.Header>
             <Drawer.Body>
-                {/* List of execution items */}
                 <FlowElementList
                     label="Execution instructions"
                     itemList={itemList}
@@ -335,14 +228,11 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
                 <Divider color="#000" size="xs" spacing="lg" />
                 <ExecutionItemForm
                     model={formModel}
-                    // onChange={(val) => {
-                    //     setFormValue(val as FormValueType)
-                    //     setDirtyForm(true)
-                    // }}
                     formValue={formValue}
                     type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
                     selectedElement={selectedListElement}
                     sysOptions={sysOptions}
+                    positionOptions={positionOptions}
                     setDirty={setDirtyForm}
                     setFormValue={setFormValue}
                     loop={loop}

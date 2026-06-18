@@ -10,6 +10,8 @@ import type { NoteSymbol } from '../typing/basetypes'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
+import { debug } from '../utils/debugger'
+import { executionItemTooltip } from '../utils/executionItems'
 import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 
@@ -33,6 +35,11 @@ function postprocessScore(score: Score): Score {
         _.entries(system.staffs).forEach(([_pos, staff]) => {
             staff.objNotation = NoteObject.fromNotation(staff.notation, _pos as Position)
         })
+        for (const item of system.execution ?? []) {
+            item.tooltip = executionItemTooltip(item, 'long')
+            debug(`setting tooltip to '${item.tooltip}'`)
+            item.tooltipshort = executionItemTooltip(item, 'short')
+        }
     }
     return score
 }

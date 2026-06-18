@@ -1,4 +1,6 @@
 import _ from 'lodash'
+import { positionConfigs } from '../config/config'
+import type { Position } from '../typing/basetypes'
 import type { ExecutionItem } from '../typing/execution'
 
 export function executionItemSeqId(item: ExecutionItem) {
@@ -45,6 +47,11 @@ function toOrdinal(val: number): string {
     }
 }
 
+function positionsText(positions: Position[] | undefined): string {
+    if (!positions || positions.length === 0) return 'all positions'
+    return positions.map((p) => positionConfigs[p]?.name ?? p).join(', ')
+}
+
 export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
@@ -72,6 +79,29 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
             shortTooltip = `${item.seconds} sec.`
             instruction = `wait ${fmtFloat(item.seconds)} ${item.seconds > 1 ? 'seconds' : 'second'}`
             preposition = 'after'
+            break
+        }
+        case 'sequence': {
+            const seq = item.labels.join(' → ')
+            shortTooltip =
+                `seq:${item.labels.slice(0, Math.min(3, item.labels.length)).join('→')}` +
+                (item.labels.length > 3 ? '...' : '')
+            instruction = `play sequence ${seq}`
+            preposition = 'after'
+            break
+        }
+        case 'suppress': {
+            const beatsText = item.beats && item.beats.length ? ` on beat ${toText(item.beats)}` : ''
+            shortTooltip = `suppress ${positionsText(item.positions)}`
+            instruction = `suppress ${positionsText(item.positions)}${beatsText}`
+            preposition = 'on'
+            break
+        }
+        case 'kempli': {
+            const beatsText = item.beats && item.beats.length ? ` on beat ${toText(item.beats)}` : ''
+            shortTooltip = `kempli ${item.value}`
+            instruction = `kempli ${item.value}${beatsText}`
+            preposition = 'on'
             break
         }
         case 'tempo':

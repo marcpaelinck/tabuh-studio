@@ -1,52 +1,100 @@
 import _ from 'lodash'
-import { useRef, useState, type Dispatch, type ElementType, type SyntheticEvent } from 'react'
-import type { CheckPickerProps, FormControlProps, FormGroupProps, InputPickerProps, InputProps, Option } from 'rsuite'
-import {
-    ArrayType,
-    BooleanType,
-    CheckPicker,
-    Form,
-    InputPicker,
-    NumberType,
-    SchemaModel,
-    StringType,
-    Toggle
-} from 'rsuite'
+import { useRef, type Dispatch, type ReactNode, type SyntheticEvent } from 'react'
+import { ArrayType, BooleanType, CheckPicker, Form, InputPicker, NumberType, SchemaModel, StringType, Toggle } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { dynamicValues } from '../../config/config'
-import type { DynamicsValue, ExecutionItemType } from '../../typing/execution'
-import { debug } from '../../utils/debugger'
+import { dynamicValues, dynamicsToNumber, positionConfigs, positionOrder } from '../../config/config'
+import type { Position } from '../../typing/basetypes'
+import type {
+    DynamicsItem,
+    DynamicsValue,
+    ExecutionItem,
+    ExecutionItemType,
+    GotoItem,
+    KempliItem,
+    KempliValue,
+    LoopItem,
+    SequenceItem,
+    SuppressItem,
+    TempoItem,
+    WaitItem
+} from '../../typing/execution'
+import SequenceEditor from './SequenceEditor'
+
+// ===========================================================================
+// The execution-item form is driven by a per-type DESCRIPTOR REGISTRY.
+//
+// Everything type-specific lives in one descriptor object per item type:
+//   - label         the option shown in the "add item" type picker
+//   - createDefault a fresh draft item of that type
+//   - toForm        item  -> flat form values (deserialize)
+//   - fromForm      form  -> item            (serialize)
+//   - Fields        the subform JSX for that type
+//   - hasIterations whether the item supports the per-iteration condition
+//
+// Adding a new execution-item type = add one descriptor here (+ a tooltip case
+// in utils/executionItems.ts). The validation schema (`formModel`) is the only
+// other place that lists fields; add any new type-specific fields there.
+// ===========================================================================
 
 export type FlowConditionType = 'pass' | 'nthpass' | 'iteration'
 
+// Flat form value: a superset of every type's editable fields. Each descriptor
+// reads/writes only the fields relevant to its type, so the rest of the form
+// machinery never needs to know which fields belong to which type.
 export interface FormValueType {
     type: ExecutionItemType | ''
+    // goto
     targetuuid?: string
+    // loop
     count?: number
+    // wait
     seconds?: number
+    // tempo
     fromBPM?: number
     toBPM?: number
+    // dynamics
     fromDynamics?: DynamicsValue
     toDynamics?: DynamicsValue
+    // tempo + dynamics
+    isGradual?: boolean
     fromBeat?: number
     toBeat?: number
-    isGradual?: boolean
+    // sequence
+    sequenceUuids?: string[]
+    // suppress
+    suppressPositions?: Position[]
+    suppressBeats?: number[]
+    // kempli
+    kempliValue?: KempliValue
+    kempliBeats?: number[]
+    // conditions (shared)
+    conditions: FlowConditionType[]
     passes?: number[]
     iterations?: number[]
-    conditions: FlowConditionType[]
 }
 
-// Auxiliary function for the form schema model.
-// Enables to set a field requirement that depend on the value of other fields in the form.
-// E.g. field 'seconds' is required if field 'type' has the value 'wait'.
-// Returns a validation function that can be passed to a when clause.
-// conditions: field->value pairs.
-//             - The requirement is active if each field has the given value (AND).
-//             - If the value is an array, the field can have any of the listed values (OR).
-//             - If the field itself is an array, it should contain the value, or one of its
-//               elements if value is an array.
-// requirement: requirement for the field being checked: currently 'isRequired' or 'notEmpty' (array).
-// RequiredType: the current field's required type.
+// A draft is a list item that may still be incomplete while the user fills the
+// form (and, for a freshly added item, has no `type` yet). The index signature
+// keeps it decoupled from the discriminated `ExecutionItem` union, so adding any
+// type's fields here does not run into cross-type property conflicts.
+export interface ExecutionItemDraft {
+    type?: ExecutionItemType
+    seqId: number
+    tooltip: string
+    tooltipshort: string
+    [field: string]: any
+}
+
+interface FromFormContext {
+    uuidToName: Record<string, string>
+}
+
+// ---------------------------------------------------------------------------
+// Validation schema
+// ---------------------------------------------------------------------------
+
+// Builds a `when` validator whose requirement only applies if other fields hold
+// the given value(s). E.g. `seconds` is required only when `type === 'wait'`.
 const If = (
     ifAll: { [field: string]: any | any[] },
     requirement: 'isRequired' | 'notEmpty',
@@ -54,9 +102,8 @@ const If = (
     message?: string
 ) => {
     function compare(a: any, b: any) {
-        if (Array.isArray(b)) {
-            return b.some((bval) => (Array.isArray(a) ? a.includes(bval) : a == b))
-        } else return Array.isArray(a) ? a.includes(b) : a == b
+        if (Array.isArray(b)) return b.some((bval) => (Array.isArray(a) ? a.includes(bval) : a == bval))
+        return Array.isArray(a) ? a.includes(b) : a == b
     }
     function doCheck(schema: any, ifAll: Record<string, any>, RequiredType: CallableFunction) {
         const cond = Object.entries(ifAll).reduce((aggr, [field, val]) => {
@@ -75,19 +122,36 @@ const If = (
     return (schema: any) => doCheck(schema, ifAll, RequiredType)
 }
 
+export const EXECUTION_TYPES: ExecutionItemType[] = [
+    'goto',
+    'loop',
+    'wait',
+    'tempo',
+    'dynamics',
+    'sequence',
+    'suppress',
+    'kempli'
+]
+
 export const formModel = SchemaModel({
-    type: StringType().isOneOf(['goto', 'loop', 'wait', 'tempo', 'dynamics']).isRequired(),
+    type: StringType().isOneOf(EXECUTION_TYPES).isRequired(),
+    // goto
     targetuuid: StringType().when(If({ type: 'goto' }, 'isRequired', StringType)),
+    // loop
     count: NumberType()
         .when(If({ type: 'loop' }, 'isRequired', NumberType))
         .isInteger(),
+    // wait
     seconds: NumberType().when(If({ type: 'wait' }, 'isRequired', NumberType)),
+    // tempo
     fromBPM: NumberType().isInteger(),
     toBPM: NumberType()
         .isInteger()
         .when(If({ type: 'tempo' }, 'isRequired', NumberType)),
+    // dynamics
     fromDynamics: StringType(),
     toDynamics: StringType().when(If({ type: 'dynamics' }, 'isRequired', StringType)),
+    // tempo + dynamics
     fromBeat: NumberType()
         .isInteger()
         .when(If({ isGradual: true }, 'isRequired', NumberType)),
@@ -95,6 +159,19 @@ export const formModel = SchemaModel({
         .isInteger()
         .when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', NumberType)),
     isGradual: BooleanType().when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', BooleanType)),
+    // sequence
+    sequenceUuids: ArrayType()
+        .of(StringType())
+        .when(If({ type: 'sequence' }, 'notEmpty', ArrayType, 'Select at least one system')),
+    // suppress (positions/beats optional: empty means "all")
+    suppressPositions: ArrayType().of(StringType()),
+    suppressBeats: ArrayType().of(NumberType()),
+    // kempli
+    kempliValue: StringType()
+        .isOneOf(['double', 'off'])
+        .when(If({ type: 'kempli' }, 'isRequired', StringType)),
+    kempliBeats: ArrayType().of(NumberType()),
+    // conditions (shared)
     passes: ArrayType()
         .of(NumberType())
         .when(If({ conditions: ['pass', 'nthpass'] }, 'notEmpty', ArrayType)),
@@ -104,23 +181,7 @@ export const formModel = SchemaModel({
     conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration']))
 })
 
-const formFieldNames = {
-    type: 'type',
-    targetuuid: 'targetuuid',
-    count: 'count',
-    seconds: 'seconds',
-    fromBPM: 'fromBPM',
-    toBPM: 'toBPM',
-    fromDynamics: 'fromDynamics',
-    toDynamics: 'toDynamics',
-    fromBeat: 'fromBeat',
-    toBeat: 'toBeat',
-    isGradual: 'isGradual',
-    conditions: 'conditions',
-    passes: 'passes',
-    iterations: 'iterations'
-}
-
+// Empty form used to fill in missing keys before a validity check.
 const emptyForm = {
     type: '',
     targetuuid: undefined,
@@ -133,415 +194,598 @@ const emptyForm = {
     fromBeat: undefined,
     toBeat: undefined,
     isGradual: undefined,
+    sequenceUuids: undefined,
+    suppressPositions: undefined,
+    suppressBeats: undefined,
+    kempliValue: undefined,
+    kempliBeats: undefined,
     conditions: undefined,
     passes: undefined,
     iterations: undefined
 }
 
-// GENERIC FIELD COMPONENTS
+// ---------------------------------------------------------------------------
+// Generic field components (reused by the per-type Fields)
+// ---------------------------------------------------------------------------
 
-interface ExecutionBaseFieldProps extends Pick<FormGroupProps, 'controlId'>, Pick<FormControlProps, 'accepter'> {
-    label?: string
-    name?: string
+interface FieldsProps {
     formValue: FormValueType
-    setValueChanged: (formValue: FormValueType, event: SyntheticEvent<Element, Event> | undefined) => void
-    loop: number | undefined
     selectedElement: number | undefined
+    sysOptions: InputOption<string>[]
+    positionOptions: InputOption<string>[]
+    loop: number | undefined
+    // Update form fields for custom widgets that aren't rsuite Form.Controls.
+    onPatch: (patch: Partial<FormValueType>) => void
 }
 
-interface PickerFieldProps
-    extends Omit<ExecutionBaseFieldProps, 'loop'>, Pick<CheckPickerProps, 'placeholder' | 'countable'> {
+interface PickerFieldProps {
+    label?: string
+    name: string
     data: any
-    onChange?: (event: Event) => void
+    placeholder?: string
+    disabled: boolean
+    accepter?: any
+    countable?: boolean
+    cleanable?: boolean
+    searchable?: boolean
 }
-// Selection (single or multiple)
-const PickerField = ({ label, selectedElement, setValueChanged, formValue, onChange, ...props }: PickerFieldProps) => {
-    return (
-        <Form.Group className="items-start h-8" controlId={props.controlId}>
-            <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
-            <Form.Control
-                accepter={props.accepter || InputPicker}
-                cleanable={false}
-                disabled={selectedElement == undefined}
-                block
-                searchable={false}
-                className="w-60"
-                {...props}
-            />
-        </Form.Group>
-    )
-}
+const PickerField = ({
+    label,
+    name,
+    data,
+    placeholder,
+    disabled,
+    accepter,
+    countable,
+    cleanable,
+    searchable
+}: PickerFieldProps) => (
+    <Form.Group className="items-start h-8" controlId={name}>
+        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <Form.Control
+            name={name}
+            accepter={accepter || InputPicker}
+            data={data}
+            placeholder={placeholder}
+            disabled={disabled}
+            block
+            cleanable={cleanable ?? false}
+            searchable={searchable ?? false}
+            countable={countable}
+            className="w-60"
+        />
+    </Form.Group>
+)
 
-interface InputFieldProps extends ExecutionBaseFieldProps, Pick<InputProps, 'placeholder'> {}
-const InputField = ({ label, selectedElement, setValueChanged, formValue, ...props }: InputFieldProps) => {
-    return (
-        <Form.Group className="items-start h-8" controlId={props.controlId}>
-            <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
-            <Form.Control
-                // onChange={setValueChanged}
-                disabled={selectedElement == undefined}
-                className="w-60"
-                {...props}
-            />
-        </Form.Group>
-    )
+interface InputFieldProps {
+    label?: string
+    name: string
+    placeholder?: string
+    disabled: boolean
 }
+const InputField = ({ label, name, placeholder, disabled }: InputFieldProps) => (
+    <Form.Group className="items-start h-8" controlId={name}>
+        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <Form.Control name={name} placeholder={placeholder} disabled={disabled} className="w-60" />
+    </Form.Group>
+)
 
-interface RangeFieldProps
-    extends
-        ExecutionBaseFieldProps,
-        Pick<InputPickerProps, 'block' | 'cleanable' | 'searchable'>,
-        Omit<InputProps, 'name' | 'placeholder'> {
+const ToggleField = ({ label, name, disabled }: { label?: string; name: string; disabled: boolean }) => (
+    <Form.Group className="items-start h-8" controlId={name}>
+        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <Form.Control accepter={Toggle} name={name} disabled={disabled} className="w-60" />
+    </Form.Group>
+)
+
+interface RangeFieldProps {
     labels: string[]
     names: string[]
     placeholders: string[]
-    data?: InputOption
-    accepter?: ElementType
+    disabled: boolean
+    data?: any
+    accepter?: any
+    block?: boolean
+    cleanable?: boolean
+    searchable?: boolean
 }
 const RangeField = ({
     labels,
     names,
     placeholders,
-    selectedElement,
-    setValueChanged,
-    formValue,
-    ...props
-}: RangeFieldProps) => {
-    return (
-        <Form.Stack layout="inline">
-            <Form.Group className="items-start h-8" controlId={props.controlId}>
-                <Form.Label className="w-40 h-2 pt-[0.5rem]">{labels[0]}</Form.Label>
-                <Form.Control
-                    // onChange={setValueChanged}
-                    name={names[0]}
-                    disabled={selectedElement == undefined}
-                    className="w-24"
-                    placeholder={placeholders[0]}
-                    {...props}
-                />
-            </Form.Group>
-            <Form.Group className="items-start h-8" controlId={props.controlId}>
-                <Form.Label className="w-5 h-2 pt-[0.5rem]">{labels[1]}</Form.Label>
-                <Form.Control
-                    // onChange={setValueChanged}
-                    name={names[1]}
-                    disabled={selectedElement == undefined}
-                    className="w-24"
-                    placeholder={placeholders[1]}
-                    {...props}
-                />
-            </Form.Group>
-        </Form.Stack>
-    )
-}
-
-interface CheckBoxProps extends ExecutionBaseFieldProps {}
-const ToggleField = ({ label, selectedElement, setValueChanged, formValue, ...props }: CheckBoxProps) => {
-    return (
-        <Form.Group className="items-start h-8" controlId={props.controlId}>
-            <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+    disabled,
+    data,
+    accepter,
+    block,
+    cleanable,
+    searchable
+}: RangeFieldProps) => (
+    <Form.Stack layout="inline">
+        <Form.Group className="items-start h-8" controlId={names[0]}>
+            <Form.Label className="w-40 h-2 pt-[0.5rem]">{labels[0]}</Form.Label>
             <Form.Control
-                accepter={Toggle}
-                // onChange={setValueChanged}
-                disabled={selectedElement == undefined}
-                className="w-60"
-                {...props}
+                name={names[0]}
+                disabled={disabled}
+                className="w-24"
+                placeholder={placeholders[0]}
+                data={data}
+                accepter={accepter}
+                block={block}
+                cleanable={cleanable}
+                searchable={searchable}
             />
         </Form.Group>
-    )
+        <Form.Group className="items-start h-8" controlId={names[1]}>
+            <Form.Label className="w-5 h-2 pt-[0.5rem]">{labels[1]}</Form.Label>
+            <Form.Control
+                name={names[1]}
+                disabled={disabled}
+                className="w-24"
+                placeholder={placeholders[1]}
+                data={data}
+                accepter={accepter}
+                block={block}
+                cleanable={cleanable}
+                searchable={searchable}
+            />
+        </Form.Group>
+    </Form.Stack>
+)
+
+// A 1..n multi-select used for beat / pass / iteration numbers.
+const numberOptions = (max: number) => new Array(max).fill(null).map((_v, idx) => ({ label: `${idx + 1}`, value: idx + 1 }))
+
+// ---------------------------------------------------------------------------
+// Descriptor registry
+// ---------------------------------------------------------------------------
+
+export interface ItemDescriptor {
+    type: ExecutionItemType
+    label: string
+    hasIterations: boolean
+    createDefault: () => ExecutionItemDraft
+    toForm: (item: ExecutionItem) => Partial<FormValueType>
+    fromForm: (form: FormValueType, base: ExecutionItem, ctx: FromFormContext) => ExecutionItem
+    Fields: (props: FieldsProps) => ReactNode
 }
 
-// COMMON PART: CONDITION
+const draftBase = (type: ExecutionItemType): ExecutionItemDraft => ({
+    type,
+    seqId: 0,
+    tooltip: type,
+    tooltipshort: ''
+})
 
-// CheckPicker with specific logic
-const ConditionPicker = ({ ...props }: CheckPickerProps<string>) => {
-    const [value, setValue] = useState<string[]>(props.value || [])
+// Recomputes the iterations field from the condition selection (types that
+// support iterations only).
+function iterationsFromForm(form: FormValueType): number[] | undefined {
+    return form.conditions?.includes('iteration') ? form.iterations || [] : undefined
+}
 
-    // useEffect(() => debug(`SET VALUE TO ${JSON.stringify(value)}`), value)
+export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = {
+    goto: {
+        type: 'goto',
+        label: 'go to',
+        hasIterations: false,
+        createDefault: () => ({ ...draftBase('goto'), targetuuid: '', targetname: '' }),
+        toForm: (item) => ({ targetuuid: (item as GotoItem).targetuuid || '' }),
+        fromForm: (form, base, ctx): GotoItem => ({
+            ...(base as GotoItem),
+            type: 'goto',
+            targetuuid: form.targetuuid || '',
+            targetname: form.targetuuid ? ctx.uuidToName[form.targetuuid] : ''
+        }),
+        Fields: ({ sysOptions, selectedElement }) => (
+            <PickerField
+                name="targetuuid"
+                data={sysOptions}
+                placeholder="System to go to"
+                disabled={selectedElement == undefined}
+            />
+        )
+    },
 
-    // Ensures that at most one the options `pass` or `nthpass` can be selected.
-    function doLogic(currValue: string[], option: Option<string>) {
-        if (option.value == 'pass') {
-            const idx = currValue.indexOf('nthpass')
-            // if (idx >= 0) setValue(currValue.toSpliced(idx, 1))
-            if (idx >= 0) currValue.splice(idx, 1)
+    loop: {
+        type: 'loop',
+        label: 'loop',
+        hasIterations: false,
+        createDefault: () => ({ ...draftBase('loop'), count: undefined }),
+        toForm: (item) => ({ count: (item as LoopItem).count }),
+        fromForm: (form, base): LoopItem => ({
+            ...(base as LoopItem),
+            type: 'loop',
+            count: form.count != undefined ? Number(form.count) : (base as LoopItem).count
+        }),
+        Fields: ({ selectedElement }) => (
+            <InputField label="Loop count" name="count" placeholder="Iterations" disabled={selectedElement == undefined} />
+        )
+    },
+
+    wait: {
+        type: 'wait',
+        label: 'wait',
+        hasIterations: false,
+        createDefault: () => ({ ...draftBase('wait'), seconds: 0 }),
+        toForm: (item) => ({ seconds: (item as WaitItem).seconds }),
+        fromForm: (form, base): WaitItem => ({
+            ...(base as WaitItem),
+            type: 'wait',
+            seconds: form.seconds != undefined ? Number(form.seconds) : 0
+        }),
+        Fields: ({ selectedElement }) => (
+            <InputField label="Seconds" name="seconds" placeholder="Seconds" disabled={selectedElement == undefined} />
+        )
+    },
+
+    tempo: {
+        type: 'tempo',
+        label: 'tempo',
+        hasIterations: true,
+        createDefault: () => ({ ...draftBase('tempo'), isGradual: false }),
+        toForm: (item) => {
+            const t = item as TempoItem
+            return { fromBPM: t.fromValue, toBPM: t.value, isGradual: t.isGradual, fromBeat: t.fromBeat, toBeat: t.toBeat }
+        },
+        fromForm: (form, base): TempoItem => ({
+            ...(base as TempoItem),
+            type: 'tempo',
+            isGradual: form.isGradual || false,
+            fromBeat: form.fromBeat,
+            toBeat: form.toBeat,
+            fromValue: form.fromBPM != undefined ? Number(form.fromBPM) : undefined,
+            value: Number(form.toBPM),
+            iterations: iterationsFromForm(form)
+        }),
+        Fields: ({ formValue, selectedElement }) => {
+            const disabled = selectedElement == undefined
+            return (
+                <>
+                    <ToggleField label="Gradual" name="isGradual" disabled={disabled} />
+                    {!formValue.isGradual ? (
+                        <>
+                            <InputField label="BPM" name="toBPM" placeholder="BPM value" disabled={disabled} />
+                            <InputField
+                                label="Starting from beat"
+                                name="toBeat"
+                                placeholder="Beat number"
+                                disabled={disabled}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <RangeField
+                                labels={['BPM: from', 'to']}
+                                names={['fromBPM', 'toBPM']}
+                                placeholders={['Current', '']}
+                                disabled={disabled}
+                            />
+                            <RangeField
+                                labels={['From beat', 'to']}
+                                names={['fromBeat', 'toBeat']}
+                                placeholders={['1', '']}
+                                disabled={disabled}
+                            />
+                        </>
+                    )}
+                </>
+            )
         }
-        if (option.value == 'nthpass') {
-            const idx = currValue.indexOf('pass')
-            // if (idx >= 0) setValue(currValue.toSpliced(idx, 1))
-            if (idx >= 0) currValue.splice(idx, 1)
+    },
+
+    dynamics: {
+        type: 'dynamics',
+        label: 'dynamics',
+        hasIterations: true,
+        createDefault: () => ({ ...draftBase('dynamics'), isGradual: false }),
+        toForm: (item) => {
+            const d = item as DynamicsItem
+            return {
+                fromDynamics: d.fromDynamics,
+                toDynamics: d.dynamics,
+                isGradual: d.isGradual,
+                fromBeat: d.fromBeat,
+                toBeat: d.toBeat
+            }
+        },
+        fromForm: (form, base): DynamicsItem => {
+            const prev = base as DynamicsItem
+            const dynamics = (form.toDynamics ?? prev.dynamics) as DynamicsValue
+            return {
+                ...prev,
+                type: 'dynamics',
+                isGradual: form.isGradual || false,
+                fromBeat: form.fromBeat,
+                toBeat: form.toBeat,
+                fromDynamics: form.fromDynamics,
+                fromValue: form.fromDynamics ? dynamicsToNumber[form.fromDynamics] : undefined,
+                dynamics,
+                value: dynamicsToNumber[dynamics],
+                positions: prev.positions ?? [],
+                iterations: iterationsFromForm(form)
+            }
+        },
+        Fields: ({ formValue, selectedElement }) => {
+            const disabled = selectedElement == undefined
+            const dynData = dynamicValues.map((dyn) => ({ label: dyn, value: dyn }))
+            return (
+                <>
+                    <ToggleField label="Gradual" name="isGradual" disabled={disabled} />
+                    {!formValue.isGradual ? (
+                        <>
+                            <PickerField
+                                label="Dynamics"
+                                name="toDynamics"
+                                data={dynData}
+                                placeholder="Select..."
+                                disabled={disabled}
+                            />
+                            <InputField
+                                label="Starting from beat"
+                                name="toBeat"
+                                placeholder="Beat number"
+                                disabled={disabled}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <RangeField
+                                labels={['Dynamics: from', 'to']}
+                                names={['fromDynamics', 'toDynamics']}
+                                placeholders={['Current', '']}
+                                data={dynData}
+                                accepter={InputPicker}
+                                block
+                                cleanable
+                                searchable={false}
+                                disabled={disabled}
+                            />
+                            <RangeField
+                                labels={['From beat', 'to']}
+                                names={['fromBeat', 'toBeat']}
+                                placeholders={['1', '']}
+                                disabled={disabled}
+                            />
+                        </>
+                    )}
+                </>
+            )
+        }
+    },
+
+    sequence: {
+        type: 'sequence',
+        label: 'sequence',
+        hasIterations: false,
+        createDefault: () => ({ ...draftBase('sequence'), labels: [], uuids: [] }),
+        toForm: (item) => ({ sequenceUuids: (item as SequenceItem).uuids }),
+        fromForm: (form, base, ctx): SequenceItem => {
+            const uuids = form.sequenceUuids || []
+            return {
+                ...(base as SequenceItem),
+                type: 'sequence',
+                uuids,
+                labels: uuids.map((u) => ctx.uuidToName[u] ?? u)
+            }
+        },
+        Fields: ({ sysOptions, selectedElement, formValue, onPatch }) => (
+            <SequenceEditor
+                options={sysOptions}
+                value={formValue.sequenceUuids || []}
+                onChange={(uuids) => onPatch({ sequenceUuids: uuids })}
+                disabled={selectedElement == undefined}
+            />
+        )
+    },
+
+    suppress: {
+        type: 'suppress',
+        label: 'suppress',
+        hasIterations: true,
+        createDefault: () => ({ ...draftBase('suppress') }),
+        toForm: (item) => ({
+            suppressPositions: (item as SuppressItem).positions,
+            suppressBeats: (item as SuppressItem).beats
+        }),
+        fromForm: (form, base): SuppressItem => ({
+            ...(base as SuppressItem),
+            type: 'suppress',
+            positions: form.suppressPositions && form.suppressPositions.length > 0 ? form.suppressPositions : undefined,
+            beats: form.suppressBeats && form.suppressBeats.length > 0 ? form.suppressBeats : undefined,
+            iterations: iterationsFromForm(form)
+        }),
+        Fields: ({ positionOptions, selectedElement }) => {
+            const disabled = selectedElement == undefined
+            return (
+                <>
+                    <PickerField
+                        label="Positions"
+                        name="suppressPositions"
+                        accepter={CheckPicker}
+                        data={positionOptions}
+                        placeholder="All positions"
+                        countable={false}
+                        cleanable
+                        disabled={disabled}
+                    />
+                    <PickerField
+                        label="On beats"
+                        name="suppressBeats"
+                        accepter={CheckPicker}
+                        data={numberOptions(16)}
+                        placeholder="All beats"
+                        countable={false}
+                        cleanable
+                        disabled={disabled}
+                    />
+                </>
+            )
+        }
+    },
+
+    kempli: {
+        type: 'kempli',
+        label: 'kempli',
+        hasIterations: true,
+        createDefault: () => ({ ...draftBase('kempli'), value: 'off' }),
+        toForm: (item) => ({
+            kempliValue: (item as KempliItem).value,
+            kempliBeats: (item as KempliItem).beats
+        }),
+        fromForm: (form, base): KempliItem => ({
+            ...(base as KempliItem),
+            type: 'kempli',
+            value: (form.kempliValue ?? (base as KempliItem).value ?? 'off') as KempliValue,
+            beats: form.kempliBeats && form.kempliBeats.length > 0 ? form.kempliBeats : undefined,
+            iterations: iterationsFromForm(form)
+        }),
+        Fields: ({ selectedElement }) => {
+            const disabled = selectedElement == undefined
+            return (
+                <>
+                    <PickerField
+                        label="Kempli"
+                        name="kempliValue"
+                        data={[
+                            { label: 'double', value: 'double' },
+                            { label: 'off', value: 'off' }
+                        ]}
+                        placeholder="Select..."
+                        disabled={disabled}
+                    />
+                    <PickerField
+                        label="On beats"
+                        name="kempliBeats"
+                        accepter={CheckPicker}
+                        data={numberOptions(16)}
+                        placeholder="All beats"
+                        countable={false}
+                        cleanable
+                        disabled={disabled}
+                    />
+                </>
+            )
         }
     }
-
-    return (
-        <CheckPicker
-            countable={false}
-            groupBy="group"
-            onSelect={(value, option) => doLogic(value, option)}
-            value={value}
-            onChange={setValue}
-            {...props}
-        />
-    )
 }
 
-interface ConditionFormProps extends ExecutionBaseFieldProps {
+export const executionTypeOptions: { label: string; value: ExecutionItemType }[] = EXECUTION_TYPES.map((type) => ({
+    label: executionItemRegistry[type].label,
+    value: type
+}))
+
+/** Position options for a system, derived from the staffs it contains. */
+export function positionOptionsForSystem(staffs: Partial<Record<Position, unknown>>): InputOption<string>[] {
+    return positionOrder
+        .filter((p) => p in staffs && p !== 'KEMPLI')
+        .map((p) => ({ label: positionConfigs[p as Position].name, value: p }))
+}
+
+// ---------------------------------------------------------------------------
+// Shared condition subform (passes / nth-pass / iterations)
+// ---------------------------------------------------------------------------
+
+interface ConditionFormProps extends FieldsProps {
     type: ExecutionItemType
-    loop: number | undefined
+    hasIterations: boolean
 }
-// Form that captures the details of the selected item
-const ConditionForm = ({ type, loop, ...props }: ConditionFormProps) => {
-    const afterOn = ['goto', 'wait'].includes(type) ? 'after' : 'on'
+const ConditionForm = ({ type, hasIterations, formValue, loop, selectedElement }: ConditionFormProps) => {
+    const disabled = selectedElement == undefined
+    const afterOn = ['goto', 'wait', 'sequence'].includes(type) ? 'after' : 'on'
     const options = [
         { group: 'passes', label: `${afterOn} pass(es) nr ... `, value: 'pass' },
         { group: 'passes', label: `${afterOn} every ...th pass`, value: 'nthpass' }
     ]
-    if (['tempo', 'dynamics'].includes(type) && loop)
+    if (hasIterations && loop)
         options.push({ group: 'loop', label: `${afterOn} iteration(s) nr ... `, value: 'iteration' })
 
     return (
         <>
             <PickerField
                 label="Condition"
-                name={formFieldNames.conditions}
-                accepter={ConditionPicker}
+                name="conditions"
+                accepter={CheckPicker}
                 data={options}
-                placeholder={'None'}
-                {...props}
+                placeholder="None"
+                countable={false}
+                disabled={disabled}
             />
-            {props.formValue?.conditions?.some((value) => ['pass', 'nthpass'].includes(value)) && (
+            {formValue?.conditions?.some((value) => ['pass', 'nthpass'].includes(value)) && (
                 <PickerField
-                    accepter={CheckPicker}
                     label="Passes"
-                    name={formFieldNames.passes}
-                    onChange={(event: Event) => debug(event)}
-                    countable={false}
-                    data={new Array(20).fill(null).map((_, idx) => {
-                        return { label: `${idx + 1}`, value: idx + 1 }
-                    })}
-                    {...props}
-                />
-            )}
-            {props.formValue?.conditions?.includes('iteration') && (
-                <PickerField
+                    name="passes"
                     accepter={CheckPicker}
-                    label="Iterations"
-                    name={formFieldNames.iterations}
-                    onChange={(event: Event) => debug(event)}
+                    data={numberOptions(20)}
                     countable={false}
-                    data={new Array(loop).fill(null).map((_, idx) => {
-                        return { label: `${idx + 1}`, value: idx + 1 }
-                    })}
-                    {...props}
+                    disabled={disabled}
+                />
+            )}
+            {formValue?.conditions?.includes('iteration') && (
+                <PickerField
+                    label="Iterations"
+                    name="iterations"
+                    accepter={CheckPicker}
+                    data={numberOptions(loop || 0)}
+                    countable={false}
+                    disabled={disabled}
                 />
             )}
         </>
     )
 }
 
-// SPECIFIC PART: EXECUTION TYPES
+// ---------------------------------------------------------------------------
+// The generic execution-item form
+// ---------------------------------------------------------------------------
 
-interface GotoFormProps extends ExecutionBaseFieldProps {
-    sysOptions: InputOption<string>[]
-}
-const GoToForm = ({ sysOptions, ...props }: GotoFormProps) => {
-    return (
-        <>
-            <PickerField
-                name={formFieldNames.targetuuid}
-                data={sysOptions || []}
-                placeholder={'System to go to'}
-                {...props}
-            />
-        </>
-    )
-}
-
-const LoopForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
-    return (
-        <>
-            <InputField
-                label="Loop count"
-                name={formFieldNames.count}
-                formValue={formValue}
-                placeholder={'Iterations'}
-                {...props}
-            />
-        </>
-    )
-}
-
-const WaitForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
-    return (
-        <>
-            <InputField
-                label="Seconds"
-                name={formFieldNames.seconds}
-                formValue={formValue}
-                placeholder={'Seconds'}
-                {...props}
-            />
-        </>
-    )
-}
-
-const TempoForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
-    return (
-        <>
-            <ToggleField label="Gradual" name={formFieldNames.isGradual} formValue={formValue} {...props} />
-            {!formValue.isGradual ? (
-                <>
-                    <InputField
-                        label="BPM"
-                        name={formFieldNames.toBPM}
-                        formValue={formValue}
-                        placeholder={'BPM value'}
-                        {...props}
-                    />
-                    <InputField
-                        label="Starting from beat"
-                        name={formFieldNames.toBeat}
-                        formValue={formValue}
-                        placeholder={'Beat number'}
-                        {...props}
-                    />
-                </>
-            ) : (
-                <>
-                    <RangeField
-                        labels={['BPM: from', 'to']}
-                        formValue={formValue}
-                        names={[formFieldNames.fromBPM, formFieldNames.toBPM]}
-                        placeholders={['Current', '']}
-                        {...props}
-                    />
-                    <RangeField
-                        labels={['From beat', 'to']}
-                        formValue={formValue}
-                        names={[formFieldNames.fromBeat, formFieldNames.toBeat]}
-                        placeholders={['1', '']}
-                        {...props}
-                    />
-                </>
-            )}
-        </>
-    )
-}
-
-const DynamicsForm = ({ formValue, ...props }: ExecutionBaseFieldProps) => {
-    return (
-        <>
-            <ToggleField label="Gradual" name={formFieldNames.isGradual} formValue={formValue} {...props} />
-            {!formValue.isGradual ? (
-                <>
-                    <PickerField
-                        label="Dynamics"
-                        formValue={formValue}
-                        name={formFieldNames.toDynamics}
-                        data={dynamicValues.map((dyn) => {
-                            return { label: dyn, value: dyn }
-                        })}
-                        placeholder={'Select...'}
-                        {...props}
-                    />
-                    <InputField
-                        label="Starting from beat"
-                        name={formFieldNames.toBeat}
-                        formValue={formValue}
-                        placeholder={'Beat number'}
-                        {...props}
-                    />
-                </>
-            ) : (
-                <>
-                    <RangeField
-                        labels={['Dynamics: from', 'to']}
-                        formValue={formValue}
-                        names={[formFieldNames.fromDynamics, formFieldNames.toDynamics]}
-                        data={dynamicValues.map((dyn) => {
-                            return { label: dyn, value: dyn }
-                        })}
-                        accepter={InputPicker}
-                        placeholders={['Current', '']}
-                        block
-                        cleanable={true}
-                        searchable={false}
-                        {...props}
-                    />
-                    <RangeField
-                        labels={['From beat', 'to']}
-                        formValue={formValue}
-                        names={[formFieldNames.fromBeat, formFieldNames.toBeat]}
-                        placeholders={['1', '']}
-                        {...props}
-                    />
-                </>
-            )}
-        </>
-    )
-}
-
-interface ExecutionItemFormProps {
+interface ExecutionItemFormProps extends Omit<FieldsProps, 'onPatch'> {
     type: ExecutionItemType | undefined
-    selectedElement: number | undefined
-    formValue: FormValueType
-    sysOptions: InputOption<string>[]
     setDirty: Dispatch<boolean>
     setFormValue: Dispatch<FormValueType>
-    loop: number | undefined
-    model: any
-    // onChange: (value: Record<string, any>, event?: SyntheticEvent) => void
+    model: typeof formModel
 }
-// Contains the details of a specific Execution item.
+
 export default function ExecutionItemForm({
     type,
     selectedElement,
     formValue,
     sysOptions,
+    positionOptions,
     setDirty,
     setFormValue,
     loop,
     model
-    // onChange
 }: ExecutionItemFormProps) {
-    // Properties that will be passed down to each form type
     const formRef = useRef<any>(null)
 
-    function isValid(formValue: FormValueType) {
-        const checkResult = formModel.check(Object.assign(emptyForm, formValue))
-        const returnValue = !_.values(checkResult).some((val) => val.hasError)
-        return returnValue
+    function isValid(value: FormValueType) {
+        // `check` expects every schema key present; merge onto a complete blank
+        // form. Cast because the merged type has optional keys.
+        const checkResult = formModel.check(Object.assign({ ...emptyForm }, value) as any)
+        return !_.values(checkResult).some((val: any) => val.hasError)
     }
 
-    function setValueChanged(value: Record<string, any>, event: SyntheticEvent<Element, Event> | undefined) {
+    function setValueChanged(value: Record<string, any>, _event: SyntheticEvent<Element, Event> | undefined) {
         const newValue = value as FormValueType
         setFormValue(newValue)
-        if (isValid(newValue)) {
-            setDirty(true)
-        }
+        if (isValid(newValue)) setDirty(true)
     }
 
-    const baseProps: ExecutionBaseFieldProps = { selectedElement, formValue, setValueChanged, loop }
-    const gotoForm = <GoToForm sysOptions={sysOptions} {...baseProps} />
-    const loopForm = <LoopForm {...baseProps} />
-    const waitForm = <WaitForm {...baseProps} />
-    const tempoForm = <TempoForm {...baseProps} />
-    const dynamicsForm = <DynamicsForm {...baseProps} />
-    if (!type) return
+    // Lets custom widgets (e.g. the sequence editor) update the form value the
+    // same way an rsuite Form.Control change would.
+    const onPatch = (patch: Partial<FormValueType>) => setValueChanged({ ...formValue, ...patch }, undefined)
+
+    if (!type) return null
+    const descriptor = executionItemRegistry[type]
+    const fieldsProps: FieldsProps = { formValue, selectedElement, sysOptions, positionOptions, loop, onPatch }
 
     return (
         <Form ref={formRef} model={model} onChange={setValueChanged} formValue={formValue}>
             <Form.Stack layout="horizontal">
-                <Form.Group controlId={`goto-subform`}>
+                <Form.Group controlId="item-type">
                     <Form.Label className="w-40">Type</Form.Label>
-                    <Form.Text className="w-120 font-bold text-base">{type}</Form.Text>
+                    <Form.Text className="w-120 font-bold text-base">{descriptor.label}</Form.Text>
                 </Form.Group>
-                {type == 'goto' && gotoForm}
-                {type == 'loop' && loopForm}
-                {type == 'wait' && waitForm}
-                {type == 'tempo' && tempoForm}
-                {type == 'dynamics' && dynamicsForm}
-                <ConditionForm type={type} {...baseProps} />
+                {descriptor.Fields(fieldsProps)}
+                <ConditionForm type={type} hasIterations={descriptor.hasIterations} {...fieldsProps} />
             </Form.Stack>
         </Form>
     )

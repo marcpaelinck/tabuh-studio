@@ -14,6 +14,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { ExecutionFormContext } from './executionFormContext'
 import { PartIndicator } from './PartIndicator'
 import { SystemNode } from './SystemNode'
 
@@ -55,6 +56,14 @@ export default function EditorWindow({
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
+
+    // Number of open (non-modal) execution forms. While > 0 the editor content is
+    // made inert so it can't be edited, yet remains scrollable behind the Drawer.
+    const [openFormCount, setOpenFormCount] = useState(0)
+    const setExecutionFormOpen = useCallback(
+        (open: boolean) => setOpenFormCount((count) => Math.max(0, count + (open ? 1 : -1))),
+        []
+    )
 
     useEffect(() => {
         visibleRef.current = visible
@@ -192,8 +201,15 @@ export default function EditorWindow({
     }, [score, playbackState, selectionOn])
 
     return (
-        // <Profiler id="App" onRender={onRender}>
-        <VStack id="Editor Window">{loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}</VStack>
-        // </Profiler>
+        // While an execution form is open, mark the editor content inert (no editing)
+        // but keep it scrollable: inert content is skipped in hit-testing, so wheel
+        // events reach the scrollable ancestor; the Drawer is portaled to <body>.
+        <ExecutionFormContext.Provider value={setExecutionFormOpen}>
+            <div className="contents" inert={openFormCount > 0 ? true : undefined}>
+                <VStack id="Editor Window">
+                    {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
+                </VStack>
+            </div>
+        </ExecutionFormContext.Provider>
     )
 }

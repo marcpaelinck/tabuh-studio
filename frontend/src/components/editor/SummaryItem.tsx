@@ -2,7 +2,7 @@
 // This summary contains buttons optionally combined with a text field. The item type determines the button's action
 // such as editing a field name (e.g. `part` or `label`) or creating/copying a section. After the action is performed
 // the field will contain the result of the action (e.g. new field value or id/label of copied system).
-import { useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
+import { useContext, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
 import { AiOutlineNumber } from 'react-icons/ai'
 import { FaCheck, FaXmark } from 'react-icons/fa6'
 import type { IconType } from 'react-icons/lib'
@@ -32,6 +32,7 @@ import TsNewIcon from '../../reacticons/TsNewIcon'
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { ExecutionForm } from './ExecutionForm'
+import { ExecutionFormContext } from './executionFormContext'
 
 // Col item formatted to contain summary items
 export function SCol({ ...props }: ColProps) {
@@ -178,6 +179,16 @@ export function SummaryItem({
     const [editing, setEditing] = useState<boolean>(itemSpecs[item].fieldeditwhen == 'always')
     const inputRef = useRef<HTMLInputElement & PickerHandle>(null)
     const [warning, setWarning] = useState<string | null>(null)
+    const setExecutionFormOpen = useContext(ExecutionFormContext)
+
+    // While the execution form (a non-modal Drawer) is open, tell the EditorWindow
+    // so it can make its content inert (no editing) but still scrollable. Only the
+    // open instance touches the count; closed instances early-return.
+    useEffect(() => {
+        if (item !== 'execution' || !editing) return
+        setExecutionFormOpen(true)
+        return () => setExecutionFormOpen(false)
+    }, [item, editing, setExecutionFormOpen])
 
     useEffect(() => {
         // Cancel editing when Esc key is pressed or when user clicks anywhere outside the input field.
