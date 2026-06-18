@@ -1,11 +1,15 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import { NoteObject } from '@tabuhstudio/shared'
-import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { castNotation, type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
-import { applyPatterns, notationWidth } from '../componentlogic/patternManager.ts'
+import type { CastingInstruction } from '../componentlogic/castingRulesManager.ts'
+import {
+    castGroupedNotationToPositions,
+    deriveKempli,
+    expandParsedStaffs,
+    type ParsedStaffs
+} from '../componentlogic/expandNotation.ts'
 import { dynamicsToNumber } from '../config/config.ts'
 import type { Position, UUID } from '../typing/basetypes.ts'
 import type {
@@ -137,61 +141,6 @@ export function parseNotation(content: string): ParserReturnValue {
     return { score, errors, postProcessing, tree }
 }
 
-// Intermediate type: array of beat-grouped staffs per position (used only during parsing).
-type ParsedStaffs = Partial<Record<Position, Staff[]>>
-
-// When a staff notation applies to a group of positions, this function converts
-// the common staff notation to individual staff notation for each position, using 'casting' rules.
-// groupedNotation: groups of positions with corresponding notation (one Staff per kempli beat)
-// castInstructions: contains AUTOKEMPYUNG metadata which indicates whether homophonic notation
-//                   should be converted to kempyung equivalent for sangsih positions.
-function castGroupedNotationToPositions(
-    groupedNotations: GroupedNotation[],
-    castInstructions: CastingInstruction[]
-): ParsedStaffs {
-    const staffs: ParsedStaffs = {}
-    for (const group of groupedNotations) {
-        if (group.positions.length == 1) {
-            // Single position: leave notation unchanged
-            staffs[group.positions[0]] = group.staff
-        } else if (group.positions.length > 1) {
-            // Multiple positions: cast notation to each position
-            group.positions.forEach((position, posIdx) => {
-                const beats: Staff[] = []
-                var measureIdx = 0
-                for (const beat of group.staff) {
-                    const objNotation = castNotation(
-                        beat.objNotation,
-                        group.positions,
-                        measureIdx,
-                        posIdx,
-                        castInstructions
-                    )
-                    const strNotation = objNotation.map((note) => note.toString())
-                    if (group.positions.length > 1) {
-                        beats.push({ notation: strNotation, objNotation: objNotation })
-                    } else beats.push({ ...beat })
-                    measureIdx++
-                }
-                staffs[position] = beats
-            })
-        }
-    }
-    return staffs
-}
-
-// Flattens an array of beat-grouped staffs into a single flat Staff per position.
-function flattenParsedStaffs(parsedStaffs: ParsedStaffs): Staffs {
-    const staffs: Staffs = {}
-    for (const [pos, beats] of Object.entries(parsedStaffs)) {
-        if (!beats) continue
-        const notation = beats.flatMap((beat) => beat.notation)
-        const objNotation = notation.map((symbol) => new NoteObject(symbol, pos as Position))
-        staffs[pos as Position] = { notation: notation, objNotation: objNotation }
-    }
-    return staffs
-}
-
 /********************
  POSTPROCESSING
 ********************/
@@ -243,53 +192,15 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
     }
 
     // At this point system.staffs temporarily holds Staff[] per position (ParsedStaffs).
-    // We need to: (1) expand pattern symbols, (2) pad beats to equal width, (3) set kempli, (4) flatten to Staff.
+    // Expand pattern symbols, pad beats to equal width, derive kempli and flatten to Staff.
+    // The transform itself now lives in componentlogic/expandNotation.ts so that the live
+    // editor can reuse exactly the same code.
     for (const system of score.systems) {
-        // Cast to ParsedStaffs for intermediate processing
         const parsedStaffs = system.staffs as unknown as ParsedStaffs
-
-        // Step 1: Expand shorthand pattern symbols (e.g. norot) within each beat
-        _.entries(parsedStaffs).forEach(([position, beats]) => {
-            if (beats) parsedStaffs[position as Position] = applyPatterns(position as Position, beats)
-        })
-
-        // Step 2: Compute column widths (max notation width per beat across all positions) and pad beats
-        const colWidths = getColwidths(parsedStaffs)
-        _.entries(parsedStaffs).forEach(([position, beats]) => {
-            if (!beats) return
-            beats.forEach((beat, colIdx) => {
-                const diff = (colWidths[colIdx] ?? 0) - beat.notation.length
-                if (diff > 0) {
-                    const padding = Array(diff).fill(SPACE_CHAR)
-                    beat.notation.push(...padding)
-                    beat.objNotation.push(...padding.map((symbol) => new NoteObject(symbol, position as Position)))
-                }
-            })
-        })
-
-        // Step 3: Set kempli frequency from the beat width and apply kempli execution items
-        // Default value
-        system.kempli.state = 'on'
-        if (system.execution) {
-            const kempliItem: KempliItem = system.execution.find((exec) => exec.type == 'kempli') as KempliItem
-            if (kempliItem) {
-                if (kempliItem.value == 'off') system.kempli.state = 'off'
-                if (kempliItem.value === 'double') system.kempli.frequency = system.kempli.frequency! / 2
-            }
-        }
-        if (system.kempli.state != 'off') {
-            if (colWidths.length == 0 || 'KEMPLI' in system.staffs) {
-                system.kempli.state = 'notation'
-            } else {
-                // Set kempli frequency if all measures have the same duration
-                if (colWidths.every((w) => w == colWidths[0])) {
-                    system.kempli.frequency = colWidths.length > 0 ? colWidths[0] : 4
-                }
-            }
-        }
-
-        // Step 4: Flatten beats into a single Staff per position
-        system.staffs = flattenParsedStaffs(parsedStaffs)
+        const hasKempliStaff = 'KEMPLI' in parsedStaffs
+        const { staffs, colWidths } = expandParsedStaffs(parsedStaffs)
+        system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliStaff)
+        system.staffs = staffs
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -476,22 +387,8 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
     return notationGroups
 }
 
-// Returns the maximum width of vertically aligned sections.
-// Takes ParsedStaffs (Staff[] per position) as input — only valid during parsing.
-function getColwidths(parsedStaffs: ParsedStaffs): number[] {
-    const sizes = _.entries(parsedStaffs)
-        .filter(([_position, beats]) => beats != undefined)
-        .map(([position, beats]) => beats!.map((beat) => notationWidth(beat.objNotation, position as Position)))
-    // Transpose to get widths per column
-    const widthsByColumn = _.zip(...sizes)
-    const columnWidths: number[] = widthsByColumn.map((widths) =>
-        widths.reduce((max, width) => Math.max(max || 0, width || 0), 0)
-    ) as number[]
-    return columnWidths
-}
-
 /***********
-  METADATA 
+  METADATA
 ***********/
 
 // Returns a list of ProcessingInstruction objects for the given gongan node.

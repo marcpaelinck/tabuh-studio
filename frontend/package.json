@@ -10,6 +10,8 @@
         "preview": "vite preview",
         "test": "node .\\src\\scoreparsers\\grammars\\tabuh\\test.ts",
         "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts",
+        "test:expand": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts",
+        "test:expand:generate": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts --generate",
         "import:scores:file": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts file",
         "import:scores:local": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=local",
         "import:scores:remote": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=remote"
@@ -44,6 +46,7 @@
         "@types/react-dom": "^19.1.7",
         "@vitejs/plugin-react": "^5.0.0",
         "babel-plugin-react-compiler": "^1.0.0",
+        "esbuild": "^0.28.1",
         "eslint": "^9.39.1",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.20",
