@@ -55,6 +55,7 @@ export interface FormValueType {
     // dynamics
     fromDynamics?: DynamicsValue
     toDynamics?: DynamicsValue
+    dynamicsPositions?: Position[]
     // tempo + dynamics
     isGradual?: boolean
     fromBeat?: number
@@ -151,6 +152,7 @@ export const formModel = SchemaModel({
     // dynamics
     fromDynamics: StringType(),
     toDynamics: StringType().when(If({ type: 'dynamics' }, 'isRequired', StringType)),
+    dynamicsPositions: ArrayType().of(StringType()),
     // tempo + dynamics
     fromBeat: NumberType()
         .isInteger()
@@ -191,6 +193,7 @@ const emptyForm = {
     toBPM: undefined,
     fromDynamics: undefined,
     toDynamics: undefined,
+    dynamicsPositions: undefined,
     fromBeat: undefined,
     toBeat: undefined,
     isGradual: undefined,
@@ -475,7 +478,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
         type: 'dynamics',
         label: 'dynamics',
         hasIterations: true,
-        createDefault: () => ({ ...draftBase('dynamics'), isGradual: false }),
+        createDefault: () => ({ ...draftBase('dynamics'), isGradual: false, positions: [] }),
         toForm: (item) => {
             const d = item as DynamicsItem
             return {
@@ -483,7 +486,8 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                 toDynamics: d.dynamics,
                 isGradual: d.isGradual,
                 fromBeat: d.fromBeat,
-                toBeat: d.toBeat
+                toBeat: d.toBeat,
+                dynamicsPositions: d.positions
             }
         },
         fromForm: (form, base): DynamicsItem => {
@@ -499,15 +503,25 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                 fromValue: form.fromDynamics ? dynamicsToNumber[form.fromDynamics] : undefined,
                 dynamics,
                 value: dynamicsToNumber[dynamics],
-                positions: prev.positions ?? [],
+                positions: form.dynamicsPositions ?? prev.positions ?? [],
                 iterations: iterationsFromForm(form)
             }
         },
-        Fields: ({ formValue, selectedElement }) => {
+        Fields: ({ formValue, selectedElement, positionOptions }) => {
             const disabled = selectedElement == undefined
             const dynData = dynamicValues.map((dyn) => ({ label: dyn, value: dyn }))
             return (
                 <>
+                    <PickerField
+                        label="Positions"
+                        name="dynamicsPositions"
+                        accepter={CheckPicker}
+                        data={positionOptions}
+                        placeholder="All positions"
+                        countable={false}
+                        cleanable
+                        disabled={disabled}
+                    />
                     <ToggleField label="Gradual" name="isGradual" disabled={disabled} />
                     {!formValue.isGradual ? (
                         <>
