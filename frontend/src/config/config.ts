@@ -48,7 +48,7 @@ export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 // JSON FORMATTING, EDITOR SORTING
 
 export const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
-export const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'staffs', 'kempli', 'notationGroups']
+export const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'groups', 'castingInstructions', 'staffs', 'kempli']
 export const positionOrder = [
     'UGAL',
     'GENDER_RAMBAT',

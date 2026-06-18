@@ -88,12 +88,20 @@ All symbols that are visually aligned vertically must start playing simultaneous
 interface NotationGroup {
     id: string
     positions: Position[]            // 1..n; a single-position group is a "solo" line
-    measures: NoteObject[][]         // compact symbols per kempli beat (may contain shorthand)
-    castingInstructions?: CastingInstruction[]   // nokempyung / norot context
-}
-// System gains: groups: NotationGroup[]   (subsumes notationGroups + the dead editorGroup)
-//               staffs stays, but becomes a DERIVED CACHE (recomputed via expandSystem)
+    measures: NoteSymbol[][]         // compact, position-independent symbols per kempli beat
+}                                    // (string symbols → serialise cleanly; may contain shorthand)
+// System gains:
+//   groups?: NotationGroup[]                    // CANONICAL compact store
+//   castingInstructions?: CastingInstruction[]  // system-wide casting context (AUTOKEMPYUNG=off)
+//   staffs stays, but becomes a DERIVED CACHE (recomputed via expandSystem)
 ```
+
+Implementation notes (as built in Step 2):
+
+- `measures` holds **symbol strings** (`NoteSymbol[][]`), not `NoteObject`s, so groups serialise to JSON cleanly; `expandSystem` rebuilds `NoteObject`s (bound to no position, exactly as the parser does) before running the shared pipeline.
+- Casting context lives at the **system** level (`System.castingInstructions`), not per group, because column-width padding is computed across the whole system in a single expand pass.
+- `notationGroups` and `editorGroup` are left in place (deprecated, no longer populated) to avoid churn; they will be removed once the dual editor fully replaces them.
+- **COPY is deferred.** The parser still produces correct staffs for COPY systems, but those systems are marked (`copyFromUuid`) and **excluded** from groups-based re-derivation on load (they keep their cached staffs). Representing COPY at the group level — and re-enabling its editing — is a planned follow-up.
 
 ## Steps
 
@@ -110,7 +118,9 @@ New module `frontend/src/componentlogic/expandNotation.ts` owning the whole comp
 
 ### Step 2 — Canonical compact model + derive `staffs` + storage
 
-Add `groups` to `System`; parser populates them (ungrouped positions become single-position groups); `expandSystem(system)` refreshes `staffs`+`kempli` from `groups`. `useScoreReader.postprocessScore` re-derives staffs on load; `saveScore` persists groups + cached staffs. Migration: re-run `importTsvScores` for tsv-backed scores; all-solo groups for the rest. Update `config.systemKeyOrder` and backend Zod.
+Add `groups` to `System`; parser populates them (ungrouped positions become single-position groups); `expandSystem(system)` refreshes `staffs`+`kempli` from `groups`. `useScoreReader.postprocessScore` re-derives staffs on load (skipping legacy/laras scores with no groups and COPY systems); `saveScore` already strips `objNotation` and now persists groups + the staffs cache (groups hold plain strings, so nothing extra to strip). Migration: re-run `import:scores:*` for tsv-backed scores (the parser now emits groups) — no separate migration code needed; legacy DB scores without groups keep working off their cached staffs until re-imported. `config.systemKeyOrder` updated; backend Zod needs no change (the score `content` schema uses `.catchall`, so `groups` passes through).
+
+Verification: `npm run test:groups` parses every fixture and asserts `expandSystem(fromGroups)` reproduces the parser's staffs + kempli for all non-COPY systems. `npm run test:expand` (Step 1 goldens) must also still pass since the parser's own path is unchanged.
 
 ### Step 3 — Compact view editor (the new editing surface)
 

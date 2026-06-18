@@ -12,6 +12,7 @@
         "testnotation": "node .\\src\\scoreparsers\\grammars\\tabuh\\test\\testnotation.ts",
         "test:expand": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts",
         "test:expand:generate": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts --generate",
+        "test:groups": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/groupsRoundtrip.test.ts",
         "import:scores:file": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts file",
         "import:scores:local": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=local",
         "import:scores:remote": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./scripts/importTsvScores.ts db --target=remote"

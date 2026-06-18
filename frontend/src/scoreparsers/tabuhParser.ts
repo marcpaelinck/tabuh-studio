@@ -98,7 +98,6 @@ export function parseNotation(content: string): ParserReturnValue {
                     id: gonganCounter,
                     index: gonganCounter - 1,
                     line: lineNr(content, node.from),
-                    notationGroups: groupedNotation.filter((group) => group.positions.length > 1),
                     staffs: {},
                     kempli: { state: 'on' },
                     label: undefined,
@@ -119,6 +118,14 @@ export function parseNotation(content: string): ParserReturnValue {
                 const castInstructions: CastingInstruction[] = metaData
                     .filter((item) => item.type == 'castinginstruction')
                     .map((item) => item.value) as CastingInstruction[]
+                // Canonical compact store: one group per StaffLine (solo or multi-position),
+                // holding position-independent compact symbols per kempli beat.
+                system.groups = groupedNotation.map((group) => ({
+                    id: uuidv4(),
+                    positions: group.positions,
+                    measures: group.staff.map((beat) => beat.notation.slice())
+                }))
+                system.castingInstructions = castInstructions.length > 0 ? castInstructions : undefined
                 const parsedStaffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
                 system.staffs = parsedStaffs as Staffs // temporarily holds Staff[] per position until postProcess
                 parsedScore.systems.push(system)
@@ -180,6 +187,11 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         if (source && target) {
             // Target staffs should be applied to the copy of source
             target.staffs = { ...source.staffs, ...target.staffs }
+            // COPY is not yet represented in the canonical `groups` store. Mark the target
+            // so the groups-based re-derivation (expandSystem) is skipped on load and the
+            // cached staffs are used instead. COPY-at-group-level is a planned follow-up.
+            target.copyFrom = source.label
+            target.copyFromUuid = source.uuid
             debug(`INCLUDE source=${source.label ?? source.id} include=${JSON.stringify(copyInstr.include ?? [])}`)
             if (copyInstr.include && source.execution) {
                 const copyItems: ExecutionItem[] = source.execution.filter((item) =>

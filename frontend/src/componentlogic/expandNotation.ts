@@ -22,7 +22,7 @@ import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import type { Position } from '../typing/basetypes.ts'
 import type { ExecutionItem, KempliItem } from '../typing/execution.ts'
-import type { GroupedNotation, KempliSetting, Staff, Staffs } from '../typing/score.ts'
+import type { GroupedNotation, KempliSetting, Staff, Staffs, System } from '../typing/score.ts'
 import { castNotation, type CastingInstruction } from './castingRulesManager.ts'
 import { applyPatterns, notationWidth } from './patternManager.ts'
 
@@ -131,6 +131,29 @@ export function expandGroupedNotation(
     castInstructions: CastingInstruction[]
 ): { staffs: Staffs; colWidths: number[] } {
     return expandParsedStaffs(castGroupedNotationToPositions(groupedNotations, castInstructions))
+}
+
+// Re-derives a system's expanded `staffs` (the cache) and `kempli` from its canonical
+// compact `groups`. Mutates and returns the system. No-op if the system has no groups
+// (e.g. legacy/laras scores), so callers can apply it unconditionally.
+//
+// The compact `measures` are position-independent symbol strings; they are rebuilt into
+// NoteObjects (bound to no position, exactly as the parser does) before running the
+// shared cast -> expand -> pad -> flatten pipeline, so this reproduces the parser output.
+export function expandSystem(system: System): System {
+    if (!system.groups || system.groups.length === 0) return system
+    const groupedNotations: GroupedNotation[] = system.groups.map((group) => ({
+        positions: group.positions,
+        staff: group.measures.map((measure) => {
+            const objNotation = measure.map((symbol) => new NoteObject(symbol, undefined))
+            return { notation: measure.slice(), objNotation } as Staff
+        })
+    }))
+    const hasKempliStaff = system.groups.some((group) => group.positions.includes('KEMPLI'))
+    const { staffs, colWidths } = expandGroupedNotation(groupedNotations, system.castingInstructions ?? [])
+    system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliStaff)
+    system.staffs = staffs
+    return system
 }
 
 // Derives the kempli state/frequency for a system from its execution items and the

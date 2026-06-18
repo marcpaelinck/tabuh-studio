@@ -1,4 +1,5 @@
 import type { NoteObject } from '@tabuhstudio/shared/NoteObject'
+import type { CastingInstruction } from '../componentlogic/castingRulesManager'
 import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeLocation, ToneType, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
 
@@ -42,6 +43,17 @@ export interface GroupedNotation {
     positions: Position[]
     staff: Staff[]
 }
+
+// Canonical "compact" notation group — the source of truth for the dual editor.
+// `measures` holds position-independent compact symbols per kempli beat (one inner
+// array per beat) and may contain shorthand symbols (e.g. norot). The expanded,
+// per-position `staffs` are DERIVED from a system's groups via expandSystem()
+// (see componentlogic/expandNotation.ts).
+export interface NotationGroup {
+    id: string
+    positions: Position[] // 1..n; a single-position group is a "solo" line
+    measures: NoteSymbol[][] // compact symbols per kempli beat
+}
 // Subdivision of a score, typically spans one gongan
 
 export type System = {
@@ -49,9 +61,11 @@ export type System = {
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
     line?: number // in case the score was parsed from a text file, the first line of the system
-    notationGroups?: GroupedNotation[] // Staves of an imported Notation assigned to multiple positions.
+    notationGroups?: GroupedNotation[] // DEPRECATED: superseded by `groups`; no longer populated.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
-    staffs: Partial<Record<Position, Staff>> // Contains the flat notation for each position.
+    groups?: NotationGroup[] // CANONICAL compact notation (source of truth for the dual editor).
+    castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
+    staffs: Partial<Record<Position, Staff>> // Derived (cache) flat notation for each position.
     kempli: KempliSetting
     label?: string
     execution?: ExecutionItem[]
