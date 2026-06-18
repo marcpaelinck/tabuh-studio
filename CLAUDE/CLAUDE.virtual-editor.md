@@ -1,5 +1,4 @@
-# Virtual Editor — Conversation Summary
-
+# Virtual Editor — Implementation Summary
 ## Context
 
 This document summarises a design decision made for the Tabuh Studio application regarding the interactive editor. See `Claude.md` for full project context.

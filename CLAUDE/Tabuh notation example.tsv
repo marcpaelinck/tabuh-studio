@@ -1,0 +1,74 @@
+{INFO uuid=737c1fb8-59a3-4e92-934f-cfdcacdb11d0 notation="gilak penutup" part=full title="Gilak Penutup" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+	{TEMPO 80}
+	{DYNAMICS mf positions=[gangsa, ugal]}
+	{DYNAMICS f positions=[gangsa, ugal] pass=3 nthpass=true}
+	{LABEL REGULAR}
+	{PART Unisono}
+ga/ugal	u---	u---	u---	a---	u---	a---	u---	e---
+reyong13	ua.u	au.a	ua.u	au.a	ua.u	au.a	ui.a	i.ai
+reyong24	.oe.	o.eo	.oe.	o.eo	.oe.	o.eo	.eo.	eo.e
+calung	u	u	u	a	u	a	u	e
+jegogan	u				u
+gong	G				G	P		P
+
+	{LABEL REGULAR2}
+ga/ugal	o---	o---	o---	e---	o---	e---	o---	i---
+reyong13	.ai.	a.ia	.ai.	a.ia	.ai.	a.ia	.ia.	ia.i
+reyong24	oe.o	eo.e	oe.o	eo.e	oe.o	eo.e	o.eo	.eo.
+calung	o	o	o	e	o	e	o	i
+jegogan	o				o
+gong	G				G	P		P
+	{GOTO TRANSITION pass=3 nthpass=true}
+
+	{LABEL REGULAR3}
+	{TEMPO 50 beats=1->8 pass=5}
+ga/ugal	a,---	a,---	i---	o---	e---	u---	o---	e---
+reyong13	ai.a	ia.i	.o.i	o.io	.i.a	ua.u	.au.	aua.
+reyong24	e.oe	.eo.	e.eu	.eu.	e.oe	.oe.	eo.e	o.oe
+calung	a	a	i	o	e	u	o	e
+jegogan	a				e
+gong	G				G	P		P
+	{GOTO REGULAR}
+	{GOTO END pass=5}
+
+
+	{LABEL TRANSITION}
+	{PART Transition}
+ga/ugal	a,---	a,---	i---	o---	e---	u---	--ee	e/...
+reyong13	ai.a	ia.i	a.ia	.ai.	ai.a	u---	--xx	x...
+reyong24	e.oe	.eo.	eo.e	oe.o	e.oe	....	..xx	x...
+calung	a	a	i	o	e	u	o	e
+jegogan	a				e
+gong	G				G	P		P
+
+	{LABEL KOTEKAN}
+	{COPY REGULAR}
+	{PART Kotekan}
+	## GONGAN 5
+gangsa_p	u.i<.	u.o.	u.i<.	u.o.	u.i<.	u.o.	u.o.	i.a,.
+gangsa_s	.a.a	.e.e	.a.a	.e.e	.a.a	.e.e	.i.a,	.u,.i
+reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+
+	{LABEL KOTEKAN2}
+	{COPY REGULAR2}
+gangsa_p	o.u.	o.a,.	o.u.	o.a,.	o.u.	o.a,.	o.a,.	u,.e,.
+gangsa_s	.e.e	.i.i	.e.e	.i.i	.e.e	.i.i	.u,.e,	.o,.u,
+reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+	{GOTO END pass=9}
+
+	{LABEL KOTEKAN3}
+	{COPY REGULAR3}
+gangsa_p	a,.i.	a,.u,.	i.e.	o.i.	e.o.	u.u.	o.u.	u.o.
+gangsa_s	.a,.u,	.e,.a,	.o.i	.a,.o	.i.e	.a.e	.e.a	.e.e
+reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+	{GOTO KOTEKAN}
+	{GOTO REGULAR pass=3 nthpass=true}
+
+	{LABEL END}
+	{VALIDATION ignore=["beat-duration"]}
+ugal	u
+ga/reyong	u
+calung	u
+jegogan	u
+gong	G
