@@ -58,7 +58,7 @@ const patterns = {
                             kotekan: { ngubeng: ['e,', '.', 'e,', '.'], majalan: ['?', 'e,', 'e,', '.'], basenote: 'e,' } },
                     'u,': { homophonic: { ngubeng: ['u,', 'a,', 'u,', 'a,'], majalan: ['?', 'u,/', 'u,', 'a,'], basenote: 'u,' },
                             kotekan: { ngubeng: ['u,', '.', 'u,', '.'], majalan: ['?', 'u,', 'u,', '.'], basenote: 'u,' } },
-                    'a,': { homophonic: { ngubeng: ['a,', 'i,', 'a,', 'i,'], majalan: ['?', 'a,/', 'a,', 'i,'], basenote: 'a,' },
+                    'a,': { homophonic: { ngubeng: ['a,', 'i', 'a,', 'i'], majalan: ['?', 'a,/', 'a,', 'i'], basenote: 'a,' },
                             kotekan: { ngubeng: ['a,', '.', 'a,', '.'], majalan: ['?', 'a,', 'a,', '.'], basenote: 'a,' } },
                     i: { homophonic: { ngubeng: ['i', 'o', 'i', 'o'], majalan: ['?', 'i/', 'i', 'o'], basenote: 'i' },
                             kotekan: { ngubeng: ['i', '.', 'i', '.'], majalan: ['?', 'i', 'i', '.'], basenote: 'i' } },
@@ -80,7 +80,7 @@ const patterns = {
                             kotekan: { ngubeng: ['e,', '.', 'e,', '.'], majalan: ['?', 'e,', 'e,', '.'], basenote: 'e,' } },
                     'u,': { homophonic: { ngubeng: ['u,', 'a,', 'u,', 'a,'], majalan: ['?', 'u,/', 'u,', 'a,'], basenote: 'u,' },
                             kotekan: { ngubeng: ['u,', '.', 'u,', '.'], majalan: ['?', 'u,', 'u,', '.'], basenote: 'u,' } },
-                    'a,': { homophonic: { ngubeng: ['a,', 'i,', 'a,', 'i,'], majalan: ['?', 'a,/', 'a,', 'i,'], basenote: 'a,' },
+                    'a,': { homophonic: { ngubeng: ['a,', 'i', 'a,', 'i'], majalan: ['?', 'a,/', 'a,', 'i'], basenote: 'a,' },
                             kotekan: { ngubeng: ['a,', '.', 'a,', '.'], majalan: ['?', 'a,', 'a,', '.'], basenote: 'a,' } },
                     i: { homophonic: { ngubeng: ['i', 'o', 'i', 'o'], majalan: ['?', 'i/', 'i', 'o'], basenote: 'i' },
                             kotekan: { ngubeng: ['i', '.', 'i', '.'], majalan: ['?', 'i', 'i', '.'], basenote: 'i' } },
@@ -108,7 +108,7 @@ const patterns = {
                             kotekan: { ngubeng: ['.', 'o', '.', 'o'], majalan: ['.', 'i', 'i', 'o'], basenote: 'i' } },
                     o: { homophonic: { ngubeng: ['a', 'i<', 'a', 'i<'], majalan: ['?', 'a/', 'a', 'i<'], basenote: 'a' },
                             kotekan: { ngubeng: ['.', 'e', '.', 'e'], majalan: ['.', 'o', 'o', 'e'], basenote: 'o' } },
-                    e: { homophonic: { ngubeng: ['i<', 'a', 'i<', 'a'], majalan: ['?', 'i</', 'i<', 'a'], basenote: 'i<' },
+                    e: { homophonic: { ngubeng: ['i<', 'u', 'i<', 'u'], majalan: ['?', 'i</', 'i<', 'u'], basenote: 'i<' },
                             kotekan: { ngubeng: ['.', 'u', '.', 'u'], majalan: ['.', 'e', 'e', 'u'], basenote: 'e' } },
                     u: { homophonic: { ngubeng: ['u', 'a', 'u', 'a'], majalan: ['?', 'u/', 'u', 'a'], basenote: 'u' },
                             kotekan: { ngubeng: ['.', 'a', '.', 'a'], majalan: ['.', 'u', 'u', 'a'], basenote: 'u' } },
@@ -130,7 +130,7 @@ const patterns = {
                             kotekan: { ngubeng: ['.', 'o', '.', 'o'], majalan: ['.', 'i', 'i', 'o'], basenote: 'i' } },
                     o: { homophonic: { ngubeng: ['a', 'i<', 'a', 'i<'], majalan: ['?', 'a/', 'a', 'i<'], basenote: 'a' },
                             kotekan: { ngubeng: ['.', 'e', '.', 'e'], majalan: ['.', 'o', 'o', 'e'], basenote: 'o' } },
-                    e: { homophonic: { ngubeng: ['i<', 'a', 'i<', 'a'], majalan: ['?', 'i</', 'i<', 'a'], basenote: 'i<' },
+                    e: { homophonic: { ngubeng: ['i<', 'u', 'i<', 'u'], majalan: ['?', 'i</', 'i<', 'u'], basenote: 'i<' },
                             kotekan: { ngubeng: ['.', 'u', '.', 'u'], majalan: ['.', 'e', 'e', 'u'], basenote: 'e' } },
                     u: { homophonic: { ngubeng: ['u', 'a', 'u', 'a'], majalan: ['?', 'u/', 'u', 'a'], basenote: 'u' },
                             kotekan: { ngubeng: ['.', 'a', '.', 'a'], majalan: ['.', 'u', 'u', 'a'], basenote: 'u' } },
@@ -196,13 +196,14 @@ const patterns = {
 // Returns the number of notes a symbol expands to during pattern resolution.
 // Norot symbols expand to 4 notes. All other symbols (including combined
 // grace-note symbols) occupy exactly one notation column.
-export function patternSize(note: NoteObject, position: Position): number {
+export function patternSize(note: NoteObject, position?: Position): number {
     void position // reserved for future position-specific logic
     return note.pattern.norot ? patterns.norot.size : 1
 }
 
 // Returns the width of the notation after expanding notation pattern symbols.
-export function notationWidth(notation: NoteObject[], position: Position) {
+// (norot counts as its pattern size, every other symbol as one column.)
+export function notationWidth(notation: NoteObject[], position?: Position) {
     return notation.reduce((sum, note) => sum + patternSize(note, position), 0)
 }
 
@@ -213,22 +214,55 @@ function symbolArrayToNoteArray(symbols: NoteSymbol[], position: Position): Note
 
 // Expands shorthand notation symbols (norot) into their full note sequences.
 // staff is an array of Staffs, one per kempli beat (as produced by the parser before flattening).
-export function applyPatterns(position: Position, staff: Staff[]): Staff[] {
+//
+// `eatSpaces` enables the alignment policy used by the compact view: a shorthand
+// symbol "eats" the following space columns so it occupies its full expanded width
+// in place (a norot symbol therefore consumes the 3 spaces after it). When there
+// are too few following spaces the sequence is cut off and a warning is logged.
+// With `eatSpaces` off (the parser's path) every norot expands to its full size
+// and following spaces are kept — the original behaviour.
+export function applyPatterns(position: Position, staff: Staff[], eatSpaces = false): Staff[] {
     const newStaff: Staff[] = []
     staff.forEach((beat, measureIdx) => {
         const expandedObjNotation: NoteObject[] = []
-        beat.objNotation.forEach((note, noteIdx) => {
+        let noteIdx = 0
+        while (noteIdx < beat.objNotation.length) {
+            const note = beat.objNotation[noteIdx]
             if (note.error !== undefined) {
                 // Structurally invalid symbol — replace with silence
-                // console.error(`invalid symbol '${note.inputSymbol}' for ${position}`)
                 expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
+                noteIdx++
             } else if (note.pattern.norot) {
-                expandedObjNotation.push(...norotPattern(position, staff, measureIdx, noteIdx))
+                const pattern = norotPattern(position, staff, measureIdx, noteIdx)
+                if (eatSpaces) {
+                    // The norot occupies its own column plus the following space columns.
+                    let avail = 1
+                    while (
+                        avail < pattern.length &&
+                        noteIdx + avail < beat.objNotation.length &&
+                        beat.objNotation[noteIdx + avail].toString() === ' '
+                    ) {
+                        avail++
+                    }
+                    const take = Math.min(pattern.length, avail)
+                    expandedObjNotation.push(...pattern.slice(0, take))
+                    if (take < pattern.length) {
+                        console.warn(
+                            `norot sequence cut off in ${position} measure ${measureIdx}: ` +
+                                `needs ${pattern.length} columns, only ${take} available.`
+                        )
+                    }
+                    noteIdx += take // consumed the norot symbol + (take - 1) following spaces
+                } else {
+                    expandedObjNotation.push(...pattern)
+                    noteIdx++
+                }
             } else {
                 // Single note (including combined grace-note symbols, strokes, etc.)
                 expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
+                noteIdx++
             }
-        })
+        }
         const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.toString())
         newStaff.push({ notation: expandedNotation, objNotation: expandedObjNotation } as Staff)
     })
