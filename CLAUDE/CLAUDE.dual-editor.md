@@ -87,21 +87,25 @@ All symbols that are visually aligned vertically must start playing simultaneous
 ```ts
 interface NotationGroup {
     id: string
-    positions: Position[]            // 1..n; a single-position group is a "solo" line
-    measures: NoteSymbol[][]         // compact, position-independent symbols per kempli beat
-}                                    // (string symbols → serialise cleanly; may contain shorthand)
+    positions: Position[]    // 1..n; a single-position group is a "solo" line
+    notation: NoteSymbol[]   // FLAT, space-padded compact symbols (measures concatenated)
+}
 // System gains:
 //   groups?: NotationGroup[]                    // CANONICAL compact store
+//   beatColWidths?: number[]                    // per-kempli-beat column widths
 //   castingInstructions?: CastingInstruction[]  // system-wide casting context (AUTOKEMPYUNG=off)
 //   staffs stays, but becomes a DERIVED CACHE (recomputed via expandSystem)
 ```
 
-Implementation notes (as built in Step 2):
+Implementation notes (as built):
 
-- `measures` holds **symbol strings** (`NoteSymbol[][]`), not `NoteObject`s, so groups serialise to JSON cleanly; `expandSystem` rebuilds `NoteObject`s (bound to no position, exactly as the parser does) before running the shared pipeline.
-- Casting context lives at the **system** level (`System.castingInstructions`), not per group, because column-width padding is computed across the whole system in a single expand pass.
-- `notationGroups` and `editorGroup` are left in place (deprecated, no longer populated) to avoid churn; they will be removed once the dual editor fully replaces them.
-- **COPY is deferred.** The parser still produces correct staffs for COPY systems, but those systems are marked (`copyFromUuid`) and **excluded** from groups-based re-derivation on load (they keep their cached staffs). Representing COPY at the group level — and re-enabling its editing — is a planned follow-up.
+- **Flat notation (like a Staff).** A group's `notation` is a single flat `NoteSymbol[]`. The parser builds it by padding each measure with spaces up to that beat's column width and concatenating, so **compact columns line up 1:1 with the expanded notation**. `System.beatColWidths` holds the per-beat column widths used to split the flat notation back into measures and to draw the grid.
+- **Norot occupies its full width.** A column width counts a norot as 4 (`presume norot = 4 symbols`). The parser inline-pads each norot with its 3 trailing spaces (`flattenCompactRaw`). On expansion, the `eatSpaces` mode of `applyPatterns` lets the norot consume those 3 spaces in place (cut off + warning if too few), so the expanded output is byte-identical to the old pipeline — `expandSystem` therefore reproduces the parser staffs (validated by `test:groups`), and the Step-1 goldens are unaffected because the parser's own staff path is unchanged.
+- **Two width counts.** The parser uses `compactColWidths` (norot = 4) on raw measures to allocate room; edits commit through `entryColWidths` (each entry = 1 column) because the editor's measures already contain the norot padding spaces — avoiding double-counting on round-trips.
+- Casting context lives at the **system** level (`System.castingInstructions`); padding is computed across the whole system in a single pass.
+- `notationGroups` and `editorGroup` are left in place (deprecated, no longer populated).
+- **COPY is deferred.** The parser still produces correct staffs for COPY systems, but those systems are marked (`copyFromUuid`) and **excluded** from groups-based re-derivation on load (they keep their cached staffs). Group-level COPY is a planned follow-up.
+- **Grid (compact view).** `CompactSystemEditor` draws the same background grid as the expanded notation — a gridline every column plus the kempli beats in green — using `beatColWidths` (or the uniform `kempli.frequency`). Each group is rendered as one continuous line; the controller still keeps measures internally, and the cursor is mapped to/from the flat column index.
 
 ## Steps
 
@@ -125,3 +129,17 @@ Verification: `npm run test:groups` parses every fixture and asserts `expandSyst
 ### Step 3 — Compact view editor (the new editing surface)
 
 `useCompactSystemEditor` (analogous to `useSystemEditor`, lines = groups), reusing `inputStateMachine`/`StaffLine`; compact label chips with full-position tooltips; on edit → `expandSystem` (debounced). The existing per-position editor becomes read-only. Implement the norot space-eating / cut-off alignment here (with cut-off warning). Group-membership editing (create/add/remove) and Lezer validation are later steps (4 and 6).
+
+Implementation notes (as built):
+
+- **`componentlogic/editor/useCompactSystemEditor.ts`** — controller whose lines are groups and whose cursor is `{ line, measure, index }`. Measures (kempli beats) are kept as first-class units so the expansion pipeline still gets per-beat structure; the cursor wraps across measures and lines. All state-machine ops run with an `undefined` position (compact symbols are position-independent), so shorthand/aggregated input is allowed. Reuses `inputStateMachine` and the default `keyMap`.
+- **`components/editor/CompactSystemEditor.tsx`** — renders one row per group: a label chip (`utils/compactGroupLabel.ts`, with the full position list as a tooltip) + the measures, each drawn with the shared `StaffLine`, divided by a thin separator.
+- **`SystemNotationEditor`** gained a reactive `readOnly` mode: it renders straight from the `initialStaves` prop (so it reflects compact edits flowing through `expandSystem`), shows no cursor, and ignores input.
+- **`SystemNode`** now renders the `CompactSystemEditor` (editable) above the expanded notation, and sets the expanded editor `readOnly` when the system has groups. A second debounced commit rebuilds `groups` from the compact lines, calls `expandSystem`, and `updateSystem`s. Systems without groups (legacy/laras) and COPY systems keep the old editable expanded editor.
+
+MVP boundaries (deferred):
+
+- Precise column alignment of compact measures against the kempli grid, and the **norot space-eating / cut-off** policy, are not yet implemented (measures are shown divided but not pixel-aligned to expanded columns).
+- The per-system **"view expanded"** toggle is Step 5; for now the read-only expanded view is always shown beneath the compact editor (it also carries playback).
+- Compact **paste** is minimal (first clipboard line into the active measure).
+- Group-membership editing (Step 4) and Lezer validation + save gating (Step 6) are unchanged/later.
