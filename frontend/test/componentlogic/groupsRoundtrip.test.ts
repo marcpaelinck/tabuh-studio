@@ -57,6 +57,7 @@ function run() {
             // Re-derive from groups only, starting from the same blank kempli the parser used.
             const rebuilt = {
                 groups: system.groups,
+                beatColWidths: system.beatColWidths,
                 castingInstructions: system.castingInstructions,
                 execution: system.execution,
                 kempli: { state: 'on' },

@@ -27,32 +27,48 @@ export interface SystemNotationEditorProps {
     keyMap?: KeyMap
     className?: string
     style?: CSSProperties
+    /**
+     * When true the editor is a non-interactive, REACTIVE read-only display: it
+     * renders straight from `initialStaves` on every render (so it reflects
+     * external updates, e.g. compact-view edits flowing through expandSystem),
+     * shows no cursor, and ignores keyboard/paste input.
+     */
+    readOnly?: boolean
 }
 
-export function SystemNotationEditor({ initialStaves, onChange, keyMap, className, style }: SystemNotationEditorProps) {
-    const { staves, cursor, focused, onKeyDown, onPaste, onFocus, onBlur, setCursor } = useSystemEditor({
-        initialStaves,
-        keyMap,
-        onChange
-    })
+export function SystemNotationEditor({
+    initialStaves,
+    onChange,
+    keyMap,
+    className,
+    style,
+    readOnly
+}: SystemNotationEditorProps) {
+    const controller = useSystemEditor({ initialStaves, keyMap, onChange })
+
+    // In read-only mode we ignore the controller's internal (mount-seeded) state
+    // and render from the live prop, so the view tracks external changes.
+    const staves = readOnly ? initialStaves : controller.staves
+    const showCursor = !readOnly && controller.focused
 
     const fontClass = `balifontspaced${editorFontSize}`
 
     return (
         <div
-            tabIndex={0}
+            tabIndex={readOnly ? -1 : 0}
             role="textbox"
             aria-multiline="true"
+            aria-readonly={readOnly}
             aria-label="system notation editor"
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-            onFocus={onFocus}
-            onBlur={onBlur}
+            onKeyDown={readOnly ? undefined : controller.onKeyDown}
+            onPaste={readOnly ? undefined : controller.onPaste}
+            onFocus={readOnly ? undefined : controller.onFocus}
+            onBlur={readOnly ? undefined : controller.onBlur}
             className={`${fontClass}${className ? ' ' + className : ''}`}
             style={{
                 outline: 'none',
                 whiteSpace: 'pre',
-                cursor: 'text',
+                cursor: readOnly ? 'default' : 'text',
                 background: 'transparent',
                 boxSizing: 'border-box',
                 ...style
@@ -62,9 +78,9 @@ export function SystemNotationEditor({ initialStaves, onChange, keyMap, classNam
                 <StaffLine
                     key={staff.position}
                     symbols={staff.symbols}
-                    cursorIndex={focused && cursor.staff === staffIdx ? cursor.index : null}
-                    onSymbolClick={(index) => setCursor(staffIdx, index)}
-                    onTrailingClick={() => setCursor(staffIdx, staff.symbols.length)}
+                    cursorIndex={showCursor && controller.cursor.staff === staffIdx ? controller.cursor.index : null}
+                    onSymbolClick={readOnly ? () => {} : (index) => controller.setCursor(staffIdx, index)}
+                    onTrailingClick={readOnly ? () => {} : () => controller.setCursor(staffIdx, staff.symbols.length)}
                 />
             ))}
         </div>

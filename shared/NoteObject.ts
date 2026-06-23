@@ -249,6 +249,7 @@ export class NoteObject {
                 } else if (PATTERN_MODIFIERS.has(ch)) {
                     this.symbol.modifier = ch as PatternModifier
                     this.hasPattern = true
+                    this.pattern.norot = PATTERN_MODIFIER_MAP.get(ch) == 'NOROT'
                 }
             }
         } catch {

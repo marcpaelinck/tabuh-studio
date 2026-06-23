@@ -1,13 +1,16 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import { NoteObject } from '@tabuhstudio/shared'
+import { KEMPLI_BEAT_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager.ts'
 import {
     castGroupedNotationToPositions,
+    compactColWidths,
     deriveKempli,
     expandParsedStaffs,
+    flattenCompactRaw,
     type ParsedStaffs
 } from '../componentlogic/expandNotation.ts'
 import { dynamicsToNumber } from '../config/config.ts'
@@ -118,12 +121,17 @@ export function parseNotation(content: string): ParserReturnValue {
                 const castInstructions: CastingInstruction[] = metaData
                     .filter((item) => item.type == 'castinginstruction')
                     .map((item) => item.value) as CastingInstruction[]
-                // Canonical compact store: one group per StaffLine (solo or multi-position),
-                // holding position-independent compact symbols per kempli beat.
-                system.groups = groupedNotation.map((group) => ({
+                // Canonical compact store: one group per StaffLine (solo or multi-position).
+                // Each group's notation is stored FLAT, like a Staff: measures are padded
+                // with spaces to the per-beat column width and concatenated, so the compact
+                // columns line up 1:1 with the expanded notation.
+                const compactMeasures = groupedNotation.map((group) => group.staff.map((beat) => beat.objNotation))
+                const beatColWidths = compactColWidths(compactMeasures)
+                system.beatColWidths = beatColWidths
+                system.groups = groupedNotation.map((group, groupIdx) => ({
                     id: uuidv4(),
                     positions: group.positions,
-                    measures: group.staff.map((beat) => beat.notation.slice())
+                    notation: flattenCompactRaw(compactMeasures[groupIdx], beatColWidths)
                 }))
                 system.castingInstructions = castInstructions.length > 0 ? castInstructions : undefined
                 const parsedStaffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
@@ -205,6 +213,7 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
 
     // At this point system.staffs temporarily holds Staff[] per position (ParsedStaffs).
     // Expand pattern symbols, pad beats to equal width, derive kempli and flatten to Staff.
+    // If the beats have unequal widths and there is no explicit kempli staff, add a kempli staff.
     // The transform itself now lives in componentlogic/expandNotation.ts so that the live
     // editor can reuse exactly the same code.
     for (const system of score.systems) {
@@ -213,6 +222,16 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         const { staffs, colWidths } = expandParsedStaffs(parsedStaffs)
         system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliStaff)
         system.staffs = staffs
+        // ensure that there is a kempli staff if the kempli state is 'notation'.
+        console.log(colWidths)
+        if (system.kempli.state == 'notation' && !('KEMPLI' in system.staffs)) {
+            const notation: string[] = colWidths
+                .map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR)))
+                .flat()
+            const objNotation = NoteObject.fromNotation(notation)
+            system.staffs['KEMPLI'] = { notation, objNotation }
+            system.groups?.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
+        }
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -379,7 +398,7 @@ function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNot
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
                 // The NoteObject is not bound to any instrument
-                const note = new NoteObject(getText(noteNode, content).trim(), undefined)
+                const note = new NoteObject(getText(noteNode, content), undefined)
                 beat.notation.push(note.toString())
                 beat.objNotation.push(note)
                 noteNode = noteNode.nextSibling

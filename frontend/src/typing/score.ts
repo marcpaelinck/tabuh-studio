@@ -45,14 +45,16 @@ export interface GroupedNotation {
 }
 
 // Canonical "compact" notation group — the source of truth for the dual editor.
-// `measures` holds position-independent compact symbols per kempli beat (one inner
-// array per beat) and may contain shorthand symbols (e.g. norot). The expanded,
-// per-position `staffs` are DERIVED from a system's groups via expandSystem()
-// (see componentlogic/expandNotation.ts).
+// Like a Staff, `notation` is a single FLAT list of position-independent compact
+// symbols (may contain shorthand such as norot). It is built by padding each measure
+// with spaces up to the per-beat column width (`System.beatColWidths`) and
+// concatenating, so the compact columns line up 1:1 with the expanded notation.
+// The expanded per-position `staffs` are DERIVED from a system's groups via
+// expandSystem() (see componentlogic/expandNotation.ts).
 export interface NotationGroup {
     id: string
     positions: Position[] // 1..n; a single-position group is a "solo" line
-    measures: NoteSymbol[][] // compact symbols per kempli beat
+    notation: NoteSymbol[] // flat, space-padded compact symbols (measures concatenated)
 }
 // Subdivision of a score, typically spans one gongan
 
@@ -64,6 +66,7 @@ export type System = {
     notationGroups?: GroupedNotation[] // DEPRECATED: superseded by `groups`; no longer populated.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
     groups?: NotationGroup[] // CANONICAL compact notation (source of truth for the dual editor).
+    beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
     castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
     staffs: Partial<Record<Position, Staff>> // Derived (cache) flat notation for each position.
     kempli: KempliSetting

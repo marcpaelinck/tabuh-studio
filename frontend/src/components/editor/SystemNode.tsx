@@ -15,7 +15,9 @@ import {
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
+import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
+import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
 import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { Position, UUID } from '../../typing/basetypes'
@@ -28,6 +30,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
@@ -318,6 +321,39 @@ export const SystemNode = memo(function SystemNode({
         updateSystem({ ...systemData, staffs: newStaffs })
     }, 300)
 
+    // The compact (grouped/shorthand) view is the editable surface for systems that
+    // have a canonical `groups` store. COPY systems are excluded for now (their
+    // copied positions are not yet represented in groups — see CLAUDE.dual-editor.md).
+    const hasGroups = !!systemData.groups && systemData.groups.length > 0 && !systemData.copyFromUuid
+
+    // Compact lines seeded from the system's groups. The stored notation is flat, so
+    // it is split back into measures using the system's per-beat column widths.
+    const beatColWidths = systemData.beatColWidths ?? []
+    const compactLines: CompactLine[] = (systemData.groups ?? []).map((group) => ({
+        id: group.id,
+        positions: group.positions,
+        measures: splitFlat(group.notation, beatColWidths).map((measure) =>
+            measure.map((sym) => new NoteObject(sym, undefined))
+        )
+    }))
+
+    // Committing a compact edit re-computes the per-beat column widths, re-flattens the
+    // groups, re-derives the expanded staffs (and kempli) via the shared pipeline, then
+    // updates the score. Debounced like the expanded path so typing stays instant.
+    const { schedule: handleCompactChange } = useDebouncedCommit((lines: CompactLine[]) => {
+        // Editor measures already contain a norot's padding spaces, so widths are
+        // counted by entry (compactColWidths would double-count the norot).
+        const newBeatColWidths = entryColWidths(lines.map((line) => line.measures))
+        const groups = lines.map((line) => ({
+            id: line.id,
+            positions: line.positions,
+            notation: flattenCompact(line.measures, newBeatColWidths)
+        }))
+        const newSystem: System = { ...systemData, groups, beatColWidths: newBeatColWidths }
+        expandSystem(newSystem)
+        updateSystem(newSystem)
+    }, 300)
+
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
         const positionTitlesFont = `courierfont${10}`
@@ -329,6 +365,21 @@ export const SystemNode = memo(function SystemNode({
                     {systemHeaderButtons}
                     {systemHeaderFields}
                 </Row>
+                {hasGroups && (
+                    <Row id="CompactNotation">
+                        <Col span={23}>
+                            {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
+                            <CompactSystemEditor
+                                key={`compact-${systemData.uuid}`}
+                                initialLines={compactLines}
+                                beatColWidths={beatColWidths}
+                                kempliFrequency={systemData.kempli.frequency}
+                                onChange={handleCompactChange}
+                                className="border-1 border-solid border-gray-200 p-1"
+                            />
+                        </Col>
+                    </Row>
+                )}
                 <Row id="SystemNotation">
                     <Col span={3} id="Positions">
                         <Textarea
@@ -362,6 +413,7 @@ export const SystemNode = memo(function SystemNode({
                             <SystemNotationEditor
                                 initialStaves={editorStaves}
                                 onChange={handleStavesChange}
+                                readOnly={hasGroups}
                                 className="leading-5.5 border-1 border-solid border-transparent p-0"
                                 style={{ position: 'absolute', inset: 0, zIndex: 2 }}
                             />

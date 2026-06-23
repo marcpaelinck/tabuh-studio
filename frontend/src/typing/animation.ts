@@ -39,6 +39,6 @@ export interface HighlightRange {
 }
 
 // Determines whether the playback cursor highlights each beat separately or the entire system
-export type PlaybackCursorStyle = 'Beat' | 'System'
+export type PlaybackCursorStyle = 'Beat' | 'System' | 'None'
 
 export type HilightRangeFunction = (hlRange: HighlightRange) => void
