@@ -32,32 +32,6 @@ export interface CompactSystemEditorProps {
     style?: CSSProperties
 }
 
-const GRID_GRAY = 'rgba(0, 0, 0, 0.15)'
-const KEMPLI_GREEN = 'rgba(0, 150, 0, 0.65)'
-
-// Builds the background grid: gridlines every 1ch plus kempli beat lines (green).
-function buildGrid(beatColWidths: number[], kempliFrequency?: number): string {
-    const gridlines = `repeating-linear-gradient(to right, ${GRID_GRAY} 0 1px, transparent 1px 1ch)`
-    let kempli: string
-    if (kempliFrequency && kempliFrequency > 0) {
-        kempli = `repeating-linear-gradient(to right, ${KEMPLI_GREEN} 0 2px, transparent 2px ${kempliFrequency}ch)`
-    } else {
-        const stops: string[] = ['transparent 0']
-        let pos = 0
-        for (const w of beatColWidths) {
-            pos += w
-            stops.push(
-                `transparent calc(${pos}ch - 2px)`,
-                `${KEMPLI_GREEN} calc(${pos}ch - 2px)`,
-                `${KEMPLI_GREEN} ${pos}ch`,
-                `transparent ${pos}ch`
-            )
-        }
-        kempli = `linear-gradient(to right, ${stops.join(', ')}, transparent 100%)`
-    }
-    return `${kempli}, ${gridlines}`
-}
-
 // Maps a flat column index to a { measure, index } position within a line.
 function locate(measures: { length: number }[], flatIndex: number): { measure: number; index: number } {
     let offset = 0
