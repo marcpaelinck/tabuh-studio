@@ -88,6 +88,9 @@ app.use('/api/scores', scoresRouter)
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' })
 })
+app.get('/api/environment', (_req, res) => {
+    res.json({ environment: process.env.NODE_ENV })
+})
 
 // ── React client-side routing ───────────────────────────────
 

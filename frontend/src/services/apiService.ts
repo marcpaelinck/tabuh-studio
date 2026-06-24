@@ -48,6 +48,10 @@ export interface ScoreListItem {
     created_at: string
 }
 
+export async function apiGetEnvironment(): Promise<{ environment: string } | undefined> {
+    return request<{ environment: string }>('/environment')
+}
+
 export interface ScoreRecord extends ScoreListItem {
     content: unknown // full score JSON — cast to Score in the hook
 }

@@ -31,6 +31,7 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { useScreenSize } from '../componentlogic/useScreenSize'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
+import { apiGetEnvironment } from '../services/apiService'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { Position, UUID } from '../typing/basetypes'
 import {
@@ -56,7 +57,9 @@ import { MainMenu } from './MainMenu'
 import PlayerMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
-import logo from '/dist/icons/tabuh-studio_icon.svg'
+import logo_development from '/icons/tabuh-studio_icon_development.svg'
+import logo_local from '/icons/tabuh-studio_icon_local.svg'
+import logo_production from '/icons/tabuh-studio_icon_production.svg'
 
 interface LoginDialogProps {
     open: boolean
@@ -132,6 +135,24 @@ interface NavHeaderProps {
 function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [logoutMenu, setLogoutMenu] = useState<boolean>(false)
+    const [logo, setLogo] = useState<string | undefined>()
+
+    useEffect(() => {
+        const getEnvLogo = async () => {
+            const env = await apiGetEnvironment()
+            const logo = !env?.environment
+                ? logo_local
+                : env.environment == 'production'
+                  ? logo_production
+                  : env.environment == 'development'
+                    ? logo_development
+                    : logo_local
+            setLogo(logo)
+        }
+        getEnvLogo()
+    }, [])
+
+    useEffect(() => console.log(logo), [logo])
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -174,6 +195,7 @@ interface MainWindowProps {
     dataSource: 'database' | 'file'
 }
 type ActiveView = 'editor' | 'player'
+
 export function MainWindow({ dataSource }: MainWindowProps) {
     // ── NAVIGATION ─────────────────────────────────────────────
 
