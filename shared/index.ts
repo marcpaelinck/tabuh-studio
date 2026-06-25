@@ -10,16 +10,16 @@
  *   - NoteObject class, NoteObjectError, NoteObjectFault (NoteObject.ts)
  */
 
-export type { Position } from "./position.ts";
+export type { Position } from './position.ts'
 
 export {
-  AFTER_MODIFIERS,
-  GRACE_NOTE_PREFIXES,
-  OCTAVE_MODIFIERS,
-  PATTERN_MODIFIERS,
-  PITCH_CHARS,
-  STROKE_MODIFIERS,
-} from "./noteChars.ts";
+    AFTER_MODIFIERS,
+    GRACE_NOTE_PREFIXES,
+    OCTAVE_MODIFIERS,
+    PATTERN_MODIFIERS,
+    PITCH_CHARS,
+    STROKE_MODIFIERS
+} from './constants/noteChars.ts'
 
-export { NoteObject, NoteObjectError } from "./NoteObject.ts";
-export type { NoteObjectFault } from "./NoteObject.ts";
+export { NoteObject, NoteObjectError } from './types/NoteObject.ts'
+export type { NoteObjectFault } from './types/NoteObject.ts'

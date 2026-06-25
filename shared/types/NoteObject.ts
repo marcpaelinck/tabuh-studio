@@ -2,10 +2,10 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
-import { positionConfigs } from '../frontend/src/config/config.ts'
-import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from './noteChars'
+import { positionConfigs } from '../../frontend/src/config/config.ts'
+import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
 
-import { noteRange } from '../frontend/src/utils/alphabet.ts'
+import { noteRange } from '../../frontend/src/utils/alphabet.ts'
 import type {
     GracenoteChar,
     OctaveChar,
@@ -14,7 +14,7 @@ import type {
     PitchChar,
     StrokeModifier,
     StrokeType
-} from './noteChars.ts'
+} from '../constants/noteChars.ts'
 import {
     GRACE_NOTE_PREFIXES,
     MELODIC_PITCH_CHARS,
@@ -24,8 +24,8 @@ import {
     PITCH_CHARS,
     STROKE_MODIFIER_MAP,
     STROKE_MODIFIERS
-} from './noteChars.ts'
-import type { Position } from './position.ts'
+} from '../constants/noteChars.ts'
+import type { Position } from '../position.ts'
 
 // Re-export so that consumers can import everything from a single file if needed.
 export {
@@ -35,7 +35,7 @@ export {
     PATTERN_MODIFIERS,
     PITCH_CHARS,
     STROKE_MODIFIERS
-} from './noteChars.ts'
+} from '../constants/noteChars.ts'
 
 // ---------------------------------------------------------------------------
 // NoteObjectFault
@@ -384,7 +384,7 @@ export class NoteObject {
         var shortestDistance = 99
 
         // Try different octavations and keep the value that is 'nearest' to the next this.
-        const octaveOptions = new Set(['']).union(OCTAVE_MODIFIERS)
+        const octaveOptions = new Set(['', ...OCTAVE_MODIFIERS])
         for (const octaveChar of octaveOptions) {
             const tryNote = pitchChar + octaveChar
             if (instrumentRange.includes(tryNote)) {

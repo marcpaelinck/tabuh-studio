@@ -18,7 +18,7 @@
 // space-eating refinement is planned for the compact editor (see CLAUDE.dual-editor.md).
 
 import { NoteObject } from '@tabuhstudio/shared'
-import { SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
+import { SPACE_CHAR } from '@tabuhstudio/shared/constants/notechars'
 import _ from 'lodash'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
 import type { ExecutionItem, KempliItem } from '../typing/execution.ts'

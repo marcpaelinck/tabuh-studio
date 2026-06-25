@@ -5,7 +5,7 @@
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
 import { NoteObject } from '@tabuhstudio/shared'
-import { EXTENDING_CHAR, MUTING_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/noteChars'
+import { EXTENDING_CHAR, MUTING_CHAR, SPACE_CHAR } from '@tabuhstudio/shared/constants/notechars'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
 import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'

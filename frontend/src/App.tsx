@@ -1,30 +1,15 @@
-import { useEffect, useState } from 'react'
 import Favicon from 'react-favicon'
 import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
+import { useEnvironmentManager } from './componentlogic/useEnvironmentManager'
 import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
-import { apiGetEnvironment } from './services/apiService'
 
 export default function App() {
-    // Set the logo and favicon color depending on the environment
-    const [logoURL, setLogoURL] = useState<string>('')
-    useEffect(() => {
-        const getEnvLogo = async () => {
-            const env = await apiGetEnvironment()
-            const logo = !env?.environment
-                ? 'icons/tabuh-studio_icon_local.svg'
-                : env.environment == 'production'
-                  ? 'icons/tabuh-studio_icon_production.svg'
-                  : env.environment == 'development'
-                    ? 'icons/tabuh-studio_icon_development.svg'
-                    : 'icons/tabuh-studio_icon_local.svg'
-            setLogoURL(logo)
-        }
-        getEnvLogo()
-    }, [])
     const dataSource = 'database'
+    // The logo and favicon colors depend on the backend's environment (production, development, local)
+    const { logoURL } = useEnvironmentManager()
 
     return (
         <CustomProvider>

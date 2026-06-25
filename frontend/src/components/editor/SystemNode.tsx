@@ -1,5 +1,5 @@
 import { NoteObject } from '@tabuhstudio/shared'
-import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/noteChars'
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/notechars'
 import _ from 'lodash'
 import {
     memo,
@@ -14,8 +14,8 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
+import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
 import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'

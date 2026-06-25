@@ -3,7 +3,7 @@
  */
 
 import { NoteObject } from '@tabuhstudio/shared'
-import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/noteChars'
+import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/notechars'
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'

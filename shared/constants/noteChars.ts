@@ -44,7 +44,7 @@ export const KEMPLI_BEAT_CHAR = 'x'
  * Characters that do not produce sound during playback.
  *
  */
-export const SILENCE_CHARS: ReadonlySet<string> = SILENCE_EXTENDING_CHARS.union(SILENCE_MUTING_CHARS)
+export const SILENCE_CHARS: ReadonlySet<string> = new Set([...SILENCE_EXTENDING_CHARS, ...SILENCE_MUTING_CHARS])
 
 /**
  * Octave modifier characters. Appear after the pitch character.
