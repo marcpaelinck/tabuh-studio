@@ -1,5 +1,5 @@
 import { NoteObject } from '@tabuhstudio/shared'
-import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/notechars'
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/noteChars'
 import _ from 'lodash'
 import {
     memo,
@@ -30,6 +30,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { FeatureUnderDevelopment } from '../Feature'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -369,14 +370,16 @@ export const SystemNode = memo(function SystemNode({
                     <Row id="CompactNotation">
                         <Col span={23}>
                             {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
-                            <CompactSystemEditor
-                                key={`compact-${systemData.uuid}`}
-                                initialLines={compactLines}
-                                beatColWidths={beatColWidths}
-                                kempliFrequency={systemData.kempli.frequency}
-                                onChange={handleCompactChange}
-                                className="border-1 border-solid border-gray-200 p-1"
-                            />
+                            <FeatureUnderDevelopment>
+                                <CompactSystemEditor
+                                    key={`compact-${systemData.uuid}`}
+                                    initialLines={compactLines}
+                                    beatColWidths={beatColWidths}
+                                    kempliFrequency={systemData.kempli.frequency}
+                                    onChange={handleCompactChange}
+                                    className="border-1 border-solid border-gray-200 p-1"
+                                />
+                            </FeatureUnderDevelopment>
                         </Col>
                     </Row>
                 )}
