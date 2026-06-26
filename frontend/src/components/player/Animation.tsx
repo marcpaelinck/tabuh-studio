@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ReactSVG } from 'react-svg'
 import { Grid, Loader, Row, SelectPicker, Slider, Stack, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
-import { FRAMESTYLE, positionConfigs, theme } from '../../config/config'
+import { positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
 import { panggulDefaultOption, type ExtendedOption } from '../../typing/interface'
@@ -141,9 +141,9 @@ export function Animation({
     }, [playbackSettings.selectedFocusOption, svgSizeStyle])
 
     return playbackSettings.selectedFocusOption.objValue.length > 0 ? (
-        <div className="m-0 md:m-6 w-full min-w-0">
-            <Grid fluid id="Animation" color="black" className={`px-4 pt-3 pb-4 ${FRAMESTYLE}`}>
-                <Row id="animation-toggles-row" gutter={10} className="p-1">
+        <div className="m-0 md:m-6 md:w-95/100 " id="animationgrid">
+            <Grid fluid id="Animation" color="black" className="min-w-0">
+                <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
                     <Stack direction={{ xs: 'column', sm: 'row' }}>
                         <Toggle
                             id="notation toggle"
@@ -151,7 +151,7 @@ export function Animation({
                             labelPlacement="start"
                             disabled={notationElement == null}
                             color={theme.animation}
-                            defaultChecked={notationElement != null && notationVisible}
+                            checked={notationVisible}
                             onChange={(checked) => setNotationVisibility(checked)}></Toggle>
                         {
                             // The panggul checkbox is only visible if the embedded SVG code has a panggul element
@@ -175,7 +175,7 @@ export function Animation({
                         }
                     </Stack>
                 </Row>
-                <Row id="notation-area-row" className="p-2">
+                <Row id="notation-area-row" className="p-2 min-w-0">
                     <NotationArea
                         notation={notationElement}
                         visible={notationVisible}
@@ -183,7 +183,7 @@ export function Animation({
                         updatePlaybackFunctions={updatePlaybackFunctions}
                     />
                 </Row>
-                <Row id="slider-row" className="pl-4 pr-4 pt-10">
+                <Row id="slider-row" className="pl-4 pr-4 pt-10 min-w-0">
                     <Slider
                         progress
                         className="flex w-full ts-theme-animation"

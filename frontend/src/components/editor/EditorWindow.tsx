@@ -77,7 +77,6 @@ export default function EditorWindow({
 
     // In order to minimize re-renders, each SystemNode gets its own cursor update function.
     // const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
-    // const [systemCursorFunctions, setSystemCursorFunctions] = useState<Record<UUID, SystemCursorFunction>>({})
 
     const systemCursorFunctions = useRef<Record<UUID, SystemCursorFunction>>({})
 

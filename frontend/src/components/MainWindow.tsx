@@ -26,12 +26,12 @@ import {
 } from 'rsuite'
 import { playbackReducerFactory } from '../componentlogic/playback/playbackReducer'
 import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManager'
-import { useEnvironmentManager } from '../componentlogic/useEnvironmentManager'
 import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
+import { useEnvironmentManager } from '../stores/useEnvironmentManager'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { Position, UUID } from '../typing/basetypes'
 import {
@@ -188,7 +188,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const { user, login, logout } = useAuth()
 
     useEffect(() => {
-        setAppAppearance(screenSize.abbr.includes('lg') ? 'full' : 'playerOnly')
+        setAppAppearance(screenSize?.abbr.includes('lg') ? 'full' : 'playerOnly')
     }, [screenSize])
 
     // ── DASHBOARD WARNINGS ─────────────────────────────────────────────
@@ -443,7 +443,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                     </Grid>
                 </Header>
                 <Content id="content" px="1rem" className="h-9/10 min-h-0 p-4">
-                    <div id="editor/player window box" className={`h-[100%] border rounded-md p-2 overflow-scroll`}>
+                    <div
+                        id="editor/player window box"
+                        className={`h-[100%] border rounded-md p-2 ${active == 'editor' ? 'overflow-scroll' : ''}`}>
                         <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
                         <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
                     </div>

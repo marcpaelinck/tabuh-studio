@@ -1,10 +1,10 @@
 import Favicon from 'react-favicon'
 import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
-import { useEnvironmentManager } from './componentlogic/useEnvironmentManager'
 import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
+import { useEnvironmentManager } from './stores/useEnvironmentManager'
 
 export default function App() {
     const dataSource = 'database'

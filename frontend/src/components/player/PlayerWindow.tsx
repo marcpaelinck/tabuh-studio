@@ -109,7 +109,7 @@ export default function PlayerWindow({
     return (
         <VStack
             id="Player Window"
-            className="pt-6 sm:pl-0 sm:pr-0 md:pl-18 md:pr-18"
+            className="pt-6 sm:pl-0 sm:pr-0 md:pl-6 md:pr-6 min-h-0 overflow-hidden w-full"
             visibility={visible ? 'visible' : 'collapse'}>
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{playerMenu}</Activity>
             <Activity mode={playbackSettings.selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
