@@ -198,10 +198,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const appInfo = useAppInfo()
     const dialog = useDialog()
 
+    // Dialog with app information. Appears when user clicks the app logo.
     function infoDlg() {
         dialog.alert(
             <p>
                 <b>{appInfo.name}</b> version {appInfo.version}
+                {environment != 'production' && <br />}
+                {environment != 'production' && `${environment} environment`}
                 <br />
                 <br />
                 {appInfo.copyright}
