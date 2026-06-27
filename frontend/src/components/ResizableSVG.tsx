@@ -5,8 +5,16 @@ const MIN_SIZE = 10 // percent
 const MAX_SIZE = 100 // percent
 
 // Adds a handle to the lower right corner of an SVG image that can be used to resize the image.
-export function ResizableSVG({ src, afterInjection }: { src: string; afterInjection: (svg: SVGSVGElement) => void }) {
-    const svgSizeRef = useRef<number>(50)
+export function ResizableSVG({
+    src,
+    defaultSize,
+    afterInjection
+}: {
+    src: string
+    defaultSize: number
+    afterInjection: (svg: SVGSVGElement) => void
+}) {
+    const svgSizeRef = useRef<number>(defaultSize)
     const [svgSize, setSvgSize] = useState<number>(svgSizeRef.current)
     const svgMaxWHRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
     const dragStateRef = useRef<boolean>(false)

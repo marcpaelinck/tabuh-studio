@@ -1,4 +1,4 @@
-import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/notechars'
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared'
 import type { Position } from '../../../typing/basetypes'
 
 // Instrument tag conversion (tag -> )

@@ -1,5 +1,4 @@
-import { NoteObject } from '@tabuhstudio/shared'
-import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/noteChars'
+import { KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import {
     memo,

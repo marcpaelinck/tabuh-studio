@@ -14,12 +14,19 @@ export type { Position } from './position.ts'
 
 export {
     AFTER_MODIFIERS,
+    ERROR_PITCH_CHAR,
+    EXTENDING_CHAR,
     GRACE_NOTE_PREFIXES,
+    KEMPLI_BEAT_CHAR,
+    MUTING_CHAR,
     OCTAVE_MODIFIERS,
     PATTERN_MODIFIERS,
     PITCH_CHARS,
+    SILENCE_EXTENDING_CHARS,
+    SILENCE_MUTING_CHARS,
+    SPACE_CHAR,
     STROKE_MODIFIERS
 } from './constants/noteChars.ts'
 
-export { NoteObject, NoteObjectError } from './types/NoteObject.ts'
-export type { NoteObjectFault } from './types/NoteObject.ts'
+export { NoteObject, NoteObjectError } from './types/NoteObject'
+export type { NoteObjectFault } from './types/NoteObject'

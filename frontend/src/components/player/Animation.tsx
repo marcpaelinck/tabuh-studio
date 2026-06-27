@@ -54,10 +54,9 @@ export function Animation({
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
-    const defaultSvgSize = 35 // percent
+    const defaultSvgSize = 50 // percent
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
-    const [svgSizeStyle, setSvgSize] = useState<Object>({ width: `${defaultSvgSize}%`, height: `${defaultSvgSize}%` })
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -97,11 +96,6 @@ export function Animation({
         if (playbackSettings.selectedPanggulOption) setPanggulVisibility(playbackSettings.selectedPanggulOption)
     }, [playbackSettings.selectedPanggulOption, svgInfoRef.current])
 
-    const updateSvgSize = (val: number | number[]) => {
-        const size: number = Math.round(typeof val == 'number' ? val : val[0])
-        setSvgSize({ width: `${size}%`, height: `${size}%` })
-    }
-
     function setSvgStates(svg: SVGSVGElement) {
         if (svg) {
             svgInfoRef.current = retrieve_svg_data(svg)
@@ -132,10 +126,11 @@ export function Animation({
         return (
             <ResizableSVG
                 src={positionToSvg(playbackSettings.selectedFocusOption?.objValue)}
+                defaultSize={defaultSvgSize}
                 afterInjection={setSvgStates}
             />
         )
-    }, [playbackSettings.selectedFocusOption, svgSizeStyle])
+    }, [playbackSettings.selectedFocusOption])
 
     return playbackSettings.selectedFocusOption.objValue.length > 0 ? (
         <div className="m-0 md:m-6 md:w-95/100 " id="animationgrid">

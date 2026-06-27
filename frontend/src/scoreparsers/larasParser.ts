@@ -1,8 +1,7 @@
 // Parser for imported scores with Laras formatting.
 
 import type { SyntaxNode } from '@lezer/common'
-import { EXTENDING_CHAR } from '@tabuhstudio/shared/constants/notechars'
-import { NoteObject } from '@tabuhstudio/shared/types/noteObject'
+import { EXTENDING_CHAR, NoteObject } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import type { Position } from '../typing/basetypes'

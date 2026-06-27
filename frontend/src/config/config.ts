@@ -1,4 +1,4 @@
-import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared/constants/noteChars'
+import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { MutingType, Position, ToneType } from '../typing/basetypes'
 import type { DynamicsValue } from '../typing/execution'
