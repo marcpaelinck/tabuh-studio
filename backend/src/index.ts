@@ -14,6 +14,12 @@ dotenv.config()
 
 const app = express()
 
+// Trust exactly the number of reverse proxies in front of this app (e.g. 1 for a
+// single nginx / load balancer) so express-rate-limit can read the real client IP
+// from X-Forwarded-For without trusting a spoofable, fully-permissive chain.
+// Set TRUST_PROXY=0 for local development with no proxy.
+app.set('trust proxy', Number(process.env.TRUST_PROXY ?? 1))
+
 const frontendPath = path.resolve(__dirname, '../../frontend-dist')
 
 // ── Static files — before before everything else ─────────
@@ -58,6 +64,13 @@ app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))
 // ── Body parsing and cookies — only needed for API routes ─────
 app.use('/api', express.json({ limit: '500kb' }))
 app.use('/api', cookieParser())
+
+// TEMPORARY: verify the `trust proxy` setting. Hit /api/debug/ip from a browser or
+// curl; `ip` should be your real public address (not an internal 10./172./192.168.
+// or 127.0.0.1). Adjust TRUST_PROXY until it is, then delete this route.
+app.get('/api/debug/ip', (req, res) => {
+    res.json({ ip: req.ip, ips: req.ips, xForwardedFor: req.headers['x-forwarded-for'] })
+})
 
 const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false })
 
