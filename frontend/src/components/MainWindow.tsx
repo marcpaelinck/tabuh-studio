@@ -56,7 +56,7 @@ import {
 } from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
-import PlayerMenu from './PlaybackMenu'
+import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
 
@@ -398,8 +398,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
-    const playerMenu = (
-        <PlayerMenu
+    const playbackMenu = (
+        <PlaybackMenu
             appAppearance={appAppearance}
             scoreMenuOptions={scoreMenuOptions}
             score={score}
@@ -410,18 +410,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const playerWindow = (
         <PlayerWindow
             appAppearance={appAppearance}
-            playerMenu={playerMenu}
             visible={active == 'player'}
             player={player}
             score={score}
-            totalDurationMs={totalDurationMs}
             timeLine={timeLine}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackSettings={playbackSettings}
-            playbackProgress={playbackProgress}
             playbackSpeed={playbackSpeed}
-            playbackState={playbackState}
-            playback={playback}
         />
     )
 
@@ -486,7 +481,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             </Col>
                             <Col span={5} id="Toolbar" className="flex justify-end">
                                 <HStack>
-                                    {playerMenu}
+                                    {playbackMenu}
                                     <SegmentedControl
                                         value={active}
                                         data={[
@@ -559,7 +554,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             </Activity>
             {/* Container for small screens only displays the Player Window */}
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
-                <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} />
+                {playbackMenu}
+                {/* <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} /> */}
                 <Container id="player-only">{playerWindow}</Container>
             </Activity>
         </>
