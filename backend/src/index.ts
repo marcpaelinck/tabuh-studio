@@ -65,13 +65,6 @@ app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }))
 app.use('/api', express.json({ limit: '500kb' }))
 app.use('/api', cookieParser())
 
-// TEMPORARY: verify the `trust proxy` setting. Hit /api/debug/ip from a browser or
-// curl; `ip` should be your real public address (not an internal 10./172./192.168.
-// or 127.0.0.1). Adjust TRUST_PROXY until it is, then delete this route.
-app.get('/api/debug/ip', (req, res) => {
-    res.json({ ip: req.ip, ips: req.ips, xForwardedFor: req.headers['x-forwarded-for'] })
-})
-
 const readLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 500, standardHeaders: true, legacyHeaders: false })
 
 const writeLimit = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false })
