@@ -1,7 +1,7 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
-import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
+import { BsList, BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
     Col,
@@ -193,6 +193,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [active, setActive] = useState<ActiveView>('player')
     const { screenSize } = useEnvironmentManager()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
+    // Mobile hamburger holding the playback menu. `pbMenu*` to avoid confusion with the Sidenav.
+    const [pbMenuOpen, setPbMenuOpen] = useState(false)
+    const pbMenuRef = useRef<HTMLDivElement>(null) // wraps the button + panel
     const { user, login, logout } = useAuth()
     const { environment } = useEnvironmentManager()
     const appInfo = useAppInfo()
@@ -216,6 +219,22 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     useEffect(() => {
         setAppAppearance(screenSize?.abbr.includes('lg') ? 'full' : 'playerOnly')
     }, [screenSize])
+
+    // Close the mobile playback menu on a click outside it. Clicks inside the menu, on
+    // its button, or inside an rsuite overlay portal (e.g. a SelectPicker dropdown,
+    // which renders on document.body) are ignored so the menu stays open while in use.
+    useEffect(() => {
+        if (!pbMenuOpen) return
+        function onPointerDown(e: PointerEvent) {
+            const target = e.target as HTMLElement | null
+            if (!target) return
+            if (pbMenuRef.current?.contains(target)) return
+            if (target.closest('.rs-picker-popup, .rs-popover, .rs-picker-menu')) return
+            setPbMenuOpen(false)
+        }
+        document.addEventListener('pointerdown', onPointerDown)
+        return () => document.removeEventListener('pointerdown', onPointerDown)
+    }, [pbMenuOpen])
 
     // ── DASHBOARD WARNINGS ─────────────────────────────────────────────
 
@@ -552,11 +571,32 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                     {fullApplication}
                 </Container>
             </Activity>
-            {/* Container for small screens only displays the Player Window */}
+            {/* Container for small screens only displays the Player Window.
+                Full-viewport flex column so the player fills down to the screen edge. */}
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
-                {playbackMenu}
-                {/* <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} /> */}
-                <Container id="player-only">{playerWindow}</Container>
+                <div className="flex flex-col h-dvh min-h-0">
+                    {/* Hamburger menu holding the playback menu; stays open until a click outside. */}
+                    <div ref={pbMenuRef} className="relative shrink-0">
+                        <IconButton
+                            icon={<BsList />}
+                            appearance="subtle"
+                            aria-label="Open playback menu"
+                            aria-expanded={pbMenuOpen}
+                            onClick={() => setPbMenuOpen((open) => !open)}
+                        />
+                        {pbMenuOpen && (
+                            <div
+                                className="absolute left-0 z-50 mt-1 rounded-md border bg-white p-2 shadow-lg"
+                                style={{ minWidth: '16rem' }}>
+                                {playbackMenu}
+                            </div>
+                        )}
+                    </div>
+                    {/* <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} /> */}
+                    <Container id="player-only" className="flex-1 min-h-0">
+                        {playerWindow}
+                    </Container>
+                </div>
             </Activity>
         </>
     )
