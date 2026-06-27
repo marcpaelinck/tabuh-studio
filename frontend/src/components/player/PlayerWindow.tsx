@@ -1,26 +1,11 @@
-import {
-    Activity,
-    useEffect,
-    useRef,
-    useState,
-    type ActionDispatch,
-    type Dispatch,
-    type JSX,
-    type RefObject
-} from 'react'
+import { Activity, useEffect, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
 import { type Appearance } from '../../typing/interface'
-import {
-    type PlaybackAction,
-    type PlaybackCallbackFunctions,
-    type PlaybackSettings,
-    type PlaybackState,
-    type TimeLine
-} from '../../typing/playback'
+import { type PlaybackCallbackFunctions, type PlaybackSettings, type TimeLine } from '../../typing/playback'
 import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { Animation } from './Animation'
@@ -28,32 +13,22 @@ import { Animation } from './Animation'
 interface PlayerWindowProps {
     visible: boolean
     appAppearance: Appearance
-    playerMenu: JSX.Element
     player: JSX.Element
     score: Score | undefined
-    totalDurationMs: number
     timeLine: TimeLine | undefined
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackSettings: PlaybackSettings
-    playbackProgress: number
     playbackSpeed: number
-    playback: ActionDispatch<[action: PlaybackAction]>
-    playbackState: PlaybackState
 }
 export default function PlayerWindow({
     visible,
     appAppearance,
-    playerMenu,
     player,
     score,
-    totalDurationMs,
     timeLine,
     updatePlaybackFunctions,
     playbackSettings,
-    playbackProgress,
-    playbackSpeed,
-    playback,
-    playbackState
+    playbackSpeed
 }: PlayerWindowProps) {
     const [notationParas, setNotationParas] = useState<ReactElement[] | null>(null)
 
@@ -109,9 +84,10 @@ export default function PlayerWindow({
     return (
         <VStack
             id="Player Window"
-            className="pt-6 sm:pl-0 sm:pr-0 md:pl-6 md:pr-6 min-h-0 overflow-hidden w-full"
+            className={`pt-6 sm:pl-0 sm:pr-0 md:pl-6 md:pr-6 min-h-0 overflow-hidden w-full ${
+                appAppearance == 'playerOnly' ? 'h-full' : ''
+            }`}
             visibility={visible ? 'visible' : 'collapse'}>
-            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{playerMenu}</Activity>
             <Activity mode={playbackSettings.selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
                 <Animation
                     notationElement={notationParas}

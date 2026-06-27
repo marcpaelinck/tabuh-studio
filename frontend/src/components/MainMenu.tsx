@@ -1,6 +1,7 @@
 import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
+import { TbFileImport } from 'react-icons/tb'
 import { Box, Modal, Nav, SelectPicker, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
@@ -133,16 +134,16 @@ export function MainMenu({
         <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
             <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />}>
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
-                <Nav.Item eventKey="file-open-json">Open file...</Nav.Item>
                 <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">
                     <div className="block width-xl">Save</div>
                     {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
                 </Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="1" title="Import" icon={<IoFolderOpenOutline />}>
-                <Nav.Item eventKey="file-import-notation">Notation file...</Nav.Item>
-                <Nav.Item eventKey="file-import-laras">Laras file...</Nav.Item>
+            <Nav.Menu eventKey="1" title="Import" icon={<TbFileImport />}>
+                <Nav.Item eventKey="file-open-json">Tabuh Studio...</Nav.Item>
+                <Nav.Item eventKey="file-import-notation">TS Script...</Nav.Item>
+                <Nav.Item eventKey="file-import-laras">Laras...</Nav.Item>
             </Nav.Menu>
             <Nav.Menu
                 disabled

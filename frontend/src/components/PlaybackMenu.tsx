@@ -17,7 +17,7 @@ export interface PlayerMenuProps {
     playbackSettings: PlaybackSettings
 }
 
-export default function PlayerMenu({
+export default function PlaybackMenu({
     appAppearance,
     score,
     scoreMenuOptions,
