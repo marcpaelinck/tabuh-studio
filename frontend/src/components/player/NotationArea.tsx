@@ -70,9 +70,9 @@ export default function NotationArea({
         (hlRange: HighlightRange) => {
             const para: HTMLParagraphElement = textAreaRef.current?.children[hlRange.line] as HTMLParagraphElement
             const para1: Node = textAreaRef.current?.childNodes[hlRange.line] as Node
-            // Not using scrollIntoView method because the `container` parameter
-            // is not treated the same way by all browsers.
-            scrollIntoContainerView(para, textAreaRef.current)
+            para?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
+            // More stable alternative for scrollIntoView:
+            // scrollIntoContainerView(para, textAreaRef.current)
 
             const range1 = new Range()
             if (para1) {
