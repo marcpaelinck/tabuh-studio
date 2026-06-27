@@ -21,6 +21,7 @@ import {
     Sidebar,
     Sidenav,
     StringType,
+    useDialog,
     useMediaQuery,
     type FormInstance
 } from 'rsuite'
@@ -31,6 +32,7 @@ import { useScoreReader } from '../componentlogic/useScoreReader'
 import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
+import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentManager } from '../stores/useEnvironmentManager'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { Position, UUID } from '../typing/basetypes'
@@ -128,11 +130,12 @@ interface NavHeaderProps {
     user: AuthUser | null
     login: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
+    infoDlg: () => void
+    environment: string | undefined
 }
-function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
+function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [logoutMenu, setLogoutMenu] = useState<boolean>(false)
-    const { environment } = useEnvironmentManager()
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -156,7 +159,12 @@ function NavHeader({ expanded, user, login, logout, ...rest }: NavHeaderProps) {
     return (
         <>
             <HStack justify={expandedfmt[expKey].justify}>
-                <TsLogoIcon environment={environment} remSize={2.5} />
+                <TsLogoIcon
+                    environment={environment}
+                    remSize={2.5}
+                    onClick={() => infoDlg()}
+                    style={{ cursor: 'pointer' }}
+                />
                 {expanded ? '  Tabuh Studio' : ''}
             </HStack>
             <HStack justify={expandedfmt[expKey].justify} className="mt-3">
@@ -186,6 +194,21 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const { screenSize } = useEnvironmentManager()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     const { user, login, logout } = useAuth()
+    const { environment } = useEnvironmentManager()
+    const appInfo = useAppInfo()
+    const dialog = useDialog()
+
+    function infoDlg() {
+        dialog.alert(
+            <p>
+                <b>{appInfo.name}</b> version {appInfo.version}
+                <br />
+                <br />
+                {appInfo.copyright}
+            </p>,
+            { title: 'About' }
+        )
+    }
 
     useEffect(() => {
         setAppAppearance(screenSize?.abbr.includes('lg') ? 'full' : 'playerOnly')
@@ -415,6 +438,40 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
+    // NOT USED YET
+    // const smallApplication = (
+    //     <Container>
+    //         <Navbar>
+    //             <Navbar.Content>
+    //                 {({ onClose }) => {
+    //                     return (
+    //                         <>
+    //                             <Navbar.Toggle />
+    //                             <Navbar.Drawer placement="left">
+    //                                 <Drawer.Title>Menu</Drawer.Title>
+    //                                 <Drawer.Body>
+    //                                     <MainMenu
+    //                                         keyboard={keyboard}
+    //                                         selectedScoreOption={selectedScoreOption}
+    //                                         score={score}
+    //                                         setSelectedScoreOption={setSelectedScoreOption}
+    //                                         loadScore={loadScore}
+    //                                         saveScore={saveScore}
+    //                                         setKeyboard={SetKeyboard}
+    //                                         scoreMenuOptions={scoreMenuOptions}
+    //                                         user={user}
+    //                                     />
+    //                                 </Drawer.Body>
+    //                             </Navbar.Drawer>
+    //                         </>
+    //                     )
+    //                 }}
+    //             </Navbar.Content>
+    //         </Navbar>
+    //         {playerWindow}
+    //     </Container>
+    // )
+
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
             <Container id="header+content" className="flex w-full min-w-0 min-h-0">
@@ -445,7 +502,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 <Content id="content" px="1rem" className="h-9/10 min-h-0 p-4">
                     <div
                         id="editor/player window box"
-                        className={`h-[100%] border rounded-md p-2 ${active == 'editor' ? 'overflow-scroll' : ''}`}>
+                        className={`h-[100%] border rounded-md p-2 ${active == 'editor' ? 'overflow-scroll' : 'overflow-hidden'}`}>
                         <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
                         <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
                     </div>
@@ -455,7 +512,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 {/* rounded-r-md of the Sidenav only rounds the corners on the right. */}
                 <Sidenav expanded={isExpandedSidenav} defaultOpenKeys={[]} h="100%" className="rounded-r-md">
                     <Sidenav.Header className={isExpandedSidenav ? '' : 'pl-0 pr-0'}>
-                        <NavHeader expanded={isExpandedSidenav} user={user} login={login} logout={logout} />
+                        <NavHeader
+                            expanded={isExpandedSidenav}
+                            user={user}
+                            login={login}
+                            logout={logout}
+                            infoDlg={infoDlg}
+                            environment={environment}
+                        />
                     </Sidenav.Header>
                     <Sidenav.Body>
                         <MainMenu
@@ -492,6 +556,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             </Activity>
             {/* Container for small screens only displays the Player Window */}
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
+                <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} />
                 <Container id="player-only">{playerWindow}</Container>
             </Activity>
         </>

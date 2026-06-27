@@ -24,7 +24,13 @@ export const TsLogoIcon = (props: TsLogoIconProps) => {
     const height = scale * clipHeight
 
     return (
-        <svg width={width} height={height} xmlns="http://www.w3.org/2000/svg" overflow="hidden">
+        <svg
+            width={width}
+            height={height}
+            xmlns="http://www.w3.org/2000/svg"
+            overflow="hidden"
+            onClick={props.onClick}
+            style={props.style}>
             <defs>
                 <clipPath id="clip0">
                     <rect x="1284" y="315" width="763" height="711" />

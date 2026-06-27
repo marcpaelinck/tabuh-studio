@@ -16,9 +16,9 @@ type Action =
     | '4'
     | 'login'
     | 'file-open'
-    | 'file-import'
+    | 'file-open-json'
+    | 'file-import-notation'
     | 'file-import-laras'
-    | 'file-import-tabuh'
     | 'file-save'
     | 'file-saveas'
     | 'instruments-select'
@@ -80,16 +80,16 @@ export function MainMenu({
                 }
                 break
             }
-            case 'file-import': {
+            case 'file-open-json': {
                 loadScore('JSON-file')
+                break
+            }
+            case 'file-import-notation': {
+                loadScore('Notation')
                 break
             }
             case 'file-import-laras': {
                 loadScore('Laras')
-                break
-            }
-            case 'file-import-tabuh': {
-                loadScore('Notation')
                 break
             }
         }
@@ -130,17 +130,19 @@ export function MainMenu({
     )
 
     return (
-        <Nav activeKey={activeKey} onSelect={setActiveKey}>
-            <Nav.Menu eventKey="1" title="Notation" icon={<IoFolderOpenOutline />}>
+        <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
+            <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />}>
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
-                <Nav.Item eventKey="file-import">Import...</Nav.Item>
-                <Nav.Item eventKey="file-import-laras">Import Laras file...</Nav.Item>
-                <Nav.Item eventKey="file-import-tabuh">Import Tabuh file...</Nav.Item>
+                <Nav.Item eventKey="file-open-json">Open file...</Nav.Item>
                 <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">
                     <div className="block width-xl">Save</div>
                     {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
                 </Nav.Item>
                 <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
+            </Nav.Menu>
+            <Nav.Menu eventKey="1" title="Import" icon={<IoFolderOpenOutline />}>
+                <Nav.Item eventKey="file-import-notation">Notation file...</Nav.Item>
+                <Nav.Item eventKey="file-import-laras">Laras file...</Nav.Item>
             </Nav.Menu>
             <Nav.Menu
                 disabled
