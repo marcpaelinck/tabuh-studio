@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-source ~/nodevenv/tabuh-studio/backend/20/bin/activate
+source ~/nodevenv/tabuh-studio-dev/backend/20/bin/activate
 
 echo "── Pulling latest code ──"
-cd ~/tabuh-studio
+cd ~/tabuh-studio-dev
 git pull origin develop
 
 echo "── Installing dependencies ──"
