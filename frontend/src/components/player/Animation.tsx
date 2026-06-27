@@ -1,7 +1,6 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ReactSVG } from 'react-svg'
-import { Grid, Loader, Row, SelectPicker, Slider, Stack, Toggle } from 'rsuite'
+import { Grid, Row, SelectPicker, Stack, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
@@ -14,6 +13,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/DropDown/styles/index.css';
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import { debug } from '../../utils/debugger'
+import { ResizableSVG } from '../ResizableSVG'
 
 // Returns the SVG filename for the given position if found.
 // In case more than one position is given, all positions must use the same SVG file.
@@ -130,11 +130,8 @@ export function Animation({
 
     const svgImage = useMemo(() => {
         return (
-            <ReactSVG
+            <ResizableSVG
                 src={positionToSvg(playbackSettings.selectedFocusOption?.objValue)}
-                style={svgSizeStyle}
-                loading={() => <Loader />}
-                useRequestCache={true}
                 afterInjection={setSvgStates}
             />
         )
@@ -181,19 +178,6 @@ export function Animation({
                         visible={notationVisible}
                         playbackSettings={playbackSettings}
                         updatePlaybackFunctions={updatePlaybackFunctions}
-                    />
-                </Row>
-                <Row id="slider-row" className="pl-4 pr-4 pt-10 min-w-0">
-                    <Slider
-                        progress
-                        className="flex w-full ts-theme-animation"
-                        barClassName="flex w-full ts-theme-animation"
-                        min={0}
-                        max={100}
-                        defaultValue={defaultSvgSize}
-                        onChange={(val) => {
-                            updateSvgSize(val)
-                        }}
                     />
                 </Row>
                 <Row id="svg-embed-row" className="pt-2 pl-4 pr-4">
