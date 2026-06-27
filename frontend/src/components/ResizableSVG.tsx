@@ -78,6 +78,7 @@ export function ResizableSVG({
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
                 style={{
                     position: 'absolute',
                     bottom: 0,
@@ -85,7 +86,10 @@ export function ResizableSVG({
                     width: 24,
                     height: 24,
                     cursor: 'nwse-resize',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    // Stop the browser from treating a touch-drag on the handle as a
+                    // scroll/zoom gesture (which suppresses pointermove on mobile).
+                    touchAction: 'none'
                 }}>
                 {[0, 6].map((offset) => (
                     <div

@@ -455,40 +455,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
-    // NOT USED YET
-    // const smallApplication = (
-    //     <Container>
-    //         <Navbar>
-    //             <Navbar.Content>
-    //                 {({ onClose }) => {
-    //                     return (
-    //                         <>
-    //                             <Navbar.Toggle />
-    //                             <Navbar.Drawer placement="left">
-    //                                 <Drawer.Title>Menu</Drawer.Title>
-    //                                 <Drawer.Body>
-    //                                     <MainMenu
-    //                                         keyboard={keyboard}
-    //                                         selectedScoreOption={selectedScoreOption}
-    //                                         score={score}
-    //                                         setSelectedScoreOption={setSelectedScoreOption}
-    //                                         loadScore={loadScore}
-    //                                         saveScore={saveScore}
-    //                                         setKeyboard={SetKeyboard}
-    //                                         scoreMenuOptions={scoreMenuOptions}
-    //                                         user={user}
-    //                                     />
-    //                                 </Drawer.Body>
-    //                             </Navbar.Drawer>
-    //                         </>
-    //                     )
-    //                 }}
-    //             </Navbar.Content>
-    //         </Navbar>
-    //         {playerWindow}
-    //     </Container>
-    // )
-
     const fullApplication = (
         <Container id="main-wide-screen" height="80vh">
             <Container id="header+content" className="flex w-full min-w-0 min-h-0">

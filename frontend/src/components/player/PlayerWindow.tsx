@@ -101,7 +101,11 @@ export default function PlayerWindow({
                     <Text size="lg">Select a Focus value to view animation</Text>
                 </Box>
             </Activity>
-            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>{player}</Activity>
+            {/* On small screens the player sits at the bottom of the screen (mt-auto pushes
+                it down in the flex column) with a 2rem inner margin. */}
+            <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
+                <div className="mt-auto w-full p-8">{player}</div>
+            </Activity>
         </VStack>
     )
 }
