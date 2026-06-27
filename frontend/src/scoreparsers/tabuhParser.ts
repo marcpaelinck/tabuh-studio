@@ -222,7 +222,6 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliStaff)
         system.staffs = staffs
         // ensure that there is a kempli staff if the kempli state is 'notation'.
-        console.log(colWidths)
         if (system.kempli.state == 'notation' && !('KEMPLI' in system.staffs)) {
             const notation: string[] = colWidths
                 .map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR)))

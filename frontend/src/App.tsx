@@ -9,7 +9,8 @@ import { useEnvironmentManager } from './stores/useEnvironmentManager'
 export default function App() {
     const dataSource = 'database'
     // The logo and favicon colors depend on the backend's environment (production, development, local)
-    const { logoURL } = useEnvironmentManager()
+    const { environment, logoURL } = useEnvironmentManager()
+    console.log(environment)
 
     return (
         <CustomProvider>
