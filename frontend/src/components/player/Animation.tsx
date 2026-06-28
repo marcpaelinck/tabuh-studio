@@ -1,11 +1,11 @@
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Grid, Row, SelectPicker, Stack, Toggle } from 'rsuite'
+import { Grid, HStack, Row, SelectPicker, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { positionConfigs, theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import { panggulDefaultOption, type ExtendedOption } from '../../typing/interface'
+import { panggulDefaultOption, type Appearance, type ExtendedOption } from '../../typing/interface'
 import type { PlaybackCallbackFunctions, PlaybackSettings } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
@@ -45,16 +45,18 @@ const retrieve_svg_data = (svgElement: SVGSVGElement | null): SVGInfo => {
 interface AnimationProps {
     playbackSettings: PlaybackSettings
     notationElement: NotationParagraph[] | null
+    appAppearance: Appearance
     setSVGInfo: Dispatch<SVGInfo>
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 export function Animation({
     playbackSettings,
     notationElement,
+    appAppearance,
     setSVGInfo,
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
-    const defaultSvgSize = 50 // percent
+    const defaultSvgSize = appAppearance == 'playerOnly' ? 100 : 50 // percent
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
@@ -133,10 +135,10 @@ export function Animation({
     }, [playbackSettings.selectedFocusOption])
 
     return playbackSettings.selectedFocusOption.objValue.length > 0 ? (
-        <div className="m-0 md:m-6 md:w-95/100 " id="animationgrid">
+        <div className="m-0 md:m-6 w-full md:w-95/100 " id="animationgrid">
             <Grid fluid id="Animation" color="black" className="min-w-0">
                 <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
-                    <Stack direction={{ xs: 'column', sm: 'row' }}>
+                    <HStack className="w-full" justifyContent="center">
                         <Toggle
                             id="notation toggle"
                             label="notation"
@@ -165,7 +167,7 @@ export function Animation({
                                 />
                             )
                         }
-                    </Stack>
+                    </HStack>
                 </Row>
                 <Row id="notation-area-row" className="p-2 min-w-0">
                     <NotationArea

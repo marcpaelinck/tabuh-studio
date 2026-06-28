@@ -540,25 +540,38 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             {/* Container for small screens only displays the Player Window.
                 Full-viewport flex column so the player fills down to the screen edge. */}
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
-                <div className="flex flex-col h-dvh min-h-0">
+                <div className="flex flex-col h-dvh min-h-0 p-1">
                     {/* Hamburger menu holding the playback menu; stays open until a click outside. */}
-                    <div ref={pbMenuRef} className="relative shrink-0">
+                    <HStack ref={pbMenuRef} className="align-top">
                         <IconButton
-                            icon={<BsList />}
+                            icon={<BsList style={{ fontSize: '2rem' }} />}
+                            size="lg"
                             appearance="subtle"
                             aria-label="Open playback menu"
                             aria-expanded={pbMenuOpen}
                             onClick={() => setPbMenuOpen((open) => !open)}
+                            className="p-0"
                         />
                         {pbMenuOpen && (
                             <div
-                                className="absolute left-0 z-50 mt-1 rounded-md border bg-white p-2 shadow-lg"
+                                className="absolute left-0 top-0 z-50 mt-1 ml-1 rounded-md border bg-white p-2 shadow-lg"
                                 style={{ minWidth: '16rem' }}>
                                 {playbackMenu}
                             </div>
                         )}
-                    </div>
-                    {/* <TsLogoIcon environment={environment} remSize={2.5} onClick={() => infoDlg()} /> */}
+                        <TsLogoIcon
+                            environment={environment}
+                            remSize={2.5}
+                            onClick={() => infoDlg()}
+                            className="mt-2"
+                            style={{
+                                marginLeft: 'auto',
+                                marginRight: '0.5rem',
+                                marginTop: '0.5rem',
+                                cursor: 'pointer'
+                            }}
+                        />
+                    </HStack>
                     <Container id="player-only" className="flex-1 min-h-0">
                         {playerWindow}
                     </Container>

@@ -94,6 +94,7 @@ export default function PlayerWindow({
                     updatePlaybackFunctions={updatePlaybackFunctions}
                     playbackSettings={playbackSettings}
                     setSVGInfo={setSvgInfo}
+                    appAppearance={appAppearance}
                 />
             </Activity>
             <Activity mode={score && playbackSettings.selectedFocusOption.objValue.length == 0 ? 'visible' : 'hidden'}>

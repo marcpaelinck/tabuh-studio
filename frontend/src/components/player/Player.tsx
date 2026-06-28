@@ -85,42 +85,4 @@ export function Player({
             <Text size="sm">{toMmSs(Math.ceil(totalDurationMs / 1000))}</Text>
         </HStack>
     )
-    // return (
-    //     <Grid fluid className="w-[100%]">
-    //         <Row gutter={[0, 0]} align="middle" justify="start">
-    //             <Col span="auto" className="min-w-0">
-    //                 <IconButton onClick={() => playback({ actionType: 'rewind' })} icon={<FaStop />}></IconButton>
-    //             </Col>
-    //             <Col span="auto" className="min-w-0">
-    //                 <IconButton
-    //                     onClick={() => playPause()}
-    //                     icon={
-    //                         playbackState.audioState == 'playing' ? (
-    //                             <FaPause color="orange" />
-    //                         ) : (
-    //                             <FaPlay color={playbackState.audioState == 'paused' ? 'orange' : 'black'} />
-    //                         )
-    //                     }></IconButton>
-    //             </Col>
-    //             <Col span="auto">
-    //                 <Text size="sm">{toMmSs(playbackProgress)}</Text>
-    //             </Col>
-    //             <Col span={8} className="min-w-0">
-    //                 <Slider
-    //                     progress
-    //                     // className="flex w-full ts-theme-player"
-    //                     // barClassName="flex w-full ts-theme-player"
-    //                     renderTooltip={(value) => (value ? toMmSs(value) : '')}
-    //                     min={0}
-    //                     max={Math.ceil(totalDurationMs / 1000)}
-    //                     value={playbackProgress}
-    //                     onChange={(val) => playback({ actionType: 'jumptotime', seconds: val })}
-    //                 />
-    //             </Col>
-    //             <Col span="auto" className="min-w-0">
-    //                 <Text size="sm">{toMmSs(Math.ceil(totalDurationMs / 1000))}</Text>
-    //             </Col>
-    //         </Row>
-    //     </Grid>
-    // )
 }
