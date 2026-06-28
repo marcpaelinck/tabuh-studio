@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 const NAME = 'Tabuh Studio'
-const VERSION = '1.0.0'
+const VERSION = '1.0.1'
 const COPYRIGHT = '\u00a9 Marc Paelinck 2026'
 
 export interface AppInfoStore {
