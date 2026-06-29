@@ -50,10 +50,12 @@ export function MainMenu({
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const dialog = useDialog()
-    const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
-        state.selectedScoreOption,
-        state.setSelectedScoreOption
-    ])
+    // const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
+    //     state.selectedScoreOption,
+    //     state.setSelectedScoreOption
+    // ])
+    const selectedScoreOption = useUserSelectionStore((state) => state.selectedScoreOption)
+    const setSelectedScoreOption = useUserSelectionStore((state) => state.setSelectedScoreOption)
 
     async function performAction() {
         switch (activeKey) {
