@@ -1,5 +1,4 @@
 @import 'tailwindcss' important;
-@import url('burgermenu.css');
 
 ::highlight(notation-highlight) {
     background-color: peachpuff;

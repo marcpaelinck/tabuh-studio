@@ -9,11 +9,6 @@
     /* ...more variables */
 }
 
-/* Undo `color: inherit` setting which resets color of WordPress theme.*/
-h2 {
-    color: #dd3333;
-}
-
 .ts-theme-animation {
     --rs-primary-50: #f7fff2;
     --rs-primary-100: #cfebc0;
