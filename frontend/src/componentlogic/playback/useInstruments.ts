@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type RefObject } from 'react'
+import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
     alwaysFocusPositions,
@@ -11,6 +11,7 @@ import {
     SOUNDS_FOLDER
 } from '../../config/config'
 import { soundFile } from '../../config/configfunctions'
+import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import type { Position } from '../../typing/basetypes'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
@@ -21,7 +22,7 @@ export type InstrumentSampler = {
         time: number,
         params: SamplerFunctionParameters,
         focusRef: RefObject<Position[]>,
-        activePanggulRef: RefObject<Position[]>
+        panggulRef: RefObject<Position[]>
     ) => void
     mute: (time: number) => void
 }
@@ -97,21 +98,24 @@ const createInstrument = (
             time: number,
             params: SamplerFunctionParameters,
             focusRef: RefObject<Position[]>,
-            activePanggulRef: RefObject<Position[]>
+            panggulRef: RefObject<Position[]>
         ) => {
             // dimValue = 1 if
             // - no focus is selected or
             // - active panggul is selected and params.position corresponds with a panggul position or
             // - no active panggul is selecte and params.position corresponds with a focus position or
             // - position is labeled as 'always focus'
+            const currentFocus = focusRef.current
+            const activePanggul = panggulRef.current
             const dimValue =
-                focusRef.current.length == 0 ||
-                (activePanggulRef.current.length > 0 && activePanggulRef.current.includes(position)) ||
-                (activePanggulRef.current.length == 0 && focusRef.current.includes(position)) ||
+                currentFocus.length == 0 ||
+                (activePanggul.length > 0 && activePanggul.includes(position)) ||
+                (activePanggul.length == 0 && currentFocus.includes(position)) ||
                 alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            debug(`focus=${JSON.stringify(focusRef)} pos=${params.position}, dimvalue=${dimValue}`)
+            if (position == 'PEMADE_POLOS')
+                debug(`focus=${JSON.stringify(focusRef.current)} pos=${params.position}, dimvalue=${dimValue}`)
             const indices = lookup[position].symbol2idxs[params.note.canonicalSymbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = params.duration
@@ -132,11 +136,7 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (
-    focusRef: RefObject<Position[]>,
-    activePanggulRef: RefObject<Position[]>,
-    outroTime: number = defaultOutroTime
-) => {
+export const useInstruments = (outroTime: number = defaultOutroTime) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])
@@ -145,6 +145,17 @@ export const useInstruments = (
     const samplers: Record<string, Tone.Sampler | null> = useMemo(() => {
         return createSamplers()
     }, [])
+    const selectedFocusOption = useUserSelectionStore((store) => store.selectedFocusOption)
+    const selectedPanggulOption = useUserSelectionStore((store) => store.selectedPanggulOption)
+    const focusRef = useRef<Position[]>([])
+    const panggulRef = useRef<Position[]>([])
+
+    useEffect(() => {
+        focusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
+    useEffect(() => {
+        panggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption])
 
     const instrumentSamplers: InstrumentSamplers = useMemo(() => {
         return Object.fromEntries(
@@ -160,12 +171,12 @@ export const useInstruments = (
         time + (-1 + 2 * Math.random()) * Tone.Time(AVERAGE_ATTACK_DELAY).valueOf()
 
     const playInstrument = useCallback((time: number, params: SamplerFunctionParameters) => {
-        debug(
-            `playing ${params.position} ${params.note.toString()} ${time} ${params.duration['16n']} ${params.velocity} ${time}`
-        )
+        // debug(
+        //     `playing ${params.position} ${params.note.toString()} ${time} ${params.duration['16n']} ${params.velocity} ${time}`
+        // )
         if (params.note.isMutingSilence) instrumentSamplers[params.position].mute(time)
         else {
-            instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef, activePanggulRef)
+            instrumentSamplers[params.position].play(random_attack_deviation(time), params, focusRef, panggulRef)
         }
     }, [])
 

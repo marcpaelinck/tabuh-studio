@@ -3,13 +3,13 @@ import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
+import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { UUID } from '../../typing/basetypes'
 import type {
     EditorCursorParameters,
     PlaybackAction,
     PlaybackCallbackFunctions,
-    PlaybackSettings,
     PlaybackState
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
@@ -30,7 +30,6 @@ interface EditorWindowProps {
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
-    playbackSettings: PlaybackSettings
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
     updateSystem: (sysData: System) => void
@@ -44,7 +43,6 @@ export default function EditorWindow({
     updateParts,
     executeItemAction,
     updatePlaybackFunctions,
-    playbackSettings,
     playbackState,
     playback,
     updateSystem
@@ -56,6 +54,7 @@ export default function EditorWindow({
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
+    const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -70,8 +69,8 @@ export default function EditorWindow({
     }, [visible])
 
     useEffect(() => {
-        cursorStyleRef.current = playbackSettings.selectedCursorStyle
-    }, [playbackSettings.selectedCursorStyle])
+        cursorStyleRef.current = selectedCursorStyle
+    }, [selectedCursorStyle])
 
     const systemId = (uuid: UUID) => 'system-' + uuid
 

@@ -3,6 +3,7 @@
 // notation while the corresponding notes are being played.
 
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
+import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import type {
     HighlightRange,
     HilightRangeFunction,
@@ -10,7 +11,7 @@ import type {
     PlaybackCursorStyle
 } from '../../typing/animation'
 import type { Position } from '../../typing/basetypes'
-import type { PlaybackCallbackFunctions, PlaybackSettings, PlayerCursorParameters } from '../../typing/playback'
+import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
 // function scrollIntoContainerView(element: HTMLElement | null, container: HTMLElement | null) {
@@ -40,30 +41,27 @@ import { debug } from '../../utils/debugger'
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    playbackSettings: PlaybackSettings
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
-export default function NotationArea({
-    notation,
-    visible,
-    playbackSettings,
-    updatePlaybackFunctions
-}: NotationAreaProps) {
+export default function NotationArea({ notation, visible, updatePlaybackFunctions }: NotationAreaProps) {
     const textAreaRef: RefObject<HTMLDivElement | null> = useRef<HTMLDivElement | null>(null)
     const selectedFocusRef = useRef<Position[]>([])
     const selectedPanggulRef = useRef<Position[]>([])
     const selectedCursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
+    const selectedFocusOption = useUserSelectionStore((state) => state.selectedFocusOption)
+    const selectedPanggulOption = useUserSelectionStore((state) => state.selectedPanggulOption)
+    const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
 
     useEffect(() => {
-        selectedFocusRef.current = playbackSettings.selectedFocusOption.objValue
-    }, [playbackSettings.selectedFocusOption])
+        selectedFocusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
     useEffect(() => {
-        selectedPanggulRef.current = playbackSettings.selectedPanggulOption.objValue
-    }, [playbackSettings.selectedPanggulOption])
+        selectedPanggulRef.current = selectedPanggulOption.objValue
+    }, [selectedPanggulOption])
     useEffect(() => {
-        selectedCursorStyleRef.current = playbackSettings.selectedCursorStyle
-    }, [playbackSettings.selectedCursorStyle])
+        selectedCursorStyleRef.current = selectedCursorStyle
+    }, [selectedCursorStyle])
 
     // Highlighting function: highlights the given range (line and character range)
     const highlightCursor: HilightRangeFunction = useCallback(
@@ -93,7 +91,7 @@ export default function NotationArea({
                 }
             }
         },
-        [playbackSettings.selectedCursorStyle]
+        [selectedCursorStyle]
     )
 
     // Callback function used for playback animation

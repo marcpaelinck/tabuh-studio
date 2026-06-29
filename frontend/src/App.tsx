@@ -4,12 +4,12 @@ import 'rsuite/dist/rsuite.css'
 import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
-import { useEnvironmentManager } from './stores/useEnvironmentManager'
+import { useEnvironmentStore } from './stores/useEnvironmentStore'
 
 export default function App() {
     const dataSource = 'database'
     // The logo and favicon colors depend on the backend's environment (production, development, local)
-    const { environment, logoURL } = useEnvironmentManager()
+    const { environment, logoURL } = useEnvironmentStore()
     console.log(environment)
 
     return (

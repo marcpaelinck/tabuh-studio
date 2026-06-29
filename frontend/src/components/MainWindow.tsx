@@ -33,18 +33,11 @@ import { noCursor, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
-import { useEnvironmentManager } from '../stores/useEnvironmentManager'
-import type { PlaybackCursorStyle } from '../typing/animation'
-import type { Position, UUID } from '../typing/basetypes'
-import {
-    focusDefaultOption,
-    panggulDefaultOption,
-    speedDefaultOption,
-    type Appearance,
-    type ExtendedOption,
-    type ScoreInfo
-} from '../typing/interface'
-import type { DashboardParameters, PlaybackSettings } from '../typing/playback'
+import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
+import { useUserSelectionStore } from '../stores/usePlaybackStore.tsx'
+import type { UUID } from '../typing/basetypes'
+import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
+import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
 import {
     chars,
@@ -191,13 +184,13 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const [active, setActive] = useState<ActiveView>('player')
-    const { screenSize } = useEnvironmentManager()
+    const { screenSize } = useEnvironmentStore()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     // Mobile hamburger holding the playback menu. `pbMenu*` to avoid confusion with the Sidenav.
     const [pbMenuOpen, setPbMenuOpen] = useState(false)
     const pbMenuRef = useRef<HTMLDivElement>(null) // wraps the button + panel
     const { user, login, logout } = useAuth()
-    const { environment } = useEnvironmentManager()
+    const { environment } = useEnvironmentStore()
     const appInfo = useAppInfo()
     const dialog = useDialog()
 
@@ -247,23 +240,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
+    const selectedSpeedOption = useUserSelectionStore((state) => state.selectedSpeedOption)
+    const selectedScoreOption = useUserSelectionStore((state) => state.selectedScoreOption)
 
     // ──  MENU AND SELECTORS SETTINGS ─────────────────────────────────────────────
-
-    // By keeping these values here, the actual selectors can occur in any child element.
-
-    const [selectedScoreOption, setSelectedScoreOption] = useState<ExtendedOption<ScoreInfo> | null>(null)
-    const [selectedFocusOption, setSelectedFocusOption] = useState<ExtendedOption<Position[]>>(focusDefaultOption)
-    const [selectedPanggulOption, setSelectedPanggulOption] = useState<ExtendedOption<Position[]>>(panggulDefaultOption)
-    const [selectedSpeedOption, setSelectedSpeedOption] = useState<ExtendedOption<number>>(speedDefaultOption)
-    const [selectedCursorStyle, setSelectedCursorStyle] = useState<PlaybackCursorStyle>('Beat')
-    const currentFocusRef = useRef<Position[]>([]) // List of positions corresponding with the selected instrument
-    const currentPanggulRef = useRef<Position[]>([]) // List of positions corresponding with the selected panggul animation (currently max. 1 position)
-
-    useEffect(() => {
-        currentFocusRef.current = selectedFocusOption.objValue
-        currentPanggulRef.current = selectedPanggulOption.objValue
-    }, [selectedPanggulOption, selectedFocusOption])
 
     useEffect(() => {
         if (selectedScoreOption && selectedScoreOption.objValue) loadScore('JSON', selectedScoreOption?.objValue)
@@ -278,7 +258,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setPlaybackSpeed,
         schedulePlayback,
         totalDurationMs
-    } = usePlaybackManager(currentFocusRef, currentPanggulRef)
+    } = usePlaybackManager()
     const playbackReducer = playbackReducerFactory(schedulePlayback, setPlaybackProgress)
     const [playbackState, playback] = useReducer(playbackReducer, {
         cursor: noCursor,
@@ -294,33 +274,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         () => updatePlaybackCallbackFunctions({ generic: stopPlayback, updatedashboard: playbackDashboardFunction }),
         []
     )
-
-    const playbackSettings: PlaybackSettings = {
-        selectedScoreOption,
-        selectedFocusOption,
-        selectedSpeedOption,
-        selectedPanggulOption,
-        selectedCursorStyle,
-        setSelectedScoreOption,
-        setSelectedFocusOption,
-        setSelectedSpeedOption,
-        setSelectedPanggulOption,
-        setSelectedCursorStyle
-    }
-
-    useEffect(() => {
-        // Update user's playback choices
-        if (playbackSettings.selectedScoreOption?.value != selectedScoreOption?.value)
-            playbackSettings.selectedScoreOption = selectedScoreOption
-        if (playbackSettings.selectedFocusOption?.value != selectedFocusOption?.value)
-            playbackSettings.selectedFocusOption = selectedFocusOption
-        if (playbackSettings.selectedSpeedOption?.value != selectedSpeedOption?.value)
-            playbackSettings.selectedSpeedOption = selectedSpeedOption
-        if (playbackSettings.selectedPanggulOption?.value != selectedPanggulOption?.value)
-            playbackSettings.selectedPanggulOption = selectedPanggulOption
-        if (playbackSettings.selectedCursorStyle != selectedCursorStyle)
-            playbackSettings.selectedCursorStyle = selectedCursorStyle
-    }, [selectedScoreOption, selectedFocusOption, selectedSpeedOption, selectedCursorStyle])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -418,12 +371,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     )
 
     const playbackMenu = (
-        <PlaybackMenu
-            appAppearance={appAppearance}
-            scoreMenuOptions={scoreMenuOptions}
-            score={score}
-            playbackSettings={playbackSettings}
-        />
+        <PlaybackMenu appAppearance={appAppearance} scoreMenuOptions={scoreMenuOptions} score={score} />
     )
 
     const playerWindow = (
@@ -434,7 +382,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             score={score}
             timeLine={timeLine}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
-            playbackSettings={playbackSettings}
             playbackSpeed={playbackSpeed}
         />
     )
@@ -448,7 +395,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             updateParts={updateParts}
             executeItemAction={executeItemAction}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
-            playbackSettings={playbackSettings}
             playbackState={playbackState}
             playback={playback}
             updateSystem={updateSystem}
@@ -507,9 +453,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                     <Sidenav.Body>
                         <MainMenu
                             keyboard={keyboard}
-                            selectedScoreOption={selectedScoreOption}
                             score={score}
-                            setSelectedScoreOption={setSelectedScoreOption}
                             loadScore={loadScore}
                             saveScore={saveScore}
                             setKeyboard={SetKeyboard}

@@ -1,6 +1,7 @@
 import { instrumentConfigs, type InstrumentConfig } from '../config/config'
+import { focusDefaultOption } from '../stores/usePlaybackStore'
 import type { Position } from '../typing/basetypes'
-import { focusDefaultOption, type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
+import { type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
 import type { Score, System } from '../typing/score'
 
 // MenuItemInfo contains the info needed to create a single DropDown menu item.

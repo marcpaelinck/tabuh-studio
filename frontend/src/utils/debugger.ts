@@ -37,7 +37,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     tabuhParser: false,
     useAnimation: false,
     useScoreManager: false,
-    useInstruments: false,
+    useInstruments: true,
     usePartManager: false,
     usePlaybackManager: false,
     useScoreReader: false,

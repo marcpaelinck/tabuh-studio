@@ -7,6 +7,7 @@ import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
+import { useUserSelectionStore } from '../stores/usePlaybackStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
 
@@ -29,9 +30,7 @@ type Action =
 
 interface TabuhEditorMenuProps {
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
-    selectedScoreOption: ExtendedOption<ScoreInfo> | null
     score: Score | undefined
-    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
     keyboard: KeyboardType
@@ -41,9 +40,7 @@ interface TabuhEditorMenuProps {
 
 export function MainMenu({
     scoreMenuOptions,
-    selectedScoreOption,
     score,
-    setSelectedScoreOption,
     loadScore,
     saveScore,
     keyboard,
@@ -53,6 +50,10 @@ export function MainMenu({
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     const dialog = useDialog()
+    const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
+        state.selectedScoreOption,
+        state.setSelectedScoreOption
+    ])
 
     async function performAction() {
         switch (activeKey) {

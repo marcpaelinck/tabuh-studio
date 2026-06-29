@@ -45,7 +45,7 @@ export interface EnvironmentManagerStore {
 }
 
 // 1. Define the store structure
-export const useEnvironmentManager = create(
+export const useEnvironmentStore = create(
     (): EnvironmentManagerStore => ({ environment: '', screenSize: undefined, logoURL: ' ' })
 )
 
@@ -54,17 +54,17 @@ const initializeApp = async () => {
     try {
         const env = await apiGetEnvironment() // Your middleware endpoint
         if (!env) throw new Error('Could not retrieve backend environment.')
-        useEnvironmentManager.setState({ environment: env.environment })
-        useEnvironmentManager.setState({ logoURL: currentLogo(env.environment) })
+        useEnvironmentStore.setState({ environment: env.environment })
+        useEnvironmentStore.setState({ logoURL: currentLogo(env.environment) })
     } catch (err) {
-        useEnvironmentManager.setState({ error: (err as Error).message })
+        useEnvironmentStore.setState({ error: (err as Error).message })
     }
-    useEnvironmentManager.setState({ screenSize: currentScreenSize() })
+    useEnvironmentStore.setState({ screenSize: currentScreenSize() })
 
     // Subscribe to window resize event
     if (typeof window !== 'undefined') {
         const debouncedResize = debounce(() => {
-            useEnvironmentManager.setState({ screenSize: currentScreenSize() })
+            useEnvironmentStore.setState({ screenSize: currentScreenSize() })
         }, 150)
         window.addEventListener('resize', debouncedResize)
     }

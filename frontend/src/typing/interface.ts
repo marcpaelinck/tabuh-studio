@@ -37,7 +37,3 @@ export type MenuCollectionInfo = Record<MenuName, MenuInfo>
 export interface ExtendedOption<U> extends Option<string> {
     objValue: U
 }
-
-export const panggulDefaultOption: ExtendedOption<Position[]> = { label: 'Hide', value: 'Hide', objValue: [] }
-export const focusDefaultOption: ExtendedOption<Position[]> = { label: 'No Focus', value: 'No Focus', objValue: [] }
-export const speedDefaultOption: ExtendedOption<number> = { label: '100%', value: '100%', objValue: 1 }

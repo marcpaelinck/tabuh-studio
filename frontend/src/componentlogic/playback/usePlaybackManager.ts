@@ -8,8 +8,7 @@
 // createPlaybackSchedule:
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
-import { NoteObject } from '@tabuhstudio/shared'
-import { KEMPLI_BEAT_CHAR, SPACE_CHAR } from '@tabuhstudio/shared'
+import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -23,9 +22,9 @@ import {
     noteConfigs,
     positionConfigs
 } from '../../config/config'
+import { speedDefaultOption } from '../../stores/usePlaybackStore'
 import type { BPM, Position } from '../../typing/basetypes'
 import type { FlowStep } from '../../typing/execution'
-import { speedDefaultOption } from '../../typing/interface'
 import type {
     AnimationNote,
     GenericAction,
@@ -69,8 +68,8 @@ export interface SchedulePlaybackParams {
     outro?: number
 }
 
-export function usePlaybackManager(focusRef: RefObject<Position[]>, activePanggulRef: RefObject<Position[]>) {
-    const { playInstrument } = useInstruments(focusRef, activePanggulRef, 0)
+export function usePlaybackManager() {
+    const { playInstrument } = useInstruments(0)
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(speedDefaultOption.objValue as number)
     const [totalDurationMs, setTotalDurationMs] = useState<number>(0)
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
