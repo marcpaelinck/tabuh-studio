@@ -11,7 +11,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
-import { panggulDefaultOption, useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import { debug } from '../../utils/debugger'
 import { ResizableSVG } from '../ResizableSVG'
@@ -67,26 +67,16 @@ export function Animation({
     })
 
     const [panggulMenuItems, setPanggulMenuItems] = useState<ExtendedOption<Position[]>[]>([])
-    const selectedPanggulOption = useUserSelectionStore((state) => state.selectedPanggulOption)
     const selectedFocusOption = useUserSelectionStore((state) => state.selectedFocusOption)
+    const selectedPanggulOption = useUserSelectionStore((state) => state.selectedPanggulOption)
     const setSelectedPanggulOption = useUserSelectionStore((state) => state.setSelectedPanggulOption)
 
     useEffect(() => debug(`SELECTED PANGGUL: ${JSON.stringify(selectedPanggulOption)}`), [selectedPanggulOption])
 
     useEffect(() => {
         debug(`new focus: ${JSON.stringify(selectedFocusOption.objValue)}`)
-        const menuItems: ExtendedOption<Position[]>[] = selectedFocusOption.objValue.map((position) => {
-            return { label: positionConfigs[position as Position].name, value: position, objValue: [position] }
-        })
-        const hideItem: ExtendedOption<Position[]> = panggulDefaultOption
-        setPanggulMenuItems([hideItem].concat(menuItems))
-        setSelectedPanggulOption(menuItems.length > 0 ? menuItems[0] : hideItem)
+        initializeAnimationOptionsMenu(selectedFocusOption)
     }, [selectedFocusOption])
-
-    useEffect(() => {
-        if (panggulMenuItems.length > 1) setSelectedPanggulOption(panggulMenuItems[1])
-        else setSelectedPanggulOption(panggulDefaultOption)
-    }, [panggulMenuItems])
 
     // Initialize the selected pangul option. Dependency svgInfoRef.current is necessary
     // because it might not be initialized before selectedPanggulOption gets its initial value.
@@ -94,6 +84,30 @@ export function Animation({
         debug(`panggul=${JSON.stringify(selectedPanggulOption)}`)
         if (selectedPanggulOption) setPanggulVisibility(selectedPanggulOption)
     }, [selectedPanggulOption, svgInfoRef.current])
+
+    // Populates the animation selection menu, depending on the number of positions available.
+    function initializeAnimationOptionsMenu(selectedFocusOption: ExtendedOption<Position[]>): void {
+        const menuItems: ExtendedOption<Position[]>[] = []
+        if (selectedFocusOption.objValue.length > 1) {
+            selectedFocusOption.objValue.forEach((position) => {
+                menuItems.push({
+                    label: positionConfigs[position as Position].name,
+                    value: position,
+                    objValue: [position]
+                })
+            })
+            menuItems.push({ label: 'Both (highlight only)', value: 'Highlight', objValue: [] })
+        } else {
+            menuItems.push({
+                label: 'Panggul + highlight',
+                value: 'Panggul',
+                objValue: [selectedFocusOption.objValue[0]]
+            })
+            menuItems.push({ label: 'Highlight', value: 'Highlight', objValue: [] })
+        }
+        setPanggulMenuItems(menuItems)
+        setSelectedPanggulOption(menuItems[0])
+    }
 
     function setSvgStates(svg: SVGSVGElement) {
         if (svg) {
@@ -151,7 +165,7 @@ export function Animation({
                                     id="panggul selector"
                                     searchable={false}
                                     cleanable={false}
-                                    label="panggul:"
+                                    label="animation:"
                                     data={panggulMenuItems}
                                     value={selectedPanggulOption.value}
                                     onSelect={(value, item) => {
