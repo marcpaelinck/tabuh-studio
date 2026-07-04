@@ -11,62 +11,14 @@
 //
 // `deriveKempli` reproduces the kempli-frequency/state derivation that depends on the
 // computed column widths.
-//
-// NOTE: the norot space-consuming / cut-off alignment policy is intentionally NOT
-// implemented here yet — this module preserves the parser's current behaviour exactly
-// (norot expands to a fixed-size sequence and beats are padded to equal width). The
-// space-eating refinement is planned for the compact editor (see CLAUDE.dual-editor.md).
 
 import { NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
-import type { BeatSliceInfo, ExecutionItem, KempliItem } from '../typing/execution.ts'
-import type { KempliSetting, Staffs, System } from '../typing/score.ts'
+import type { System } from '../typing/score.ts'
 import { getBeatSlices } from '../utils/objectUtils.ts'
 import { castGroupedNotationToPositions } from './castingRulesManager.ts'
-import { applyPatterns, notationWidth, patternSize } from './patternManager.ts'
-
-// Expands shorthand pattern symbols, pads all beats to a common per-column width and
-// flattens the result into one Staff per position. MUTATES the given parsedStaffs
-// (replaces each position's beats with the expanded+padded version) and returns the
-// flattened staffs together with the computed column widths.
-function expandParsedStaffs(system: System, eatSpaces = false): { staffs: Staffs; colWidths: number[] } {
-    const expandedStaffs: Staffs = {}
-    const beatSlices = getBeatSlices(system)
-    // Expand shorthand pattern symbols (e.g. norot) within each beat
-    _.entries(system.staffs).forEach(([position, staff]) => {
-        if (staff)
-            expandedStaffs[position as Position] = applyPatterns(position as Position, staff, beatSlices, eatSpaces)
-    })
-
-    // Compute column widths (max notation width per beat across all positions) and pad beats
-    // NOTE: move this part to the tabuhParser. Apply before calling expandParsedStaffs.
-    const colWidths = beatSlices.map((slice: BeatSliceInfo) => slice.end - slice.start)
-
-    return { staffs: expandedStaffs, colWidths }
-}
-
-// --- Compact (flat) notation helpers ------------------------------------------
-//
-// A NotationGroup stores its notation FLAT (like a Staff): each measure is padded
-// with spaces to the per-beat column width and the measures are concatenated. The
-// per-beat column width counts a norot as its full size (4), so the compact columns
-// line up 1:1 with the expanded notation. These helpers convert between the flat
-// form and per-measure form, and compute the column widths.
-
-// Per-beat column widths, counting a norot as its full expanded size (4).
-// Used by the PARSER on RAW measures (norot = 1 entry) to allocate the columns the
-// norot will occupy once its trailing padding spaces are added.
-export function compactColWidths(measuresPerGroup: NoteObject[][][]): number[] {
-    const widths: number[] = []
-    for (const measures of measuresPerGroup) {
-        measures.forEach((measure, beatIdx) => {
-            const w = notationWidth(measure)
-            widths[beatIdx] = Math.max(widths[beatIdx] ?? 0, w)
-        })
-    }
-    return widths
-}
+import { applyPatterns } from './patternManager.ts'
 
 // Per-beat column widths counting each symbol (including a norot) as ONE column.
 // Used on ALREADY-PADDED measures (e.g. after editing), where a norot's expansion
@@ -91,21 +43,6 @@ export function flattenCompact(measures: NoteObject[][], colWidths: number[]): N
     })
 }
 
-// Like flattenCompact but for RAW measures (norot = a single entry): each norot is
-// followed inline by (patternSize - 1) padding spaces so it occupies its full column
-// span, then the measure is padded to the column width. Used by the parser.
-export function flattenCompactRaw(measures: NoteObject[][], colWidths: number[]): NoteSymbol[] {
-    return measures.flatMap((measure, beatIdx) => {
-        const cells: NoteSymbol[] = []
-        for (const note of measure) {
-            cells.push((note.toString() || SPACE_CHAR) as NoteSymbol)
-            for (let k = 0; k < patternSize(note) - 1; k++) cells.push(SPACE_CHAR as NoteSymbol)
-        }
-        const pad = Math.max(0, (colWidths[beatIdx] ?? cells.length) - cells.length)
-        return [...cells, ...(Array(pad).fill(SPACE_CHAR) as NoteSymbol[])]
-    })
-}
-
 // Splits a flat notation back into measures using the per-beat column widths.
 export function splitFlat(notation: NoteSymbol[], colWidths: number[]): NoteSymbol[][] {
     if (colWidths.length === 0) return notation.length ? [notation.slice()] : []
@@ -126,56 +63,18 @@ export function splitFlat(notation: NoteSymbol[], colWidths: number[]): NoteSymb
 // The compact `measures` are position-independent symbol strings; they are rebuilt into
 // NoteObjects (bound to no position, exactly as the parser does) before running the
 // shared cast -> expand -> pad -> flatten pipeline, so this reproduces the parser output.
-export function expandSystem(system: System): System {
-    if (!system.groups || system.groups.length === 0) return system
-    const { staffs, colWidths } = expandParsedStaffs(
-        castGroupedNotationToPositions(system, system.castingInstructions ?? []),
-        true
-    )
-
-    // Derive kempli from a clean base (state 'on', no frequency) exactly as the parser
-    // does, preserving only the user-set `beatAtEnd`. Starting from an already-derived
-    // kempli would otherwise let the 'double' branch compound the frequency on re-derivation.
-    // const baseKempli: KempliSetting = { state: 'on', beatAtEnd: system.kempli?.beatAtEnd }
-    // system.kempli = deriveKempli(baseKempli, system.execution, colWidths, hasKempliStaff)
-    system.staffs = staffs
-    return system
-}
-
-// Determines if the columns have different widths.
-function varying(colWidths: number[]): boolean {
-    return Math.max(...colWidths) != Math.min(...colWidths)
-}
-
-// ___________ TABUH PARSER ONLY ______________
-
-// Derives the kempli state/frequency for a system from its execution items and the
-// expanded column widths. Returns a new KempliSetting (does not mutate the input).
-// `hasKempliStaff` must reflect whether the system has an explicit KEMPLI staff.
-export function deriveKempli(
-    current: KempliSetting,
-    execution: ExecutionItem[] | undefined,
-    colWidths: number[],
-    hasKempliStaff: boolean
-): KempliSetting {
-    const kempli: KempliSetting = { ...current }
-    kempli.state = 'on'
-    if (execution) {
-        const kempliItem: KempliItem = execution.find((exec) => exec.type == 'kempli') as KempliItem
-        if (kempliItem) {
-            if (kempliItem.value == 'off') kempli.state = 'off'
-            if (kempliItem.value === 'double') kempli.frequency = kempli.frequency! / 2
-        }
-    }
-    if (kempli.state != 'off') {
-        if (colWidths.length == 0 || varying(colWidths) || hasKempliStaff) {
-            kempli.state = 'notation'
-        } else {
-            // Set kempli frequency if all measures have the same duration
-            if (colWidths.every((w) => w == colWidths[0])) {
-                kempli.frequency = colWidths.length > 0 ? colWidths[0] : 4
-            }
-        }
-    }
-    return kempli
+export function expandSystem(system: System): void {
+    if (!system.groups || system.groups.length === 0) return
+    system.staffs = castGroupedNotationToPositions(system, system.castingInstructions ?? [])
+    const beatSlices = getBeatSlices(system)
+    // Expand shorthand pattern symbols (e.g. norot) within each beat
+    _.entries(system.staffs).forEach(([position, staff]) => {
+        if (staff)
+            system.staffs[position as Position] = applyPatterns({
+                position: position as Position,
+                staff,
+                beatSlices,
+                eatSpaces: true
+            })
+    })
 }

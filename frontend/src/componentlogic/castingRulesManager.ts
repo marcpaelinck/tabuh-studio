@@ -113,7 +113,7 @@ function selectRule(
 // groupedNotation: groups of positions with corresponding notation (one Staff per kempli beat)
 // castInstructions: contains AUTOKEMPYUNG metadata which indicates whether homophonic notation
 //                   should be converted to kempyung equivalent for sangsih positions.
-export function castGroupedNotationToPositions(system: System, castInstructions: CastingInstruction[]): System {
+export function castGroupedNotationToPositions(system: System, castInstructions: CastingInstruction[]): Staffs {
     const staffs: Staffs = {}
     for (const notationGroup of system.groups) {
         // Multiple positions: cast notation to each position
@@ -123,9 +123,7 @@ export function castGroupedNotationToPositions(system: System, castInstructions:
             staffs[position] = { notation: strNotation, objNotation: objNotation }
         })
     }
-    const newSystem = { ...system }
-    newSystem.staffs = staffs
-    return newSystem
+    return staffs
 }
 
 // Casts the measure to the given position:

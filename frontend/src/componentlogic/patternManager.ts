@@ -237,7 +237,13 @@ function symbolArrayToNoteArray(symbols: NoteSymbol[], position: Position): Note
 // are too few following spaces the sequence is cut off and a warning is logged.
 // With `eatSpaces` off (the parser's path) every norot expands to its full size
 // and following spaces are kept — the original behaviour.
-export function applyPatterns(position: Position, staff: Staff, beatSlices: BeatSliceInfo[], eatSpaces = false): Staff {
+export interface ApplyPatternParams {
+    position: Position
+    staff: Staff
+    beatSlices: BeatSliceInfo[]
+    eatSpaces: boolean
+}
+export function applyPatterns({ position, staff, beatSlices, eatSpaces }: ApplyPatternParams): Staff {
     const expandedObjNotation: NoteObject[] = []
     var prevNorotSymbol: NoteObject | null = null
     beatSlices.forEach((slice, beatIdx) => {
