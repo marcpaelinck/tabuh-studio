@@ -37,13 +37,6 @@ export interface Staff {
 
 export type Staffs = Partial<Record<Position, Staff>>
 
-// Used during parsing only: staff is an array of Staffs, one per kempli beat (measure).
-// After parsing, these are flattened into a single Staff per position.
-export interface GroupedNotation {
-    positions: Position[]
-    staff: Staff[]
-}
-
 // Canonical "compact" notation group — the source of truth for the dual editor.
 // Like a Staff, `notation` is a single FLAT list of position-independent compact
 // symbols (may contain shorthand such as norot). It is built by padding each measure
@@ -51,7 +44,7 @@ export interface GroupedNotation {
 // concatenating, so the compact columns line up 1:1 with the expanded notation.
 // The expanded per-position `staffs` are DERIVED from a system's groups via
 // expandSystem() (see componentlogic/expandNotation.ts).
-export interface NotationGroup {
+export interface GroupedNotation {
     id: string
     positions: Position[] // 1..n; a single-position group is a "solo" line
     notation: NoteSymbol[] // flat, space-padded compact symbols (measures concatenated)
@@ -63,9 +56,8 @@ export type System = {
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
     line?: number // in case the score was parsed from a text file, the first line of the system
-    notationGroups?: GroupedNotation[] // DEPRECATED: superseded by `groups`; no longer populated.
     editorGroup: string[] // positions that are/were grouped in one line in the editor.
-    groups?: NotationGroup[] // CANONICAL compact notation (source of truth for the dual editor).
+    groups: GroupedNotation[] // CANONICAL compact notation (source of truth for the dual editor).
     beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
     castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
     staffs: Partial<Record<Position, Staff>> // Derived (cache) flat notation for each position.

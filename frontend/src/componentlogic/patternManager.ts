@@ -3,6 +3,7 @@
 
 import { NoteObject } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '../typing/basetypes'
+import type { BeatSliceInfo } from '../typing/execution'
 import type { Staff } from '../typing/score'
 
 type NorotSubPattern = 'ngubeng' | 'majalan'
@@ -201,10 +202,25 @@ export function patternSize(note: NoteObject, position?: Position): number {
     return note.pattern.norot ? patterns.norot.size : 1
 }
 
-// Returns the width of the notation after expanding notation pattern symbols.
-// (norot counts as its pattern size, every other symbol as one column.)
-export function notationWidth(notation: NoteObject[], position?: Position) {
-    return notation.reduce((sum, note) => sum + patternSize(note, position), 0)
+// Returns the number of columns over which the notation spans, after expanding pattern symbols.
+// Currently only norot has a pattern length > 1.
+// Patterns that are not followed by a sufficient number of extension symbols will be truncated
+// except if the pattern occurs at the end of the notation.
+export function notationWidth(notation: NoteObject[], position?: Position): number {
+    var totalWidth = 0
+    var remaining = 0 // remaining number of expected spaces after a pattern
+    notation.forEach((note) => {
+        if (note.isExtensionSilence) {
+            if (remaining) remaining--
+            else totalWidth++
+        } else if (note.isMutingSilence) totalWidth++
+        else {
+            totalWidth += 1 - remaining // pattern will be truncated if there are insufficient trailing spaces
+            remaining = patternSize(note, position) - 1
+        }
+    })
+    totalWidth += remaining
+    return totalWidth
 }
 
 // Converts an array of NoteSymbol strings to an array of NoteObject objects.
@@ -221,26 +237,35 @@ function symbolArrayToNoteArray(symbols: NoteSymbol[], position: Position): Note
 // are too few following spaces the sequence is cut off and a warning is logged.
 // With `eatSpaces` off (the parser's path) every norot expands to its full size
 // and following spaces are kept — the original behaviour.
-export function applyPatterns(position: Position, staff: Staff[], eatSpaces = false): Staff[] {
-    const newStaff: Staff[] = []
-    staff.forEach((beat, measureIdx) => {
-        const expandedObjNotation: NoteObject[] = []
-        let noteIdx = 0
-        while (noteIdx < beat.objNotation.length) {
-            const note = beat.objNotation[noteIdx]
-            if (note.error !== undefined) {
+export function applyPatterns(position: Position, staff: Staff, beatSlices: BeatSliceInfo[], eatSpaces = false): Staff {
+    const expandedObjNotation: NoteObject[] = []
+    var prevNorotSymbol: NoteObject | null = null
+    beatSlices.forEach((slice, beatIdx) => {
+        const beatObjNotation = staff.objNotation.slice(slice.start, slice.end)
+        var noteIdx = 0
+        while (noteIdx < beatObjNotation.length) {
+            const symbol = beatObjNotation[noteIdx]
+            if (symbol.error !== undefined) {
                 // Structurally invalid symbol — replace with silence
-                expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
+                prevNorotSymbol = null
+                expandedObjNotation.push(new NoteObject(symbol.canonicalSymbol, position))
                 noteIdx++
-            } else if (note.pattern.norot) {
-                const pattern = norotPattern(position, staff, measureIdx, noteIdx)
+            } else if (symbol.pattern.norot) {
+                const pattern = norotPattern(
+                    position,
+                    symbol,
+                    prevNorotSymbol,
+                    noteIdx,
+                    beatIdx,
+                    slice.end - slice.start
+                )
                 if (eatSpaces) {
                     // The norot occupies its own column plus the following space columns.
                     let avail = 1
                     while (
                         avail < pattern.length &&
-                        noteIdx + avail < beat.objNotation.length &&
-                        beat.objNotation[noteIdx + avail].toString() === ' '
+                        noteIdx + avail < beatObjNotation.length &&
+                        beatObjNotation[noteIdx + avail].toString() === ' '
                     ) {
                         avail++
                     }
@@ -248,28 +273,36 @@ export function applyPatterns(position: Position, staff: Staff[], eatSpaces = fa
                     expandedObjNotation.push(...pattern.slice(0, take))
                     if (take < pattern.length) {
                         console.warn(
-                            `norot sequence cut off in ${position} measure ${measureIdx}: ` +
+                            `norot sequence cut off in ${position} measure ${beatIdx}: ` +
                                 `needs ${pattern.length} columns, only ${take} available.`
                         )
                     }
-                    noteIdx += take // consumed the norot symbol + (take - 1) following spaces
+                    noteIdx += take
                 } else {
                     expandedObjNotation.push(...pattern)
                     noteIdx++
                 }
+                prevNorotSymbol = symbol
             } else {
                 // Single note (including combined grace-note symbols, strokes, etc.)
-                expandedObjNotation.push(new NoteObject(note.canonicalSymbol, position))
+                if (!symbol.isExtensionSilence) prevNorotSymbol = null
+                expandedObjNotation.push(new NoteObject(symbol.canonicalSymbol, position))
                 noteIdx++
             }
         }
-        const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.toString())
-        newStaff.push({ notation: expandedNotation, objNotation: expandedObjNotation } as Staff)
     })
-    return newStaff
+    const expandedNotation: NoteSymbol[] = expandedObjNotation.map((note) => note.toString())
+    return { notation: expandedNotation, objNotation: expandedObjNotation }
 }
 
-function norotPattern(position: Position, staff: Staff[], measureIdx: number, symbolIdx: number): NoteObject[] {
+function norotPattern(
+    position: Position,
+    norotNote: NoteObject,
+    prevNorotNote: NoteObject | null,
+    noteIdx: number,
+    beatIdx: number,
+    beatLength: number
+): NoteObject[] {
     if (!(position in patterns.norot.patterns)) {
         console.error(`Unexpected norot symbol in ${position} notation.`)
         return []
@@ -277,27 +310,24 @@ function norotPattern(position: Position, staff: Staff[], measureIdx: number, sy
     // Remove any space symbols and determine the norot type.
     // Norot style rule: if the measure contains only one note, assume kotekan style.
     // Rationale: in general the kempli doubles the beat frequency when norot is played kotekan style.
-    const objNotation = staff[measureIdx].objNotation.filter((note) => note.toString() != '')
-    const norotType: NorotType = objNotation.length == 1 ? 'kotekan' : 'homophonic'
+    //     const objNotation = beatObjNotation.filter((note) => note.toString() != SPACE_CHAR)
+    //     const norotType: NorotType = objNotation.length == 1 ? 'kotekan' : 'homophonic'
+    const norotType: NorotType = beatLength == 4 ? 'kotekan' : 'homophonic'
 
     // Current note
-    const note = staff[measureIdx].objNotation[symbolIdx]
-    const currTone = note.symbol.pitch + note.symbol.octave
+    //     const norotNote = beatObjNotation[symbolIdx]
+    const currTone = norotNote.symbol.pitch + norotNote.symbol.octave
 
     // Previous symbol: from the same beat (if symbolIdx > 0) or the last symbol of the previous beat
-    const prevNote: NoteObject | undefined =
-        symbolIdx > 0
-            ? staff[measureIdx].objNotation[symbolIdx - 1]
-            : measureIdx > 0
-              ? staff[measureIdx - 1].objNotation.at(-1)
-              : undefined
+    //     const prevNote: NoteObject | undefined =
+    //         symbolIdx > 0 ? beatObjNotation[symbolIdx - 1] : prevBeatObjNotation?.at(-1)
 
-    const prevNorotNote = prevNote !== undefined && prevNote.pattern.norot ? prevNote : undefined
+    //     const prevNorotNote = prevNote !== undefined && prevNote.pattern.norot ? prevNote : undefined
 
     // Ngubeng when the previous norot note has the same tone; majalan on a tone change,
     // at the start of a norot sequence, or on the GIR.
     const subPattern: NorotSubPattern =
-        prevNorotNote !== undefined && prevNorotNote.toString() === note.toString() ? 'ngubeng' : 'majalan'
+        prevNorotNote && prevNorotNote.toString() === norotNote.toString() ? 'ngubeng' : 'majalan'
 
     if (subPattern === 'ngubeng') {
         return symbolArrayToNoteArray(patterns.norot.patterns[position]![currTone][norotType].ngubeng, position)
@@ -305,9 +335,9 @@ function norotPattern(position: Position, staff: Staff[], measureIdx: number, sy
 
     // Majalan: derive the first pattern note from the previous norot basenote (if any)
     let firstNote: NoteSymbol
-    if (measureIdx === 0 && symbolIdx === 0) {
+    if (beatIdx === 0 && noteIdx === 0) {
         firstNote = patterns.norot.patterns[position]![currTone][norotType].basenote // on GIR
-    } else if (prevNorotNote !== undefined) {
+    } else if (prevNorotNote) {
         const prevTone = prevNorotNote.symbol.pitch + prevNorotNote.symbol.octave
         firstNote = patterns.norot.patterns[position]![prevTone][norotType].basenote
     } else {

@@ -611,6 +611,12 @@ export function usePlaybackManager() {
         newTimeLine.genericactions.push({ time: newTimeLine.totalDurationTO, params: {} })
 
         newTimeLine.notation = getNotationParagraphs(pbAction.score!)
+        //_____________DEBUG_____________
+        newTimeLine.sampleractions
+            .filter((action) => action.params.position == 'CALUNG')
+            .map((action, idx) => [idx, action.params.position, action.time['16n'], action.params.note.canonicalSymbol])
+            .forEach((a) => console.log(JSON.stringify(a)))
+        //_____________DEBUG_____________
         return newTimeLine
     }
 

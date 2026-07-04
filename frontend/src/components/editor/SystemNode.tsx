@@ -322,9 +322,8 @@ export const SystemNode = memo(function SystemNode({
     }, 300)
 
     // The compact (grouped/shorthand) view is the editable surface for systems that
-    // have a canonical `groups` store. COPY systems are excluded for now (their
-    // copied positions are not yet represented in groups — see CLAUDE.dual-editor.md).
-    const hasGroups = !!systemData.groups && systemData.groups.length > 0 && !systemData.copyFromUuid
+    // have a canonical `groups` store. See CLAUDE.dual-editor.md.
+    const hasGroups = !!systemData.groups && systemData.groups.length > 0
 
     // Compact lines seeded from the system's groups. The stored notation is flat, so
     // it is split back into measures using the system's per-beat column widths.

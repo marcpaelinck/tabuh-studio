@@ -125,9 +125,12 @@ export function getBeatSlices(system: System): BeatSliceInfo[] {
         }
     } else if (system.kempli.state === 'notation') {
         // KEMPLI_BEAT_CHAR marks the START of each kempli beat.
-        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
+        const kempliNotation =
+            system.groups?.find((group) => group.positions.includes('KEMPLI'))?.notation ||
+            system.staffs['KEMPLI']?.notation ||
+            []
         const beatStartIndices = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note.canonicalSymbol === KEMPLI_BEAT_CHAR || idx == 0 ? [...pos, idx] : pos),
+            (pos: number[], note, idx) => (note === KEMPLI_BEAT_CHAR || idx == 0 ? [...pos, idx] : pos),
             []
         )
         if (!beatStartIndices.length) beatSliceInfo.push({ start: 0, end: maxColumnCount })
@@ -142,32 +145,6 @@ export function getBeatSlices(system: System): BeatSliceInfo[] {
         beatSliceInfo.push({ start: 0, end: maxColumnCount })
     }
     return beatSliceInfo
-}
-
-// Finds the [startIdx, endIdx) array slice for beat beatIdx
-function getBeatSlice(objNotation: NoteObject[], beatIdx: number, freq: number): [number, number] {
-    if ((beatIdx + 1) * freq <= objNotation.length) return [beatIdx * freq, (beatIdx + 1) * freq]
-    if (beatIdx * freq < objNotation.length) return [beatIdx * freq, objNotation.length]
-    return [0, 0]
-}
-
-export function getBeatStart(beatIdx: number, system: System, position?: Position): number {
-    if (system.kempli.state === 'on' || system.kempli.state === 'off') {
-        const freq = system.kempli.frequency || defaultBeatFrequency
-        const refPosition = position ?? (Object.keys(system.staffs)[0] as Position)
-        const refNotation = system.staffs[refPosition]?.objNotation ?? []
-        const [start] = getBeatSlice(refNotation, beatIdx, freq)
-        return start
-    } else if (system.kempli.state === 'notation') {
-        // KEMPLI_BEAT_CHAR marks the START of each kempli beat.
-        const kempliNotation = system.staffs['KEMPLI']?.objNotation || []
-        const beatPositions = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note.canonicalSymbol === KEMPLI_BEAT_CHAR ? [...pos, idx] : pos),
-            []
-        )
-        return beatIdx < beatPositions.length ? beatPositions[beatIdx] : 0
-    }
-    return 0
 }
 
 export interface GetBeatNotationArgs {

@@ -109,12 +109,12 @@ export function createGridStyle({
         )`
     return {
         background: highlight + gridlineHider + kempliLines + gridlines,
-        'background-position': `
+        backgroundPosition: `
             left,
             calc(0.5ch - 2px) 0,
             calc(0.5ch - 2px) 0,
             calc(0.5ch - 2px) 0
 `,
-        'background-repeat': 'repeat-x'
+        backgroundRepeat: 'repeat-x'
     }
 }

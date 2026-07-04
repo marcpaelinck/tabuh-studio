@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
-import { expandSystem } from './expandNotation'
 import type { ScoreListItem, ScoreRecord } from '../services/apiService'
 import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
 import type { NoteSymbol } from '../typing/basetypes'
@@ -15,6 +14,7 @@ import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
 import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
+import { expandSystem } from './expandNotation'
 
 export function persistCachedChanges(score: Score | undefined): Score | undefined {
     if (!score) return
@@ -34,9 +34,8 @@ function postprocessScore(score: Score): Score {
     if (!score.uuid) score.uuid = uuidv4()
     for (const system of score.systems) {
         // Re-derive the expanded staffs cache from the canonical compact groups.
-        // Skipped for legacy/laras scores (no groups) and COPY systems (not yet
-        // represented in groups), which keep their stored/parsed staffs.
-        if (system.groups && system.groups.length > 0 && !system.copyFromUuid) expandSystem(system)
+        // Skipped for legacy/laras scores which keep their stored/parsed staffs.
+        if (system.groups && system.groups.length > 0) expandSystem(system)
         _.entries(system.staffs).forEach(([_pos, staff]) => {
             staff.objNotation = NoteObject.fromNotation(staff.notation, _pos as Position)
         })
@@ -111,11 +110,6 @@ export function useScoreReader(source: 'database' | 'file'): {
                     if (staff) delete (staff as StaffNoObject).objNotation
                     if (staff) delete (staff as StaffNoObject).objNotation_
                 })
-                system.notationGroups?.forEach((group) => {
-                    group.staff.forEach((staff) => {
-                        delete (staff as StaffNoObject).objNotation
-                    })
-                })
             })
             if (destination == 'database') isSuccess = await saveScoreToDb(scoreNoObject)
             else if (destination == 'file') isSuccess = await saveScoreToLocalFile(scoreNoObject)
@@ -175,7 +169,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                 const content = await file.text()
                 const parserReturnValue: ParserReturnValue = parse(content)
                 if (parserReturnValue.score) {
-                    setScore(parserReturnValue.score)
+                    setScore(postprocessScore(parserReturnValue.score))
                 }
 
                 // Process content as needed

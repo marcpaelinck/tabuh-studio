@@ -3,17 +3,11 @@ import type { SyntaxNode } from '@lezer/common'
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { CastingInstruction } from '../componentlogic/castingRulesManager.ts'
-import {
-    castGroupedNotationToPositions,
-    compactColWidths,
-    deriveKempli,
-    expandParsedStaffs,
-    flattenCompactRaw,
-    type ParsedStaffs
-} from '../componentlogic/expandNotation.ts'
+import { type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
+import { deriveKempli } from '../componentlogic/expandNotation.ts'
+import { notationWidth } from '../componentlogic/patternManager.ts'
 import { dynamicsToNumber } from '../config/config.ts'
-import type { Position, UUID } from '../typing/basetypes.ts'
+import type { NoteSymbol, Position, UUID } from '../typing/basetypes.ts'
 import type {
     DynamicsItem,
     DynamicsValue,
@@ -34,7 +28,7 @@ import type {
     PostProcessing,
     ProcessingInstruction
 } from '../typing/parsers.ts'
-import type { GroupedNotation, Score, Staff, Staffs, System } from '../typing/score.ts'
+import type { GroupedNotation, Score, System } from '../typing/score.ts'
 import { debug } from '../utils/debugger.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
 import { parser } from './grammars/tabuh/tabuh.ts'
@@ -73,6 +67,8 @@ export function parseNotation(content: string): ParserReturnValue {
 
     const postProcessing: PostProcessing[] = []
 
+    const columnWidthsTable: Record<UUID, number[]> = {}
+
     var gonganCounter = 0
 
     const traverse = (node: SyntaxNode) => {
@@ -93,13 +89,15 @@ export function parseNotation(content: string): ParserReturnValue {
             case 'Gongan': {
                 gonganCounter++
                 const systemuuid = uuidv4()
-                const groupedNotation = getNotation(node, content)
                 const metaData = getMetadata(node, gonganCounter, systemuuid, content)
+                const { notation, columnWidths } = getNotation(node, content)
+                columnWidthsTable[systemuuid] = columnWidths
                 const system = {
                     uuid: systemuuid,
                     id: gonganCounter,
                     index: gonganCounter - 1,
                     line: lineNr(content, node.from),
+                    groups: notation,
                     staffs: {},
                     kempli: { state: 'on' },
                     label: undefined,
@@ -117,24 +115,7 @@ export function parseNotation(content: string): ParserReturnValue {
                         .filter((item) => item.type == 'postprocessing')
                         .map((item) => item.value) as PostProcessing[])
                 )
-                const castInstructions: CastingInstruction[] = metaData
-                    .filter((item) => item.type == 'castinginstruction')
-                    .map((item) => item.value) as CastingInstruction[]
-                // Canonical compact store: one group per StaffLine (solo or multi-position).
-                // Each group's notation is stored FLAT, like a Staff: measures are padded
-                // with spaces to the per-beat column width and concatenated, so the compact
-                // columns line up 1:1 with the expanded notation.
-                const compactMeasures = groupedNotation.map((group) => group.staff.map((beat) => beat.objNotation))
-                const beatColWidths = compactColWidths(compactMeasures)
-                system.beatColWidths = beatColWidths
-                system.groups = groupedNotation.map((group, groupIdx) => ({
-                    id: uuidv4(),
-                    positions: group.positions,
-                    notation: flattenCompactRaw(compactMeasures[groupIdx], beatColWidths)
-                }))
-                system.castingInstructions = castInstructions.length > 0 ? castInstructions : undefined
-                const parsedStaffs = castGroupedNotationToPositions(groupedNotation, castInstructions)
-                system.staffs = parsedStaffs as Staffs // temporarily holds Staff[] per position until postProcess
+
                 parsedScore.systems.push(system)
                 break
             }
@@ -150,16 +131,25 @@ export function parseNotation(content: string): ParserReturnValue {
 
     traverse(tree.topNode)
 
-    const score: Score = postProcess(parsedScore, postProcessing)
+    const score: Score = postProcess(parsedScore, columnWidthsTable, postProcessing)
 
     return { score, errors, postProcessing, tree }
+}
+
+function addKempliNotation(system: System, colWidths: number[]) {
+    const notation: string[] = colWidths.map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR))).flat()
+    system.groups.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
 }
 
 /********************
  POSTPROCESSING
 ********************/
 
-function postProcess(score: Score, postProcessingInstructions: PostProcessing[]): Score {
+function postProcess(
+    score: Score,
+    columnWidthsTable: Record<UUID, number[]>,
+    postProcessingInstructions: PostProcessing[]
+): Score {
     score.positions = getAllPositions(score)
 
     // fill in targetuuid of GOTO
@@ -192,13 +182,26 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         const target: System | undefined = getSystemByUuid(copyInstr.targetuuid, score, copyInstr.targetid, 'COPY')
         const source: System | undefined = getSystemByLabel(copyInstr.label, score, copyInstr.targetid, 'COPY')
         if (source && target) {
-            // Target staffs should be applied to the copy of source
-            target.staffs = { ...source.staffs, ...target.staffs }
+            // Remove positions from source that are in target
+            const targetPositions = new Set(target.groups.map((group) => group.positions).flat())
+            const sourceGroupsToCopy = source.groups
+                .map((group) => {
+                    return {
+                        id: uuidv4(),
+                        positions: group.positions.filter((pos) => !targetPositions.has(pos)),
+                        notation: group.notation
+                    }
+                })
+                .filter((group) => group.positions.length)
+            // Merge selected source groups with target
+            target.groups = sourceGroupsToCopy.concat(target.groups)
             // COPY is not yet represented in the canonical `groups` store. Mark the target
             // so the groups-based re-derivation (expandSystem) is skipped on load and the
             // cached staffs are used instead. COPY-at-group-level is a planned follow-up.
             target.copyFrom = source.label
             target.copyFromUuid = source.uuid
+            // Also copy the kempli state
+            target.kempli = source.kempli
             debug(`INCLUDE source=${source.label ?? source.id} include=${JSON.stringify(copyInstr.include ?? [])}`)
             if (copyInstr.include && source.execution) {
                 const copyItems: ExecutionItem[] = source.execution.filter((item) =>
@@ -210,26 +213,14 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
         }
     }
 
-    // At this point system.staffs temporarily holds Staff[] per position (ParsedStaffs).
-    // Expand pattern symbols, pad beats to equal width, derive kempli and flatten to Staff.
-    // If the beats have unequal widths and there is no explicit kempli staff, add a kempli staff.
-    // The transform itself now lives in componentlogic/expandNotation.ts so that the live
-    // editor can reuse exactly the same code.
+    // Set the kempli state ('on', 'notation' or 'off').
+    // 'notation' is selected if the beats vary in length. In that case, add a kempli staff if missing.
     for (const system of score.systems) {
-        const parsedStaffs = system.staffs as unknown as ParsedStaffs
-        const hasKempliStaff = 'KEMPLI' in parsedStaffs
-        const { staffs, colWidths } = expandParsedStaffs(parsedStaffs)
-        system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliStaff)
-        system.staffs = staffs
+        const hasKempliNotation = system.groups.some((group) => group.positions.includes('KEMPLI'))
+        const colWidths = columnWidthsTable[system.uuid] || []
+        system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliNotation)
         // ensure that there is a kempli staff if the kempli state is 'notation'.
-        if (system.kempli.state == 'notation' && !('KEMPLI' in system.staffs)) {
-            const notation: string[] = colWidths
-                .map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR)))
-                .flat()
-            const objNotation = NoteObject.fromNotation(notation)
-            system.staffs['KEMPLI'] = { notation, objNotation }
-            system.groups?.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
-        }
+        if (system.kempli.state == 'notation' && !hasKempliNotation) addKempliNotation(system, colWidths)
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -259,7 +250,10 @@ function postProcess(score: Score, postProcessingInstructions: PostProcessing[])
 }
 
 function getAllPositions(score: Score): Position[] {
-    const positionSet = score.systems.reduce((aggr, system) => aggr.union(new Set(_.keys(system.staffs))), new Set())
+    const positionSet = score.systems.reduce(
+        (aggr, system) => aggr.union(new Set(system.groups.map((group) => group.positions).flat())),
+        new Set()
+    )
     return Array.from(positionSet) as Position[]
 }
 
@@ -375,45 +369,80 @@ function tagsToPositions(tags: string[]): Position[] {
    GONGAN   
 ***********/
 
+// Used during parsing only: staff is an array of Staffs, one per kempli beat (measure).
+// After parsing, these are flattened into a single Staff per position.
+export interface GroupedMeasures {
+    positions: Position[]
+    measures: NoteSymbol[][]
+}
+
 // Creates a GroupedNotation object list from the given node's children
 // Returns a list of position groups if some position tags refer to multiple positions.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 //          StaffLine { PositionLabel Measure+ Eol }
 //          Measure { tab Note* }
-function getNotation(gonganNode: SyntaxNode | null, content: string): GroupedNotation[] {
-    if (gonganNode == undefined) return []
-    const notationGroups: GroupedNotation[] = []
+function getNotation(
+    gonganNode: SyntaxNode | null,
+    content: string
+): { notation: GroupedNotation[]; columnWidths: number[] } {
+    if (gonganNode == undefined) return { notation: [], columnWidths: [] }
+    const groupedNotationByMeasures: GroupedMeasures[] = []
     const staffNodes = gonganNode.getChildren('StaffLine')
 
     for (const child of staffNodes) {
-        var staff: Staff[] = []
+        var measures: NoteSymbol[][] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
         const positions = tagsToPositions(positionTag.split('/'))
-        var groupedNotation: GroupedNotation
+        var notationMeasures: GroupedMeasures
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
-            const beat: Staff = { notation: [], objNotation: [] }
+            const measure: NoteSymbol[] = []
             var noteNode = measureNode.getChild('Note')
             while (noteNode) {
-                // The NoteObject is not bound to any instrument
-                const note = new NoteObject(getText(noteNode, content), undefined)
-                beat.notation.push(note.toString())
-                beat.objNotation.push(note)
+                measure.push(getText(noteNode, content))
                 noteNode = noteNode.nextSibling
             }
-            staff.push(beat)
+            measures.push(measure)
         }
-        groupedNotation = { positions: positions, staff: staff } as GroupedNotation
-        notationGroups.push(groupedNotation)
+        notationMeasures = { positions: positions, measures: measures } as GroupedMeasures
+        groupedNotationByMeasures.push(notationMeasures)
     }
     // Ensure that all staffs have the same number of measures. Add empty measures where necessary.
-    const maxMeasures = Math.max(...notationGroups.map((ng) => ng.staff.length))
-    for (const ng of notationGroups) {
-        const shortage = maxMeasures - ng.staff.length
-        if (shortage > 0) ng.staff.push(...(Array(shortage).fill({ notation: [], objNotation: [] }) as Staff[]))
+    const maxMeasures = Math.max(...groupedNotationByMeasures.map((group) => group.measures.length))
+    for (const group of groupedNotationByMeasures) {
+        const shortage = maxMeasures - group.measures.length
+        if (shortage > 0) group.measures.push(...Array(shortage).fill([]))
     }
+    // Pad measures with space characters where needed to normalize the measure lengths.
 
-    return notationGroups
+    // First calculate the maximum width of the columns. `notationWidth` returns the unabbreviated width
+    // for 'shorthand' notation such as norot.
+    const columnWidths = groupedNotationByMeasures.map((group) =>
+        group.measures.map((m) => notationWidth(NoteObject.fromNotation(m)))
+    )
+    const maxColWidths = _.zip(...columnWidths).map((col) => Math.max(...col.map((n) => n || 0)))
+
+    // Now pad measures up to the maximum width of the column.
+    const groupedNotationArray: GroupedNotation[] = []
+    groupedNotationByMeasures.forEach((group) => {
+        group.measures.forEach((measure, colIdx) => {
+            const diff = (maxColWidths[colIdx] ?? 0) - measure.length
+            if (diff > 0) {
+                const padding = Array(diff).fill(SPACE_CHAR)
+                measure.push(...padding)
+            }
+        })
+        const groupedNotation: GroupedNotation = {
+            id: uuidv4(),
+            positions: group.positions,
+            notation: group.measures.flat()
+        }
+        groupedNotationArray.push(groupedNotation)
+    })
+
+    // Join the measures into a single notation array.
+
+    return { notation: groupedNotationArray, columnWidths: maxColWidths }
 }
 
 /***********

@@ -1,9 +1,9 @@
 // This module contains the rules that are used for the automatic generation of notation for grouped staves.
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
-import { NoteObject } from '@tabuhstudio/shared'
-import { ERROR_PITCH_CHAR } from '@tabuhstudio/shared'
+import { ERROR_PITCH_CHAR, NoteObject } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '../typing/basetypes.ts'
+import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
 type CastingInstructionType = 'nokempyung' | 'norot'
 export interface CastingInstruction {
@@ -108,68 +108,62 @@ function selectRule(
     return posRuleset.default
 }
 
+// When a staff notation applies to a group of positions, this function converts
+// the common staff notation to individual staff notation for each position, using 'casting' rules.
+// groupedNotation: groups of positions with corresponding notation (one Staff per kempli beat)
+// castInstructions: contains AUTOKEMPYUNG metadata which indicates whether homophonic notation
+//                   should be converted to kempyung equivalent for sangsih positions.
+export function castGroupedNotationToPositions(system: System, castInstructions: CastingInstruction[]): System {
+    const staffs: Staffs = {}
+    for (const notationGroup of system.groups) {
+        // Multiple positions: cast notation to each position
+        notationGroup.positions.forEach((position, posIdx) => {
+            const objNotation = castNotation(notationGroup, posIdx, castInstructions)
+            const strNotation = objNotation.map((note) => note.toString())
+            staffs[position] = { notation: strNotation, objNotation: objNotation }
+        })
+    }
+    const newSystem = { ...system }
+    newSystem.staffs = staffs
+    return newSystem
+}
+
 // Casts the measure to the given position:
 // converts the notation to the position's range and polos/sangsih type,
 // assuming that the measure is a basic (polos) melody.
 // measureId starts with 0
 export function castNotation(
-    notation: NoteObject[],
-    groupedPositions: Position[],
-    measureIdx: number,
+    notationGroup: GroupedNotation,
     posIdx: number,
     castingInstructions?: CastingInstruction[]
 ): NoteObject[] {
-    if (posIdx < 0 || posIdx >= groupedPositions.length) {
+    if (posIdx < 0 || posIdx >= notationGroup.positions.length) {
         console.error(`Instrument index ${posIdx} too large.`)
         return []
     }
-    // No casting if there is only one instrument position
-    if (groupedPositions.length == 1) return notation.map((note) => new NoteObject(note.canonicalSymbol, position))
+    const position = notationGroup.positions[posIdx]
 
-    const position = groupedPositions[posIdx]
-    const conversion: CastingRule = selectRule(position, groupedPositions, castingInstructions)
+    // No casting if there is only one instrument position
+    if (notationGroup.positions.length == 1)
+        return notationGroup.notation.map((symbol) => new NoteObject(symbol, position))
+
+    const conversion: CastingRule = selectRule(position, notationGroup.positions, castingInstructions)
     // Norot notes should not be translated to kempyung
-    const norotconversion: CastingRule = selectRule(position, groupedPositions, [
+    const norotconversion: CastingRule = selectRule(position, notationGroup.positions, [
         { type: 'norot' as CastingInstructionType }
     ])
 
-    var updatedNotation = [...notation]
-
-    // Apply pokok rules if the group contains multiple positions and kempli is 'on'
-    // SUPPRESS TEMPORARILY: need to refactor tabuhParser - kempli status is not available.
-    // if (onlyOddMeasures.includes(position) && isEvenPositionByIndex(measureIdx)) {
-    //     // Clear even numbered measures. Note that measure numbering starts with 0.
-    //     updatedNotation = updatedNotation.map((_) => new NoteObject(' ', position))
-    //     debug(`${position}: onlyOddMeasures, result = ${updatedNotation}`)
-    // }
-    // if (onlyOddNotes.includes(position)) {
-    //     updatedNotation = updatedNotation.map((note, idx) =>
-    //         // Remove even numbered notes.
-    //         (idx + 1) % 2 == 0 ? new NoteObject(' ', position) : note
-    //     )
-    //     debug(`${position}: onlyOddNotes, result = ${updatedNotation}`)
-    // }
-    // if (onlyFirstNote.includes(position)) {
-    //     updatedNotation = updatedNotation.map((note, idx) =>
-    //         // Remove all but first note.
-    //         idx > 0 ? new NoteObject(' ', position) : note
-    //     )
-    //     debug(`${position}: onlyFirstNote, result = ${updatedNotation}`)
-    // }
-
-    // Apply casting rules using NoteObject for tone/norot classification.
-    // Invalid symbols (error !== undefined) pass through as ERROR_PITCH_CHAR (error character).
-    // Symbols not found in the casting table are also replaced with an error character.
-    const result = updatedNotation.map((note, idx) => {
+    const result = notationGroup.notation.map((symbol) => {
+        const note: NoteObject = new NoteObject(symbol, position)
         if (note.error !== undefined) return new NoteObject(ERROR_PITCH_CHAR, position)
         const tone = note.symbol.pitch + note.symbol.octave
         const cast = note.pattern.norot ? norotconversion[tone] : conversion[tone]
         if (cast == undefined) {
             console.error(`invalid symbol '${note.canonicalSymbol}' for ${position}`)
         }
-        const symbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : ERROR_PITCH_CHAR
+        const newSymbol = cast !== undefined ? note.symbol.prefix + cast + note.symbol.modifier : ERROR_PITCH_CHAR
 
-        return new NoteObject(symbol, position)
+        return new NoteObject(newSymbol, position)
     })
 
     return result
