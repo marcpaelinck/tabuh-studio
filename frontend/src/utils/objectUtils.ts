@@ -33,7 +33,7 @@ export function defaultObject<T>(otype: DefaultType): T {
 }
 
 const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
-const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'staffs', 'kempli']
+const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'kempli', 'line', 'groups', 'staffs', 'kempli']
 
 function reorderKeys<T extends object>(obj: T, keyOrder: string[]): T {
     const reordered: any = {}
@@ -62,13 +62,14 @@ export function scoreToFormattedJson(score: Score, clearCache: boolean = true): 
     )
 
     const flatten = (key: string, value: any) => {
-        if (/^(execution|staff|group|positions)$/.test(key) && value) {
+        if (/^(execution|notation|positions)$/.test(key) && value) {
             var json = value.map((item: any) => {
                 return JSON.stringify(item)
             })
             if (key != 'execution') json = '[' + json.join(', ') + ']'
             return json
         }
+        // Flatten staffs
         if (/^[A-Z][A-Z\d_]+$/.test(key) && value && typeof value === 'object' && 'notation' in value) {
             // Staff object: inline it
             return JSON.stringify(value)

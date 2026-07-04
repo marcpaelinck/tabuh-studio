@@ -40,9 +40,9 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'fs'
 import _ from 'lodash'
 import { basename, dirname, extname, join } from 'path'
 import { fileURLToPath } from 'url'
-import { positionOrder, scoreKeyOrder, systemKeyOrder } from '../src/config/config.ts'
 import { parseNotation } from '../src/scoreparsers/tabuhParser.ts'
-import type { Score, System } from '../src/typing/score.ts'
+import type { Score } from '../src/typing/score.ts'
+import { scoreToFormattedJson } from '../src/utils/objectUtils.ts'
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const DEFAULT_FOLDER = './test/scoreparsers/notationParser/data/tabuh-notation'
@@ -65,10 +65,7 @@ function loadEnvFile(path: string): boolean {
         if (eq === -1) continue
         const key = line.slice(0, eq).trim()
         let value = line.slice(eq + 1).trim()
-        if (
-            (value.startsWith('"') && value.endsWith('"')) ||
-            (value.startsWith("'") && value.endsWith("'"))
-        ) {
+        if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
             value = value.slice(1, -1)
         }
         if (!(key in process.env)) process.env[key] = value
@@ -99,13 +96,6 @@ function postProcess(score: Score): void {
             delete (staff as any).objNotation_
             delete (staff as any).notation_
         })
-        sys.notationGroups?.forEach((group) =>
-            group.staff.forEach((staff) => {
-                delete (staff as any).objNotation
-                delete (staff as any).objNotation_
-                delete (staff as any).notation_
-            })
-        )
     }
 }
 
@@ -119,40 +109,6 @@ function reorderKeys<T extends object>(obj: T, keyOrder: string[]): T {
     for (const key of keyOrder) if (key in obj) reordered[key] = (obj as any)[key]
     for (const key of Object.keys(obj)) if (!keyOrder.includes(key)) reordered[key] = (obj as any)[key]
     return reordered as T
-}
-
-function scoreToFormattedJson(score: Score): string {
-    const orderedScore = reorderKeys(
-        {
-            ...score,
-            systems: score.systems.map((sys: System) => {
-                return { ...reorderKeys(sys, systemKeyOrder), staffs: reorderKeys(sys.staffs, positionOrder) }
-            })
-        },
-        scoreKeyOrder
-    )
-
-    const flatten = (key: string, value: any) => {
-        if (/^(execution|staff|group|positions)$/.test(key) && value) {
-            const json = value.map((item: any) => JSON.stringify(item))
-            return key !== 'execution' ? '[' + json.join(', ') + ']' : json
-        }
-        if (/^[A-Z][A-Z\d_]+$/.test(key) && value && typeof value === 'object' && 'notation' in value) {
-            return JSON.stringify(value)
-        }
-        if (key === 'starttime') return undefined
-        return value
-    }
-
-    const json = JSON.stringify(orderedScore, flatten, 2)
-    return json
-        .replace(/"([\{\[])/g, '$1')
-        .replace(/([\}\]])"/g, '$1')
-        .replace(/\\"/g, '"')
-        .replace(/(?<="):(?! )/g, ': ')
-        .replace(/([\]\}\d"]),"/g, '$1, "')
-        .replace(/(true|false),(?![ \n\r])/g, '$1, ')
-        .replace(/([\d]),(?=\d)/g, '$1, ')
 }
 
 // ---------------------------------------------------------------------------
