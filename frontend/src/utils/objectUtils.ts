@@ -6,7 +6,7 @@ import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/share
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'
-import type { BPM, Position } from '../typing/basetypes'
+import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { BeatSliceInfo } from '../typing/execution'
 import type { Score, System } from '../typing/score'
 
@@ -110,11 +110,14 @@ export function isEvenByIndex(index: number) {
 // - For 'notation' state use the beat strokes in the notation.
 // TODO: not used yet. This function should be used by as basis for getSystemBeatCount, getBeatSlice and getBeatStart
 export function getBeatSlices(system: System): BeatSliceInfo[] {
-    const staffEntries = Object.entries(system.staffs).filter(([_, staff]) => staff != null)
+    // Retrieve a list of notation arrays.
+    const groupNotations: NoteSymbol[][] = system.groups
+        .filter((group) => group.notation != null)
+        .map((group) => group.notation)
 
-    if (!staffEntries.length) return []
-    const maxColumnCount = Math.max(...staffEntries.map(([pos, staff]) => staff!.objNotation.length))
+    if (groupNotations.length == 0) return []
 
+    const maxColumnCount = Math.max(...groupNotations.map((notation) => notation.length))
     const beatSliceInfo: BeatSliceInfo[] = []
 
     if (system.kempli.state === 'on' || system.kempli.state === 'off') {
@@ -130,21 +133,28 @@ export function getBeatSlices(system: System): BeatSliceInfo[] {
             system.groups?.find((group) => group.positions.includes('KEMPLI'))?.notation ||
             system.staffs['KEMPLI']?.notation ||
             []
-        const beatStartIndices = kempliNotation.reduce(
-            (pos: number[], note, idx) => (note === KEMPLI_BEAT_CHAR || idx == 0 ? [...pos, idx] : pos),
-            []
-        )
-        if (!beatStartIndices.length) beatSliceInfo.push({ start: 0, end: maxColumnCount })
-        else
-            beatStartIndices.forEach((start, idx) => {
-                beatSliceInfo.push({
-                    start,
-                    end: idx < beatStartIndices.length - 1 ? beatStartIndices[idx + 1] : maxColumnCount
-                })
-            })
+        beatSliceInfo.push(...getBeatSlicesFromKempliNotation(kempliNotation, maxColumnCount))
     } else {
         beatSliceInfo.push({ start: 0, end: maxColumnCount })
     }
+    return beatSliceInfo
+}
+
+export function getBeatSlicesFromKempliNotation(kempliNotation: NoteSymbol[], maxColumnCount: number) {
+    // KEMPLI_BEAT_CHAR marks the START of each kempli beat.
+    const beatSliceInfo: BeatSliceInfo[] = []
+    const beatStartIndices = kempliNotation.reduce(
+        (pos: number[], note, idx) => (note === KEMPLI_BEAT_CHAR || idx == 0 ? [...pos, idx] : pos),
+        []
+    )
+    if (!beatStartIndices.length) beatSliceInfo.push({ start: 0, end: maxColumnCount })
+    else
+        beatStartIndices.forEach((start, idx) => {
+            beatSliceInfo.push({
+                start,
+                end: idx < beatStartIndices.length - 1 ? beatStartIndices[idx + 1] : maxColumnCount
+            })
+        })
     return beatSliceInfo
 }
 

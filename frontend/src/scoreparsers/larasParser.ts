@@ -1,43 +1,69 @@
 // Parser for imported scores with Laras formatting.
 
 import type { SyntaxNode } from '@lezer/common'
-import { EXTENDING_CHAR, NoteObject } from '@tabuhstudio/shared'
-import _ from 'lodash'
+import { KEMPLI_BEAT_CHAR, SILENCE_EXTENDING_CHARS, SPACE_CHAR } from '@tabuhstudio/shared'
+import { SILENCE_CHARS } from '@tabuhstudio/shared/constants/noteChars'
 import { v4 as uuidv4 } from 'uuid'
-import type { Position } from '../typing/basetypes'
+import type { NoteSymbol, Position } from '../typing/basetypes'
 import type { TempoItem } from '../typing/execution'
 import type { ParserReturnValue } from '../typing/parsers'
-import type { Score, Staff, System } from '../typing/score'
+import type { KempliSetting, Score, System } from '../typing/score'
+import { getBeatSlicesFromKempliNotation } from '../utils/objectUtils'
 import { labelToPosition, symbolLookup } from './grammars/laras/config'
 import { parser } from './grammars/laras/laras'
 
-function parseStave(position: Position, stave: string): Staff {
-    var tabuhNotation: string[] = []
+function parseNotation(position: Position, stave: string): NoteSymbol[] {
+    var notation: string[] = []
     for (const char of stave) {
-        tabuhNotation.push(symbolLookup[position][char] || EXTENDING_CHAR)
+        notation.push(symbolLookup[position][char] || SPACE_CHAR)
     }
-    const objNotation = tabuhNotation.map((symbol) => new NoteObject(symbol, position))
-    return { notation: tabuhNotation, objNotation }
+    return notation
+}
+
+// Detects whether there is a kempli beat and whether it is regular
+function detectKempliSetting(kempliNotation: NoteSymbol[]): KempliSetting {
+    const allowed = [KEMPLI_BEAT_CHAR].concat([...SILENCE_CHARS])
+    // State remains notation if kempli contains non-beat symbols
+    if (!kempliNotation.every((sym) => allowed.includes(sym))) return { state: 'notation' }
+    // State is 'off' if no beat is detected
+    if (!kempliNotation.some((sym) => sym == KEMPLI_BEAT_CHAR)) return { state: 'off', frequency: 4 }
+    else {
+        // Detect a regular beat
+        const beatSlices = getBeatSlicesFromKempliNotation(kempliNotation, kempliNotation.length)
+        const beatLengths = new Set(beatSlices.map((slice) => slice.end - slice.start))
+        if (beatLengths.size == 1) {
+            return { state: 'on', frequency: [...beatLengths][0] }
+        } else {
+            return { state: 'notation' }
+        }
+    }
 }
 
 function postProcess(score: Score): Score {
+    // Assign score.position
     score.systems.forEach((system: System) => {
-        _.keys(system.staffs).forEach((pos) => {
-            if (!score.positions.includes(pos as Position)) score.positions.push(pos as Position)
+        system.groups.forEach((group) => {
+            group.positions.forEach((position) => {
+                if (!score.positions.includes(position)) score.positions.push(position as Position)
+            })
         })
     })
 
-    // Add missing positions (fill with dashes matching the first staff's length)
+    // Remove empty staffs
     score.systems.forEach((system: System) => {
-        const firstStaff = _.values(system.staffs)[0]
-        const notationLen = firstStaff?.notation.length ?? 0
-        score.positions.forEach((pos) => {
-            if (!(pos in system.staffs)) {
-                const notation = Array(notationLen).fill(EXTENDING_CHAR)
-                const objNotation = notation.map((symbol) => new NoteObject(symbol, pos))
-                system.staffs[pos] = { notation: notation, objNotation: objNotation }
-            }
-        })
+        system.groups = system.groups.filter((group) =>
+            group.notation.some((symbol) => !SILENCE_EXTENDING_CHARS.has(symbol))
+        )
+    })
+
+    // Set kempli to 'on' or 'off' if possible. In that case, remove the kempli staff.
+    score.systems.forEach((system: System) => {
+        const kempliNotation: NoteSymbol[] =
+            system.groups.find((group) => group.positions.includes('KEMPLI'))?.notation || ([] as NoteSymbol[])
+        system.kempli = detectKempliSetting(kempliNotation)
+        if (['on', 'off'].includes(system.kempli.state))
+            // Remove kempli staff
+            system.groups = system.groups.filter((group) => !group.positions.includes('KEMPLI'))
     })
 
     return score
@@ -82,6 +108,7 @@ export function parseLaras(content: string): ParserReturnValue {
                     id: score.systems.length + 1,
                     index: score.systems.length,
                     editorGroup: [],
+                    groups: [],
                     staffs: {},
                     kempli: { state: 'notation' },
                     execution: [
@@ -96,7 +123,7 @@ export function parseLaras(content: string): ParserReturnValue {
                         } as TempoItem
                     ]
                 }
-                score.systems.push(currentSystem)
+                score.systems.push(currentSystem!)
                 if (partname) {
                     if (!(partname in score.parts)) score.parts['partname'] = [partname]
                     else score.parts['partname'].push(partname)
@@ -107,9 +134,9 @@ export function parseLaras(content: string): ParserReturnValue {
                 if (!currentSystem) return
                 const label = getText(node.getChild('Name')!)
                 const positions: Position[] = label in labelToPosition ? labelToPosition[label] : []
-                const notation: string = cleanCode(getText(node.getChild('Code')!))
-                const staffData: Staff = parseStave(positions[0], notation)
-                positions.forEach((pos) => (currentSystem!.staffs[pos] = staffData))
+                const larasNotation: string = cleanCode(getText(node.getChild('Code')!))
+                const notation = parseNotation(positions[0], larasNotation)
+                currentSystem.groups.push({ id: uuidv4(), positions, notation })
                 break
             }
         }
