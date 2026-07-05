@@ -16,6 +16,7 @@ import type {
     GotoItem,
     LoopItem,
     SequenceItem,
+    SuppressItem,
     WaitItem
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
@@ -52,7 +53,15 @@ export function executionManager(
         score.systems.map((system) => {
             const beatSlices: BeatSliceInfo[] = getBeatSlices(system)
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
-            for (const type of ['goto', 'loop', 'wait', 'tempo', 'dynamics', 'sequence'] as ExecutionItemType[]) {
+            for (const type of [
+                'goto',
+                'loop',
+                'wait',
+                'tempo',
+                'dynamics',
+                'sequence',
+                'suppress'
+            ] as ExecutionItemType[]) {
                 executionItems[type] = system.execution?.filter((item) => item.type == type)?.sort(compareItems) || []
                 // debug(`executionItems[system ${system.id}}]=${JSON.stringify(executionItems)}`)
             }
@@ -173,6 +182,11 @@ export function executionManager(
     function getWaitTimeMsAfter(sysIdx: number): number {
         const waitItems: WaitItem[] = getExecutionItems('wait', sysIdx) as WaitItem[]
         return waitItems.reduce((subtotal, item) => subtotal + item.seconds * 1000, 0)
+    }
+
+    function getSuppressPositions(sysIdx: number): Set<Position> {
+        const suppressItems: SuppressItem[] = getExecutionItems('suppress', sysIdx) as SuppressItem[]
+        return new Set(suppressItems.map((item) => item.positions || []).flat())
     }
 
     function getExpressionValue(
@@ -350,7 +364,8 @@ export function executionManager(
                 duration: stepDuration,
                 pass: peek ? nextPass : flowinfo[next.systemIdx].pass,
                 iteration: peek ? nextIteration : flowinfo[next.systemIdx].iteration,
-                positions: _.keys(beats) as Position[],
+                // Omit positions if there is a SuppressItem
+                positions: [...new Set(_.keys(beats) as Position[]).difference(getSuppressPositions(next.systemIdx))],
                 tempo: tempo,
                 dynamics: getExpressionValue(
                     'dynamics',
