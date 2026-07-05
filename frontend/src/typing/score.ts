@@ -56,7 +56,6 @@ export type System = {
     id: number // system id as shown to user, starts with 1, can change when data items are  added / deleted
     index: number // row index, starts with 0, can change when data items are added / deleted
     line?: number // in case the score was parsed from a text file, the first line of the system
-    editorGroup: string[] // positions that are/were grouped in one line in the editor.
     groups: GroupedNotation[] // CANONICAL compact notation (source of truth for the dual editor).
     beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
     castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
