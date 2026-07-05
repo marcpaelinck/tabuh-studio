@@ -4,8 +4,7 @@
 // Stroke modifiers that are shorthand notation for sequences of base notes --e.g. 'norot' patterns--
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
-import { NoteObject } from '@tabuhstudio/shared'
-import { EXTENDING_CHAR, MUTING_CHAR, SPACE_CHAR } from '@tabuhstudio/shared'
+import { EXTENDING_CHAR, MUTING_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
 import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
@@ -101,7 +100,7 @@ export function createNoteActions(args: CreateStrokeArgs): PlaybackSamplerAction
     if (args.note.stroke.halfduration) return halfDurationAction(args)
     if (args.note.stroke.tremolo) return tremoloAction(args)
     if (args.note.stroke.acceleratingtremolo) return AcceleratingTremoloAction(args)
-    if (args.note.stroke.rakeleft || args.note.pattern.rakeright) return rakeAction(args)
+    if (args.note.stroke.rakeleft || args.note.stroke.rakeright) return rakeAction(args)
 
     console.error(`Unexpected stroke type ${args.note.toString()} for ${args.position}`)
     return silenceAction(args)
