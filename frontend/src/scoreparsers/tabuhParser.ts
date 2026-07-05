@@ -46,6 +46,18 @@ type ValueType =
     | 'ScopeValue'
 type ListType = 'IntegerList' | 'StringList' | 'ExecutiontypeList'
 
+// The following interfaces are used to keep the measure information
+// for the postprocessing step.
+interface ScoreByMeasure extends Omit<Score, 'systems'> {
+    systems: SystemByMeasure[]
+}
+interface SystemByMeasure extends Omit<System, 'groups'> {
+    groups: GroupedNotationByMeasure[]
+}
+export interface GroupedNotationByMeasure extends Omit<GroupedNotation, 'notation'> {
+    notation: NoteSymbol[][]
+}
+
 // Returns a Score object
 // Grammar: @top Document { InfoMetadataLine Gongan+ }
 //          InfoMetadataLine {tab lbrace space* InfoMetadata rbrace Eol}
@@ -54,7 +66,7 @@ export function parseNotation(content: string): ParserReturnValue {
 
     const errors: string[] = []
 
-    const parsedScore = {
+    const scoreByMeasure = {
         uuid: '',
         title: '',
         composer: '',
@@ -62,11 +74,9 @@ export function parseNotation(content: string): ParserReturnValue {
         parts: {},
         positions: [],
         systems: []
-    } as Score
+    } as ScoreByMeasure
 
     const postProcessing: PostProcessing[] = []
-
-    const columnWidthsTable: Record<UUID, number[]> = {}
 
     var gonganCounter = 0
 
@@ -82,32 +92,31 @@ export function parseNotation(content: string): ParserReturnValue {
                 if (scoreSettings.title == undefined) errors.push('INFO: Missing or incorrectly formatted title')
                 if (scoreSettings.instrumenttype == undefined)
                     errors.push('INFO: Missing or incorrectly formatted instrumenttype')
-                Object.assign(parsedScore, scoreSettings)
+                Object.assign(scoreByMeasure, scoreSettings)
                 break
             }
             case 'Gongan': {
                 gonganCounter++
                 const systemuuid = uuidv4()
                 const metaData = getMetadata(node, gonganCounter, systemuuid, content)
-                const { notation, columnWidths } = getNotation(node, content)
-                columnWidthsTable[systemuuid] = columnWidths
-                const system = {
+                const notationByMeasure: GroupedNotationByMeasure[] = getNotationByMeasure(node, content)
+                const systemByMeasure: SystemByMeasure = {
                     uuid: systemuuid,
                     id: gonganCounter,
                     index: gonganCounter - 1,
                     line: lineNr(content, node.from),
-                    groups: notation,
+                    groups: notationByMeasure,
                     staffs: {},
                     kempli: { state: 'on' },
                     label: undefined,
                     execution: metaData.filter((item) => item.type == 'executionitem').map((item) => item.value)
-                } as System
+                } as SystemByMeasure
                 metaData
                     .filter((item) => item.type == 'attribute')
                     .forEach((item) => {
                         const attributeOf: Attribute = item.value as Attribute
-                        if (attributeOf.system) Object.assign(system, attributeOf.system)
-                        if (attributeOf.score) Object.assign(parsedScore, attributeOf.score)
+                        if (attributeOf.system) Object.assign(systemByMeasure, attributeOf.system)
+                        if (attributeOf.score) Object.assign(scoreByMeasure, attributeOf.score)
                     })
                 postProcessing.push(
                     ...(metaData
@@ -115,7 +124,7 @@ export function parseNotation(content: string): ParserReturnValue {
                         .map((item) => item.value) as PostProcessing[])
                 )
 
-                parsedScore.systems.push(system)
+                scoreByMeasure.systems.push(systemByMeasure)
                 break
             }
             default:
@@ -130,44 +139,49 @@ export function parseNotation(content: string): ParserReturnValue {
 
     traverse(tree.topNode)
 
-    const score: Score = postProcess(parsedScore, columnWidthsTable, postProcessing)
+    const score: Score = postProcess(scoreByMeasure, postProcessing)
 
     return { score, errors, postProcessing, tree }
-}
-
-function addKempliNotation(system: System, colWidths: number[]) {
-    const notation: string[] = colWidths.map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR))).flat()
-    system.groups.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
 }
 
 /********************
  POSTPROCESSING
 ********************/
 
-function postProcess(
-    score: Score,
-    columnWidthsTable: Record<UUID, number[]>,
-    postProcessingInstructions: PostProcessing[]
-): Score {
-    score.positions = getAllPositions(score)
+function addKempliNotationByMeasure(system: SystemByMeasure, colWidths: number[]) {
+    const notation: string[][] = colWidths.map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR)))
+    system.groups.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
+}
+
+function postProcess(scoreByMeasure: ScoreByMeasure, postProcessingInstructions: PostProcessing[]): Score {
+    scoreByMeasure.positions = getAllPositions(scoreByMeasure)
 
     // fill in targetuuid of GOTO
-    for (const system of score.systems) {
+    for (const system of scoreByMeasure.systems) {
         const gotoItems: GotoItem[] = (system.execution?.filter((item) => item.type == 'goto') || []) as GotoItem[]
         for (const gotoItem of gotoItems) {
-            const target: System | undefined =
-                getSystemByLabel(gotoItem.targetname, score, system.id, 'GOTO') || undefined
+            const target: SystemByMeasure | undefined = getSystemByLabel(
+                gotoItem.targetname,
+                scoreByMeasure,
+                system.id,
+                'GOTO'
+            ) as SystemByMeasure | undefined
             if (target) gotoItem.targetuuid = target.uuid
         }
     }
 
     // fill in uuids of SEQUENCE
-    for (const system of score.systems) {
+    for (const system of scoreByMeasure.systems) {
         const seqItems: SequenceItem[] = (system.execution?.filter((item) => item.type == 'sequence') ||
             []) as SequenceItem[]
         for (const seqItem of seqItems) {
             for (const label of seqItem.labels) {
-                const target: System | undefined = getSystemByLabel(label, score, system.id, 'SEQUENCE') || undefined
+                const target: SystemByMeasure | undefined = getSystemByLabel(
+                    label,
+                    scoreByMeasure,
+                    system.id,
+                    'SEQUENCE'
+                ) as SystemByMeasure | undefined
                 if (target) seqItem.uuids.push(target.uuid)
             }
         }
@@ -178,8 +192,18 @@ function postProcess(
         postProcessingInstructions.filter((instr) => instr.copy != undefined) || []
     for (const instr of copyInstructions) {
         const copyInstr = instr.copy!
-        const target: System | undefined = getSystemByUuid(copyInstr.targetuuid, score, copyInstr.targetid, 'COPY')
-        const source: System | undefined = getSystemByLabel(copyInstr.label, score, copyInstr.targetid, 'COPY')
+        const target: SystemByMeasure | undefined = getSystemByUuid(
+            copyInstr.targetuuid,
+            scoreByMeasure,
+            copyInstr.targetid,
+            'COPY'
+        ) as SystemByMeasure | undefined
+        const source: SystemByMeasure | undefined = getSystemByLabel(
+            copyInstr.label,
+            scoreByMeasure,
+            copyInstr.targetid,
+            'COPY'
+        ) as SystemByMeasure | undefined
         if (source && target) {
             // Remove positions from source that are in target
             const targetPositions = new Set(target.groups.map((group) => group.positions).flat())
@@ -212,14 +236,19 @@ function postProcess(
         }
     }
 
+    // Ensure that all measures in the same beat have the same length by padding them with space symbols.
+    scoreByMeasure.systems.forEach((system) => {
+        system.groups = PadMeasures(system.groups)
+    })
+
     // Set the kempli state ('on', 'notation' or 'off').
     // 'notation' is selected if the beats vary in length. In that case, add a kempli staff if missing.
-    for (const system of score.systems) {
+    for (const system of scoreByMeasure.systems) {
         const hasKempliNotation = system.groups.some((group) => group.positions.includes('KEMPLI'))
-        const colWidths = columnWidthsTable[system.uuid] || []
+        const colWidths = system.groups[0].notation.map((measure) => measure.length)
         system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliNotation)
         // ensure that there is a kempli staff if the kempli state is 'notation'.
-        if (system.kempli.state == 'notation' && !hasKempliNotation) addKempliNotation(system, colWidths)
+        if (system.kempli.state == 'notation' && !hasKempliNotation) addKempliNotationByMeasure(system, colWidths)
     }
 
     // Generate and assign the score's `parts` attribute.
@@ -241,14 +270,27 @@ function postProcess(
 
     for (const [part, next] of pairs) {
         if (!part || !next) continue
-        const partSystems = score.systems.filter((system) => system.id >= part?.systemid && system.id < next.systemid)
-        score.parts[part.name] = partSystems.map((system) => system.uuid)
+        const partSystems = scoreByMeasure.systems.filter(
+            (system) => system.id >= part?.systemid && system.id < next.systemid
+        )
+        scoreByMeasure.parts[part.name] = partSystems.map((system) => system.uuid)
     }
 
-    return score
+    // Finally, flatten the notation from measure based to system based
+    const flattenedSystems: System[] = scoreByMeasure.systems.map(
+        (system) =>
+            _.assign(system, {
+                groups: system.groups.map(
+                    (group) => _.assign(group, { notation: group.notation.flat() as NoteSymbol[] }) as GroupedNotation
+                ) as GroupedNotation[]
+            }) as System
+    )
+    const score: Score = _.assign(scoreByMeasure, { systems: flattenedSystems as System[] })
+
+    return score as Score
 }
 
-function getAllPositions(score: Score): Position[] {
+function getAllPositions(score: Score | ScoreByMeasure): Position[] {
     const positionSet = score.systems.reduce(
         (aggr, system) => aggr.union(new Set(system.groups.map((group) => group.positions).flat())),
         new Set()
@@ -258,8 +300,13 @@ function getAllPositions(score: Score): Position[] {
 
 // Returns the system with the given label.
 // sourceId and metaItem are given to specify potential error message.
-function getSystemByLabel(label: string, score: Score, sourceId: number, metaItem: string): System | undefined {
-    const target: System | undefined = score.systems.find((system) => system.label == label)
+function getSystemByLabel(
+    label: string,
+    score: Score | ScoreByMeasure,
+    sourceId: number,
+    metaItem: string
+): System | SystemByMeasure | undefined {
+    const target: System | SystemByMeasure | undefined = score.systems.find((system) => system.label == label)
     if (target) return target
     else console.error(`${metaItem} of system ${sourceId}: could not find system with label ${label}.`)
     return undefined
@@ -267,8 +314,13 @@ function getSystemByLabel(label: string, score: Score, sourceId: number, metaIte
 
 // Returns the system with the given label.
 // sourceId and metaItem are given to specify potential error message.
-function getSystemByUuid(uuid: UUID, score: Score, sourceId: number, metaItem: string): System | undefined {
-    const target: System | undefined = score.systems.find((system) => system.uuid == uuid)
+function getSystemByUuid(
+    uuid: UUID,
+    score: Score | ScoreByMeasure,
+    sourceId: number,
+    metaItem: string
+): System | SystemByMeasure | undefined {
+    const target: System | SystemByMeasure | undefined = score.systems.find((system) => system.uuid == uuid)
     if (target) return target
     else console.error(`${metaItem} of system ${sourceId}: could not find system with uuid ${uuid}.`)
     return undefined
@@ -368,31 +420,21 @@ function tagsToPositions(tags: string[]): Position[] {
    GONGAN   
 ***********/
 
-// Used during parsing only: staff is an array of Staffs, one per kempli beat (measure).
-// After parsing, these are flattened into a single Staff per position.
-export interface GroupedMeasures {
-    positions: Position[]
-    measures: NoteSymbol[][]
-}
-
 // Creates a GroupedNotation object list from the given node's children
 // Returns a list of position groups if some position tags refer to multiple positions.
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 //          StaffLine { PositionLabel Measure+ Eol }
 //          Measure { tab Note* }
-function getNotation(
-    gonganNode: SyntaxNode | null,
-    content: string
-): { notation: GroupedNotation[]; columnWidths: number[] } {
-    if (gonganNode == undefined) return { notation: [], columnWidths: [] }
-    const groupedNotationByMeasures: GroupedMeasures[] = []
+function getNotationByMeasure(gonganNode: SyntaxNode | null, content: string): GroupedNotationByMeasure[] {
+    if (gonganNode == undefined) return []
+    const groupedNotationByMeasures: GroupedNotationByMeasure[] = []
     const staffNodes = gonganNode.getChildren('StaffLine')
 
     for (const child of staffNodes) {
-        var measures: NoteSymbol[][] = []
+        var notationByMeasure: NoteSymbol[][] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
         const positions = tagsToPositions(positionTag.split('/'))
-        var notationMeasures: GroupedMeasures
+        var notationMeasures: GroupedNotationByMeasure
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
             const measure: NoteSymbol[] = []
@@ -401,47 +443,51 @@ function getNotation(
                 measure.push(getText(noteNode, content))
                 noteNode = noteNode.nextSibling
             }
-            measures.push(measure)
+            notationByMeasure.push(measure)
         }
-        notationMeasures = { positions: positions, measures: measures } as GroupedMeasures
+        notationMeasures = { positions, notation: notationByMeasure } as GroupedNotationByMeasure
         groupedNotationByMeasures.push(notationMeasures)
     }
     // Ensure that all staffs have the same number of measures. Add empty measures where necessary.
-    const maxMeasures = Math.max(...groupedNotationByMeasures.map((group) => group.measures.length))
+    const maxMeasures = Math.max(...groupedNotationByMeasures.map((group) => group.notation.length))
     for (const group of groupedNotationByMeasures) {
-        const shortage = maxMeasures - group.measures.length
-        if (shortage > 0) group.measures.push(...Array(shortage).fill([]))
+        const shortage = maxMeasures - group.notation.length
+        if (shortage > 0) group.notation.push(...Array(shortage).fill([]))
     }
+    return groupedNotationByMeasures
+}
+
+function PadMeasures(groupedNotationByMeasures: GroupedNotationByMeasure[]): GroupedNotationByMeasure[] {
     // Pad measures with space characters where needed to normalize the measure lengths.
 
     // First calculate the maximum width of the columns. `notationWidth` returns the unabbreviated width
     // for 'shorthand' notation such as norot.
     const columnWidths = groupedNotationByMeasures.map((group) =>
-        group.measures.map((m) => notationWidth(NoteObject.fromNotation(m)))
+        group.notation.map((m) => notationWidth(NoteObject.fromNotation(m)))
     )
     const maxColWidths = _.zip(...columnWidths).map((col) => Math.max(...col.map((n) => n || 0)))
 
     // Now pad measures up to the maximum width of the column.
-    const groupedNotationArray: GroupedNotation[] = []
+    const groupedNotationArray: GroupedNotationByMeasure[] = []
     groupedNotationByMeasures.forEach((group) => {
-        group.measures.forEach((measure, colIdx) => {
+        group.notation.forEach((measure, colIdx) => {
             const diff = (maxColWidths[colIdx] ?? 0) - measure.length
             if (diff > 0) {
                 const padding = Array(diff).fill(SPACE_CHAR)
                 measure.push(...padding)
             }
         })
-        const groupedNotation: GroupedNotation = {
+        const groupedNotation: GroupedNotationByMeasure = {
             id: uuidv4(),
             positions: group.positions,
-            notation: group.measures.flat()
+            notation: group.notation
         }
         groupedNotationArray.push(groupedNotation)
     })
 
     // Join the measures into a single notation array.
 
-    return { notation: groupedNotationArray, columnWidths: maxColWidths }
+    return groupedNotationArray
 }
 
 /***********
