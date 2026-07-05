@@ -1,6 +1,16 @@
 import _ from 'lodash'
 import { useRef, type Dispatch, type ReactNode, type SyntheticEvent } from 'react'
-import { ArrayType, BooleanType, CheckPicker, Form, InputPicker, NumberType, SchemaModel, StringType, Toggle } from 'rsuite'
+import {
+    ArrayType,
+    BooleanType,
+    CheckPicker,
+    Form,
+    InputPicker,
+    NumberType,
+    SchemaModel,
+    StringType,
+    Toggle
+} from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import { dynamicValues, dynamicsToNumber, positionConfigs, positionOrder } from '../../config/config'
 import type { Position } from '../../typing/basetypes'
@@ -156,10 +166,10 @@ export const formModel = SchemaModel({
     // tempo + dynamics
     fromBeat: NumberType()
         .isInteger()
-        .when(If({ isGradual: true }, 'isRequired', NumberType)),
+        .when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', NumberType)),
     toBeat: NumberType()
         .isInteger()
-        .when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', NumberType)),
+        .when(If({ isGradual: true }, 'isRequired', NumberType)),
     isGradual: BooleanType().when(If({ type: ['tempo', 'dynamics'] }, 'isRequired', BooleanType)),
     // sequence
     sequenceUuids: ArrayType()
@@ -335,7 +345,8 @@ const RangeField = ({
 )
 
 // A 1..n multi-select used for beat / pass / iteration numbers.
-const numberOptions = (max: number) => new Array(max).fill(null).map((_v, idx) => ({ label: `${idx + 1}`, value: idx + 1 }))
+const numberOptions = (max: number) =>
+    new Array(max).fill(null).map((_v, idx) => ({ label: `${idx + 1}`, value: idx + 1 }))
 
 // ---------------------------------------------------------------------------
 // Descriptor registry
@@ -351,12 +362,7 @@ export interface ItemDescriptor {
     Fields: (props: FieldsProps) => ReactNode
 }
 
-const draftBase = (type: ExecutionItemType): ExecutionItemDraft => ({
-    type,
-    seqId: 0,
-    tooltip: type,
-    tooltipshort: ''
-})
+const draftBase = (type: ExecutionItemType): ExecutionItemDraft => ({ type, seqId: 0, tooltip: type, tooltipshort: '' })
 
 // Recomputes the iterations field from the condition selection (types that
 // support iterations only).
@@ -399,7 +405,12 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
             count: form.count != undefined ? Number(form.count) : (base as LoopItem).count
         }),
         Fields: ({ selectedElement }) => (
-            <InputField label="Loop count" name="count" placeholder="Iterations" disabled={selectedElement == undefined} />
+            <InputField
+                label="Loop count"
+                name="count"
+                placeholder="Iterations"
+                disabled={selectedElement == undefined}
+            />
         )
     },
 
@@ -426,7 +437,13 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
         createDefault: () => ({ ...draftBase('tempo'), isGradual: false }),
         toForm: (item) => {
             const t = item as TempoItem
-            return { fromBPM: t.fromValue, toBPM: t.value, isGradual: t.isGradual, fromBeat: t.fromBeat, toBeat: t.toBeat }
+            return {
+                fromBPM: t.fromValue,
+                toBPM: t.value,
+                isGradual: t.isGradual,
+                fromBeat: t.fromBeat,
+                toBeat: t.toBeat
+            }
         },
         fromForm: (form, base): TempoItem => ({
             ...(base as TempoItem),
@@ -448,7 +465,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                             <InputField label="BPM" name="toBPM" placeholder="BPM value" disabled={disabled} />
                             <InputField
                                 label="Starting from beat"
-                                name="toBeat"
+                                name="fromBeat"
                                 placeholder="Beat number"
                                 disabled={disabled}
                             />
@@ -534,7 +551,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                             />
                             <InputField
                                 label="Starting from beat"
-                                name="toBeat"
+                                name="fromBeat"
                                 placeholder="Beat number"
                                 disabled={disabled}
                             />
@@ -640,10 +657,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
         label: 'kempli',
         hasIterations: true,
         createDefault: () => ({ ...draftBase('kempli'), value: 'off' }),
-        toForm: (item) => ({
-            kempliValue: (item as KempliItem).value,
-            kempliBeats: (item as KempliItem).beats
-        }),
+        toForm: (item) => ({ kempliValue: (item as KempliItem).value, kempliBeats: (item as KempliItem).beats }),
         fromForm: (form, base): KempliItem => ({
             ...(base as KempliItem),
             type: 'kempli',
