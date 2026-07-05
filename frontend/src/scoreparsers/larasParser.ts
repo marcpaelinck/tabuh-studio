@@ -107,7 +107,6 @@ export function parseLaras(content: string): ParserReturnValue {
                     uuid: uuidv4(),
                     id: score.systems.length + 1,
                     index: score.systems.length,
-                    editorGroup: [],
                     groups: [],
                     staffs: {},
                     kempli: { state: 'notation' },
