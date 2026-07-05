@@ -632,7 +632,7 @@ function parseMetadata(
         }
         case 'SuppressMetadata': {
             const baseAttr = { type: 'suppress' }
-            const value = { positions: getValueList<string>(node, 'StringList', content) }
+            const value = { positions: tagsToPositions(getValueList<string>(node, 'StringList', content) || []) }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
             updateSeqAndTooltips(item)
