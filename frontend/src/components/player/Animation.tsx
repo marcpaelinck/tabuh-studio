@@ -3,7 +3,7 @@ import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, HStack, Row, SelectPicker, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
-import { positionConfigs, theme } from '../../config/config'
+import { theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import { type Appearance, type ExtendedOption } from '../../typing/interface'
 import type { PlaybackCallbackFunctions } from '../../typing/playback'
@@ -11,6 +11,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import { debug } from '../../utils/debugger'

@@ -1,5 +1,4 @@
-import { positionConfigs } from '../../frontend/src/config/config'
-
+import { positionConfigs } from '../config/position'
 import type { NoteSymbol, Position } from '../types/basetypes'
 
 export function notation2text(notation: string[] | undefined): string {

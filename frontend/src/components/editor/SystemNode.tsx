@@ -1,4 +1,5 @@
 import { KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
@@ -18,7 +19,7 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
-import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
+import { defaultBeatFrequency, editorFontSize, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     AudioState,

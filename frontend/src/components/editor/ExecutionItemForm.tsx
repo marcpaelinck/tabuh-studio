@@ -1,3 +1,4 @@
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { useRef, type Dispatch, type ReactNode, type SyntheticEvent } from 'react'
@@ -13,7 +14,7 @@ import {
     Toggle
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { dynamicValues, dynamicsToNumber, positionConfigs, positionOrder } from '../../config/config'
+import { dynamicValues, dynamicsToNumber, positionOrder } from '../../config/config'
 import type {
     DynamicsItem,
     DynamicsValue,

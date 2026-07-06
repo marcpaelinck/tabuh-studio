@@ -1,3 +1,4 @@
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
@@ -8,7 +9,6 @@ import {
     defaultOutroTime,
     dimRateNonFocusedInstruments,
     NOTES,
-    positionConfigs,
     SOUNDS_FOLDER
 } from '../../config/config'
 import { soundFile } from '../../config/configfunctions'

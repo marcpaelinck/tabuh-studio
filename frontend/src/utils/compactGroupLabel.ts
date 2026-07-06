@@ -7,8 +7,9 @@
 //   - otherwise                                    -> first name + " +N"
 // The tooltip always lists every position's full name.
 
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
-import { instrumentConfigs, positionConfigs } from '../config/config'
+import { instrumentConfigs } from '../config/config'
 
 function sameSet(a: Position[], b: Position[]): boolean {
     if (a.length !== b.length) return false

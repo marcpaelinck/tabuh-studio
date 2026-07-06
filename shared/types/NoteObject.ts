@@ -5,7 +5,6 @@
 import { positionConfigs } from '../config/position.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
 
-import type { Position } from '../config/position.ts'
 import type {
     GracenoteChar,
     OctaveChar,
@@ -25,6 +24,7 @@ import {
     STROKE_MODIFIER_MAP,
     STROKE_MODIFIERS
 } from '../constants/noteChars.ts'
+import type { Position } from '../types/basetypes.ts'
 import { noteRange } from '../utils/alphabet.ts'
 
 // Re-export so that consumers can import everything from a single file if needed.
