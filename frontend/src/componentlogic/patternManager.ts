@@ -2,7 +2,7 @@
 // Also sets the octave of a grace note according to the note to which it is attached and to the position's range.
 
 import { NoteObject } from '@tabuhstudio/shared'
-import type { NoteSymbol, Position } from '../typing/basetypes'
+import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
 import type { BeatSliceInfo } from '../typing/execution'
 import type { Staff } from '../typing/score'
 

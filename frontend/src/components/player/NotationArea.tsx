@@ -2,6 +2,7 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the
 // notation while the corresponding notes are being played.
 
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import type {
@@ -10,7 +11,6 @@ import type {
     NotationParagraph,
     PlaybackCursorStyle
 } from '../../typing/animation'
-import type { Position } from '../../typing/basetypes'
 import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 

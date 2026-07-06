@@ -5,11 +5,11 @@
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
 import { EXTENDING_CHAR, MUTING_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
+import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
-import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '../../typing/basetypes'
+import { noteRange } from '../../../../shared/utils/alphabet'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
-import { noteRange } from '../../utils/alphabet'
 import { debug } from '../../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../../utils/timeunits'
 

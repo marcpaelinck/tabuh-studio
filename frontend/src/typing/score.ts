@@ -1,6 +1,14 @@
 import type { NoteObject } from '@tabuhstudio/shared'
+import type {
+    InstrumentType,
+    MutingType,
+    NoteSymbol,
+    Position,
+    StrokeLocation,
+    ToneType,
+    UUID
+} from '@tabuhstudio/shared/types/basetypes'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
-import type { InstrumentType, MutingType, NoteSymbol, Position, StrokeLocation, ToneType, UUID } from './basetypes'
 import type { ExecutionItem } from './execution'
 
 export type Note = {

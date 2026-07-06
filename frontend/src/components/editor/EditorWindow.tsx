@@ -1,3 +1,4 @@
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -5,7 +6,6 @@ import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { useUserSelectionStore } from '../../stores/usePlaybackStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
-import type { UUID } from '../../typing/basetypes'
 import type {
     EditorCursorParameters,
     PlaybackAction,

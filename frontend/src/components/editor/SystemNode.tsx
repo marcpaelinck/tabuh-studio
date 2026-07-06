@@ -1,4 +1,5 @@
 import { KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
+import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
     memo,
@@ -19,7 +20,6 @@ import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
 import { defaultBeatFrequency, editorFontSize, positionConfigs, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
-import type { Position, UUID } from '../../typing/basetypes'
 import type {
     AudioState,
     EditorCursor,

@@ -1,4 +1,4 @@
-import type { BPM, Position, UUID } from './basetypes'
+import type { BPM, Position, UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { Staff, System } from './score'
 
 // EXECUTION

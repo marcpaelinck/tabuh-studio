@@ -10,10 +10,7 @@
         /* Bundler mode */
         "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
-        "paths": {
-            "@tabuhstudio/shared": ["../shared/index.ts"],
-            "@tabuhstudio/shared/*": ["../shared/*.ts"]
-        },
+        "paths": { "@tabuhstudio/shared": ["../shared/index.ts"], "@tabuhstudio/shared/*": ["../shared/*.ts"] },
         "verbatimModuleSyntax": true,
         "moduleDetection": "force",
         "noEmit": true,
@@ -27,5 +24,5 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
     },
-    "include": ["src/**/*", "tests/**/*"]
+    "include": ["src/**/*", "tests/**/*", "test/test.ts", "../shared/utils/alphabet.ts", "../shared/types/basetypes.ts"]
 }

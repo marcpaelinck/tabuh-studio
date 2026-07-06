@@ -1,6 +1,6 @@
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { positionConfigs } from '../config/config'
-import type { Position } from '../typing/basetypes'
 import type { ExecutionItem } from '../typing/execution'
 
 export function executionItemSeqId(item: ExecutionItem) {

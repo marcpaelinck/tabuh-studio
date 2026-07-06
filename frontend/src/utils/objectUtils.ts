@@ -3,10 +3,10 @@
  */
 
 import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
+import type { BPM, NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'
-import type { BPM, NoteSymbol, Position } from '../typing/basetypes'
 import type { BeatSliceInfo } from '../typing/execution'
 import type { Score, System } from '../typing/score'
 

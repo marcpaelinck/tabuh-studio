@@ -24,6 +24,7 @@ ceng	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
 
 	{COPY REGULAR}
 	{DYNAMICS ff positions=[gangsa,reyong]}
+ceng	x---	x---	x---	x---	x--x	x-x-	--x.	....
 
 	{COPY REGULAR}
 	# Transition to kotekan gangsa
@@ -39,21 +40,25 @@ ceng	----	----	----	----	x--x	x-x-	--x-	x-x-
 gangsa p	o.i.	e.o.	u.e.	a.o.	u.e.	a.u.	e.i.	i.a,.
 gangsa s	.a,.o	.i.e	.o.u	.i.e	.o.u	.e.o	.a,.a,	.u,.i
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
+ceng	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
 
 	{LABEL CC-SOLO}
 	{COPY REGULAR}
+	{SUPPRESS [gangsa,reyong] passes=[2,3]}
 	# Ceng-ceng and kendang solo
 ga/rey	o---	----	----	----	----	----	----	----
-ceng	x---	----	----	--xx	x---	----	----	---x
+ceng	x---	----	----	--xx	x---	----	----	--xx
 
-	{COPY CC-SOLO}
-ceng	xx--	----	----	--xx	x-x-	x-x-	x-x-	x-xx
+	{COPY REGULAR}
+ga/rey	----	----	----	----	----	----	----	----
+ceng	x---	----	----	--xx	x-x-	x-x-	x-x-	x-xx
 	{GOTO CC-SOLO}
 	{GOTO CC-END pass=[3] nthpass=true}
 
 	{LABEL CC-END}
-	{COPY CC-SOLO}
-ceng	x---	x---	x---	x---	x--x	x-x-	--x-	x-x-
+	{COPY REGULAR}
+ga/rey	----	----	----	----	----	----	----	----
+ceng	x---	x---	x---	x---	x--x	x-x-	--x.	....
 	{GOTO REGULAR passes=[1,2]}
 
 	{LABEL END}

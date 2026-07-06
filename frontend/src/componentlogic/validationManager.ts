@@ -1,5 +1,5 @@
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
-import type { UUID } from '../typing/basetypes'
 import type { FlowStep } from '../typing/execution'
 import type { Score, System, ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'

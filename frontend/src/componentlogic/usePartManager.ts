@@ -1,9 +1,9 @@
 // Keeps track of the part definitions and manages the automation of the editor's
 // left margin containing the part names.
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { partColorPalette } from '../config/config'
-import type { UUID } from '../typing/basetypes'
 import type { Score } from '../typing/score'
 import { debug } from '../utils/debugger'
 

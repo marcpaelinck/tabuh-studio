@@ -1,8 +1,8 @@
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
 import { animationConfig, colorPalette, type ColorName } from '../../config/config'
 import type { SVGInfo } from '../../typing/animation'
-import type { Position } from '../../typing/basetypes'
 import type { AnimationNote, AnimmationFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 

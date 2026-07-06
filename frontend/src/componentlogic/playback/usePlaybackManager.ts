@@ -9,6 +9,7 @@
 // Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
 
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
+import type { BPM, Position } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { createElement, useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
@@ -23,7 +24,6 @@ import {
     positionConfigs
 } from '../../config/config'
 import { speedDefaultOption } from '../../stores/usePlaybackStore'
-import type { BPM, Position } from '../../typing/basetypes'
 import type { FlowStep } from '../../typing/execution'
 import type {
     AnimationNote,

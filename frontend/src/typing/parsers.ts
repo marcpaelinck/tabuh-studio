@@ -1,6 +1,6 @@
 import type { Tree } from '@lezer/common'
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
-import type { UUID } from './basetypes'
 import type { ExecutionItem, ExecutionItemType } from './execution'
 import type { Score } from './score'
 

@@ -7,8 +7,8 @@
 //   - otherwise                                    -> first name + " +N"
 // The tooltip always lists every position's full name.
 
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { instrumentConfigs, positionConfigs } from '../config/config'
-import type { Position } from '../typing/basetypes'
 
 function sameSet(a: Position[], b: Position[]): boolean {
     if (a.length !== b.length) return false
@@ -22,9 +22,7 @@ export function compactGroupLabel(positions: Position[]): { label: string; toolt
 
     if (positions.length === 0) return { label: '(empty)', tooltip: '' }
 
-    const instrument = Object.values(instrumentConfigs).find((cfg) =>
-        sameSet(cfg.positions as Position[], positions)
-    )
+    const instrument = Object.values(instrumentConfigs).find((cfg) => sameSet(cfg.positions as Position[], positions))
     if (instrument) return { label: instrument.name, tooltip }
 
     if (positions.length === 1) return { label: names[0], tooltip }

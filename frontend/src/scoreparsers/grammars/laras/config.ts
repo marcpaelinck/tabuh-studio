@@ -1,5 +1,5 @@
 import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared'
-import type { Position } from '../../../typing/basetypes'
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 
 // Instrument tag conversion (tag -> )
 export const labelToPosition: Record<string, Position[]> = {

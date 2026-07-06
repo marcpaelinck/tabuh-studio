@@ -2,7 +2,7 @@
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
 import { ERROR_PITCH_CHAR, NoteObject } from '@tabuhstudio/shared'
-import type { NoteSymbol, Position } from '../typing/basetypes.ts'
+import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes.ts'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
 type CastingInstructionType = 'nokempyung' | 'norot'

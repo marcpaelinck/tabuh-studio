@@ -1,6 +1,6 @@
 import { KEMPLI_BEAT_CHAR } from '@tabuhstudio/shared'
+import type { MutingType, Position, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
-import type { MutingType, Position, ToneType } from '../typing/basetypes'
 import type { DynamicsValue } from '../typing/execution'
 import type { EditorCursor } from '../typing/playback'
 import type { Note } from '../typing/score'
@@ -134,23 +134,6 @@ export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1
 // INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
 
 export type InstrumentConfig = { name: string; positions: Position[] }
-
-export type Modifiers = { before: string[]; after: string[] }
-
-export type PositionConfig = {
-    //`notes` contains a list of single notes or multiple notes that are played simultaneously.
-    // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
-    // sampletemplate should contain the string '{note}' where the note name should appear in the
-    // sample file name.
-    name: string
-    type: string
-    svg_file: string
-    sampletemplate: string
-    volume: number
-    symbolToNoteNames: { [symbol: string]: string[] }
-    validStrokes: string[]
-    modifiers: Modifiers
-}
 
 // The following characters should be ignored when sending a note to a Sampler.
 // TODO This is a temporary solution to avoid having to double the length of each
@@ -292,6 +275,23 @@ export const polosPositions = [
 export const sangsihPositions = ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
 
 // SAMPLES
+
+export type Modifiers = { before: string[]; after: string[] }
+
+export type PositionConfig = {
+    //`notes` contains a list of single notes or multiple notes that are played simultaneously.
+    // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
+    // sampletemplate should contain the string '{note}' where the note name should appear in the
+    // sample file name.
+    name: string
+    type: string
+    svg_file: string
+    sampletemplate: string
+    volume: number
+    symbolToNoteNames: { [symbol: string]: string[] }
+    validStrokes: string[]
+    modifiers: Modifiers
+}
 
 //prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {

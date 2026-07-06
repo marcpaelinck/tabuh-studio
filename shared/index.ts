@@ -10,7 +10,7 @@
  *   - NoteObject class, NoteObjectError, NoteObjectFault (NoteObject.ts)
  */
 
-export type { Position } from './position.ts'
+export type { Position } from './config/position.ts'
 
 export {
     AFTER_MODIFIERS,

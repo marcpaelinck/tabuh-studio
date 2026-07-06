@@ -1,3 +1,4 @@
+import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
@@ -12,7 +13,6 @@ import {
 } from '../../config/config'
 import { soundFile } from '../../config/configfunctions'
 import { useUserSelectionStore } from '../../stores/usePlaybackStore'
-import type { Position } from '../../typing/basetypes'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'

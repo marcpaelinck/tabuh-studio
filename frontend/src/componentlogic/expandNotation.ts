@@ -13,8 +13,8 @@
 // computed column widths.
 
 import { NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
+import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes.ts'
 import _ from 'lodash'
-import type { NoteSymbol, Position } from '../typing/basetypes.ts'
 import type { System } from '../typing/score.ts'
 import { getBeatSlices } from '../utils/objectUtils.ts'
 import { castGroupedNotationToPositions } from './castingRulesManager.ts'
