@@ -69,7 +69,6 @@ export type System = {
     beatSlices: BeatSliceInfo[]
     castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
     kempli: KempliSetting
-    beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
     label?: string
     execution?: ExecutionItem[]
     copyFrom?: string // Label of the system of which the current system is a copy

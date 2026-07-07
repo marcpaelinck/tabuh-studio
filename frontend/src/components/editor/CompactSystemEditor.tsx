@@ -12,7 +12,7 @@
  * `{ measure, index }` form.
  */
 
-import type { CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { editorFontSize } from '../../config/config'
@@ -58,19 +58,25 @@ export function CompactSystemEditor({
         keyMap,
         onChange
     })
+    const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
+    const [maxCols, setMaxCols] = useState<number>(0)
 
     const fontClass = `balifontspaced${editorFontSize}`
 
-    const gridStyle = createGridStyle({
-        beatColWidths,
-        kempliFrequency: kempliFrequency || null,
-        cursor: null,
-        cursorStyle: 'None',
-        gridColors: gridColorsAggregated
-    })
-    const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
-    // Width (in columns) shared by every row so the grids line up.
-    const maxCols = Math.max(sumBeats, ...lines.map((l) => l.measures.reduce((a, m) => a + m.length, 0)), 1)
+    useEffect(() => {
+        const style = createGridStyle({
+            beatColWidths,
+            kempliFrequency: kempliFrequency || null,
+            cursor: null,
+            cursorStyle: 'None',
+            gridColors: gridColorsAggregated
+        })
+        setGridStyle(style)
+        const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
+        // Width (in columns) shared by every row so the grids line up.
+        const maxCols = Math.max(sumBeats, ...lines.map((l) => l.measures.reduce((a, m) => a + m.length, 0)), 1)
+        setMaxCols(maxCols)
+    }, [])
 
     return (
         <div
