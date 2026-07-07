@@ -110,7 +110,7 @@ export interface FlowCursor {
     systemIdx: number // Index of the current system (numbering starts at 0)
     beatIdx: number // Index of the current kempli beat (numbering starts at 0)
     newSystem: boolean // True if this system is different than that of the previous step
-    systemStart: boolean // True if this is the first section of the system
+    systemStart: boolean // True if this is the first beat of the system
     lastBeat: boolean // True if this is the last kempli beat of the current system
     sequence: UUID[] | undefined // Currently active sequence (UUIDs of systems to be performed in the given order)
     sequenceIdx: number | undefined // Current index of the active sequence
@@ -133,7 +133,7 @@ export interface FlowStep {
     dynamics: number[]
     lastSystem: boolean
     lastBeat: boolean
-    waitMsAfter: number // Delay after the end of the current section in milliseconds
+    waitMsAfter: number // Delay after the end of the current step in milliseconds
     sequence?: UUID[] // Currently active sequence (UUIDs of systems to be performed in the given order)
     sequenceIdx?: number // Current index of the active sequence
 }

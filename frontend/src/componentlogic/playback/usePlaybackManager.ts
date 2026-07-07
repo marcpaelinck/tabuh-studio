@@ -167,7 +167,7 @@ export function usePlaybackManager() {
         return notation
     }
 
-    // Returns the tempo at the given relative time from the start of the current section in TimeObject units.
+    // Returns the tempo at the given relative time from the start of the current beat in TimeObject units.
     function tempoAt(timeFromSectionStartInTO: number, currentStep: FlowStep) {
         if (currentStep.id in tempoLookup && timeFromSectionStartInTO in tempoLookup[currentStep.id])
             return tempoLookup[currentStep.id][timeFromSectionStartInTO]
@@ -256,7 +256,7 @@ export function usePlaybackManager() {
         var currentStep: FlowStep | undefined = nextInFlow()
         var introTempo: BPM = defaultTempo // Needed for initial animation action.
         if (!currentStep) return newTimeLine
-        // Keeps track of the longest measure duration in a section. All measures in a system should have
+        // Keeps track of the longest measure duration in a beat. All measures in a system should have
         // the same length but in case they don't, this value will be used to resync the following system.
         var maxMeasureDuration: number = 0
         // const introTimeBn = Math.round(millis2BaseNoteEquiv(defaultIntroTime, 60))
@@ -393,7 +393,7 @@ export function usePlaybackManager() {
                         motifNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
                             currAction[position] = noteAction
                             if (endOfMeasure && noteAction.params.isLastOfMotif && currentStep!.waitMsAfter) {
-                                // Extend the last note of the section with wait time if it is indicated in the score.
+                                // Extend the last note of the beat with wait time if it is indicated in the score.
                                 currAction[position].params.duration = TOplusNumber(
                                     currAction[position].params.duration,
                                     millis2BaseNoteEquiv(currentStep!.waitMsAfter, currentStep!.tempo[1])
@@ -428,7 +428,7 @@ export function usePlaybackManager() {
                 var cursorStart = 0
                 var cursorWidth = 0
                 if (position in currentStep.system.staffs) {
-                    // Character offset = start index of current section in the flat notation
+                    // Character offset = start index of current beat in the flat notation
                     const beatIdx = currentStep!.beatIdx
                     const noteIdx = currentStep.beatSlices[beatIdx]
                     const posNotation = currentStep.system.staffs[position]!.notation

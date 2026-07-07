@@ -106,7 +106,7 @@ function simulatePlayback(score: Score, transitions: StateTransitionMatrix): Val
         // Next in flow
         beatcount = 0
         while (step && getId(step.system as System) == uuid && beatcount < 500) {
-            // NextInFlow returns the next beat (section) so we need to iterate until we reach the next
+            // NextInFlow returns the next beat so we need to iterate until we reach the next
             // system. Count helps to detect a cycle within a system (not likely to occur).
             // A maximum of 100 allow for a cycle within a system.
             step = nextInFlow()

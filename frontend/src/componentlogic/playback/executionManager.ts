@@ -198,11 +198,11 @@ export function executionManager(
         const matches = getExecutionItems(type, sysIdx)
         // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
         if (matches.length == 0) return [currentValue, currentValue]
-        // Find an item that matches the given section index.
+        // Find an item that matches the given beat index.
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
             const exprItem = item as ExpressionItem
-            // debug(`exprItem=${JSON.stringify([exprItem])}, section=${beatNbr}`)
+            // debug(`exprItem=${JSON.stringify([exprItem])}, beat=${beatNbr}`)
             if (!exprItem.isGradual) {
                 if (beatNbr == exprItem.fromBeat) {
                     // Non-gradual matching item found
@@ -210,7 +210,7 @@ export function executionManager(
                     return [exprItem.value, exprItem.value]
                 }
             } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
-                // Gradual matching item found: determine start and end values for the given section.
+                // Gradual matching item found: determine start and end values for the given beat.
                 if (undefined !== exprItem.fromValue) {
                     // Case 1: fromValue is given
                     const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
@@ -264,7 +264,7 @@ export function executionManager(
                 break
             }
             case currentStep!.beatIdx < flowinfo![currentStep!.systemIdx].beatSlices.length - 1: {
-                // Next section, same system
+                // Next beat, same system
                 _.assign(next, {
                     systemIdx: currentStep.systemIdx,
                     beatIdx: currentStep.beatIdx + 1,
@@ -312,7 +312,7 @@ export function executionManager(
         if (next.systemIdx >= 0 && next.beatIdx >= 0) {
             // debug(`NEXTCURSOR [pass=${flowinfo[next.systemIdx].pass}]: ${JSON.stringify(next)}`)
             const nextSystem = flowinfo[next.systemIdx].system
-            // Build a Staff per position containing only the current section's notation
+            // Build a Staff per position containing only the current beat's notation
             const beats = _.fromPairs(
                 _.keys(nextSystem.staffs)
                     .filter((pos) => nextSystem.staffs[pos as Position] != null)
