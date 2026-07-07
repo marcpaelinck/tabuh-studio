@@ -1,14 +1,14 @@
 {
     "name": "tabuh-studio",
     "private": true,
-    "version": "0.0.0",
+    "version": "1.0.1",
     "type": "module",
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
         "lint": "eslint .",
         "preview": "vite preview",
-        "test": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/test.ts",
+        "test": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs --inspect ./test/test.ts",
         "testnotation": "node ./src/scoreparsers/grammars/tabuh/test/testnotation.ts",
         "test:expand": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts",
         "test:expand:generate": "node --experimental-transform-types --loader ./scripts/ts_loader.mjs ./test/componentlogic/expandNotation.test.ts --generate",
