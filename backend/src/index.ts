@@ -7,6 +7,7 @@ import fs from 'fs'
 import helmet from 'helmet'
 import path from 'path'
 
+import pkg from '../package.json'
 import authRouter from './routes/auth'
 import scoresRouter from './routes/scores'
 
@@ -93,6 +94,9 @@ app.use('/api/scores', scoresRouter)
 
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' })
+})
+app.get('/api/version', (_req, res) => {
+    res.json({ version: pkg.version })
 })
 app.get('/api/environment', (_req, res) => {
     res.json({ environment: process.env.NODE_ENV })
