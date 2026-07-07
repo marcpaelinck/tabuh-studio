@@ -1,7 +1,7 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import type { UUID } from '@tabuhstudio/shared/types/basetypes.ts'
-import { Activity, useEffect, useReducer, useRef, useState, type Dispatch } from 'react'
+import { Activity, useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsList, BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
@@ -35,7 +35,7 @@ import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
-import { useUserSelectionStore } from '../stores/usePlaybackStore.tsx'
+import { useUserSelectionStore } from '../stores/useUserSettingsStore.tsx'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -373,8 +373,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         />
     )
 
-    const playbackMenu = (
-        <PlaybackMenu appAppearance={appAppearance} scoreMenuOptions={scoreMenuOptions} score={score} />
+    const playbackMenu = useMemo(
+        () => <PlaybackMenu appAppearance={appAppearance} scoreMenuOptions={scoreMenuOptions} score={score} />,
+        [appAppearance, scoreMenuOptions, score]
     )
 
     const playerWindow = (
@@ -499,13 +500,15 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                             onClick={() => setPbMenuOpen((open) => !open)}
                             className="p-0"
                         />
-                        {pbMenuOpen && (
-                            <div
-                                className="absolute left-0 top-0 z-50 mt-1 ml-1 rounded-md border bg-white p-2 shadow-lg"
-                                style={{ minWidth: '16rem' }}>
-                                {playbackMenu}
-                            </div>
-                        )}
+                        {/* Keep the menu mounted and toggle only CSS visibility. Wrapping it in
+                            <Activity> (or `pbMenuOpen && …`) tears down and re-runs PlaybackMenu's
+                            effects on every open, which would reset the focus even when the score
+                            is unchanged. display:none hides it without touching its effects. */}
+                        <div
+                            className="absolute left-0 top-0 z-50 mt-1 ml-1 rounded-md border bg-white p-2 shadow-lg"
+                            style={{ minWidth: '16rem', display: pbMenuOpen ? 'block' : 'none' }}>
+                            {playbackMenu}
+                        </div>
                         <TsLogoIcon
                             environment={environment}
                             remSize={2.5}

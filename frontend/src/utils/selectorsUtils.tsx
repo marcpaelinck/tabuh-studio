@@ -1,6 +1,6 @@
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { instrumentConfigs, type InstrumentConfig } from '../config/config'
-import { focusDefaultOption } from '../stores/usePlaybackStore'
+import { focusDefaultOption } from '../stores/useUserSettingsStore'
 import { type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
 import type { Score, System } from '../typing/score'
 

@@ -4,7 +4,7 @@
 
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
-import { useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type {
     HighlightRange,
     HilightRangeFunction,

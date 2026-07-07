@@ -7,7 +7,7 @@ import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
-import { useUserSelectionStore } from '../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
 

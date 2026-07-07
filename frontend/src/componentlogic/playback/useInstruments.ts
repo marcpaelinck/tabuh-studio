@@ -12,7 +12,7 @@ import {
     SOUNDS_FOLDER
 } from '../../config/config'
 import { soundFile } from '../../config/configfunctions'
-import { useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'

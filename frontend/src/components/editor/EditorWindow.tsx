@@ -4,7 +4,7 @@ import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
-import { useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     EditorCursorParameters,

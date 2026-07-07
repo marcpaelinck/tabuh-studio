@@ -3,10 +3,10 @@ import { Activity, useEffect, useRef, useState, type Dispatch, type JSX, type Re
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
-import { useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import { type Appearance } from '../../typing/interface'
-import { type PlaybackCallbackFunctions, type PlaybackSettings, type TimeLine } from '../../typing/playback'
+import { type PlaybackCallbackFunctions, type TimeLine, type UserSelections } from '../../typing/playback'
 import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { Animation } from './Animation'
@@ -36,9 +36,9 @@ export default function PlayerWindow({
     const currentFocusRef = useRef<Position[]>([])
     const currentPanggulRef = useRef<Position[]>([])
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
-    const selectedPanggulOption = useUserSelectionStore((state: PlaybackSettings) => state.selectedPanggulOption)
-    const selectedCursorStyle = useUserSelectionStore((state: PlaybackSettings) => state.selectedCursorStyle)
-    const selectedFocusOption = useUserSelectionStore((state: PlaybackSettings) => state.selectedFocusOption)
+    const selectedPanggulOption = useUserSelectionStore((state: UserSelections) => state.selectedPanggulOption)
+    const selectedCursorStyle = useUserSelectionStore((state: UserSelections) => state.selectedCursorStyle)
+    const selectedFocusOption = useUserSelectionStore((state: UserSelections) => state.selectedFocusOption)
 
     useEffect(() => {
         visibleRef.current = visible
@@ -55,6 +55,10 @@ export default function PlayerWindow({
         cursorStyleRef.current = selectedCursorStyle
     }, [selectedCursorStyle])
 
+    useEffect(() => {
+        currentFocusRef.current = selectedFocusOption.objValue
+    }, [selectedFocusOption])
+
     // HOOKS
     const { animateInstrument, setSvgInfo } = useAnimationEngine(
         currentFocusRef,
@@ -63,10 +67,6 @@ export default function PlayerWindow({
         visibleRef
     )
     useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
-
-    useEffect(() => {
-        currentFocusRef.current = selectedFocusOption.objValue
-    }, [selectedFocusOption])
 
     useEffect(() => {
         updateNotationParas(selectedPanggulOption.objValue, selectedFocusOption.objValue)

@@ -23,7 +23,7 @@ import {
     dynamicsToNumber,
     noteConfigs
 } from '../../config/config'
-import { speedDefaultOption } from '../../stores/usePlaybackStore'
+import { speedDefaultOption } from '../../stores/useUserSettingsStore'
 import type { FlowStep } from '../../typing/execution'
 import type {
     AnimationNote,

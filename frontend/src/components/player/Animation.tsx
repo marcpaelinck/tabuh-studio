@@ -12,7 +12,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import { useUserSelectionStore } from '../../stores/usePlaybackStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import { debug } from '../../utils/debugger'
 import { ResizableSVG } from '../ResizableSVG'

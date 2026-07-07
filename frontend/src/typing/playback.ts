@@ -169,7 +169,7 @@ export type PlaybackAction = {
 
 export type EditorCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo; lastColumn: number }
 
-export interface PlaybackSettings {
+export interface UserSelections {
     selectedScoreOption: ExtendedOption<ScoreInfo> | null
     selectedFocusOption: ExtendedOption<Position[]>
     selectedSpeedOption: ExtendedOption<number>
