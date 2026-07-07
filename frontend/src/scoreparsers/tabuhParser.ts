@@ -240,7 +240,8 @@ function postProcess(scoreByMeasure: ScoreByMeasure, postProcessingInstructions:
     // Ensure that all measures in the same beat have the same length by padding them with space symbols.
     scoreByMeasure.systems.forEach((system) => {
         debug(`system ${system.id}`)
-        system.groups = PadMeasures(system.groups)
+        const columnWidths = getColumnWidths(system.groups)
+        system.groups = PadMeasures(system.groups, columnWidths)
     })
 
     // Set the kempli state ('on', 'notation' or 'off').
@@ -459,22 +460,29 @@ function getNotationByMeasure(gonganNode: SyntaxNode | null, content: string): G
     return groupedNotationByMeasures
 }
 
-function PadMeasures(groupedNotationByMeasures: GroupedNotationByMeasure[]): GroupedNotationByMeasure[] {
+function getColumnWidths(groupedNotationByMeasures: GroupedNotationByMeasure[]): number[] {
+    // First calculate the maximum width of the columns. `notationWidth` returns the unabbreviated width
+    // for 'shorthand' notation such as norot.
+    const measureWidths = groupedNotationByMeasures.map((group) =>
+        group.notation.map((m) => notationWidth(NoteObject.fromNotation(m)))
+    )
+    return _.zip(...measureWidths).map((col) => Math.max(...col.map((n) => n || 0)))
+}
+
+function PadMeasures(
+    groupedNotationByMeasures: GroupedNotationByMeasure[],
+    columnWidths: number[]
+): GroupedNotationByMeasure[] {
     // Pad measures with space characters where needed to normalize the measure lengths.
 
     // First calculate the maximum width of the columns. `notationWidth` returns the unabbreviated width
     // for 'shorthand' notation such as norot.
-    const columnWidths = groupedNotationByMeasures.map((group) =>
-        group.notation.map((m) => notationWidth(NoteObject.fromNotation(m)))
-    )
-    const maxColWidths = _.zip(...columnWidths).map((col) => Math.max(...col.map((n) => n || 0)))
-    debug(`maxColWidths=${JSON.stringify(maxColWidths)}`)
 
     // Now pad measures up to the maximum width of the column.
     const groupedNotationArray: GroupedNotationByMeasure[] = []
     groupedNotationByMeasures.forEach((group) => {
         group.notation.forEach((measure, colIdx) => {
-            const diff = (maxColWidths[colIdx] ?? 0) - measure.length
+            const diff = (columnWidths[colIdx] ?? 0) - measure.length
             if (diff > 0) {
                 const padding = Array(diff).fill(SPACE_CHAR)
                 measure.push(...padding)

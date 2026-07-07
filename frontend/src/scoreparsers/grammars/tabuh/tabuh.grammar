@@ -49,8 +49,8 @@ DisplayParameter { "display" "=" BooleanValue }
 
 Gongan { (CommentLine | MetadataLine | StaffLine)+ }
 
-StaffLine { PositionLabel Measure+ (Eol | Eof) }
-Measure { tab Note* }
+StaffLine { PositionLabel Measure+ tab* (Eol | Eof) }
+Measure { tab Note+ }
 
 // METADATA
 
