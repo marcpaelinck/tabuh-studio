@@ -5,7 +5,7 @@ import { KEMPLI_BEAT_CHAR, SILENCE_EXTENDING_CHARS, SPACE_CHAR } from '@tabuhstu
 import { SILENCE_CHARS } from '@tabuhstudio/shared/constants/noteChars'
 import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
 import { v4 as uuidv4 } from 'uuid'
-import type { TempoItem } from '../typing/execution'
+import type { BeatSliceInfo, TempoItem } from '../typing/execution'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { KempliSetting, Score, System } from '../typing/score'
 import { getBeatSlicesFromKempliNotation } from '../utils/objectUtils'
@@ -21,7 +21,7 @@ function parseNotation(position: Position, stave: string): NoteSymbol[] {
 }
 
 // Detects whether there is a kempli beat and whether it is regular
-function detectKempliSetting(kempliNotation: NoteSymbol[]): KempliSetting {
+function detectKempliSetting(kempliNotation: NoteSymbol[], beatSlices: BeatSliceInfo[]): KempliSetting {
     const allowed = [KEMPLI_BEAT_CHAR].concat([...SILENCE_CHARS])
     // State remains notation if kempli contains non-beat symbols
     if (!kempliNotation.every((sym) => allowed.includes(sym))) return { state: 'notation' }
@@ -29,7 +29,6 @@ function detectKempliSetting(kempliNotation: NoteSymbol[]): KempliSetting {
     if (!kempliNotation.some((sym) => sym == KEMPLI_BEAT_CHAR)) return { state: 'off', frequency: 4 }
     else {
         // Detect a regular beat
-        const beatSlices = getBeatSlicesFromKempliNotation(kempliNotation, kempliNotation.length)
         const beatLengths = new Set(beatSlices.map((slice) => slice.end - slice.start))
         if (beatLengths.size == 1) {
             return { state: 'on', frequency: [...beatLengths][0] }
@@ -60,7 +59,8 @@ function postProcess(score: Score): Score {
     score.systems.forEach((system: System) => {
         const kempliNotation: NoteSymbol[] =
             system.groups.find((group) => group.positions.includes('KEMPLI'))?.notation || ([] as NoteSymbol[])
-        system.kempli = detectKempliSetting(kempliNotation)
+        system.beatSlices = getBeatSlicesFromKempliNotation(kempliNotation, kempliNotation.length)
+        system.kempli = detectKempliSetting(kempliNotation, system.beatSlices)
         if (['on', 'off'].includes(system.kempli.state))
             // Remove kempli staff
             system.groups = system.groups.filter((group) => !group.positions.includes('KEMPLI'))
@@ -109,6 +109,7 @@ export function parseLaras(content: string): ParserReturnValue {
                     index: score.systems.length,
                     groups: [],
                     staffs: {},
+                    beatSlices: [],
                     kempli: { state: 'notation' },
                     execution: [
                         {
