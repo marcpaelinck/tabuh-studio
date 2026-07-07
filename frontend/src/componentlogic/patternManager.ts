@@ -1,7 +1,7 @@
 // Converts (shorthand) symbols that represent a sequence of base notes to the corresponding base note symbols.
 // Also sets the octave of a grace note according to the note to which it is attached and to the position's range.
 
-import { NoteObject } from '@tabuhstudio/shared'
+import { NoteObject, SILENCE_EXTENDING_CHARS } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
 import type { BeatSliceInfo } from '../typing/execution'
 import type { Staff } from '../typing/score'
@@ -211,8 +211,8 @@ export function notationWidth(notation: NoteObject[], position?: Position): numb
     var remaining = 0 // remaining number of expected spaces after a pattern
     notation.forEach((note) => {
         if (note.isExtensionSilence) {
+            totalWidth++
             if (remaining) remaining--
-            else totalWidth++
         } else if (note.isMutingSilence) totalWidth++
         else {
             totalWidth += 1 - remaining // pattern will be truncated if there are insufficient trailing spaces
@@ -271,7 +271,7 @@ export function applyPatterns({ position, staff, beatSlices, eatSpaces }: ApplyP
                     while (
                         avail < pattern.length &&
                         noteIdx + avail < beatObjNotation.length &&
-                        beatObjNotation[noteIdx + avail].toString() === ' '
+                        SILENCE_EXTENDING_CHARS.has(beatObjNotation[noteIdx + avail].toString())
                     ) {
                         avail++
                     }

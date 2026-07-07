@@ -540,7 +540,7 @@ export function usePlaybackManager() {
                     if (strokeNoteActions) {
                         newTimeLine.sampleractions.push(...strokeNoteActions)
                     } else {
-                        console.log('what`s going on here?')
+                        debug('what`s going on here?')
                     }
                 }
             }
