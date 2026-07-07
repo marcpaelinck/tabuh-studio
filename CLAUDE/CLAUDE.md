@@ -28,15 +28,14 @@ The following documents in the CLAUDE folder contain additional documentation
 | Instrument | An instrument type, such as PEMADE or JEGOGAN |
 | Instrument Group | Orchestra type, e.g. GONG_KEBYAR, SEMAR_PAGULINGAN. |
 | Kempli | Instrument that gives the beat (`kempli beat`) in a Balinese gamelan orchestra. |
-| Beat | Same as `kempli beat`. This term is also used to denote a range of notes from one kempli beat up to (but not including) the next kempli beat. |
 | Key | Brass tuned stave mounted above a bamboo resonator. The term `key` is sometimes used to denote in general the sound-producing elements of any melodic instruments such as the chimes of a reyong. |
 | Notation | Human-readable transcription of (part of a) a composition. A notation consists of `Note` objects which are visualized using the BaliMusic font. |
 | BaliMusic font | A custom, monospaced font for Balinese gamelan cipher notation. Uses **negative spacing** on modifier characters so they visually combine with the preceding pitch character (displayed as diacritics). |
 | Score | Document containing the notation for an entire composition. A score is represented internally by a `Score` object |
 | Gongan | Part of a score that spans one gong cycle. |
 | System | Visual and logical subdivision of a score. A system usually corresponds with a `gongan`. |
-| Section | This term is deprecated but still occurs in the code. It is equivalent to `beat` when used to denote a range of notes. |
-| Measure | Same as Section. |
+| Measure | A range of notes in a Staff from one kempli beat up to (but not including) the next kempli beat. |
+| Beat | 1. Same as `kempli beat`. 2. A group of vertically aligned measures in the same System. Or in other words: the collection of measures of a staff that start on the same kempli beat. |
 | Column | The list of notes in a system's staffs that are visually aligned vertically. Every note takes the same horizontal space when viewed with the BaliMusic font because the font is monospaced. As a consequence a column contains all the notes from the system's staffs with the same `notation` index. All the notes in the same column should be played simultaneously during playback. |
 | Pitch | For melodic instruments, the pitch indicates the note name (DING, DONG, DENG, DUNG, DANG). For melodic instruments that span multiple octaves, an octave indicator can be used |
 | Symbol | A string of one or more characters in a notation. A symbol represents a single note and is represented as one `glyph` when the `BaliMusic` font is used. |
