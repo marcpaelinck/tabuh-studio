@@ -67,6 +67,7 @@ export function expandSystem(system: System): void {
     if (!system.groups || system.groups.length === 0) return
     system.staffs = castGroupedNotationToPositions(system, system.castingInstructions ?? [])
     const beatSlices = getBeatSlices(system)
+    system.beatSlices = beatSlices
     // Expand shorthand pattern symbols (e.g. norot) within each beat
     _.entries(system.staffs).forEach(([position, staff]) => {
         if (staff)

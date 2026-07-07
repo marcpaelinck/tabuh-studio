@@ -9,7 +9,7 @@ import type {
     UUID
 } from '@tabuhstudio/shared/types/basetypes'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
-import type { ExecutionItem } from './execution'
+import type { BeatSliceInfo, ExecutionItem } from './execution'
 
 export type Note = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
@@ -65,13 +65,13 @@ export type System = {
     index: number // row index, starts with 0, can change when data items are added / deleted
     line?: number // in case the score was parsed from a text file, the first line of the system
     groups: GroupedNotation[] // CANONICAL compact notation (source of truth for the dual editor).
-    beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
-    castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
     staffs: Partial<Record<Position, Staff>> // Derived (cache) flat notation for each position.
+    beatSlices: BeatSliceInfo[]
+    castingInstructions?: CastingInstruction[] // system-wide casting context (e.g. AUTOKEMPYUNG=off) used to re-derive staffs.
     kempli: KempliSetting
+    beatColWidths?: number[] // per-kempli-beat column widths used to flatten/split groups and draw the grid.
     label?: string
     execution?: ExecutionItem[]
-    staffs_?: Staffs // Reserved to contain the original staffs of a copied system
     copyFrom?: string // Label of the system of which the current system is a copy
     copyFromUuid?: string // UUID of the system of which the current system is a copy
 }
