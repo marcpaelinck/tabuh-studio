@@ -11,15 +11,13 @@ ugal	--i-	Oe---	o---	i---	a,a,?a,i	o-i-	o---	e---
 	# Penyalit
 	{LABEL KAWITAN_UNISONO}
 	{DYNAMICS f positions=[gangsa]}
-ugal	o---	e---	o-i-	a,-i-	o---	e---	o-e-	i-o-	e---	i---	e---	o---	i-o-	e---	o---	i---
-gangsa	o---	e---	o-i-	a-i-	o---	e---	o-e-	i-o-	e---	i---	e---	o---	i-o-	e---	o---	i---
+ugal/ga	o---	e---	o-i-	a,-i-	o---	e---	o-e-	i-o-	e---	i---	e---	o---	i-o-	e---	o---	i---
 calung	o	e	o	i	o	e	i	o	e	i	e	o	i	e	o	i
 jegogan	o				o				e				i
 gong	G
 	{GOTO KAWITAN_UNISONO_ANGSEL passes=[2]}
 
-ugal	o---	i---	a,---	u,-a,-	i---	a,---	u,---	a,-i-	o--o	o-o-	o-e-	o-i-	a,-i-	o-i-	o---	e---
-gangsa	o---	i---	a---	u-a-	i---	a---	u---	a-i-	o--o	o-o-	o-e-	o-i-	a-i-	o-i-	o---	e---
+ugal/ga	o---	i---	a,---	u,-a,-	i---	a,---	u,---	a,-i-	o--o	o-o-	o-e-	o-i-	a,-i-	o-i-	o---	e---
 calung	o	i	a	u-a-	i	a	u	a-i-	o	e	o	i	a-i-	o-i-	o	e
 jegogan	o				i				o				a
 gong	T
@@ -27,8 +25,7 @@ gong	T
 
 	{LABEL KAWITAN_UNISONO_ANGSEL}
 	{TEMPO 80 beats=3->8}
-ugal	o---	i---	a,---	u,-a,-	i---	a,---	u,---	a,-i-	o--o	o-o-	o-e-	o-i-	a,-i-	o-i-	o---	e---
-gangsa	o---	i---	a---	u-a-	i---	a---	u---	a-i-	o---	----	----	----	-a/a-	Io---	----	----
+ugal/ga	o---	i---	a,---	u,-a,-	i---	a,---	u,---	a,-i-	o--o	o-o-	o-e-	o-i-	a,-i-	o-i-	o---	e---
 calung	o	i	a	u-a-	i	a	u	a-i-	o	e	o	i	a-i-	o-i-	o	e
 jegogan	o				i				o				a
 gong	T
@@ -39,7 +36,7 @@ gong	T
 	{DYNAMICS f passes=[2,4] positions=[gangsa]}
 ugal	o---	e---	o-i-	a,-i-	o---	e---	o-e-	i-o-	e---	i---	e---	o---	i-o-	e---	o---	i---
 gangsa p	o.oe	.o.e	o.oe	.o.e	o.oe	.o.e	.o.i	o.io	.i.o	i.io	.oii	.i.o	i.io	.i.o	i.oo	.o.e
-gangsa s	aua.	uau.	aua.	uau.	aua.	uau.	a.eu	.eu.	eue.	ueu.	e.uu	.ue.	ueu.	eue.	u.aa	.au.
+gangsa s	aua.	uau.	aua.	uau.	aua.	uau.	aueu	.eu.	eue.	ueu.	e.uu	.ue.	ueu.	eue.	u.aa	.au.
 calung	o	e	o	i	o	e	i	o	e	i	e	o	i	e	o	i
 jegogan	o				o				e				i
 gong	G

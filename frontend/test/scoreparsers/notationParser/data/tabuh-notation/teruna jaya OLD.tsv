@@ -1,6 +1,6 @@
-{INFO uuid=5267b75a-1f5f-4ef3-be21-aa8b643d217f notation="teruna jaya" part=full title="Teruna Jaya (under development)" composer="" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION, TABUH_TEST] loop=false beat_at_end=false}
-	
-#	Composer: I Gede Manik, choreographer: Pan Wandres
+{INFO uuid=5267b75a-1f5f-4ef3-be21-aa8b643d217f notation="teruna jaya" part=full title="Teruna Jaya (under development)" composer="I Gede Manik" instrumentgroup=GONG_KEBYAR font=BaliMusic5 run_types=[DEBUG, PRODUCTION] loop=false beat_at_end=false}
+
+#	choreographer: Pan Wandres
 ##	https://www.youtube.com/watch?v=RH9G9bntTPk&list=RDRH9G9bntTPk
 	{PART kebyar}
 	{TEMPO 150}
@@ -19,7 +19,7 @@ ga/ug/rey	----uui<i<uui<i<uui<i<uui<i<	u----o-eu-e-ua-u-o-eu-e-ua-
 kendang	----99--99--99--99--	9-------9---99-9----9---99-
 calung/jeg	--------------------	u--------------u
 gong	--------------------	G
-	
+
 	{GONGAN kebyar}
 	{TEMPO 110 beat=2}
 	{TEMPO 150 beat=3}
@@ -70,7 +70,7 @@ gong	G---------G-------------	-------------------	G
 gangsa	..e,.	....
 
 gangsa	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,.	..e,.	....	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,.	..e,.	....
-gong	G		P		T		P		G		P		T		P	
+gong	G		P		T		P		G		P		T		P
 
 	{LABEL INTRO1}
 ##	gongan 10
@@ -79,7 +79,7 @@ ga_p	a,.i.	a,i.a,	i.o.	io.i	o.e.	oe.o	e.u.	eu.e	u.e.	ue.u	e.a.	ua.u	a.i.	e...	i.
 ga_s	.a,.u,	a,.u,a,	.i.a,	i.a,i	.o.i	o.io	.e.o	e.oe	.u.a	u.au	.u.e	u.eu	.a,.o	e..a,	.a,.o	.a,.o
 calung	a		i		o		e		u		e		a		u
 jegogan	a				o				u				a
-gong	G				P				T				P			
+gong	G				P				T				P
 
 	{VALIDATION ignore=kempyung beat=13}
 ugal	e	e	a	a	u	u	o	o	a,	a,	e,	e,	a,		e,
@@ -87,10 +87,10 @@ ga_p	e.a.	ua.u	a.u.	eu.e	u.o.	eo.e	o.a,.	ia,.i	a,.e,.	u,e,.u,	e,.a,.	u,a,.u,	a,.
 ga_s	.u.e	u.eu	.e.a	e.oe	.u.u	e.ue	.o.o	i.oi	.a,.a,	u,.a,u,	.u,.e,	u,.e,u,	a,...	i/...	i/...	i/...
 calung	e		a		u		o		a		e		a		e
 jegogan	e				u				a				a
-gong	G				P				T				P			
+gong	G				P				T				P
 	{GOTO INTRO1 passes=[1,2]}
 	{GOTO BATEL1 from_beat=8 pass=3}
-	
+
 	{LABEL BATEL1}
 	{VALIDATION ignore=kempyung beat=2}
 	{DYNAMICS f positions=[gangsa,ugal,reyong] beat=3}
@@ -100,7 +100,7 @@ ga_s	.a,.a,	u,...	..i-	----	e--e	e-e.	..i-	----
 reyong	....	....	..b-	----	b--b	b-b.	..b-	----
 calung	a		e		a		e
 jegogan	a				a
-gong	T				P			
+gong	T				P
 
 	{TEMPO 195}
 	{DYNAMICS mp positions=[gangsa,ugal,reyong] beats=4->6}
@@ -114,7 +114,7 @@ gong	G		P		G		P
 
 	{LABEL BATEL_TEMPLATE}
 	{DYNAMICS f positions=[gangsa,ugal,reyong] beat=3}
-ugal	u,---	a,---	u,---	a,---	u,---	a,---	u,---	a,---	
+ugal	u,---	a,---	u,---	a,---	u,---	a,---	u,---	a,---
 gangsa	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
 calung	u		e		u		e
@@ -124,7 +124,7 @@ gong	G		P		G		P
 	{COPY BATEL_TEMPLATE}
 	{DYNAMICS mp positions=[gangsa,ugal,reyong] beats=4->6}
 ##	gongan 15
-ugal	u,---	a,---	u,---	a,---	u,---	a,---	u,---	----	
+ugal	u,---	a,---	u,---	a,---	u,---	a,---	u,---	----
 gangsa	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,-a,-	u,---	----
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	x...	....
 
@@ -139,9 +139,9 @@ reyong	b---	----	--xx	x.b.	..xx	x.b.	..xx	x.b.
 ugal	u,---	a,---	u,---	a,---
 gangsa	u,-a,-	u,-a,-	..e,-	e,---
 reyong	....	....	--b-	b---
-calung	u		e	
-jegogan	u			
-gong	G		P	
+calung	u		e
+jegogan	u
+gong	G		P
 
 	{COPY BATEL_TEMPLATE}
 ugal	u,---	a,---	u,---	a,...	....	e,...	..e,-	----
@@ -177,9 +177,9 @@ reyong	b---	----	b---	----	b---	----	b---	----
 
 ga/ugal	u,-a,-	u,...	..e,.	..e,-
 reyong	b---	----	--b.	--b-
-calung	u		e	
-jegogan	u			
-gong	G		P	
+calung	u		e
+jegogan	u
+gong	G		P
 
 	{COPY BATEL_TEMPLATE}
 
@@ -229,7 +229,7 @@ reyong	....	....	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx
 	{LABEL ANGSEL1}
 	{COPY REGULAR}
 	{DYNAMICS mf positions=[gangsa,ugal,reyong]}
-	{DYNAMICS p positions=[ugal], beat=5}
+	{DYNAMICS p positions=[ugal] beat=5}
 ga_p	u,.i.	a,.o.	io.i	.oi.	i.o.	u---	----	----
 ga_s	.a,.u,	.i.a,	.u,a,.	a,u,.a,	.i.e	....	....	....
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	x...	....	....
@@ -238,7 +238,7 @@ reyong	xxxx	xxxx	xxxx	xxxx	xxxx	x...	....	....
 	{COPY REGULAR}
 	{DYNAMICS f positions=[gangsa,ugal,reyong]}
 	{DYNAMICS mf positions=[gangsa,reyong] beat=5}
-	{DYNAMICS p positions=[ugal], beat=5}	
+	{DYNAMICS p positions=[ugal] beat=5}
 ga_p	u,.i.	a,.o.	io.i	.oi.	i.o.	u---	----	----
 ga_s	.a,.u,	.i.a,	.u,a,.	a,u,.a,	.i.e	....	....	....
 reyong	xxxx	xxxx	xxxx	xxxx	xxxx	x...	....	....
@@ -299,10 +299,10 @@ reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	xxxx	....
 ugal	u,---	a,---	u,---	a,---
 gangsa	....	....	....	....
 reyong	....	....	....	....
-calung	u		e	
-jegogan	u			
-gong	G		P	
-	
+calung	u		e
+jegogan	u
+gong	G		P
+
 	{COPY BATEL_TEMPLATE}
 
 	{COPY BATEL_TEMPLATE}
@@ -317,9 +317,9 @@ reyong	xxxx	xxxx	xxxx	xxxx	xxxx	xxx.	..b-	----
 	{DYNAMICS mp->mf positions=[gangsa] beat=4}
 ugal/ga	u,...	..e,-	----	e,---
 reyong	....	..b-	----	b---
-calung	u		e	
-jegogan	u			
-gong	G		P	
+calung	u		e
+jegogan	u
+gong	G		P
 	{GOTO TEMPLATE_PEPESON2A}
 
 	{LABEL TEMPLATE_PEPESON2}
@@ -337,7 +337,7 @@ gong	G-------	--------	P-------	--------	T-------	--------	G-------	--------
 	{LABEL TEMPLATE_PEPESON2A}
 	{COPY TEMPLATE_PEPESON2 include=[DYNAMICS]}
 	{TEMPO 55 beats=1->7}
-	{TEMPO 50 beats=8->8}
+	{TEMPO ->50 beat=8}
 gangsa	.u,a,e,u,a,e,u,	a,ioa,ioa,i	oia,oia,oi	a,a,ioeioa,	ia,u,ia,u,ia,	u,u,a,ioa,iu,	a,u,e,a,u,e,a,u,	e,e,u,a,iu,a,e,
 reyong	.xxxxxxx	xxxxxxxx	xxxxxxxx	xxxxxxx.	b----xxx	xxxxxxxx	xxxxxxxx	xxxxxxxx
 

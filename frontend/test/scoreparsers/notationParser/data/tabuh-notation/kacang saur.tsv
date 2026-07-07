@@ -54,7 +54,7 @@ jegogan	-----------------------e---
 	{WAIT 1}
 
 	{TEMPO 60}
-	{TEMPO 120 beat=2}
+	{TEMPO 120 beat=6}
 	{GONGAN kebyar}
 	{DYNAMICS ->p positions=[gangsa,ugal] beat=2}
 ugal	e,e,u,a,u,u,a,ia,a,io--euaueo-	ii.io-i-e-o,-

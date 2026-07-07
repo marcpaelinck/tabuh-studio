@@ -316,6 +316,7 @@ reyong	un	un	un	un	un	an	an	in
 
 	## gongan 40
 	{COPY C4}
+
 	{TEMPO ->115 beats=1->8}
 	# 4  gongan  kendang-solo
 ugal/ga	ii-a	.au-	ee-o	.oe-	ii-a	.au-	ee-o	.oe-
@@ -371,7 +372,6 @@ jegogan	i
 gong	G		P		T		P
 
 	{LABEL FINAL}
-	{LOOP 4}
 ugal	i---	i---	e---	e---	i---	i---	e---	e---
 pemade p	i.ei	.ei.	ei.e	ie.e	i.ei	.ei.	ei.e	ie.e
 pemade s	.ue.	ue.u	e.ue	.ueu	.ue.	ue.u	e.ue	.ueu
@@ -383,6 +383,10 @@ reyong4	i<.e<i<	.e<i<.	e<i<.e<	i<e<.e<	i<.e<i<	.e<i<.	e<i<.e<	i<e<.e<
 calung	i	i	e	e	i	i	e	e
 jegogan	i		e		i		e
 gong	G		P		T		P
+
+	{COPY FINAL}
+	{LOOP 3}
+kantilan	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	..ua	i<-i</.
 
 kantilan	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	i<i<i<i<	..ua	i<-i</.
 ugal	i---	i---	e---	e---	i---	i---	e--.	....

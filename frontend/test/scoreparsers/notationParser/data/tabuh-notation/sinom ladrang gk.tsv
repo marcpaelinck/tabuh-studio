@@ -7,7 +7,7 @@ jegog	u----------
 
 	{GONGAN gineman}
 	{LOOP 2}
-ugal	u/.u/.u:---e-u-a_a_/._u_aa-----u-i<-a_u_---a-u_	e_----------
+ugal	u/.u/.u:---e-u-a_a_._u_aa-----u-i<-a_u_---a-u_	e_----------
 ##	ugal low melody:----------o/.o/.o:---Ia,.Ia,-----o-i-a,/.Ia,--------o-i-e:o:e/...a,-i_
 ##	trompong=o/o/o/o:---Ia,.Ia,----oie:o:e/...a,-i=o.o----o/o----oi=a,_a,_----oi=a,.i=a,=a,=----ui<au.Au--a_u_eUe-----uea:u:a/...o.Eu---a,ioeu_.Eu---Ue.Ue---oeu_e_.Eu----
 calung		e
@@ -31,7 +31,7 @@ calung		a
 jegog		a
 
 	{GONGAN gineman}
-ugal	i/.i/.i:---a,-io_o/i_oo----i_	a,-----i/.i/.i:---a,-i-o_o/i_oo----e_u--e--o-e_u-e-o-i-e_o_i_o_/....a,-i_o/.
+ugal	i/.i/.i:---a,-io_o/i_oo----i_	a,-----i/.i/.i:---a,-i-o_o/i_oo----e_u--e--o-e_u-e-o-i-e_o_i_o_....a,-i_o/.
 calung		a
 jegog		a
 
@@ -101,12 +101,14 @@ calung	u---	--a-	u-e-	u-a-	--u-	--a-	u-e-	u-a-
 jegog	u
 kendang	-8*8	**8*	8**8	*9(-	-8*9	(9((	9--9	-(-(
 gong	G
+	{GOTO C}
 
 	{LABEL B}
 	{COPY P1 include=TEMPO}
 gangsa p	.oe.	eo.e	.oe.	eo.e	.oe.	eo.e	.oe.	eo.e
 gangsa s	ua.u	.au.	ua.u	.au.	ua.u	.au.	ua.u	.au.
 
+	{LABEL C}
 	{SUPPRESS ["gangsa p", "gangsa s"] passes=[1]}
 ##	GONGAN 15
 ugal	--u-	--a-	u-e-	u-a-	u-e-	o---	i-o-	a,-i-
