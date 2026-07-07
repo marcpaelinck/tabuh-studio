@@ -198,7 +198,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     function infoDlg() {
         dialog.alert(
             <p>
-                <b>{appInfo.name}</b> version {appInfo.version}
+                <b>{appInfo.name}</b>
+                <br />
+                <br /> version {appInfo.frontend_version}
+                <br /> API version {appInfo.backend_version}
                 {environment != 'production' && <br />}
                 {environment != 'production' && `${environment} environment`}
                 <br />

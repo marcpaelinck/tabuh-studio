@@ -18,6 +18,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     return response.json()
 }
 
+// ── General Info ──────────────────────────────────────────────────────
+export async function apiVersion() {
+    return request<{ version: string }>('/version')
+}
+
 // ── Auth ──────────────────────────────────────────────────────
 
 export async function apiLogin(email: string, password: string) {
