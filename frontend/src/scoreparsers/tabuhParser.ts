@@ -149,7 +149,7 @@ export function parseNotation(content: string): ParserReturnValue {
 ********************/
 
 function addKempliNotationByMeasure(system: SystemByMeasure, colWidths: number[]) {
-    console.log(`system ${system.id}, colwidths=${JSON.stringify(colWidths)}`)
+    debug(`system ${system.id}, colwidths=${JSON.stringify(colWidths)}`)
     const notation: string[][] = colWidths.map((w) => [KEMPLI_BEAT_CHAR].concat(_.fill(Array(w - 1), SPACE_CHAR)))
     system.groups.push({ id: uuidv4(), positions: ['KEMPLI'], notation })
 }
@@ -239,7 +239,7 @@ function postProcess(scoreByMeasure: ScoreByMeasure, postProcessingInstructions:
 
     // Ensure that all measures in the same beat have the same length by padding them with space symbols.
     scoreByMeasure.systems.forEach((system) => {
-        console.log(`system ${system.id}`)
+        debug(`system ${system.id}`)
         system.groups = PadMeasures(system.groups)
     })
 
@@ -468,7 +468,7 @@ function PadMeasures(groupedNotationByMeasures: GroupedNotationByMeasure[]): Gro
         group.notation.map((m) => notationWidth(NoteObject.fromNotation(m)))
     )
     const maxColWidths = _.zip(...columnWidths).map((col) => Math.max(...col.map((n) => n || 0)))
-    console.log(`columnWidths=${JSON.stringify(columnWidths)} maxColWidths=${JSON.stringify(maxColWidths)}`)
+    debug(`maxColWidths=${JSON.stringify(maxColWidths)}`)
 
     // Now pad measures up to the maximum width of the column.
     const groupedNotationArray: GroupedNotationByMeasure[] = []
