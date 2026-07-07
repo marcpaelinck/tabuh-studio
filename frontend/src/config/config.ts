@@ -257,6 +257,16 @@ export const instrumentConfigs: Record<string, InstrumentConfig> = {
     REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] }
 }
 
+export const positionGroups: Record<string, Position[]> = {
+    PEMADE: ['PEMADE_POLOS', 'PEMADE_SANGSIH'],
+    KANTILAN: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'],
+    GANGSA: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH'],
+    REYONG13: ['REYONG_1', 'REYONG_3'],
+    REYONG24: ['REYONG_2', 'REYONG_4'],
+    REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'],
+    POKOK: ['CALUNG', 'JEGOGAN']
+}
+
 // Next two lists used when applying multiple instrument notation
 export const polosPositions = [
     'JEGOGAN',
