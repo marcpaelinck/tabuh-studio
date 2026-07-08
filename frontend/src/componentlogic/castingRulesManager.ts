@@ -1,7 +1,7 @@
 // This module contains the rules that are used for the automatic generation of notation for grouped staves.
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
-import { ERROR_PITCH_CHAR, NoteObject } from '@tabuhstudio/shared'
+import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes.ts'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
@@ -74,6 +74,24 @@ const nokempyung: Partial<Position>[][] = [
     ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'],
     ['REYONG_1', 'REYONG_3'],
     ['REYONG_2', 'REYONG_4']
+]
+
+const allowedGroups: Position[][] = [
+    [
+        'PEMADE_POLOS',
+        'PEMADE_SANGSIH',
+        'KANTILAN_POLOS',
+        'KANTILAN_SANGSIH',
+        'REYONG_1',
+        'REYONG_2',
+        'REYONG_3',
+        'REYONG_4',
+        'UGAL',
+        'PENYACAH',
+        'CALUNG',
+        'JEGOGAN'
+    ],
+    ['KEMPLI', 'CENGCENG', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
 ]
 
 function selectRule(
@@ -165,4 +183,40 @@ export function castNotation(
     })
 
     return result
+}
+
+// --- Dual-editor group-membership helpers -------------------------------------
+
+// Which positions may be ADDED to a group. `available` is already the system-wide
+// universe minus the positions in use. A candidate `p` is allowed only if the
+// resulting set `group ∪ {p}` fits inside a single `allowedGroups` array (so only
+// valid aggregations can be formed). An empty group accepts any available position.
+export function candidatesFor(groupPositions: Position[], available: Position[]): Position[] {
+    if (groupPositions.length === 0) return available
+    return available.filter((p) =>
+        allowedGroups.some((grp) => [...groupPositions, p].every((x) => grp.includes(x)))
+    )
+}
+
+// Splits a position `p` out of a multi-position group into its own solo staff,
+// carrying the notation `p` currently has (the cast result), so it keeps playing.
+// Casting is 1:1 per symbol, so the per-measure lengths are preserved; the result is
+// returned as measures (NoteObject[][]) matching the input measure structure.
+export function castGroupToSolo(
+    groupPositions: Position[],
+    measures: NoteObject[][],
+    p: Position,
+    castingInstructions?: CastingInstruction[]
+): NoteObject[][] {
+    const posIdx = groupPositions.indexOf(p)
+    if (posIdx < 0) return measures
+    const flat = measures.flat().map((note) => (note.toString() || SPACE_CHAR) as NoteSymbol)
+    const cast = castNotation({ id: '', positions: groupPositions, notation: flat }, posIdx, castingInstructions)
+    const out: NoteObject[][] = []
+    let offset = 0
+    for (const measure of measures) {
+        out.push(cast.slice(offset, offset + measure.length))
+        offset += measure.length
+    }
+    return out
 }

@@ -19,6 +19,8 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
 import { useCallback, useState } from 'react'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
+import { v4 as uuidv4 } from 'uuid'
+import { castGroupToSolo, type CastingInstruction } from '../castingRulesManager'
 import {
     changeOctave,
     clampCursor,
@@ -53,7 +55,9 @@ interface CompactEditorState {
 export interface UseCompactSystemEditorOptions {
     initialLines: CompactLine[]
     keyMap?: KeyMap
-    /** Called with the updated lines whenever an edit changes the notation. */
+    /** System-wide casting context; used when splitting a position out of a group. */
+    castingInstructions?: CastingInstruction[]
+    /** Called with the updated lines whenever an edit changes the notation or structure. */
     onChange?: (lines: CompactLine[]) => void
 }
 
@@ -66,6 +70,14 @@ export interface CompactEditorController {
     onFocus: () => void
     onBlur: () => void
     setCursor: (line: number, measure: number, index: number) => void
+    /** Insert a new solo staff (group) at `atIndex`, seeded with `position` and rests. */
+    addLine: (atIndex: number, position: Position) => void
+    /** Remove the staff (group) at `index`. */
+    removeLine: (index: number) => void
+    /** Add `position` to the group at `lineIndex`. */
+    addPosition: (lineIndex: number, position: Position) => void
+    /** Remove `position` from a multi-position group, splitting it into its own solo staff. */
+    removePosition: (lineIndex: number, position: Position) => void
 }
 
 function toKeystroke(e: KeyboardEvent): Keystroke {
@@ -77,6 +89,7 @@ const COMPACT_POSITION = undefined // compact symbols are not bound to a positio
 export function useCompactSystemEditor({
     initialLines,
     keyMap = defaultKeyMap,
+    castingInstructions,
     onChange
 }: UseCompactSystemEditorOptions): CompactEditorController {
     const [state, setState] = useState<CompactEditorState>(() => ({
@@ -228,5 +241,81 @@ export function useCompactSystemEditor({
     const onFocus = useCallback(() => setFocused(true), [])
     const onBlur = useCallback(() => setFocused(false), [])
 
-    return { lines: state.lines, cursor: state.cursor, focused, onKeyDown, onPaste, onFocus, onBlur, setCursor }
+    // --- Group-structure editing (Step 4) -------------------------------------
+
+    // Insert a new solo staff seeded with `position` and empty measures (one per beat,
+    // which flatten to rests). The cursor moves into the new line.
+    const addLine = useCallback(
+        (atIndex: number, position: Position) =>
+            setState((st) => {
+                const beatCount = st.lines[0]?.measures.length ?? 0
+                const measures: NoteObject[][] = Array.from({ length: beatCount }, () => [])
+                const newLine: CompactLine = { id: uuidv4(), positions: [position], measures }
+                const idx = Math.max(0, Math.min(st.lines.length, atIndex))
+                const lines = [...st.lines.slice(0, idx), newLine, ...st.lines.slice(idx)]
+                onChange?.(lines)
+                return { lines, cursor: { line: idx, measure: 0, index: 0 } }
+            }),
+        [onChange]
+    )
+
+    const removeLine = useCallback(
+        (index: number) =>
+            setState((st) => {
+                if (index < 0 || index >= st.lines.length) return st
+                const lines = st.lines.filter((_, i) => i !== index)
+                onChange?.(lines)
+                if (lines.length === 0) return { lines, cursor: { line: 0, measure: 0, index: 0 } }
+                const line = Math.min(lines.length - 1, st.cursor.line > index ? st.cursor.line - 1 : st.cursor.line)
+                const measure = Math.min(st.cursor.measure, lines[line].measures.length - 1)
+                const index2 = clampCursor(lines[line].measures[measure] ?? [], st.cursor.index)
+                return { lines, cursor: { line, measure: Math.max(0, measure), index: index2 } }
+            }),
+        [onChange]
+    )
+
+    const addPosition = useCallback(
+        (lineIndex: number, position: Position) =>
+            setState((st) => {
+                const line = st.lines[lineIndex]
+                if (!line || line.positions.includes(position)) return st
+                const lines = st.lines.with(lineIndex, { ...line, positions: [...line.positions, position] })
+                onChange?.(lines)
+                return { ...st, lines }
+            }),
+        [onChange]
+    )
+
+    // Removing a position from a multi-position group splits it into its own solo staff
+    // carrying the cast notation it had (see castGroupToSolo). A group's last position
+    // cannot be removed (remove the whole line instead) — the UI disables that case.
+    const removePosition = useCallback(
+        (lineIndex: number, position: Position) =>
+            setState((st) => {
+                const line = st.lines[lineIndex]
+                if (!line || !line.positions.includes(position) || line.positions.length <= 1) return st
+                const soloMeasures = castGroupToSolo(line.positions, line.measures, position, castingInstructions)
+                const reduced: CompactLine = { ...line, positions: line.positions.filter((p) => p !== position) }
+                const solo: CompactLine = { id: uuidv4(), positions: [position], measures: soloMeasures }
+                const lines = [...st.lines.slice(0, lineIndex), reduced, solo, ...st.lines.slice(lineIndex + 1)]
+                onChange?.(lines)
+                return { ...st, lines }
+            }),
+        [onChange, castingInstructions]
+    )
+
+    return {
+        lines: state.lines,
+        cursor: state.cursor,
+        focused,
+        onKeyDown,
+        onPaste,
+        onFocus,
+        onBlur,
+        setCursor,
+        addLine,
+        removeLine,
+        addPosition,
+        removePosition
+    }
 }

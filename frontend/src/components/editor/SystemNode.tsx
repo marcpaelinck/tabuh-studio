@@ -256,6 +256,11 @@ export const SystemNode = memo(function SystemNode({
     // Compact lines seeded from the system's groups. The stored notation is flat, so
     // it is split back into measures using the system's per-beat column widths.
     const beatColWidths = systemData.beatSlices.map((slice) => slice.end - slice.start) ?? []
+
+    // Universe of positions the system may contain (KEMPLI only when written as notation).
+    const availablePositions = positionOrder.filter(
+        (p) => p !== 'KEMPLI' || systemData.kempli.state === 'notation'
+    ) as Position[]
     const compactLines: CompactLine[] = (systemData.groups ?? []).map((group) => ({
         id: group.id,
         positions: group.positions,
@@ -302,6 +307,8 @@ export const SystemNode = memo(function SystemNode({
                                     initialLines={compactLines}
                                     beatColWidths={beatColWidths}
                                     kempliFrequency={systemData.kempli.frequency}
+                                    availablePositions={availablePositions}
+                                    castingInstructions={systemData.castingInstructions}
                                     onChange={handleCompactChange}
                                     className="border-1 border-solid border-gray-200 p-1"
                                 />

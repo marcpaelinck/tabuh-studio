@@ -1,32 +1,39 @@
 // Produces a short label and a full tooltip for a compact notation group.
 //
-// MVP heuristic (proper tag-based labels — e.g. "ga/ugal", "reyong13" — and the
-// list of *valid* combinations come in Step 4 of the dual-editor work):
-//   - exact match of an instrument's position set  -> that instrument's name (e.g. "Pemade")
-//   - a single position                            -> its position name
-//   - otherwise                                    -> first name + " +N"
-// The tooltip always lists every position's full name.
+// The label greedily covers the group's position set with the largest matching
+// `positionGroups` entries and renders each covered piece (plus any leftover single
+// positions) via `positionAbbr`, joined with '/'. E.g. GANGSA + UGAL -> "ga/ug",
+// REYONG_1 + REYONG_3 -> "rey13". The tooltip always lists every position's full name.
 
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { positionAbbr, positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
-import { instrumentConfigs } from '../config/config'
 
-function sameSet(a: Position[], b: Position[]): boolean {
-    if (a.length !== b.length) return false
-    const setB = new Set(b)
-    return a.every((p) => setB.has(p))
-}
+type PositionGroupKey = keyof typeof positionGroups
+
+const groupEntries = Object.entries(positionGroups) as [PositionGroupKey, Position[]][]
 
 export function compactGroupLabel(positions: Position[]): { label: string; tooltip: string } {
     const names = positions.map((p) => positionConfigs[p]?.name ?? p)
     const tooltip = names.join(', ')
-
     if (positions.length === 0) return { label: '(empty)', tooltip: '' }
 
-    const instrument = Object.values(instrumentConfigs).find((cfg) => sameSet(cfg.positions as Position[], positions))
-    if (instrument) return { label: instrument.name, tooltip }
+    const covered = new Array(positions.length).fill(false)
+    const parts: { abbr: string; firstIdx: number }[] = []
 
-    if (positions.length === 1) return { label: names[0], tooltip }
+    // Cover with named position groups, largest first, so e.g. GANGSA wins over PEMADE.
+    for (const [key, members] of [...groupEntries].sort((a, b) => b[1].length - a[1].length)) {
+        const indices = members.map((m) => positions.indexOf(m))
+        const fullyPresent = indices.every((i) => i >= 0 && !covered[i])
+        if (!fullyPresent) continue
+        indices.forEach((i) => (covered[i] = true))
+        parts.push({ abbr: positionAbbr[key] ?? key, firstIdx: Math.min(...indices) })
+    }
 
-    return { label: `${names[0]} +${positions.length - 1}`, tooltip }
+    // Leftover single positions.
+    positions.forEach((p, i) => {
+        if (!covered[i]) parts.push({ abbr: positionAbbr[p] ?? positionConfigs[p]?.name ?? p, firstIdx: i })
+    })
+
+    parts.sort((a, b) => a.firstIdx - b.firstIdx)
+    return { label: parts.map((x) => x.abbr).join('/'), tooltip }
 }
