@@ -139,7 +139,19 @@ Implementation notes (as built):
 
 MVP boundaries (deferred):
 
-- Precise column alignment of compact measures against the kempli grid, and the **norot space-eating / cut-off** policy, are not yet implemented (measures are shown divided but not pixel-aligned to expanded columns).
 - The per-system **"view expanded"** toggle is Step 5; for now the read-only expanded view is always shown beneath the compact editor (it also carries playback).
 - Compact **paste** is minimal (first clipboard line into the active measure).
 - Group-membership editing (Step 4) and Lezer validation + save gating (Step 6) are unchanged/later.
+
+### Step 4 — Compact view editor refinement (part 1)
+- Add the full position list as a tooltip to the compact position tags at the beginning of each staff.
+- Enable add/remove a staff above/below the pointer. Initially fill the `Position` group with a single, random position which does not yet occur in another staff of the same system. Adding a staff should be disabled if all positions are accounted for in the current system.
+- Enable add/remove positions to groups. Only allow to add positions that do not occur yet in the current system. 
+Adding a position that already has its own notation pops the warning you described before overwriting it with the cast result.
+
+### Step 5 — Compact view editor refinement (part 2), separate expanded view
+- Remove the expanded view from the compact view and display it separately. Add a toggle above the editor window to switch between both.
+- In the expanded view all `SummaryItems` should be disabled. Editing should only be possible in the compact view.
+- In the compact view display a read-only expanded view below of the staff that contains the editing cursor. The expanded view should be displayed immediately below the staff.
+- Enable to create a new score which should initially contain an empty system.
+
