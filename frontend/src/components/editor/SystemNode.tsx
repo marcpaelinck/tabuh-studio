@@ -1,4 +1,4 @@
-import { KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
+import { NoteObject } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
@@ -15,11 +15,12 @@ import {
 } from 'react'
 import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import type { StyleProperties } from 'rsuite/esm/internals/types'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
-import { defaultBeatFrequency, editorFontSize, positionOrder } from '../../config/config'
+import { editorFontSize, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     AudioState,
@@ -30,6 +31,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, Staffs, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { createGridStyle, gridColorsExpanded } from '../../utils/editor'
 import { FeatureUnderDevelopment } from '../Feature'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
@@ -95,94 +97,6 @@ export const SystemNode = memo(function SystemNode({
         systemGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' })
     }
 
-    // Sets the background grid and cursor highlighting
-    function setGrid(systemData: System, cursor: EditorCursor | null) {
-        // Generates a gradient function for the kempli lines
-        function kempliGrid(systemData: System): string {
-            switch (systemData.kempli.state) {
-                case 'on': {
-                    return `repeating-linear-gradient(
-                        to right,
-                        ${gridColors.kempli} 0px 2px,
-                        transparent 2px ${systemData.kempli.frequency || defaultBeatFrequency}ch
-                        ),`
-                }
-                case 'notation': {
-                    // Get the kempli notation for the entire system
-                    const objNotation: NoteObject[] = systemData.staffs['KEMPLI']?.objNotation || []
-                    // Determine the positions of the kempli characters
-                    const indices = objNotation.reduce(
-                        (aggr: number[], note, idx) =>
-                            note.canonicalSymbol == KEMPLI_BEAT_CHAR ? aggr.concat([idx]) : aggr,
-                        []
-                    )
-                    if (indices.length == 0) return ''
-                    // Generate the gradient functions
-                    // Fill transparent color until the first
-                    var gradients = indices[0] != 0 ? `transparent 0 calc(${indices[0]}ch), ` : ''
-                    gradients += indices
-                        .map((index, idx, arr) => {
-                            const transpEnd = idx < arr.length - 1 ? `calc(${arr[idx + 1]}ch)` : '100%'
-                            const css =
-                                `${gridColors.kempli} ${index}ch calc(${index}ch + 2px),
-                                transparent calc(${index}ch + 2px) ` + transpEnd
-                            return css
-                        })
-                        .join(', ')
-                    return `linear-gradient(to right, ` + gradients + '),'
-                }
-                case 'off':
-                default:
-                    return ''
-            }
-        }
-
-        function cursorHighlight(cursor: EditorCursor | null): string {
-            if (!cursor || cursor.sysUuid != systemData.uuid) return ''
-            var start = cursor.beatSlice.start
-            var end = cursor.beatSlice.end
-            // If user cursor setting is system, highlight the entire system.
-            // Do nothing if end==0: this is the 'cursor off' message.
-            if (cursorStyleRef.current == 'System' && end != 0) {
-                start = 0
-                end = cursor.lastColumn
-            }
-
-            const highlight = `linear-gradient(
-                to right,
-                transparent 0 calc(${start}ch - 2px),
-                ${gridColors.cursor} calc(${start}ch - 2px) calc(${end}ch - 2px),
-                transparent calc(${end}ch) 100%),`
-            return highlight
-        }
-
-        if (!notationAreaRef.current) return
-        const firstStaff = Object.values(systemData.staffs)[0]
-        const totalWidth = firstStaff?.objNotation.length ?? 0
-
-        const highlight = cursorHighlight(cursor)
-        const kempliLines = kempliGrid(systemData)
-        // Hides the superfluous gridlines which are generated with a recurring pattern
-        const gridlineHider = `linear-gradient(to right, transparent 0 calc(${totalWidth}ch - 1px), ${gridColors.background} ${totalWidth}ch 100%),`
-        const gridlines = `repeating-linear-gradient(
-            to right,
-            ${gridColors.grid} 0px 1px,
-            transparent 1px 1ch
-        )`
-        notationAreaRef.current.style.setProperty('background', highlight + gridlineHider + kempliLines + gridlines)
-        /* Centers lines on characters */
-        notationAreaRef.current.style.setProperty(
-            'background-position',
-            `
-            left,
-            calc(0.5ch - 2px) 0,
-            calc(0.5ch - 2px) 0,
-            calc(0.5ch - 2px) 0
-`
-        )
-        notationAreaRef.current.style.setProperty('background-repeat', 'repeat-x')
-    }
-
     useEffect(() => {
         debug(`System ${systemData.uuid} updating editorcursor function`)
         updateCursorFunction(systemData.uuid, moveEditorCursor)
@@ -195,8 +109,21 @@ export const SystemNode = memo(function SystemNode({
         }
     }, [audioState])
 
+    // Redraw background gridlines
     useEffect(() => {
-        setGrid(systemData, playbackCursor)
+        const style = createGridStyle({
+            beatColWidths,
+            kempliFrequency: systemData.kempli.frequency || null,
+            cursor: playbackCursor,
+            cursorStyle: playbackCursor?.sysUuid == systemData.uuid ? cursorStyleRef.current : 'None',
+            gridColors: gridColorsExpanded
+        })
+        // Need to set the style directly because the grid includes the cursor which should move
+        // in sync with the audio. Letting the notation area's style depend on a state variable will
+        // cause the grid + cursor to change at the next re-render. This causes an unacceptable lag.
+        _.entries(style).forEach(([key, value]) => {
+            if (notationAreaRef.current != null) notationAreaRef.current.style[key as keyof StyleProperties] = value
+        })
     }, [systemData, playbackCursor])
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {

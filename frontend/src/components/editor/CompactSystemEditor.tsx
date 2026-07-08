@@ -63,6 +63,7 @@ export function CompactSystemEditor({
 
     const fontClass = `balifontspaced${editorFontSize}`
 
+    // Redraw background gridlines
     useEffect(() => {
         const style = createGridStyle({
             beatColWidths,
@@ -76,7 +77,7 @@ export function CompactSystemEditor({
         // Width (in columns) shared by every row so the grids line up.
         const maxCols = Math.max(sumBeats, ...lines.map((l) => l.measures.reduce((a, m) => a + m.length, 0)), 1)
         setMaxCols(maxCols)
-    }, [])
+    }, [beatColWidths])
 
     return (
         <div

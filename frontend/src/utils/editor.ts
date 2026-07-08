@@ -54,7 +54,7 @@ export function createGridStyle({
                         transparent 2px ${kempliFrequency}ch
                         ),`
         } else if (beatColWidths && beatColWidths.length > 0) {
-            // Get the kempli notation for the entire system
+            // Irregular kempli beats (from notation)
             const indices = [0]
             for (const width of beatColWidths) {
                 indices.push(indices[indices.length - 1] + width)
@@ -108,7 +108,7 @@ export function createGridStyle({
             transparent 1px 1ch
         )`
     return {
-        background: highlight + gridlineHider + kempliLines + gridlines,
+        backgroundImage: highlight + gridlineHider + kempliLines + gridlines,
         backgroundPosition: `
             left,
             calc(0.5ch - 2px) 0,
