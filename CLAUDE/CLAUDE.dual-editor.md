@@ -149,6 +149,32 @@ MVP boundaries (deferred):
 - Enable add/remove positions to groups. Only allow to add positions that do not occur yet in the current system. 
 Adding a position that already has its own notation pops the warning you described before overwriting it with the cast result.
 
+#### Step 4 — agreed approach (design)
+
+Everything here is a mutation of `System.groups` (each `NotationGroup.positions` / `.notation`); edits flow through the existing `entryColWidths → flattenCompact → expandSystem` commit path — no new expansion machinery. Group-structure edits commit **immediately** (not the 300 ms typing debounce).
+
+**Membership rule — strict "unused only".** A position lives in exactly one group. Every picker offers `universe \ used`, where `used = ⋃ group.positions` and `universe = positionOrder` minus `used`. `KEMPLI` is included in `universe` **only when `system.kempli.state === 'notation'`** (i.e. the kempli is written as notation rather than derived from a frequency); otherwise it is excluded. No move / overwrite / confirm-dialog path (dropped).
+
+**Aggregation validity — `allowedGroups`.** A group's positions are valid iff they are all contained in one `allowedGroups[]` array (in `castingRulesManager`). Helpers, co-located with `allowedGroups`:
+- adding to a group offers only `p ∈ (universe \ used)` such that `group.positions ∪ {p}` ⊆ some `allowedGroups` entry;
+- a fresh solo staff accepts any `p ∈ (universe \ used)` (a single position is trivially valid).
+
+**KEMPLI.** `KEMPLI` is offered as an addable/editable staff **only while `system.kempli.state === 'notation'`** (see the universe rule above); when the kempli is frequency-driven it is not an editable position. When a `KEMPLI` group is present, `expandSystem` already sets `kempli.state = 'notation'` (`hasKempliStaff`), so the two stay consistent.
+
+**Labels — `positionGroups` + `positionAbbr` (rewrite `compactGroupLabel`).** Greedily cover the position set with the largest matching `positionGroups` entries, render each covered piece (and any leftover single positions) via `positionAbbr` (falling back to the position/group name), and join with `/` → `ga/ugal`, `reyong13`, `pokok`. The `tooltip` stays the full comma-separated position names (bullet 1); the chip keeps `title={tooltip}` (optionally upgraded to a `Whisper`).
+
+**Controller ops (`useCompactSystemEditor`).**
+- `addLine(atIndex, position)` — insert `{ id, positions:[position], measures: beatColWidths.map(() => []) }` (empty → rests); move cursor into it. Disabled when `universe \ used` is empty.
+- `removeLine(index)` — drop the group; clamp cursor.
+- `addPosition(lineIndex, position)` — append to `positions` (candidates constrained as above).
+- `removePosition(lineIndex, position)` — **split into a solo staff**: remove `p` from the group and insert a new solo group `{ positions:[p], notation: cast of the group's compact measures to p }` so `p` keeps the notation it had. The cast is a small helper next to `castNotation` (`castGroupToSolo(measures, groupPositions, p)`), preserving norot shorthand; disallow removing a group's **last** position (remove the line instead).
+
+**UI (`CompactSystemEditor`).** Per-line control cluster by the label chip: add-above / add-below / remove-line `IconButton`s (disabled states per the rules); clicking the label chip opens a `Popover` showing the group's positions as removable chips + a picker limited to the valid candidates.
+
+**Wiring (`SystemNode`).** Pass `availablePositions` (the `universe`) down; commit path unchanged, so added/removed positions and lines flow to the derived staffs, kempli and playback.
+
+**Edge cases.** Removing the last line leaves an empty system (dovetails with Step 5's "new empty system"); adding an empty line doesn't change `beatColWidths`; removing a line that held a beat's widest norot correctly shrinks that beat on the next `entryColWidths` recompute.
+
 ### Step 5 — Compact view editor refinement (part 2), separate expanded view
 - Remove the expanded view from the compact view and display it separately. Add a toggle above the editor window to switch between both.
 - In the expanded view all `SummaryItems` should be disabled. Editing should only be possible in the compact view.
