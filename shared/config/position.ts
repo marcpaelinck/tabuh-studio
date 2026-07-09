@@ -38,33 +38,34 @@ export const positionGroups: Record<PositionGroup, Position[]> = {
     REYONG_13: ['REYONG_1', 'REYONG_3'],
     REYONG_24: ['REYONG_2', 'REYONG_4'],
     REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'],
-    POKOK: ['CALUNG', 'JEGOGAN']
+    POKOK: ['CALUNG', 'JEGOGAN', 'PENYACAH']
 }
 
 export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
-    PEMADE_POLOS: 'pemP',
-    PEMADE_SANGSIH: 'pemS',
-    KANTILAN_POLOS: 'kanP',
-    KANTILAN_SANGSIH: 'kanS',
-    PEMADE: 'pem',
-    KANTILAN: 'kan',
-    GANGSA_POLOS: 'gaP',
-    GANGSA_SANGSIH: 'gaS',
-    GANGSA: 'ga',
-    REYONG_1: 'rey1',
-    REYONG_2: 'rey2',
-    REYONG_3: 'rey3',
-    REYONG_4: 'rey4',
-    REYONG_13: 'rey13',
-    REYONG_24: 'rey24',
-    REYONG: 'rey',
-    UGAL: 'ug',
-    PENYACAH: 'peny',
-    CALUNG: 'cal',
-    JEGOGAN: 'jeg',
-    POKOK: 'pok',
-    KEMPLI: 'kpl',
-    CENGCENG: 'cng2'
+    PEMADE_POLOS: 'pemadeP',
+    PEMADE_SANGSIH: 'pemadeS',
+    KANTILAN_POLOS: 'kantilanP',
+    KANTILAN_SANGSIH: 'kantilanS',
+    PEMADE: 'pemade',
+    KANTILAN: 'kantilan',
+    GANGSA_POLOS: 'gangsaP',
+    GANGSA_SANGSIH: 'gangsaS',
+    GANGSA: 'gangsa',
+    REYONG_1: 'reyong1',
+    REYONG_2: 'reyong2',
+    REYONG_3: 'reyong3',
+    REYONG_4: 'reyong4',
+    REYONG_13: 'reyong13',
+    REYONG_24: 'reyong24',
+    REYONG: 'reyong',
+    UGAL: 'ugal',
+    PENYACAH: 'penyacah',
+    CALUNG: 'calung',
+    JEGOGAN: 'jegogan',
+    POKOK: 'pokok',
+    KEMPLI: 'kempli',
+    CENGCENG: 'cengceng',
+    GONGS: 'gongs'
 }
 
 //prettier-ignore
