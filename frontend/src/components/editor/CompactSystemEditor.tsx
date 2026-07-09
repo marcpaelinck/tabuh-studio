@@ -18,7 +18,7 @@
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useEffect, useState, type CSSProperties } from 'react'
-import { Button, Popover, Tag, Whisper } from 'rsuite'
+import { Button, Popover, Tag, Tooltip, Whisper } from 'rsuite'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
@@ -56,8 +56,20 @@ export function CompactSystemEditor({
     className,
     style
 }: CompactSystemEditorProps) {
-    const { lines, cursor, focused, onKeyDown, onPaste, onFocus, onBlur, setCursor, addLine, removeLine, addPosition, removePosition } =
-        useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
+    const {
+        lines,
+        cursor,
+        focused,
+        onKeyDown,
+        onPaste,
+        onFocus,
+        onBlur,
+        setCursor,
+        addLine,
+        removeLine,
+        addPosition,
+        removePosition
+    } = useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
     const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
@@ -103,10 +115,7 @@ export function CompactSystemEditor({
                 <div className="text-xs font-semibold mb-1">Staff positions</div>
                 <div className="flex flex-wrap gap-1 mb-2 max-w-64">
                     {line.positions.map((p) => (
-                        <Tag
-                            key={p}
-                            closable={line.positions.length > 1}
-                            onClose={() => removePosition(li, p)}>
+                        <Tag key={p} closable={line.positions.length > 1} onClose={() => removePosition(li, p)}>
                             {positionName(p)}
                         </Tag>
                     ))}
@@ -181,10 +190,11 @@ export function CompactSystemEditor({
                             onClose={() => setNewPositions([])}
                             speaker={linePopover(li, line)}>
                             <div
-                                title={tooltip}
                                 className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
                                 style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px' }}>
-                                {label}
+                                <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
+                                    {label}
+                                </Whisper>
                             </div>
                         </Whisper>
                         <div className={`relative ${fontClass}`} style={{ width: `${maxCols}ch`, whiteSpace: 'pre' }}>
