@@ -3,6 +3,7 @@
 
 import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
 import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes.ts'
+import _ from 'lodash'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
 type CastingInstructionType = 'nokempyung' | 'norot'
@@ -193,9 +194,7 @@ export function castNotation(
 // valid aggregations can be formed). An empty group accepts any available position.
 export function candidatesFor(groupPositions: Position[], available: Position[]): Position[] {
     if (groupPositions.length === 0) return available
-    return available.filter((p) =>
-        allowedGroups.some((grp) => [...groupPositions, p].every((x) => grp.includes(x)))
-    )
+    return available.filter((p) => allowedGroups.some((grp) => [...groupPositions, p].every((x) => grp.includes(x))))
 }
 
 // Splits a position `p` out of a multi-position group into its own solo staff,
@@ -210,4 +209,108 @@ export function castGroupToSolo(
     if (posIdx < 0) return notation
     const flat = notation.map((note) => (note.toString() || SPACE_CHAR) as NoteSymbol)
     return castNotation({ id: '', positions: groupPositions, notation: flat }, posIdx, castingInstructions)
+}
+
+// ______________ AGGREGATION RULES _______________
+
+// Aggregation rules determine which rule to apply for each possible combination of instruments.
+// Only these combinations may be aggregated. Aggregation should be tried in the sequence in which
+// they occur here.
+const aggregationRules: { group: Position[]; rules: RuleName[] }[] = [
+    {
+        group: [
+            'PEMADE_POLOS',
+            'KANTILAN_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_SANGSIH',
+            'UGAL',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4'
+        ],
+        rules: ['default', 'default', 'default', 'default', 'default', 'default', 'default', 'default', 'default']
+    },
+    {
+        group: ['PEMADE_POLOS', 'KANTILAN_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_SANGSIH', 'UGAL'],
+        rules: ['default', 'default', 'default', 'default', 'default']
+    },
+    {
+        group: [
+            'PEMADE_POLOS',
+            'KANTILAN_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_SANGSIH',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4'
+        ],
+        rules: ['default', 'default', 'default', 'default', 'default', 'default', 'default', 'default']
+    },
+    { group: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'], rules: ['default', 'default', 'default', 'default'] },
+    { group: ['PEMADE_POLOS', 'KANTILAN_POLOS'], rules: ['default', 'default'] },
+    { group: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'], rules: ['nokempyung', 'nokempyung'] },
+    { group: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], rules: ['default', 'default'] },
+    { group: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], rules: ['default', 'default'] },
+    { group: ['REYONG_1', 'REYONG_3'], rules: ['nokempyung', 'nokempyung'] },
+    { group: ['REYONG_2', 'REYONG_4'], rules: ['nokempyung', 'nokempyung'] }
+]
+
+type InverseCastingRule = Record<NoteSymbol, NoteSymbol[]>
+type InversePositionRuleSet = Partial<Record<RuleName, InverseCastingRule>>
+type InverseCastingRuleSet = Partial<Record<Position, InversePositionRuleSet>>
+
+// Inverts the casting rules. The result maps position notes to a list of corresponding grouped notation notes.
+const inverseCastingRules: InverseCastingRuleSet = _.fromPairs(
+    _.entries(castingRules).map(([position, rule]) => [
+        position,
+        _.fromPairs(
+            _.entries(rule).map(([name, mapping]) => [
+                name,
+                _.entries(mapping).reduce(
+                    (aggr, [a, b]) => {
+                        if (!(b in aggr)) aggr[b] = []
+                        aggr[b].push(a)
+                        return aggr
+                    },
+                    {} as Record<string, string[]>
+                )
+            ])
+        )
+    ])
+)
+
+// This function performs the opposite of `castNotation`: it tries to group separate notations.
+// Returns a new notation if aggregation is possible, otherwise undefined.
+export function aggregateNotation(groups: Partial<Record<Position, NoteSymbol[]>>): GroupedNotation | undefined {
+    // Create a mapping: position -> rule
+    const positions = _.keys(groups)
+    const groupRules = aggregationRules.find((grouping) => _.difference(grouping.group, positions).length == 0)
+    if (!groupRules) return undefined
+    const ruleMap: Partial<Record<Position, RuleName>> = _.fromPairs(_.zip(groupRules.group, groupRules.rules))
+
+    // Create staffs where each item of the notation contains all possible grouped notation equivalents
+    const alternatives = _.entries(groups).map(([pos, notation]) =>
+        notation.map((note) => {
+            const mapping: InverseCastingRule | undefined =
+                inverseCastingRules[pos as Position]![ruleMap[pos as Position] as RuleName]
+            return mapping ? (mapping[note] ?? []) : []
+        })
+    )
+    // Create a grouped notation by selecting a symbol for each column that occurs in all alternatives in that column.
+    const nrColumns = Math.max(...alternatives.map((notation) => notation.length))
+    const notation: NoteSymbol[] = []
+    var valid = true
+    for (var col = 0; col < nrColumns && valid; col++) {
+        const column: NoteSymbol[][] = alternatives.map((notation) => notation[col] ?? [])
+        const options = new Set(column.flat()) // The candidates to consider as grouped notation for this column
+        for (const symbol of options) {
+            if (column.every((alt) => alt.includes(symbol as NoteSymbol))) {
+                notation[col] = symbol
+                break
+            }
+        }
+        valid = false
+    }
 }

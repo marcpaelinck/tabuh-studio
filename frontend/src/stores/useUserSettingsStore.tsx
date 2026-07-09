@@ -2,7 +2,7 @@ import type { Position } from '@tabuhstudio/shared'
 import { create, type StoreApi, type UseBoundStore } from 'zustand'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
-import type { UserSelections } from '../typing/playback'
+import type { EditorView, UserSelections } from '../typing/playback'
 
 export const panggulDefaultOption: ExtendedOption<Position[]> = { label: 'Hide', value: 'Hide', objValue: [] }
 export const focusDefaultOption: ExtendedOption<Position[]> = { label: 'No Focus', value: 'No Focus', objValue: [] }
@@ -14,9 +14,11 @@ export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = cr
     selectedSpeedOption: speedDefaultOption,
     selectedPanggulOption: panggulDefaultOption,
     selectedCursorStyle: 'Beat' as PlaybackCursorStyle,
+    editorView: 'compact' as EditorView,
     setSelectedScoreOption: (option: ExtendedOption<ScoreInfo> | null) => set(() => ({ selectedScoreOption: option })),
     setSelectedFocusOption: (option: ExtendedOption<Position[]>) => set(() => ({ selectedFocusOption: option })),
     setSelectedSpeedOption: (option: ExtendedOption<number>) => set(() => ({ selectedSpeedOption: option })),
     setSelectedPanggulOption: (option: ExtendedOption<Position[]>) => set(() => ({ selectedPanggulOption: option })),
-    setSelectedCursorStyle: (option: PlaybackCursorStyle) => set(() => ({ selectedCursorStyle: option }))
+    setSelectedCursorStyle: (option: PlaybackCursorStyle) => set(() => ({ selectedCursorStyle: option })),
+    setEditorView: (view: EditorView) => set(() => ({ editorView: view }))
 }))

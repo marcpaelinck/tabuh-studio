@@ -3,9 +3,14 @@
  *
  * Renders each symbol in its own span (preserving the font's intra-symbol
  * negative spacing) and draws the blinking cursor between whole symbols when
- * `cursorIndex` is non-null. Clicking a symbol reports the nearest boundary;
- * clicking past the end reports the trailing position. It is purely
+ * `cursorIndex` is non-null. Pressing on a symbol reports the nearest boundary;
+ * pressing past the end reports the trailing position. It is purely
  * presentational — all state lives in the controller.
+ *
+ * The cursor is placed on `mousedown` (not `click`), like a real text editor: this
+ * captures the target at press time, before focusing the editor can re-render and
+ * shift the layout (e.g. the expansion snippet appearing), which would otherwise
+ * make the trailing `click` land on the wrong staff.
  */
 
 import type { NoteObject } from '@tabuhstudio/shared'
@@ -20,7 +25,7 @@ export interface StaffLineProps {
 }
 
 export function StaffLine({ symbols, cursorIndex, onSymbolClick, onTrailingClick }: StaffLineProps) {
-    function handleSymbolClick(e: MouseEvent<HTMLSpanElement>, index: number) {
+    function handleSymbolPress(e: MouseEvent<HTMLSpanElement>, index: number) {
         e.stopPropagation()
         const rect = e.currentTarget.getBoundingClientRect()
         const mid = rect.left + rect.width / 2
@@ -30,13 +35,13 @@ export function StaffLine({ symbols, cursorIndex, onSymbolClick, onTrailingClick
     return (
         <div
             style={{ whiteSpace: 'pre', lineHeight: 'inherit', minHeight: '1em' }}
-            onClick={(e) => {
+            onMouseDown={(e) => {
                 e.stopPropagation()
                 onTrailingClick()
             }}
         >
             {symbols.map((sym, index) => (
-                <span key={index} onClick={(e) => handleSymbolClick(e, index)}>
+                <span key={index} onMouseDown={(e) => handleSymbolPress(e, index)}>
                     {cursorIndex === index && <Cursor />}
                     <span>{sym.toString()}</span>
                 </span>

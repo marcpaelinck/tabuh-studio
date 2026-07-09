@@ -169,15 +169,21 @@ export type PlaybackAction = {
 
 export type EditorCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo; lastColumn: number }
 
+// Which editor view is shown: the editable compact (grouped) view, or the
+// read-only expanded (per-position) view.
+export type EditorView = 'compact' | 'expanded'
+
 export interface UserSelections {
     selectedScoreOption: ExtendedOption<ScoreInfo> | null
     selectedFocusOption: ExtendedOption<Position[]>
     selectedSpeedOption: ExtendedOption<number>
     selectedPanggulOption: ExtendedOption<Position[]>
     selectedCursorStyle: PlaybackCursorStyle
+    editorView: EditorView
     setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedCursorStyle: Dispatch<PlaybackCursorStyle>
+    setEditorView: Dispatch<EditorView>
 }

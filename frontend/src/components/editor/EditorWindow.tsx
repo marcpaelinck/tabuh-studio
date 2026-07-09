@@ -2,12 +2,13 @@ import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Col, Grid, Placeholder, Row, useDialog, VStack } from 'rsuite'
+import { Col, Grid, Placeholder, Row, SegmentedControl, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     EditorCursorParameters,
+    EditorView,
     PlaybackAction,
     PlaybackCallbackFunctions,
     PlaybackState
@@ -55,6 +56,8 @@ export default function EditorWindow({
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
     const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
+    const editorView = useUserSelectionStore((state) => state.editorView)
+    const setEditorView = useUserSelectionStore((state) => state.setEditorView)
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -205,6 +208,19 @@ export default function EditorWindow({
         <ExecutionFormContext.Provider value={setExecutionFormOpen}>
             <div className="contents" inert={openFormCount > 0 ? true : undefined}>
                 <VStack id="Editor Window">
+                    {/* View toggle: editable compact (grouped) view vs read-only expanded view.
+                        Sticky so it stays pinned at the top while the systems scroll beneath it. */}
+                    <div className="sticky top-0 z-10 w-full bg-white pb-1">
+                        <SegmentedControl
+                            size="sm"
+                            value={editorView}
+                            onChange={(value) => setEditorView(value as EditorView)}
+                            data={[
+                                { label: 'Compact', value: 'compact' },
+                                { label: 'Expanded', value: 'expanded' }
+                            ]}
+                        />
+                    </div>
                     {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
                 </VStack>
             </div>

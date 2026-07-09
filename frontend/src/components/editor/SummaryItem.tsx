@@ -50,6 +50,7 @@ interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field. Used for validation.
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string | number>[]
+    disabled?: boolean // read-only mode (e.g. the expanded view): no button action, no field editing
 }
 
 // This Element displays a single System attribute. The element containing a button and/or a value field.
@@ -64,6 +65,7 @@ export function SummaryItem({
     gototargets,
     execute,
     options,
+    disabled,
     ...props
 }: SummaryItemProps) {
     // Specifications of the display mode and functionality of each SummaryItem type.
@@ -177,7 +179,7 @@ export function SummaryItem({
             ]
         }
     }
-    const [editing, setEditing] = useState<boolean>(itemSpecs[item].fieldeditwhen == 'always')
+    const [editing, setEditing] = useState<boolean>(itemSpecs[item].fieldeditwhen == 'always' && !disabled)
     const inputRef = useRef<HTMLInputElement & PickerHandle>(null)
     const [warning, setWarning] = useState<string | null>(null)
     const setExecutionFormOpen = useContext(ExecutionFormContext)
@@ -211,8 +213,14 @@ export function SummaryItem({
         }
     }, [editing])
 
+    // Cancel any editing when the item becomes disabled (e.g. switching to the expanded view).
+    useEffect(() => {
+        if (disabled) setEditing(false)
+    }, [disabled])
+
     // Action performed on button click.
     function buttonAction(event: any, action: string) {
+        if (disabled) return
         if (itemSpecs[item].fieldeditwhen == 'afterbuttonclick') {
             setEditing(true)
             return
@@ -350,6 +358,7 @@ export function SummaryItem({
                     <IconButton
                         size="sm"
                         as={'span'}
+                        disabled={disabled}
                         icon={summaryIcon}
                         onClick={(event: MouseEvent<HTMLElement>) => {
                             buttonAction(event, itemSpecs[item].action)

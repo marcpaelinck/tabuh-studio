@@ -20,6 +20,7 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { editorFontSize, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
@@ -29,7 +30,7 @@ import type {
     PlaybackAction,
     PlaybackType
 } from '../../typing/playback'
-import type { Score, Staffs, System } from '../../typing/score'
+import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { createGridStyle, gridColorsExpanded } from '../../utils/editor'
 import { FeatureUnderDevelopment } from '../Feature'
@@ -80,6 +81,11 @@ export const SystemNode = memo(function SystemNode({
     const notationAreaRef = useRef<HTMLTextAreaElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
 
+    // Global editor view (compact = editable grouped view; expanded = read-only per-position).
+    const editorView = useUserSelectionStore((state) => state.editorView)
+    const headerDisabled = editorView === 'expanded' // SummaryItems are read-only in the expanded view
+    const playing = ['playing', 'paused'].includes(audioState) // hide the expansion snippet while playing
+
     const gridColors = {
         cursor: 'rgba(255, 255, 0, 0.5)',
         kempli: 'rgba(0, 255, 0, 0.8)',
@@ -124,7 +130,8 @@ export const SystemNode = memo(function SystemNode({
         _.entries(style).forEach(([key, value]) => {
             if (notationAreaRef.current != null) notationAreaRef.current.style[key as keyof StyleProperties] = value
         })
-    }, [systemData, playbackCursor])
+        // editorView so the grid repaints when the expanded textarea (re)mounts on a view switch.
+    }, [systemData, playbackCursor, editorView])
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
         return (
@@ -178,10 +185,16 @@ export const SystemNode = memo(function SystemNode({
         return (
             <>
                 <SCol span={2}>
-                    <SummaryItem item="id" sysData={systemData} />
+                    <SummaryItem item="id" sysData={systemData} disabled={headerDisabled} />
                 </SCol>
                 <SCol span={4}>
-                    <SummaryItem item="label" labels={labels} sysData={systemData} execute={execute} />
+                    <SummaryItem
+                        item="label"
+                        labels={labels}
+                        sysData={systemData}
+                        execute={execute}
+                        disabled={headerDisabled}
+                    />
                 </SCol>
                 <SCol span={6}>
                     <SummaryItem
@@ -189,23 +202,32 @@ export const SystemNode = memo(function SystemNode({
                         sysData={systemData}
                         options={systemSelectorOptions(systemData, false, false)}
                         execute={execute}
+                        disabled={headerDisabled}
                     />
                 </SCol>
                 <SCol span={4}>
-                    <SummaryItem item="new" sysData={systemData} execute={execute} />
+                    <SummaryItem item="new" sysData={systemData} execute={execute} disabled={headerDisabled} />
                     <SummaryItem
                         item="copy"
                         sysData={systemData}
                         options={systemSelectorOptions(systemData, true, false)}
                         execute={execute}
+                        disabled={headerDisabled}
                     />
-                    <SummaryItem item="delete" gototargets={gotoTargets} sysData={systemData} execute={execute} />
+                    <SummaryItem
+                        item="delete"
+                        gototargets={gotoTargets}
+                        sysData={systemData}
+                        execute={execute}
+                        disabled={headerDisabled}
+                    />
                 </SCol>
                 <SCol span={2}>
                     <SummaryItem
                         item="kempli"
                         sysData={systemData}
                         execute={execute}
+                        disabled={headerDisabled}
                         options={Array(16)
                             .fill(0)
                             .map((_, idx) => {
@@ -215,7 +237,7 @@ export const SystemNode = memo(function SystemNode({
                 </SCol>
             </>
         )
-    }, [systemData])
+    }, [systemData, headerDisabled])
 
     // Generate the content in a fixed sorting order.
     const sortedStaffEntries = _.entries(systemData.staffs).sort(
@@ -233,21 +255,6 @@ export const SystemNode = memo(function SystemNode({
         position: position as Position,
         symbols: staff.objNotation
     }))
-
-    // Committing an edit re-renders the whole score and rewrites the local cache,
-    // so it is debounced: the editor shows changes instantly (it owns its state);
-    // the score only catches up once typing pauses. The pending edit is flushed on
-    // unmount so nothing is lost when navigating away. The commit closure always
-    // sees the current systemData (useDebouncedCommit keeps the latest version).
-    const { schedule: handleStavesChange } = useDebouncedCommit((staves: EditorStaff[]) => {
-        const newStaffs: Staffs = { ...systemData.staffs }
-        staves.forEach(({ position, symbols }) => {
-            const prev = newStaffs[position]
-            if (!prev) return
-            newStaffs[position] = { ...prev, objNotation: symbols, notation: NoteObject.toNotation(symbols) }
-        })
-        updateSystem({ ...systemData, staffs: newStaffs })
-    }, 300)
 
     // The compact (grouped/shorthand) view is the editable surface for systems that
     // have a canonical `groups` store. See CLAUDE.dual-editor.md.
@@ -284,6 +291,8 @@ export const SystemNode = memo(function SystemNode({
 
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
+        // Groups are leading: a system with no groups shows nothing.
+        if (!hasGroups) return null
         const positionTitlesFont = `courierfont${10}`
         const notationFont = `balifontspaced${editorFontSize}`
         const rows = _.keys(systemData.staffs).length
@@ -293,7 +302,7 @@ export const SystemNode = memo(function SystemNode({
                     {systemHeaderButtons}
                     {systemHeaderFields}
                 </Row>
-                {hasGroups && (
+                {editorView === 'compact' ? (
                     <Row id="CompactNotation">
                         <Col span={23}>
                             {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
@@ -305,14 +314,16 @@ export const SystemNode = memo(function SystemNode({
                                     kempliFrequency={systemData.kempli.frequency}
                                     availablePositions={availablePositions}
                                     castingInstructions={systemData.castingInstructions}
+                                    staffs={systemData.staffs}
+                                    playing={playing}
                                     onChange={handleCompactChange}
                                     className="border-1 border-solid border-gray-200 p-1"
                                 />
                             </FeatureUnderDevelopment>
                         </Col>
                     </Row>
-                )}
-                <Row id="SystemNotation">
+                ) : (
+                    <Row id="SystemNotation">
                     <Col span={3} id="Positions">
                         <Textarea
                             disabled
@@ -344,17 +355,17 @@ export const SystemNode = memo(function SystemNode({
                             />
                             <SystemNotationEditor
                                 initialStaves={editorStaves}
-                                onChange={handleStavesChange}
-                                readOnly={hasGroups}
+                                readOnly
                                 className="leading-5.5 border-1 border-solid border-transparent p-0"
                                 style={{ position: 'absolute', inset: 0, zIndex: 2 }}
                             />
                         </div>
                     </Col>
                 </Row>
+                )}
             </Grid>
         )
-    }, [systemData, playbackCursor, audioState, playbackType])
+    }, [systemData, playbackCursor, audioState, playbackType, editorView, playing])
 
     return notationArea
 })
