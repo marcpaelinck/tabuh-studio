@@ -152,7 +152,7 @@ MVP boundaries (deferred):
 - Enable add/remove positions to groups. Only allow to add positions that do not occur yet in the current system. 
 Adding a position that already has its own notation pops the warning you described before overwriting it with the cast result.
 
-#### Step 4 — agreed approach (design)
+#### Implementation
 
 Everything here is a mutation of `System.groups` (each group's `positions` / `.notation`); edits flow through the commit path (`NoteObject.toNotation` → `expandSystem`) — no new expansion machinery. Group-structure edits commit **immediately** (not the 300 ms typing debounce).
 
@@ -179,11 +179,21 @@ Everything here is a mutation of `System.groups` (each group's `positions` / `.n
 **Edge cases.** Removing the last line leaves an empty system (dovetails with Step 5's "new empty system"). The grid re-derives from `beatSlices` (via `getBeatSlices`) on each commit, so adding/removing lines and positions is reflected automatically.
 
 ### Step 5 — Compact view editor refinement (part 2), separate expanded view
-- In the compact view display a read-only expanded view immediately below the grouped staff which contains the editing cursor. The expanded view should only display the staffs for the positions that are in the grouped staff. If the editor cursor is not visible no expanded view should be displayed.
-- Remove the expanded systems from the compact view and display them in a separate expanded view. Add a toggle above the editor window to switch between the compact view and the editor view.
+- In the compact view display a read-only expanded view immediately below the grouped staff which contains the editing cursor. The expanded staff view should only display the staffs for the positions that are in the grouped staff. If the editor cursor is not visible no expanded staff view should be displayed.
+- Remove the expanded systems from the compact view and display them in a separate view. Add a toggle above the editor window to switch between the compact view and the editor view.
+- Playback should be enabled both in the compact and the expanded view. Don't implement the cursor in the compact view yet, we'll get to that once we agree on the new architecture for the split editor view concept.
 - During playback the expanded staffs in the compact view should be hidden.
 - In the expanded view all `SummaryItems` should be disabled. Editing should only be possible in the compact view.
-- Playback should be possible both in the compact and the expanded view. Don't implement the cursor in the compact view yet, we'll get to that once we agree on the new architecture for the combined views.
+
+#### Implementation
+
+- **`groups` are leading.** A system with no groups renders nothing (`SystemNode` returns `null`). The legacy editable per-position path was removed: the expanded view is now **always read-only**, and editing happens only in the compact view. (laras is being adapted to emit one-position groups; a brand-new empty system with `groups: []` therefore shows nothing until Step 6 seeds it.)
+- **View toggle.** `editorView: 'compact' | 'expanded'` lives in `useUserSelectionStore` (typed in `typing/playback.ts`). `EditorWindow` renders a `SegmentedControl` at the top, wrapped in a `sticky top-0` bar so it stays pinned while the systems scroll. `SystemNode` subscribes to the store directly (no prop threading, so `React.memo` stays effective).
+- **`SystemNode` branch.** In **compact** view it renders only the `CompactSystemEditor`; in **expanded** view it renders only the read-only per-position notation (the textarea + `SystemNotationEditor readOnly`, which also carries the playback highlight). The header (`PlaybackButtons` + `SummaryItem`s) is shown in both; the `SummaryItem`s get `disabled={editorView === 'expanded'}`.
+- **`SummaryItem.disabled`.** New prop that blocks the button action and prevents/cancels field editing (`useEffect` forces `editing = false` when disabled; the `IconButton` is disabled).
+- **Per-line expansion snippet.** `CompactSystemEditor` renders, immediately below the line holding the cursor, read-only `StaffLine`s for just that group's positions, taken from the derived `systemData.staffs` (passed in as `staffs`). Shown only when the editor is **focused** (cursor visible) and **not** while playing (`playing` prop). The snippet uses the same `w-36` label column as the compact staff so its **notation columns line up 1:1** with the compact notation (a norot occupies its 4 padded columns in both); the label is styled to stand out.
+- **Playback.** Audio is view-independent (the header play buttons work in both). No visual cursor is drawn in the compact view yet (deferred): the expanded textarea isn't mounted there, so the grid-paint effect just no-ops; `editorView` was added to that effect's deps so the expanded grid repaints when you switch back.
+- **Caret placement fix.** `StaffLine` places the caret on `mousedown` (not `click`), so the target staff/column is captured at press time — before focusing the editor re-renders and the snippet shifts the layout, which previously made the first click after a scroll land on the wrong staff.
 
 ### Step 6 — Creating a new score
 - Add a menu option `New` under `Notation` in the MainMenu and add functionality that creates a new score. The function should enable the user to fill in the title, instrument type and composer. The first two items are compulsory. The instrument type should be chosen from the possible values of the `InstrumentType` interface, except 'UNDEFINED'.
