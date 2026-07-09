@@ -179,8 +179,13 @@ Everything here is a mutation of `System.groups` (each group's `positions` / `.n
 **Edge cases.** Removing the last line leaves an empty system (dovetails with Step 5's "new empty system"). The grid re-derives from `beatSlices` (via `getBeatSlices`) on each commit, so adding/removing lines and positions is reflected automatically.
 
 ### Step 5 — Compact view editor refinement (part 2), separate expanded view
-- Remove the expanded view from the compact view and display it separately. Add a toggle above the editor window to switch between both.
+- In the compact view display a read-only expanded view immediately below the grouped staff which contains the editing cursor. The expanded view should only display the staffs for the positions that are in the grouped staff. If the editor cursor is not visible no expanded view should be displayed.
+- Remove the expanded systems from the compact view and display them in a separate expanded view. Add a toggle above the editor window to switch between the compact view and the editor view.
+- During playback the expanded staffs in the compact view should be hidden.
 - In the expanded view all `SummaryItems` should be disabled. Editing should only be possible in the compact view.
-- In the compact view display a read-only expanded view below of the staff that contains the editing cursor. The expanded view should be displayed immediately below the staff.
-- Enable to create a new score which should initially contain an empty system.
+- Playback should be possible both in the compact and the expanded view. Don't implement the cursor in the compact view yet, we'll get to that once we agree on the new architecture for the combined views.
 
+### Step 6 — Creating a new score
+- Add a menu option `New` under `Notation` in the MainMenu and add functionality that creates a new score. The function should enable the user to fill in the title, instrument type and composer. The first two items are compulsory. The instrument type should be chosen from the possible values of the `InstrumentType` interface, except 'UNDEFINED'.
+- A new score should initially contain one system with an empty `groups`.
+- The user should be able to modify the title and composer of the score at any time.

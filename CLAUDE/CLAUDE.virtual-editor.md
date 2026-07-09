@@ -9,7 +9,7 @@ Symbols consist of a pitch character and one or more modifier characters. In the
 
 ## The Problem
 
-The developer wants want the editor to be simple and intuitive to use. There are two main aspects that should be tackled:
+The developer wants the editor to be simple and intuitive to use. There are two main aspects that should be tackled:
 1. The editor cursor should always be positioned BETWEEN two symbols, whatever the keyboard or mouse input might be. The fact that a symbol consists of multiple characters should be transparent to the user.
 2. The editor should enable the user to input symbols. It is currently not clear what interface would be the most suited for this.
 
