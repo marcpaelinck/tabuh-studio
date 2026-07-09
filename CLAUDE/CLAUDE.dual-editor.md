@@ -85,27 +85,28 @@ All symbols that are visually aligned vertically must start playing simultaneous
 ## Data model
 
 ```ts
+// Named `GroupedNotation` in the code (typing/score.ts).
 interface NotationGroup {
     id: string
     positions: Position[]    // 1..n; a single-position group is a "solo" line
-    notation: NoteSymbol[]   // FLAT, space-padded compact symbols (measures concatenated)
+    notation: NoteSymbol[]   // FLAT compact symbols (a norot is followed by its space columns)
 }
 // System gains:
-//   groups?: NotationGroup[]                    // CANONICAL compact store
-//   beatColWidths?: number[]                    // per-kempli-beat column widths
+//   groups: GroupedNotation[]                   // CANONICAL compact store
+//   beatSlices: BeatSliceInfo[]                 // per-kempli-beat boundaries (from getBeatSlices)
 //   castingInstructions?: CastingInstruction[]  // system-wide casting context (AUTOKEMPYUNG=off)
 //   staffs stays, but becomes a DERIVED CACHE (recomputed via expandSystem)
 ```
 
 Implementation notes (as built):
 
-- **Flat notation (like a Staff).** A group's `notation` is a single flat `NoteSymbol[]`. The parser builds it by padding each measure with spaces up to that beat's column width and concatenating, so **compact columns line up 1:1 with the expanded notation**. `System.beatColWidths` holds the per-beat column widths used to split the flat notation back into measures and to draw the grid.
-- **Norot occupies its full width.** A column width counts a norot as 4 (`presume norot = 4 symbols`). The parser inline-pads each norot with its 3 trailing spaces (`flattenCompactRaw`). On expansion, the `eatSpaces` mode of `applyPatterns` lets the norot consume those 3 spaces in place (cut off + warning if too few), so the expanded output is byte-identical to the old pipeline — `expandSystem` therefore reproduces the parser staffs (validated by `test:groups`), and the Step-1 goldens are unaffected because the parser's own staff path is unchanged.
-- **Two width counts.** The parser uses `compactColWidths` (norot = 4) on raw measures to allocate room; edits commit through `entryColWidths` (each entry = 1 column) because the editor's measures already contain the norot padding spaces — avoiding double-counting on round-trips.
-- Casting context lives at the **system** level (`System.castingInstructions`); padding is computed across the whole system in a single pass.
+- **Flat notation (like a Staff).** A group's `notation` is a single flat `NoteSymbol[]`. `System.beatSlices` holds the per-beat boundaries, derived by `getBeatSlices` from the kempli (frequency, or the `KEMPLI` staff's beat characters); they're used to draw the grid.
+- **Norot occupies its full width.** A norot occupies 4 columns (`presume norot = 4 symbols`). The **tabuhParser** pads the individual measures with spaces before flattening, so the `group.notation` it returns already has every staff correctly aligned (a norot is followed by its space columns). On expansion, the `eatSpaces` mode of `applyPatterns` consumes those spaces in place (cut off + warning if too few). Outside the parsers, measures do not exist as explicit objects — they can be reconstructed on the fly via `getBeatSlices`. `expandSystem` reproduces the parser staffs (validated by `test:groups`).
+- **Compact editor uses a FLAT model (no measures).** `CompactLine` is `{ id, positions, notation: NoteObject[] }` and the cursor is `{ line, index }` — a flat index into the line's notation (see `CLAUDE.refactor-remove-measure.md`). The earlier per-measure representation (and the `splitFlat`/`flattenCompact`/`entryColWidths` helpers) was removed; columns are now the user's to align with spaces, consistent with the frequency-based grid.
+- Casting context lives at the **system** level (`System.castingInstructions`).
 - `notationGroups` and `editorGroup` are left in place (deprecated, no longer populated).
 - **COPY is deferred.** The parser still produces correct staffs for COPY systems, but those systems are marked (`copyFromUuid`) and **excluded** from groups-based re-derivation on load (they keep their cached staffs). Group-level COPY is a planned follow-up.
-- **Grid (compact view).** `CompactSystemEditor` draws the same background grid as the expanded notation — a gridline every column plus the kempli beats in green — using `beatColWidths` (or the uniform `kempli.frequency`). Each group is rendered as one continuous line; the controller still keeps measures internally, and the cursor is mapped to/from the flat column index.
+- **Grid (compact view).** `CompactSystemEditor` draws the same background grid as the expanded notation — a gridline every column plus the kempli beats in green — using the per-beat widths derived from `beatSlices` (or the uniform `kempli.frequency`). Each group is rendered as one continuous flat line; the cursor is the flat index into the line's notation.
 
 ## Steps
 
@@ -120,6 +121,8 @@ New module `frontend/src/componentlogic/expandNotation.ts` owning the whole comp
 
 `tabuhParser` is rewired to call these (parser and editor then run identical code). A node test pins the expanded `staffs` for fixtures.
 
+> **Superseded.** The pipeline has since been refactored to the flat model: `castGroupedNotationToPositions(system, castInstructions)` → `getBeatSlices(system)` → `applyPatterns(…, beatSlices, eatSpaces)`. `expandParsedStaffs`, `expandGroupedNotation` and `deriveKempli` no longer exist, and `colWidths` is now `System.beatSlices`. See the Implementation notes above and `CLAUDE.refactor-remove-measure.md`.
+
 ### Step 2 — Canonical compact model + derive `staffs` + storage
 
 Add `groups` to `System`; parser populates them (ungrouped positions become single-position groups); `expandSystem(system)` refreshes `staffs`+`kempli` from `groups`. `useScoreReader.postprocessScore` re-derives staffs on load (skipping legacy/laras scores with no groups and COPY systems); `saveScore` already strips `objNotation` and now persists groups + the staffs cache (groups hold plain strings, so nothing extra to strip). Migration: re-run `import:scores:*` for tsv-backed scores (the parser now emits groups) — no separate migration code needed; legacy DB scores without groups keep working off their cached staffs until re-imported. `config.systemKeyOrder` updated; backend Zod needs no change (the score `content` schema uses `.catchall`, so `groups` passes through).
@@ -132,15 +135,15 @@ Verification: `npm run test:groups` parses every fixture and asserts `expandSyst
 
 Implementation notes (as built):
 
-- **`componentlogic/editor/useCompactSystemEditor.ts`** — controller whose lines are groups and whose cursor is `{ line, measure, index }`. Measures (kempli beats) are kept as first-class units so the expansion pipeline still gets per-beat structure; the cursor wraps across measures and lines. All state-machine ops run with an `undefined` position (compact symbols are position-independent), so shorthand/aggregated input is allowed. Reuses `inputStateMachine` and the default `keyMap`.
-- **`components/editor/CompactSystemEditor.tsx`** — renders one row per group: a label chip (`utils/compactGroupLabel.ts`, with the full position list as a tooltip) + the measures, each drawn with the shared `StaffLine`, divided by a thin separator.
+- **`componentlogic/editor/useCompactSystemEditor.ts`** — controller whose lines are groups, each holding a flat `notation: NoteObject[]`; the cursor is `{ line, index }` (flat). Left/right wrap to the adjacent line at the ends; up/down keep the column clamped to the target line. All state-machine ops run with an `undefined` position (compact symbols are position-independent), so shorthand/aggregated input is allowed. Reuses `inputStateMachine` and the default `keyMap`.
+- **`components/editor/CompactSystemEditor.tsx`** — renders one row per group: a label chip (`utils/compactGroupLabel.ts`, with the full position list as a tooltip) + the group's notation drawn as one continuous `StaffLine` over the kempli grid. Clicks pass the flat index straight to the cursor. The label chip opens a popover for group-membership editing (Step 4).
 - **`SystemNotationEditor`** gained a reactive `readOnly` mode: it renders straight from the `initialStaves` prop (so it reflects compact edits flowing through `expandSystem`), shows no cursor, and ignores input.
 - **`SystemNode`** now renders the `CompactSystemEditor` (editable) above the expanded notation, and sets the expanded editor `readOnly` when the system has groups. A second debounced commit rebuilds `groups` from the compact lines, calls `expandSystem`, and `updateSystem`s. Systems without groups (legacy/laras) and COPY systems keep the old editable expanded editor.
 
 MVP boundaries (deferred):
 
 - The per-system **"view expanded"** toggle is Step 5; for now the read-only expanded view is always shown beneath the compact editor (it also carries playback).
-- Compact **paste** is minimal (first clipboard line into the active measure).
+- Compact **paste** is minimal (first clipboard line into the active line at the cursor).
 - Group-membership editing (Step 4) and Lezer validation + save gating (Step 6) are unchanged/later.
 
 ### Step 4 — Compact view editor refinement (part 1)
@@ -151,7 +154,7 @@ Adding a position that already has its own notation pops the warning you describ
 
 #### Step 4 — agreed approach (design)
 
-Everything here is a mutation of `System.groups` (each `NotationGroup.positions` / `.notation`); edits flow through the existing `entryColWidths → flattenCompact → expandSystem` commit path — no new expansion machinery. Group-structure edits commit **immediately** (not the 300 ms typing debounce).
+Everything here is a mutation of `System.groups` (each group's `positions` / `.notation`); edits flow through the commit path (`NoteObject.toNotation` → `expandSystem`) — no new expansion machinery. Group-structure edits commit **immediately** (not the 300 ms typing debounce).
 
 **Membership rule — strict "unused only".** A position lives in exactly one group. Every picker offers `universe \ used`, where `used = ⋃ group.positions` and `universe = positionOrder` minus `used`. `KEMPLI` is included in `universe` **only when `system.kempli.state === 'notation'`** (i.e. the kempli is written as notation rather than derived from a frequency); otherwise it is excluded. No move / overwrite / confirm-dialog path (dropped).
 
@@ -164,16 +167,16 @@ Everything here is a mutation of `System.groups` (each `NotationGroup.positions`
 **Labels — `positionGroups` + `positionAbbr` (rewrite `compactGroupLabel`).** Greedily cover the position set with the largest matching `positionGroups` entries, render each covered piece (and any leftover single positions) via `positionAbbr` (falling back to the position/group name), and join with `/` → `ga/ugal`, `reyong13`, `pokok`. The `tooltip` stays the full comma-separated position names (bullet 1); the chip keeps `title={tooltip}` (optionally upgraded to a `Whisper`).
 
 **Controller ops (`useCompactSystemEditor`).**
-- `addLine(atIndex, position)` — insert `{ id, positions:[position], measures: beatColWidths.map(() => []) }` (empty → rests); move cursor into it. Disabled when `universe \ used` is empty.
+- `addLine(atIndex, positions)` — insert `{ id, positions, notation: [] }` (empty → rests); move cursor into it. Disabled when `universe \ used` is empty. (The UI collects the position selection first, then creates the staff.)
 - `removeLine(index)` — drop the group; clamp cursor.
 - `addPosition(lineIndex, position)` — append to `positions` (candidates constrained as above).
-- `removePosition(lineIndex, position)` — **split into a solo staff**: remove `p` from the group and insert a new solo group `{ positions:[p], notation: cast of the group's compact measures to p }` so `p` keeps the notation it had. The cast is a small helper next to `castNotation` (`castGroupToSolo(measures, groupPositions, p)`), preserving norot shorthand; disallow removing a group's **last** position (remove the line instead).
+- `removePosition(lineIndex, position)` — **split into a solo staff**: remove `p` from the group and insert a new solo group `{ positions:[p], notation: cast of the group's notation to p }` so `p` keeps the notation it had. The cast is a small flat helper next to `castNotation` (`castGroupToSolo(groupPositions, notation, p)`), preserving norot shorthand; disallow removing a group's **last** position (remove the line instead).
 
 **UI (`CompactSystemEditor`).** Per-line control cluster by the label chip: add-above / add-below / remove-line `IconButton`s (disabled states per the rules); clicking the label chip opens a `Popover` showing the group's positions as removable chips + a picker limited to the valid candidates.
 
 **Wiring (`SystemNode`).** Pass `availablePositions` (the `universe`) down; commit path unchanged, so added/removed positions and lines flow to the derived staffs, kempli and playback.
 
-**Edge cases.** Removing the last line leaves an empty system (dovetails with Step 5's "new empty system"); adding an empty line doesn't change `beatColWidths`; removing a line that held a beat's widest norot correctly shrinks that beat on the next `entryColWidths` recompute.
+**Edge cases.** Removing the last line leaves an empty system (dovetails with Step 5's "new empty system"). The grid re-derives from `beatSlices` (via `getBeatSlices`) on each commit, so adding/removing lines and positions is reflected automatically.
 
 ### Step 5 — Compact view editor refinement (part 2), separate expanded view
 - Remove the expanded view from the compact view and display it separately. Add a toggle above the editor window to switch between both.
