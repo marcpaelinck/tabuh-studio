@@ -24,19 +24,15 @@ export function serializeStaves(staves: { symbols: NoteObject[] }[]): string {
     return staves.map((s) => serializeStaff(s.symbols)).join('\n')
 }
 
-/** Splits clipboard text into lines, tolerating CRLF and a trailing newline. */
-export function splitClipboardLines(text: string): string[] {
-    const lines = text.replace(/\r\n?/g, '\n').split('\n')
-    // Drop a single trailing empty line produced by a terminating newline.
-    if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop()
-    return lines
-}
-
 /**
  * Parses clipboard text into one `NoteObject[]` per line. Each line is bound to
  * the position at the same index in `positions` (used when distributing a paste
  * across consecutive staves); lines beyond `positions` fall back to unbound.
+ * CRLF is normalised and a single trailing empty line (from a terminating newline)
+ * is dropped.
  */
 export function parseClipboard(text: string, positions: (Position | undefined)[]): NoteObject[][] {
-    return splitClipboardLines(text).map((line, i) => NoteObject.parseText(line, positions[i]))
+    const lines = text.replace(/\r\n?/g, '\n').split('\n')
+    if (lines.length > 1 && lines[lines.length - 1] === '') lines.pop()
+    return lines.map((line, i) => NoteObject.parseText(line, positions[i]))
 }

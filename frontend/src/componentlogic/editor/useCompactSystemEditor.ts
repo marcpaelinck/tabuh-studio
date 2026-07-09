@@ -3,9 +3,8 @@
  *
  * This is the compact-view analogue of {@link useSystemEditor}. Its lines are
  * notation GROUPS (each may stand for several instrument positions) rather than
- * individual staves, and each line is subdivided into MEASURES (kempli beats),
- * because the per-measure structure is what the expansion pipeline needs to align
- * columns. The cursor is therefore three-dimensional: { line, measure, index }.
+ * individual staves. Each line's notation is a single FLAT array of symbols (like a
+ * Staff); the cursor is two-dimensional: { line, index }.
  *
  * Compact symbols are position-independent (exactly as the parser builds them with
  * an `undefined` position), so all state-machine operations are run with no
@@ -33,18 +32,17 @@ import {
 } from './inputStateMachine'
 import { defaultKeyMap, type KeyMap, type Keystroke } from './keyMap'
 
-/** One compact line = one notation group, subdivided into measures (kempli beats). */
+/** One compact line = one notation group, holding a flat array of symbols. */
 export interface CompactLine {
     id: string
     positions: Position[]
-    measures: NoteObject[][]
+    notation: NoteObject[]
 }
 
-/** Cursor across the compact grid: which line, which measure, and where within it. */
+/** Cursor across the compact grid: which line, and where within its notation. */
 export interface CompactCursor {
     line: number
-    measure: number
-    index: number
+    index: number // the index of the note in the CompactLine's notation
 }
 
 interface CompactEditorState {
@@ -69,9 +67,9 @@ export interface CompactEditorController {
     onPaste: (e: ClipboardEvent<HTMLDivElement>) => void
     onFocus: () => void
     onBlur: () => void
-    setCursor: (line: number, measure: number, index: number) => void
-    /** Insert a new solo staff (group) at `atIndex`, seeded with `position` and rests. */
-    addLine: (atIndex: number, position: Position) => void
+    setCursor: (line: number, index: number) => void
+    /** Insert a new staff (group) at `atIndex`, seeded with `positions` and empty notation. */
+    addLine: (atIndex: number, positions: Position[]) => void
     /** Remove the staff (group) at `index`. */
     removeLine: (index: number) => void
     /** Add `position` to the group at `lineIndex`. */
@@ -94,29 +92,23 @@ export function useCompactSystemEditor({
 }: UseCompactSystemEditorOptions): CompactEditorController {
     const [state, setState] = useState<CompactEditorState>(() => ({
         lines: initialLines,
-        cursor: {
-            line: 0,
-            measure: 0,
-            index: initialLines[0]?.measures[0]?.length ?? 0
-        }
+        cursor: { line: 0, index: initialLines[0]?.notation.length ?? 0 }
     }))
     const [focused, setFocused] = useState(false)
 
-    // Applies a pure single-staff op to the active MEASURE and writes it back,
+    // Applies a pure single-staff op to the active LINE and writes it back,
     // reporting whether the notation (not just the cursor) changed.
-    const applyToActiveMeasure = useCallback(
+    const applyToActiveLine = useCallback(
         (st: CompactEditorState, op: (s: EditorStaffState) => EditorStaffState): CompactEditorState => {
             const line = st.lines[st.cursor.line]
-            const measure = line?.measures[st.cursor.measure]
-            if (!line || !measure) return st
-            const result = op({ symbols: measure, cursorIndex: st.cursor.index })
-            const notationChanged = result.symbols !== measure
+            if (!line) return st
+            const result = op({ symbols: line.notation, cursorIndex: st.cursor.index })
+            const notationChanged = result.symbols !== line.notation
             const cursorChanged = result.cursorIndex !== st.cursor.index
             if (!notationChanged && !cursorChanged) return st
             let lines = st.lines
             if (notationChanged) {
-                const newMeasures = line.measures.with(st.cursor.measure, result.symbols)
-                lines = st.lines.with(st.cursor.line, { ...line, measures: newMeasures })
+                lines = st.lines.with(st.cursor.line, { ...line, notation: result.symbols })
                 onChange?.(lines)
             }
             return { lines, cursor: { ...st.cursor, index: result.cursorIndex } }
@@ -124,45 +116,30 @@ export function useCompactSystemEditor({
         [onChange]
     )
 
-    // Left/right wrap across measures within a line, then across lines.
+    // Left/right wrap to the adjacent line at the ends.
     const moveLeftRight = useCallback(
         (st: CompactEditorState, delta: -1 | 1): CompactEditorState => {
             const line = st.lines[st.cursor.line]
-            const measure = line?.measures[st.cursor.measure]
-            if (!line || !measure) return st
+            if (!line) return st
             if (delta === -1 && st.cursor.index === 0) {
-                if (st.cursor.measure > 0) {
-                    const m = st.cursor.measure - 1
-                    return { lines: st.lines, cursor: { ...st.cursor, measure: m, index: line.measures[m].length } }
-                }
-                if (st.cursor.line > 0) {
-                    const l = st.cursor.line - 1
-                    const m = st.lines[l].measures.length - 1
-                    return { lines: st.lines, cursor: { line: l, measure: m, index: st.lines[l].measures[m].length } }
-                }
-                return st
+                if (st.cursor.line === 0) return st
+                const l = st.cursor.line - 1
+                return { lines: st.lines, cursor: { line: l, index: st.lines[l].notation.length } }
             }
-            if (delta === 1 && st.cursor.index === measure.length) {
-                if (st.cursor.measure < line.measures.length - 1) {
-                    return { lines: st.lines, cursor: { ...st.cursor, measure: st.cursor.measure + 1, index: 0 } }
-                }
-                if (st.cursor.line < st.lines.length - 1) {
-                    return { lines: st.lines, cursor: { line: st.cursor.line + 1, measure: 0, index: 0 } }
-                }
-                return st
+            if (delta === 1 && st.cursor.index === line.notation.length) {
+                if (st.cursor.line === st.lines.length - 1) return st
+                return { lines: st.lines, cursor: { line: st.cursor.line + 1, index: 0 } }
             }
-            return applyToActiveMeasure(st, (s) => moveCursor(s, delta))
+            return applyToActiveLine(st, (s) => moveCursor(s, delta))
         },
-        [applyToActiveMeasure]
+        [applyToActiveLine]
     )
 
-    // Up/down move between lines, keeping the measure index and clamping the cursor.
+    // Up/down move between lines, keeping the column (index) clamped to the target line.
     const moveUpDown = useCallback((st: CompactEditorState, delta: -1 | 1): CompactEditorState => {
         const line = st.cursor.line + delta
         if (line < 0 || line >= st.lines.length) return st
-        const measure = Math.min(st.cursor.measure, st.lines[line].measures.length - 1)
-        const index = clampCursor(st.lines[line].measures[measure], st.cursor.index)
-        return { lines: st.lines, cursor: { line, measure, index } }
+        return { lines: st.lines, cursor: { line, index: clampCursor(st.lines[line].notation, st.cursor.index) } }
     }, [])
 
     const onKeyDown = useCallback(
@@ -182,33 +159,33 @@ export function useCompactSystemEditor({
                     case 'cursorDown':
                         return moveUpDown(st, 1)
                     case 'cursorStart':
-                        return applyToActiveMeasure(st, (s) => ({ ...s, cursorIndex: 0 }))
+                        return applyToActiveLine(st, (s) => ({ ...s, cursorIndex: 0 }))
                     case 'cursorEnd':
-                        return applyToActiveMeasure(st, (s) => ({ ...s, cursorIndex: s.symbols.length }))
+                        return applyToActiveLine(st, (s) => ({ ...s, cursorIndex: s.symbols.length }))
                     case 'octaveUp':
-                        return applyToActiveMeasure(st, (s) => changeOctave(s, 1, COMPACT_POSITION))
+                        return applyToActiveLine(st, (s) => changeOctave(s, 1, COMPACT_POSITION))
                     case 'octaveDown':
-                        return applyToActiveMeasure(st, (s) => changeOctave(s, -1, COMPACT_POSITION))
+                        return applyToActiveLine(st, (s) => changeOctave(s, -1, COMPACT_POSITION))
                     case 'deleteLeft':
-                        return applyToActiveMeasure(st, deleteLeft)
+                        return applyToActiveLine(st, deleteLeft)
                     case 'deleteRight':
-                        return applyToActiveMeasure(st, deleteRight)
+                        return applyToActiveLine(st, deleteRight)
                     case 'insertChar':
-                        return applyToActiveMeasure(st, (s) => typeChar(s, e.key, COMPACT_POSITION))
+                        return applyToActiveLine(st, (s) => typeChar(s, e.key, COMPACT_POSITION))
                     case 'insertSymbol':
                         return action.value
-                            ? applyToActiveMeasure(st, (s) => insertSymbol(s, action.value!, COMPACT_POSITION))
+                            ? applyToActiveLine(st, (s) => insertSymbol(s, action.value!, COMPACT_POSITION))
                             : st
                     default:
                         return st
                 }
             })
         },
-        [keyMap, applyToActiveMeasure, moveLeftRight, moveUpDown]
+        [keyMap, applyToActiveLine, moveLeftRight, moveUpDown]
     )
 
-    // Minimal paste: insert the first clipboard line's symbols into the active
-    // measure at the cursor, routed through typeChar so only valid symbols land.
+    // Minimal paste: insert the first clipboard line's symbols into the active line
+    // at the cursor, routed through typeChar so only valid symbols land.
     const onPaste = useCallback(
         (e: ClipboardEvent<HTMLDivElement>) => {
             const text = e.clipboardData.getData('text')
@@ -217,23 +194,17 @@ export function useCompactSystemEditor({
             const firstLine = text.split(/\r?\n/)[0] ?? ''
             if (!firstLine) return
             setState((st) =>
-                applyToActiveMeasure(st, (s) =>
-                    [...firstLine].reduce((acc, ch) => typeChar(acc, ch, COMPACT_POSITION), s)
-                )
+                applyToActiveLine(st, (s) => [...firstLine].reduce((acc, ch) => typeChar(acc, ch, COMPACT_POSITION), s))
             )
         },
-        [applyToActiveMeasure]
+        [applyToActiveLine]
     )
 
     const setCursor = useCallback(
-        (line: number, measure: number, index: number) =>
+        (line: number, index: number) =>
             setState((st) => {
                 if (line < 0 || line >= st.lines.length) return st
-                const m = Math.max(0, Math.min(st.lines[line].measures.length - 1, measure))
-                return {
-                    lines: st.lines,
-                    cursor: { line, measure: m, index: clampCursor(st.lines[line].measures[m], index) }
-                }
+                return { lines: st.lines, cursor: { line, index: clampCursor(st.lines[line].notation, index) } }
             }),
         []
     )
@@ -243,18 +214,17 @@ export function useCompactSystemEditor({
 
     // --- Group-structure editing (Step 4) -------------------------------------
 
-    // Insert a new solo staff seeded with `position` and empty measures (one per beat,
-    // which flatten to rests). The cursor moves into the new line.
+    // Insert a new staff seeded with `positions` and empty notation. The cursor moves
+    // into the new line. (Columns are the user's to align; no auto-padding.)
     const addLine = useCallback(
-        (atIndex: number, position: Position) =>
+        (atIndex: number, positions: Position[]) =>
             setState((st) => {
-                const beatCount = st.lines[0]?.measures.length ?? 0
-                const measures: NoteObject[][] = Array.from({ length: beatCount }, () => [])
-                const newLine: CompactLine = { id: uuidv4(), positions: [position], measures }
+                if (positions.length === 0) return st
+                const newLine: CompactLine = { id: uuidv4(), positions: [...positions], notation: [] }
                 const idx = Math.max(0, Math.min(st.lines.length, atIndex))
                 const lines = [...st.lines.slice(0, idx), newLine, ...st.lines.slice(idx)]
                 onChange?.(lines)
-                return { lines, cursor: { line: idx, measure: 0, index: 0 } }
+                return { lines, cursor: { line: idx, index: 0 } }
             }),
         [onChange]
     )
@@ -265,11 +235,9 @@ export function useCompactSystemEditor({
                 if (index < 0 || index >= st.lines.length) return st
                 const lines = st.lines.filter((_, i) => i !== index)
                 onChange?.(lines)
-                if (lines.length === 0) return { lines, cursor: { line: 0, measure: 0, index: 0 } }
+                if (lines.length === 0) return { lines, cursor: { line: 0, index: 0 } }
                 const line = Math.min(lines.length - 1, st.cursor.line > index ? st.cursor.line - 1 : st.cursor.line)
-                const measure = Math.min(st.cursor.measure, lines[line].measures.length - 1)
-                const index2 = clampCursor(lines[line].measures[measure] ?? [], st.cursor.index)
-                return { lines, cursor: { line, measure: Math.max(0, measure), index: index2 } }
+                return { lines, cursor: { line, index: clampCursor(lines[line].notation, st.cursor.index) } }
             }),
         [onChange]
     )
@@ -294,9 +262,9 @@ export function useCompactSystemEditor({
             setState((st) => {
                 const line = st.lines[lineIndex]
                 if (!line || !line.positions.includes(position) || line.positions.length <= 1) return st
-                const soloMeasures = castGroupToSolo(line.positions, line.measures, position, castingInstructions)
+                const soloNotation = castGroupToSolo(line.positions, line.notation, position, castingInstructions)
                 const reduced: CompactLine = { ...line, positions: line.positions.filter((p) => p !== position) }
-                const solo: CompactLine = { id: uuidv4(), positions: [position], measures: soloMeasures }
+                const solo: CompactLine = { id: uuidv4(), positions: [position], notation: soloNotation }
                 const lines = [...st.lines.slice(0, lineIndex), reduced, solo, ...st.lines.slice(lineIndex + 1)]
                 onChange?.(lines)
                 return { ...st, lines }

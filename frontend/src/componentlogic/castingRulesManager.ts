@@ -200,23 +200,14 @@ export function candidatesFor(groupPositions: Position[], available: Position[])
 
 // Splits a position `p` out of a multi-position group into its own solo staff,
 // carrying the notation `p` currently has (the cast result), so it keeps playing.
-// Casting is 1:1 per symbol, so the per-measure lengths are preserved; the result is
-// returned as measures (NoteObject[][]) matching the input measure structure.
 export function castGroupToSolo(
     groupPositions: Position[],
-    measures: NoteObject[][],
+    notation: NoteObject[],
     p: Position,
     castingInstructions?: CastingInstruction[]
-): NoteObject[][] {
+): NoteObject[] {
     const posIdx = groupPositions.indexOf(p)
-    if (posIdx < 0) return measures
-    const flat = measures.flat().map((note) => (note.toString() || SPACE_CHAR) as NoteSymbol)
-    const cast = castNotation({ id: '', positions: groupPositions, notation: flat }, posIdx, castingInstructions)
-    const out: NoteObject[][] = []
-    let offset = 0
-    for (const measure of measures) {
-        out.push(cast.slice(offset, offset + measure.length))
-        offset += measure.length
-    }
-    return out
+    if (posIdx < 0) return notation
+    const flat = notation.map((note) => (note.toString() || SPACE_CHAR) as NoteSymbol)
+    return castNotation({ id: '', positions: groupPositions, notation: flat }, posIdx, castingInstructions)
 }

@@ -43,18 +43,6 @@ export interface CompactSystemEditorProps {
     style?: CSSProperties
 }
 
-// Maps a flat column index to a { measure, index } position within a line.
-function locate(measures: { length: number }[], flatIndex: number): { measure: number; index: number } {
-    let offset = 0
-    for (let m = 0; m < measures.length; m++) {
-        const len = measures[m].length
-        if (flatIndex <= offset + len) return { measure: m, index: flatIndex - offset }
-        offset += len
-    }
-    const last = Math.max(0, measures.length - 1)
-    return { measure: last, index: measures[last]?.length ?? 0 }
-}
-
 const positionName = (p: Position) => positionConfigs[p]?.name ?? p
 
 export function CompactSystemEditor({
@@ -72,6 +60,8 @@ export function CompactSystemEditor({
         useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
     const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     const [maxCols, setMaxCols] = useState<number>(0)
+    // Positions chosen for a NEW staff, before it is created (add above/below).
+    const [newPositions, setNewPositions] = useState<Position[]>([])
 
     const fontClass = `balifontspaced${editorFontSize}`
 
@@ -87,7 +77,7 @@ export function CompactSystemEditor({
         setGridStyle(style)
         const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
         // Width (in columns) shared by every row so the grids line up.
-        const maxCols = Math.max(sumBeats, ...lines.map((l) => l.measures.reduce((a, m) => a + m.length, 0)), 1)
+        const maxCols = Math.max(sumBeats, ...lines.map((l) => l.notation.length), 1)
         setMaxCols(maxCols)
     }, [beatColWidths])
 
@@ -96,9 +86,18 @@ export function CompactSystemEditor({
     const used = new Set(lines.flatMap((l) => l.positions))
     const free = availablePositions.filter((p) => !used.has(p))
 
+    const toggleNewPosition = (p: Position) =>
+        setNewPositions((sel) => (sel.includes(p) ? sel.filter((x) => x !== p) : [...sel, p]))
+
     // Popover for one line: edit its positions and add/remove staves.
     const linePopover = (li: number, line: CompactLine) => {
         const candidates = candidatesFor(line.positions, free)
+        // For a NEW staff: positions still selectable given the current selection.
+        const newCandidates = candidatesFor(newPositions, free)
+        const createNewStaff = (atIndex: number) => {
+            addLine(atIndex, newPositions)
+            setNewPositions([])
+        }
         return (
             <Popover>
                 <div className="text-xs font-semibold mb-1">Staff positions</div>
@@ -124,16 +123,36 @@ export function CompactSystemEditor({
                         </div>
                     </>
                 )}
-                <div className="flex gap-1 border-t border-gray-200 pt-2">
-                    <Button size="xs" disabled={free.length === 0} onClick={() => addLine(li, free[0])}>
-                        + staff above
-                    </Button>
-                    <Button size="xs" disabled={free.length === 0} onClick={() => addLine(li + 1, free[0])}>
-                        + staff below
-                    </Button>
-                    <Button size="xs" color="red" appearance="ghost" disabled={lines.length <= 1} onClick={() => removeLine(li)}>
-                        Remove staff
-                    </Button>
+                <div className="border-t border-gray-200 pt-2">
+                    <div className="text-xs mb-1">New staff — select position(s):</div>
+                    <div className="flex flex-wrap gap-1 mb-2 max-w-64">
+                        {newCandidates.map((p) => (
+                            <Button
+                                key={p}
+                                size="xs"
+                                appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
+                                onClick={() => toggleNewPosition(p)}>
+                                {positionName(p)}
+                            </Button>
+                        ))}
+                        {newCandidates.length === 0 && <span className="text-xs text-gray-400">no positions free</span>}
+                    </div>
+                    <div className="flex gap-1">
+                        <Button size="xs" disabled={newPositions.length === 0} onClick={() => createNewStaff(li)}>
+                            + above
+                        </Button>
+                        <Button size="xs" disabled={newPositions.length === 0} onClick={() => createNewStaff(li + 1)}>
+                            + below
+                        </Button>
+                        <Button
+                            size="xs"
+                            color="red"
+                            appearance="ghost"
+                            disabled={lines.length <= 1}
+                            onClick={() => removeLine(li)}>
+                            Remove staff
+                        </Button>
+                    </div>
                 </div>
             </Popover>
         )
@@ -153,12 +172,14 @@ export function CompactSystemEditor({
             style={{ outline: 'none', cursor: 'text', ...style }}>
             {lines.map((line, li) => {
                 const { label, tooltip } = compactGroupLabel(line.positions)
-                const flatSymbols = line.measures.flat()
-                const offsetToActiveMeasure = line.measures.slice(0, cursor.measure).reduce((a, m) => a + m.length, 0)
-                const flatCursor = focused && cursor.line === li ? offsetToActiveMeasure + cursor.index : null
+                const flatCursor = focused && cursor.line === li ? cursor.index : null
                 return (
                     <div key={line.id} className="flex items-center">
-                        <Whisper trigger="click" placement="bottomStart" speaker={linePopover(li, line)}>
+                        <Whisper
+                            trigger="click"
+                            placement="bottomStart"
+                            onClose={() => setNewPositions([])}
+                            speaker={linePopover(li, line)}>
                             <div
                                 title={tooltip}
                                 className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
@@ -170,16 +191,10 @@ export function CompactSystemEditor({
                             <div aria-hidden="true" className="absolute inset-0" style={gridStyle} />
                             <div className="relative">
                                 <StaffLine
-                                    symbols={flatSymbols}
+                                    symbols={line.notation}
                                     cursorIndex={flatCursor}
-                                    onSymbolClick={(index) => {
-                                        const { measure, index: idx } = locate(line.measures, index)
-                                        setCursor(li, measure, idx)
-                                    }}
-                                    onTrailingClick={() => {
-                                        const lastMeasure = Math.max(0, line.measures.length - 1)
-                                        setCursor(li, lastMeasure, line.measures[lastMeasure]?.length ?? 0)
-                                    }}
+                                    onSymbolClick={(index) => setCursor(li, index)}
+                                    onTrailingClick={() => setCursor(li, line.notation.length)}
                                 />
                             </div>
                         </div>

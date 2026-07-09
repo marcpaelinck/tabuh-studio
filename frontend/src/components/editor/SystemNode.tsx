@@ -19,7 +19,7 @@ import type { StyleProperties } from 'rsuite/esm/internals/types'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
-import { entryColWidths, expandSystem, flattenCompact, splitFlat } from '../../componentlogic/expandNotation'
+import { expandSystem } from '../../componentlogic/expandNotation'
 import { editorFontSize, positionOrder } from '../../config/config'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
@@ -253,33 +253,29 @@ export const SystemNode = memo(function SystemNode({
     // have a canonical `groups` store. See CLAUDE.dual-editor.md.
     const hasGroups = !!systemData.groups && systemData.groups.length > 0
 
-    // Compact lines seeded from the system's groups. The stored notation is flat, so
-    // it is split back into measures using the system's per-beat column widths.
+    // Per-beat column widths for the compact grid, derived from the system's beat slices.
     const beatColWidths = systemData.beatSlices.map((slice) => slice.end - slice.start) ?? []
 
     // Universe of positions the system may contain (KEMPLI only when written as notation).
     const availablePositions = positionOrder.filter(
         (p) => p !== 'KEMPLI' || systemData.kempli.state === 'notation'
     ) as Position[]
+
+    // Compact lines seeded from the system's groups (flat notation, position-independent).
     const compactLines: CompactLine[] = (systemData.groups ?? []).map((group) => ({
         id: group.id,
         positions: group.positions,
-        measures: splitFlat(group.notation, beatColWidths).map((measure) =>
-            measure.map((sym) => new NoteObject(sym, undefined))
-        )
+        notation: group.notation.map((sym) => new NoteObject(sym, undefined))
     }))
 
-    // Committing a compact edit re-computes the per-beat column widths, re-flattens the
-    // groups, re-derives the expanded staffs (and kempli) via the shared pipeline, then
-    // updates the score. Debounced like the expanded path so typing stays instant.
+    // Committing a compact edit writes the flat notation back into the groups, re-derives
+    // the expanded staffs (and kempli) via the shared pipeline, then updates the score.
+    // Debounced like the expanded path so typing stays instant.
     const { schedule: handleCompactChange } = useDebouncedCommit((lines: CompactLine[]) => {
-        // Editor measures already contain a norot's padding spaces, so widths are
-        // counted by entry (compactColWidths would double-count the norot).
-        const newBeatColWidths = entryColWidths(lines.map((line) => line.measures))
         const groups = lines.map((line) => ({
             id: line.id,
             positions: line.positions,
-            notation: flattenCompact(line.measures, newBeatColWidths)
+            notation: NoteObject.toNotation(line.notation)
         }))
         const newSystem: System = { ...systemData, groups }
         expandSystem(newSystem)
@@ -322,7 +318,7 @@ export const SystemNode = memo(function SystemNode({
                             disabled
                             rows={rows}
                             className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                            defaultValue={positionTitles}
+                            value={positionTitles}
                         />
                     </Col>
                     <Col span={20} id="Notation">
