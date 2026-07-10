@@ -60,7 +60,6 @@ export function SystemNotationViewer({
 
     return (
         <StaffGrid
-            // ref={ref}
             grid={{ ref, left: '9rem', widthCh: notationWidth }}
             rows={rows}
             readOnly={readOnly}

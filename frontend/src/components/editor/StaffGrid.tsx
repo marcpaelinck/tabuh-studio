@@ -30,10 +30,6 @@ export interface StaffGridRow {
 }
 
 export interface StaffGridProps {
-    /** Ref to the outer container. Used as the grid-paint surface only when there is no
-     *  internal label column (e.g. the expanded viewer); the compact view paints `grid.ref`
-     *  (the inner, label-offset grid element) instead so the grid aligns with the notation. */
-    ref?: RefObject<HTMLDivElement | null>
     rows: StaffGridRow[]
     /**
      * Single background grid behind all staves. Omit for a transparent overlay (e.g. the
@@ -55,7 +51,6 @@ export interface StaffGridProps {
 }
 
 export function StaffGrid({
-    ref,
     rows,
     grid,
     rowWidthCh,
@@ -72,7 +67,6 @@ export function StaffGrid({
     const notationFont = `balifontspaced${editorFontSize}`
     return (
         <div
-            ref={ref}
             tabIndex={readOnly ? -1 : 0}
             role="textbox"
             aria-multiline="true"
