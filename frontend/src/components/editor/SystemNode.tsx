@@ -79,7 +79,7 @@ export const SystemNode = memo(function SystemNode({
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
-    const expandedNotationRef = useRef<HTMLTextAreaElement>(null)
+    const expandedNotationRef = useRef<HTMLDivElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
@@ -351,8 +351,8 @@ export const SystemNode = memo(function SystemNode({
                             highlight + grid). Its text is transparent so only the highlight
                             shows; the SystemNotationEditor on top supplies the glyphs, the
                             cursor and editing, aligned by matching font / line metrics. */}
-                            <div style={{ position: 'relative' }}>
-                                <Textarea
+                            {/* <div style={{ position: 'relative' }}> */}
+                            {/* <Textarea
                                     disabled
                                     ref={expandedNotationRef}
                                     id={props.id}
@@ -366,14 +366,15 @@ export const SystemNode = memo(function SystemNode({
                                     }}
                                     spellCheck="false"
                                     defaultValue={notationText}
-                                />
-                                <SystemNotationViewer
-                                    initialStaves={editorStaves}
-                                    readOnly
-                                    className="leading-5.5 border-1 border-solid border-transparent p-0"
-                                    style={{ position: 'absolute', inset: 0, zIndex: 2 }}
-                                />
-                            </div>
+                                /> */}
+                            <SystemNotationViewer
+                                ref={expandedNotationRef}
+                                initialStaves={editorStaves}
+                                readOnly
+                                className="leading-5.5 border-1 border-solid border-transparent p-0"
+                                // style={{ position: 'absolute', inset: 0, zIndex: 2 }}
+                            />
+                            {/* </div> */}
                         </Col>
                     </Row>
                 )}
