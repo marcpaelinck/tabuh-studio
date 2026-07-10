@@ -20,7 +20,7 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
-import { editorFontSize, positionOrder } from '../../config/config'
+import { positionOrder } from '../../config/config'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
@@ -132,9 +132,8 @@ export const SystemNode = memo(function SystemNode({
             cursorStyle: playbackCursor?.sysUuid == systemData.uuid ? cursorStyleRef.current : 'None',
             gridColors: gridColorsExpanded
         })
-        // Need to set the style directly because the grid includes the cursor which should move
-        // in sync with the audio. Letting the notation area's style depend on a state variable will
-        // cause the grid + cursor to change at the next re-render. This causes an unacceptable lag.
+        // Need to set the style through a callback function rather than through a state variable
+        // in order to move the playback cursor in sync with the audio.
         _.entries(compactStyle).forEach(([key, value]) => {
             if (compactNotationRef.current != null)
                 compactNotationRef.current.style[key as keyof StyleProperties] = value
@@ -259,9 +258,6 @@ export const SystemNode = memo(function SystemNode({
     const positionTitles = sortedStaffEntries
         .map(([position, _]) => positionConfigs[position as Position].name)
         .join('\n')
-    const notationText = sortedStaffEntries
-        .map(([_, staff]) => staff.objNotation.map((note) => note.toString()).join(''))
-        .join('\n')
 
     // Staves handed to the virtual editor, in the same display order as the textarea.
     const editorStaves: EditorStaff[] = sortedStaffEntries.map(([position, staff]) => ({
@@ -307,7 +303,6 @@ export const SystemNode = memo(function SystemNode({
         // Groups are leading: a system with no groups shows nothing.
         if (!hasGroups) return null
         const positionTitlesFont = `courierfont${10}`
-        const notationFont = `balifontspaced${editorFontSize}`
         const rows = _.keys(systemData.staffs).length
         return (
             <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
@@ -347,32 +342,12 @@ export const SystemNode = memo(function SystemNode({
                             />
                         </Col>
                         <Col span={20} id="Notation">
-                            {/* The textarea stays as the playback animation surface (background
-                            highlight + grid). Its text is transparent so only the highlight
-                            shows; the SystemNotationEditor on top supplies the glyphs, the
-                            cursor and editing, aligned by matching font / line metrics. */}
-                            {/* <div style={{ position: 'relative' }}> */}
-                            {/* <Textarea
-                                    disabled
-                                    ref={expandedNotationRef}
-                                    id={props.id}
-                                    rows={rows}
-                                    className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                                    style={{
-                                        position: 'relative',
-                                        zIndex: 1,
-                                        backgroundColor: gridColors.background,
-                                        color: 'transparent'
-                                    }}
-                                    spellCheck="false"
-                                    defaultValue={notationText}
-                                /> */}
+                            {/* The expanded view (separate staff for each position) - READ ONLY. */}
                             <SystemNotationViewer
                                 ref={expandedNotationRef}
                                 initialStaves={editorStaves}
                                 readOnly
                                 className="leading-5.5 border-1 border-solid border-transparent p-0"
-                                // style={{ position: 'absolute', inset: 0, zIndex: 2 }}
                             />
                             {/* </div> */}
                         </Col>
