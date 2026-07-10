@@ -180,7 +180,13 @@ export function CompactSystemEditor({
                 placement="bottomStart"
                 onClose={() => setNewPositions([])}
                 speaker={linePopover(li, line)}>
-                <div className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600">
+                {/* preventDefault on mousedown stops the click from focusing the StaffGrid
+                    container (tabIndex=0). Without it, focusing reveals the cursor on the
+                    controller's current line (not the clicked one) and mounts the snippet,
+                    shifting the layout mid-click so the Whisper popover never opens. */}
+                <div
+                    className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
+                    onMouseDown={(e) => e.preventDefault()}>
                     <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
                         {label}
                     </Whisper>
