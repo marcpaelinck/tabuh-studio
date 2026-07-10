@@ -8,7 +8,7 @@ interface GridColors {
     grid: string
     background: string
 }
-export const gridColorsAggregated = {
+export const gridColorsCompact = {
     cursor: 'rgba(255, 255, 0, 0.5)',
     kempli: 'rgba(238, 0, 255, 0.52)',
     grid: 'rgba(0, 0, 0, 0.2)',

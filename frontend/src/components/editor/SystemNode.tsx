@@ -32,7 +32,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { createGridStyle, gridColorsExpanded } from '../../utils/editor'
+import { createGridStyle, gridColorsCompact, gridColorsExpanded } from '../../utils/editor'
 import { FeatureUnderDevelopment } from '../Feature'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
@@ -78,8 +78,8 @@ export const SystemNode = memo(function SystemNode({
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
 
-    const compactNotationRef = useRef<HTMLTextAreaElement>(null)
-    const extendedNotationRef = useRef<HTMLTextAreaElement>(null)
+    const compactNotationRef = useRef<HTMLDivElement>(null)
+    const expandedNotationRef = useRef<HTMLTextAreaElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
@@ -118,7 +118,14 @@ export const SystemNode = memo(function SystemNode({
 
     // Redraw background gridlines
     useEffect(() => {
-        const style = createGridStyle({
+        const compactStyle = createGridStyle({
+            beatColWidths,
+            kempliFrequency: systemData.kempli.frequency || null,
+            cursor: playbackCursor,
+            cursorStyle: playbackCursor?.sysUuid == systemData.uuid ? cursorStyleRef.current : 'None',
+            gridColors: gridColorsCompact
+        })
+        const expandedStyle = createGridStyle({
             beatColWidths,
             kempliFrequency: systemData.kempli.frequency || null,
             cursor: playbackCursor,
@@ -128,9 +135,13 @@ export const SystemNode = memo(function SystemNode({
         // Need to set the style directly because the grid includes the cursor which should move
         // in sync with the audio. Letting the notation area's style depend on a state variable will
         // cause the grid + cursor to change at the next re-render. This causes an unacceptable lag.
-        _.entries(style).forEach(([key, value]) => {
-            if (extendedNotationRef.current != null)
-                extendedNotationRef.current.style[key as keyof StyleProperties] = value
+        _.entries(compactStyle).forEach(([key, value]) => {
+            if (compactNotationRef.current != null)
+                compactNotationRef.current.style[key as keyof StyleProperties] = value
+        })
+        _.entries(expandedStyle).forEach(([key, value]) => {
+            if (expandedNotationRef.current != null)
+                expandedNotationRef.current.style[key as keyof StyleProperties] = value
         })
         // editorView so the grid repaints when the expanded textarea (re)mounts on a view switch.
     }, [systemData, playbackCursor, editorView])
@@ -343,7 +354,7 @@ export const SystemNode = memo(function SystemNode({
                             <div style={{ position: 'relative' }}>
                                 <Textarea
                                     disabled
-                                    ref={extendedNotationRef}
+                                    ref={expandedNotationRef}
                                     id={props.id}
                                     rows={rows}
                                     className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}

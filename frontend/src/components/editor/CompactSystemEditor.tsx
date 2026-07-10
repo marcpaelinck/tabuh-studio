@@ -25,11 +25,10 @@ import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/e
 import { editorFontSize } from '../../config/config'
 import type { Staffs } from '../../typing/score'
 import { compactGroupLabel } from '../../utils/compactGroupLabel'
-import { createGridStyle, gridColorsAggregated } from '../../utils/editor'
 import { StaffLine } from './StaffLine'
 
 export interface CompactSystemEditorProps {
-    ref: RefObject<HTMLTextAreaElement | null>
+    ref: RefObject<HTMLDivElement | null>
     initialLines: CompactLine[]
     /** Per-kempli-beat column widths (used to draw the kempli beat lines of the grid). */
     beatColWidths: number[]
@@ -79,23 +78,15 @@ export function CompactSystemEditor({
         addPosition,
         removePosition
     } = useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
-    const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
+    // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const [newPositions, setNewPositions] = useState<Position[]>([])
 
     const fontClass = `balifontspaced${editorFontSize}`
 
-    // Redraw background gridlines
+    // Update the number of columns in the notation area
     useEffect(() => {
-        const style = createGridStyle({
-            beatColWidths,
-            kempliFrequency: kempliFrequency || null,
-            cursor: null,
-            cursorStyle: 'None',
-            gridColors: gridColorsAggregated
-        })
-        setGridStyle(style)
         const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
         // Width (in columns) shared by every row so the grids line up.
         const maxCols = Math.max(sumBeats, ...lines.map((l) => l.notation.length), 1)
@@ -188,74 +179,84 @@ export function CompactSystemEditor({
             onBlur={onBlur}
             className={className}
             style={{ outline: 'none', cursor: 'text', ...style }}>
-            {lines.map((line, li) => {
-                const { label, tooltip } = compactGroupLabel(line.positions)
-                const flatCursor = focused && cursor.line === li ? cursor.index : null
-                // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
-                const showSnippet = focused && !playing && cursor.line === li
-                return (
-                    <div key={line.id}>
-                        <div className="flex items-center">
-                            <Whisper
-                                trigger="click"
-                                placement="bottomStart"
-                                onClose={() => setNewPositions([])}
-                                speaker={linePopover(li, line)}>
-                                <div
-                                    className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
-                                    style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px' }}>
+            <div className="relative">
+                {/* Single background grid behind all staves (offset past the w-36 label column),
+                    like SystemNotationViewer. A moving playback-cursor band can later live here. */}
+                <div
+                    ref={ref}
+                    aria-hidden="true"
+                    className={`absolute top-0 bottom-0 z-0 ${fontClass}`}
+                    style={{ left: '9rem', width: `${maxCols}ch` }}
+                />
+                <div className="relative z-10">
+                    {lines.map((line, li) => {
+                        const { label, tooltip } = compactGroupLabel(line.positions)
+                        const flatCursor = focused && cursor.line === li ? cursor.index : null
+                        // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
+                        const showSnippet = focused && !playing && cursor.line === li
+                        return (
+                            <div key={line.id}>
+                                <div className="flex items-center">
                                     <Whisper
-                                        trigger="hover"
+                                        trigger="click"
                                         placement="bottomStart"
-                                        speaker={<Tooltip>{tooltip}</Tooltip>}>
-                                        {label}
-                                    </Whisper>
-                                </div>
-                            </Whisper>
-                            <div
-                                className={`relative ${fontClass}`}
-                                style={{ width: `${maxCols}ch`, whiteSpace: 'pre' }}>
-                                <div aria-hidden="true" className="absolute inset-0" style={gridStyle} />
-                                <div className="relative">
-                                    <StaffLine
-                                        symbols={line.notation}
-                                        cursorIndex={flatCursor}
-                                        onSymbolClick={(index) => setCursor(li, index)}
-                                        onTrailingClick={() => setCursor(li, line.notation.length)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        {showSnippet && (
-                            <div className="my-1 bg-blue-50">
-                                {line.positions.map((p) => {
-                                    const staff = staffs[p]
-                                    if (!staff) return null
-                                    return (
-                                        <div key={p} className="flex items-center">
-                                            {/* Same w-36 label column as the compact staff, so the snippet
-                                                notation lines up with it; the label styling makes it stand out. */}
-                                            <div
-                                                className="shrink-0 w-36 pr-2 truncate text-blue-400"
-                                                style={{ fontFamily: 'system-ui, sans-serif', fontSize: '10px' }}>
-                                                {positionName(p)}
-                                            </div>
-                                            <div className={fontClass} style={{ whiteSpace: 'pre' }}>
-                                                <StaffLine
-                                                    symbols={staff.objNotation}
-                                                    cursorIndex={null}
-                                                    onSymbolClick={() => {}}
-                                                    onTrailingClick={() => {}}
-                                                />
-                                            </div>
+                                        onClose={() => setNewPositions([])}
+                                        speaker={linePopover(li, line)}>
+                                        <div
+                                            className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
+                                            style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px' }}>
+                                            <Whisper
+                                                trigger="hover"
+                                                placement="bottomStart"
+                                                speaker={<Tooltip>{tooltip}</Tooltip>}>
+                                                {label}
+                                            </Whisper>
                                         </div>
-                                    )
-                                })}
+                                    </Whisper>
+                                    <div className={fontClass} style={{ width: `${maxCols}ch`, whiteSpace: 'pre' }}>
+                                        <StaffLine
+                                            symbols={line.notation}
+                                            cursorIndex={flatCursor}
+                                            onSymbolClick={(index) => setCursor(li, index)}
+                                            onTrailingClick={() => setCursor(li, line.notation.length)}
+                                        />
+                                    </div>
+                                </div>
+                                {showSnippet && (
+                                    <div className="my-1 bg-blue-50">
+                                        {line.positions.map((p) => {
+                                            const staff = staffs[p]
+                                            if (!staff) return null
+                                            return (
+                                                <div key={p} className="flex items-center">
+                                                    {/* Same w-36 label column as the compact staff, so the snippet
+                                                notation lines up with it; the label styling makes it stand out. */}
+                                                    <div
+                                                        className="shrink-0 w-36 pr-2 truncate text-blue-400"
+                                                        style={{
+                                                            fontFamily: 'system-ui, sans-serif',
+                                                            fontSize: '10px'
+                                                        }}>
+                                                        {positionName(p)}
+                                                    </div>
+                                                    <div className={fontClass} style={{ whiteSpace: 'pre' }}>
+                                                        <StaffLine
+                                                            symbols={staff.objNotation}
+                                                            cursorIndex={null}
+                                                            onSymbolClick={() => {}}
+                                                            onTrailingClick={() => {}}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
                             </div>
-                        )}
-                    </div>
-                )
-            })}
+                        )
+                    })}
+                </div>
+            </div>
         </div>
     )
 }
