@@ -209,8 +209,10 @@ export default function EditorWindow({
             <div className="contents" inert={openFormCount > 0 ? true : undefined}>
                 <VStack id="Editor Window">
                     {/* View toggle: editable compact (grouped) view vs read-only expanded view.
-                        Sticky so it stays pinned at the top while the systems scroll beneath it. */}
-                    <div className="sticky top-0 z-10 w-full bg-white pb-1">
+                        Sticky so it stays pinned at the top while the systems scroll beneath it.
+                        z-30 keeps this bar above the compact editor's content layer (StaffGrid's
+                        `relative z-10`), so clicks on the toggle win over overlapping position labels. */}
+                    <div className="sticky top-0 z-30 w-full bg-white pb-1">
                         <HStack>
                             <SegmentedControl
                                 size="sm"
