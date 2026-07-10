@@ -17,7 +17,7 @@
 
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Popover, Tag, Tooltip, Whisper } from 'rsuite'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
@@ -29,6 +29,7 @@ import { createGridStyle, gridColorsAggregated } from '../../utils/editor'
 import { StaffLine } from './StaffLine'
 
 export interface CompactSystemEditorProps {
+    ref: RefObject<HTMLTextAreaElement | null>
     initialLines: CompactLine[]
     /** Per-kempli-beat column widths (used to draw the kempli beat lines of the grid). */
     beatColWidths: number[]
@@ -51,6 +52,7 @@ export interface CompactSystemEditorProps {
 const positionName = (p: Position) => positionConfigs[p]?.name ?? p
 
 export function CompactSystemEditor({
+    ref,
     initialLines,
     beatColWidths,
     kempliFrequency,
@@ -210,7 +212,9 @@ export function CompactSystemEditor({
                                     </Whisper>
                                 </div>
                             </Whisper>
-                            <div className={`relative ${fontClass}`} style={{ width: `${maxCols}ch`, whiteSpace: 'pre' }}>
+                            <div
+                                className={`relative ${fontClass}`}
+                                style={{ width: `${maxCols}ch`, whiteSpace: 'pre' }}>
                                 <div aria-hidden="true" className="absolute inset-0" style={gridStyle} />
                                 <div className="relative">
                                     <StaffLine

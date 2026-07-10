@@ -13,13 +13,13 @@
  * keystrokes re-render only this component, not the whole system.
  */
 
-import { editorFontSize } from '../../config/config'
-import { useSystemEditor, type EditorStaff } from '../../componentlogic/editor/useSystemEditor'
-import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import type { CSSProperties } from 'react'
+import type { KeyMap } from '../../componentlogic/editor/keyMap'
+import { useSystemEditor, type EditorStaff } from '../../componentlogic/editor/useSystemEditor'
+import { editorFontSize } from '../../config/config'
 import { StaffLine } from './StaffLine'
 
-export interface SystemNotationEditorProps {
+export interface SystemNotationViewerProps {
     /** Staves in display order (one per instrument position). */
     initialStaves: EditorStaff[]
     /** Called with the updated staves whenever an edit changes the notation. */
@@ -36,14 +36,14 @@ export interface SystemNotationEditorProps {
     readOnly?: boolean
 }
 
-export function SystemNotationEditor({
+export function SystemNotationViewer({
     initialStaves,
     onChange,
     keyMap,
     className,
     style,
     readOnly
-}: SystemNotationEditorProps) {
+}: SystemNotationViewerProps) {
     const controller = useSystemEditor({ initialStaves, keyMap, onChange })
 
     // In read-only mode we ignore the controller's internal (mount-seeded) state
@@ -72,8 +72,7 @@ export function SystemNotationEditor({
                 background: 'transparent',
                 boxSizing: 'border-box',
                 ...style
-            }}
-        >
+            }}>
             {staves.map((staff, staffIdx) => (
                 <StaffLine
                     key={staff.position}

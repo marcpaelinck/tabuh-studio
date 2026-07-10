@@ -2,7 +2,7 @@ import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Col, Grid, Placeholder, Row, SegmentedControl, useDialog, VStack } from 'rsuite'
+import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
@@ -211,15 +211,18 @@ export default function EditorWindow({
                     {/* View toggle: editable compact (grouped) view vs read-only expanded view.
                         Sticky so it stays pinned at the top while the systems scroll beneath it. */}
                     <div className="sticky top-0 z-10 w-full bg-white pb-1">
-                        <SegmentedControl
-                            size="sm"
-                            value={editorView}
-                            onChange={(value) => setEditorView(value as EditorView)}
-                            data={[
-                                { label: 'Compact', value: 'compact' },
-                                { label: 'Expanded', value: 'expanded' }
-                            ]}
-                        />
+                        <HStack>
+                            <SegmentedControl
+                                size="sm"
+                                value={editorView}
+                                onChange={(value) => setEditorView(value as EditorView)}
+                                data={[
+                                    { label: 'Compact', value: 'compact' },
+                                    { label: 'Expanded', value: 'expanded' }
+                                ]}
+                            />
+                            <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
+                        </HStack>
                     </div>
                     {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
                 </VStack>

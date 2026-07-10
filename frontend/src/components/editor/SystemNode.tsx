@@ -20,8 +20,8 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
-import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { editorFontSize, positionOrder } from '../../config/config'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     AudioState,
@@ -38,7 +38,7 @@ import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
-import { SystemNotationEditor } from './SystemNotationEditor'
+import { SystemNotationViewer } from './SystemNotationViewer'
 
 interface EditorSystemProps extends TextareaProps {
     systemData: System
@@ -78,7 +78,8 @@ export const SystemNode = memo(function SystemNode({
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
 
-    const notationAreaRef = useRef<HTMLTextAreaElement>(null)
+    const compactNotationRef = useRef<HTMLTextAreaElement>(null)
+    const extendedNotationRef = useRef<HTMLTextAreaElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
@@ -128,7 +129,8 @@ export const SystemNode = memo(function SystemNode({
         // in sync with the audio. Letting the notation area's style depend on a state variable will
         // cause the grid + cursor to change at the next re-render. This causes an unacceptable lag.
         _.entries(style).forEach(([key, value]) => {
-            if (notationAreaRef.current != null) notationAreaRef.current.style[key as keyof StyleProperties] = value
+            if (extendedNotationRef.current != null)
+                extendedNotationRef.current.style[key as keyof StyleProperties] = value
         })
         // editorView so the grid repaints when the expanded textarea (re)mounts on a view switch.
     }, [systemData, playbackCursor, editorView])
@@ -308,6 +310,7 @@ export const SystemNode = memo(function SystemNode({
                             {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
                             <FeatureUnderDevelopment>
                                 <CompactSystemEditor
+                                    ref={compactNotationRef}
                                     key={`compact-${systemData.uuid}`}
                                     initialLines={compactLines}
                                     beatColWidths={beatColWidths}
@@ -324,44 +327,44 @@ export const SystemNode = memo(function SystemNode({
                     </Row>
                 ) : (
                     <Row id="SystemNotation">
-                    <Col span={3} id="Positions">
-                        <Textarea
-                            disabled
-                            rows={rows}
-                            className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                            value={positionTitles}
-                        />
-                    </Col>
-                    <Col span={20} id="Notation">
-                        {/* The textarea stays as the playback animation surface (background
+                        <Col span={3} id="Positions">
+                            <Textarea
+                                disabled
+                                rows={rows}
+                                className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                                value={positionTitles}
+                            />
+                        </Col>
+                        <Col span={20} id="Notation">
+                            {/* The textarea stays as the playback animation surface (background
                             highlight + grid). Its text is transparent so only the highlight
                             shows; the SystemNotationEditor on top supplies the glyphs, the
                             cursor and editing, aligned by matching font / line metrics. */}
-                        <div style={{ position: 'relative' }}>
-                            <Textarea
-                                disabled
-                                ref={notationAreaRef}
-                                id={props.id}
-                                rows={rows}
-                                className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                                style={{
-                                    position: 'relative',
-                                    zIndex: 1,
-                                    backgroundColor: gridColors.background,
-                                    color: 'transparent'
-                                }}
-                                spellCheck="false"
-                                defaultValue={notationText}
-                            />
-                            <SystemNotationEditor
-                                initialStaves={editorStaves}
-                                readOnly
-                                className="leading-5.5 border-1 border-solid border-transparent p-0"
-                                style={{ position: 'absolute', inset: 0, zIndex: 2 }}
-                            />
-                        </div>
-                    </Col>
-                </Row>
+                            <div style={{ position: 'relative' }}>
+                                <Textarea
+                                    disabled
+                                    ref={extendedNotationRef}
+                                    id={props.id}
+                                    rows={rows}
+                                    className={`${notationFont}  leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
+                                    style={{
+                                        position: 'relative',
+                                        zIndex: 1,
+                                        backgroundColor: gridColors.background,
+                                        color: 'transparent'
+                                    }}
+                                    spellCheck="false"
+                                    defaultValue={notationText}
+                                />
+                                <SystemNotationViewer
+                                    initialStaves={editorStaves}
+                                    readOnly
+                                    className="leading-5.5 border-1 border-solid border-transparent p-0"
+                                    style={{ position: 'absolute', inset: 0, zIndex: 2 }}
+                                />
+                            </div>
+                        </Col>
+                    </Row>
                 )}
             </Grid>
         )
