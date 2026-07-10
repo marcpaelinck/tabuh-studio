@@ -67,7 +67,9 @@ export function StaffGrid({
     className,
     style
 }: StaffGridProps) {
-    const fontClass = `balifontspaced${editorFontSize}`
+    const positionFontStyle = { fontFamily: 'Courier', fontSize: '12px' }
+
+    const notationFont = `balifontspaced${editorFontSize}`
     return (
         <div
             ref={ref}
@@ -80,7 +82,7 @@ export function StaffGrid({
             onPaste={onPaste}
             onFocus={onFocus}
             onBlur={onBlur}
-            className={`${fontClass}${className ? ' ' + className : ''}`}
+            className={`${notationFont}${className ? ' ' + className : ''}`}
             style={{
                 outline: 'none',
                 whiteSpace: 'pre',
@@ -94,7 +96,7 @@ export function StaffGrid({
                     <div
                         ref={grid.ref}
                         aria-hidden="true"
-                        className={`absolute top-0 bottom-0 z-0 ${fontClass}`}
+                        className={`absolute top-0 bottom-0 z-0 ${notationFont}`}
                         style={{ left: grid.left, width: `${grid.widthCh}ch`, ...grid.style }}
                     />
                 )}
@@ -117,8 +119,8 @@ export function StaffGrid({
                         return (
                             <div key={row.key}>
                                 {row.label ? (
-                                    <div className="flex items-center">
-                                        {row.label}
+                                    <div className={`flex items-center`}>
+                                        <div style={positionFontStyle}>{row.label}</div>
                                         {staff}
                                     </div>
                                 ) : (

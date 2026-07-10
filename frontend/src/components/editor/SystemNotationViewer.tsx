@@ -11,6 +11,7 @@
  * reflects external updates (e.g. compact-view edits flowing through expandSystem).
  */
 
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { CSSProperties, RefObject } from 'react'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useSystemEditor, type EditorStaff } from '../../componentlogic/editor/useSystemEditor'
@@ -20,6 +21,8 @@ export interface SystemNotationViewerProps {
     ref: RefObject<HTMLDivElement | null>
     /** Staves in display order (one per instrument position). */
     initialStaves: EditorStaff[]
+    /** Width of the staves (in number of notes) */
+    notationWidth: number
     /** Called with the updated staves whenever an edit changes the notation. */
     onChange?: (staves: EditorStaff[]) => void
     keyMap?: KeyMap
@@ -32,6 +35,7 @@ export interface SystemNotationViewerProps {
 export function SystemNotationViewer({
     ref,
     initialStaves,
+    notationWidth,
     onChange,
     keyMap,
     className,
@@ -47,6 +51,7 @@ export function SystemNotationViewer({
 
     const rows: StaffGridRow[] = staves.map((staff, staffIdx) => ({
         key: staff.position,
+        label: <div className="shrink-0 w-36 pr-2 truncate text-blue-600">{positionConfigs[staff.position].name}</div>,
         symbols: staff.symbols,
         cursorIndex: showCursor && controller.cursor.staff === staffIdx ? controller.cursor.index : null,
         onSymbolClick: readOnly ? () => {} : (index) => controller.setCursor(staffIdx, index),
@@ -55,7 +60,8 @@ export function SystemNotationViewer({
 
     return (
         <StaffGrid
-            ref={ref}
+            // ref={ref}
+            grid={{ ref, left: '9rem', widthCh: notationWidth }}
             rows={rows}
             readOnly={readOnly}
             onKeyDown={readOnly ? undefined : controller.onKeyDown}

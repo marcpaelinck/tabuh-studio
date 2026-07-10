@@ -219,8 +219,8 @@ export default function EditorWindow({
                                 value={editorView}
                                 onChange={(value) => setEditorView(value as EditorView)}
                                 data={[
-                                    { label: 'Compact', value: 'compact' },
-                                    { label: 'Expanded', value: 'expanded' }
+                                    { label: 'Editor', value: 'compact' },
+                                    { label: 'Viewer (expanded)', value: 'expanded' }
                                 ]}
                             />
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>

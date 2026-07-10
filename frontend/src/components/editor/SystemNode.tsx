@@ -13,7 +13,7 @@ import {
     type ReactNode,
     type RefObject
 } from 'react'
-import { Col, Grid, Row, Textarea, type TextareaProps } from 'rsuite'
+import { Col, Grid, Row, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { StyleProperties } from 'rsuite/esm/internals/types'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
@@ -86,6 +86,7 @@ export const SystemNode = memo(function SystemNode({
     const editorView = useUserSelectionStore((state) => state.editorView)
     const headerDisabled = editorView === 'expanded' // SummaryItems are read-only in the expanded view
     const playing = ['playing', 'paused'].includes(audioState) // hide the expansion snippet while playing
+    const [notationWidth, setNotationWidth] = useState<number>(0)
 
     const gridColors = {
         cursor: 'rgba(255, 255, 0, 0.5)',
@@ -115,6 +116,12 @@ export const SystemNode = memo(function SystemNode({
             setPlaybackCursor(null)
         }
     }, [audioState])
+
+    // Update the number of columns in the notation area
+    useEffect(() => {
+        const maxColumns = Math.max(0, ...systemData.groups.map((group) => group.notation.length))
+        setNotationWidth(maxColumns)
+    }, [systemData])
 
     // Redraw background gridlines
     useEffect(() => {
@@ -302,8 +309,6 @@ export const SystemNode = memo(function SystemNode({
         debug(`re-rendering notation area of system ${systemData.id}`)
         // Groups are leading: a system with no groups shows nothing.
         if (!hasGroups) return null
-        const positionTitlesFont = `courierfont${10}`
-        const rows = _.keys(systemData.staffs).length
         return (
             <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
                 <Row id="SystemHeader">
@@ -319,7 +324,7 @@ export const SystemNode = memo(function SystemNode({
                                     ref={compactNotationRef}
                                     key={`compact-${systemData.uuid}`}
                                     initialLines={compactLines}
-                                    beatColWidths={beatColWidths}
+                                    notationWidth={notationWidth}
                                     kempliFrequency={systemData.kempli.frequency}
                                     availablePositions={availablePositions}
                                     castingInstructions={systemData.castingInstructions}
@@ -333,23 +338,15 @@ export const SystemNode = memo(function SystemNode({
                     </Row>
                 ) : (
                     <Row id="SystemNotation">
-                        <Col span={3} id="Positions">
-                            <Textarea
-                                disabled
-                                rows={rows}
-                                className={`${positionTitlesFont} leading-5.5 border-1 border-solid border-gray-200 resize-none overflow-clip p-0`}
-                                value={positionTitles}
-                            />
-                        </Col>
-                        <Col span={20} id="Notation">
+                        <Col span={23} id="Notation">
                             {/* The expanded view (separate staff for each position) - READ ONLY. */}
                             <SystemNotationViewer
                                 ref={expandedNotationRef}
                                 initialStaves={editorStaves}
+                                notationWidth={notationWidth}
                                 readOnly
                                 className="leading-5.5 border-1 border-solid border-transparent p-0"
                             />
-                            {/* </div> */}
                         </Col>
                     </Row>
                 )}

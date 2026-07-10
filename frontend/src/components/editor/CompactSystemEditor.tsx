@@ -17,7 +17,7 @@
 
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position } from '@tabuhstudio/shared/types/basetypes'
-import { useEffect, useState, type CSSProperties, type RefObject } from 'react'
+import { useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Popover, Tag, Tooltip, Whisper } from 'rsuite'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
@@ -31,8 +31,8 @@ import { StaffLine } from './StaffLine'
 export interface CompactSystemEditorProps {
     ref: RefObject<HTMLDivElement | null>
     initialLines: CompactLine[]
-    /** Per-kempli-beat column widths (used to draw the kempli beat lines of the grid). */
-    beatColWidths: number[]
+    /** Width of the notation (in number of notes) */
+    notationWidth: number
     /** Uniform kempli frequency, if any — used for the repeating kempli grid line. */
     kempliFrequency?: number
     /** Universe of positions the system may contain (KEMPLI only when kempli.state === 'notation'). */
@@ -54,7 +54,7 @@ const positionName = (p: Position) => positionConfigs[p]?.name ?? p
 export function CompactSystemEditor({
     ref,
     initialLines,
-    beatColWidths,
+    notationWidth,
     kempliFrequency,
     availablePositions,
     castingInstructions,
@@ -80,19 +80,19 @@ export function CompactSystemEditor({
         removePosition
     } = useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
     // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
-    const [maxCols, setMaxCols] = useState<number>(0)
+    // const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const [newPositions, setNewPositions] = useState<Position[]>([])
 
     const fontClass = `balifontspaced${editorFontSize}`
 
     // Update the number of columns in the notation area
-    useEffect(() => {
-        const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
-        // Width (in columns) shared by every row so the grids line up.
-        const maxCols = Math.max(sumBeats, ...lines.map((l) => l.notation.length), 1)
-        setMaxCols(maxCols)
-    }, [beatColWidths])
+    // useEffect(() => {
+    //     const sumBeats = beatColWidths.reduce((a, b) => a + b, 0)
+    //     // Width (in columns) shared by every row so the grids line up.
+    //     const maxCols = Math.max(sumBeats, ...lines.map((l) => l.notation.length), 1)
+    //     setMaxCols(maxCols)
+    // }, [beatColWidths])
 
     // Positions in use across the whole system, and the still-free ones (the seed pool
     // for new staves / added positions). Recomputed from the live lines so it tracks edits.
@@ -180,9 +180,7 @@ export function CompactSystemEditor({
                 placement="bottomStart"
                 onClose={() => setNewPositions([])}
                 speaker={linePopover(li, line)}>
-                <div
-                    className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
-                    style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px' }}>
+                <div className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600">
                     <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
                         {label}
                     </Whisper>
@@ -231,8 +229,8 @@ export function CompactSystemEditor({
     return (
         <StaffGrid
             rows={rows}
-            grid={{ ref, left: '9rem', widthCh: maxCols }}
-            rowWidthCh={maxCols}
+            grid={{ ref, left: '9rem', widthCh: notationWidth }}
+            rowWidthCh={notationWidth}
             onKeyDown={onKeyDown}
             onPaste={onPaste}
             onFocus={onFocus}
