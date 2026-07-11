@@ -1,5 +1,4 @@
 import { NoteObject } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
@@ -87,13 +86,6 @@ export const SystemNode = memo(function SystemNode({
     const headerDisabled = editorView === 'expanded' // SummaryItems are read-only in the expanded view
     const playing = ['playing', 'paused'].includes(audioState) // hide the expansion snippet while playing
     const [notationWidth, setNotationWidth] = useState<number>(0)
-
-    const gridColors = {
-        cursor: 'rgba(255, 255, 0, 0.5)',
-        kempli: 'rgba(0, 255, 0, 0.8)',
-        grid: 'rgba(0, 0, 0, 0.2)',
-        background: 'rgba(255, 255, 255, 0.9)'
-    }
 
     function moveEditorCursor(cursorParams: EditorCursorParameters) {
         if (cursorParams.cursor.sysUuid != systemData.uuid) {
@@ -262,9 +254,6 @@ export const SystemNode = memo(function SystemNode({
     const sortedStaffEntries = _.entries(systemData.staffs).sort(
         ([p1, _1], [p2, _2]) => (positionOrder.indexOf(p1) || 0) - (positionOrder.indexOf(p2) || 0)
     )
-    const positionTitles = sortedStaffEntries
-        .map(([position, _]) => positionConfigs[position as Position].name)
-        .join('\n')
 
     // Staves handed to the virtual editor, in the same display order as the textarea.
     const editorStaves: EditorStaff[] = sortedStaffEntries.map(([position, staff]) => ({
