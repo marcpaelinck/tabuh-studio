@@ -7,6 +7,7 @@ import type { ExecutionItem } from '../typing/execution'
 import { kempliStates, type Score, type Staff, type System, type ValidationResult } from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
+import { expandSystem } from './expandNotation'
 import { cycleValidation, defaultValidationValue } from './validationManager'
 
 export interface LocalCacheInfo {
@@ -215,14 +216,16 @@ export function useScoreManager() {
                 break
             case 'new': {
                 // Creates an empty system based on the staff settings of the current system.
-                Object.values(newSystemData.staffs).forEach((staff: Staff) => {
-                    if (!staff) return
-                    delete staff.objNotation_
-                    staff.objNotation = []
-                })
-                newSystemData.label = undefined
-                newSystemData.execution = undefined
-                newSystemData.uuid = uuidv4()
+                newSystemData = {
+                    uuid: uuidv4(),
+                    id: -1,
+                    index: -1,
+                    groups: [],
+                    staffs: {},
+                    beatSlices: [],
+                    kempli: newSystemData.kempli
+                }
+
                 sliceIndex1 = systemData.index + 1 // Insert below current
                 break
             }
@@ -264,11 +267,15 @@ export function useScoreManager() {
                     newSystemData.kempli.state = kempliStates[nextIdx]
                     if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
                 }
+                // Changing the kempli settings can affect the expanded notation
+                if (newSystemData) expandSystem(newSystemData)
+
                 break
             default:
                 // Unrecognized action
                 return
         }
+
         // Update, remove or insert system
         const newData = newSystemData
             ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
