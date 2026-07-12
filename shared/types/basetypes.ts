@@ -22,7 +22,8 @@ export type StrokeLocation = (typeof _strokes_)[number]
 const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = (typeof _mutings_)[number]
 
-export type InstrumentType = 'GONG_KEBYAR' | 'SEMAR_PAGULINGAN' | 'UNDEFINED'
+export const instrumentTypes = ['GONG_KEBYAR', 'SEMAR_PAGULINGAN', 'UNDEFINED'] as const
+export type InstrumentType = (typeof instrumentTypes)[number]
 
 export type Position =
     | 'CALUNG'

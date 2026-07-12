@@ -12,6 +12,11 @@
 
 export type { Position } from './types/basetypes.ts'
 
+export { instrumentTypes } from './types/basetypes.ts'
+export type { InstrumentType } from './types/basetypes.ts'
+
+export { DEFAULT_KEMPLI } from './config/defaults.ts'
+
 export {
     AFTER_MODIFIERS,
     ERROR_PITCH_CHAR,

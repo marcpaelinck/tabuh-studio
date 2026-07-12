@@ -201,6 +201,29 @@ Everything here is a mutation of `System.groups` (each group's `positions` / `.n
 - **Caret placement fix.** `StaffLine` places the caret on `mousedown` (not `click`), so the target staff/column is captured at press time — before focusing the editor re-renders and the snippet shifts the layout, which previously made the first click after a scroll land on the wrong staff.
 
 ### Step 6 — Creating a new score
-- Add a menu option `New` under `Notation` in the MainMenu and add functionality that creates a new score. The function should enable the user to fill in the title, instrument type and composer. The first two items are compulsory. The instrument type should be chosen from the possible values of the `InstrumentType` interface, except 'UNDEFINED'.
+This step consists of two parts.
+1. Creating a new (empty) system
+2. Creating a new Score
+
+**Creating a new system**
+Function `updateScoreFromItemAction` in `useScoreManager` already has functionality to create a new empty system (`switch` option 'new'). This option is executed when the `SummaryItem` 'new' of `SystemNode` is clicked. However currently nothing is displayed in the editor view. The new system should be displayed as a new row of SummaryItems followed by an empty staffs area. In the position labels area a '+' button should be displayed to add a first staff. As long as the system contains only one staff, the `delete` option of the label should be disabled.
+
+** Creating a new score**
+- A menu option `New` should be added in the MainMenu under option `Notation`. This option should call a `newScore` function that creates an empty 'current' score.
+- The function should enable the user to fill in the score fields title, instrument type and composer. The first two items are compulsory. The instrument type should be chosen from the possible values of the `InstrumentType` interface, except 'UNDEFINED'.
 - A new score should initially contain one system with an empty `groups`.
 - The user should be able to modify the title and composer of the score at any time.
+
+#### Implementation
+- **Empty-system factory.** `useScoreManager` has a module-level `createEmptySystem(kempli)` that builds `{ groups: [], staffs: {}, beatSlices: [], kempli }` (id/index are placeholders, renumbered by `updateScore`'s effect). The `'new'` case of `updateScoreFromItemAction` uses it, inheriting the current system's kempli (falling back to the shared default).
+- **Empty systems now render.** `SystemNode` no longer returns `null` for a system with no groups. It always renders the header row (`PlaybackButtons` + `SummaryItem`s), and renders the **compact** editor surface whenever `editorView === 'compact' || !hasGroups` — i.e. an empty system always shows the editable compact surface (the expanded view is read-only and has nothing to display). `headerDisabled` is `editorView === 'expanded' && groups.length > 0`, so an empty system's header stays enabled in either view.
+- **Add-first-staff affordance.** When `CompactSystemEditor` has zero lines it renders a `+ Add staff` button in the label column; its popover reuses the Step-4 "New staff — select position(s)" selector and calls the existing `addLine(0, positions)`. The controller already supports 0↔1 lines, so no controller changes were needed.
+- **Delete-disabled rule.** Already satisfied by Step 4: the line popover's `Remove staff` button is `disabled={lines.length <= 1}`.
+- **Shared defaults.** `@tabuhstudio/shared` now exports `DEFAULT_KEMPLI` (`{ state: 'on', frequency: 4 }`, in `shared/config/defaults.ts`) and `instrumentTypes` (the `InstrumentType` union redefined as `(typeof instrumentTypes)[number]`, so the runtime list and the type stay in sync).
+- **New score.** `useScoreManager.newScore({ title, instrumenttype, composer })` assembles an empty `Score` (`parts: {}`, `positions: []`, one `createEmptySystem({ ...DEFAULT_KEMPLI })`) and loads it via `updateScore`. `updateScoreMeta({ title, composer })` edits the score-level fields. Both are threaded through `MainWindow` into `MainMenu`.
+- **Menu + dialog.** The `Notation` menu gains `New...` and `Score details...` (the latter disabled when there is no score). Both open `ScoreDetailsDialog` (`components/ScoreDetailsDialog.tsx`): mode `'new'` requires title + instrument type (options = `instrumentTypes` minus `UNDEFINED`) and takes an optional composer; mode `'edit'` edits title + composer with the instrument type shown read-only. The Create/Save button is disabled until required fields are set.
+- **Note.** The compact editor (hence the add-staff flow) is wrapped in `FeatureUnderDevelopment`, so the `+` affordance is hidden in the production environment until the dual editor ships.
+
+
+## Step 7 - Validation and save gating
+Using the existing Lezer grammar plus a per-position allowed-symbol table to detect incorrect symbols in the editor. The casting-rule keys already encode each position's legal tones, so that table can seed it. Invalid notes get highlighted in both views. Wire a score-level hasInvalidSymbols check that blocks DB save but still allows JSON-file save.

@@ -168,6 +168,52 @@ export function CompactSystemEditor({
         )
     }
 
+    // Empty system: no staves yet. Show a single "+" in the label column whose
+    // popover lets the user pick the position(s) for the FIRST staff. Once created the
+    // component re-renders with the normal grid.
+    if (lines.length === 0) {
+        const newCandidates = candidatesFor(newPositions, free)
+        const createFirstStaff = () => {
+            addLine(0, newPositions)
+            setNewPositions([])
+        }
+        const addStaffPopover = (
+            <Popover>
+                <div className="text-xs mb-1">New staff — select position(s):</div>
+                <div className="flex flex-wrap gap-1 mb-2 max-w-64">
+                    {newCandidates.map((p) => (
+                        <Button
+                            key={p}
+                            size="xs"
+                            appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
+                            onClick={() => toggleNewPosition(p)}>
+                            {positionName(p)}
+                        </Button>
+                    ))}
+                    {newCandidates.length === 0 && <span className="text-xs text-gray-400">no positions free</span>}
+                </div>
+                <Button size="xs" appearance="primary" disabled={newPositions.length === 0} onClick={createFirstStaff}>
+                    Create staff
+                </Button>
+            </Popover>
+        )
+        return (
+            <div className={className} style={style}>
+                <div className="shrink-0 w-36 pr-2">
+                    <Whisper
+                        trigger="click"
+                        placement="bottomStart"
+                        onClose={() => setNewPositions([])}
+                        speaker={addStaffPopover}>
+                        <Button size="xs" appearance="ghost">
+                            + Add staff
+                        </Button>
+                    </Whisper>
+                </div>
+            </div>
+        )
+    }
+
     const rows: StaffGridRow[] = lines.map((line, li) => {
         const { label, tooltip } = compactGroupLabel(line.positions)
         const flatCursor = focused && cursor.line === li ? cursor.index : null
