@@ -83,7 +83,10 @@ export const SystemNode = memo(function SystemNode({
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
     const editorView = useUserSelectionStore((state) => state.editorView)
-    const headerDisabled = editorView === 'expanded' // SummaryItems are read-only in the expanded view
+    // SummaryItems are read-only in the expanded view — except for an empty system, which is
+    // always shown as the editable compact add-staff surface (see notationArea), so its header
+    // stays enabled regardless of the current view.
+    const headerDisabled = editorView === 'expanded'
     const playing = ['playing', 'paused'].includes(audioState) // hide the expansion snippet while playing
     const [notationWidth, setNotationWidth] = useState<number>(0)
 
@@ -296,14 +299,13 @@ export const SystemNode = memo(function SystemNode({
 
     const notationArea = useMemo(() => {
         debug(`re-rendering notation area of system ${systemData.id}`)
-        // Groups are leading: a system with no groups shows nothing.
-        if (!hasGroups) return null
         return (
             <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
                 <Row id="SystemHeader">
                     {systemHeaderButtons}
                     {systemHeaderFields}
                 </Row>
+                {/* Display editor mode (compact view) */}
                 {editorView === 'compact' ? (
                     <Row id="CompactNotation">
                         <Col span={23}>
@@ -326,6 +328,7 @@ export const SystemNode = memo(function SystemNode({
                         </Col>
                     </Row>
                 ) : (
+                    // Display read-only view (expanded view)
                     <Row id="SystemNotation">
                         <Col span={23} id="Notation">
                             {/* The expanded view (separate staff for each position) - READ ONLY. */}

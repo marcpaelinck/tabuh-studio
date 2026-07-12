@@ -196,8 +196,6 @@ export function SummaryItem({
     useEffect(() => {
         // Cancel editing when Esc key is pressed or when user clicks anywhere outside the input field.
         // The input field's onClick handler stops propagation to avoid closing it on mouse click.
-        debug(`Editing= ${editing}`)
-
         if (editing) {
             function handleEscapeKey(event: KeyboardEvent) {
                 if (event.code === 'Escape' && itemSpecs[item].fieldeditwhen != 'always') {
@@ -214,8 +212,9 @@ export function SummaryItem({
     }, [editing])
 
     // Cancel any editing when the item becomes disabled (e.g. switching to the expanded view).
+    // When the item becomes enabled, set editing if the field should always be editable.
     useEffect(() => {
-        if (disabled) setEditing(false)
+        setEditing(itemSpecs[item].fieldeditwhen == 'always' && !disabled)
     }, [disabled])
 
     // Action performed on button click.
@@ -306,6 +305,7 @@ export function SummaryItem({
             width="100%"
             cleanable={false}
             size="xs"
+            popupStyle={{ zIndex: 100 }} // Keeps the popup list above staff content. Rsuite's default value is 7.
         />
     )
 
@@ -341,6 +341,7 @@ export function SummaryItem({
 
     return (
         <>
+            {/* Button or Icon */}
             {itemSpecs[item].action == 'none' ? (
                 summaryIcon
             ) : (
@@ -368,6 +369,7 @@ export function SummaryItem({
                     />
                 </Whisper>
             )}
+            {/* Field or selector next to the button */}
             {itemSpecs[item].hasfield ? (
                 <Whisper
                     ref={textWhisperRef}

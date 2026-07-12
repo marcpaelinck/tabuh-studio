@@ -1,13 +1,38 @@
+import { DEFAULT_KEMPLI, type InstrumentType } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
 import type { ExecutionItem } from '../typing/execution'
-import { kempliStates, type Score, type Staff, type System, type ValidationResult } from '../typing/score'
+import {
+    kempliStates,
+    type KempliSetting,
+    type Score,
+    type Staff,
+    type System,
+    type ValidationResult
+} from '../typing/score'
 import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
+import { expandSystem } from './expandNotation'
 import { cycleValidation, defaultValidationValue } from './validationManager'
+
+// Factory for an empty system (no groups, no staffs). Used both when inserting a new
+// system below an existing one (inheriting its kempli) and when creating a score from
+// scratch (seeded with DEFAULT_KEMPLI). id/index are placeholders; they are renumbered
+// by updateScore's effect once the system is placed in the score.
+function createEmptySystem(kempli: KempliSetting): System {
+    return {
+        uuid: uuidv4(),
+        id: -1,
+        index: -1,
+        groups: [],
+        staffs: {},
+        beatSlices: [],
+        kempli: _.cloneDeep(kempli)
+    }
+}
 
 export interface LocalCacheInfo {
     level: DashboardLevel
@@ -214,15 +239,9 @@ export function useScoreManager() {
                 }
                 break
             case 'new': {
-                // Creates an empty system based on the staff settings of the current system.
-                Object.values(newSystemData.staffs).forEach((staff: Staff) => {
-                    if (!staff) return
-                    delete staff.objNotation_
-                    staff.objNotation = []
-                })
-                newSystemData.label = undefined
-                newSystemData.execution = undefined
-                newSystemData.uuid = uuidv4()
+                // Creates an empty system, inheriting the current system's kempli (or the
+                // shared default when the current system has none).
+                newSystemData = createEmptySystem(systemData.kempli ?? { ...DEFAULT_KEMPLI })
                 sliceIndex1 = systemData.index + 1 // Insert below current
                 break
             }
@@ -264,11 +283,15 @@ export function useScoreManager() {
                     newSystemData.kempli.state = kempliStates[nextIdx]
                     if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
                 }
+                // Changing the kempli settings can affect the expanded notation
+                if (newSystemData) expandSystem(newSystemData)
+
                 break
             default:
                 // Unrecognized action
                 return
         }
+
         // Update, remove or insert system
         const newData = newSystemData
             ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
@@ -297,6 +320,26 @@ export function useScoreManager() {
         [labels]
     )
 
+    // Creates a brand-new, empty 'current' score: one empty system seeded with the shared
+    // default kempli. Loaded straight into the editor (updateScore rebuilds labels/validation).
+    function newScore(fields: { title: string; instrumenttype: InstrumentType; composer: string }) {
+        const score: Score = {
+            uuid: uuidv4(),
+            title: fields.title,
+            composer: fields.composer,
+            instrumenttype: fields.instrumenttype,
+            parts: {},
+            positions: [],
+            systems: [createEmptySystem({ ...DEFAULT_KEMPLI })]
+        }
+        updateScore(score)
+    }
+
+    // Edits the score-level title / composer (the "Score details..." menu action).
+    const updateScoreMeta = useCallback((meta: { title: string; composer: string }) => {
+        setScore((current) => (current ? { ...current, title: meta.title, composer: meta.composer } : current))
+    }, [])
+
     return {
         score,
         validation,
@@ -306,6 +349,8 @@ export function useScoreManager() {
         updateScore,
         updateSystem,
         updateParts,
-        executeItemAction
+        executeItemAction,
+        newScore,
+        updateScoreMeta
     }
 }

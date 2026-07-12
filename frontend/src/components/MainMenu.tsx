@@ -10,6 +10,7 @@ import TsGongIcon from '../reacticons/TsGongIcon'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
+import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 
 type Action =
     | '1'
@@ -17,12 +18,14 @@ type Action =
     | '3'
     | '4'
     | 'login'
+    | 'score-new'
+    | 'score-details'
     | 'file-open'
     | 'file-open-json'
     | 'file-import-notation'
     | 'file-import-laras'
     | 'file-save'
-    | 'file-saveas'
+    | 'file-export'
     | 'instruments-select'
     | 'settings-instruments'
     | 'settings-keyboard'
@@ -33,6 +36,8 @@ interface TabuhEditorMenuProps {
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
+    newScore: (fields: ScoreDetailsValues) => void
+    updateScoreMeta: (meta: { title: string; composer: string }) => void
     keyboard: KeyboardType
     setKeyboard: Dispatch<KeyboardType>
     user: AuthUser | null
@@ -43,12 +48,16 @@ export function MainMenu({
     score,
     loadScore,
     saveScore,
+    newScore,
+    updateScoreMeta,
     keyboard,
     setKeyboard,
     user
 }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
+    // The New / Score details dialog (null when closed).
+    const [scoreDialogMode, setScoreDialogMode] = useState<'new' | 'edit' | null>(null)
     const dialog = useDialog()
     // const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
     //     state.selectedScoreOption,
@@ -59,6 +68,12 @@ export function MainMenu({
 
     async function performAction() {
         switch (activeKey) {
+            case 'score-new':
+                setScoreDialogMode('new')
+                break
+            case 'score-details':
+                if (score) setScoreDialogMode('edit')
+                break
             case 'file-open':
                 setScoreSelector(true)
                 break
@@ -70,13 +85,13 @@ export function MainMenu({
                     } else {
                         dialog.alert(
                             'An error occurred: the notation was not saved.\n' +
-                                'If the error persists choose `Save As... and copy the text to a file.\n' +
-                                'You will be able to upload it later.'
+                                'If the error persists choose `Export... to save\n' +
+                                ' your work to a text file.'
                         )
                     }
                 }
                 break
-            case 'file-saveas': {
+            case 'file-export': {
                 // Persist cached changes and empty caches
                 const persistedScore = persistCachedChanges(score)
                 if (persistedScore) {
@@ -133,15 +148,36 @@ export function MainMenu({
         </Modal>
     )
 
+    const scoreDetailsDialog = (
+        <ScoreDetailsDialog
+            open={scoreDialogMode !== null}
+            mode={scoreDialogMode ?? 'new'}
+            initial={
+                scoreDialogMode === 'edit' && score
+                    ? { title: score.title, composer: score.composer, instrumenttype: score.instrumenttype }
+                    : undefined
+            }
+            onClose={() => setScoreDialogMode(null)}
+            onSubmit={(values) => {
+                if (scoreDialogMode === 'edit') updateScoreMeta({ title: values.title, composer: values.composer })
+                else newScore(values)
+            }}
+        />
+    )
+
     return (
         <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
             <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />}>
+                <Nav.Item eventKey="score-new">New...</Nav.Item>
                 <Nav.Item eventKey="file-open">Open...</Nav.Item>
+                <Nav.Item disabled={!score} eventKey="score-details">
+                    Score details...
+                </Nav.Item>
                 <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">
                     <div className="block width-xl">Save</div>
                     {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
                 </Nav.Item>
-                <Nav.Item eventKey="file-saveas">Save As...</Nav.Item>
+                <Nav.Item eventKey="file-export">Export...</Nav.Item>
             </Nav.Menu>
             <Nav.Menu eventKey="1" title="Import" icon={<TbFileImport />}>
                 <Nav.Item eventKey="file-open-json">Tabuh Studio...</Nav.Item>
@@ -183,6 +219,7 @@ export function MainMenu({
                 </Nav.Item>
             </Nav.Menu>
             {selectScoreDialog}
+            {scoreDetailsDialog}
         </Nav>
     )
 }
