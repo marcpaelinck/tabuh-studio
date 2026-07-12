@@ -1,0 +1,35 @@
+# Tabuh Studio frontend
+
+## Instructions
+
+- `Added` for new features.
+- `Changed` for changes in existing functionality.
+- `Deprecated` for soon-to-be removed features.
+- `Removed` for now removed features.
+- `Fixed` for any bug fixes.
+- `Security`
+
+## 1.0.0
+
+Initial release
+
+## 1.0.1
+
+- `Changed` Redesigned mobile version
+
+## 1.0.2
+
+- `Added` Compact editor
+- `Added` Using Zustand package for user settings
+
+## 1.0.3
+
+- `Added` Beatslices now stored in score object
+- `Fixed` Gridlines of compact editor not displayed initially
+
+## 1.1.0
+
+- `Added` Adding and removing staffs and positions per staff in editor.
+- `Added` Expanded view appears below the staff being edited.
+- `Changed` Editor (compact) and Viewer (expanded) are now different views.
+- `Changed` Unified the way expanded and compact views are being generated.
