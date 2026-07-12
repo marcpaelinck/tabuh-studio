@@ -13,10 +13,14 @@ import { Button, Input, InputGroup, Modal, SelectPicker } from 'rsuite'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
 const instrumentLabels: Partial<Record<InstrumentType, string>> = Object.fromEntries(
-    instrumentTypes.filter((t) => t !== 'UNDEFINED').map((t) => [t as InstrumentType, t.replace('_', ' ')])
+    instrumentTypes.map((t) => [t as InstrumentType, t.replace('_', ' ')])
 )
 
-const instrumentOptions = instrumentTypes.map((t) => ({ label: instrumentLabels[t], value: t }))
+const instrumentOptions = instrumentTypes
+    .filter((t) => t !== 'UNDEFINED')
+    .map((t) => {
+        return { label: instrumentLabels[t], value: t }
+    })
 
 export interface ScoreDetailsValues {
     title: string
