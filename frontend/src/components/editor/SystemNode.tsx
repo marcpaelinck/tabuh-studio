@@ -264,10 +264,6 @@ export const SystemNode = memo(function SystemNode({
         symbols: staff.objNotation
     }))
 
-    // The compact (grouped/shorthand) view is the editable surface for systems that
-    // have a canonical `groups` store. See CLAUDE.dual-editor.md.
-    const hasGroups = !!systemData.groups && systemData.groups.length > 0
-
     // Per-beat column widths for the compact grid, derived from the system's beat slices.
     const beatColWidths = systemData.beatSlices.map((slice) => slice.end - slice.start) ?? []
 
