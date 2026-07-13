@@ -1,7 +1,7 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
-import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
-import type { NoteSymbol, Position, UUID } from '@tabuhstudio/shared/types/basetypes.ts'
+import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
+import type { NoteSymbol, UUID } from '@tabuhstudio/shared/types/basetypes.ts'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { type CastingInstruction } from '../componentlogic/castingRulesManager.ts'

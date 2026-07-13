@@ -24,7 +24,7 @@ import {
     STROKE_MODIFIER_MAP,
     STROKE_MODIFIERS
 } from '../constants/noteChars.ts'
-import type { Position } from '../types/basetypes.ts'
+import type { Position } from '../types/position.ts'
 import { noteRange } from '../utils/alphabet.ts'
 
 // Re-export so that consumers can import everything from a single file if needed.

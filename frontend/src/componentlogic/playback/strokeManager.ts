@@ -4,8 +4,8 @@
 // Stroke modifiers that are shorthand notation for sequences of base notes --e.g. 'norot' patterns--
 // are converted to regular notation symbols by the patternManager. They are not handled in this module.
 
-import { EXTENDING_CHAR, MUTING_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
-import type { BPM, DurationInBasenoteEquiv, Position, TimeInBasenoteEquiv } from '@tabuhstudio/shared/types/basetypes'
+import { EXTENDING_CHAR, MUTING_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
+import type { BPM, DurationInBasenoteEquiv, TimeInBasenoteEquiv } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
 import { noteRange } from '../../../../shared/utils/alphabet'

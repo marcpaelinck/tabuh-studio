@@ -1,5 +1,5 @@
+import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {

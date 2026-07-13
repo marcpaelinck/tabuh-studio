@@ -2,8 +2,8 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
-import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR, NoteObject } from '@tabuhstudio/shared'
-import type { BPM, NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
+import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR, NoteObject, type Position } from '@tabuhstudio/shared'
+import type { BPM, NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'

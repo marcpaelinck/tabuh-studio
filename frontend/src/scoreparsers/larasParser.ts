@@ -1,9 +1,9 @@
 // Parser for imported scores with Laras formatting.
 
 import type { SyntaxNode } from '@lezer/common'
-import { KEMPLI_BEAT_CHAR, SILENCE_EXTENDING_CHARS, SPACE_CHAR } from '@tabuhstudio/shared'
+import { KEMPLI_BEAT_CHAR, SILENCE_EXTENDING_CHARS, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
 import { SILENCE_CHARS } from '@tabuhstudio/shared/constants/noteChars'
-import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes'
+import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import { v4 as uuidv4 } from 'uuid'
 import type { BeatSliceInfo, TempoItem } from '../typing/execution'
 import type { ParserReturnValue } from '../typing/parsers'

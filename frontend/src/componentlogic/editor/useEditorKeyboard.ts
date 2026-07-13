@@ -10,9 +10,9 @@
  * calls `preventDefault`.
  */
 
-import { useCallback } from 'react'
+import type { Keystroke, NoteObject, Position } from '@tabuhstudio/shared'
 import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
-import type { NoteObject, Position } from '@tabuhstudio/shared'
+import { useCallback } from 'react'
 import {
     attachModifier,
     changeOctave,
@@ -23,7 +23,7 @@ import {
     typeChar,
     type EditorStaffState
 } from './inputStateMachine'
-import { defaultKeyMap, type KeyMap, type Keystroke } from './keyMap'
+import { defaultKeyMap, type KeyMap } from './keyMap'
 
 function toKeystroke(e: KeyboardEvent): Keystroke {
     return { key: e.key, ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }

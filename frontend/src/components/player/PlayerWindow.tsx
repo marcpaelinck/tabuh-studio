@@ -1,4 +1,4 @@
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
 import { Activity, useEffect, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'

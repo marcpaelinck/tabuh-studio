@@ -5,8 +5,8 @@
 // positions) via `positionAbbr`, joined with '/'. E.g. GANGSA + UGAL -> "ga/ug",
 // REYONG_1 + REYONG_3 -> "rey13". The tooltip always lists every position's full name.
 
+import type { Position } from '@tabuhstudio/shared'
 import { positionAbbr, positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
 
 type PositionGroupKey = keyof typeof positionGroups
 

@@ -1,4 +1,4 @@
-import type { Position } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { Position } from '@tabuhstudio/shared'
 import type { ExecutionItem, KempliItem } from '../typing/execution.ts'
 import type { KempliSetting } from '../typing/score.ts'
 import { instrumentTags, separators } from './tabuhConfig.ts'

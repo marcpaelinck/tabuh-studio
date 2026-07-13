@@ -1,5 +1,5 @@
-import { NoteObject } from '@tabuhstudio/shared'
-import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
+import { NoteObject, type Position } from '@tabuhstudio/shared'
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
     memo,

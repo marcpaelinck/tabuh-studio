@@ -10,8 +10,6 @@
  *   - NoteObject class, NoteObjectError, NoteObjectFault (NoteObject.ts)
  */
 
-export type { Position } from './types/basetypes.ts'
-
 export { instrumentTypes } from './types/basetypes.ts'
 export type { InstrumentType } from './types/basetypes.ts'
 
@@ -33,5 +31,7 @@ export {
     STROKE_MODIFIERS
 } from './constants/noteChars.ts'
 
+export type { EditorAction, EditorActionType, KeyMapDefinition, Keystroke } from './types/keymap'
 export { NoteObject, NoteObjectError } from './types/NoteObject'
 export type { NoteObjectFault } from './types/NoteObject'
+export type { Position, PositionGroup } from './types/position'

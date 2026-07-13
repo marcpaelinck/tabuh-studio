@@ -1,6 +1,5 @@
-import { SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '@tabuhstudio/shared'
+import { SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS, type Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck, SOUNDS_FOLDER } from './config'
 

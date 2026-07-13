@@ -1,4 +1,4 @@
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
 import type { JSX } from 'react'
 import { Activity, useEffect, useState } from 'react'
 import { HStack, Radio, RadioGroup, SelectPicker, Stack, Text } from 'rsuite'

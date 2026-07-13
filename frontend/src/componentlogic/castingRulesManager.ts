@@ -1,8 +1,8 @@
 // This module contains the rules that are used for the automatic generation of notation for grouped staves.
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
-import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR } from '@tabuhstudio/shared'
-import type { NoteSymbol, Position } from '@tabuhstudio/shared/types/basetypes.ts'
+import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
+import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes.ts'
 import _ from 'lodash'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 

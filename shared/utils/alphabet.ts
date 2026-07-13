@@ -1,5 +1,6 @@
 import { positionConfigs } from '../config/position'
-import type { NoteSymbol, Position } from '../types/basetypes'
+import type { NoteSymbol } from '../types/basetypes'
+import type { Position } from '../types/position'
 
 export function notation2text(notation: string[] | undefined): string {
     if (notation) return notation.map((symbol) => symbol).join('')

@@ -1,4 +1,5 @@
-import type { Position, UUID } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { Option } from 'rsuite'
 
 // APPEARANCE

@@ -1,9 +1,8 @@
-import type { NoteObject } from '@tabuhstudio/shared'
+import type { NoteObject, Position } from '@tabuhstudio/shared'
 import type {
     InstrumentType,
     MutingType,
     NoteSymbol,
-    Position,
     StrokeLocation,
     ToneType,
     UUID

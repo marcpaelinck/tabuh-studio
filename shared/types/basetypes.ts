@@ -24,25 +24,3 @@ export type MutingType = (typeof _mutings_)[number]
 
 export const instrumentTypes = ['GONG_KEBYAR', 'UNDEFINED'] as const
 export type InstrumentType = (typeof instrumentTypes)[number]
-
-export type Position =
-    | 'CALUNG'
-    | 'CENGCENG'
-    | 'GENDER_RAMBAT'
-    | 'GONGS'
-    | 'JEGOGAN'
-    | 'KANTILAN_POLOS'
-    | 'KANTILAN_SANGSIH'
-    | 'KEMPLI'
-    | 'KENDANG'
-    | 'KENDANG_LANANG'
-    | 'KENDANG_WADON'
-    | 'PEMADE_POLOS'
-    | 'PEMADE_SANGSIH'
-    | 'PENYACAH'
-    | 'REYONG_1'
-    | 'REYONG_2'
-    | 'REYONG_3'
-    | 'REYONG_4'
-    | 'TROMPONG'
-    | 'UGAL'

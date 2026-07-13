@@ -15,8 +15,8 @@
  * add/remove positions (constrained to valid, unused positions) and add/remove staves.
  */
 
+import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import { useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Popover, Tag, Tooltip, Whisper } from 'rsuite'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'

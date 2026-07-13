@@ -15,9 +15,9 @@
  * expanded staffs via expandSystem().
  */
 
-import type { NoteObject, Position } from '@tabuhstudio/shared'
-import { useCallback, useState } from 'react'
+import type { Keystroke, NoteObject, Position } from '@tabuhstudio/shared'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
+import { useCallback, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { castGroupToSolo, type CastingInstruction } from '../castingRulesManager'
 import {
@@ -30,7 +30,7 @@ import {
     typeChar,
     type EditorStaffState
 } from './inputStateMachine'
-import { defaultKeyMap, type KeyMap, type Keystroke } from './keyMap'
+import { defaultKeyMap, type KeyMap } from './keyMap'
 
 /** One compact line = one notation group, holding a flat array of symbols. */
 export interface CompactLine {

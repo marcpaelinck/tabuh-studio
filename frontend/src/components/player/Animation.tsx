@@ -1,4 +1,3 @@
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
 import type { Dispatch, JSX, RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, HStack, Row, SelectPicker, Toggle } from 'rsuite'
@@ -11,6 +10,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
+import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'

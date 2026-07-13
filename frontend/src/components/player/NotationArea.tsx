@@ -2,7 +2,7 @@
 // E.g. notation can be written in the textarea element or a cursor can scroll through the
 // notation while the corresponding notes are being played.
 
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
 import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type {

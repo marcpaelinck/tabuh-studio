@@ -9,7 +9,7 @@
 //
 // Both the parser and the live editor call this so they produce identical output.
 
-import type { Position } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { Position } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import type { System } from '../typing/score.ts'
 import { getBeatSlices } from '../utils/objectUtils.ts'

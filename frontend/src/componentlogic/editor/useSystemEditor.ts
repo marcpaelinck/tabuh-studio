@@ -17,10 +17,10 @@
  * works because the rendered glyphs are real text.
  */
 
-import { useCallback, useState } from 'react'
-import type { ClipboardEvent, KeyboardEvent } from 'react'
+import type { Keystroke, Position } from '@tabuhstudio/shared'
 import { NoteObject } from '@tabuhstudio/shared'
-import type { Position } from '@tabuhstudio/shared'
+import type { ClipboardEvent, KeyboardEvent } from 'react'
+import { useCallback, useState } from 'react'
 import {
     attachModifier,
     changeOctave,
@@ -32,7 +32,7 @@ import {
     typeChar,
     type EditorStaffState
 } from './inputStateMachine'
-import { defaultKeyMap, type KeyMap, type Keystroke } from './keyMap'
+import { defaultKeyMap, type KeyMap } from './keyMap'
 import { parseClipboard } from './notationClipboard'
 
 /** One staff in the editor: an instrument position and its notation. */
@@ -99,10 +99,7 @@ export function useSystemEditor({
             const staves = notationChanged
                 ? st.staves.with(st.cursor.staff, { ...active, symbols: result.symbols })
                 : st.staves
-            const next: SystemEditorState = {
-                staves,
-                cursor: { staff: st.cursor.staff, index: result.cursorIndex }
-            }
+            const next: SystemEditorState = { staves, cursor: { staff: st.cursor.staff, index: result.cursorIndex } }
             if (notationChanged) onChange?.(staves)
             return next
         },
@@ -116,21 +113,24 @@ export function useSystemEditor({
         return { staves: st.staves, cursor: { staff, index } }
     }, [])
 
-    const moveLeftRight = useCallback((st: SystemEditorState, delta: -1 | 1): SystemEditorState => {
-        const active = st.staves[st.cursor.staff]
-        if (!active) return st
-        // Wrap to the adjacent staff when stepping off either end.
-        if (delta === -1 && st.cursor.index === 0) {
-            if (st.cursor.staff === 0) return st
-            const staff = st.cursor.staff - 1
-            return { staves: st.staves, cursor: { staff, index: st.staves[staff].symbols.length } }
-        }
-        if (delta === 1 && st.cursor.index === active.symbols.length) {
-            if (st.cursor.staff === st.staves.length - 1) return st
-            return { staves: st.staves, cursor: { staff: st.cursor.staff + 1, index: 0 } }
-        }
-        return applyToActiveStaff(st, (s) => moveCursor(s, delta))
-    }, [applyToActiveStaff])
+    const moveLeftRight = useCallback(
+        (st: SystemEditorState, delta: -1 | 1): SystemEditorState => {
+            const active = st.staves[st.cursor.staff]
+            if (!active) return st
+            // Wrap to the adjacent staff when stepping off either end.
+            if (delta === -1 && st.cursor.index === 0) {
+                if (st.cursor.staff === 0) return st
+                const staff = st.cursor.staff - 1
+                return { staves: st.staves, cursor: { staff, index: st.staves[staff].symbols.length } }
+            }
+            if (delta === 1 && st.cursor.index === active.symbols.length) {
+                if (st.cursor.staff === st.staves.length - 1) return st
+                return { staves: st.staves, cursor: { staff: st.cursor.staff + 1, index: 0 } }
+            }
+            return applyToActiveStaff(st, (s) => moveCursor(s, delta))
+        },
+        [applyToActiveStaff]
+    )
 
     const onKeyDown = useCallback(
         (e: KeyboardEvent<HTMLDivElement>) => {
@@ -196,19 +196,12 @@ export function useSystemEditor({
                     if (staffIdx >= staves.length || objs.length === 0) return
                     const staff = staves[staffIdx]
                     const insertAt = k === 0 ? st.cursor.index : clampCursor(staff.symbols, st.cursor.index)
-                    const symbols = [
-                        ...staff.symbols.slice(0, insertAt),
-                        ...objs,
-                        ...staff.symbols.slice(insertAt)
-                    ]
+                    const symbols = [...staff.symbols.slice(0, insertAt), ...objs, ...staff.symbols.slice(insertAt)]
                     staves = staves.with(staffIdx, { ...staff, symbols })
                     changed = true
                 })
                 if (!changed) return st
-                const cursor: SystemCursor = {
-                    staff: st.cursor.staff,
-                    index: st.cursor.index + lines[0].length
-                }
+                const cursor: SystemCursor = { staff: st.cursor.staff, index: st.cursor.index + lines[0].length }
                 onChange?.(staves)
                 return { staves, cursor }
             })

@@ -1,5 +1,5 @@
-import type { NoteObject } from '@tabuhstudio/shared'
-import type { MutingType, Position, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
+import type { NoteObject, Position } from '@tabuhstudio/shared'
+import type { MutingType, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { Dispatch, HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'

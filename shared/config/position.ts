@@ -1,33 +1,5 @@
 import { KEMPLI_BEAT_CHAR } from '../constants/noteChars'
-import type { Position } from '../types/basetypes'
-
-export type Modifiers = { before: string[]; after: string[] }
-
-export type PositionConfig = {
-    //`notes` contains a list of single notes or multiple notes that are played simultaneously.
-    // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
-    // sampletemplate should contain the string '{note}' where the note name should appear in the
-    // sample file name.
-    name: string
-    type: string
-    svg_file: string
-    sampletemplate: string
-    volume: number
-    symbolToNoteNames: { [symbol: string]: string[] }
-    validStrokes: string[]
-    modifiers: Modifiers
-}
-
-type PositionGroup =
-    | 'PEMADE'
-    | 'KANTILAN'
-    | 'GANGSA_POLOS'
-    | 'GANGSA_SANGSIH'
-    | 'GANGSA'
-    | 'REYONG_13'
-    | 'REYONG_24'
-    | 'REYONG'
-    | 'POKOK'
+import type { Position, PositionConfig, PositionGroup } from '../types/position'
 
 export const positionGroups: Record<PositionGroup, Position[]> = {
     PEMADE: ['PEMADE_POLOS', 'PEMADE_SANGSIH'],
@@ -38,7 +10,20 @@ export const positionGroups: Record<PositionGroup, Position[]> = {
     REYONG_13: ['REYONG_1', 'REYONG_3'],
     REYONG_24: ['REYONG_2', 'REYONG_4'],
     REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'],
-    POKOK: ['CALUNG', 'JEGOGAN', 'PENYACAH']
+    POKOK: ['CALUNG', 'JEGOGAN', 'PENYACAH'],
+    MELODIC: [
+        'PEMADE_POLOS',
+        'PEMADE_SANGSIH',
+        'KANTILAN_POLOS',
+        'KANTILAN_SANGSIH',
+        'REYONG_1',
+        'REYONG_3',
+        'REYONG_2',
+        'REYONG_4',
+        'CALUNG',
+        'JEGOGAN',
+        'PENYACAH'
+    ]
 }
 
 export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {

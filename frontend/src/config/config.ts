@@ -1,4 +1,5 @@
-import type { MutingType, Position, ToneType } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
+import type { MutingType, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { DynamicsValue } from '../typing/execution'
 import type { EditorCursor } from '../typing/playback'
@@ -76,14 +77,7 @@ export const editorInitialExpandState = false
 export type KeyboardType = 'regular' | 'laras'
 
 export type NavigationAction =
-    | 'cellup'
-    | 'celldown'
-    | 'cellleft'
-    | 'cellright'
-    | 'rowstart'
-    | 'rowend'
-    | 'firstrow'
-    | 'lastrow'
+    'cellup' | 'celldown' | 'cellleft' | 'cellright' | 'rowstart' | 'rowend' | 'firstrow' | 'lastrow'
 
 export const partColorPalette: ColorName[] = [
     'darkseagreen',

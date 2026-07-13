@@ -1,4 +1,4 @@
-import type { Position } from '@tabuhstudio/shared/types/basetypes'
+import type { Position } from '@tabuhstudio/shared'
 import { instrumentConfigs, type InstrumentConfig } from '../config/config'
 import { focusDefaultOption } from '../stores/useUserSettingsStore'
 import { type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
