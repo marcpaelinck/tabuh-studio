@@ -15,6 +15,8 @@ export type { InstrumentType } from './types/basetypes.ts'
 
 export { DEFAULT_KEMPLI } from './config/defaults.ts'
 
+export { keyMaps } from './config/keymap.ts'
+
 export {
     AFTER_MODIFIERS,
     ERROR_PITCH_CHAR,
@@ -31,7 +33,7 @@ export {
     STROKE_MODIFIERS
 } from './constants/noteChars.ts'
 
-export type { EditorAction, EditorActionType, KeyMapDefinition, Keystroke } from './types/keymap'
+export type { EditableKeyMapping, EditorAction, EditorActionType, KeyMapDefinition, Keystroke } from './types/keymap'
 export { NoteObject, NoteObjectError } from './types/NoteObject'
 export type { NoteObjectFault } from './types/NoteObject'
 export type { Position, PositionGroup } from './types/position'

@@ -14,6 +14,7 @@ import type { Keystroke, NoteObject, Position } from '@tabuhstudio/shared'
 import type { Dispatch, KeyboardEvent, SetStateAction } from 'react'
 import { useCallback } from 'react'
 import {
+    applyString,
     attachModifier,
     changeOctave,
     deleteLeft,
@@ -91,6 +92,9 @@ export function useEditorKeyboard({
                     break
                 case 'insertSymbol':
                     next = action.value ? insertSymbol(state, action.value, position) : state
+                    break
+                case 'insertString':
+                    next = action.value ? applyString(state, action.value, position) : state
                     break
                 case 'attachModifier':
                     next = action.value ? attachModifier(state, action.value, position) : state

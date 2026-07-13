@@ -14,6 +14,7 @@ export type EditorActionType =
     | 'deleteRight'
     | 'insertChar' // insert/attach the literal character that was typed
     | 'insertSymbol' // insert a fixed symbol string (action.value)
+    | 'insertString' // insert a mapped string (action.value): a whole symbol, or a modifier attached to the left
     | 'attachModifier' // attach a fixed modifier char (action.value)
     | 'ignore' // swallow the keystroke, do nothing
 

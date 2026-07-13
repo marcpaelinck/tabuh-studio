@@ -21,6 +21,7 @@ import { useCallback, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { castGroupToSolo, type CastingInstruction } from '../castingRulesManager'
 import {
+    applyString,
     changeOctave,
     clampCursor,
     deleteLeft,
@@ -175,6 +176,10 @@ export function useCompactSystemEditor({
                     case 'insertSymbol':
                         return action.value
                             ? applyToActiveLine(st, (s) => insertSymbol(s, action.value!, COMPACT_POSITION))
+                            : st
+                    case 'insertString':
+                        return action.value
+                            ? applyToActiveLine(st, (s) => applyString(s, action.value!, COMPACT_POSITION))
                             : st
                     default:
                         return st

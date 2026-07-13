@@ -43,6 +43,7 @@ export type PositionGroup =
     | 'GANGSA_POLOS'
     | 'GANGSA_SANGSIH'
     | 'GANGSA'
+    | 'GANGSA_RANGE'
     | 'REYONG_13'
     | 'REYONG_24'
     | 'REYONG'

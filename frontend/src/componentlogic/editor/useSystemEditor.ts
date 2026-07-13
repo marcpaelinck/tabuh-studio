@@ -22,6 +22,7 @@ import { NoteObject } from '@tabuhstudio/shared'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
 import { useCallback, useState } from 'react'
 import {
+    applyString,
     attachModifier,
     changeOctave,
     clampCursor,
@@ -167,6 +168,10 @@ export function useSystemEditor({
                     case 'insertSymbol':
                         return action.value
                             ? applyToActiveStaff(st, (s) => insertSymbol(s, action.value!, pos(st)))
+                            : st
+                    case 'insertString':
+                        return action.value
+                            ? applyToActiveStaff(st, (s) => applyString(s, action.value!, pos(st)))
                             : st
                     case 'attachModifier':
                         return action.value

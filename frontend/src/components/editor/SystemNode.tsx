@@ -1,4 +1,4 @@
-import { NoteObject, type Position } from '@tabuhstudio/shared'
+import { keyMaps, NoteObject, type Position } from '@tabuhstudio/shared'
 import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
@@ -15,6 +15,7 @@ import {
 import { Col, Grid, Row, type TextareaProps } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { StyleProperties } from 'rsuite/esm/internals/types'
+import { compileKeyMap } from '../../componentlogic/editor/keyMap'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
@@ -83,6 +84,12 @@ export const SystemNode = memo(function SystemNode({
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
     const editorView = useUserSelectionStore((state) => state.editorView)
+    // Active keyboard mapping: compile the selected definition into a runnable KeyMap.
+    const selectedKeyMapId = useUserSelectionStore((state) => state.selectedKeyMapId)
+    const keyMap = useMemo(() => {
+        const def = keyMaps.find((k) => k.id === selectedKeyMapId) ?? keyMaps[0]
+        return compileKeyMap(def)
+    }, [selectedKeyMapId])
     // SummaryItems are read-only in the expanded view — except for an empty system, which is
     // always shown as the editable compact add-staff surface (see notationArea), so its header
     // stays enabled regardless of the current view.
@@ -317,6 +324,7 @@ export const SystemNode = memo(function SystemNode({
                                     castingInstructions={systemData.castingInstructions}
                                     staffs={systemData.staffs}
                                     playing={playing}
+                                    keyMap={keyMap}
                                     onChange={handleCompactChange}
                                     className="border-1 border-solid border-gray-200 p-1"
                                 />
@@ -340,7 +348,7 @@ export const SystemNode = memo(function SystemNode({
                 )}
             </Grid>
         )
-    }, [systemData, playbackCursor, audioState, playbackType, editorView, playing])
+    }, [systemData, playbackCursor, audioState, playbackType, editorView, playing, keyMap])
 
     return notationArea
 })

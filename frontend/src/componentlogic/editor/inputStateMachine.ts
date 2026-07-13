@@ -161,6 +161,27 @@ export function typeChar(state: EditorStaffState, char: string, position: Positi
     return state
 }
 
+/**
+ * Applies a mapped string (from a custom key mapping's `symbol`) to the state.
+ *
+ * A mapping's target can be either a whole composite symbol (e.g. `'a,'`, `'<a'`,
+ * written in canonical order) or a bare modifier that should attach to the symbol
+ * on the left (e.g. `','`). We therefore try to insert the string as ONE symbol
+ * first — `insertSymbol` validates the whole thing via `NoteObject` — and only
+ * fall back to per-character routing (`typeChar`) when that fails, which is what
+ * makes single-modifier mappings and other char-sequences work. Using the atomic
+ * path first also gets grace-note prefixes right (canonical prefix-before-pitch
+ * order), which a naive left-to-right `typeChar` reduce would drop.
+ */
+export function applyString(state: EditorStaffState, str: string, position: Position | undefined): EditorStaffState {
+    if (!str) return state
+    const inserted = insertSymbol(state, str, position)
+    if (inserted !== state) return inserted
+    // Not a single valid symbol — route each character through typeChar (handles a
+    // lone modifier attaching left, and any other decomposable sequence).
+    return [...str].reduce((s, ch) => typeChar(s, ch, position), state)
+}
+
 /** Removes the symbol to the LEFT of the cursor (Backspace). */
 export function deleteLeft(state: EditorStaffState): EditorStaffState {
     const { symbols, cursorIndex } = state

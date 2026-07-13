@@ -23,15 +23,7 @@ import { cycleValidation, defaultValidationValue } from './validationManager'
 // scratch (seeded with DEFAULT_KEMPLI). id/index are placeholders; they are renumbered
 // by updateScore's effect once the system is placed in the score.
 function createEmptySystem(kempli: KempliSetting): System {
-    return {
-        uuid: uuidv4(),
-        id: -1,
-        index: -1,
-        groups: [],
-        staffs: {},
-        beatSlices: [],
-        kempli: _.cloneDeep(kempli)
-    }
+    return { uuid: uuidv4(), id: -1, index: -1, groups: [], staffs: {}, beatSlices: [], kempli: _.cloneDeep(kempli) }
 }
 
 export interface LocalCacheInfo {
@@ -330,7 +322,7 @@ export function useScoreManager() {
             instrumenttype: fields.instrumenttype,
             parts: {},
             positions: [],
-            systems: [createEmptySystem({ ...DEFAULT_KEMPLI })]
+            systems: [{ ...createEmptySystem({ ...DEFAULT_KEMPLI }), id: 1, index: 0 }]
         }
         updateScore(score)
     }

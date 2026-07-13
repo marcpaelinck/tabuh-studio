@@ -180,10 +180,13 @@ export interface UserSelections {
     selectedPanggulOption: ExtendedOption<Position[]>
     selectedCursorStyle: PlaybackCursorStyle
     editorView: EditorView
+    /** Id of the active keyboard mapping (see shared `keyMaps`). */
+    selectedKeyMapId: string
     setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
     setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedCursorStyle: Dispatch<PlaybackCursorStyle>
     setEditorView: Dispatch<EditorView>
+    setSelectedKeyMapId: Dispatch<string>
 }

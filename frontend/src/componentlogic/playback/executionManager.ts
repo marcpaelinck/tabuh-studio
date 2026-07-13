@@ -1,4 +1,4 @@
-// The FlowManager functions enable to run through the score in the correct sequence.
+// The Execution Manager functions enable to run through the score in the correct sequence.
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import type { Position } from '@tabuhstudio/shared'
