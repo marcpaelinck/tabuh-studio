@@ -10,6 +10,7 @@ import TsGongIcon from '../reacticons/TsGongIcon'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
+import { KeyMapEditor } from './editor/KeyMapEditor'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 
 type Action =
@@ -20,6 +21,7 @@ type Action =
     | 'login'
     | 'score-new'
     | 'score-details'
+    | 'keyboard-edit'
     | 'file-open'
     | 'file-open-json'
     | 'file-import-notation'
@@ -58,6 +60,8 @@ export function MainMenu({
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     // The New / Score details dialog (null when closed).
     const [scoreDialogMode, setScoreDialogMode] = useState<'new' | 'edit' | null>(null)
+    // The keyboard-mapping editor drawer.
+    const [keyMapEditorOpen, setKeyMapEditorOpen] = useState<boolean>(false)
     const dialog = useDialog()
     // const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
     //     state.selectedScoreOption,
@@ -73,6 +77,9 @@ export function MainMenu({
                 break
             case 'score-details':
                 if (score) setScoreDialogMode('edit')
+                break
+            case 'keyboard-edit':
+                setKeyMapEditorOpen(true)
                 break
             case 'file-open':
                 setScoreSelector(true)
@@ -191,7 +198,8 @@ export function MainMenu({
                 icon={<TsGongIcon height="1em" width="1em" color="black" />}>
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu disabled eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
+            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
+                <Nav.Item eventKey="keyboard-edit">Edit mappings...</Nav.Item>
                 <Nav.Item
                     disabled
                     active={keyboard == 'regular'}
@@ -220,6 +228,7 @@ export function MainMenu({
             </Nav.Menu>
             {selectScoreDialog}
             {scoreDetailsDialog}
+            <KeyMapEditor open={keyMapEditorOpen} setOpen={setKeyMapEditorOpen} />
         </Nav>
     )
 }

@@ -74,10 +74,23 @@ function controlAction(ks: Keystroke): EditorAction | undefined {
  * (`'A'` vs `'a'`), so comparing `shift` as well would double-count it — we ignore
  * `shift` for length-1 keys and compare it only for named keys (`ArrowUp`, …).
  */
-function keystrokeMatches(a: Keystroke, b: Keystroke): boolean {
+export function keystrokeMatches(a: Keystroke, b: Keystroke): boolean {
     if (a.key !== b.key || a.ctrl !== b.ctrl || a.alt !== b.alt || a.meta !== b.meta) return false
     const printable = a.key.length === 1
     return printable || a.shift === b.shift
+}
+
+/** Human-readable label for a keystroke, e.g. `Ctrl+Alt+O`, `Shift+ArrowUp`, `Space`. */
+export function formatKeystroke(ks: Keystroke): string {
+    if (!ks.key) return ''
+    const parts: string[] = []
+    if (ks.ctrl) parts.push('Ctrl')
+    if (ks.alt) parts.push('Alt')
+    if (ks.meta) parts.push('Meta')
+    // Shift is already reflected in a printable key's case, so only surface it for named keys.
+    if (ks.shift && ks.key.length !== 1) parts.push('Shift')
+    parts.push(ks.key === ' ' ? 'Space' : ks.key)
+    return parts.join('+')
 }
 
 /**

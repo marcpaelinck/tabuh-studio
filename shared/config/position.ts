@@ -17,6 +17,8 @@ export const positionGroups: Record<PositionGroup, Position[]> = {
         'PEMADE_SANGSIH',
         'KANTILAN_POLOS',
         'KANTILAN_SANGSIH',
+        'UGAL',
+        'GENDER_RAMBAT',
         'REYONG_1',
         'REYONG_3',
         'REYONG_2',
@@ -52,7 +54,8 @@ export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
     POKOK: 'pokok',
     KEMPLI: 'kempli',
     CENGCENG: 'cengceng',
-    GONGS: 'gongs'
+    GONGS: 'gongs',
+    MELODIC: 'melodic'
 }
 
 //prettier-ignore

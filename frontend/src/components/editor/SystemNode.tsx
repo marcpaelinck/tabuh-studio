@@ -1,4 +1,4 @@
-import { keyMaps, NoteObject, type Position } from '@tabuhstudio/shared'
+import { NoteObject, type Position } from '@tabuhstudio/shared'
 import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
@@ -18,6 +18,7 @@ import type { StyleProperties } from 'rsuite/esm/internals/types'
 import { compileKeyMap } from '../../componentlogic/editor/keyMap'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
+import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
 import { positionOrder } from '../../config/config'
@@ -84,12 +85,13 @@ export const SystemNode = memo(function SystemNode({
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
     const editorView = useUserSelectionStore((state) => state.editorView)
-    // Active keyboard mapping: compile the selected definition into a runnable KeyMap.
+    // Active keyboard mapping: compile the selected (editable) definition into a runnable KeyMap.
     const selectedKeyMapId = useUserSelectionStore((state) => state.selectedKeyMapId)
+    const keyMaps = useKeyMapStore((state) => state.keyMaps)
     const keyMap = useMemo(() => {
         const def = keyMaps.find((k) => k.id === selectedKeyMapId) ?? keyMaps[0]
-        return compileKeyMap(def)
-    }, [selectedKeyMapId])
+        return def ? compileKeyMap(def) : compileKeyMap({ id: 'default', name: 'Default', mappings: [] })
+    }, [selectedKeyMapId, keyMaps])
     // SummaryItems are read-only in the expanded view — except for an empty system, which is
     // always shown as the editable compact add-staff surface (see notationArea), so its header
     // stays enabled regardless of the current view.
