@@ -352,10 +352,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     // ___________ UPDATE SCORE STATES ____________
 
     useEffect(() => {
-        // `loadedScore` status is updated after new score is imported
-        // if (currentScore) {
-        //     updateScore(currentScore)
-        // }
         playback({ actionType: 'clear' })
     }, [currentScore])
 
