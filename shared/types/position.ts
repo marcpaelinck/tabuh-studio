@@ -36,6 +36,8 @@ export type Position =
     | 'REYONG_4'
     | 'TROMPONG'
     | 'UGAL'
+    | 'CENGCENG_P'
+    | 'CENGCENG_S'
     | 'REYONGB_1'
     | 'REYONGB_2'
     | 'TAWATAWA'

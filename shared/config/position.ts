@@ -82,7 +82,7 @@ export const instrumentGroups: Partial<Record<InstrumentGroup, Position[]>> = {
         'KENDANG',
         'KEMPLI'
     ],
-    BALEGANJUR: ['CENGCENG', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA']
+    BALEGANJUR: ['CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA']
 }
 
 //prettier-ignore
@@ -411,6 +411,26 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             'I', 'O', 'E', 'U', 'A', 'X', 'B'
                         ],
             modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
+        },
+        CENGCENG_P: {
+            name: 'Cengceng polos',
+            type: 'percussion',
+            volume: -15,
+            svg_file: '',
+            sampletemplate: 'BAL_CENGCENG_P_{note}.mp3',
+            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
+            validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
+            modifiers: {before: [], after:[';', ':']}
+        },
+        CENGCENG_S: {
+            name: 'Cengceng sangsih',
+            type: 'percussion',
+            volume: -15,
+            svg_file: '',
+            sampletemplate: 'BAL_CENGCENG_S_{note}.mp3',
+            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
+            validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
+            modifiers: {before: [], after:[';', ':']}
         },
     REYONGB_1: {
         name: 'Reyong 1',
