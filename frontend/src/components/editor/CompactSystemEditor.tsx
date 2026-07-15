@@ -23,6 +23,7 @@ import { candidatesFor, type CastingInstruction } from '../../componentlogic/cas
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { editorFontSize } from '../../config/config'
+import { useScoreStore } from '../../stores/useScoreStore'
 import type { Staffs } from '../../typing/score'
 import { compactGroupLabel } from '../../utils/compactGroupLabel'
 import { StaffGrid, type StaffGridRow } from './StaffGrid'
@@ -82,6 +83,8 @@ export function CompactSystemEditor({
     // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     // const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
+    const orchestra = useScoreStore((state) => state.orchestra)
+    const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
     const [newPositions, setNewPositions] = useState<Position[]>([])
 
     const fontClass = `balifontspaced${editorFontSize}`
@@ -97,16 +100,16 @@ export function CompactSystemEditor({
     // Positions in use across the whole system, and the still-free ones (the seed pool
     // for new staves / added positions). Recomputed from the live lines so it tracks edits.
     const used = new Set(lines.flatMap((l) => l.positions))
-    const free = availablePositions.filter((p) => !used.has(p))
+    const free = orchestraPositions.filter((p) => !used.has(p))
 
     const toggleNewPosition = (p: Position) =>
         setNewPositions((sel) => (sel.includes(p) ? sel.filter((x) => x !== p) : [...sel, p]))
 
     // Popover for one line: edit its positions and add/remove staves.
     const linePopover = (li: number, line: CompactLine) => {
-        const candidates = candidatesFor(line.positions, free)
+        const candidates = candidatesFor(line.positions, free, orchestra)
         // For a NEW staff: positions still selectable given the current selection.
-        const newCandidates = candidatesFor(newPositions, free)
+        const newCandidates = candidatesFor(newPositions, free, orchestra)
         const createNewStaff = (atIndex: number) => {
             addLine(atIndex, newPositions)
             setNewPositions([])
@@ -172,7 +175,7 @@ export function CompactSystemEditor({
     // popover lets the user pick the position(s) for the FIRST staff. Once created the
     // component re-renders with the normal grid.
     if (lines.length === 0) {
-        const newCandidates = candidatesFor(newPositions, free)
+        const newCandidates = candidatesFor(newPositions, free, orchestra)
         const createFirstStaff = () => {
             addLine(0, newPositions)
             setNewPositions([])

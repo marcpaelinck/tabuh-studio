@@ -2,7 +2,7 @@
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
 import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
-import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { InstrumentGroup, NoteSymbol } from '@tabuhstudio/shared/types/basetypes.ts'
 import _ from 'lodash'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
@@ -77,23 +77,27 @@ const nokempyung: Partial<Position>[][] = [
     ['REYONG_2', 'REYONG_4']
 ]
 
-const allowedGroups: Position[][] = [
-    [
-        'PEMADE_POLOS',
-        'PEMADE_SANGSIH',
-        'KANTILAN_POLOS',
-        'KANTILAN_SANGSIH',
-        'REYONG_1',
-        'REYONG_2',
-        'REYONG_3',
-        'REYONG_4',
-        'UGAL',
-        'PENYACAH',
-        'CALUNG',
-        'JEGOGAN'
+export const allowedPositionGroups: Record<InstrumentGroup, Position[][]> = {
+    GONG_KEBYAR: [
+        [
+            'PEMADE_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_POLOS',
+            'KANTILAN_SANGSIH',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4',
+            'UGAL',
+            'PENYACAH',
+            'CALUNG',
+            'JEGOGAN'
+        ],
+        ['KEMPLI', 'CENGCENG', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
     ],
-    ['KEMPLI', 'CENGCENG', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
-]
+    BALEGANJUR: [],
+    UNDEFINED: []
+}
 
 function selectRule(
     position: keyof CastingRuleSet,
@@ -192,9 +196,15 @@ export function castNotation(
 // universe minus the positions in use. A candidate `p` is allowed only if the
 // resulting set `group ∪ {p}` fits inside a single `allowedGroups` array (so only
 // valid aggregations can be formed). An empty group accepts any available position.
-export function candidatesFor(groupPositions: Position[], available: Position[]): Position[] {
+export function candidatesFor(
+    groupPositions: Position[],
+    available: Position[],
+    orchestra: InstrumentGroup
+): Position[] {
     if (groupPositions.length === 0) return available
-    return available.filter((p) => allowedGroups.some((grp) => [...groupPositions, p].every((x) => grp.includes(x))))
+    return available.filter((p) =>
+        allowedPositionGroups[orchestra].some((grp) => [...groupPositions, p].every((x) => grp.includes(x)))
+    )
 }
 
 // Splits a position `p` out of a multi-position group into its own solo staff,

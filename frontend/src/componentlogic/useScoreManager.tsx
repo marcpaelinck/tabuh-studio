@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
+import { useScoreStore } from '../stores/useScoreStore'
 import type { ExecutionItem } from '../typing/execution'
 import {
     kempliStates,
@@ -36,7 +37,9 @@ function gotoItemTargetName(destination: System) {
 }
 
 export function useScoreManager() {
-    const [score, setScore] = useState<Score | undefined>(undefined)
+    const score = useScoreStore((state) => state.currentScore)
+    const setScore = useScoreStore((state) => state.setCurrentScore)
+    const updateCurrentScore = useScoreStore((state) => state.updateCurrentScore)
     const [labels, setLabels] = useState<Record<string, System>>({})
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
@@ -145,7 +148,7 @@ export function useScoreManager() {
     // Stable identity (empty deps) so memoised SystemNodes are not all re-rendered
     // when one system is committed. Uses functional setScore to read the latest score.
     const updateSystem = useCallback((sysData: System) => {
-        setScore((current) => {
+        updateCurrentScore((current) => {
             if (!current) return current
             const sysIdx = sysData.index
             return {
@@ -305,7 +308,9 @@ export function useScoreManager() {
             debug(`processing ${fieldname}`)
             // Callback functions have to pass a function to state setters if they need to
             // access to the current value of that state.
-            setScore((currentScore) => updateScoreFromItemAction(currentScore, fieldname, systemData, value))
+            updateCurrentScore(
+                (currentScore) => updateScoreFromItemAction(currentScore, fieldname, systemData, value) || {}
+            )
         },
         // Depends only on `labels` (used by updateScoreFromItemAction); the score is
         // read via the functional setScore above, so editing does not change identity.
@@ -329,7 +334,9 @@ export function useScoreManager() {
 
     // Edits the score-level title / composer (the "Score details..." menu action).
     const updateScoreMeta = useCallback((meta: { title: string; composer: string }) => {
-        setScore((current) => (current ? { ...current, title: meta.title, composer: meta.composer } : current))
+        updateCurrentScore((current) =>
+            current ? { ...current, title: meta.title, composer: meta.composer } : current
+        )
     }, [])
 
     return {

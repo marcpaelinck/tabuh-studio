@@ -18,10 +18,11 @@ import type { StyleProperties } from 'rsuite/esm/internals/types'
 import { compileKeyMap } from '../../componentlogic/editor/keyMap'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
-import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
 import { positionOrder } from '../../config/config'
+import { useKeyMapStore } from '../../stores/useKeyMapStore'
+import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
@@ -78,6 +79,7 @@ export const SystemNode = memo(function SystemNode({
     const systemUuid = systemData.uuid
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
+    const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
     const expandedNotationRef = useRef<HTMLDivElement>(null)
@@ -264,7 +266,8 @@ export const SystemNode = memo(function SystemNode({
 
     // Generate the content in a fixed sorting order.
     const sortedStaffEntries = _.entries(systemData.staffs).sort(
-        ([p1, _1], [p2, _2]) => (positionOrder.indexOf(p1) || 0) - (positionOrder.indexOf(p2) || 0)
+        ([p1, _1], [p2, _2]) =>
+            (orchestraPositions.indexOf(p1 as Position) || 0) - (positionOrder.indexOf(p2 as Position) || 0)
     )
 
     // Staves handed to the virtual editor, in the same display order as the textarea.

@@ -35,6 +35,7 @@ import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
+import { useScoreStore } from '../stores/useScoreStore.tsx'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore.tsx'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
@@ -236,7 +237,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { scoreInfoList, loadedScore, loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
+    const { loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
+    const currentScore = useScoreStore((state) => state.currentScore)
+    const scoreInfoList = useScoreStore((state) => state.scoreInfoList)
     const {
         score,
         validation,
@@ -337,11 +340,12 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     }, [selectedSpeedOption])
 
     useEffect(() => {
-        setScoreMenuOptions(
-            scoreInfoList.map((scoreInfo, idx) => {
-                return { label: scoreInfo.title, value: `#${idx} scoreInfo.title`, objValue: scoreInfo }
-            })
-        )
+        if (scoreInfoList)
+            setScoreMenuOptions(
+                scoreInfoList.map((scoreInfo, idx) => {
+                    return { label: scoreInfo.title, value: `#${idx} scoreInfo.title`, objValue: scoreInfo }
+                })
+            )
         debug('ScoreInfoList changed')
     }, [scoreInfoList])
 
@@ -349,11 +353,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     useEffect(() => {
         // `loadedScore` status is updated after new score is imported
-        if (loadedScore) {
-            updateScore(loadedScore)
-        }
+        // if (currentScore) {
+        //     updateScore(currentScore)
+        // }
         playback({ actionType: 'clear' })
-    }, [loadedScore])
+    }, [currentScore])
 
     useEffect(() => {
         // `score` status is updated after each edit to the current score

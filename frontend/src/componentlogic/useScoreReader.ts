@@ -1,4 +1,4 @@
-import { NoteObject, type Position } from '@tabuhstudio/shared'
+import { instrumentGroups, NoteObject, type Position } from '@tabuhstudio/shared'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
@@ -7,6 +7,7 @@ import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem, ScoreRecord } from '../services/apiService'
 import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
+import { useScoreStore } from '../stores/useScoreStore'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
 import type { Score, ScoreFormat } from '../typing/score'
@@ -14,6 +15,7 @@ import { debug } from '../utils/debugger'
 import { executionItemTooltip } from '../utils/executionItems'
 import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
+import { allowedPositionGroups } from './castingRulesManager'
 import { expandSystem } from './expandNotation'
 
 export function persistCachedChanges(score: Score | undefined): Score | undefined {
@@ -59,15 +61,23 @@ function toScoreInfo(item: ScoreListItem): ScoreInfo {
 
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader(source: 'database' | 'file'): {
-    scoreInfoList: ScoreInfo[]
-    loadedScore: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
     saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
     isLoading: boolean
 } {
-    const [scoreInfoList, setScoreInfoList] = useState<ScoreInfo[]>([])
-    const [loadedScore, setScore] = useState<Score>()
+    const setScoreInfoList = useScoreStore((state) => state.setScoreInfoList)
+    const setCurrentScore = useScoreStore((state) => state.setCurrentScore)
+    const setOrchestra = useScoreStore((state) => state.setOrchestra)
+    const setAvailablePositions = useScoreStore((state) => state.setOrchestraPositions)
+    const setAllowedPositionGroups = useScoreStore((state) => state.setAllowedPositionGroups)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+
+    function setScoreStates(score: Score): void {
+        setCurrentScore(score)
+        setAvailablePositions(instrumentGroups[score.instrumenttype] || [])
+        setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype])
+        setOrchestra(score.instrumenttype)
+    }
 
     useEffect(() => {
         if (source == 'database') loadScoreListFromDb()
@@ -126,7 +136,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             var score: Score = JSON.parse(jsonText)
             if (!score) return
             score = postprocessScore(score)
-            setScore(score)
+            setScoreStates(score)
             setIsLoading(false)
         }
     }
@@ -142,7 +152,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             try {
                 const content = await file.text()
                 const parsed: Score = JSON.parse(content)
-                setScore(postprocessScore(parsed))
+                setScoreStates(postprocessScore(parsed))
             } catch (err) {
                 console.error('Failed to parse imported JSON score:', err)
             }
@@ -169,7 +179,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                 const content = await file.text()
                 const parserReturnValue: ParserReturnValue = parse(content)
                 if (parserReturnValue.score) {
-                    setScore(postprocessScore(parserReturnValue.score))
+                    setScoreStates(postprocessScore(parserReturnValue.score))
                 }
 
                 // Process content as needed
@@ -186,7 +196,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             // Scores are addressed by uuid, so fetch directly (404 if not found).
             const record = await apiGetScore(newScoreInfo.uuid)
             const score = postprocessScore(record.content as Score)
-            setScore(score)
+            setScoreStates(score)
         } catch (err) {
             console.error('Failed to load score from database:', err)
         } finally {
@@ -297,5 +307,5 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(false)
     }
 
-    return { scoreInfoList, loadedScore, loadScore, saveScore, isLoading }
+    return { loadScore, saveScore, isLoading }
 }

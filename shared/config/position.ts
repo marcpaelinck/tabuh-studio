@@ -82,8 +82,7 @@ export const instrumentGroups: Partial<Record<InstrumentGroup, Position[]>> = {
         'KENDANG',
         'KEMPLI'
     ],
-    BALEGANJUR: ['CENGCENG', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
-    UNDEFINED: []
+    BALEGANJUR: ['CENGCENG', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA']
 }
 
 //prettier-ignore
