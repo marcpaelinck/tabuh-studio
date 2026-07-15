@@ -245,7 +245,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         validation,
         labels,
         localCacheState,
-        updateScore,
         updateSystem,
         updateParts,
         executeItemAction,
