@@ -1,4 +1,5 @@
 import { KEMPLI_BEAT_CHAR } from '../constants/noteChars'
+import type { InstrumentGroup } from '../types/basetypes'
 import type { Position, PositionConfig, PositionGroup } from '../types/position'
 
 export const positionGroups: Record<PositionGroup, Position[]> = {
@@ -56,6 +57,33 @@ export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
     CENGCENG: 'cengceng',
     GONGS: 'gongs',
     MELODIC: 'melodic'
+}
+
+// List of available instrument groups.
+// The staffs will appear in the editor in the given sequence.
+export const instrumentGroups: Partial<Record<InstrumentGroup, Position[]>> = {
+    GONG_KEBYAR: [
+        'UGAL',
+        'GENDER_RAMBAT',
+        'TROMPONG',
+        'PEMADE_POLOS',
+        'PEMADE_SANGSIH',
+        'KANTILAN_POLOS',
+        'KANTILAN_SANGSIH',
+        'REYONG_1',
+        'REYONG_2',
+        'REYONG_3',
+        'REYONG_4',
+        'PENYACAH',
+        'CALUNG',
+        'JEGOGAN',
+        'GONGS',
+        'CENGCENG',
+        'KENDANG',
+        'KEMPLI'
+    ],
+    BALEGANJUR: ['CENGCENG', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
+    UNDEFINED: []
 }
 
 //prettier-ignore
@@ -384,5 +412,84 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                             'I', 'O', 'E', 'U', 'A', 'X', 'B'
                         ],
             modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
-        }
+        },
+    REYONGB_1: {
+        name: 'Reyong 1',
+        type: 'chimes',
+        volume: -15,
+        svg_file: '',
+        sampletemplate: 'BAL_REYONG_{note}.mp3',
+        symbolToNoteNames: {
+            o: ['DONG1'],
+            e: ['DENG1'],
+            'o/': ['DONG1_ABBR'],
+            'e/': ['DENG1_ABBR'],
+            'o?': ['DONG1_MUTED'],
+            'e?': ['DENG1_MUTED'],
+            b: ['DONG1', 'DENG1'],
+            'b/': ['DONG1_ABBR', 'DENG1_ABBR'],
+            'b?': ['DONG1_MUTED', 'DENG1_MUTED'],
+            x: ['XDONG1'],
+            'x/': ['XDONG1_ABBR'],
+            'x?': ['XDONG1_MUTED']
+        },
+        validStrokes: ['o;', 'e;', 'o:', 'e:', 'O', 'E'],
+        modifiers: { before: ['O', 'E', 'X', 'B'], after: [';', ':'] }
+    },
+    REYONGB_2: {
+        name: 'Reyong 2',
+        type: 'chimes',
+        volume: -15,
+        svg_file: '',
+        sampletemplate: 'BAL_REYONG_{note}.mp3',
+        symbolToNoteNames: {
+            u: ['DUNG1'],
+            a: ['DANG1'],
+            'u/': ['DUNG1_ABBR'],
+            'a/': ['DANG1_ABBR'],
+            'u?': ['DUNG1_MUTED'],
+            'a?': ['DANG1_MUTED'],
+            b: ['DUNG1', 'DANG1'],
+            'b/': ['DUNG1_ABBR', 'DANG1_ABBR'],
+            'b?': ['DUNG1_MUTED', 'DANG1_MUTED'],
+            x: ['XDUNG1'],
+            'x/': ['XDUNG1_ABBR'],
+            'x?': ['XDUNG1_MUTED']
+        },
+        validStrokes: ['u;', 'a;', 'u:', 'a:', 'U', 'A'],
+        modifiers: { before: ['U', 'A', 'X', 'B'], after: [';', ':'] }
+    },
+    TAWATAWA: {
+        name: 'Tawa tawa',
+        type: 'percussion',
+        volume: -15,
+        svg_file: '',
+        sampletemplate: 'BAL_TAWA_{note}.mp3',
+        symbolToNoteNames: { x: ['X'] },
+        validStrokes: [],
+        modifiers: { before: [], after: [] }
+    },
+    PONGGANG: {
+        name: 'Ponggang',
+        type: 'chimes',
+        volume: -15,
+        svg_file: '',
+        sampletemplate: 'BAL_PONGGANG_{note}.mp3',
+        symbolToNoteNames: {
+            u: ['DUNG1'],
+            a: ['DANG1'],
+            'u/': ['DUNG1_ABBR'],
+            'a/': ['DANG1_ABBR'],
+            'u?': ['DUNG1_MUTED'],
+            'a?': ['DANG1_MUTED'],
+            b: ['DUNG1', 'DANG1'],
+            'b/': ['DUNG1_ABBR', 'DANG1_ABBR'],
+            'b?': ['DUNG1_MUTED', 'DANG1_MUTED'],
+            x: ['XDUNG1'],
+            'x/': ['XDUNG1_ABBR'],
+            'x?': ['XDUNG1_MUTED']
+        },
+        validStrokes: ['u;', 'a;', 'u:', 'a:', 'U', 'A'],
+        modifiers: { before: ['U', 'A', 'X', 'B'], after: [';', ':'] }
+    }
     }

@@ -7,25 +7,24 @@
  *                Used by the "Notation → Score details..." menu action.
  */
 
-import { instrumentTypes, type InstrumentType } from '@tabuhstudio/shared'
+import { instrumentGroups, type InstrumentGroup } from '@tabuhstudio/shared'
+import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Input, InputGroup, Modal, SelectPicker } from 'rsuite'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
-const instrumentLabels: Partial<Record<InstrumentType, string>> = Object.fromEntries(
-    instrumentTypes.map((t) => [t as InstrumentType, t.replace('_', ' ')])
+const instrumentLabels: Partial<Record<InstrumentGroup, string>> = Object.fromEntries(
+    _.keys(instrumentGroups).map((t) => [t as InstrumentGroup, t.replace('_', ' ')])
 )
 
-const instrumentOptions = instrumentTypes
-    .filter((t) => t !== 'UNDEFINED')
-    .map((t) => {
-        return { label: instrumentLabels[t], value: t }
-    })
+const instrumentOptions = _.keys(instrumentGroups).map((t) => {
+    return { label: instrumentLabels[t as InstrumentGroup], value: t }
+})
 
 export interface ScoreDetailsValues {
     title: string
     composer: string
-    instrumenttype: InstrumentType
+    instrumenttype: InstrumentGroup
 }
 
 interface ScoreDetailsDialogProps {
@@ -41,7 +40,7 @@ interface ScoreDetailsDialogProps {
 export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: ScoreDetailsDialogProps) {
     const [title, setTitle] = useState('')
     const [composer, setComposer] = useState('')
-    const [instrumenttype, setInstrumenttype] = useState<InstrumentType | null>(null)
+    const [instrumenttype, setInstrumenttype] = useState<InstrumentGroup | null>(null)
 
     // (Re)seed the fields whenever the dialog opens.
     useEffect(() => {
@@ -85,7 +84,7 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                                 cleanable={false}
                                 data={instrumentOptions}
                                 value={instrumenttype}
-                                onChange={(v) => setInstrumenttype(v as InstrumentType | null)}
+                                onChange={(v) => setInstrumenttype(v as InstrumentGroup | null)}
                                 placeholder="Select instrument type"
                             />
                         ) : (

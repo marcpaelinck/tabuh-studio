@@ -36,6 +36,10 @@ export type Position =
     | 'REYONG_4'
     | 'TROMPONG'
     | 'UGAL'
+    | 'REYONGB_1'
+    | 'REYONGB_2'
+    | 'TAWATAWA'
+    | 'PONGGANG'
 
 export type PositionGroup =
     | 'PEMADE'

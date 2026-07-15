@@ -1,5 +1,5 @@
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
@@ -38,15 +38,15 @@ export type InstrumentSamplers = Record<Position, InstrumentSampler>
 // ).toDestination();
 
 const createSampler = ({
-    instr_type,
+    isMelodic,
     samples,
     volume
 }: {
-    instr_type: string
+    isMelodic: boolean
     samples: { [key: string]: string }
     volume: Tone.Unit.Decibels
 }) => {
-    if (['daun', 'chimes'].includes(instr_type))
+    if (isMelodic)
         // PitchShift currently disabled because it causes a slight time lag
         return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
     else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
@@ -57,7 +57,7 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
         return [
             position,
             createSampler({
-                instr_type: config.type,
+                isMelodic: positionGroups.MELODIC.includes(position as Position),
                 samples: lookup[position].idx2sample,
                 volume: config.volume
             }).toDestination()

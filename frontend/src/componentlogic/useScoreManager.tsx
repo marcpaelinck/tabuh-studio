@@ -1,4 +1,4 @@
-import { DEFAULT_KEMPLI, type InstrumentType } from '@tabuhstudio/shared'
+import { DEFAULT_KEMPLI, type InstrumentGroup } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -314,7 +314,7 @@ export function useScoreManager() {
 
     // Creates a brand-new, empty 'current' score: one empty system seeded with the shared
     // default kempli. Loaded straight into the editor (updateScore rebuilds labels/validation).
-    function newScore(fields: { title: string; instrumenttype: InstrumentType; composer: string }) {
+    function newScore(fields: { title: string; instrumenttype: InstrumentGroup; composer: string }) {
         const score: Score = {
             uuid: uuidv4(),
             title: fields.title,

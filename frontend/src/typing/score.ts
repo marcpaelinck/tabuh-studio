@@ -1,6 +1,6 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
 import type {
-    InstrumentType,
+    InstrumentGroup,
     MutingType,
     NoteSymbol,
     StrokeLocation,
@@ -78,7 +78,7 @@ export type Score = {
     uuid: UUID
     title: string
     composer: string
-    instrumenttype: InstrumentType
+    instrumenttype: InstrumentGroup
     parts: Record<string, UUID[]>
     positions: Position[]
     systems: System[]
