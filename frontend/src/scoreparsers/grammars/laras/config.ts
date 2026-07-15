@@ -55,6 +55,8 @@ export const symbolLookup: Record<Position, Record<string, string>> = {
     KENDANG_WADON: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
     KENDANG_LANANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
     // BALEGANJUR SPECIFIC, NOT USED IN LARAS
+    CENGCENG_P: { x: 'x', c: 'x?', '.': '.' },
+    CENGCENG_S: { x: 'x', c: 'x?', '.': '.' },
     REYONGB_1: {},
     REYONGB_2: {},
     TAWATAWA: {},
