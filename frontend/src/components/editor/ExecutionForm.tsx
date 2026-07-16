@@ -189,10 +189,14 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         setItemList(newItemList)
     }
 
-    // Populate fields when the selection changes.
+    // Populate fields when the selection changes — and also when the selected item's
+    // TYPE changes. A freshly added item gets its type assigned in place (same list
+    // index), so keying only on `selectedListElement` would leave `formValue.type`
+    // empty, which fails the schema's `type isRequired` check and blocks the write-back
+    // (the item never gets bound to the form).
     useEffect(() => {
         updateFieldsFromSelected()
-    }, [selectedListElement])
+    }, [selectedListElement, selectedListElement != undefined ? itemList[selectedListElement]?.type : undefined])
 
     // Write back when the user edits a (valid) field.
     useEffect(() => {
