@@ -383,8 +383,9 @@ export function usePlaybackManager() {
                                 currentStep!.tempo[0] +
                                 (noteIdx / objNotation.length) * (currentStep!.tempo[1] - currentStep!.tempo[0]),
                             velocity:
-                                currentStep!.dynamics[0] +
-                                (noteIdx / objNotation.length) * (currentStep!.dynamics[1] - currentStep!.dynamics[0]),
+                                currentStep!.dynamics[position][0] +
+                                (noteIdx / objNotation.length) *
+                                    (currentStep!.dynamics[position][1] - currentStep!.dynamics[position][0]),
                             prevaction: _.last(newTimeLine.sampleractions),
                             isLast: lastStep && endOfMeasure
                         })
@@ -499,7 +500,7 @@ export function usePlaybackManager() {
                     pass: currentStep.pass,
                     iteration: currentStep.iteration,
                     tempo: currentStep.tempo[0],
-                    dynamics: currentStep.dynamics[0]
+                    dynamics: currentStep.dynamics['PEMADE_POLOS'][0]
                 }
             })
 

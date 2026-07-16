@@ -29,13 +29,24 @@ export type InstrumentSampler = {
 
 export type InstrumentSamplers = Record<Position, InstrumentSampler>
 
-// const pitchShift: Tone.PitchShift = new Tone.PitchShift({
-//   pitch: 0.0, // 1 unit equals 100 cents
-//   windowSize: 0.07,
-//   delayTime: 0,
-//   feedback: 0
-// }
-// ).toDestination();
+const pitchShift: Tone.PitchShift = new Tone.PitchShift({
+    pitch: 5.0, // 1 unit equals 100 cents
+    windowSize: 0.07,
+    delayTime: 0,
+    feedback: 0
+})
+
+const lowpassFilter = new Tone.Filter({
+    frequency: 5000, // Cutoff frequency in Hz
+    type: 'lowpass', // Filter type
+    rolloff: -48 // Steepness (-12, -24, or -48 dB/octave)
+})
+
+function lowpassFrequency(velocity: number): number {
+    const minFreq = 500
+    const maxFreq = 8000
+    return minFreq + (maxFreq - minFreq) * velocity
+}
 
 const createSampler = ({
     isMelodic,
@@ -48,8 +59,8 @@ const createSampler = ({
 }) => {
     if (isMelodic)
         // PitchShift currently disabled because it causes a slight time lag
-        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination() //.connect(pitchShift)
-    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
+        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
+    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
 }
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
@@ -60,7 +71,7 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
                 isMelodic: positionGroups.MELODIC.includes(position as Position),
                 samples: lookup[position].idx2sample,
                 volume: config.volume
-            }).toDestination()
+            })
         ]
     })
     return Object.fromEntries(entries)
@@ -126,6 +137,7 @@ const createInstrument = (
                     duration[baseNoteSubdivision] += millis2BaseNoteEquiv(outroTime, params.bpm)
                 }
                 try {
+                    lowpassFilter.frequency.setValueAtTime(lowpassFrequency(params.velocity * dimValue), time)
                     sampler?.triggerAttackRelease(indices, duration, time, params.velocity * dimValue)
                 } catch {
                     console.error(`ERROR: could not play sound ${params.position} ${JSON.stringify(params)} `)

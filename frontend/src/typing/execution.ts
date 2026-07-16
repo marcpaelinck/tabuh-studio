@@ -131,7 +131,7 @@ export interface FlowStep {
     iteration: number // current iteration count
     positions: Partial<Position>[]
     tempo: BPM[]
-    dynamics: number[]
+    dynamics: Record<Position, number[]>
     lastSystem: boolean
     lastBeat: boolean
     waitMsAfter: number // Delay after the end of the current step in milliseconds

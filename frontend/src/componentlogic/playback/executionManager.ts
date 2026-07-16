@@ -2,11 +2,13 @@
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import type { Position } from '@tabuhstudio/shared'
+import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { UUID } from 'crypto'
 import _ from 'lodash'
 import { defaultDynamics, defaultTempo } from '../../config/config'
 import type {
     BeatSliceInfo,
+    DynamicsItem,
     ExecutionItem,
     ExecutionItemType,
     ExpressionItem,
@@ -17,6 +19,7 @@ import type {
     LoopItem,
     SequenceItem,
     SuppressItem,
+    TempoItem,
     WaitItem
 } from '../../typing/execution'
 import type { PlaybackType } from '../../typing/playback'
@@ -189,19 +192,47 @@ export function executionManager(
         return new Set(suppressItems.map((item) => item.positions || []).flat())
     }
 
-    function getExpressionValue(
-        type: 'tempo' | 'dynamics',
-        sysIdx: number,
-        beatIdx: number,
-        currentValue: number
-    ): number[] {
-        const matches = getExecutionItems(type, sysIdx)
+    // Returns the start and end values of an expression value (tempo or dynamics) for the given beat
+    // In case the expression item is gradual, interpolation is applied.
+    // Returns
+    function getExpressionValues(
+        exprItem: ExpressionItem,
+        beatNbr: number,
+        prevEndValue: number
+    ): number[] | undefined {
+        if (!exprItem.isGradual) {
+            if (beatNbr == exprItem.fromBeat) {
+                // Non-gradual matching item found
+                return [exprItem.value, exprItem.value]
+            }
+        } else if (exprItem.fromBeat && exprItem.toBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat) {
+            // Gradual matching item found: determine start and end values for the given beat.
+            if (undefined !== exprItem.fromValue) {
+                // Case 1: fromValue is given
+                const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
+                const valueRange = exprItem.value - exprItem.fromValue
+                const startValue = exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
+                const endValue = startValue + valueRange / totalBeats
+                return [startValue, endValue]
+            } else {
+                // Case 2: fromValue is undefined.
+                const remainingBeats = exprItem.toBeat! - beatNbr + 1
+                const valueRange = exprItem.value - prevEndValue
+                const startValue = prevEndValue
+                const endValue = prevEndValue + valueRange * (1 / remainingBeats)
+                return [startValue, endValue]
+            }
+        }
+    }
+
+    function getTempoValue(sysIdx: number, beatIdx: number, currentValue: number): number[] {
+        const matches = getExecutionItems('tempo', sysIdx)
         // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
         if (matches.length == 0) return [currentValue, currentValue]
         // Find an item that matches the given beat index.
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
-            const exprItem = item as ExpressionItem
+            const exprItem = item as TempoItem
             // debug(`exprItem=${JSON.stringify([exprItem])}, beat=${beatNbr}`)
             if (!exprItem.isGradual) {
                 if (beatNbr == exprItem.fromBeat) {
@@ -233,6 +264,61 @@ export function executionManager(
         }
         // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
         return [currentValue, currentValue]
+    }
+
+    type PositionDynamics = Record<Position, number[]>
+
+    function getDynamicsValue(
+        sysIdx: number,
+        beatIdx: number,
+        currentValues: PositionDynamics | undefined
+    ): PositionDynamics {
+        var newDynamics =
+            currentValues ??
+            (_.fromPairs(
+                _.keys(positionConfigs).map((pos) => [pos, [defaultDynamics, defaultDynamics]])
+            ) as PositionDynamics)
+        const matches = getExecutionItems('dynamics', sysIdx)
+        if (matches.length == 0) return newDynamics
+        // Find all items that match the given beat index.
+        const beatNbr = beatIdx + 1 // Beats are numbered from 1
+        for (const item of matches) {
+            const exprItem = item as DynamicsItem
+            // If positions is not given, assume dynamics apply to all positions
+            const positions = exprItem.positions.length > 0 ? exprItem.positions : _.keys(positionConfigs)
+            // debug(`exprItem=${JSON.stringify([exprItem])}, beat=${beatNbr}`)
+            if (!exprItem.isGradual) {
+                if (beatNbr == exprItem.fromBeat) {
+                    // Non-gradual matching item found
+                    const dynamics = _.fromPairs(positions.map((pos) => [pos, [exprItem.value, exprItem.value]]))
+                    newDynamics = { ...newDynamics, ...dynamics }
+                }
+            } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
+                // Gradual matching item found: determine start and end values for the given beat.
+                if (undefined !== exprItem.fromValue) {
+                    // Case 1: fromValue is given
+                    const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
+                    const valueRange = exprItem.value - exprItem.fromValue
+                    const startValue = exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
+                    const endValue = startValue + valueRange / totalBeats
+                    // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
+                    const dynamics = _.fromPairs(positions.map((pos) => [pos, [startValue, endValue]]))
+                    newDynamics = { ...newDynamics, ...dynamics }
+                } else {
+                    // Case 2: fromValue is undefined.
+                    const remainingBeats = exprItem.toBeat! - beatNbr + 1
+                    const fromValue = newDynamics[positions[0] as Position][1]
+                    const valueRange = exprItem.value - fromValue
+                    const startValue = fromValue
+                    const endValue = fromValue + valueRange * (1 / remainingBeats)
+                    // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
+                    const dynamics = _.fromPairs(positions?.map((pos) => [pos, [startValue, endValue]]))
+                    newDynamics = { ...newDynamics, ...dynamics }
+                }
+            }
+        }
+        // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
+        return newDynamics
     }
 
     // Returns the next step in the execution flow
@@ -342,12 +428,7 @@ export function executionManager(
                 if (next.systemStart) flowinfo[next.systemIdx].iteration += 1
             }
 
-            const tempo = getExpressionValue(
-                'tempo',
-                next.systemIdx,
-                next.beatIdx,
-                currentStep?.tempo[1] || defaultTempo
-            )
+            const tempo = getTempoValue(next.systemIdx, next.beatIdx, currentStep?.tempo[1] || defaultTempo)
             const stepDuration = Object.entries(beats).reduce(
                 (maxDur, [position, measure]) =>
                     Math.max(maxDur, totalDuration(measure.objNotation, tempo[0], 'basenote')),
@@ -367,12 +448,10 @@ export function executionManager(
                 // Omit positions if there is a SuppressItem
                 positions: [...new Set(_.keys(beats) as Position[]).difference(getSuppressPositions(next.systemIdx))],
                 tempo: tempo,
-                dynamics: getExpressionValue(
-                    'dynamics',
-                    next.systemIdx,
-                    next.beatIdx,
-                    currentStep?.dynamics[1] || defaultDynamics
-                ),
+                dynamics: getDynamicsValue(next.systemIdx, next.beatIdx, currentStep?.dynamics || undefined) as Record<
+                    Position,
+                    number[]
+                >,
                 lastSystem: next.systemIdx == score.systems.length - 1 || playbackType == 'single',
                 lastBeat: next.beatIdx == flowinfo[next.systemIdx].beatSlices.length - 1,
                 waitMsAfter: next.lastBeat ? getWaitTimeMsAfter(next.systemIdx) : 0,
