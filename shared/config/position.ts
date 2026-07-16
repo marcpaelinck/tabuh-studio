@@ -426,7 +426,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             volume: -15,
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_P_{note}.mp3',
-            symbolToNoteNames: { x: ['X'], 'x?': ['X_MUTED'] },
+            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
             validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
             modifiers: {before: [], after:[';', ':']}
         },
@@ -436,7 +436,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             volume: -15,
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_S_{note}.mp3',
-            symbolToNoteNames: { x: ['X'], 'x?': ['X_MUTED'] },
+            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
             validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
             modifiers: {before: [], after:[';', ':']}
         },

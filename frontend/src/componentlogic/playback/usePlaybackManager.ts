@@ -123,16 +123,18 @@ export function usePlaybackManager() {
             const instrType: string = positionConfigs[position].type
             if (!shCode) return null
             const note: Note = noteConfigs[instrType][shCode]
-            const keyname: string = `${note.tone}${note.octave != null ? note.octave : ''}`
-            result.push({
-                time: action.time,
-                keyname: keyname,
-                tone: note.tone,
-                stroke: note.stroke,
-                muting: note.muting,
-                duration: action.params.duration,
-                isLast: action.params.isLast
-            })
+            const keyname: string = note ? `${note.tone}${note.octave != null ? note.octave : ''}` : ''
+            if (note)
+                result.push({
+                    time: action.time,
+                    keyname: keyname,
+                    tone: note.tone,
+                    stroke: note.stroke,
+                    muting: note.muting,
+                    duration: action.params.duration,
+                    isLast: action.params.isLast
+                })
+            else console.error(`Note ${shCode} not found in noteConfigs[${instrType}]`)
         })
         return result
     }

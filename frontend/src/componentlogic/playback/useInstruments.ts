@@ -58,9 +58,11 @@ const createSampler = ({
     volume: Tone.Unit.Decibels
 }) => {
     if (isMelodic)
-        // PitchShift currently disabled because it causes a slight time lag
-        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
-    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
+        // filter needs to be checked first. Doesn't seem to work.
+        //     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
+        // else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
+        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
+    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
 }
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
