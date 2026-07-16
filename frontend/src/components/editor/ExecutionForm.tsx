@@ -4,6 +4,7 @@ import { useEffect, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
+import { useScoreStore } from '../../stores/useScoreStore'
 import type { ExecutionItem, LoopItem } from '../../typing/execution'
 import type { System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
@@ -126,9 +127,10 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     const [formValue, setFormValue] = useState<FormValueType>({ type: '', conditions: [] })
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
     const [loop, setLoop] = useState<number | undefined>(undefined) // loop count if a loop item exists
+    const beatPosition = useScoreStore((state) => state.beatPosition)
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label as string]))
-    const positionOptions = positionOptionsForSystem(systemData.staffs)
+    const positionOptions = positionOptionsForSystem(systemData.staffs, beatPosition)
 
     useEffect(() => debug(`ITEMLIST=${JSON.stringify(itemList)}`), [itemList])
 

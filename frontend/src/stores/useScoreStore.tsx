@@ -9,12 +9,14 @@ export interface CurrentScore {
     currentScore: Score | undefined
     orchestra: InstrumentGroup
     orchestraPositions: Position[]
+    beatPosition: Position
     allowedPositionGroups: Position[][]
     setScoreInfoList: Dispatch<ScoreInfo[] | null>
     setOrchestra: Dispatch<InstrumentGroup>
+    setOrchestraPositions: Dispatch<Position[]>
+    setBeatPosition: Dispatch<Position>
     setCurrentScore: Dispatch<Score>
     updateCurrentScore: (updater: (score: Score) => Partial<Score>) => void
-    setOrchestraPositions: Dispatch<Position[]>
     setAllowedPositionGroups: Dispatch<Position[][]>
 }
 
@@ -23,13 +25,14 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
     currentScore: undefined,
     orchestra: 'UNDEFINED',
     orchestraPositions: [],
+    beatPosition: 'KEMPLI',
     allowedPositionGroups: [],
     setScoreInfoList: (infoList: ScoreInfo[] | null) => set(() => ({ scoreInfoList: infoList })),
     setCurrentScore: (score: Score) =>
         set(() => ({
             currentScore: score,
             orchestra: score.instrumenttype,
-            orchestraPositions: instrumentGroups[score.instrumenttype]
+            orchestraPositions: instrumentGroups[score.instrumenttype]?.positions || []
         })),
     updateCurrentScore: (updater) =>
         set((state) => {
@@ -40,8 +43,10 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
             const attr = updater(currentScore)
             return { currentScore: { ...currentScore, ...attr } }
         }),
-    setOrchestra: (orchestra: InstrumentGroup) => set(() => ({ orchestra: orchestra })),
+    setOrchestra: (orchestra: InstrumentGroup) =>
+        set(() => ({ orchestra: orchestra, beatPosition: instrumentGroups[orchestra]?.beatPosition })),
     setOrchestraPositions: (positions: Position[]) => set(() => ({ orchestraPositions: positions })),
+    setBeatPosition: (position: Position) => set(() => ({ beatPosition: position })),
     setAllowedPositionGroups: (groups: Position[][]) => set(() => ({ allowedPositionGroups: groups }))
 }))
 

@@ -32,12 +32,12 @@ export function persistCachedChanges(score: Score | undefined): Score | undefine
 }
 
 // Seta the score's UUID if missing and creates NoteObject notation
-function postprocessScore(score: Score): Score {
+function postprocessScore(score: Score, beatPosition: Position): Score {
     if (!score.uuid) score.uuid = uuidv4()
     for (const system of score.systems) {
         // Re-derive the expanded staffs cache from the canonical compact groups.
         // Skipped for legacy/laras scores which keep their stored/parsed staffs.
-        if (system.groups && system.groups.length > 0) expandSystem(system)
+        if (system.groups && system.groups.length > 0) expandSystem(system, beatPosition)
         _.entries(system.staffs).forEach(([_pos, staff]) => {
             staff.objNotation = NoteObject.fromNotation(staff.notation, _pos as Position)
         })
@@ -71,10 +71,11 @@ export function useScoreReader(source: 'database' | 'file'): {
     const setAvailablePositions = useScoreStore((state) => state.setOrchestraPositions)
     const setAllowedPositionGroups = useScoreStore((state) => state.setAllowedPositionGroups)
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    const beatPosition = useScoreStore((state) => state.beatPosition)
 
     function setScoreStates(score: Score): void {
         setCurrentScore(score)
-        setAvailablePositions(instrumentGroups[score.instrumenttype] || [])
+        setAvailablePositions(instrumentGroups[score.instrumenttype]?.positions || [])
         setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype])
         setOrchestra(score.instrumenttype)
     }
@@ -135,7 +136,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             let jsonText = await readFile('scores/' + newScoreInfo.file)
             var score: Score = JSON.parse(jsonText)
             if (!score) return
-            score = postprocessScore(score)
+            score = postprocessScore(score, beatPosition)
             setScoreStates(score)
             setIsLoading(false)
         }
@@ -152,7 +153,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             try {
                 const content = await file.text()
                 const parsed: Score = JSON.parse(content)
-                setScoreStates(postprocessScore(parsed))
+                setScoreStates(postprocessScore(parsed, beatPosition))
             } catch (err) {
                 console.error('Failed to parse imported JSON score:', err)
             }
@@ -179,7 +180,7 @@ export function useScoreReader(source: 'database' | 'file'): {
                 const content = await file.text()
                 const parserReturnValue: ParserReturnValue = parse(content)
                 if (parserReturnValue.score) {
-                    setScoreStates(postprocessScore(parserReturnValue.score))
+                    setScoreStates(postprocessScore(parserReturnValue.score, beatPosition))
                 }
 
                 // Process content as needed
@@ -195,7 +196,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         try {
             // Scores are addressed by uuid, so fetch directly (404 if not found).
             const record = await apiGetScore(newScoreInfo.uuid)
-            const score = postprocessScore(record.content as Score)
+            const score = postprocessScore(record.content as Score, beatPosition)
             setScoreStates(score)
         } catch (err) {
             console.error('Failed to load score from database:', err)

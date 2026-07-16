@@ -19,10 +19,10 @@ import { applyPatterns } from './patternManager.ts'
 // Re-derives a system's expanded `staffs`, `beatSlices` and `kempli` from its canonical
 // compact `groups`. Mutates the system in place. No-op if it has no groups (e.g.
 // legacy/laras scores), so callers can apply it unconditionally.
-export function expandSystem(system: System): void {
+export function expandSystem(system: System, beatPosition: Position): void {
     if (!system.groups || system.groups.length === 0) return
     system.staffs = castGroupedNotationToPositions(system, system.castingInstructions ?? [])
-    const beatSlices = getBeatSlices(system)
+    const beatSlices = getBeatSlices(system, beatPosition)
     system.beatSlices = beatSlices
     // Expand shorthand pattern symbols (e.g. norot) within each beat.
     _.entries(system.staffs).forEach(([position, staff]) => {

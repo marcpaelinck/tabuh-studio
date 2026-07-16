@@ -80,6 +80,7 @@ export const SystemNode = memo(function SystemNode({
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
     const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
+    const beatPosition = useScoreStore((state) => state.beatPosition)
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
     const expandedNotationRef = useRef<HTMLDivElement>(null)
@@ -281,7 +282,7 @@ export const SystemNode = memo(function SystemNode({
 
     // Universe of positions the system may contain (KEMPLI only when written as notation).
     const availablePositions = positionOrder.filter(
-        (p) => p !== 'KEMPLI' || systemData.kempli.state === 'notation'
+        (p) => p !== beatPosition || systemData.kempli.state === 'notation'
     ) as Position[]
 
     // Compact lines seeded from the system's groups (flat notation, position-independent).
@@ -301,7 +302,7 @@ export const SystemNode = memo(function SystemNode({
             notation: NoteObject.toNotation(line.notation)
         }))
         const newSystem: System = { ...systemData, groups }
-        expandSystem(newSystem)
+        expandSystem(newSystem, beatPosition)
         updateSystem(newSystem)
     }, 300)
 

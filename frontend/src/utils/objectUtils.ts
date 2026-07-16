@@ -109,7 +109,7 @@ export function isEvenByIndex(index: number) {
 // - For 'off' state use the default beat length.
 // - For 'notation' state use the beat strokes in the notation.
 // TODO: not used yet. This function should be used by as basis for getSystemBeatCount, getBeatSlice and getBeatStart
-export function getBeatSlices(system: System): BeatSliceInfo[] {
+export function getBeatSlices(system: System, beatPosition: Position): BeatSliceInfo[] {
     // Retrieve a list of notation arrays.
     const groupNotations: NoteSymbol[][] = system.groups
         .filter((group) => group.notation != null)
@@ -130,8 +130,8 @@ export function getBeatSlices(system: System): BeatSliceInfo[] {
     } else if (system.kempli.state === 'notation') {
         // KEMPLI_BEAT_CHAR marks the START of each kempli beat.
         const kempliNotation =
-            system.groups?.find((group) => group.positions.includes('KEMPLI'))?.notation ||
-            system.staffs['KEMPLI']?.notation ||
+            system.groups?.find((group) => group.positions.includes(beatPosition))?.notation ||
+            system.staffs[beatPosition]?.notation ||
             []
         beatSliceInfo.push(...getBeatSlicesFromKempliNotation(kempliNotation, maxColumnCount))
     } else {

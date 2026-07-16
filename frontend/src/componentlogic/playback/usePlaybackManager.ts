@@ -23,6 +23,7 @@ import {
     dynamicsToNumber,
     noteConfigs
 } from '../../config/config'
+import { useScoreStore } from '../../stores/useScoreStore'
 import { speedDefaultOption } from '../../stores/useUserSettingsStore'
 import type { FlowStep } from '../../typing/execution'
 import type {
@@ -75,6 +76,7 @@ export function usePlaybackManager() {
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)
     const [playbackTempo, setPlaybackTempo] = useState<number>(60)
+    const beatPosition = useScoreStore((state) => state.beatPosition)
 
     var tempoLookup: Record<number, Record<number, number>> = {}
 
@@ -332,7 +334,7 @@ export function usePlaybackManager() {
             var maxEndTime = 0
             var maxEndTimeMs = 0
             for (const position of currentStep.positions) {
-                if (position == 'KEMPLI' && currentStep.system.kempli.state != 'notation') {
+                if (position == beatPosition && currentStep.system.kempli.state != 'notation') {
                     // Kempli will be generated separately based on 'on' or 'off' state.
                     break
                 }
@@ -527,9 +529,9 @@ export function usePlaybackManager() {
                         // but this is irrelevent because there is no kempli animation
                         timeMs: BaseNoteEquiv2Millis(beatStartTime + beatOffset, currentStep.tempo[0]),
                         measureIdx: currentStep!.beatIdx,
-                        position: 'KEMPLI',
+                        position: beatPosition,
                         prevnote: undefined,
-                        note: new NoteObject(KEMPLI_BEAT_CHAR, 'KEMPLI'),
+                        note: new NoteObject(KEMPLI_BEAT_CHAR, beatPosition),
                         nextnote: undefined,
                         // The tempo is not precise but irrelevant for single notes
                         bpm: currentStep.tempo[0],

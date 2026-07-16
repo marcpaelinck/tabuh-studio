@@ -1,8 +1,8 @@
 // The Execution Manager functions enable to run through the score in the correct sequence.
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
-import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { type Position } from '@tabuhstudio/shared'
+import { defaultBeatPosition, orchestras, positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { UUID } from 'crypto'
 import _ from 'lodash'
 import { defaultDynamics, defaultTempo } from '../../config/config'
@@ -54,7 +54,10 @@ export function executionManager(
     // Create the lookup table and initialize the flow.
     var flowinfo: FlowInfoTable = Object.fromEntries(
         score.systems.map((system) => {
-            const beatSlices: BeatSliceInfo[] = getBeatSlices(system)
+            const beatSlices: BeatSliceInfo[] = getBeatSlices(
+                system,
+                orchestras[score.instrumenttype]?.beatPosition || defaultBeatPosition
+            )
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of [
                 'goto',

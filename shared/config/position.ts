@@ -59,30 +59,38 @@ export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
     MELODIC: 'melodic'
 }
 
+export const defaultBeatPosition: Position = 'KEMPLI'
+
 // List of available instrument groups.
 // The staffs will appear in the editor in the given sequence.
-export const instrumentGroups: Partial<Record<InstrumentGroup, Position[]>> = {
-    GONG_KEBYAR: [
-        'UGAL',
-        'GENDER_RAMBAT',
-        'TROMPONG',
-        'PEMADE_POLOS',
-        'PEMADE_SANGSIH',
-        'KANTILAN_POLOS',
-        'KANTILAN_SANGSIH',
-        'REYONG_1',
-        'REYONG_2',
-        'REYONG_3',
-        'REYONG_4',
-        'PENYACAH',
-        'CALUNG',
-        'JEGOGAN',
-        'GONGS',
-        'CENGCENG',
-        'KENDANG',
-        'KEMPLI'
-    ],
-    BALEGANJUR: ['CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA']
+export const orchestras: Partial<Record<InstrumentGroup, { positions: Position[]; beatPosition: Position }>> = {
+    GONG_KEBYAR: {
+        positions: [
+            'UGAL',
+            'GENDER_RAMBAT',
+            'TROMPONG',
+            'PEMADE_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_POLOS',
+            'KANTILAN_SANGSIH',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4',
+            'PENYACAH',
+            'CALUNG',
+            'JEGOGAN',
+            'GONGS',
+            'CENGCENG',
+            'KENDANG',
+            'KEMPLI'
+        ],
+        beatPosition: 'KEMPLI'
+    },
+    BALEGANJUR: {
+        positions: ['CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
+        beatPosition: 'TAWATAWA'
+    }
 }
 
 //prettier-ignore
@@ -418,7 +426,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             volume: -15,
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_P_{note}.mp3',
-            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
+            symbolToNoteNames: { x: ['X'], 'x?': ['X_MUTED'] },
             validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
             modifiers: {before: [], after:[';', ':']}
         },
@@ -428,7 +436,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             volume: -15,
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_S_{note}.mp3',
-            symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
+            symbolToNoteNames: { x: ['X'], 'x?': ['X_MUTED'] },
             validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
             modifiers: {before: [], after:[';', ':']}
         },
@@ -437,7 +445,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         type: 'chimes',
         volume: -15,
         svg_file: '',
-        sampletemplate: 'BAL_REYONG_{note}.mp3',
+        sampletemplate: 'BAL_REYONGB_{note}.mp3',
         symbolToNoteNames: {
             o: ['DONG1'],
             e: ['DENG1'],
@@ -460,7 +468,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         type: 'chimes',
         volume: -15,
         svg_file: '',
-        sampletemplate: 'BAL_REYONG_{note}.mp3',
+        sampletemplate: 'BAL_REYONGB_{note}.mp3',
         symbolToNoteNames: {
             u: ['DUNG1'],
             a: ['DANG1'],
@@ -483,7 +491,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         type: 'percussion',
         volume: -15,
         svg_file: '',
-        sampletemplate: 'BAL_TAWA_{note}.mp3',
+        sampletemplate: 'BAL_TAWATAWA_{note}.mp3',
         symbolToNoteNames: { x: ['X'] },
         validStrokes: [],
         modifiers: { before: [], after: [] }
@@ -497,16 +505,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         symbolToNoteNames: {
             u: ['DUNG1'],
             a: ['DANG1'],
-            'u/': ['DUNG1_ABBR'],
-            'a/': ['DANG1_ABBR'],
-            'u?': ['DUNG1_MUTED'],
-            'a?': ['DANG1_MUTED'],
-            b: ['DUNG1', 'DANG1'],
-            'b/': ['DUNG1_ABBR', 'DANG1_ABBR'],
-            'b?': ['DUNG1_MUTED', 'DANG1_MUTED'],
-            x: ['XDUNG1'],
-            'x/': ['XDUNG1_ABBR'],
-            'x?': ['XDUNG1_MUTED']
         },
         validStrokes: ['u;', 'a;', 'u:', 'a:', 'U', 'A'],
         modifiers: { before: ['U', 'A', 'X', 'B'], after: [';', ':'] }

@@ -72,7 +72,6 @@ export const positionOrder = [
 
 export const editorFontSize = 12
 export const pixelsPerPoint = 1.3333
-export const editorDoNotDisplay = ['KEMPLI']
 export const editorInitialExpandState = false
 export type KeyboardType = 'regular' | 'laras'
 

@@ -450,7 +450,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
             ...(base as TempoItem),
             type: 'tempo',
             isGradual: form.isGradual || false,
-            fromBeat: form.fromBeat,
+            fromBeat: form.fromBeat || 1,
             toBeat: form.toBeat,
             fromValue: form.fromBPM != undefined ? Number(form.fromBPM) : undefined,
             value: Number(form.toBPM),
@@ -515,7 +515,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                 ...prev,
                 type: 'dynamics',
                 isGradual: form.isGradual || false,
-                fromBeat: form.fromBeat,
+                fromBeat: form.fromBeat || 1,
                 toBeat: form.toBeat,
                 fromDynamics: form.fromDynamics,
                 fromValue: form.fromDynamics ? dynamicsToNumber[form.fromDynamics] : undefined,
@@ -702,9 +702,12 @@ export const executionTypeOptions: { label: string; value: ExecutionItemType }[]
 }))
 
 /** Position options for a system, derived from the staffs it contains. */
-export function positionOptionsForSystem(staffs: Partial<Record<Position, unknown>>): InputOption<string>[] {
+export function positionOptionsForSystem(
+    staffs: Partial<Record<Position, unknown>>,
+    beatPosition: Position
+): InputOption<string>[] {
     return positionOrder
-        .filter((p) => p in staffs && p !== 'KEMPLI')
+        .filter((p) => p in staffs && p !== beatPosition)
         .map((p) => ({ label: positionConfigs[p as Position].name, value: p }))
 }
 

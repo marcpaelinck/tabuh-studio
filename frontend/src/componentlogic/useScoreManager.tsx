@@ -38,6 +38,7 @@ function gotoItemTargetName(destination: System) {
 
 export function useScoreManager() {
     const score = useScoreStore((state) => state.currentScore)
+    const beatPosition = useScoreStore((state) => state.beatPosition)
     const setScore = useScoreStore((state) => state.setCurrentScore)
     const updateCurrentScore = useScoreStore((state) => state.updateCurrentScore)
     const [labels, setLabels] = useState<Record<string, System>>({})
@@ -279,7 +280,7 @@ export function useScoreManager() {
                     if (!newSystemData.kempli.frequency) newSystemData.kempli.frequency = defaultBeatFrequency
                 }
                 // Changing the kempli settings can affect the expanded notation
-                if (newSystemData) expandSystem(newSystemData)
+                if (newSystemData) expandSystem(newSystemData, beatPosition)
 
                 break
             default:
