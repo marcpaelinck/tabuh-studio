@@ -49,25 +49,7 @@ export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 
 export const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
 export const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'groups', 'castingInstructions', 'staffs', 'kempli']
-export const positionOrder = [
-    'UGAL',
-    'GENDER_RAMBAT',
-    'PEMADE_POLOS',
-    'PEMADE_SANGSIH',
-    'KANTILAN_POLOS',
-    'KANTILAN_SANGSIH',
-    'REYONG_1',
-    'REYONG_2',
-    'REYONG_3',
-    'REYONG_4',
-    'PENYACAH',
-    'CALUNG',
-    'JEGOGAN',
-    'GONGS',
-    'CENGCENG',
-    'KENDANG',
-    'KEMPLI'
-]
+
 // EDITOR
 
 export const editorFontSize = 12

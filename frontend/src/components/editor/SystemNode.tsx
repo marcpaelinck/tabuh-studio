@@ -20,7 +20,6 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
-import { positionOrder } from '../../config/config'
 import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
@@ -268,7 +267,7 @@ export const SystemNode = memo(function SystemNode({
     // Generate the content in a fixed sorting order.
     const sortedStaffEntries = _.entries(systemData.staffs).sort(
         ([p1, _1], [p2, _2]) =>
-            (orchestraPositions.indexOf(p1 as Position) || 0) - (positionOrder.indexOf(p2 as Position) || 0)
+            (orchestraPositions.indexOf(p1 as Position) || 0) - (orchestraPositions.indexOf(p2 as Position) || 0)
     )
 
     // Staves handed to the virtual editor, in the same display order as the textarea.
@@ -281,7 +280,7 @@ export const SystemNode = memo(function SystemNode({
     const beatColWidths = systemData.beatSlices.map((slice) => slice.end - slice.start) ?? []
 
     // Universe of positions the system may contain (KEMPLI only when written as notation).
-    const availablePositions = positionOrder.filter(
+    const availablePositions = orchestraPositions.filter(
         (p) => p !== beatPosition || systemData.kempli.state === 'notation'
     ) as Position[]
 

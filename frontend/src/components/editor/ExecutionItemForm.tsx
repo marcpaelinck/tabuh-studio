@@ -14,7 +14,7 @@ import {
     Toggle
 } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import { dynamicValues, dynamicsToNumber, positionOrder } from '../../config/config'
+import { dynamicValues, dynamicsToNumber } from '../../config/config'
 import type {
     DynamicsItem,
     DynamicsValue,
@@ -704,9 +704,10 @@ export const executionTypeOptions: { label: string; value: ExecutionItemType }[]
 /** Position options for a system, derived from the staffs it contains. */
 export function positionOptionsForSystem(
     staffs: Partial<Record<Position, unknown>>,
+    orchestraPosititions: Position[],
     beatPosition: Position
 ): InputOption<string>[] {
-    return positionOrder
+    return orchestraPosititions
         .filter((p) => p in staffs && p !== beatPosition)
         .map((p) => ({ label: positionConfigs[p as Position].name, value: p }))
 }
