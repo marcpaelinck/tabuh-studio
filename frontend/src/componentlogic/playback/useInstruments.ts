@@ -29,12 +29,12 @@ export type InstrumentSampler = {
 
 export type InstrumentSamplers = Record<Position, InstrumentSampler>
 
-const pitchShift: Tone.PitchShift = new Tone.PitchShift({
-    pitch: 5.0, // 1 unit equals 100 cents
-    windowSize: 0.07,
-    delayTime: 0,
-    feedback: 0
-})
+// const pitchShift: Tone.PitchShift = new Tone.PitchShift({
+//     pitch: 5.0, // 1 unit equals 100 cents
+//     windowSize: 0.07,
+//     delayTime: 0,
+//     feedback: 0
+// })
 
 const lowpassFilter = new Tone.Filter({
     frequency: 5000, // Cutoff frequency in Hz
