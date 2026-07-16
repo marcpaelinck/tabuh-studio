@@ -34,7 +34,6 @@ import type {
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { createGridStyle, gridColorsCompact, gridColorsExpanded } from '../../utils/editor'
-import { FeatureUnderDevelopment } from '../Feature'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
@@ -318,22 +317,20 @@ export const SystemNode = memo(function SystemNode({
                     <Row id="CompactNotation">
                         <Col span={23}>
                             {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
-                            <FeatureUnderDevelopment>
-                                <CompactSystemEditor
-                                    ref={compactNotationRef}
-                                    key={`compact-${systemData.uuid}`}
-                                    initialLines={compactLines}
-                                    notationWidth={notationWidth}
-                                    kempliFrequency={systemData.kempli.frequency}
-                                    availablePositions={availablePositions}
-                                    castingInstructions={systemData.castingInstructions}
-                                    staffs={systemData.staffs}
-                                    playing={playing}
-                                    keyMap={keyMap}
-                                    onChange={handleCompactChange}
-                                    className="border-1 border-solid border-gray-200 p-1"
-                                />
-                            </FeatureUnderDevelopment>
+                            <CompactSystemEditor
+                                ref={compactNotationRef}
+                                key={`compact-${systemData.uuid}`}
+                                initialLines={compactLines}
+                                notationWidth={notationWidth}
+                                kempliFrequency={systemData.kempli.frequency}
+                                availablePositions={availablePositions}
+                                castingInstructions={systemData.castingInstructions}
+                                staffs={systemData.staffs}
+                                playing={playing}
+                                keyMap={keyMap}
+                                onChange={handleCompactChange}
+                                className="border-1 border-solid border-gray-200 p-1"
+                            />
                         </Col>
                     </Row>
                 ) : (
