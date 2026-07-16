@@ -192,9 +192,8 @@ export function executionManager(
         return new Set(suppressItems.map((item) => item.positions || []).flat())
     }
 
-    // Returns the start and end values of an expression value (tempo or dynamics) for the given beat
-    // In case the expression item is gradual, interpolation is applied.
-    // Returns
+    // Returns the start and end values of an expression value (tempo or dynamics) for the given beat.
+    // Interpolation is applied if expression item is gradual.
     function getExpressionValues(
         exprItem: ExpressionItem,
         beatNbr: number,
@@ -233,34 +232,8 @@ export function executionManager(
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
             const exprItem = item as TempoItem
-            // debug(`exprItem=${JSON.stringify([exprItem])}, beat=${beatNbr}`)
-            if (!exprItem.isGradual) {
-                if (beatNbr == exprItem.fromBeat) {
-                    // Non-gradual matching item found
-                    // debug(`EXPRESSION(${type}) NON-GRADUAL=${JSON.stringify([exprItem.toValue, exprItem.toValue])}`)
-                    return [exprItem.value, exprItem.value]
-                }
-            } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
-                // Gradual matching item found: determine start and end values for the given beat.
-                if (undefined !== exprItem.fromValue) {
-                    // Case 1: fromValue is given
-                    const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
-                    const valueRange = exprItem.value - exprItem.fromValue
-                    const startValue = exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
-                    const endValue = startValue + valueRange / totalBeats
-                    // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
-                    return [startValue, endValue]
-                } else {
-                    // Case 2: fromValue is undefined.
-                    const remainingBeats = exprItem.toBeat! - beatNbr + 1
-                    const fromValue = currentValue
-                    const valueRange = exprItem.value - fromValue
-                    const startValue = fromValue
-                    const endValue = fromValue + valueRange * (1 / remainingBeats)
-                    // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
-                    return [startValue, endValue]
-                }
-            }
+            const newValues = getExpressionValues(exprItem, beatNbr, currentValue)
+            return newValues ?? [currentValue, currentValue]
         }
         // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
         return [currentValue, currentValue]
@@ -283,41 +256,16 @@ export function executionManager(
         // Find all items that match the given beat index.
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
-            const exprItem = item as DynamicsItem
+            const dynamicsItem = item as DynamicsItem
             // If positions is not given, assume dynamics apply to all positions
-            const positions = exprItem.positions.length > 0 ? exprItem.positions : _.keys(positionConfigs)
-            // debug(`exprItem=${JSON.stringify([exprItem])}, beat=${beatNbr}`)
-            if (!exprItem.isGradual) {
-                if (beatNbr == exprItem.fromBeat) {
-                    // Non-gradual matching item found
-                    const dynamics = _.fromPairs(positions.map((pos) => [pos, [exprItem.value, exprItem.value]]))
-                    newDynamics = { ...newDynamics, ...dynamics }
-                }
-            } else if (exprItem.fromBeat && exprItem.fromBeat <= beatNbr && beatNbr <= exprItem.toBeat!) {
-                // Gradual matching item found: determine start and end values for the given beat.
-                if (undefined !== exprItem.fromValue) {
-                    // Case 1: fromValue is given
-                    const totalBeats = exprItem.toBeat! - exprItem.fromBeat! + 1
-                    const valueRange = exprItem.value - exprItem.fromValue
-                    const startValue = exprItem.fromValue + valueRange * ((beatNbr - exprItem.fromBeat) / totalBeats)
-                    const endValue = startValue + valueRange / totalBeats
-                    // debug(`EXPRESSION(${type}) GRADUAL1=${JSON.stringify([startValue, endValue])}`)
-                    const dynamics = _.fromPairs(positions.map((pos) => [pos, [startValue, endValue]]))
-                    newDynamics = { ...newDynamics, ...dynamics }
-                } else {
-                    // Case 2: fromValue is undefined.
-                    const remainingBeats = exprItem.toBeat! - beatNbr + 1
-                    const fromValue = newDynamics[positions[0] as Position][1]
-                    const valueRange = exprItem.value - fromValue
-                    const startValue = fromValue
-                    const endValue = fromValue + valueRange * (1 / remainingBeats)
-                    // debug(`EXPRESSION(${type}) GRADUAL2=${JSON.stringify([startValue, endValue])}`)
-                    const dynamics = _.fromPairs(positions?.map((pos) => [pos, [startValue, endValue]]))
-                    newDynamics = { ...newDynamics, ...dynamics }
-                }
+            const positions = dynamicsItem.positions.length > 0 ? dynamicsItem.positions : _.keys(positionConfigs)
+            const fromValue = newDynamics[positions[0] as Position][1]
+            const newValues = getExpressionValues(dynamicsItem, beatNbr, fromValue)
+            if (newValues) {
+                const dynamics = _.fromPairs(positions?.map((pos) => [pos, newValues]))
+                newDynamics = { ...newDynamics, ...dynamics }
             }
         }
-        // debug(`EXPRESSION(${type}) DEFAULT=${JSON.stringify([currentValue, currentValue])}`)
         return newDynamics
     }
 
