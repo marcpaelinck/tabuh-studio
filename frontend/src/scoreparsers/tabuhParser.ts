@@ -800,7 +800,7 @@ function getGradualBeatsParameters(node: SyntaxNode, content: string, valueGradu
     const gradual: boolean = valueGradual || values.isGradual
     const param: BeatsParameter = gradual
         ? {
-              fromBeat: (values.fromValue as number | undefined) ?? 1,
+              fromBeat: (values.fromValue as number | undefined) ?? (values.value as number | undefined) ?? 1,
               toBeat: values.value as number | undefined,
               isGradual: true
           }

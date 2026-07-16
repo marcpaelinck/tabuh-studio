@@ -105,8 +105,8 @@ export function executionManager(
 
     // Returns the best matching 'goto', 'loop', 'tempo' or 'dynamics' item for the current pass/iteration count values
     // or undefined if none was found.
-    function getExecutionItems(type: ExecutionItemType, sysIdx: number): ExecutionItem[] {
-        const matches: ExecutionItem[] = []
+    function getExecutionItems(type: ExecutionItemType, sysIdx: number, beatId?: number): ExecutionItem[] {
+        var matches: ExecutionItem[] = []
         const items = flowinfo![sysIdx].executionItems[type]
         const flow = flowinfo![sysIdx]
         for (const item of items) {
@@ -134,6 +134,15 @@ export function executionManager(
                 }
             }
         }
+        // Filter tempo and dynamics items on beat ID.
+        if (['tempo', 'dynamics'].includes(type) && beatId != undefined)
+            matches = matches.filter((item) => {
+                const eItem = item as ExpressionItem
+                return (
+                    beatId == eItem.fromBeat ||
+                    (eItem.toBeat != undefined && eItem.fromBeat <= beatId && beatId <= eItem.toBeat)
+                )
+            })
         return matches
     }
 
@@ -225,7 +234,7 @@ export function executionManager(
     }
 
     function getTempoValue(sysIdx: number, beatIdx: number, currentValue: number): number[] {
-        const matches = getExecutionItems('tempo', sysIdx)
+        const matches = getExecutionItems('tempo', sysIdx, beatIdx + 1)
         // debug(`matches[system ${sysIdx + 1} pass=${flowinfo[sysIdx].pass}]=${JSON.stringify(matches)}`)
         if (matches.length == 0) return [currentValue, currentValue]
         // Find an item that matches the given beat index.
@@ -246,12 +255,13 @@ export function executionManager(
         beatIdx: number,
         currentValues: PositionDynamics | undefined
     ): PositionDynamics {
-        var newDynamics =
-            currentValues ??
-            (_.fromPairs(
-                _.keys(positionConfigs).map((pos) => [pos, [defaultDynamics, defaultDynamics]])
-            ) as PositionDynamics)
-        const matches = getExecutionItems('dynamics', sysIdx)
+        var newDynamics = _.fromPairs(
+            _.keys(positionConfigs).map((pos) => {
+                const value = currentValues ? currentValues[pos as Position][1] : defaultDynamics
+                return [pos, [value, value]]
+            })
+        ) as PositionDynamics
+        const matches = getExecutionItems('dynamics', sysIdx, beatIdx + 1)
         if (matches.length == 0) return newDynamics
         // Find all items that match the given beat index.
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
