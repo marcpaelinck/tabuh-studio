@@ -1,364 +1,254 @@
-const alphabet = {
+import type { NoteSymbol } from '../types/basetypes'
+import type { Position } from '../types/position'
+import { positionGroups } from './position'
+
+export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'null'
+export type Category = 'melodic' | 'percussion' | 'colotomy' | 'other'
+
+export interface AlphabetItem {
+    kind: Kind
+    category?: Category
+    combinesWith?: Category[]
+    combinesWithPrefix?: boolean
+    name: string
+    description: string
+    positions: Position[]
+}
+
+// prettier-ignore
+export const alphabet: Record<NoteSymbol, AlphabetItem> = {
     '0': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Ka',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     '8': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Det',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     '9': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Tong',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
-    G: { type: 'tone', name: 'Gir', description: 'Gong stroke', positions: ['GONGS'] },
-    P: { type: 'tone', name: 'Pur', description: 'Kempur stroke', positions: ['GONGS'] },
-    T: { type: 'tone', name: 'Tong', description: 'Kemong stroke', positions: ['GONGS'] },
+    G: { kind: 'tone', category: 'colotomy', name: 'Gir', description: 'Gong stroke', positions: ['GONGS'] },
+    P: { kind: 'tone', category: 'colotomy', name: 'Pur', description: 'Kempur stroke', positions: ['GONGS'] },
+    T: { kind: 'tone', category: 'colotomy', name: 'Tong', description: 'Kemong stroke', positions: ['GONGS'] },
     x: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Stroke',
-        description: 'Toneless stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
-        positions: ['REYONG_4', 'REYONG_3', 'REYONG_2', 'REYONG_1', 'CENGCENG', 'KEMPLI']
+        description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
+        positions: [
+            'REYONG_4',
+            'REYONG_3',
+            'REYONG_2',
+            'REYONG_1',
+            'CENGCENG',
+            'KEMPLI',
+            'CENGCENG_P',
+            'CENGCENG_S',
+            'TAWATAWA'
+        ]
     },
     '(': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Tut',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     ')': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Teng',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     '*': {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Pak',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     i: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DING',
         description: 'Generic tone (without octave)',
-        positions: [
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'TROMPONG',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'PENYACAH',
-            'CALUNG',
-            'JEGOGAN'
-        ]
+        positions: positionGroups.MELODIC
     },
     o: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DONG',
         description: 'Generic tone (without octave)',
-        positions: [
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'TROMPONG',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'PENYACAH',
-            'CALUNG',
-            'JEGOGAN'
-        ]
+        positions: positionGroups.MELODIC
     },
     e: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DENG',
         description: 'Generic tone (without octave)',
-        positions: [
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'TROMPONG',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'PENYACAH',
-            'CALUNG',
-            'JEGOGAN'
-        ]
+        positions: positionGroups.MELODIC
     },
     u: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DUNG',
         description: 'Generic tone (without octave)',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'GENDER_RAMBAT',
-            'TROMPONG',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'PENYACAH',
-            'CALUNG',
-            'JEGOGAN'
-        ]
+        positions: positionGroups.MELODIC
     },
     a: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DANG',
         description: 'Generic tone (without octave)',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'GENDER_RAMBAT',
-            'TROMPONG',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'PENYACAH',
-            'CALUNG',
-            'JEGOGAN'
-        ]
+        positions: positionGroups.MELODIC
     },
     t: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'melodic',
         name: 'DENG-DING',
         description: 'Combined stroke on DENG and DING (only used in DONG norot pattern)',
         positions: ['REYONG_1']
     },
     b: {
-        type: 'tone',
+        kind: 'tone',
+        category: 'percussion',
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: ['REYONG_4', 'REYONG_3', 'REYONG_2', 'REYONG_1']
+        positions: positionGroups.REYONG
     },
     I: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'DING grace note',
         description: 'Briefly struck note preceding another note',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     },
     O: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'DONG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     },
     E: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'DENG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     },
     U: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'DUNG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     },
     A: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'DANG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     },
     X: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['melodic'],
         name: 'Stroke',
         description: 'Stroke on chime rim.',
-        positions: ['REYONG_4', 'REYONG_3', 'REYONG_2', 'REYONG_1']
+        positions: positionGroups.REYONG
     },
     B: {
-        type: 'prefix',
+        kind: 'prefix',
+        combinesWith: ['percussion'],
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: ['REYONG_4', 'REYONG_3', 'REYONG_2', 'REYONG_1']
+        positions: positionGroups.REYONG
     },
-    ';': {
-        type: 'modifier',
-        name: 'Tremolo',
-        description: 'Repeated, rapid succession of the same note.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'KENDANG_LANANG',
-            'KENDANG_WADON',
-            'KENDANG',
-            'CENGCENG',
-            'KEMPLI'
-        ]
+    ',': {
+        kind: 'octavation',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: true,
+        name: 'Octave -1',
+        description: 'Lowers the tone with one octave',
+        positions: positionGroups.MELODIC
+    },
+    '<': {
+        kind: 'octavation',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: true,
+        name: 'Octave +1',
+        description: 'Raises the tone with one octave',
+        positions: positionGroups.MELODIC
+    },
+    '/': {
+        kind: 'modifier',
+        combinesWith: ['melodic', 'percussion'],
+        combinesWithPrefix: true,
+        name: 'Abbreviated',
+        description: 'Mutes note immediately after the stroke.',
+        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
+    },
+    '?': {
+        kind: 'modifier',
+        combinesWith: ['melodic', 'percussion'],
+        combinesWithPrefix: true,
+        name: 'Muted',
+        description: 'Mutes note during the stroke.',
+        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
     },
     ':': {
-        type: 'modifier',
+        kind: 'modifier',
+        combinesWith: ['melodic', 'percussion'],
+        combinesWithPrefix: false,
         name: 'Accelerating tremolo',
         description: 'Repeated succession of the same note, starting slowly and gradually increasing the tempo.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS',
-            'KENDANG_LANANG',
-            'KENDANG_WADON',
-            'KENDANG',
-            'CENGCENG',
-            'KEMPLI'
-        ]
+        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
     },
     _: {
-        type: 'modifier',
+        kind: 'modifier',
+        combinesWith: ['melodic', 'percussion'],
+        combinesWithPrefix: true,
         name: 'Half duration',
         description: 'Halves the duration of the note.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
     },
     '[': {
-        type: 'modifier',
+        kind: 'modifier',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: false,
         name: 'Rake left',
         description:
             'Slide the panggul along the notes from left to right, starting on the note to which the modifier belongs.',
-        positions: ['GENDER_RAMBAT', 'UGAL', 'PEMADE_SANGSIH', 'PEMADE_POLOS', 'KANTILAN_SANGSIH', 'KANTILAN_POLOS']
+        positions: positionGroups.DAUN
     },
     ']': {
-        type: 'modifier',
+        kind: 'modifier',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: false,
         name: 'Rake left',
         description:
             'Slide the panggul along the notes from right to left, starting on the note to which the modifier belongs.',
-        positions: ['GENDER_RAMBAT', 'UGAL', 'PEMADE_SANGSIH', 'PEMADE_POLOS', 'KANTILAN_SANGSIH', 'KANTILAN_POLOS']
+        positions: positionGroups.DAUN
     },
     n: {
-        type: 'modifier',
+        kind: 'modifier',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: false,
         name: 'Norot',
         description: '4-note partial norot pattern. Combines with three trailing spaces.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
-    },
-    N: {
-        type: 'modifier',
-        name: 'Norot',
-        description: '4-note partial norot pattern. Combines with three trailing spaces.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'GENDER_RAMBAT',
-            'UGAL',
-            'PEMADE_SANGSIH',
-            'PEMADE_POLOS',
-            'KANTILAN_SANGSIH',
-            'KANTILAN_POLOS'
-        ]
+        positions: positionGroups.MELODIC
     }
 }

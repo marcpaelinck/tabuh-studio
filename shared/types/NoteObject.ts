@@ -2,6 +2,7 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
+import { alphabet, type Category } from '../config/alphabet.ts'
 import { positionConfigs } from '../config/position.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
 
@@ -160,6 +161,7 @@ export class NoteObject {
     readonly pattern: Record<PatternType, boolean>
     readonly hasStroke: boolean
     readonly hasPattern: boolean
+    readonly category: Category
 
     /**
      * The instrument position this note is bound to, or `undefined` if the
@@ -231,6 +233,7 @@ export class NoteObject {
             rakeright: false
         }
         this.pattern = { norot: false }
+        this.category = 'other'
 
         try {
             NoteObject.validate(input, position)
@@ -272,7 +275,7 @@ export class NoteObject {
             if (stroke) this.stroke[stroke] = true
             const pattern = PATTERN_MODIFIER_MAP.get(this.symbol.modifier as PatternModifier)
             if (pattern) this.stroke[pattern] = true
-
+            this.category = alphabet[this.symbol.pitch].category ?? 'other'
             this.isExtensionSilence = SILENCE_EXTENDING_CHARS.has(this.symbol.pitch)
             this.isMutingSilence = SILENCE_MUTING_CHARS.has(this.symbol.pitch)
 

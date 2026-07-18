@@ -11,7 +11,7 @@ export type PositionConfig = {
     sampletemplate: string
     volume: number
     symbolToNoteNames: { [symbol: string]: string[] }
-    validStrokes: string[]
+    validStrokes: string[] // Not used, replaced with alphabet `positions` attribute
     modifiers: Modifiers
 }
 
@@ -55,3 +55,6 @@ export type PositionGroup =
     | 'REYONG'
     | 'POKOK'
     | 'MELODIC'
+    | 'DAUN'
+    | 'PERCUSSION'
+    | 'CENGCENG_KOPYAK'

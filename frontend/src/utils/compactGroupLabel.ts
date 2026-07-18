@@ -5,12 +5,16 @@
 // positions) via `positionAbbr`, joined with '/'. E.g. GANGSA + UGAL -> "ga/ug",
 // REYONG_1 + REYONG_3 -> "rey13". The tooltip always lists every position's full name.
 
-import type { Position } from '@tabuhstudio/shared'
+import type { InstrumentGroup, Position } from '@tabuhstudio/shared'
 import { positionAbbr, positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
+import { getPositionGroups } from '../config/position-functions'
+import { useScoreStore } from '../stores/useScoreStore'
 
 type PositionGroupKey = keyof typeof positionGroups
 
-const groupEntries = Object.entries(positionGroups) as [PositionGroupKey, Position[]][]
+const orchestra: InstrumentGroup = useScoreStore((state) => state.orchestra)
+
+const groupEntries = Object.entries(getPositionGroups(orchestra)) as [PositionGroupKey, Position[]][]
 
 export function compactGroupLabel(positions: Position[]): { label: string; tooltip: string } {
     const names = positions.map((p) => positionConfigs[p]?.name ?? p)

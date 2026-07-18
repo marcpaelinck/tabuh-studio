@@ -11,7 +11,7 @@ export const positionGroups: Record<PositionGroup, Position[]> = {
     GANGSA_RANGE: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL'],
     REYONG_13: ['REYONG_1', 'REYONG_3'],
     REYONG_24: ['REYONG_2', 'REYONG_4'],
-    REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'],
+    REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2'],
     POKOK: ['CALUNG', 'JEGOGAN', 'PENYACAH'],
     MELODIC: [
         'PEMADE_POLOS',
@@ -24,10 +24,41 @@ export const positionGroups: Record<PositionGroup, Position[]> = {
         'REYONG_3',
         'REYONG_2',
         'REYONG_4',
+        'REYONGB_1',
+        'REYONGB_2',
+        'CALUNG',
+        'JEGOGAN',
+        'PENYACAH',
+        'PONGGANG'
+    ],
+    DAUN: [
+        'PEMADE_POLOS',
+        'PEMADE_SANGSIH',
+        'KANTILAN_POLOS',
+        'KANTILAN_SANGSIH',
+        'UGAL',
+        'GENDER_RAMBAT',
         'CALUNG',
         'JEGOGAN',
         'PENYACAH'
-    ]
+    ],
+    PERCUSSION: [
+        'KEMPLI',
+        'KENDANG',
+        'KENDANG_LANANG',
+        'KENDANG_WADON',
+        'REYONG_1',
+        'REYONG_2',
+        'REYONG_3',
+        'REYONG_4',
+        'CENGCENG',
+        'CENGCENG_P',
+        'CENGCENG_S',
+        'REYONGB_1',
+        'REYONGB_2',
+        'TAWATAWA'
+    ],
+    CENGCENG_KOPYAK: ['CENGCENG_P', 'CENGCENG_S']
 }
 
 export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
@@ -55,6 +86,7 @@ export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
     POKOK: 'pokok',
     KEMPLI: 'kempli',
     CENGCENG: 'cengceng',
+    CENGCENG_KOPYAK: 'cengceng',
     GONGS: 'gongs',
     MELODIC: 'melodic'
 }
