@@ -23,6 +23,7 @@ import { candidatesFor, type CastingInstruction } from '../../componentlogic/cas
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { editorFontSize } from '../../config/config'
+import { getPositionGroups } from '../../config/position-functions'
 import { useScoreStore } from '../../stores/useScoreStore'
 import type { Staffs } from '../../typing/score'
 import { compactGroupLabel } from '../../utils/compactGroupLabel'
@@ -218,7 +219,7 @@ export function CompactSystemEditor({
     }
 
     const rows: StaffGridRow[] = lines.map((line, li) => {
-        const { label, tooltip } = compactGroupLabel(line.positions)
+        const { label, tooltip } = compactGroupLabel(line.positions, getPositionGroups(orchestra))
         const flatCursor = focused && cursor.line === li ? cursor.index : null
         // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
         const showSnippet = focused && !playing && cursor.line === li
