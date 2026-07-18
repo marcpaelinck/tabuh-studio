@@ -1,9 +1,9 @@
 import type { NoteSymbol } from '../types/basetypes'
 import type { Position } from '../types/position'
-import { positionGroups } from './position'
+import { positionConfigs, positionGroups } from './position'
 
-export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'null'
-export type Category = 'melodic' | 'percussion' | 'colotomy' | 'other'
+export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'rest' | 'null'
+export type Category = 'melodic' | 'percussion' | 'colotomy' | 'all' | 'other'
 
 export interface AlphabetItem {
     kind: Kind
@@ -17,6 +17,27 @@ export interface AlphabetItem {
 
 // prettier-ignore
 export const alphabet: Record<NoteSymbol, AlphabetItem> = {
+    '.': {
+        kind: 'rest',
+        category: 'all',
+        name: 'Silence',
+        description: 'Mutes the previous note',
+        positions: Object.keys(positionConfigs) as Position[]
+    },
+    '-': {
+        kind: 'rest',
+        category: 'all',
+        name: 'Extension',
+        description: 'Extends the previous note',
+        positions: Object.keys(positionConfigs) as Position[]
+    },
+    ' ': {
+        kind: 'rest',
+        category: 'all',
+        name: 'Extension',
+        description: 'Extends the previous note',
+        positions: Object.keys(positionConfigs) as Position[]
+    },
     '0': {
         kind: 'tone',
         category: 'percussion',
