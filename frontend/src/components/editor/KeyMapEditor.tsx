@@ -181,8 +181,8 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
 
     const valueRenderer = (label: ReactNode, item: Option<string | number>) => (
         <span>
-            <span className="text-gray-400 balifont12">{String(item.value)}</span>
-            {' ' + label}
+            <span className="text-gray-400 balifont12">{String('\u00A0' + item.value)}</span>
+            {'\u00A0\u00A0' + item.label}
         </span>
     )
 
