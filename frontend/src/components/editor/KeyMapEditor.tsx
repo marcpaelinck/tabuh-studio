@@ -163,7 +163,7 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
     }
 
     return (
-        <Drawer open={open} backdrop={false} enforceFocus={false} size="md" onClose={() => setOpen(false)}>
+        <Drawer open={open} size="md" onClose={() => setOpen(false)}>
             <Drawer.Header>
                 <Drawer.Title>Keyboard mapping</Drawer.Title>
                 <Drawer.Actions>
