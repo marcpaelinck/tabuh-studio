@@ -47,7 +47,14 @@ function symbolValid(symbol: string): boolean {
     }
 }
 
-/** A single-line input that captures the next keystroke pressed while it is focused. */
+/**
+ * A single-line input that captures the next keystroke pressed while it is focused.
+ *
+ * Uses a NATIVE read-only input rather than rsuite's `Input`: rsuite's InputBase only
+ * wires `onKeyDown`/`onFocus`/`onChange` when the field is editable (`!disabled &&
+ * !readOnly`), so a read-only rsuite Input never fires our capture handler. The
+ * `rs-input` class keeps the native element visually consistent.
+ */
 function KeystrokeInput({ value, onChange }: { value: Keystroke; onChange: (ks: Keystroke) => void }) {
     const [capturing, setCapturing] = useState(false)
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -59,9 +66,10 @@ function KeystrokeInput({ value, onChange }: { value: Keystroke; onChange: (ks: 
         e.currentTarget.blur()
     }
     return (
-        <Input
+        <input
             readOnly
-            size="sm"
+            className="rs-input"
+            style={{ cursor: 'pointer' }}
             value={capturing ? 'press a key…' : formatKeystroke(value)}
             placeholder="click, then press"
             onFocus={() => setCapturing(true)}
