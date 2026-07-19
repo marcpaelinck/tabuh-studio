@@ -55,11 +55,20 @@ etc.
 
 The editor should open in a drawer similar to that of the ExecutionForm.
 
+#### Additional requirements
+I created an `alphabet`​ dictionary in `shared/config/alphabet`​ which contains information about each valid character. Based on this definition I also created two functions in `frontend/src/config/alphabet-functions.ts`​. Function `validNoteObjects​` creates a list of all valid `NoteObject​s`. Function `symbolName`​ returns a human-readable name for a symbol which combines the names of each character as defined in the `alphabet`​ dictionary. I added an attribute `name`​ to the `NoteObject`​ class which gets its value from the `symbolName` function.
+
+In the table of the `KeymapEditor` I want the user to select the symbol name from a list of possible symbols **and** possible characters instead of typing it in an `Input` field. Because the list of possible symbols is large, I want to use a filtered dropdown selector. The filtered list should contain all note symbols and characters that have a partial or entire match on either the symbol's `symbolName` or the symbol's string value.
+
+This new requirement makes the validity check of the symbols unnecessary, so it should be removed.
+
+
 #### Implementation (as built)
 - **Editable store.** `useKeyMapStore` (zustand) holds an in-memory clone of the shared built-in `keyMaps` plus mutations (`updateMappings`, `addKeyMap`, `importKeyMap`, `renameKeyMap`, `deleteKeyMap`). The *active* selection stays in `useUserSelectionStore.selectedKeyMapId`. `SystemNode` compiles the selected definition from the store list, so edits take effect live.
 - **`KeyMapEditor` drawer** (`components/editor/KeyMapEditor.tsx`) mirrors the `ExecutionForm` drawer (`backdrop={false} enforceFocus={false}`, Cancel/Confirm actions). Header row: a definition `SelectPicker`, a name field (rename), and `New` / `Save to file` / `Load from file`. Body: an editable table `symbol · keystroke · instrument(s)` with add/remove rows. Row edits are staged locally and committed to the store on Confirm.
-- **Keystroke capture.** Each keystroke cell is a read-only input that records the next key pressed while focused (lone modifier presses ignored); it is displayed via `formatKeystroke`.
-- **Validation** (blocks Confirm): empty/invalid symbol (checked with `NoteObject.validate`), missing keystroke, and ambiguity — the same keystroke bound to more than one symbol. Many keystrokes → one symbol is allowed. Grouping uses `formatKeystroke`, which folds shift into printable keys the same way the runtime matcher does.
+- **Keystroke capture.** Each keystroke cell is a native read-only input that records the next key pressed while focused (lone modifier presses ignored); it is displayed via `formatKeystroke`. (A read-only rsuite `Input` drops `onKeyDown`, so a native element is used.)
+- **Symbol picker.** The symbol cell is a filtered `SelectPicker` (not a free-text input): its options are every valid note symbol (from `validNoteObjects`) plus every alphabet character, labelled by `NoteObject.name` / the character's name. `searchBy` matches the typed keyword against both the name and the symbol/char string. Because only valid symbols are selectable, there is no structural symbol-validity check.
+- **Validation** (blocks Confirm): unselected symbol, missing keystroke, and ambiguity — the same keystroke bound to more than one symbol. Many keystrokes → one symbol is allowed. Grouping uses `formatKeystroke`, which folds shift into printable keys the same way the runtime matcher does.
 - **File save/load.** Save serialises the current definition to a JSON download; Load parses a JSON file, adds it under a fresh id via `importKeyMap`, and selects it.
 - **Trigger.** `Notation`-menu sibling `Keyboard → Edit mappings...` opens the drawer.
 - **Instrument scope** is editable (position groups + single positions) but not yet consulted by `compileKeyMap` — see the `TODO(instruments)` there.

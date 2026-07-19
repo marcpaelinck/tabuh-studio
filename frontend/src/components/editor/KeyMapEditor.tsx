@@ -12,21 +12,24 @@
  * immediately and re-seed the staged rows.
  */
 
+import MinusIcon from '@rsuite/icons/Minus'
+import PlusIcon from '@rsuite/icons/Plus'
 import {
-    NoteObject,
     type EditableKeyMapping,
     type KeyMapDefinition,
     type Keystroke,
+    type NoteObject,
     type Position,
     type PositionGroup
 } from '@tabuhstudio/shared'
+import { alphabet } from '@tabuhstudio/shared/config/alphabet'
 import { positionAbbr } from '@tabuhstudio/shared/config/position'
-import MinusIcon from '@rsuite/icons/Minus'
-import PlusIcon from '@rsuite/icons/Plus'
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import type { Option } from 'rsuite'
 import { Button, CheckPicker, Drawer, IconButton, Input, Message, SelectPicker, Stack } from 'rsuite'
 import { v4 as uuidv4 } from 'uuid'
 import { formatKeystroke } from '../../componentlogic/editor/keyMap'
+import { validNoteObjects } from '../../config/alphabet-functions'
 import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 
@@ -36,16 +39,21 @@ const emptyKeystroke: Keystroke = { key: '', ctrl: false, alt: false, shift: fal
 // positions (kempli, ugal, …), labelled by their abbreviation.
 const instrumentOptions = Object.entries(positionAbbr).map(([value, label]) => ({ label, value }))
 
-// A symbol string is valid when NoteObject can parse it (position-independent here).
-function symbolValid(symbol: string): boolean {
-    if (!symbol) return false
-    try {
-        NoteObject.validate(symbol, undefined)
+// Symbol dropdown options: every valid note SYMBOL plus every single alphabet
+// CHARACTER, labelled by its human-readable name (value = the symbol/char string).
+// Bare tones that also appear as characters are de-duplicated, symbols winning.
+const symbolPickerSeen = new Set<string>()
+const noteSymbolOptions = (validNoteObjects({ asDict: false }) as NoteObject[])
+    .filter((n) => {
+        if (symbolPickerSeen.has(n.canonicalSymbol)) return false
+        symbolPickerSeen.add(n.canonicalSymbol)
         return true
-    } catch {
-        return false
-    }
-}
+    })
+    .map((n) => ({ value: n.canonicalSymbol, label: n.name, group: 'note symbols' }))
+const charOptions = Object.entries(alphabet)
+    .filter(([char]) => char !== '' && !symbolPickerSeen.has(char))
+    .map(([char, item]) => ({ value: char, label: item.name, group: 'characters' }))
+const symbolPickerData = [...noteSymbolOptions, ...charOptions]
 
 /**
  * A single-line input that captures the next keystroke pressed while it is focused.
@@ -121,10 +129,11 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
         setRows((rs) => [...rs, { id: uuidv4(), keystroke: { ...emptyKeystroke }, symbol: '', instruments: [] }])
     const deleteRow = (id: string) => setRows((rs) => rs.filter((r) => r.id !== id))
 
-    // Validation: empty/invalid symbols, empty keystrokes, and ambiguous bindings
-    // (the same keystroke bound to two different symbols). Multiple keystrokes → one
-    // symbol is allowed. Grouping key uses formatKeystroke, which matches the runtime
-    // matcher (shift folded into printable keys).
+    // Validation: unselected symbols, empty keystrokes, and ambiguous bindings (the
+    // same keystroke bound to two different symbols). Multiple keystrokes → one symbol
+    // is allowed. Grouping key uses formatKeystroke, which matches the runtime matcher
+    // (shift folded into printable keys). Structural symbol validity is no longer
+    // checked — the symbol dropdown only offers valid symbols/characters.
     const byKeystroke = new Map<string, Set<string>>()
     for (const r of rows) {
         if (!r.keystroke.key) continue
@@ -134,11 +143,11 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
         byKeystroke.set(k, set)
     }
     const ambiguous = [...byKeystroke.entries()].filter(([, symbols]) => symbols.size > 1).map(([k]) => k)
-    const invalidSymbolRows = rows.filter((r) => !symbolValid(r.symbol))
+    const missingSymbolRows = rows.filter((r) => !r.symbol)
     const missingKeystrokeRows = rows.filter((r) => !r.keystroke.key)
 
     const errors: string[] = []
-    if (invalidSymbolRows.length) errors.push(`${invalidSymbolRows.length} row(s) have an empty or invalid symbol.`)
+    if (missingSymbolRows.length) errors.push(`${missingSymbolRows.length} row(s) have no symbol selected.`)
     if (missingKeystrokeRows.length) errors.push(`${missingKeystrokeRows.length} row(s) have no keystroke.`)
     if (ambiguous.length) errors.push(`Ambiguous keystroke(s): ${ambiguous.join(', ')} map to more than one symbol.`)
 
@@ -169,6 +178,13 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
             // Silent: a malformed file simply does nothing. (Could surface a toast later.)
         }
     }
+
+    const valueRenderer = (label: ReactNode, item: Option<string | number>) => (
+        <span>
+            <span className="text-gray-400 balifont12">{String(item.value)}</span>
+            {' ' + label}
+        </span>
+    )
 
     return (
         <Drawer open={open} size="md" onClose={() => setOpen(false)}>
@@ -243,11 +259,28 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
                     <tbody>
                         {rows.map((row) => (
                             <tr key={row.id} className="align-top">
-                                <td className="pb-2 pr-2 w-24">
-                                    <Input
+                                <td className="pb-2 pr-2 w-56">
+                                    <SelectPicker
                                         size="sm"
-                                        value={row.symbol}
-                                        onChange={(symbol) => setRow(row.id, { symbol })}
+                                        block
+                                        virtualized
+                                        cleanable={false}
+                                        placeholder="select symbol"
+                                        data={symbolPickerData}
+                                        groupBy="group"
+                                        value={row.symbol || null}
+                                        onChange={(v) => setRow(row.id, { symbol: (v as string) ?? '' })}
+                                        // Filter on the human-readable name AND the symbol/char string.
+                                        searchBy={(keyword, _label, item) => {
+                                            const kw = keyword.trim().toLowerCase()
+                                            if (!kw) return true
+                                            return (
+                                                String(item.label).toLowerCase().includes(kw) ||
+                                                String(item.value).toLowerCase().includes(kw)
+                                            )
+                                        }}
+                                        renderValue={valueRenderer}
+                                        renderOption={valueRenderer}
                                     />
                                 </td>
                                 <td className="pb-2 pr-2 w-40">
@@ -269,11 +302,7 @@ export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
                                     />
                                 </td>
                                 <td className="pb-2">
-                                    <IconButton
-                                        size="sm"
-                                        icon={<MinusIcon />}
-                                        onClick={() => deleteRow(row.id)}
-                                    />
+                                    <IconButton size="sm" icon={<MinusIcon />} onClick={() => deleteRow(row.id)} />
                                 </td>
                             </tr>
                         ))}
