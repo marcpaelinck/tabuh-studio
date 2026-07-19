@@ -2,7 +2,7 @@ import type { NoteSymbol } from '../types/basetypes'
 import type { Position } from '../types/position'
 import { positionConfigs, positionGroups } from './position'
 
-export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'rest' | 'null'
+export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'rest' | 'error' | 'null'
 export type Category = 'melodic' | 'percussion' | 'colotomy' | 'all' | 'other'
 
 export interface AlphabetItem {
@@ -271,5 +271,12 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Norot',
         description: '4-note partial norot pattern. Combines with three trailing spaces.',
         positions: positionGroups.MELODIC
+    },
+    '!': {
+        kind: 'error',
+        category: 'all',
+        name: 'Invalid symbol',
+        description: 'Invalid symbol',
+        positions: Object.keys(positionConfigs) as Position[]
     }
 }
