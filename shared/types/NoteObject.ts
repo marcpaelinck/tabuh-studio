@@ -2,6 +2,7 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
+import { symbolName } from '../../frontend/src/config/alphabet-functions.ts'
 import { alphabet, type Category } from '../config/alphabet.ts'
 import { positionConfigs } from '../config/position.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
@@ -140,6 +141,11 @@ export class NoteObject {
     }
 
     /**
+     * A human-readable description of the symbol.
+     */
+    readonly name: string
+
+    /**
      * Grace note prefix character, or `''` if the note is not a grace note
      * (or if `error === 'invalidSymbol'`).
      */
@@ -264,12 +270,15 @@ export class NoteObject {
             this.error = 'invalidSymbol'
             this.symbol.pitch = ERROR_PITCH_CHAR
             this.canonicalSymbol = ERROR_PITCH_CHAR
+            this.name = symbolName(this.canonicalSymbol)
+
             console.error(`invalid symbol '${input}' for ${position}`)
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
             this.error = fault
 
             this.canonicalSymbol = this.symbol.prefix + this.symbol.pitch + this.symbol.octave + this.symbol.modifier
+            this.name = symbolName(this.canonicalSymbol)
             this.octaveNumber = this.symbol.octave === ',' ? -1 : this.symbol.octave === '<' ? 1 : 0
             const stroke = STROKE_MODIFIER_MAP.get(this.symbol.modifier as StrokeModifier)
             if (stroke) this.stroke[stroke] = true

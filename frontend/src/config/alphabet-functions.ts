@@ -115,3 +115,9 @@ export function validNoteObjects({
     }
     return asDict ? validDict : validList
 }
+
+export function symbolName(symbol: NoteSymbol) {
+    return Array.from(symbol)
+        .map((char) => alphabet[char].name.toLowerCase() ?? '<?>')
+        .join(' ')
+}
