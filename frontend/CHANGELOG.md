@@ -40,3 +40,8 @@ Initial release
 - `Added` Baleganjur instrument set added.
 - `Added` Keyboard definitions (default, LARAS).
 - `Added` First (crude) version of keyboard editor.
+
+## 1.1.1
+
+- `Fixed` Animation: keys are black on iPhones (Webkit/Safari).
+- `Changed` Improved version of keyboard editor.

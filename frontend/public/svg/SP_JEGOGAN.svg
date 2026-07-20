@@ -71,7 +71,7 @@
         }
          <!-- The next setting defines the default color for the highlight-target of a daun (key) -->
         .target {
-            fill:url(#fill1);
+            fill: transparent;
         }
     </style>
     <!-- without dummy, Firefox sets the fill of the first daun to white when the highlight of another key is removed -->

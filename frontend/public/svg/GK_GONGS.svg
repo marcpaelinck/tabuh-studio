@@ -59,13 +59,13 @@
             fill: inherit;
         }
         .GONG-shape {
-            fill: url(#fill5);
+            fill: transparent;
         }
         .PUR-shape {
-            fill: url(#fill2);
+            fill: transparent;
         }
         .TONG-shape {
-            fill: url(#fill9);
+            fill: transparent;
         }
             <!-- The following sections will give control of the highlighting from the javascript application -->
         :root {

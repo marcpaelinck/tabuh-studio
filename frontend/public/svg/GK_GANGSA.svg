@@ -62,7 +62,7 @@
         }
          <!-- The next setting defines the default color for the highlight-target of a daun (key) -->
         .target {
-            fill: url(#fill1);
+            fill: transparent;
         }
          <!-- The following sections will give control of the highlighting from the javascript application.
               Variables color1 and color2 are used when both polos and sangsih are animated on the same instrument.

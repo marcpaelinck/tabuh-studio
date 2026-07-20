@@ -56,7 +56,7 @@
         }
          <!-- The next setting defines the default color for the highlight-target of a daun (key) -->
         .target {
-            fill:url(#fill1);
+            fill: transparent;
         }
     </style>
     <g id="all">

@@ -32,7 +32,6 @@ async function highlightNote(keyElement: Element, note: AnimationNote, positionI
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
         [
-            //TODO use colors from config
             { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},1)`, offset: 0, easing: bezier },
             { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`, offset: 1, easing: bezier }
         ],
