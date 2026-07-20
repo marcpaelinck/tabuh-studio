@@ -223,6 +223,18 @@ The textarea approach will be replaced with a virtual cursor system:
 
 ---
 
+## Playback and Animation
+
+### Key-highlight SVGs — transparent overlay convention (iOS/WebKit)
+
+Each instrument SVG draws a key as two overlaid `<use>`/paths: a **fixed** key underneath (its gold gradient set as a *direct* `fill="url(#…)"` presentation attribute) and a **highlight target** on top (no `fill`; class-controlled). The target's non-highlighted colour must be `fill: transparent`, **not** the gradient `url(#…)`.
+
+Reason: iOS Safari (WebKit) does not resolve a paint-server `url(#gradient)` reference that reaches an element via a CSS-computed *inherited* `fill` into a `<use>`/`<symbol>` shadow instance — it falls back to the initial `fill` (black). Chrome/Firefox/Edge resolve it against the document, so only iPhone showed a black highlight area. Direct presentation-attribute `fill="url(#…)"` (used by the fixed key beneath) resolves everywhere, so a transparent target simply lets that gradient show through — identical on all browsers, and the `.highlight…{ fill: var(--color) }` rules still override it when active.
+
+When adding a new instrument SVG: give the highlight target a `fill: transparent` default and rely on a fixed element beneath it for the resting colour. See `highlightNote` in `frontend/src/componentlogic/playback/useAnimation.ts` and the explanation comment in `frontend/public/svg/GK_REYONG.svg`.
+
+---
+
 ## API Routes
 
 ### Auth
