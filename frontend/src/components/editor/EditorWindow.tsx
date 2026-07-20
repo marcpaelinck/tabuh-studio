@@ -15,6 +15,7 @@ import type {
 } from '../../typing/playback'
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
+import { FeatureUnderDevelopment } from '../Feature'
 import { ExecutionFormContext } from './executionFormContext'
 import { PartIndicator } from './PartIndicator'
 import { SystemNode } from './SystemNode'
@@ -214,15 +215,17 @@ export default function EditorWindow({
                         `relative z-10`), so clicks on the toggle win over overlapping position labels. */}
                     <div className="sticky top-0 z-30 w-full bg-white pb-1">
                         <HStack>
-                            <SegmentedControl
-                                size="sm"
-                                value={editorView}
-                                onChange={(value) => setEditorView(value as EditorView)}
-                                data={[
-                                    { label: 'Editor', value: 'compact' },
-                                    { label: 'Viewer (expanded)', value: 'expanded' }
-                                ]}
-                            />
+                            <FeatureUnderDevelopment>
+                                <SegmentedControl
+                                    size="sm"
+                                    value={editorView}
+                                    onChange={(value) => setEditorView(value as EditorView)}
+                                    data={[
+                                        { label: 'Editor', value: 'compact' },
+                                        { label: 'Viewer (expanded)', value: 'expanded' }
+                                    ]}
+                                />
+                            </FeatureUnderDevelopment>
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
                         </HStack>
                     </div>

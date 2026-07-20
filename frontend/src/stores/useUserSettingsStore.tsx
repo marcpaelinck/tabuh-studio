@@ -14,7 +14,7 @@ export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = cr
     selectedSpeedOption: speedDefaultOption,
     selectedPanggulOption: panggulDefaultOption,
     selectedCursorStyle: 'Beat' as PlaybackCursorStyle,
-    editorView: 'compact' as EditorView,
+    editorView: 'expanded' as EditorView,
     selectedKeyMapId: '1', // default keyboard mapping (see shared `keyMaps`)
     setSelectedScoreOption: (option: ExtendedOption<ScoreInfo> | null) => set(() => ({ selectedScoreOption: option })),
     setSelectedFocusOption: (option: ExtendedOption<Position[]>) => set(() => ({ selectedFocusOption: option })),
