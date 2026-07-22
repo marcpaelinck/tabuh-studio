@@ -58,6 +58,10 @@ const castingRules: CastingRuleSet = {
             nokempyung: { 'o,':'o<', 'e,': 'e<', 'u,': 'u<', 'a,': 'a', i: 'i<', o: 'o<', 'e': 'e<', 'u': 'u<', 'a': 'a', 'i<': 'i<', 'o<': 'o<', 'e<': 'e<', 'u<': 'u<',
                         'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' },
                 norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
+    REYONGB_1: {default: { 'o,': 'o', 'e,': 'e', 'O': 'O', 'E': 'E', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' }},
+    REYONGB_2: {default: { 'u,': 'u', 'a,': 'a', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' }},
+    CENGCENG_P: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
+    CENGCENG_S: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
     DEFAULT: {default: { 'i,':' ', 'o,':' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', 'o<': ' ', 'e<': ' ', 'u<': ' ', 'a<': ' ', '-': '-', '.': '.', ' ': ' ' }
     }
 }
@@ -95,7 +99,10 @@ export const allowedPositionGroups: Record<InstrumentGroup, Position[][]> = {
         ],
         ['KEMPLI', 'CENGCENG', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
     ],
-    BALEGANJUR: [],
+    BALEGANJUR: [
+        ['REYONGB_1', 'REYONGB_2'],
+        ['CENGCENG_P', 'CENGCENG_S']
+    ],
     UNDEFINED: []
 }
 
