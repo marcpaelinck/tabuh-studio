@@ -45,3 +45,9 @@ Initial release
 
 - `Fixed` Animation: keys are black on iPhones (Webkit/Safari).
 - `Changed` Improved version of keyboard editor.
+
+## 1.1.2
+
+- `Changed` Editor: moved system new-copy-delete functions to hamburger menu.
+- `Added` Editor: 'move system' option.
+- `Changed` Different playback intro/outro times for Player and Editor views.
