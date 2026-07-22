@@ -1,11 +1,9 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
 import type { MutingType, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
-import type { Dispatch, HTMLAttributes, ReactElement } from 'react'
+import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
-import type { PlaybackCursorStyle } from './animation'
 import type { BeatSliceInfo } from './execution'
-import type { ExtendedOption, ScoreInfo } from './interface'
 import type { Score } from './score'
 
 // PLAYBACK SCHEDULING
@@ -163,30 +161,6 @@ export type PlaybackAction = {
     systemIndex?: number // system from which the playback should start.
     seconds?: number // used with actionType='jumptotime': new cursor position relative to start.
     cursor?: EditorCursor
-    intro?: number // silence before start of playback in ms
-    outro?: number // silence after end of playback in ms
 }
 
 export type EditorCursor = { sysUuid: UUID; beatSlice: BeatSliceInfo; lastColumn: number }
-
-// Which editor view is shown: the editable compact (grouped) view, or the
-// read-only expanded (per-position) view.
-export type EditorView = 'compact' | 'expanded'
-
-export interface UserSelections {
-    selectedScoreOption: ExtendedOption<ScoreInfo> | null
-    selectedFocusOption: ExtendedOption<Position[]>
-    selectedSpeedOption: ExtendedOption<number>
-    selectedPanggulOption: ExtendedOption<Position[]>
-    selectedCursorStyle: PlaybackCursorStyle
-    editorView: EditorView
-    /** Id of the active keyboard mapping (see shared `keyMaps`). */
-    selectedKeyMapId: string
-    setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
-    setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
-    setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
-    setSelectedPanggulOption: Dispatch<ExtendedOption<Position[]>>
-    setSelectedCursorStyle: Dispatch<PlaybackCursorStyle>
-    setEditorView: Dispatch<EditorView>
-    setSelectedKeyMapId: Dispatch<string>
-}

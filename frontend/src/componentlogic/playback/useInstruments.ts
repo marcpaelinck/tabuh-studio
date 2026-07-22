@@ -6,9 +6,9 @@ import {
     alwaysFocusPositions,
     AVERAGE_ATTACK_DELAY,
     baseNoteSubdivision,
-    defaultOutroTime,
     dimRateNonFocusedInstruments,
     NOTES,
+    playerOutroTime,
     SOUNDS_FOLDER
 } from '../../config/config'
 import { soundFile } from '../../config/configfunctions'
@@ -150,7 +150,7 @@ const createInstrument = (
     }
 }
 
-export const useInstruments = (outroTime: number = defaultOutroTime) => {
+export const useInstruments = (outroTime: number = playerOutroTime) => {
     // See https://github.com/Tonejs/Tone.js/wiki/Using-Tone.js-with-React-React-Typescript-or-Vue`
     // const samplers: Record<string, Tone.Sampler | null> = Object.fromEntries(
     //     Object.keys(positionConfigs).map((position) => [position, null])

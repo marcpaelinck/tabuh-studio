@@ -23,20 +23,13 @@ export function Player({
 }: PlayerProps): JSX.Element {
     function playPause() {
         switch (playbackState.audioState) {
+            case 'stopped':
             case 'nodata':
-                playback({
-                    actionType: 'play',
-                    playbackType: 'multiple',
-                    score: score,
-                    systemIndex: 0,
-                    intro: 2000,
-                    outro: 5000
-                })
+                playback({ actionType: 'play', playbackType: 'multiple', score: score, systemIndex: 0 })
                 break
             case 'playing':
                 playback({ actionType: 'pause' })
                 break
-            case 'stopped':
             case 'paused':
                 playback({ actionType: 'play' })
                 break

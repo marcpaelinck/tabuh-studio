@@ -36,7 +36,7 @@ import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
 import { useScoreStore } from '../stores/useScoreStore.tsx'
-import { useUserSelectionStore } from '../stores/useUserSettingsStore.tsx'
+import { useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore.tsx'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -176,7 +176,6 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
 interface MainWindowProps {
     dataSource: 'database' | 'file'
 }
-type ActiveView = 'editor' | 'player'
 
 export function MainWindow({ dataSource }: MainWindowProps) {
     // ── NAVIGATION ─────────────────────────────────────────────
@@ -184,7 +183,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [sidenavExpanded, setSidenavExpanded] = useState(true)
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
-    const [active, setActive] = useState<ActiveView>('player')
+    const { mainView, setMainView } = useUserSelectionStore()
     const { screenSize } = useEnvironmentStore()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     // Mobile hamburger holding the playback menu. `pbMenu*` to avoid confusion with the Sidenav.
@@ -358,14 +357,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         // `score` status is updated after each edit to the current score
         if (score && currentScoreId != score.uuid) {
             setCurrentScoreId(score.uuid)
-            playback({
-                actionType: 'load',
-                playbackType: 'multiple',
-                score: score,
-                systemIndex: 0,
-                intro: 2000,
-                outro: 5000
-            })
+            console.log('Initial PB load')
+            playback({ actionType: 'load', playbackType: 'multiple', score: score, systemIndex: 0 })
         }
         setPlaybackProgress(0)
     }, [score])
@@ -390,7 +383,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const playerWindow = (
         <PlayerWindow
             appAppearance={appAppearance}
-            visible={active == 'player'}
+            visible={mainView == 'player'}
             player={player}
             score={score}
             timeLine={timeLine}
@@ -401,7 +394,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const editorWindow = score && (
         <EditorWindow
-            visible={active == 'editor'}
+            visible={mainView == 'editor'}
             loading={isLoadingScore}
             score={score}
             labels={labels}
@@ -427,12 +420,12 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                 <HStack>
                                     {playbackMenu}
                                     <SegmentedControl
-                                        value={active}
+                                        value={mainView}
                                         data={[
                                             { label: 'player', value: 'player' },
                                             { label: 'editor', value: 'editor' }
                                         ]}
-                                        onChange={(value) => setActive(value as ActiveView)}
+                                        onChange={(value) => setMainView(value as MainView)}
                                         className="bg-[#2196f3]"
                                     />
                                 </HStack>
@@ -444,9 +437,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 <Content id="content" px="1rem" className="h-9/10 min-h-0 p-4">
                     <div
                         id="editor/player window box"
-                        className={`h-[100%] border rounded-md p-2 ${active == 'editor' ? 'overflow-scroll' : 'overflow-hidden'}`}>
-                        <Activity mode={active == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
-                        <Activity mode={active == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
+                        className={`h-[100%] border rounded-md p-2 ${mainView == 'editor' ? 'overflow-scroll' : 'overflow-hidden'}`}>
+                        <Activity mode={mainView == 'editor' ? 'visible' : 'hidden'}>{editorWindow}</Activity>
+                        <Activity mode={mainView == 'player' ? 'visible' : 'hidden'}>{playerWindow}</Activity>
                     </div>
                 </Content>
             </Container>

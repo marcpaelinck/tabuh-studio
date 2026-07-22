@@ -89,8 +89,10 @@ export const defaultBeatFrequency = 4 // Default beat (kempli) frequency used fo
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 
-export const defaultIntroTime: number = 2000 // silence added before the beginning of the score in milliseconds
-export const defaultOutroTime: number = 5000 // attenuation time added after the end of the score in milliseconds
+export const playerIntroTime: number = 2000 // silence added before the beginning of the score in milliseconds
+export const editorIntroTime: number = 0 // silence added before the beginning of the score in milliseconds
+export const playerOutroTime: number = 5000 // attenuation time added after the end of the score in milliseconds
+export const editorOutroTime: number = 2000 // attenuation time added after the end of the score in milliseconds
 
 export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume of instruments other than the focus should be reduced
 export const baseNoteValue: number = 16 // BaseNoteValue is the time unit in which all notes are expressed internally. 16 means 1/16th note, 8 means 1/8th note, etc.

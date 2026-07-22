@@ -17,14 +17,16 @@ import type { ReactElement } from 'rsuite/esm/internals/types'
 import * as Tone from 'tone'
 import {
     defaultBeatFrequency,
-    defaultIntroTime,
-    defaultOutroTime,
     defaultTempo,
     dynamicsToNumber,
-    noteConfigs
+    editorIntroTime,
+    editorOutroTime,
+    noteConfigs,
+    playerIntroTime,
+    playerOutroTime
 } from '../../config/config'
 import { useScoreStore } from '../../stores/useScoreStore'
-import { speedDefaultOption } from '../../stores/useUserSettingsStore'
+import { speedDefaultOption, useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { FlowStep } from '../../typing/execution'
 import type {
     AnimationNote,
@@ -77,6 +79,7 @@ export function usePlaybackManager() {
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)
     const [playbackTempo, setPlaybackTempo] = useState<number>(60)
     const beatPosition = useScoreStore((state) => state.beatPosition)
+    const { mainView } = useUserSelectionStore()
 
     var tempoLookup: Record<number, Record<number, number>> = {}
 
@@ -208,8 +211,8 @@ export function usePlaybackManager() {
     function createTimelineFromScore(
         pbAction: PlaybackAction,
         useCache: boolean,
-        intro: number = defaultIntroTime,
-        outro: number = defaultOutroTime
+        intro: number,
+        outro: number
     ): TimeLine | undefined {
         // Check that all necessary data is being passed
         if (!(pbAction.playbackType && pbAction.score && pbAction.systemIndex != undefined)) return undefined
@@ -681,9 +684,10 @@ export function usePlaybackManager() {
     function schedulePlayback({
         pbAction,
         useCache = true,
-        intro = defaultIntroTime,
-        outro = defaultOutroTime
+        intro = mainView == 'player' ? playerIntroTime : editorIntroTime,
+        outro = mainView == 'player' ? playerOutroTime : editorOutroTime
     }: SchedulePlaybackParams): void {
+        console.log(`${mainView} ${mainView == 'player' ? playerIntroTime : editorIntroTime}`)
         const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
         if (newTimeLine) {
             createPlaybackSchedule(newTimeLine, playbackSpeed)

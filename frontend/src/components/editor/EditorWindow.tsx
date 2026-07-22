@@ -4,11 +4,10 @@ import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
-import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
+import { useUserSelectionStore, type EditorView } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     EditorCursorParameters,
-    EditorView,
     PlaybackAction,
     PlaybackCallbackFunctions,
     PlaybackState
@@ -58,7 +57,7 @@ export default function EditorWindow({
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
     const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
     const editorView = useUserSelectionStore((state) => state.editorView)
-    const setEditorView = useUserSelectionStore((state) => state.setEditorView)
+    const { setEditorView } = useUserSelectionStore()
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.

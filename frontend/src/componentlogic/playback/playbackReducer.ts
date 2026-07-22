@@ -70,8 +70,10 @@ function playbackReducer(state: PlaybackState, action: PlaybackAction): Playback
             state = loadData(state, action)
             return state
         case 'play': {
-            debug(`executing 'play'`)
-            if (state.audioState == 'nodata' || (action.playbackType && action.score))
+            debug(`executing 'play' ${JSON.stringify(state)} ${JSON.stringify(action)}`)
+            // Always recreate the playback schedule data when the player is stopped. This is because
+            // the user may have changed the main view (editor/player) which changes the intro time.
+            if (['stopped', 'nodata'].includes(state.audioState) || (action.playbackType && action.score))
                 // New playback action: create a playback schedule
                 state = loadData(state, { ...action, actionType: 'load' })
             if (!['stopped', 'paused'].includes(state.audioState)) return { ...state }
