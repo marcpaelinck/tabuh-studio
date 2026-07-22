@@ -205,14 +205,16 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         DUNG2_MUTED: { tone: 'DUNG', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
         XDUNG0: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' },
         XDONG1: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
+        XDUNG1: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' }, // Baleganjur
         XDANG1: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
         XDENG2: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'OPEN' },
-        XDUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
+        XDUNG1_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' }, // Baleganjur
         XDENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'MUTED' },
         XDONG1_MUTED: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
+        XDUNG1_MUTED: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'MUTED' }, // Baleganjur
         XDANG1_MUTED: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
         XDENG2_MUTED: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'MUTED' }
     }

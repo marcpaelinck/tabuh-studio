@@ -31,13 +31,14 @@ import type {
     PlaybackAction,
     PlaybackType
 } from '../../typing/playback'
-import type { Score, System } from '../../typing/score'
+import type { Score, System, SystemActionValue } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { createGridStyle, gridColorsCompact, gridColorsExpanded } from '../../utils/editor'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
+import { SystemMenu } from './SystemMenu'
 import { SystemNotationViewer } from './SystemNotationViewer'
 
 interface EditorSystemProps extends TextareaProps {
@@ -50,7 +51,7 @@ interface EditorSystemProps extends TextareaProps {
     labels: Record<string, System>
     gotoTargets: Set<UUID>
     playback: ActionDispatch<[action: PlaybackAction]>
-    executeItemAction: (fieldname: string, systemData: System, value?: string) => void
+    executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
     updateCursorFunction: (uuid: UUID, func: SystemCursorFunction) => void
     updateSystem: (sysData: System) => void
 }
@@ -159,7 +160,7 @@ export const SystemNode = memo(function SystemNode({
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
         return (
-            <Col key={`systemButtons-${systemData.uuid}`} span={3} className="flex">
+            <SCol key={`systemButtons-${systemData.uuid}`} span={3} className="flex items-center">
                 <PlaybackButtons
                     scoreRef={scoreRef}
                     sysUuid={systemUuid}
@@ -169,7 +170,7 @@ export const SystemNode = memo(function SystemNode({
                     playbackAudioState={audioState}
                     className="content-start"
                 />
-            </Col>
+            </SCol>
         )
     }, [systemData, playbackCursor, audioState, playbackType])
 
@@ -202,6 +203,23 @@ export const SystemNode = memo(function SystemNode({
         return options
     }
 
+    // Hamburger menu (new / copy / move / delete). Placed at the far left of the header.
+    const systemMenu: ReactElement = useMemo(
+        () => (
+            <SCol span={2} className="flex items-center">
+                <SystemMenu
+                    systemData={systemData}
+                    isGotoTarget={gotoTargets.has(systemData.uuid)}
+                    copyOptions={systemSelectorOptions(systemData, true, false) as InputOption<string>[]}
+                    moveOptions={systemSelectorOptions(systemData, false, false) as InputOption<string>[]}
+                    onAction={(fieldname, value) => executeItemAction(fieldname, systemData, value)}
+                    disabled={headerDisabled}
+                />
+            </SCol>
+        ),
+        [systemData, headerDisabled, gotoTargets, labels]
+    )
+
     const systemHeaderFields: ReactElement | undefined = useMemo(() => {
         if (!systemData) return
 
@@ -225,23 +243,6 @@ export const SystemNode = memo(function SystemNode({
                         item="execution"
                         sysData={systemData}
                         options={systemSelectorOptions(systemData, false, false)}
-                        execute={execute}
-                        disabled={headerDisabled}
-                    />
-                </SCol>
-                <SCol span={4}>
-                    <SummaryItem item="new" sysData={systemData} execute={execute} disabled={headerDisabled} />
-                    <SummaryItem
-                        item="copy"
-                        sysData={systemData}
-                        options={systemSelectorOptions(systemData, true, false)}
-                        execute={execute}
-                        disabled={headerDisabled}
-                    />
-                    <SummaryItem
-                        item="delete"
-                        gototargets={gotoTargets}
-                        sysData={systemData}
                         execute={execute}
                         disabled={headerDisabled}
                     />
@@ -309,6 +310,7 @@ export const SystemNode = memo(function SystemNode({
         return (
             <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
                 <Row id="SystemHeader">
+                    {systemMenu}
                     {systemHeaderButtons}
                     {systemHeaderFields}
                 </Row>

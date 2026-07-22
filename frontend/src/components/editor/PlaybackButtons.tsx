@@ -77,7 +77,7 @@ export function PlaybackButtons({
             controlId={`control-id-Whisper-${pbType}`}
             className="mytooltip"
             speaker={<Tooltip className="mytooltip">{toolTips[pbType]}</Tooltip>}>
-            <Button as="div" onClick={(e) => playStopClicked(e, pbType)} disabled={isDisabled(pbType)}>
+            <Button size="sm" as="span" onClick={(e) => playStopClicked(e, pbType)} disabled={isDisabled(pbType)}>
                 {playbackAudioState == 'playing' ? (
                     playbackType == pbType ? (
                         <IoStop color={buttonColor(pbType)} />

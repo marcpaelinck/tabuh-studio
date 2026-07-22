@@ -13,7 +13,7 @@ import type {
     PlaybackCallbackFunctions,
     PlaybackState
 } from '../../typing/playback'
-import type { Score, System } from '../../typing/score'
+import type { Score, System, SystemActionValue } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { FeatureUnderDevelopment } from '../Feature'
 import { ExecutionFormContext } from './executionFormContext'
@@ -30,7 +30,7 @@ interface EditorWindowProps {
     score: Score
     labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
-    executeItemAction: (fieldname: string, systemData: System, value?: string) => void
+    executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>

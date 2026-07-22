@@ -68,7 +68,7 @@ export function PartIndicator({
                 onMouseDown={(e: MouseEvent) => handleMouseDown(e)}
                 onMouseUp={(e: MouseEvent) => handleMouseUp(e)}
                 {...props}>
-                <div className={`m-0 [writing-mode:vertical-rl] overflow-hidden align-center text-middle select-none`}>
+                <div className={`m-0 [writing-mode:vertical-rl] overflow-hidden items-center text-middle select-none`}>
                     {firstOfRange ? partName : ''}
                 </div>
             </Col>

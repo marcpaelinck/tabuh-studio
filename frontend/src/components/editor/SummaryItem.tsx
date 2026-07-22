@@ -23,13 +23,10 @@ import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import type { AppearanceType } from 'rsuite/esm/internals/types'
 import { defaultBeatFrequency, tsBlue } from '../../config/config'
-import TsCopyIcon from '../../reacticons/TsCopyIcon'
-import TsDeleteIcon from '../../reacticons/TsDeleteIcon'
 import TsKempliNotationIcon from '../../reacticons/TsKempliNotationIcon'
 import TsKempliOffIcon from '../../reacticons/TsKempliOffIcon'
 import TsKempliOnIcon from '../../reacticons/TsKempliOnIcon'
 import TsLabelIcon from '../../reacticons/TsLabelIcon'
-import TsNewIcon from '../../reacticons/TsNewIcon'
 import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { ExecutionForm } from './ExecutionForm'
@@ -40,14 +37,13 @@ export function SCol({ ...props }: ColProps) {
     return <Col as="div" className="flex bg-gray-100 border-2 border-white divide-solid items-center" {...props} />
 }
 
-type ItemName = 'id' | 'label' | 'new' | 'copy' | 'delete' | 'execution' | 'kempli'
+type ItemName = 'id' | 'label' | 'execution' | 'kempli'
 
 interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
     item: ItemName
     sysData: System
     score?: Score
     labels?: Record<string, System>
-    gototargets?: Set<string> // list of uuid's of systems that occur in some 'goto' field. Used for validation.
     execute?: (fieldname: string, value?: string) => void
     options?: InputOption<string | number>[]
     disabled?: boolean // read-only mode (e.g. the expanded view): no button action, no field editing
@@ -62,7 +58,6 @@ export function SummaryItem({
     sysData,
     score,
     labels,
-    gototargets,
     execute,
     options,
     disabled,
@@ -121,33 +116,6 @@ export function SummaryItem({
             fieldval: sysData.label || '',
             textcolor: 'orange',
             buttonTooltip: 'Add or remove a label to mark a system for copying or for `goto` instructions.'
-        },
-        new: {
-            icon: TsNewIcon,
-            iconcolor: tsBlue,
-            action: 'execute',
-            hasfield: false,
-            buttonTooltip: 'Create an empty system below this one.'
-        },
-        copy: {
-            icon: TsCopyIcon,
-            iconcolor: tsBlue,
-            action: 'fieldeditor',
-            hasfield: true,
-            fieldeditor: 'stringinputpicker',
-            fieldeditwhen: 'afterbuttonclick',
-            formtitle: 'copy',
-            fieldval: sysData.copyFrom || '',
-            textcolor: 'blue',
-            buttonTooltip: 'Select a system that should be copied below this one.',
-            fieldTooltip: 'Label or number of the system from which this system was copied.'
-        },
-        delete: {
-            icon: TsDeleteIcon,
-            iconcolor: tsBlue,
-            action: 'execute',
-            hasfield: false,
-            buttonTooltip: 'Delete this system (warning: can not be undone).'
         },
         execution: {
             icon: RiPlayListFill,
@@ -249,11 +217,6 @@ export function SummaryItem({
                 debug(`labels=${JSON.stringify(Object.keys(labels || []))} value=${value}`)
                 break
             }
-            case 'delete': {
-                if (gototargets?.has(sysData.uuid))
-                    msg = "Can't delete this system because one or more goto directives point to this system."
-                break
-            }
             default:
         }
         debug(`validate is ${msg}`)
@@ -305,7 +268,6 @@ export function SummaryItem({
             width="100%"
             cleanable={false}
             size="xs"
-            popupStyle={{ zIndex: 100 }} // Keeps the popup list above staff content. Rsuite's default value is 7.
         />
     )
 

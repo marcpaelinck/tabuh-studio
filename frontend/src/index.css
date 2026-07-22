@@ -40,6 +40,21 @@
     margin-right: 0px;
 }
 
+/* rsuite v6 gives floating popups a very low base z-index (--rs-zindex-dropdown: 5,
+   --rs-zindex-picker-popup: 7). Those lose to the notation editor's Tailwind stacking
+   (z-10 StaffGrid content, z-30 toolbar): the popup paints under the transparent staff
+   overlay, which then swallows the click. Lift both popup families above the app's z
+   scale. Overriding the *variable* on the popup class (not a hard z-index) is
+   import-order independent and leaves rsuite's modal/drawer-scoped bumps intact
+   (those set --rs-picker-popup-z-index on a more specific selector), so pickers/menus
+   inside modals still stack correctly. Kept below modal/drawer (1050) and tooltip (1070). */
+.rs-picker-popup {
+    --rs-zindex-picker-popup: 100;
+}
+.rs-dropdown-menu {
+    --rs-zindex-dropdown: 100;
+}
+
 @media (prefers-color-scheme: light) {
     :root {
         color: #213547;

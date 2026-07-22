@@ -12,6 +12,7 @@ import {
     type Score,
     type Staff,
     type System,
+    type SystemActionValue,
     type ValidationResult
 } from '../typing/score'
 import { debug } from '../utils/debugger'
@@ -25,6 +26,18 @@ import { cycleValidation, defaultValidationValue } from './validationManager'
 // by updateScore's effect once the system is placed in the score.
 function createEmptySystem(kempli: KempliSetting): System {
     return { uuid: uuidv4(), id: -1, index: -1, groups: [], staffs: {}, beatSlices: [], kempli: _.cloneDeep(kempli) }
+}
+
+// Re-assigns each system's index/id from its position. Systems whose number CHANGES get
+// a fresh object reference so the memoised SystemNode re-renders (mutating in place would
+// leave the reference untouched and the displayed id stale); unchanged systems keep their
+// reference so they are not needlessly re-rendered.
+function renumberSystems(systems: System[]): System[] {
+    return systems.map((sysData, sysIdx) =>
+        sysData.index === sysIdx && sysData.id === sysIdx + 1
+            ? sysData
+            : { ...sysData, index: sysIdx, id: sysIdx + 1 }
+    )
 }
 
 export interface LocalCacheInfo {
@@ -206,7 +219,7 @@ export function useScoreManager() {
         score: Score | undefined,
         fieldname: string,
         systemData: System,
-        value?: string | number
+        value?: string | number | SystemActionValue
     ): Score | undefined {
         var newSystemData: System | null = _.cloneDeep(systemData)
         // Reset the edit buffers of the staffs.
@@ -236,25 +249,52 @@ export function useScoreManager() {
                 break
             case 'new': {
                 // Creates an empty system, inheriting the current system's kempli (or the
-                // shared default when the current system has none).
+                // shared default when the current system has none). Placed before/after current.
                 newSystemData = createEmptySystem(systemData.kempli ?? { ...DEFAULT_KEMPLI })
-                sliceIndex1 = systemData.index + 1 // Insert below current
+                const at =
+                    (value as SystemActionValue)?.position === 'before'
+                        ? systemData.index
+                        : systemData.index + 1
+                sliceIndex1 = at
+                sliceIndex2 = at // insert (do not replace the current system)
                 break
             }
             case 'copy': {
-                const source = score.systems.find((sys) => sys.uuid == value)
-                debug(source)
+                const v = value as SystemActionValue
+                const source = score.systems.find((sys) => sys.uuid == v?.sourceUuid)
                 if (!source) {
-                    console.error(`copy system: could not find system ${value}`)
+                    console.error(`copy system: could not find system ${v?.sourceUuid}`)
                     return
                 }
-                newSystemData = _.cloneDeep(source)
+                const mode = v?.mode ?? 'entire'
+                newSystemData = _.cloneDeep(source) // carries kempli, groups, staffs, etc.
                 newSystemData.uuid = uuidv4()
                 newSystemData.label = undefined
-                newSystemData.copyFromUuid = source.uuid
-                // newSystemData.copyfrom = source.label || `#${source.index}`
-                sliceIndex1 = systemData.index + 1 // Copy after the current system
+                // 'staffs' and 'positions' do not carry the execution items.
+                if (mode !== 'entire') newSystemData.execution = undefined
+                // 'positions' keeps the position groups but clears their notation; the staffs
+                // are then re-derived (empty) from the emptied groups.
+                if (mode === 'positions') {
+                    newSystemData.groups = newSystemData.groups.map((g) => ({ ...g, notation: [] }))
+                    expandSystem(newSystemData, beatPosition)
+                }
+                const at = v?.position === 'before' ? systemData.index : systemData.index + 1
+                sliceIndex1 = at
+                sliceIndex2 = at // insert (do not replace the current system)
                 break
+            }
+            case 'move': {
+                // Moves the current system before/after a target system. Unlike new/copy this
+                // both removes and re-inserts, so it builds the new list directly and returns.
+                const v = value as SystemActionValue
+                if (!v?.targetUuid || v.targetUuid === systemData.uuid) return score // no-op
+                const without = score.systems.filter((sys) => sys.uuid !== systemData.uuid)
+                const targetIdx = without.findIndex((sys) => sys.uuid === v.targetUuid)
+                if (targetIdx === -1) return score
+                const at = v.position === 'before' ? targetIdx : targetIdx + 1
+                const movedData = renumberSystems([...without.slice(0, at), newSystemData as System, ...without.slice(at)])
+                updatePointers(movedData)
+                return { ...score, systems: movedData }
             }
             case 'execution':
                 // Changes returned by the FlowItemsForm
@@ -288,15 +328,12 @@ export function useScoreManager() {
                 return
         }
 
-        // Update, remove or insert system
-        const newData = newSystemData
-            ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
-            : [...score.systems.slice(0, sliceIndex1), ...score.systems.slice(sliceIndex2)]
-        // Update all system IDs
-        newData.forEach((sysData, sysIdx) => {
-            sysData.index = sysIdx
-            sysData.id = sysIdx + 1
-        })
+        // Update, remove or insert system, then renumber (fresh refs for changed systems).
+        const newData = renumberSystems(
+            newSystemData
+                ? [...score.systems.slice(0, sliceIndex1), newSystemData, ...score.systems.slice(sliceIndex2)]
+                : [...score.systems.slice(0, sliceIndex1), ...score.systems.slice(sliceIndex2)]
+        )
         debug('UPDATING SCORE by scoreManager')
         updatePointers(newData)
         return { ...score, ...{ systems: newData } }
@@ -305,7 +342,7 @@ export function useScoreManager() {
     // Handles user actions triggered with buttons in the panel header.
     // Note this is a callback function.
     const executeItemAction = useCallback(
-        (fieldname: string, systemData: System, value?: string | number) => {
+        (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => {
             debug(`processing ${fieldname}`)
             // Callback functions have to pass a function to state setters if they need to
             // access to the current value of that state.
