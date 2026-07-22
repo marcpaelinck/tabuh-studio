@@ -1,4 +1,3 @@
-import { KEMPLI_BEAT_CHAR } from '../constants/noteChars'
 import type { InstrumentGroup } from '../types/basetypes'
 import type { Position, PositionConfig, PositionGroup } from '../types/position'
 
@@ -134,8 +133,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: 'svg/GK_GONGS.svg',
             sampletemplate: 'GK_GONGS_{note}.mp3',
             symbolToNoteNames: { G: ['GIR'], P: ['PUR'], T: ['TONG'] }, //TODO move alphabet info to separate settings
-            validStrokes: [],
-            modifiers:{before:[], after:[]}
         },
         KEMPLI: {
             name: 'Kempli',
@@ -144,8 +141,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: '',
             sampletemplate: 'GK_KEMPLI_{note}.mp3',
             symbolToNoteNames: { 'x': ['X_MUTED'] },
-            validStrokes: [KEMPLI_BEAT_CHAR + ';', KEMPLI_BEAT_CHAR + ':'],
-            modifiers: {before: [], after:[';', ':']}
         },
         CENGCENG: {
             name: 'Cengceng',
@@ -154,8 +149,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: '',
             sampletemplate: 'GK_CENGCENG_{note}.mp3',
             symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
-            validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
-            modifiers: {before: [], after:[';', ':']}
         },
         KENDANG: {
             name: 'Kendang',
@@ -166,8 +159,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
                                  '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
                                  '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
-            validStrokes: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;'],
-            modifiers: {before: [], after:[';', ':']}
         },
         KENDANG_WADON: {
             name: 'Kendang',
@@ -178,8 +169,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
                                  '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
                                  '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
-            validStrokes: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;'],
-            modifiers: {before: [], after:[';', ':']}
         },
         KENDANG_LANANG: {
             name: 'Kendang',
@@ -190,8 +179,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { '0': ['CUNG'], '8': ['KA'], '9': ['DE'], '(': ['TUT'], ')': ['KUNG'], '*': ['PAK'],
                                  '0/': ['CUNG'], '8/': ['KA'], '9/': ['DE'], '(/': ['TUT'], ')/': ['KUNG'], '*/': ['PAK'],
                                  '0?': ['CUNG'], '8?': ['KA'], '9?': ['DE'], '(?': ['TUT'], ')?': ['KUNG'], '*?': ['PAK'] },
-            validStrokes: ['0:', '8:', '9:', '(:', '):', '*:', '0;', '8;', ';:', '(;', ');', '*;'],
-                modifiers: {before: [], after:[';', ':']}
     },
         JEGOGAN: {
             name: 'Jegogan',
@@ -200,8 +187,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: 'svg/GK_JEGOGAN.svg',
             sampletemplate: 'GK_JEGOGAN_{note}.mp3',
             symbolToNoteNames: {i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i/': ['DING1'], 'o/': ['DONG1'], 'e/': ['DENG1'], 'u/': ['DUNG1'], 'a/': ['DANG1']},
-            validStrokes: [],
-            modifiers:{before:[], after:[]}
     
         },
         CALUNG: {
@@ -211,8 +196,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: 'svg/GK_CALUNG.svg',
             sampletemplate: 'GK_CALUNG_{note}.mp3',
             symbolToNoteNames: {i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i/': ['DING1'], 'o/': ['DONG1'], 'e/': ['DENG1'], 'u/': ['DUNG1'], 'a/': ['DANG1']},
-            validStrokes: [],
-            modifiers:{before:[], after:[]}
     
         },
         PENYACAH: {
@@ -223,8 +206,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             sampletemplate: 'GK_PENYACAH_{note}.mp3',
             symbolToNoteNames: {'u,': ['DUNG0'],'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 
                            /*     'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'] */}, 
-            validStrokes: [],
-            modifiers:{before:[], after:[]}
     
         },
         KANTILAN_POLOS: {
@@ -236,16 +217,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
         },
         KANTILAN_SANGSIH: {
             name: 'Kantilan sangsih',
@@ -256,16 +227,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
         },
         PEMADE_POLOS: {
             name: 'Pemade polos',
@@ -276,16 +237,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
     
         },
         PEMADE_SANGSIH: {
@@ -297,16 +248,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
         },
         UGAL: {
             name: 'Ugal',
@@ -317,16 +258,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['o,_', 'e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'o,/_', 'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'o,;', 'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'o,:', 'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'o,[', 'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'o,]', 'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'o,n', 'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'o,N', 'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'O,', 'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
         },
         TROMPONG: {
             name: 'Ugal',
@@ -337,8 +268,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'a,': ['DANG0'], 'i,': ['DING0'], 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a': ['DANG1'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'],
                                  'a,/': ['DANG0_ABBR'], 'i,/': ['DING0_ABBR'], 'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a/': ['DANG1_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'],
                                  'a,?': ['DANG0_MUTED'], 'i,?': ['DING0_MUTED'], 'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a?': ['DANG1_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'] },
-            validStrokes: [],
-            modifiers:{before:[], after:[]}
     
         },
         GENDER_RAMBAT: {
@@ -350,16 +279,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             symbolToNoteNames: { 'e,': ['DENG0'], 'u,': ['DUNG0'], 'a,': ['DANG0'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'],
                                  'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a,/': ['DANG0_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a/': ['DANG1_ABBR'], 'i</': ['DING2_ABBR'], 
                                  'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
-            validStrokes: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_', 'i<_',
-                            'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_', 'i</_',
-                            'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 'i<;', 
-                            'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:', 'i<:',
-                            'e,[', 'u,[', 'a,[', 'i[', 'o[', 'e[', 'u[', 'a[', 'i<[', 
-                            'e,]', 'u,]', 'a,]', 'i]', 'o]', 'e]', 'u]', 'a]', 'i<]',
-                            'e,n', 'u,n', 'a,n', 'in', 'on', 'en', 'un', 'an', 'i<n',
-                            'e,N', 'u,N', 'a,N', 'iN', 'oN', 'eN', 'uN', 'aN', 'i<N',
-                            'E,', 'U,', 'A,', 'I', 'O', 'E', 'U', 'A', 'I<'],
-            modifiers: {before: ['I','O','E','U','A'], after: ['_', ';', ':', '[', ']', 'n', 'N']}                    
     
         },
         REYONG_1: {
@@ -375,15 +294,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                                 b: ['DENG0', 'DANG0'], 'b/': ['DENG0_ABBR', 'DANG0_ABBR'], 'b?': ['DENG0_MUTED', 'DANG0_MUTED'], 
                                 x: ['XDUNG0'], 'x/': ['XDUNG0_ABBR'], 'x?': ['XDUNG0_MUTED']
             },
-            validStrokes: ['e,_', 'u,_', 'a,_', 'i_', 'o_', 'e_',
-                            'e,/_', 'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_',
-                            'e,;', 'u,;', 'a,;', 'i;', 'o;', 'e;', 
-                            'e,:', 'u,:', 'a,:', 'i:', 'o:', 'e:',
-                            'in', 'on', 'en', 'un', 'an',
-                            'iN', 'oN', 'eN', 'uN', 'aN',
-                            'E', 'U', 'A', 'I', 'O', 'X', 'B'
-                            ],
-            modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
         },
         REYONG_2: {
             name: 'Reyong 2',
@@ -397,15 +307,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                                 b: ['DING1', 'DENG1'], 'b/': ['DING1_ABBR', 'DENG1_ABBR'], 'b?': ['DING1_MUTED', 'DENG1_MUTED'], 
                                 x: ['XDONG1'], 'x/': ['XDONG1_ABBR'], 'x?': ['XDONG1_MUTED']
             },
-            validStrokes: ['u,_', 'a,_', 'i_', 'o_', 'e_', 'u_', 'a_',
-                            'u,/_', 'a,/_', 'i/_', 'o/_', 'e/_', 'u/_', 'a/_',
-                            'u,;', 'a,;', 'i;', 'o;', 'e;', 'u;', 'a;', 
-                            'u,:', 'a,:', 'i:', 'o:', 'e:', 'u:', 'a:',
-                            'in', 'on', 'en', 'un', 'an',
-                            'iN', 'oN', 'eN', 'uN', 'aN',
-                            'I', 'O', 'E', 'U', 'A', 'X', 'B'
-                        ],
-            modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
     
         },
         REYONG_3: {
@@ -420,15 +321,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                                 b: ['DUNG1', 'DING2'], 'b/': ['DUNG1_ABBR', 'DING2_ABBR'], 'b?': ['DUNG1_MUTED', 'DING2_MUTED'], 
                                 x: ['XDANG1'], 'x/': ['XDANG1_ABBR'], 'x?': ['XDANG1_MUTED']
             },
-            validStrokes: ['o_', 'e_', 'u_', 'a_', 'i<_', 'o<_', 'e<_',
-                            'o/_', 'e/_', 'u/_', 'a/_', 'i</_', 'o</_', 'e</_',
-                            'o;', 'e;', 'u;', 'a;', 'i<;', 'o<;', 'e<;', 
-                            'o:', 'e:', 'u:', 'a:', 'i<:', 'o<:', 'e<:',
-                            'in', 'on', 'en', 'un', 'an',
-                            'iN', 'oN', 'eN', 'uN', 'aN',
-                            'I', 'O', 'E', 'U', 'A', 'X', 'B'
-                        ],
-            modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
         },
         REYONG_4: {
             name: 'Reyong 4',
@@ -442,15 +334,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                                 b: ['DONG2', 'DUNG2'], 'b/': ['DONG2_ABBR', 'DUNG2_ABBR'], 'b?': ['DONG2_MUTED', 'DUNG2_MUTED'], 
                                 x: ['XDENG2'], 'x/': ['XDENG2_ABBR'], 'x?': ['XDENG2_MUTED']
             },
-            validStrokes: ['u_', 'a_', 'i<_', 'o<_', 'e<_', 'u<_',
-                            'u/_', 'a/_', 'i</_', 'o</_', 'e</_', 'u</_',
-                            'u;', 'a;', 'i<;', 'o<;', 'e<;', 'u<;', 
-                            'u:', 'a:', 'i<:', 'o<:', 'e<:', 'u<:',
-                            'in', 'on', 'en', 'un', 'an',
-                            'iN', 'oN', 'eN', 'uN', 'aN',
-                            'I', 'O', 'E', 'U', 'A', 'X', 'B'
-                        ],
-            modifiers: {before: ['I','O','E','U','A', 'X', 'B'], after: ['_', ';', ':','n', 'N']}                    
         },
         CENGCENG_P: {
             name: 'Cengceng polos',
@@ -459,8 +342,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_P_{note}.mp3',
             symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
-            validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
-            modifiers: {before: [], after:[';', ':']}
         },
         CENGCENG_S: {
             name: 'Cengceng sangsih',
@@ -469,8 +350,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             svg_file: '',
             sampletemplate: 'BAL_CENGCENG_S_{note}.mp3',
             symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] },
-            validStrokes: ['x;', 'x:', 'x?;', 'x?:'],
-            modifiers: {before: [], after:[';', ':']}
         },
     REYONGB_1: {
         name: 'Reyong 1',
@@ -492,8 +371,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             'x/': ['XDONG1_ABBR'],
             'x?': ['XDONG1_MUTED']
         },
-        validStrokes: ['o;', 'e;', 'o:', 'e:', 'O', 'E'],
-        modifiers: { before: ['O', 'E', 'X', 'B'], after: [';', ':'] }
     },
     REYONGB_2: {
         name: 'Reyong 2',
@@ -515,8 +392,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             'x/': ['XDUNG1_ABBR'],
             'x?': ['XDUNG1_MUTED']
         },
-        validStrokes: ['u;', 'a;', 'u:', 'a:', 'U', 'A'],
-        modifiers: { before: ['U', 'A', 'X', 'B'], after: [';', ':'] }
     },
     TAWATAWA: {
         name: 'Tawa tawa',
@@ -525,8 +400,6 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         svg_file: '',
         sampletemplate: 'BAL_TAWATAWA_{note}.mp3',
         symbolToNoteNames: { x: ['X'] },
-        validStrokes: [],
-        modifiers: { before: [], after: [] }
     },
     PONGGANG: {
         name: 'Ponggang',
@@ -538,7 +411,5 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             u: ['DUNG1'],
             a: ['DANG1'],
         },
-        validStrokes: ['u;', 'a;', 'u:', 'a:', 'U', 'A'],
-        modifiers: { before: ['U', 'A', 'X', 'B'], after: [';', ':'] }
     }
     }

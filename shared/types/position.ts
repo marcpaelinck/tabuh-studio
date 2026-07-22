@@ -11,8 +11,6 @@ export type PositionConfig = {
     sampletemplate: string
     volume: number
     symbolToNoteNames: { [symbol: string]: string[] }
-    validStrokes: string[] // Not used, replaced with alphabet `positions` attribute
-    modifiers: Modifiers
 }
 
 export type Position =
