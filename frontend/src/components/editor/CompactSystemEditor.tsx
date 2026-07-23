@@ -11,14 +11,17 @@
  * for display and map the cursor / clicks between the flat column index and the
  * `{ measure, index }` form.
  *
- * Clicking a line's label chip opens a popover for group-membership editing (Step 4):
- * add/remove positions (constrained to valid, unused positions) and add/remove staves.
+ * Clicking a line's label chip opens a menu (New… / Modify… / Delete). New and Modify
+ * each open their own popup: New creates a staff before/after this one from selected
+ * position(s); Modify edits this staff's positions (add/remove, constrained to valid,
+ * unused positions). Delete removes the staff immediately.
  */
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import { useState, type CSSProperties, type RefObject } from 'react'
-import { Button, Popover, Tag, Tooltip, Whisper } from 'rsuite'
+import { useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { Button, Modal, Popover, Radio, RadioGroup, Tag, Tooltip, Whisper } from 'rsuite'
+import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
@@ -87,6 +90,11 @@ export function CompactSystemEditor({
     const orchestra = useScoreStore((state) => state.orchestra)
     const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
     const [newPositions, setNewPositions] = useState<Position[]>([])
+    // Open staff dialog: the New / Modify popup for the label menu of line `li`.
+    const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
+    const [newPlacement, setNewPlacement] = useState<'before' | 'after'>('after')
+    // Per-line handle to the label-menu overlay, so a menu item can close its own menu.
+    const menuRefs = useRef<Record<number, OverlayTriggerHandle | null>>({})
 
     const fontClass = `balifontspaced${editorFontSize}`
 
@@ -106,115 +114,205 @@ export function CompactSystemEditor({
     const toggleNewPosition = (p: Position) =>
         setNewPositions((sel) => (sel.includes(p) ? sel.filter((x) => x !== p) : [...sel, p]))
 
-    // Popover for one line: edit its positions and add/remove staves.
-    const linePopover = (li: number, line: CompactLine) => {
-        const candidates = candidatesFor(line.positions, free, orchestra)
-        // For a NEW staff: positions still selectable given the current selection.
-        const newCandidates = candidatesFor(newPositions, free, orchestra)
-        const createNewStaff = (atIndex: number) => {
-            addLine(atIndex, newPositions)
-            setNewPositions([])
-        }
-        return (
-            <Popover>
-                <div className="text-xs font-semibold mb-1">Staff positions</div>
-                <div className="flex flex-wrap gap-1 mb-2 max-w-64">
-                    {line.positions.map((p) => (
-                        <Tag key={p} closable={line.positions.length > 1} onClose={() => removePosition(li, p)}>
-                            {positionName(p)}
-                        </Tag>
-                    ))}
-                </div>
-                {candidates.length > 0 && (
-                    <>
-                        <div className="text-xs mb-1">Add position</div>
-                        <div className="flex flex-wrap gap-1 mb-2 max-w-64">
-                            {candidates.map((p) => (
-                                <Button key={p} size="xs" appearance="ghost" onClick={() => addPosition(li, p)}>
-                                    {positionName(p)}
-                                </Button>
-                            ))}
-                        </div>
-                    </>
-                )}
-                <div className="border-t border-gray-200 pt-2">
-                    <div className="text-xs mb-1">New staff — select position(s):</div>
-                    <div className="flex flex-wrap gap-1 mb-2 max-w-64">
-                        {newCandidates.map((p) => (
-                            <Button
-                                key={p}
-                                size="xs"
-                                appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
-                                onClick={() => toggleNewPosition(p)}>
-                                {positionName(p)}
-                            </Button>
-                        ))}
-                        {newCandidates.length === 0 && <span className="text-xs text-gray-400">no positions free</span>}
-                    </div>
-                    <div className="flex gap-1">
-                        <Button size="xs" disabled={newPositions.length === 0} onClick={() => createNewStaff(li)}>
-                            + above
-                        </Button>
-                        <Button size="xs" disabled={newPositions.length === 0} onClick={() => createNewStaff(li + 1)}>
-                            + below
-                        </Button>
-                        <Button
-                            size="xs"
-                            color="red"
-                            appearance="ghost"
-                            disabled={lines.length <= 1}
-                            onClick={() => removeLine(li)}>
-                            Remove staff
-                        </Button>
-                    </div>
+    const closeStaffDialog = () => {
+        setStaffDialog(null)
+        setNewPositions([])
+        setNewPlacement('after')
+    }
+
+    // The label menu: New… / Modify… / Delete for one line. New/Modify open a popup
+    // (see renderStaffDialog); Delete removes the staff immediately.
+    //
+    // Rendered as a Whisper + Popover (not a Dropdown) so the menu is PORTALED to <body>:
+    // an inline dropdown is trapped inside this system's `relative z-10` StaffGrid context
+    // and would be painted over by the next system's labels; a portaled popover sits in the
+    // root stacking context (z-index 1060), above every system.
+    const menuItemClass =
+        'text-left px-3 py-1.5 text-sm w-full hover:bg-gray-100 disabled:text-gray-300 disabled:hover:bg-transparent'
+    const lineMenu = (li: number, label: string, tooltip: string) => {
+        const closeMenu = () => menuRefs.current[li]?.close()
+        const menuPopover = (
+            <Popover className="p-0">
+                <div className="flex flex-col min-w-40 py-1">
+                    <button
+                        type="button"
+                        className={menuItemClass}
+                        onClick={() => {
+                            closeMenu()
+                            setStaffDialog({ kind: 'new', li })
+                        }}>
+                        Add…
+                    </button>
+                    <button
+                        type="button"
+                        className={menuItemClass}
+                        onClick={() => {
+                            closeMenu()
+                            setStaffDialog({ kind: 'modify', li })
+                        }}>
+                        Modify…
+                    </button>
+                    <button
+                        type="button"
+                        disabled={lines.length <= 1}
+                        className={menuItemClass}
+                        onClick={() => {
+                            closeMenu()
+                            removeLine(li)
+                        }}>
+                        <span className={lines.length <= 1 ? '' : 'text-red-600'}>Delete {label}</span>
+                    </button>
                 </div>
             </Popover>
+        )
+        return (
+            <Whisper
+                ref={(handle) => {
+                    menuRefs.current[li] = handle
+                }}
+                trigger="click"
+                placement="bottomStart"
+                speaker={menuPopover}>
+                {/* preventDefault on mousedown stops the click from focusing the StaffGrid
+                    container (tabIndex=0), which would otherwise move the cursor / shift layout. */}
+                <div
+                    className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
+                    onMouseDown={(e) => e.preventDefault()}>
+                    <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
+                        <span>{label}</span>
+                    </Whisper>
+                </div>
+            </Whisper>
         )
     }
 
-    // Empty system: no staves yet. Show a single "+" in the label column whose
-    // popover lets the user pick the position(s) for the FIRST staff. Once created the
-    // component re-renders with the normal grid.
-    if (lines.length === 0) {
+    // The New / Modify popup for the currently open label menu. Also used to add the
+    // FIRST staff of an empty system, in which case there is no reference line and the
+    // before/after choice is omitted.
+    const renderStaffDialog = () => {
+        if (!staffDialog) return null
+        const li = staffDialog.li
+        const isNew = staffDialog.kind === 'new'
+        const line = isNew ? undefined : lines[li]
+        if (!isNew && !line) return null
+
         const newCandidates = candidatesFor(newPositions, free, orchestra)
-        const createFirstStaff = () => {
-            addLine(0, newPositions)
-            setNewPositions([])
-        }
-        const addStaffPopover = (
-            <Popover>
-                <div className="text-xs mb-1">New staff — select position(s):</div>
-                <div className="flex flex-wrap gap-1 mb-2 max-w-64">
-                    {newCandidates.map((p) => (
-                        <Button
-                            key={p}
-                            size="xs"
-                            appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
-                            onClick={() => toggleNewPosition(p)}>
-                            {positionName(p)}
-                        </Button>
-                    ))}
-                    {newCandidates.length === 0 && <span className="text-xs text-gray-400">no positions free</span>}
-                </div>
-                <Button size="xs" appearance="primary" disabled={newPositions.length === 0} onClick={createFirstStaff}>
-                    Create staff
-                </Button>
-            </Popover>
-        )
+        const addCandidates = line ? candidatesFor(line.positions, free, orchestra) : []
+
         return (
-            <div className={className} style={style}>
-                <div className="shrink-0 w-36 pr-2">
-                    <Whisper
-                        trigger="click"
-                        placement="bottomStart"
-                        onClose={() => setNewPositions([])}
-                        speaker={addStaffPopover}>
-                        <Button size="xs" appearance="ghost">
+            // Nudge the dialog toward the left (near the position labels) instead of centre.
+            <Modal size="xs" open onClose={closeStaffDialog} style={{ marginLeft: '6rem', marginRight: 'auto' }}>
+                <Modal.Header>
+                    <Modal.Title>{isNew ? 'New staff' : 'Modify staff'}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {isNew ? (
+                        <div className="flex flex-col gap-3">
+                            <div>
+                                <div className="text-xs mb-1">Select position(s)</div>
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {newCandidates.map((p) => (
+                                        <Button
+                                            key={p}
+                                            size="xs"
+                                            appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
+                                            onClick={() => toggleNewPosition(p)}>
+                                            {positionName(p)}
+                                        </Button>
+                                    ))}
+                                    {newCandidates.length === 0 && (
+                                        <span className="text-xs text-gray-400">no positions free</span>
+                                    )}
+                                </div>
+                            </div>
+                            {lines.length > 0 && (
+                                <div>
+                                    <div className="text-xs mb-1">Position</div>
+                                    <RadioGroup
+                                        inline
+                                        value={newPlacement}
+                                        onChange={(v) => setNewPlacement(v as 'before' | 'after')}>
+                                        <Radio value="before">before</Radio>
+                                        <Radio value="after">after</Radio>
+                                    </RadioGroup>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-3">
+                            <div>
+                                <div className="text-xs mb-1">Staff positions</div>
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {line!.positions.map((p) => (
+                                        <Tag
+                                            key={p}
+                                            closable={line!.positions.length > 1}
+                                            onClose={() => removePosition(li, p)}>
+                                            {positionName(p)}
+                                        </Tag>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs mb-1">Add position</div>
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {addCandidates.map((p) => (
+                                        <Button key={p} size="xs" appearance="ghost" onClick={() => addPosition(li, p)}>
+                                            {positionName(p)}
+                                        </Button>
+                                    ))}
+                                    {addCandidates.length === 0 && (
+                                        <span className="text-xs text-gray-400">no positions available</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    {isNew ? (
+                        <>
+                            <Button onClick={closeStaffDialog} appearance="subtle">
+                                Cancel
+                            </Button>
+                            <Button
+                                appearance="primary"
+                                disabled={newPositions.length === 0}
+                                onClick={() => {
+                                    addLine(
+                                        lines.length === 0 ? 0 : newPlacement === 'before' ? li : li + 1,
+                                        newPositions
+                                    )
+                                    closeStaffDialog()
+                                }}>
+                                Create
+                            </Button>
+                        </>
+                    ) : (
+                        <Button onClick={closeStaffDialog} appearance="primary">
+                            Done
+                        </Button>
+                    )}
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
+    // Empty system: no staves yet. A "+ Add staff" button opens the SAME New-staff
+    // dialog used by the label menu (with the before/after choice omitted for the first
+    // staff). Once created the component re-renders with the normal grid.
+    if (lines.length === 0) {
+        return (
+            <>
+                <div className={className} style={style}>
+                    <div className="shrink-0 w-36 pr-2">
+                        <Button size="xs" appearance="ghost" onClick={() => setStaffDialog({ kind: 'new', li: 0 })}>
                             + Add staff
                         </Button>
-                    </Whisper>
+                    </div>
                 </div>
-            </div>
+                {renderStaffDialog()}
+            </>
         )
     }
 
@@ -224,25 +322,7 @@ export function CompactSystemEditor({
         // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
         const showSnippet = focused && !playing && cursor.line === li
 
-        const labelEl = (
-            <Whisper
-                trigger="click"
-                placement="bottomStart"
-                onClose={() => setNewPositions([])}
-                speaker={linePopover(li, line)}>
-                {/* preventDefault on mousedown stops the click from focusing the StaffGrid
-                    container (tabIndex=0). Without it, focusing reveals the cursor on the
-                    controller's current line (not the clicked one) and mounts the snippet,
-                    shifting the layout mid-click so the Whisper popover never opens. */}
-                <div
-                    className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
-                    onMouseDown={(e) => e.preventDefault()}>
-                    <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
-                        {label}
-                    </Whisper>
-                </div>
-            </Whisper>
-        )
+        const labelEl = lineMenu(li, label, tooltip)
 
         const below = showSnippet ? (
             <div className="my-1 bg-blue-50">
@@ -283,16 +363,19 @@ export function CompactSystemEditor({
     })
 
     return (
-        <StaffGrid
-            rows={rows}
-            grid={{ ref, left: '9rem', widthCh: notationWidth }}
-            rowWidthCh={notationWidth}
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            className={className}
-            style={style}
-        />
+        <>
+            <StaffGrid
+                rows={rows}
+                grid={{ ref, left: '9rem', widthCh: notationWidth }}
+                rowWidthCh={notationWidth}
+                onKeyDown={onKeyDown}
+                onPaste={onPaste}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={className}
+                style={style}
+            />
+            {renderStaffDialog()}
+        </>
     )
 }

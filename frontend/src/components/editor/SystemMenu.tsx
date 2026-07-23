@@ -112,6 +112,7 @@ export function SystemMenu({
         <>
             <Dropdown
                 placement="bottomStart"
+                disabled={disabled}
                 renderToggle={(props, ref) => (
                     <IconButton
                         {...props}
@@ -130,7 +131,12 @@ export function SystemMenu({
                 <Dropdown.Item onSelect={() => setDialog('delete')}>Delete…</Dropdown.Item>
             </Dropdown>
 
-            <Modal size="xs" open={dialog !== null} onClose={close}>
+            <Modal
+                size="xs"
+                open={dialog !== null}
+                onClose={close}
+                // Nudge the dialog toward the left (near the system menu) instead of centre.
+                style={{ marginLeft: '6rem', marginRight: 'auto' }}>
                 <Modal.Header>
                     <Modal.Title>{dialog ? titles[dialog] : ''}</Modal.Title>
                 </Modal.Header>

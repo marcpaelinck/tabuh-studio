@@ -51,3 +51,7 @@ Initial release
 - `Changed` Editor: moved system new-copy-delete functions to hamburger menu.
 - `Added` Editor: 'move system' option.
 - `Changed` Different playback intro/outro times for Player and Editor views.
+
+## 1.1.2a
+
+- `Changed` Editor: unified the firnat if tge 'position label' menu and the system's hamburger menu.

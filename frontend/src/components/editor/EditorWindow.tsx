@@ -19,8 +19,6 @@ import { ExecutionFormContext } from './executionFormContext'
 import { PartIndicator } from './PartIndicator'
 import { SystemNode } from './SystemNode'
 
-export type CMActionType = 'copy' | 'new' | 'modify' | 'delete'
-
 export type SystemCursorFunction = (cursor: EditorCursorParameters) => void
 
 interface EditorWindowProps {
@@ -220,8 +218,8 @@ export default function EditorWindow({
                                     value={editorView}
                                     onChange={(value) => setEditorView(value as EditorView)}
                                     data={[
-                                        { label: 'Editor', value: 'compact' },
-                                        { label: 'Viewer (expanded)', value: 'expanded' }
+                                        { label: 'Compact (edit)', value: 'compact' },
+                                        { label: 'Expanded (view)', value: 'expanded' }
                                     ]}
                                 />
                             </FeatureUnderDevelopment>
