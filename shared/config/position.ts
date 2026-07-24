@@ -1,93 +1,78 @@
 import type { InstrumentGroup } from '../types/basetypes'
 import type { Position, PositionConfig, PositionGroup } from '../types/position'
 
-export const positionGroups: Record<PositionGroup, Position[]> = {
-    PEMADE: ['PEMADE_POLOS', 'PEMADE_SANGSIH'],
-    KANTILAN: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'],
-    GANGSA_POLOS: ['PEMADE_POLOS', 'KANTILAN_POLOS'],
-    GANGSA_SANGSIH: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'],
-    GANGSA: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH'],
-    GANGSA_RANGE: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL'],
-    REYONG_13: ['REYONG_1', 'REYONG_3'],
-    REYONG_24: ['REYONG_2', 'REYONG_4'],
-    REYONG: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2'],
-    POKOK: ['CALUNG', 'JEGOGAN', 'PENYACAH'],
-    MELODIC: [
-        'PEMADE_POLOS',
-        'PEMADE_SANGSIH',
-        'KANTILAN_POLOS',
-        'KANTILAN_SANGSIH',
-        'UGAL',
-        'GENDER_RAMBAT',
-        'REYONG_1',
-        'REYONG_3',
-        'REYONG_2',
-        'REYONG_4',
-        'REYONGB_1',
-        'REYONGB_2',
-        'CALUNG',
-        'JEGOGAN',
-        'PENYACAH',
-        'PONGGANG'
-    ],
-    DAUN: [
-        'PEMADE_POLOS',
-        'PEMADE_SANGSIH',
-        'KANTILAN_POLOS',
-        'KANTILAN_SANGSIH',
-        'UGAL',
-        'GENDER_RAMBAT',
-        'CALUNG',
-        'JEGOGAN',
-        'PENYACAH'
-    ],
-    PERCUSSION: [
-        'KEMPLI',
-        'KENDANG',
-        'KENDANG_LANANG',
-        'KENDANG_WADON',
-        'REYONG_1',
-        'REYONG_2',
-        'REYONG_3',
-        'REYONG_4',
-        'CENGCENG',
-        'CENGCENG_P',
-        'CENGCENG_S',
-        'REYONGB_1',
-        'REYONGB_2',
-        'TAWATAWA'
-    ],
-    CENGCENG_KOPYAK: ['CENGCENG_P', 'CENGCENG_S']
-}
-
-export const positionAbbr: Partial<Record<Position | PositionGroup, string>> = {
-    PEMADE_POLOS: 'pemadeP',
-    PEMADE_SANGSIH: 'pemadeS',
-    KANTILAN_POLOS: 'kantilanP',
-    KANTILAN_SANGSIH: 'kantilanS',
-    PEMADE: 'pemade',
-    KANTILAN: 'kantilan',
-    GANGSA_POLOS: 'gangsaP',
-    GANGSA_SANGSIH: 'gangsaS',
-    GANGSA: 'gangsa',
-    GANGSA_RANGE: 'gangsa/ugal',
-    REYONG_1: 'reyong1',
-    REYONG_2: 'reyong2',
-    REYONG_3: 'reyong3',
-    REYONG_4: 'reyong4',
-    REYONG_13: 'reyong13',
-    REYONG_24: 'reyong24',
-    REYONG: 'reyong',
-    UGAL: 'ugal',
-    PENYACAH: 'penyacah',
-    CALUNG: 'calung',
-    JEGOGAN: 'jegogan',
-    POKOK: 'pokok',
-    KEMPLI: 'kempli',
-    CENGCENG: 'cengceng',
-    CENGCENG_KOPYAK: 'cengceng',
-    GONGS: 'gongs',
-    MELODIC: 'melodic'
+/**
+ * Possible grouping of instruments in the compact editor view.
+ */
+export const positionGroups: Record<PositionGroup, { positions: Position[]; name: string }> = {
+    PEMADE: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], name: 'Pemade' },
+    KANTILAN: { positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Kantilan' },
+    GANGSA_POLOS: { positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'], name: 'gangsa p' },
+    GANGSA_SANGSIH: { positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'], name: 'Gangsa s' },
+    GANGSA: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Gangsa' },
+    GANGSA_RANGE: {
+        positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL'],
+        name: 'Gangsa+Ugal'
+    },
+    REYONG_13: { positions: ['REYONG_1', 'REYONG_3'], name: 'reyong 1+3' },
+    REYONG_24: { positions: ['REYONG_2', 'REYONG_4'], name: 'reyong 2+4' },
+    REYONG: { positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
+    POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
+    MELODIC: {
+        positions: [
+            'PEMADE_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_POLOS',
+            'KANTILAN_SANGSIH',
+            'UGAL',
+            'GENDER_RAMBAT',
+            'REYONG_1',
+            'REYONG_3',
+            'REYONG_2',
+            'REYONG_4',
+            'REYONGB_1',
+            'REYONGB_2',
+            'CALUNG',
+            'JEGOGAN',
+            'PENYACAH',
+            'PONGGANG'
+        ],
+        name: 'Melodic'
+    },
+    DAUN: {
+        positions: [
+            'PEMADE_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_POLOS',
+            'KANTILAN_SANGSIH',
+            'UGAL',
+            'GENDER_RAMBAT',
+            'CALUNG',
+            'JEGOGAN',
+            'PENYACAH'
+        ],
+        name: 'Daun'
+    },
+    PERCUSSION: {
+        positions: [
+            'KEMPLI',
+            'KENDANG',
+            'KENDANG_LANANG',
+            'KENDANG_WADON',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4',
+            'CENGCENG',
+            'CENGCENG_P',
+            'CENGCENG_S',
+            'REYONGB_1',
+            'REYONGB_2',
+            'TAWATAWA'
+        ],
+        name: 'Percussion'
+    },
+    CENGCENG_KOPYAK: { positions: ['CENGCENG_P', 'CENGCENG_S'], name: 'Cengceng' }
 }
 
 export const defaultBeatPosition: Position = 'KEMPLI'
@@ -260,7 +245,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
                                  'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a,?': ['DANG0_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED'], 'a?': ['DANG1_MUTED'], 'i<?': ['DING2_MUTED']},
         },
         TROMPONG: {
-            name: 'Ugal',
+            name: 'Trompong',
             type: 'daun',
             volume: -15,
             svg_file: 'svg/GK_UGAL.svg',

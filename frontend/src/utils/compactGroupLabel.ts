@@ -2,19 +2,19 @@
 //
 // The label greedily covers the group's position set with the largest matching
 // `positionGroups` entries and renders each covered piece (plus any leftover single
-// positions) via `positionAbbr`, joined with '/'. E.g. GANGSA + UGAL -> "ga/ug",
+// positions) via `positionGroups` name, joined with '/'. E.g. GANGSA + UGAL -> "ga/ug",
 // REYONG_1 + REYONG_3 -> "rey13". The tooltip always lists every position's full name.
 
-import type { Position } from '@tabuhstudio/shared'
-import { positionAbbr, positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
+import type { Position, PositionGroup } from '@tabuhstudio/shared'
+import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
 
 type PositionGroupKey = keyof typeof positionGroups
 
 export function compactGroupLabel(
     positions: Position[],
-    positionGroups: Record<PositionGroupKey, Position[]>
+    positionGrouping: Record<PositionGroupKey, Position[]>
 ): { label: string; tooltip: string } {
-    const groupEntries = Object.entries(positionGroups) as [PositionGroupKey, Position[]][]
+    const groupEntries = Object.entries(positionGrouping) as [PositionGroupKey, Position[]][]
     const names = positions.map((p) => positionConfigs[p]?.name ?? p)
     const tooltip = names.join(', ')
     if (positions.length === 0) return { label: '(empty)', tooltip: '' }
@@ -28,12 +28,13 @@ export function compactGroupLabel(
         const fullyPresent = indices.every((i) => i >= 0 && !covered[i])
         if (!fullyPresent) continue
         indices.forEach((i) => (covered[i] = true))
-        parts.push({ abbr: positionAbbr[key] ?? key, firstIdx: Math.min(...indices) })
+        parts.push({ abbr: positionGroups[key]?.name ?? key, firstIdx: Math.min(...indices) })
     }
 
     // Leftover single positions.
     positions.forEach((p, i) => {
-        if (!covered[i]) parts.push({ abbr: positionAbbr[p] ?? positionConfigs[p]?.name ?? p, firstIdx: i })
+        if (!covered[i])
+            parts.push({ abbr: positionGroups[p as PositionGroup]?.name ?? positionConfigs[p]?.name ?? p, firstIdx: i })
     })
 
     parts.sort((a, b) => a.firstIdx - b.firstIdx)

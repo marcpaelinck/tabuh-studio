@@ -10,7 +10,10 @@ import _ from 'lodash'
 export function getPositionGroups(orchestra: InstrumentGroup): Record<PositionGroup, Position[]> {
     return _.fromPairs(
         _.entries(positionGroups)
-            .map(([group, posList]) => [group, posList.filter((pos) => orchestras[orchestra]?.positions.includes(pos))])
+            .map(([name, group]) => [
+                name,
+                group.positions.filter((pos) => orchestras[orchestra]?.positions.includes(pos))
+            ])
             .filter(([group, posList]) => posList.length > 0)
     ) as Record<PositionGroup, Position[]>
 }

@@ -70,7 +70,7 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
         return [
             position,
             createSampler({
-                isMelodic: positionGroups.MELODIC.includes(position as Position),
+                isMelodic: positionGroups.MELODIC.positions.includes(position as Position),
                 samples: lookup[position].idx2sample,
                 volume: config.volume
             })

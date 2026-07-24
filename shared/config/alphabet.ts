@@ -103,35 +103,35 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'melodic',
         name: 'DING',
         description: 'Generic tone (without octave)',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     o: {
         kind: 'tone',
         category: 'melodic',
         name: 'DONG',
         description: 'Generic tone (without octave)',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     e: {
         kind: 'tone',
         category: 'melodic',
         name: 'DENG',
         description: 'Generic tone (without octave)',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     u: {
         kind: 'tone',
         category: 'melodic',
         name: 'DUNG',
         description: 'Generic tone (without octave)',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     a: {
         kind: 'tone',
         category: 'melodic',
         name: 'DANG',
         description: 'Generic tone (without octave)',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     t: {
         kind: 'tone',
@@ -145,56 +145,56 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: positionGroups.REYONG
+        positions: positionGroups.REYONG.positions
     },
     I: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'DING grace note',
         description: 'Briefly struck note preceding another note',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     O: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'DONG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     E: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'DENG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     U: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'DUNG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     A: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'DANG grace note',
         description: 'Briefly struck note preceding another note',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     X: {
         kind: 'prefix',
         combinesWith: ['melodic'],
         name: 'Stroke',
         description: 'Stroke on chime rim.',
-        positions: positionGroups.REYONG
+        positions: positionGroups.REYONG.positions
     },
     B: {
         kind: 'prefix',
         combinesWith: ['percussion'],
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: positionGroups.REYONG
+        positions: positionGroups.REYONG.positions
     },
     ',': {
         kind: 'octavation',
@@ -202,7 +202,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Octave -1',
         description: 'Lowers the tone with one octave',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     '<': {
         kind: 'octavation',
@@ -210,7 +210,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Octave +1',
         description: 'Raises the tone with one octave',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     },
     '/': {
         kind: 'modifier',
@@ -218,7 +218,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Abbreviated',
         description: 'Mutes note immediately after the stroke.',
-        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
+        positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
     },
     '?': {
         kind: 'modifier',
@@ -226,7 +226,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Muted',
         description: 'Mutes note during the stroke.',
-        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
+        positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
     },
     ':': {
         kind: 'modifier',
@@ -234,7 +234,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: false,
         name: 'Accelerating tremolo',
         description: 'Repeated succession of the same note, starting slowly and gradually increasing the tempo.',
-        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
+        positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
     },
     _: {
         kind: 'modifier',
@@ -242,7 +242,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Half duration',
         description: 'Halves the duration of the note.',
-        positions: positionGroups.MELODIC.concat(positionGroups.PERCUSSION)
+        positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
     },
     '[': {
         kind: 'modifier',
@@ -251,7 +251,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Rake left',
         description:
             'Slide the panggul along the notes from left to right, starting on the note to which the modifier belongs.',
-        positions: positionGroups.DAUN
+        positions: positionGroups.DAUN.positions
     },
     ']': {
         kind: 'modifier',
@@ -260,7 +260,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Rake left',
         description:
             'Slide the panggul along the notes from right to left, starting on the note to which the modifier belongs.',
-        positions: positionGroups.DAUN
+        positions: positionGroups.DAUN.positions
     },
     n: {
         kind: 'modifier',
@@ -268,7 +268,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: false,
         name: 'Norot',
         description: '4-note partial norot pattern. Combines with three trailing spaces.',
-        positions: positionGroups.MELODIC
+        positions: positionGroups.MELODIC.positions
     // },
     // '!': {
     //     kind: 'error',

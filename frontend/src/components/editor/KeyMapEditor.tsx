@@ -23,7 +23,7 @@ import {
     type PositionGroup
 } from '@tabuhstudio/shared'
 import { alphabet } from '@tabuhstudio/shared/config/alphabet'
-import { positionAbbr } from '@tabuhstudio/shared/config/position'
+import { positionGroups } from '@tabuhstudio/shared/config/position'
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
 import type { Option } from 'rsuite'
 import { Button, CheckPicker, Drawer, IconButton, Input, Message, SelectPicker, Stack } from 'rsuite'
@@ -37,7 +37,7 @@ const emptyKeystroke: Keystroke = { key: '', ctrl: false, alt: false, shift: fal
 
 // Instrument-scope options: both position groups (melodic, reyong, …) and single
 // positions (kempli, ugal, …), labelled by their abbreviation.
-const instrumentOptions = Object.entries(positionAbbr).map(([value, label]) => ({ label, value }))
+const instrumentOptions = Object.entries(positionGroups).map(([value, group]) => ({ label: group.name, value }))
 
 // Symbol dropdown options: every valid note SYMBOL plus every single alphabet
 // CHARACTER, labelled by its human-readable name (value = the symbol/char string).

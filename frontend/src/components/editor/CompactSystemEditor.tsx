@@ -21,7 +21,7 @@ import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type D
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { Position, PositionGroup } from '@tabuhstudio/shared'
-import { positionAbbr, positionConfigs } from '@tabuhstudio/shared/config/position'
+import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
 import { useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Modal, Popover, Radio, RadioGroup, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
@@ -258,7 +258,7 @@ export function CompactSystemEditor({
             const positions = groupPositions(g)
             return positions.length == 1 && positions[0] in positionConfigs
                 ? positionConfigs[positions[0]].name
-                : (positionAbbr[g] ?? g)
+                : (positionGroups[g]?.name ?? g)
         }
         const newStaffLabel = (item: NewStaffItem) =>
             item.kind === 'position' ? positionName(item.position) : groupLabel(item.group)
