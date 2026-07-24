@@ -59,7 +59,7 @@ export function SystemMenu({
 }: SystemMenuProps) {
     const [dialog, setDialog] = useState<DialogKind | null>(null)
     const [position, setPosition] = useState<ItemPosition>('below')
-    const [copySource, setCopySource] = useState<UUID | null>(null)
+    const [copySource, setCopySource] = useState<UUID | null>(systemData.uuid)
     const [copyMode, setCopyMode] = useState<CopyMode>('entire')
     const [moveTarget, setMoveTarget] = useState<UUID | null>(null)
 
@@ -67,7 +67,7 @@ export function SystemMenu({
     useEffect(() => {
         if (!dialog) return
         setPosition('below')
-        setCopySource(null)
+        setCopySource(systemData.uuid)
         setCopyMode('entire')
         setMoveTarget(null)
     }, [dialog])
