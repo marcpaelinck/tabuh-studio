@@ -8,7 +8,7 @@ export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the n
 
 // TAILWIND STYLES
 
-export const FRAMESTYLE = ' rounded-xl shadow-lg shadow-gray-400 border border-gray-300 '
+export const FRAMESTYLE = ' border border-gray-300 '
 
 // COLORS
 

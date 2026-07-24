@@ -1,5 +1,13 @@
 @import 'tailwindcss' important;
 
+/* Full-height root chain so percentage / `h-full` layouts resolve against the viewport.
+   The app mounts into #tabuh-studio (see index.html / main.tsx). */
+html,
+body,
+#tabuh-studio {
+    height: 100%;
+}
+
 ::highlight(notation-highlight) {
     background-color: peachpuff;
 }

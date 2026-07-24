@@ -18,7 +18,7 @@ export default function App() {
             <AuthProvider>
                 <div className="flex w-full min-h-0 ">
                     <VStack id="vstack" className="flex w-full" align="center">
-                        <div className={'w-full lg:w-8/10 min-h-10' + FRAMESTYLE}>
+                        <div className={'w-full min-h-10' + FRAMESTYLE}>
                             <MainWindow dataSource={dataSource} />
                         </div>
                         <div id="phpdebug"></div>

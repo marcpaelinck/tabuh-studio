@@ -485,7 +485,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         <>
             {/* Full application is only displayed on larger screens */}
             <Activity mode={appAppearance == 'full' ? 'visible' : 'hidden'}>
-                <Container id="full-application" className="min-w-0">
+                <Container id="full-application" className="h-dvh min-w-0">
                     {fullApplication}
                 </Container>
             </Activity>
