@@ -1,6 +1,12 @@
 import type { Position } from '@tabuhstudio/shared'
 import { NoteObject } from '@tabuhstudio/shared'
-import { alphabet, type AlphabetItem, type Category, type Kind } from '@tabuhstudio/shared/config/alphabet'
+import {
+    alphabet,
+    invalidSymbol,
+    type AlphabetItem,
+    type Category,
+    type Kind
+} from '@tabuhstudio/shared/config/alphabet'
 import { orchestras, positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { InstrumentGroup, NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
@@ -50,11 +56,6 @@ export function validNoteObjects({
     const modifiers = Object.entries(alphabet)
         .filter(([char, props]) => props.kind == 'modifier')
         .map(([char, props]) => ({ char, ...props })) as LookupValue[]
-
-    // console.log(`tones: ${tones.map((value) => value.char)}`)
-    // console.log(`prefixe: ${prefixes.map((value) => value.char)}`)
-    // console.log(`octavations: ${octavations.map((value) => value.char)}`)
-    // console.log(`modifiers: ${modifiers.map((value) => value.char)}`)
 
     // Create a 'no character' alphabet entry
     const none = {
@@ -118,6 +119,8 @@ export function validNoteObjects({
 
 export function symbolName(symbol: NoteSymbol) {
     return Array.from(symbol)
-        .map((char) => alphabet[char].name.toLowerCase() ?? '<?>')
+        .map((char) =>
+            char in alphabet ? alphabet[char].name.toLowerCase() : alphabet[invalidSymbol].name.toLowerCase()
+        )
         .join(' ')
 }

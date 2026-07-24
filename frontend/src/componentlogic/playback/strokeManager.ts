@@ -6,9 +6,9 @@
 
 import { EXTENDING_CHAR, MUTING_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
 import type { BPM, DurationInBasenoteEquiv, TimeInBasenoteEquiv } from '@tabuhstudio/shared/types/basetypes'
+import { noteRange } from '@tabuhstudio/shared/utils/alphabet'
 import _ from 'lodash'
 import * as ToneJS from 'tone'
-import { noteRange } from '../../../../shared/utils/alphabet'
 import type { PlaybackSamplerAction, SamplerFunction, SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, TO2n } from '../../utils/timeunits'

@@ -4,6 +4,7 @@ import { positionConfigs, positionGroups } from './position'
 
 export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'rest' | 'error' | 'null'
 export type Category = 'melodic' | 'percussion' | 'colotomy' | 'all' | 'other'
+export const invalidSymbol = '!'
 
 export interface AlphabetItem {
     kind: Kind
@@ -67,17 +68,14 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Stroke',
         description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
-        positions: [
-            'REYONG_4',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_1',
-            'CENGCENG',
-            'KEMPLI',
-            'CENGCENG_P',
-            'CENGCENG_S',
-            'TAWATAWA'
-        ]
+        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CENGCENG', 'KEMPLI', 'CENGCENG_P', 'CENGCENG_S', 'TAWATAWA']
+    },
+    y: {
+        kind: 'tone',
+        category: 'percussion',
+        name: 'Stroke 2 panggul',
+        description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
+        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', ]
     },
     '(': {
         kind: 'tone',
@@ -271,12 +269,12 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Norot',
         description: '4-note partial norot pattern. Combines with three trailing spaces.',
         positions: positionGroups.MELODIC
-    },
-    '!': {
-        kind: 'error',
-        category: 'all',
-        name: 'Invalid symbol',
-        description: 'Invalid symbol',
-        positions: Object.keys(positionConfigs) as Position[]
+    // },
+    // '!': {
+    //     kind: 'error',
+    //     category: 'all',
+    //     name: 'Invalid symbol',
+    //     description: 'Invalid symbol',
+    //     positions: Object.keys(positionConfigs) as Position[]
     }
 }

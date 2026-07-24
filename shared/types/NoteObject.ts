@@ -322,6 +322,10 @@ export class NoteObject {
         if (!rawSymbol || rawSymbol.length === 0) {
             throw new NoteObjectError('empty symbol', rawSymbol ?? '')
         }
+        const validChars = Object.keys(alphabet)
+        if (Array.from(rawSymbol).some((char) => !validChars.includes(char))) {
+            throw new NoteObjectError('symbol contains illegal characters(s)', rawSymbol)
+        }
 
         let prefixCount = 0
         let octaveCount = 0
@@ -353,12 +357,11 @@ export class NoteObject {
 
         if (!hasPitch) throw new NoteObjectError('no pitch character found', rawSymbol)
 
-        // TODO: position-specific validation.
-        // When implemented, verify that `symbol` belongs to the set of notes
-        // valid for `position` (derived from positionConfigs in config.ts).
-        // The signature already accepts `position` for forward compatibility.
+        // position-specific validation.
         if (position !== undefined) {
-            void position
+            if (Array.from(rawSymbol).some((char) => !alphabet[char].positions.includes(position))) {
+                throw new NoteObjectError('illegal symbol for ' + position, rawSymbol)
+            }
         }
     }
 

@@ -2,11 +2,12 @@ import { positionConfigs } from '../config/position'
 import type { NoteSymbol } from '../types/basetypes'
 import type { Position } from '../types/position'
 
-export function notation2text(notation: string[] | undefined): string {
-    if (notation) return notation.map((symbol) => symbol).join('')
-    else return ''
-}
-
+/**
+ * Sorts melodic notes by frequency.
+ * @param values list of NoteSymbol values
+ * @param ascending boolean: sorting order
+ * @returns sorted list of NoteSymbol values.
+ */
 export function sortNotes(values: NoteSymbol[], ascending: boolean = true): NoteSymbol[] {
     const order = ['i,', 'o,', 'e,', 'u,', 'a,', 'i', 'o', 'e', 'u', 'a', 'i>', 'o>', 'e>', 'u>', 'a>']
     const compare = (n1: string, n2: string) => {
@@ -18,6 +19,12 @@ export function sortNotes(values: NoteSymbol[], ascending: boolean = true): Note
     return values.sort(compare)
 }
 
+/**
+ * Returns a position's range as a list of NoteSymbol values.
+ * @param position
+ * @param invert
+ * @returns sorted list of NoteSymbol values.
+ */
 export function noteRange(position: Position, invert: boolean = false): NoteSymbol[] {
     const range = Object.keys(positionConfigs[position].symbolToNoteNames).filter((sym) =>
         /^[aeiou][,<]{0,1}$/.test(sym)

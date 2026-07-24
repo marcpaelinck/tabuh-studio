@@ -1,4 +1,5 @@
 import { instrumentGroups, NoteObject, type Position } from '@tabuhstudio/shared'
+import { orchestras } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
@@ -284,7 +285,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             const scores = await apiGetScores()
             if (scores) {
                 const scoreInfoList = scores
-                    .filter((score) => score.instrument_set == 'GONG_KEBYAR')
+                    .filter((score) => _.keys(orchestras).includes(score.instrument_set))
                     .map((score) => toScoreInfo(score))
                     .toSorted((i1, i2) => i1.title.localeCompare(i2.title))
                 setScoreInfoList(scoreInfoList)
