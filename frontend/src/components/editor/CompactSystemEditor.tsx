@@ -17,8 +17,11 @@
  * unused positions). Delete removes the staff immediately.
  */
 
-import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
+import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import type { Position, PositionGroup } from '@tabuhstudio/shared'
+import { positionAbbr, positionConfigs } from '@tabuhstudio/shared/config/position'
 import { useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Modal, Popover, Radio, RadioGroup, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
@@ -56,6 +59,46 @@ export interface CompactSystemEditorProps {
 
 const positionName = (p: Position) => positionConfigs[p]?.name ?? p
 
+// A staff queued in the "New staffs" basket: either a single position or a whole group.
+type NewStaffItem = { kind: 'position'; position: Position } | { kind: 'group'; group: PositionGroup }
+
+// Label styling: positions read as plain chips, groups as blue chips (matching the
+// compact-view group labels). Reused for both the source lists and the basket.
+const labelBase = 'inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs cursor-pointer select-none'
+const positionLabelClass = `${labelBase} border border-gray-300 bg-white text-gray-700 hover:bg-gray-100`
+const groupLabelClass = `${labelBase} bg-blue-600 text-white hover:bg-blue-700`
+
+// Stable id for a queued staff (positions/groups are unique in the basket, so this is unique).
+const staffId = (item: NewStaffItem) => (item.kind === 'position' ? `pos:${item.position}` : `grp:${item.group}`)
+
+// A draggable/sortable chip in the "New staffs" basket. Clicking (no drag) removes it; the
+// trailing ✕ signals that. A pointer-move threshold distinguishes a click from a drag.
+function SortableStaffLabel({
+    id,
+    className,
+    label,
+    onRemove
+}: {
+    id: string
+    className: string
+    label: string
+    onRemove: () => void
+}) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
+    return (
+        <button
+            ref={setNodeRef}
+            type="button"
+            className={className}
+            style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
+            onClick={onRemove}
+            {...attributes}
+            {...listeners}>
+            {label} <span aria-hidden="true">✕</span>
+        </button>
+    )
+}
+
 export function CompactSystemEditor({
     ref,
     initialLines,
@@ -89,7 +132,10 @@ export function CompactSystemEditor({
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const orchestra = useScoreStore((state) => state.orchestra)
     const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
-    const [newPositions, setNewPositions] = useState<Position[]>([])
+    // Staffs queued in the New-staff dialog's "New staffs" basket, before they are created.
+    const [newStaffs, setNewStaffs] = useState<NewStaffItem[]>([])
+    // 5px pointer-move threshold: a click removes a basket chip, a drag reorders it.
+    const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
     // Open staff dialog: the New / Modify popup for the label menu of line `li`.
     const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
     const [newPlacement, setNewPlacement] = useState<'above' | 'below'>('below')
@@ -111,12 +157,16 @@ export function CompactSystemEditor({
     const used = new Set(lines.flatMap((l) => l.positions))
     const free = orchestraPositions.filter((p) => !used.has(p))
 
-    const toggleNewPosition = (p: Position) =>
-        setNewPositions((sel) => (sel.includes(p) ? sel.filter((x) => x !== p) : [...sel, p]))
+    // Position groups available for this orchestra, plus a helper that expands a queued
+    // "new staff" item (a single position, or a whole group) into its positions.
+    const orchestraGroups = getPositionGroups(orchestra)
+    const groupPositions = (g: PositionGroup): Position[] => orchestraGroups[g] ?? []
+    const itemPositions = (item: NewStaffItem): Position[] =>
+        item.kind === 'position' ? [item.position] : groupPositions(item.group)
 
     const closeStaffDialog = () => {
         setStaffDialog(null)
-        setNewPositions([])
+        setNewStaffs([])
         setNewPlacement('below')
     }
 
@@ -196,8 +246,35 @@ export function CompactSystemEditor({
         const line = isNew ? undefined : lines[li]
         if (!isNew && !line) return null
 
-        const newCandidates = candidatesFor(newPositions, free, orchestra)
+        // New-staff picker: positions already queued are "claimed" and disappear from the
+        // position/group lists; a group is offered only when ALL its positions are still free.
+        const claimed = new Set(newStaffs.flatMap(itemPositions))
+        const freeSet = new Set(free)
+        const availPositions = free.filter((p) => !claimed.has(p))
+        const availGroups = (Object.keys(orchestraGroups) as PositionGroup[]).filter(
+            (g) => groupPositions(g).length >= 2 && groupPositions(g).every((p) => freeSet.has(p) && !claimed.has(p))
+        )
+        const groupLabel = (g: PositionGroup) => {
+            const positions = groupPositions(g)
+            return positions.length == 1 && positions[0] in positionConfigs
+                ? positionConfigs[positions[0]].name
+                : (positionAbbr[g] ?? g)
+        }
+        const newStaffLabel = (item: NewStaffItem) =>
+            item.kind === 'position' ? positionName(item.position) : groupLabel(item.group)
+        // Modify dialog: positions that can be added to the existing group.
         const addCandidates = line ? candidatesFor(line.positions, free, orchestra) : []
+
+        // Reorder the basket when a chip is dragged onto another.
+        const handleDragEnd = (event: DragEndEvent) => {
+            const { active, over } = event
+            if (!over || active.id === over.id) return
+            setNewStaffs((s) => {
+                const from = s.findIndex((it) => staffId(it) === active.id)
+                const to = s.findIndex((it) => staffId(it) === over.id)
+                return from < 0 || to < 0 ? s : arrayMove(s, from, to)
+            })
+        }
 
         return (
             // Nudge the dialog toward the left (near the position labels) instead of centre.
@@ -211,19 +288,68 @@ export function CompactSystemEditor({
                             <div>
                                 <div className="text-xs mb-1">Select position(s)</div>
                                 <div className="flex flex-wrap gap-1 max-w-72">
-                                    {newCandidates.map((p) => (
-                                        <Button
+                                    {availPositions.map((p) => (
+                                        <button
                                             key={p}
-                                            size="xs"
-                                            appearance={newPositions.includes(p) ? 'primary' : 'ghost'}
-                                            onClick={() => toggleNewPosition(p)}>
+                                            type="button"
+                                            className={positionLabelClass}
+                                            onClick={() =>
+                                                setNewStaffs((s) => [...s, { kind: 'position', position: p }])
+                                            }>
                                             {positionName(p)}
-                                        </Button>
+                                        </button>
                                     ))}
-                                    {newCandidates.length === 0 && (
-                                        <span className="text-xs text-gray-400">no positions free</span>
-                                    )}
+                                    {availPositions.length === 0 && <span className="text-xs text-gray-400">none</span>}
                                 </div>
+                            </div>
+                            <div>
+                                <div className="text-xs mb-1">Position groups</div>
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {availGroups.map((g) => (
+                                        <button
+                                            key={g}
+                                            type="button"
+                                            className={groupLabelClass}
+                                            onClick={() => setNewStaffs((s) => [...s, { kind: 'group', group: g }])}>
+                                            {groupLabel(g)}
+                                        </button>
+                                    ))}
+                                    {availGroups.length === 0 && <span className="text-xs text-gray-400">none</span>}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs mb-1">New staffs</div>
+                                <DndContext
+                                    sensors={dragSensors}
+                                    collisionDetection={closestCenter}
+                                    onDragEnd={handleDragEnd}>
+                                    <SortableContext
+                                        items={newStaffs.map(staffId)}
+                                        strategy={horizontalListSortingStrategy}>
+                                        <div className="flex flex-wrap gap-1 max-w-72">
+                                            {newStaffs.map((item) => (
+                                                <SortableStaffLabel
+                                                    key={staffId(item)}
+                                                    id={staffId(item)}
+                                                    className={
+                                                        item.kind === 'position' ? positionLabelClass : groupLabelClass
+                                                    }
+                                                    label={newStaffLabel(item)}
+                                                    onRemove={() =>
+                                                        setNewStaffs((s) =>
+                                                            s.filter((it) => staffId(it) !== staffId(item))
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                            {newStaffs.length === 0 && (
+                                                <span className="text-xs text-gray-400">
+                                                    click a position or group to add a staff
+                                                </span>
+                                            )}
+                                        </div>
+                                    </SortableContext>
+                                </DndContext>
                             </div>
                             {lines.length > 0 && (
                                 <div>
@@ -277,12 +403,11 @@ export function CompactSystemEditor({
                             </Button>
                             <Button
                                 appearance="primary"
-                                disabled={newPositions.length === 0}
+                                disabled={newStaffs.length === 0}
                                 onClick={() => {
-                                    addLine(
-                                        lines.length === 0 ? 0 : newPlacement === 'above' ? li : li + 1,
-                                        newPositions
-                                    )
+                                    // Insert every queued staff consecutively at the chosen spot.
+                                    const at = lines.length === 0 ? 0 : newPlacement === 'above' ? li : li + 1
+                                    newStaffs.forEach((item, i) => addLine(at + i, itemPositions(item)))
                                     closeStaffDialog()
                                 }}>
                                 Create
