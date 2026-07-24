@@ -155,8 +155,7 @@ export const SystemNode = memo(function SystemNode({
             if (expandedNotationRef.current != null)
                 expandedNotationRef.current.style[key as keyof StyleProperties] = value
         })
-        // editorView so the grid repaints when the expanded textarea (re)mounts on a view switch.
-    }, [systemData, playbackCursor, editorView])
+    }, [systemData, playbackCursor, editorView, notationWidth])
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
         return (
@@ -352,7 +351,7 @@ export const SystemNode = memo(function SystemNode({
                 )}
             </Grid>
         )
-    }, [systemData, playbackCursor, audioState, playbackType, editorView, playing, keyMap])
+    }, [systemData, playbackCursor, audioState, playbackType, editorView, notationWidth, playing, keyMap])
 
     return notationArea
 })
