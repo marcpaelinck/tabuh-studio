@@ -286,7 +286,7 @@ export function CompactSystemEditor({
                     {isNew ? (
                         <div className="flex flex-col gap-3">
                             <div>
-                                <div className="text-xs mb-1">Select position(s)</div>
+                                <div className="text-xs mb-1">Positions</div>
                                 <div className="flex flex-wrap gap-1 max-w-72">
                                     {availPositions.map((p) => (
                                         <button
@@ -344,7 +344,7 @@ export function CompactSystemEditor({
                                             ))}
                                             {newStaffs.length === 0 && (
                                                 <span className="text-xs text-gray-400">
-                                                    click a position or group to add a staff
+                                                    click one or more position(s)/group(s) to add staffs
                                                 </span>
                                             )}
                                         </div>
