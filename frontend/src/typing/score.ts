@@ -94,11 +94,13 @@ export interface ValidationResult {
 // How a system copy is scoped (see the system hamburger menu / updateScoreFromItemAction).
 export type CopyMode = 'entire' | 'staffs' | 'positions'
 
+export type ItemPosition = 'above' | 'below'
+
 // Structured payload for the new / copy / move system actions, passed as the `value`
 // argument of executeItemAction / updateScoreFromItemAction.
 export interface SystemActionValue {
     /** Placement relative to the reference system (new/copy = current; move = target). */
-    position?: 'before' | 'after'
+    position?: ItemPosition
     /** Source system to copy from (copy). */
     sourceUuid?: UUID
     /** Target system to move next to (move). */

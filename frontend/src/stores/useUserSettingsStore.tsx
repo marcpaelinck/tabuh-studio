@@ -38,7 +38,7 @@ export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = cr
     selectedSpeedOption: speedDefaultOption,
     selectedPanggulOption: panggulDefaultOption,
     selectedCursorStyle: 'Beat' as PlaybackCursorStyle,
-    editorView: 'expanded' as EditorView,
+    editorView: 'compact' as EditorView,
     mainView: 'player' as MainView,
     selectedKeyMapId: '1', // default keyboard mapping (see shared `keyMaps`)
     setSelectedScoreOption: (option: ExtendedOption<ScoreInfo> | null) => set(() => ({ selectedScoreOption: option })),

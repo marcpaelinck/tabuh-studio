@@ -722,7 +722,7 @@ interface ConditionFormProps extends FieldsProps {
 }
 const ConditionForm = ({ type, hasIterations, formValue, loop, selectedElement }: ConditionFormProps) => {
     const disabled = selectedElement == undefined
-    const afterOn = ['goto', 'wait', 'sequence'].includes(type) ? 'after' : 'on'
+    const afterOn = ['goto', 'wait', 'sequence'].includes(type) ? 'below' : 'on'
     const options = [
         { group: 'passes', label: `${afterOn} pass(es) nr ... `, value: 'pass' },
         { group: 'passes', label: `${afterOn} every ...th pass`, value: 'nthpass' }

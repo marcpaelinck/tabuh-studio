@@ -197,7 +197,9 @@ export default function EditorWindow({
                 // </Profiler>
             )
         })
-    }, [score, playbackState, selectionOn])
+        // `visible` is included so the systems (and their grid-paint effect) refresh when the
+        // editor is revealed from the player view.
+    }, [score, playbackState, selectionOn, visible])
 
     return (
         // While an execution form is open, mark the editor content inert (no editing)

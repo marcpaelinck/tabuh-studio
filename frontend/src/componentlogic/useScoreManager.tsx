@@ -34,9 +34,7 @@ function createEmptySystem(kempli: KempliSetting): System {
 // reference so they are not needlessly re-rendered.
 function renumberSystems(systems: System[]): System[] {
     return systems.map((sysData, sysIdx) =>
-        sysData.index === sysIdx && sysData.id === sysIdx + 1
-            ? sysData
-            : { ...sysData, index: sysIdx, id: sysIdx + 1 }
+        sysData.index === sysIdx && sysData.id === sysIdx + 1 ? sysData : { ...sysData, index: sysIdx, id: sysIdx + 1 }
     )
 }
 
@@ -251,10 +249,7 @@ export function useScoreManager() {
                 // Creates an empty system, inheriting the current system's kempli (or the
                 // shared default when the current system has none). Placed before/after current.
                 newSystemData = createEmptySystem(systemData.kempli ?? { ...DEFAULT_KEMPLI })
-                const at =
-                    (value as SystemActionValue)?.position === 'before'
-                        ? systemData.index
-                        : systemData.index + 1
+                const at = (value as SystemActionValue)?.position === 'above' ? systemData.index : systemData.index + 1
                 sliceIndex1 = at
                 sliceIndex2 = at // insert (do not replace the current system)
                 break
@@ -278,7 +273,7 @@ export function useScoreManager() {
                     newSystemData.groups = newSystemData.groups.map((g) => ({ ...g, notation: [] }))
                     expandSystem(newSystemData, beatPosition)
                 }
-                const at = v?.position === 'before' ? systemData.index : systemData.index + 1
+                const at = v?.position === 'above' ? systemData.index : systemData.index + 1
                 sliceIndex1 = at
                 sliceIndex2 = at // insert (do not replace the current system)
                 break
@@ -291,8 +286,12 @@ export function useScoreManager() {
                 const without = score.systems.filter((sys) => sys.uuid !== systemData.uuid)
                 const targetIdx = without.findIndex((sys) => sys.uuid === v.targetUuid)
                 if (targetIdx === -1) return score
-                const at = v.position === 'before' ? targetIdx : targetIdx + 1
-                const movedData = renumberSystems([...without.slice(0, at), newSystemData as System, ...without.slice(at)])
+                const at = v.position === 'above' ? targetIdx : targetIdx + 1
+                const movedData = renumberSystems([
+                    ...without.slice(0, at),
+                    newSystemData as System,
+                    ...without.slice(at)
+                ])
                 updatePointers(movedData)
                 return { ...score, systems: movedData }
             }

@@ -23,7 +23,7 @@ const debugOn: Record<string, boolean | Record<string, boolean>> = {
     patternManager: false,
     PartIndicator: false,
     PlaybackButtons: false,
-    playbackReducer: true,
+    playbackReducer: false,
     PlaybackMenu: false,
     PlayerWindow: false,
     registerComponent: false,

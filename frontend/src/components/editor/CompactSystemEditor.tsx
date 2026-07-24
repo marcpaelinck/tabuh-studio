@@ -92,7 +92,7 @@ export function CompactSystemEditor({
     const [newPositions, setNewPositions] = useState<Position[]>([])
     // Open staff dialog: the New / Modify popup for the label menu of line `li`.
     const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
-    const [newPlacement, setNewPlacement] = useState<'before' | 'after'>('after')
+    const [newPlacement, setNewPlacement] = useState<'above' | 'below'>('below')
     // Per-line handle to the label-menu overlay, so a menu item can close its own menu.
     const menuRefs = useRef<Record<number, OverlayTriggerHandle | null>>({})
 
@@ -117,7 +117,7 @@ export function CompactSystemEditor({
     const closeStaffDialog = () => {
         setStaffDialog(null)
         setNewPositions([])
-        setNewPlacement('after')
+        setNewPlacement('below')
     }
 
     // The label menu: New… / Modify… / Delete for one line. New/Modify open a popup
@@ -231,9 +231,9 @@ export function CompactSystemEditor({
                                     <RadioGroup
                                         inline
                                         value={newPlacement}
-                                        onChange={(v) => setNewPlacement(v as 'before' | 'after')}>
-                                        <Radio value="before">before</Radio>
-                                        <Radio value="after">after</Radio>
+                                        onChange={(v) => setNewPlacement(v as 'above' | 'below')}>
+                                        <Radio value="above">above</Radio>
+                                        <Radio value="below">below</Radio>
                                     </RadioGroup>
                                 </div>
                             )}
@@ -280,7 +280,7 @@ export function CompactSystemEditor({
                                 disabled={newPositions.length === 0}
                                 onClick={() => {
                                     addLine(
-                                        lines.length === 0 ? 0 : newPlacement === 'before' ? li : li + 1,
+                                        lines.length === 0 ? 0 : newPlacement === 'above' ? li : li + 1,
                                         newPositions
                                     )
                                     closeStaffDialog()

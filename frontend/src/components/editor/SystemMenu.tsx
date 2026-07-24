@@ -14,10 +14,9 @@ import { useEffect, useState } from 'react'
 import { FaBars } from 'react-icons/fa6'
 import { Button, Dropdown, IconButton, Modal, Radio, RadioGroup, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
-import type { CopyMode, System, SystemActionValue } from '../../typing/score'
+import type { CopyMode, ItemPosition, System, SystemActionValue } from '../../typing/score'
 
 type DialogKind = 'new' | 'copy' | 'move' | 'delete'
-type Position = 'before' | 'after'
 
 interface SystemMenuProps {
     systemData: System
@@ -38,13 +37,13 @@ const copyModeOptions: { value: CopyMode; label: string; hint: string }[] = [
     { value: 'positions', label: 'positions', hint: 'position groups and staffs, notation cleared' }
 ]
 
-function PositionField({ value, onChange }: { value: Position; onChange: (p: Position) => void }) {
+function PositionField({ value, onChange }: { value: ItemPosition; onChange: (p: ItemPosition) => void }) {
     return (
         <div>
             <div className="text-xs mb-1">Position</div>
-            <RadioGroup inline value={value} onChange={(v) => onChange(v as Position)}>
-                <Radio value="before">before</Radio>
-                <Radio value="after">after</Radio>
+            <RadioGroup inline value={value} onChange={(v) => onChange(v as ItemPosition)}>
+                <Radio value="above">above</Radio>
+                <Radio value="below">below</Radio>
             </RadioGroup>
         </div>
     )
@@ -59,7 +58,7 @@ export function SystemMenu({
     disabled
 }: SystemMenuProps) {
     const [dialog, setDialog] = useState<DialogKind | null>(null)
-    const [position, setPosition] = useState<Position>('after')
+    const [position, setPosition] = useState<ItemPosition>('below')
     const [copySource, setCopySource] = useState<UUID | null>(null)
     const [copyMode, setCopyMode] = useState<CopyMode>('entire')
     const [moveTarget, setMoveTarget] = useState<UUID | null>(null)
@@ -67,7 +66,7 @@ export function SystemMenu({
     // Reset the form each time a dialog opens.
     useEffect(() => {
         if (!dialog) return
-        setPosition('after')
+        setPosition('below')
         setCopySource(null)
         setCopyMode('entire')
         setMoveTarget(null)
