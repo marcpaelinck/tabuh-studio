@@ -1,7 +1,7 @@
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import _ from 'lodash'
-import { useRef, type Dispatch, type ReactNode, type SyntheticEvent } from 'react'
+import { type Dispatch, type ReactNode, type Ref, type SyntheticEvent } from 'react'
 import {
     ArrayType,
     BooleanType,
@@ -193,6 +193,13 @@ export const formModel = SchemaModel({
         .when(If({ conditions: ['iteration'] }, 'notEmpty', ArrayType)),
     conditions: ArrayType().of(StringType().isOneOf(['pass', 'nthpass', 'iteration']))
 })
+
+// True when `value` passes the schema (no field reports an error). `check` expects
+// every schema key present, so merge onto a complete blank form first.
+export function isFormValid(value: FormValueType): boolean {
+    const checkResult = formModel.check(Object.assign({ ...emptyForm }, value) as any)
+    return !_.values(checkResult).some((val: any) => val.hasError)
+}
 
 // Empty form used to fill in missing keys before a validity check.
 const emptyForm = {
@@ -774,6 +781,9 @@ interface ExecutionItemFormProps extends Omit<FieldsProps, 'onPatch'> {
     setDirty: Dispatch<boolean>
     setFormValue: Dispatch<FormValueType>
     model: typeof formModel
+    // Ref to the underlying rsuite <Form>; lets the parent call `check()` to paint
+    // the per-field error labels when the user tries to leave an invalid form.
+    formRef?: Ref<any>
 }
 
 export default function ExecutionItemForm({
@@ -785,21 +795,13 @@ export default function ExecutionItemForm({
     setDirty,
     setFormValue,
     loop,
-    model
+    model,
+    formRef
 }: ExecutionItemFormProps) {
-    const formRef = useRef<any>(null)
-
-    function isValid(value: FormValueType) {
-        // `check` expects every schema key present; merge onto a complete blank
-        // form. Cast because the merged type has optional keys.
-        const checkResult = formModel.check(Object.assign({ ...emptyForm }, value) as any)
-        return !_.values(checkResult).some((val: any) => val.hasError)
-    }
-
     function setValueChanged(value: Record<string, any>, _event: SyntheticEvent<Element, Event> | undefined) {
         const newValue = value as FormValueType
         setFormValue(newValue)
-        if (isValid(newValue)) setDirty(true)
+        if (isFormValid(newValue)) setDirty(true)
     }
 
     // Lets custom widgets (e.g. the sequence editor) update the form value the

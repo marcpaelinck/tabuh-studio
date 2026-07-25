@@ -1,6 +1,6 @@
 import MinusIcon from '@rsuite/icons/Minus'
 import PlusIcon from '@rsuite/icons/Plus'
-import { useEffect, useState, type Dispatch } from 'react'
+import { useEffect, useRef, useState, type Dispatch } from 'react'
 import type { FormProps } from 'rsuite'
 import { Button, Divider, Drawer, IconButton, List, SelectPicker } from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
@@ -13,6 +13,7 @@ import ExecutionItemForm, {
     executionItemRegistry,
     executionTypeOptions,
     formModel,
+    isFormValid,
     positionOptionsForSystem,
     type ExecutionItemDraft,
     type FlowConditionType,
@@ -32,6 +33,8 @@ interface FlowElementListProps {
     setItemList: Dispatch<ExecutionItemDraft[]>
     selectedElement: number | undefined
     setSelectedElement: Dispatch<number | undefined>
+    // Returns true (and surfaces the errors) if the active item's form is invalid.
+    isBlocked: () => boolean
 }
 
 // Editable list of execution items.
@@ -39,6 +42,7 @@ const FlowElementList = ({
     label,
     itemList,
     selectedElement,
+    isBlocked,
     setSelectedElement,
     setItemList
 }: FlowElementListProps) => {
@@ -47,7 +51,13 @@ const FlowElementList = ({
         if (itemList && itemList.length > 0) setSelectedElement(0)
     }, [])
 
+    function handleSelectListItem(idx: number) {
+        if (isBlocked()) return
+        setSelectedElement(idx)
+    }
+
     function handleAdd() {
+        if (isBlocked()) return
         const newItemList = [...itemList, newPlaceholder(itemList.length)]
         setItemList(newItemList)
         setSelectedElement(itemList.length)
@@ -80,7 +90,7 @@ const FlowElementList = ({
                                     'h-9 pt-0 pb-0 items-center flex ' +
                                     (idx == selectedElement ? 'font-bold bg-amber-100' : '')
                                 }>
-                                <div onClick={() => setSelectedElement(idx)}>
+                                <div onClick={() => handleSelectListItem(idx)}>
                                     {val.type && cutoff(val.tooltip, 45)}
                                     {!val.type && (
                                         <SelectPicker
@@ -206,7 +216,24 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         }
     }, [dirtyForm])
 
+    const itemFormRef = useRef<any>(null)
+
+    // True when the active item's form is invalid. Also paints the per-field error
+    // labels (via the Form's imperative check()) and shows the explanatory dialog,
+    // so the user sees WHY they cannot leave the item. Shared by the list navigation,
+    // the add button and the Confirm button.
+    function activeFormBlocks(): boolean {
+        const active = selectedListElement != undefined ? itemList[selectedListElement] : undefined
+        if (active?.type && !isFormValid(formValue)) {
+            itemFormRef.current?.check()
+            return true
+        }
+        return false
+    }
+
     function handleSave() {
+        // Don't close while the active item's form has validation errors.
+        if (activeFormBlocks()) return
         const validated = itemList.filter((item) => item.type != undefined) as ExecutionItem[]
         systemData.execution = validated
         onSave()
@@ -229,11 +256,13 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
                     label="Execution instructions"
                     itemList={itemList}
                     selectedElement={selectedListElement}
+                    isBlocked={activeFormBlocks}
                     setSelectedElement={setSelectedListElement}
                     setItemList={setItemList}
                 />
                 <Divider color="#000" size="xs" spacing="lg" />
                 <ExecutionItemForm
+                    formRef={itemFormRef}
                     model={formModel}
                     formValue={formValue}
                     type={selectedListElement != undefined ? itemList[selectedListElement].type : undefined}
