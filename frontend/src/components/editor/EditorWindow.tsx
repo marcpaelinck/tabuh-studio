@@ -26,7 +26,6 @@ interface EditorWindowProps {
     visible: boolean
     loading: boolean
     score: Score
-    // labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>

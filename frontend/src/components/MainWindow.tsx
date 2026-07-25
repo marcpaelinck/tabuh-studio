@@ -242,7 +242,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const {
         score,
         validation,
-        labels,
         localCacheState,
         updateSystem,
         updateParts,
@@ -397,7 +396,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={mainView == 'editor'}
             loading={isLoadingScore}
             score={score}
-            labels={labels}
             updateParts={updateParts}
             executeItemAction={executeItemAction}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}

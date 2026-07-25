@@ -384,7 +384,6 @@ export function useScoreManager() {
     return {
         score,
         validation,
-        labels: labelDict,
         localCacheState,
         getScore,
         updateScore,
