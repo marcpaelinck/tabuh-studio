@@ -53,16 +53,7 @@ interface SummaryItemProps extends HTMLAttributes<HTMLDivElement> {
 // Depending on the value of the `action` property, the button's action will optionally collect information
 // from the user (e.g. new field value or label name of the system to copy)
 // and will then perform the `execute` function.
-export function SummaryItem({
-    item,
-    sysData,
-    score,
-    labels,
-    execute,
-    options,
-    disabled,
-    ...props
-}: SummaryItemProps) {
+export function SummaryItem({ item, sysData, score, labels, execute, options, disabled, ...props }: SummaryItemProps) {
     // Specifications of the display mode and functionality of each SummaryItem type.
     // See below for a detailed description of the properties of this interface.
     type ActionType = 'fieldeditor' | 'execute' | 'none'
@@ -127,7 +118,7 @@ export function SummaryItem({
             formtitle: `system # ${sysData.id}`,
             fieldval: sysData.execution?.map((item) => item.tooltipshort).join(' | ') || '',
             textcolor: 'green',
-            buttonTooltip: 'Playing sequence, tempo & dynamics.',
+            buttonTooltip: 'Execution items (playing sequence, tempo & dynamics).',
             fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
         },
         kempli: {

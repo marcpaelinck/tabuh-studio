@@ -20,6 +20,7 @@ import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEd
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
 import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
+import { getPositionGroups } from '../../config/position-functions'
 import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
@@ -32,13 +33,14 @@ import type {
     PlaybackType
 } from '../../typing/playback'
 import type { Score, System, SystemActionValue } from '../../typing/score'
+import { compactGroupLabel } from '../../utils/compactGroupLabel'
 import { debug } from '../../utils/debugger'
 import { createGridStyle, gridColorsCompact, gridColorsExpanded } from '../../utils/editor'
 import { CompactSystemEditor } from './CompactSystemEditor'
 import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
-import { SystemMenu } from './SystemMenu'
+import { SystemMenu, type SystemGroupTag } from './SystemMenu'
 import { SystemNotationViewer } from './SystemNotationViewer'
 
 interface EditorSystemProps extends TextareaProps {
@@ -48,7 +50,7 @@ interface EditorSystemProps extends TextareaProps {
     playbackType: PlaybackType
     cursorStyleRef: RefObject<PlaybackCursorStyle>
     scoreRef: RefObject<Score>
-    labels: Record<string, System>
+    labelDict: Record<string, System>
     gotoTargets: Set<UUID>
     playback: ActionDispatch<[action: PlaybackAction]>
     executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
@@ -67,7 +69,7 @@ export const SystemNode = memo(function SystemNode({
     playbackType,
     cursorStyleRef,
     scoreRef,
-    labels,
+    labelDict,
     gotoTargets,
     playback,
     executeItemAction,
@@ -80,6 +82,7 @@ export const SystemNode = memo(function SystemNode({
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
     const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
     const beatPosition = useScoreStore((state) => state.beatPosition)
+    const orchestra = useScoreStore((state) => state.orchestra)
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
     const expandedNotationRef = useRef<HTMLDivElement>(null)
@@ -171,14 +174,14 @@ export const SystemNode = memo(function SystemNode({
                 />
             </SCol>
         )
-    }, [systemData, playbackCursor, audioState, playbackType])
+    }, [systemData, playbackCursor, audioState, playbackType, labelDict])
 
     // Create entries for the system selectors in the SummaryItem InputPickers (dropdown menus)
     // This is a list of systems identified by their label if any, otherwise by their id.
     function systemSelectorOptions(self: System, includeSelf: boolean, includeNone: boolean) {
         if (!scoreRef.current) return []
         // List of labelled systems
-        const labelOptions: InputOption<string>[] = Object.entries(labels).map(([label, sysData]) => ({
+        const labelOptions: InputOption<string>[] = Object.entries(labelDict).map(([label, sysData]) => ({
             label: label,
             value: sysData.uuid
         }))
@@ -202,6 +205,16 @@ export const SystemNode = memo(function SystemNode({
         return options
     }
 
+    // Resolves a system's notation groups into copy-dialog tags (compact label + positions).
+    const sourceGroupTags = (uuid: UUID): SystemGroupTag[] => {
+        const groups = scoreRef.current?.systems.find((sys) => sys.uuid === uuid)?.groups ?? []
+        return groups.map((g) => ({
+            id: g.id,
+            label: compactGroupLabel(g.positions, getPositionGroups(orchestra)).label,
+            positions: g.positions
+        }))
+    }
+
     // Hamburger menu (new / copy / move / delete). Placed at the far left of the header.
     const systemMenu: ReactElement = useMemo(
         () => (
@@ -211,12 +224,13 @@ export const SystemNode = memo(function SystemNode({
                     isGotoTarget={gotoTargets.has(systemData.uuid)}
                     copyOptions={systemSelectorOptions(systemData, true, false) as InputOption<string>[]}
                     moveOptions={systemSelectorOptions(systemData, false, false) as InputOption<string>[]}
+                    sourceGroupTags={sourceGroupTags}
                     onAction={(fieldname, value) => executeItemAction(fieldname, systemData, value)}
                     disabled={headerDisabled}
                 />
             </SCol>
         ),
-        [systemData, headerDisabled, gotoTargets, labels]
+        [systemData, headerDisabled, gotoTargets, labelDict, orchestra]
     )
 
     const systemHeaderFields: ReactElement | undefined = useMemo(() => {
@@ -231,7 +245,7 @@ export const SystemNode = memo(function SystemNode({
                 <SCol span={4}>
                     <SummaryItem
                         item="label"
-                        labels={labels}
+                        labels={labelDict}
                         sysData={systemData}
                         execute={execute}
                         disabled={headerDisabled}
@@ -261,7 +275,7 @@ export const SystemNode = memo(function SystemNode({
                 </SCol>
             </>
         )
-    }, [systemData, headerDisabled])
+    }, [systemData, headerDisabled, labelDict])
 
     // Generate the content in a fixed sorting order.
     const sortedStaffEntries = _.entries(systemData.staffs).sort(

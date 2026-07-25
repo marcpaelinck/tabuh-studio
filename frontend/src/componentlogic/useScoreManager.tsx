@@ -48,11 +48,10 @@ function gotoItemTargetName(destination: System) {
 }
 
 export function useScoreManager() {
-    const score = useScoreStore((state) => state.currentScore)
     const beatPosition = useScoreStore((state) => state.beatPosition)
-    const setScore = useScoreStore((state) => state.setCurrentScore)
+    const { currentScore: score, setCurrentScore: setScore } = useScoreStore()
     const updateCurrentScore = useScoreStore((state) => state.updateCurrentScore)
-    const [labels, setLabels] = useState<Record<string, System>>({})
+    const { labelDict, setLabelDict } = useScoreStore()
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
     const [localCacheState, setLocalCacheState] = useState<LocalCacheInfo>({ level: 'info', message: '' })
@@ -65,7 +64,6 @@ export function useScoreManager() {
         },
         []
     )
-
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
         setScore(score)
@@ -74,7 +72,7 @@ export function useScoreManager() {
         )
         setValidation(cycleValidation(score))
 
-        setLabels(labeldict)
+        setLabelDict(labeldict)
     }
 
     useEffect(() => {
@@ -115,6 +113,10 @@ export function useScoreManager() {
             systemData.id = systemData.index + 1
             if (systemData.execution) executionitems.push(...systemData.execution)
         })
+
+        // Set the labels state
+        const scoreLabels = _.fromPairs(score.systems.filter((sys) => sys.label).map((sys) => [sys.label, sys]))
+        setLabelDict(scoreLabels)
 
         // Store the score object in the browser's IDB Database, for recovery purposes.
         // Writing the whole score is expensive, so it is debounced: rapid score
@@ -237,12 +239,12 @@ export function useScoreManager() {
                     // New label: add it to the list
                     // First remove any existing label for the current system
                     // Also avoid duplication of the new label to be sure (should not be necessary).
-                    var newLabels = _.omitBy(labels, (value) => value.uuid == systemData.uuid)
+                    var newLabels = _.omitBy(labelDict, (value) => value.uuid == systemData.uuid)
                     newLabels = _.omit(newLabels, value)
                     // Add the label
                     newSystemData.label = value
                     newLabels[value] = newSystemData
-                    setLabels(newLabels)
+                    setLabelDict(newLabels)
                 }
                 break
             case 'new': {
@@ -265,12 +267,15 @@ export function useScoreManager() {
                 newSystemData = _.cloneDeep(source) // carries kempli, groups, staffs, etc.
                 newSystemData.uuid = uuidv4()
                 newSystemData.label = undefined
-                // 'staffs' and 'positions' do not carry the execution items.
-                if (mode !== 'entire') newSystemData.execution = undefined
-                // 'positions' keeps the position groups but clears their notation; the staffs
-                // are then re-derived (empty) from the emptied groups.
-                if (mode === 'positions') {
-                    newSystemData.groups = newSystemData.groups.map((g) => ({ ...g, notation: [] }))
+                // 'staffs' does not carry the execution items.
+                if (mode === 'staffs') newSystemData.execution = undefined
+                // Clear the notation of the groups whose positions were deselected in the copy
+                // dialog, then re-derive the (now partly empty) staffs from the groups.
+                if (v?.omitPositions?.length) {
+                    const omit = new Set(v.omitPositions)
+                    newSystemData.groups = newSystemData.groups.map((g) =>
+                        g.positions.some((p) => omit.has(p)) ? { ...g, notation: [] } : g
+                    )
                     expandSystem(newSystemData, beatPosition)
                 }
                 const at = v?.position === 'above' ? systemData.index : systemData.index + 1
@@ -301,9 +306,9 @@ export function useScoreManager() {
                 break
             case 'delete':
                 if (newSystemData.label) {
-                    newLabels = { ...labels }
-                    delete labels[newSystemData.label]
-                    setLabels(newLabels)
+                    newLabels = { ...labelDict }
+                    delete labelDict[newSystemData.label]
+                    setLabelDict(newLabels)
                 }
                 newSystemData = null
                 break
@@ -351,7 +356,7 @@ export function useScoreManager() {
         },
         // Depends only on `labels` (used by updateScoreFromItemAction); the score is
         // read via the functional setScore above, so editing does not change identity.
-        [labels]
+        [labelDict]
     )
 
     // Creates a brand-new, empty 'current' score: one empty system seeded with the shared
@@ -379,7 +384,7 @@ export function useScoreManager() {
     return {
         score,
         validation,
-        labels,
+        labels: labelDict,
         localCacheState,
         getScore,
         updateScore,

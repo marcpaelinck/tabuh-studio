@@ -4,6 +4,7 @@ import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
+import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore, type EditorView } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
@@ -25,7 +26,7 @@ interface EditorWindowProps {
     visible: boolean
     loading: boolean
     score: Score
-    labels: Record<string, System>
+    // labels: Record<string, System>
     updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
@@ -38,7 +39,6 @@ export default function EditorWindow({
     visible,
     loading,
     score,
-    labels,
     updateParts,
     executeItemAction,
     updatePlaybackFunctions,
@@ -53,9 +53,10 @@ export default function EditorWindow({
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
-    const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
-    const editorView = useUserSelectionStore((state) => state.editorView)
-    const { setEditorView } = useUserSelectionStore()
+    // const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
+    // const editorView = useUserSelectionStore((state) => state.editorView)
+    const { selectedCursorStyle, editorView, setEditorView } = useUserSelectionStore()
+    const { labelDict } = useScoreStore()
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -184,7 +185,7 @@ export default function EditorWindow({
                                 audioState={playbackState.audioState}
                                 cursorStyleRef={cursorStyleRef}
                                 scoreRef={scoreRef}
-                                labels={labels}
+                                labelDict={labelDict}
                                 playback={playback}
                                 executeItemAction={executeItemAction}
                                 updateCursorFunction={updateCursorFunction}

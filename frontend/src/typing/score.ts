@@ -92,7 +92,7 @@ export interface ValidationResult {
 }
 
 // How a system copy is scoped (see the system hamburger menu / updateScoreFromItemAction).
-export type CopyMode = 'entire' | 'staffs' | 'positions'
+export type CopyMode = 'entire' | 'staffs'
 
 export type ItemPosition = 'above' | 'below'
 
@@ -107,4 +107,6 @@ export interface SystemActionValue {
     targetUuid?: UUID
     /** What to copy (copy). */
     mode?: CopyMode
+    /** Copy: positions whose group notation should be cleared (deselected in the copy dialog). */
+    omitPositions?: Position[]
 }
