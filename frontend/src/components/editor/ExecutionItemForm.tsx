@@ -1,7 +1,7 @@
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import _ from 'lodash'
-import { type Dispatch, type ReactNode, type Ref, type SyntheticEvent } from 'react'
+import { createContext, useContext, useMemo, type Dispatch, type ReactNode, type Ref, type SyntheticEvent } from 'react'
 import {
     ArrayType,
     BooleanType,
@@ -226,6 +226,42 @@ const emptyForm = {
 }
 
 // ---------------------------------------------------------------------------
+// Required-field marking
+//
+// Requirements are conditional (`.when()`), so there is no static "required" flag:
+// a field is required *right now* iff blanking it makes the schema report an error.
+// `checkForField` evaluates one field against the full form value, so the `.when()`
+// conditions resolve correctly. The set is provided through context so each field
+// label can render a red asterisk without prop-drilling.
+// ---------------------------------------------------------------------------
+
+const EDITABLE_FIELD_NAMES = Object.keys(emptyForm).filter((name) => name !== 'type')
+
+function requiredFieldNames(value: FormValueType): Set<string> {
+    const base = { ...emptyForm, ...value }
+    const required = new Set<string>()
+    for (const name of EDITABLE_FIELD_NAMES) {
+        const probe = { ...base, [name]: undefined }
+        // Don't add isGradual: this value is set with a toggle which will always yield a value.
+        if (name != 'isGradual' && formModel.checkForField(name as any, probe as any).hasError) required.add(name)
+    }
+    return required
+}
+
+const RequiredFieldsContext = createContext<Set<string>>(new Set())
+
+// A Form.Label that appends a red asterisk when the field is currently required.
+function FieldLabel({ name, label, className }: { name: string; label?: string; className?: string }) {
+    const required = useContext(RequiredFieldsContext).has(name)
+    return (
+        <Form.Label className={className}>
+            {label}
+            {required && <span className="text-red-500"> *</span>}
+        </Form.Label>
+    )
+}
+
+// ---------------------------------------------------------------------------
 // Generic field components (reused by the per-type Fields)
 // ---------------------------------------------------------------------------
 
@@ -262,7 +298,7 @@ const PickerField = ({
     searchable
 }: PickerFieldProps) => (
     <Form.Group className="items-start h-8" controlId={name}>
-        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <FieldLabel name={name} label={label} className="w-40 h-2 pt-[0.5rem]" />
         <Form.Control
             name={name}
             accepter={accepter || InputPicker}
@@ -286,14 +322,14 @@ interface InputFieldProps {
 }
 const InputField = ({ label, name, placeholder, disabled }: InputFieldProps) => (
     <Form.Group className="items-start h-8" controlId={name}>
-        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <FieldLabel name={name} label={label} className="w-40 h-2 pt-[0.5rem]" />
         <Form.Control name={name} placeholder={placeholder} disabled={disabled} className="w-60" />
     </Form.Group>
 )
 
 const ToggleField = ({ label, name, disabled }: { label?: string; name: string; disabled: boolean }) => (
     <Form.Group className="items-start h-8" controlId={name}>
-        <Form.Label className="w-40 h-2 pt-[0.5rem]">{label}</Form.Label>
+        <FieldLabel name={name} label={label} className="w-40 h-2 pt-[0.5rem]" />
         <Form.Control accepter={Toggle} name={name} disabled={disabled} className="w-60" />
     </Form.Group>
 )
@@ -322,7 +358,7 @@ const RangeField = ({
 }: RangeFieldProps) => (
     <Form.Stack layout="inline">
         <Form.Group className="items-start h-8" controlId={names[0]}>
-            <Form.Label className="w-40 h-2 pt-[0.5rem]">{labels[0]}</Form.Label>
+            <FieldLabel name={names[0]} label={labels[0]} className="w-40 h-2 pt-[0.5rem]" />
             <Form.Control
                 name={names[0]}
                 disabled={disabled}
@@ -336,7 +372,7 @@ const RangeField = ({
             />
         </Form.Group>
         <Form.Group className="items-start h-8" controlId={names[1]}>
-            <Form.Label className="w-5 h-2 pt-[0.5rem]">{labels[1]}</Form.Label>
+            <FieldLabel name={names[1]} label={labels[1]} className="w-5 h-2 pt-[0.5rem]" />
             <Form.Control
                 name={names[1]}
                 disabled={disabled}
@@ -442,7 +478,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
         type: 'tempo',
         label: 'tempo',
         hasIterations: true,
-        createDefault: () => ({ ...draftBase('tempo'), isGradual: false }),
+        createDefault: () => ({ ...draftBase('tempo'), isGradual: false, fromBeat: 1 }),
         toForm: (item) => {
             const t = item as TempoItem
             return {
@@ -489,7 +525,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
                             <RangeField
                                 labels={['From beat', 'to']}
                                 names={['fromBeat', 'toBeat']}
-                                placeholders={['1', '']}
+                                placeholders={['', '']}
                                 disabled={disabled}
                             />
                         </>
@@ -503,7 +539,7 @@ export const executionItemRegistry: Record<ExecutionItemType, ItemDescriptor> = 
         type: 'dynamics',
         label: 'dynamics',
         hasIterations: true,
-        createDefault: () => ({ ...draftBase('dynamics'), isGradual: false, positions: [] }),
+        createDefault: () => ({ ...draftBase('dynamics'), isGradual: false, fromBeat: 1, positions: [] }),
         toForm: (item) => {
             const d = item as DynamicsItem
             return {
@@ -808,20 +844,25 @@ export default function ExecutionItemForm({
     // same way an rsuite Form.Control change would.
     const onPatch = (patch: Partial<FormValueType>) => setValueChanged({ ...formValue, ...patch }, undefined)
 
+    // Which fields are currently required (given the rest of the form).
+    const requiredFields = useMemo(() => requiredFieldNames(formValue), [formValue])
+
     if (!type) return null
     const descriptor = executionItemRegistry[type]
     const fieldsProps: FieldsProps = { formValue, selectedElement, sysOptions, positionOptions, loop, onPatch }
 
     return (
-        <Form ref={formRef} model={model} onChange={setValueChanged} formValue={formValue}>
-            <Form.Stack layout="horizontal">
-                <Form.Group controlId="item-type">
-                    <Form.Label className="w-40">Type</Form.Label>
-                    <Form.Text className="w-120 font-bold text-base">{descriptor.label}</Form.Text>
-                </Form.Group>
-                {descriptor.Fields(fieldsProps)}
-                <ConditionForm type={type} hasIterations={descriptor.hasIterations} {...fieldsProps} />
-            </Form.Stack>
-        </Form>
+        <RequiredFieldsContext.Provider value={requiredFields}>
+            <Form ref={formRef} model={model} onChange={setValueChanged} formValue={formValue}>
+                <Form.Stack layout="horizontal">
+                    <Form.Group controlId="item-type">
+                        <Form.Label className="w-40">Type</Form.Label>
+                        <Form.Text className="w-120 font-bold text-base">{descriptor.label}</Form.Text>
+                    </Form.Group>
+                    {descriptor.Fields(fieldsProps)}
+                    <ConditionForm type={type} hasIterations={descriptor.hasIterations} {...fieldsProps} />
+                </Form.Stack>
+            </Form>
+        </RequiredFieldsContext.Provider>
     )
 }
