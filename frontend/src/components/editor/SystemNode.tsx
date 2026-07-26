@@ -18,7 +18,6 @@ import type { StyleProperties } from 'rsuite/esm/internals/types'
 import { compileKeyMap } from '../../componentlogic/editor/keyMap'
 import type { CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { useDebouncedCommit } from '../../componentlogic/editor/useDebouncedCommit'
-import type { EditorStaff } from '../../componentlogic/editor/useSystemEditor'
 import { expandSystem } from '../../componentlogic/expandNotation'
 import { getPositionGroups } from '../../config/position-functions'
 import { useKeyMapStore } from '../../stores/useKeyMapStore'
@@ -41,7 +40,7 @@ import type { SystemCursorFunction } from './EditorWindow'
 import { PlaybackButtons } from './PlaybackButtons'
 import { SCol, SummaryItem } from './SummaryItem'
 import { SystemMenu, type SystemGroupTag } from './SystemMenu'
-import { SystemNotationViewer } from './SystemNotationViewer'
+import { SystemNotationViewer, type EditorStaff } from './SystemNotationViewer'
 
 interface EditorSystemProps extends TextareaProps {
     systemData: System
@@ -355,9 +354,8 @@ export const SystemNode = memo(function SystemNode({
                             {/* The expanded view (separate staff for each position) - READ ONLY. */}
                             <SystemNotationViewer
                                 ref={expandedNotationRef}
-                                initialStaves={editorStaves}
+                                staves={editorStaves}
                                 notationWidth={notationWidth}
-                                readOnly
                                 className="leading-5.5 border-1 border-solid border-transparent p-0"
                             />
                         </Col>

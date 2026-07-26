@@ -1,7 +1,8 @@
 /**
- * useCompactSystemEditor — controller for the COMPACT (grouped/shorthand) editor.
+ * useCompactSystemEditor — the controller for the editor.
  *
- * This is the compact-view analogue of {@link useSystemEditor}. Its lines are
+ * The compact (grouped/shorthand) view is the single editable surface and the
+ * source of truth; the expanded per-position view is always read-only. Its lines are
  * notation GROUPS (each may stand for several instrument positions) rather than
  * individual staves. Each line's notation is a single FLAT array of symbols (like a
  * Staff); the cursor is two-dimensional: { line, index }.
