@@ -43,3 +43,48 @@ options:
 #### Additional remarks
 - Function `systemSelectorOptions` can be used to create a user-friendly list of all systems. The list displays system labels if available.
 - To execute the actions, use function `executeItemAction`. This is a property of `SystemNode` which points to function `updateScoreFromItemAction` of the `useScoreManager` hook. This hook will also take care of re-assigning the `id` and `index` properties of all systems after the update.
+
+## Implementation
+
+Two related menus were built: the **system hamburger menu** in the system header, and the **position label menu** in the compact editor. Both replace older inline button clusters and both rely on portaled overlays so they are never painted over by neighbouring systems.
+
+### System hamburger menu (`components/editor/SystemMenu.tsx`)
+
+`SystemMenu` renders an rsuite `Dropdown` whose toggle is a hamburger `IconButton` (`FaBars`). It exposes four items — **New…**, **Copy from…**, **Move…**, **Delete…** — each of which opens a small rsuite `Modal` (`size="xs"`) to collect its options and then dispatches the action through the `onAction(kind, value)` prop. The modal is deliberately nudged toward the left (`style={{ marginLeft: '6rem', marginRight: 'auto' }}`) so it appears near the menu and minimizes cursor travel.
+
+Props: `systemData`, `isGotoTarget`, `copyOptions`, `moveOptions`, `sourceGroupTags`, `onAction`, `disabled`.
+
+Per-dialog contents:
+
+- **New…** — a `PositionField` (above / below the current system).
+- **Copy from…** — a `SelectPicker` source (`copyOptions`, which includes "&lt;this system&gt;"); a `PositionField`; a **Toggle "Include execution items"** (`copyExecutionItems` state, mapped at dispatch to `mode: 'entire' | 'staffs'`); and a set of **per-group notation tags** derived from `sourceGroupTags(copySource)`. The tags carry a *Select all / Deselect all* toggle and per-group buttons (blue = kept, muted = omitted). Selection is tracked as the set of **deselected** ids (`deselectedGroupIds`), so a freshly picked source starts fully selected with no reset effect or flash. On confirm, the deselected groups' positions are collected into `omitPositions`.
+- **Move…** — a `PositionField` plus a `SelectPicker` target (`moveOptions`, which excludes the current system).
+- **Delete…** — a confirm dialog; blocked (`confirmDisabled`) when `isGotoTarget` is true.
+
+Wiring in `SystemNode`:
+
+- `copyOptions` / `moveOptions` come from `systemSelectorOptions(systemData, includeSelf, …)`.
+- `sourceGroupTags(uuid)` resolves a system's `groups` into `{ id, label, positions }`, where `label = compactGroupLabel(g.positions, getPositionGroups(orchestra)).label`.
+- `onAction` → `executeItemAction` → `updateScoreFromItemAction` (in `useScoreManager`). The manager renumbers `id`/`index` via `renumberSystems`, which returns **fresh objects** for renumbered systems so the memoized `SystemNode`s re-render (in-place mutation kept the same refs and the memo skipped the update). The copy branch clears the notation of the `omitPositions` groups and re-derives the staffs with `expandSystem`.
+
+The `disabled` prop must be applied to the `<Dropdown disabled>` itself (not only the `IconButton`), because the toggle is rendered `as="span"` and a span cannot be natively disabled — this is what deactivates the menu in the expanded editor view.
+
+`SystemActionValue` (in `typing/score.ts`) carries `position`, `sourceUuid`, `targetUuid`, `mode` (`CopyMode = 'entire' | 'staffs'`), and `omitPositions`.
+
+> Note: the original spec listed a third **`positions`** copy mode ("copy the groups/staffs but clear the notation"). It was superseded by the more flexible **per-group notation toggles** in the Copy dialog and the **Include execution items** toggle, and was removed.
+
+### Position label menu (`components/editor/CompactSystemEditor.tsx`)
+
+Each staff line's position label (e.g. `ga/ug`, `rey13`) is a click menu with three items: **Add…**, **Modify…**, and **Delete &lt;label&gt;**.
+
+It is rendered as an uncontrolled `Whisper trigger="click"` + `Popover` rather than an inline `Dropdown`. An inline dropdown is trapped inside this system's `relative z-10` StaffGrid stacking context and gets painted over by the next system's labels; the `Whisper`/`Popover` is **portaled to `<body>`** (z-index 1060) so it sits above every system. The `Whisper` is kept uncontrolled (no `open`/`onOpen`, which deadlocked); instead a `menuRefs` map of `OverlayTriggerHandle`s lets each item call `menuRefs.current[li].close()` before running its action.
+
+`onMouseDown` with `preventDefault` on the label wrapper stops the click from focusing the `tabIndex=0` StaffGrid container, which would otherwise move the edit cursor and shift the layout.
+
+Item behaviour:
+
+- **Add…** opens `renderStaffDialog` in `new` mode — a multi-staff picker with a positions list, a position-groups list, and a "New staffs" basket (dnd-kit reorderable), plus an above/below placement choice. On create it inserts each basket item as a new line.
+- **Modify…** opens the same dialog in `modify` mode to edit that line's positions (add/remove).
+- **Delete &lt;label&gt;** removes the line immediately (no confirmation), is disabled when only one line remains, and is shown in red otherwise.
+
+The empty-system "+ Add staff" button reuses the same `renderStaffDialog` (`new` mode) with no reference line, in which case the before/after choice is omitted.

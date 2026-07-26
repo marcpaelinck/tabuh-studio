@@ -126,3 +126,48 @@ The Drawer is non-modal (`backdrop={false}`, `enforceFocus={false}`) so the user
 3. Add any new type-specific fields to `FormValueType`, `formModel`, and `emptyForm`.
 4. Add a `case` to `executionItemTooltip` in `utils/executionItems.ts`.
 
+## Latest changes — leaving-an-invalid-form guard and required-field marks
+
+### Blocking exit from an invalid item
+
+The user must not be able to leave a half-filled / invalid `ExecutionItemForm` (which would silently drop or corrupt the edit). The validity check that previously lived inside `ExecutionItemForm` was lifted to an exported module-level helper so both files share exactly one definition:
+
+```ts
+export function isFormValid(value: FormValueType): boolean {
+    const checkResult = formModel.check(Object.assign({ ...emptyForm }, value) as any)
+    return !_.values(checkResult).some((val: any) => val.hasError)
+}
+```
+
+`ExecutionForm` guards every way of leaving the current item — the **Confirm** button (`handleSave`), the **add (`+`) button** and **selecting another list item** — through one function, `activeFormBlocks()`. When the active, typed item is invalid it:
+
+1. calls `itemFormRef.current?.check()` to paint the per-field error labels (see below),
+2. shows an explanatory alert via `useInvalidFormDialog()` (rsuite `useDialog().alert(...)`),
+3. returns `true`, so the caller aborts.
+
+The `active?.type` guard means an empty placeholder row (no type chosen yet) never blocks — those rows are filtered out on save anyway.
+
+### Surfacing the schema's error messages
+
+rsuite's `<Form>` exposes an imperative `check()` that validates the current `formValue` against the model and renders the inline error messages. To reach it from the parent, `ExecutionItemForm` now accepts an optional `formRef?: Ref<any>` prop and binds it to its `<Form ref={...}>`; `ExecutionForm` owns that ref (`itemFormRef`) and calls `check()` inside `activeFormBlocks()`. Because the form is controlled with the same `formValue` that `isFormValid` inspects, the boolean guard and the visible messages always agree.
+
+> Widgets rendered through `onPatch` rather than a `Form.Control` (currently `SequenceEditor` → `sequenceUuids`) are still validated by `isFormValid`, but they have no inline `Form.Control` message.
+
+### Required-field asterisks
+
+There is no static "required" flag to read off the schema, because requirements are **conditional** via `.when(If({ … }, 'isRequired', …))`. Instead a field is treated as *required right now* iff blanking it makes the schema report an error:
+
+```ts
+function requiredFieldNames(value: FormValueType): Set<string> {
+    const base = { ...emptyForm, ...value }
+    const required = new Set<string>()
+    for (const name of EDITABLE_FIELD_NAMES) {           // Object.keys(emptyForm) minus 'type'
+        const probe = { ...base, [name]: undefined }
+        if (formModel.checkForField(name, probe).hasError) required.add(name)
+    }
+    return required
+}
+```
+
+`checkForField` evaluates one field against the *full* form value, so the `.when()` conditions resolve correctly. The set is memoized on `formValue` and supplied through a `RequiredFieldsContext`. A small `FieldLabel` component (which replaced the raw `Form.Label` in `PickerField`, `InputField`, `ToggleField`, and both halves of `RangeField`) reads the context and appends a red asterisk. Because it is driven by `formValue`, the marks track the conditional rules automatically — e.g. `toBeat` is only marked once `isGradual` is on, and `passes` / `iterations` only once a matching condition is selected. No changes here are needed when a new field or `.when()` rule is added.
+

@@ -4,11 +4,11 @@ This document discusses the requirement for a PDF generator that creates a PDF d
 
 ## Context
 
-There is a need to generate a human-readable version of `Score` objects in PDF format. I have Python code available which performed this conversion. I would like you to generate the necessary TypeScript code to reproduce this functionality.
+I need the app to generate a human-readable version of `Score` objects in PDF format. I have a Python application which performs this conversion. I would like to to reproduce this functionality in TypeScript in Tabuh Studio.
 
-The Python code comes from a predecessor of Tabuh Studio called `gamelan-notation`. This application could be run locally on a computer and could convert `TS Script` notation files (the .tsv input that is used by the `tabuhParser` in Tabuh Studio) into several formats, including MIDI and PDF. The PDF export mainly kept the structure of the .tsv document.
+The Python code comes from a predecessor of Tabuh Studio called `gamelan-notation`. This application runs locally on a computer and can convert `TS Script` notation files (the .tsv input format that is used by the `tabuhParser` in Tabuh Studio) into several formats, including MIDI and PDF. The PDF export is essentially a formatted version of the `TS Script` format.
 
-I have added the following documents in the current folder.
+I added the following documents in the current `CLAUDE/PDF generator` folder.
 
 **score_to_pdf.py** and **formatting.py**: The main modules of the Python PDF generator.
 **Sinom_Ladrang_GK.tsv**, **Sinom_Ladrang_GK.json**, **Sinom_Ladrang_GK.txt**, **Sinom_Ladrang_GK.pdf** The same score in four different formats: 
@@ -19,12 +19,13 @@ I have added the following documents in the current folder.
 
 
 # Python code
-I have added two python modules in the CLAUDE folder: `score_to_pdf.py` and `formatting.py`
 
 ## score_to_pdf.py
-This is the main module of the PDF generator. It contains the definition of a PDFGeneratorAgent which subclasses the Agent class (explained below). This class' _main method is the entry point.
+
+This is the main module of the PDF generator. It contains the definition of a PDFGeneratorAgent which subclasses the Agent class (explained below). The _main method of this class is its entry point.
 
 ## formatting.py
+
 This module is used by the score_to_pdf.py module. It contains formatting settings and helper functions.
 
 ## Additional information
@@ -32,6 +33,7 @@ This module is used by the score_to_pdf.py module. It contains formatting settin
 This section contains information about classes and functions that are used in score_to_pdf.py and formatting.py
 
 ### Run Settings
+
 The following attributes of the RunSettings data class are being used
 
 **pdf_converter.notation_webpage**
