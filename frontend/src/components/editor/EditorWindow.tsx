@@ -59,8 +59,9 @@ export default function EditorWindow({
     const { labelDict } = useScoreStore()
     // Insert/overwrite typing mode (global editor state). Selector-scoped so the toolbar
     // doesn't re-render on unrelated editor-state changes (e.g. selection updates).
-    const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
-    const setOverwriteMode = useEditorStateStore((s) => s.setOverwriteMode)
+    const { overwriteMode, setOverwriteMode } = useEditorStateStore()
+    // Show/hide the read-only expanded-notation preview under the cursor line.
+    const { showExpansion, setShowExpansion } = useEditorStateStore()
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -231,6 +232,20 @@ export default function EditorWindow({
                                 />
                             </FeatureUnderDevelopment>
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
+                            {editorView === 'compact' && (
+                                <div
+                                    className="flex items-center gap-2"
+                                    title="Show/hide the expanded-notation preview under the cursor line">
+                                    <Text size="sm">Expand:</Text>
+                                    <Toggle
+                                        size="sm"
+                                        checked={showExpansion}
+                                        onChange={(checked) => setShowExpansion(checked)}
+                                        checkedChildren="ON"
+                                        unCheckedChildren="OFF"
+                                    />
+                                </div>
+                            )}
                             {editorView === 'compact' && (
                                 <div
                                     className="flex items-center gap-2"

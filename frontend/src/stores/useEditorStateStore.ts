@@ -68,6 +68,8 @@ const MAX_HISTORY = 200
 interface EditorStateStore {
     /** Insert (false, default) vs. overwrite (true) typing mode. Session-scoped. */
     overwriteMode: boolean
+    /** Show the read-only expanded-notation preview under the cursor line (default true). */
+    showExpansion: boolean
     /** Last internally copied/cut notation, as text (also mirrored to the OS clipboard). */
     clipboard: string | null
     /** Active selection, or null when nothing is selected. */
@@ -79,6 +81,7 @@ interface EditorStateStore {
 
     toggleOverwrite: () => void
     setOverwriteMode: (on: boolean) => void
+    setShowExpansion: (on: boolean) => void
     setClipboard: (text: string | null) => void
     setSelection: (selection: EditorSelection | null) => void
 
@@ -92,6 +95,7 @@ interface EditorStateStore {
 
 export const useEditorStateStore: UseBoundStore<StoreApi<EditorStateStore>> = create((set, get) => ({
     overwriteMode: false,
+    showExpansion: true,
     clipboard: null,
     selection: null,
     undoStack: [],
@@ -99,6 +103,7 @@ export const useEditorStateStore: UseBoundStore<StoreApi<EditorStateStore>> = cr
 
     toggleOverwrite: () => set((s) => ({ overwriteMode: !s.overwriteMode })),
     setOverwriteMode: (on) => set({ overwriteMode: on }),
+    setShowExpansion: (on) => set({ showExpansion: on }),
     setClipboard: (text) => set({ clipboard: text }),
     setSelection: (selection) => set({ selection }),
 

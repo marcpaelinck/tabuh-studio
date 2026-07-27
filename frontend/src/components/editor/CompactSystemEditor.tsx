@@ -136,6 +136,7 @@ export function CompactSystemEditor({
         removePosition
     } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor })
     const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
+    const showExpansion = useEditorStateStore((s) => s.showExpansion)
     // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     // const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
@@ -459,8 +460,9 @@ export function CompactSystemEditor({
             isActive && anchor !== null && anchor !== cursor.index
                 ? { from: Math.min(anchor, cursor.index), to: Math.max(anchor, cursor.index) }
                 : null
-        // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
-        const showSnippet = focused && !playing && cursor.line === li
+        // Read-only expanded snippet below the line that holds the cursor (hidden while
+        // playing, or when the expansion preview is toggled off).
+        const showSnippet = showExpansion && focused && !playing && cursor.line === li
 
         const labelEl = lineMenu(li, label, tooltip)
 
