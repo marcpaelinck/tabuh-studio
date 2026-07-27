@@ -84,7 +84,10 @@ selection abstraction that does not exist yet.** Building it is the first real t
 
 - Selection state = an `anchor` and `focus` symbol index within **one** stave/line.
 - Creation gestures: `Shift`+`ArrowLeft`/`ArrowRight` (extend), `Shift`+`Home`/`End`,
-  `Shift`+click, and `Ctrl/Cmd+A` (select the whole **current stave/line**).
+  `Shift`+click, **click-drag** (press, move with the button held, release), and
+  `Ctrl/Cmd+A` (select the whole **current stave/line**). The editable surface sets
+  `user-select: none` so the browser's own text selection does not fight the custom
+  highlight during a drag.
 - A visual highlight is rendered in `StaffGrid` (none exists today).
 - Moving the caret without `Shift` collapses the selection.
 

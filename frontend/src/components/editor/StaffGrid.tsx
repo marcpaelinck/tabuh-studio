@@ -23,8 +23,12 @@ export interface StaffGridRow {
     symbols: NoteObject[]
     /** Cursor index within this row, or null when the row is not active. */
     cursorIndex: number | null
-    onSymbolClick: (index: number) => void
-    onTrailingClick: () => void
+    /** Highlighted selection range [from, to) on this row, or null. */
+    selection?: { from: number; to: number } | null
+    /** Show the caret as a block over the symbol at the cursor (overwrite mode). */
+    overwrite?: boolean
+    onSymbolClick: (index: number, extend?: boolean) => void
+    onTrailingClick: (extend?: boolean) => void
     /** Optional block rendered below the row (e.g. the compact expansion snippet). */
     below?: ReactNode
 }
@@ -83,6 +87,10 @@ export function StaffGrid({
                 boxSizing: 'border-box',
                 background: 'transparent',
                 cursor: readOnly ? 'default' : 'text',
+                // Editable: suppress the browser's own text selection so it doesn't fight the
+                // custom notation highlight during a click-drag. Read-only stays selectable.
+                userSelect: readOnly ? undefined : 'none',
+                WebkitUserSelect: readOnly ? undefined : 'none',
                 ...style
             }}>
             <div className="relative">
@@ -105,6 +113,8 @@ export function StaffGrid({
                                 <StaffLine
                                     symbols={row.symbols}
                                     cursorIndex={row.cursorIndex}
+                                    selection={row.selection}
+                                    overwrite={row.overwrite}
                                     onSymbolClick={row.onSymbolClick}
                                     onTrailingClick={row.onTrailingClick}
                                 />

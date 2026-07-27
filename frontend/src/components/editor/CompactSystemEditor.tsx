@@ -30,6 +30,7 @@ import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { editorFontSize } from '../../config/config'
 import { getPositionGroups } from '../../config/position-functions'
+import { useEditorStateStore } from '../../stores/useEditorStateStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import type { Staffs } from '../../typing/score'
 import { compactGroupLabel } from '../../utils/compactGroupLabel'
@@ -38,6 +39,8 @@ import { StaffLine } from './StaffLine'
 
 export interface CompactSystemEditorProps {
     ref: RefObject<HTMLDivElement | null>
+    /** UUID of the system being edited (scopes the published selection). */
+    systemUuid: string
     initialLines: CompactLine[]
     /** Width of the notation (in number of notes) */
     notationWidth: number
@@ -101,6 +104,7 @@ function SortableStaffLabel({
 
 export function CompactSystemEditor({
     ref,
+    systemUuid,
     initialLines,
     notationWidth,
     kempliFrequency,
@@ -116,6 +120,7 @@ export function CompactSystemEditor({
     const {
         lines,
         cursor,
+        anchor,
         focused,
         onKeyDown,
         onPaste,
@@ -126,7 +131,8 @@ export function CompactSystemEditor({
         removeLine,
         addPosition,
         removePosition
-    } = useCompactSystemEditor({ initialLines, keyMap, castingInstructions, onChange })
+    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange })
+    const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
     // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     // const [maxCols, setMaxCols] = useState<number>(0)
     // Positions chosen for a NEW staff, before it is created (add above/below).
@@ -443,7 +449,13 @@ export function CompactSystemEditor({
 
     const rows: StaffGridRow[] = lines.map((line, li) => {
         const { label, tooltip } = compactGroupLabel(line.positions, getPositionGroups(orchestra))
-        const flatCursor = focused && cursor.line === li ? cursor.index : null
+        const isActive = focused && cursor.line === li
+        const flatCursor = isActive ? cursor.index : null
+        // Selection highlight on the active line (anchor + caret define the range).
+        const selection =
+            isActive && anchor !== null && anchor !== cursor.index
+                ? { from: Math.min(anchor, cursor.index), to: Math.max(anchor, cursor.index) }
+                : null
         // Read-only expanded snippet below the line that holds the cursor (hidden while playing).
         const showSnippet = focused && !playing && cursor.line === li
 
@@ -481,8 +493,10 @@ export function CompactSystemEditor({
             label: labelEl,
             symbols: line.notation,
             cursorIndex: flatCursor,
-            onSymbolClick: (index: number) => setCursor(li, index),
-            onTrailingClick: () => setCursor(li, line.notation.length),
+            selection,
+            overwrite: isActive && overwriteMode,
+            onSymbolClick: (index: number, extend?: boolean) => setCursor(li, index, extend),
+            onTrailingClick: (extend?: boolean) => setCursor(li, line.notation.length, extend),
             below
         }
     })

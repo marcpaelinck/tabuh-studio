@@ -334,6 +334,7 @@ export const SystemNode = memo(function SystemNode({
                             <CompactSystemEditor
                                 ref={compactNotationRef}
                                 key={`compact-${systemData.uuid}`}
+                                systemUuid={systemData.uuid}
                                 initialLines={compactLines}
                                 notationWidth={notationWidth}
                                 kempliFrequency={systemData.kempli.frequency}

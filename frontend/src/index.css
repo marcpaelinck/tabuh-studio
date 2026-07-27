@@ -154,6 +154,14 @@ body,
     background: black;
     animation: notation-cursor-blink 1s step-end infinite;
 }
+/* Selected notation symbols. */
+.notation-selected {
+    background: rgba(59, 130, 246, 0.35); /* blue-500 @ 35% */
+}
+/* Overwrite-mode caret: a block behind the symbol that will be replaced. */
+.notation-cursor-block {
+    background: rgba(0, 0, 0, 0.28);
+}
 .balifont14 {
     font-family: 'BaliMusic5';
     font-size: 14pt;

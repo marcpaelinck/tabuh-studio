@@ -182,6 +182,60 @@ export function applyString(state: EditorStaffState, str: string, position: Posi
     return [...str].reduce((s, ch) => typeChar(s, ch, position), state)
 }
 
+/**
+ * Overwrites the symbol AT the cursor with `built` and advances the cursor past it.
+ * When the cursor is at the end (nothing to overwrite) it inserts instead. Invalid
+ * input leaves the state unchanged. This is the overwrite-mode counterpart of
+ * {@link insertSymbol}.
+ */
+export function overwriteSymbol(state: EditorStaffState, raw: string, position: Position | undefined): EditorStaffState {
+    const built = tryBuild(raw, position)
+    if (!built) return state
+    const { symbols, cursorIndex } = state
+    if (cursorIndex >= symbols.length) {
+        return { symbols: [...symbols.slice(0, cursorIndex), built], cursorIndex: cursorIndex + 1 }
+    }
+    return {
+        symbols: [...symbols.slice(0, cursorIndex), built, ...symbols.slice(cursorIndex + 1)],
+        cursorIndex: cursorIndex + 1
+    }
+}
+
+/**
+ * Overwrite-mode counterpart of {@link typeChar}: a pitch character REPLACES the
+ * symbol at the cursor (rather than inserting); a grace prefix / octave / stroke
+ * modifier still attaches to the symbol on the left exactly as in insert mode.
+ */
+export function overwriteChar(state: EditorStaffState, char: string, position: Position | undefined): EditorStaffState {
+    if (char.length !== 1) return state
+    if (PITCH_CHARS.has(char)) return overwriteSymbol(state, char, position)
+    if (GRACE_NOTE_PREFIXES.has(char) || AFTER_MODIFIERS.has(char)) return setModifier(state, char, position)
+    return state
+}
+
+/**
+ * Overwrite-mode counterpart of {@link applyString}: a whole valid symbol replaces the
+ * symbol at the cursor; otherwise each character is routed through {@link overwriteChar}.
+ */
+export function overwriteString(state: EditorStaffState, str: string, position: Position | undefined): EditorStaffState {
+    if (!str) return state
+    const built = tryBuild(str, position)
+    if (built) return overwriteSymbol(state, str, position)
+    return [...str].reduce((s, ch) => overwriteChar(s, ch, position), state)
+}
+
+/**
+ * Removes the symbols in the range [from, to) (order-independent) and places the
+ * cursor at the range start. A no-op when the range is empty. Used to delete or
+ * replace a selection.
+ */
+export function deleteRange(state: EditorStaffState, from: number, to: number): EditorStaffState {
+    const a = clampCursor(state.symbols, Math.min(from, to))
+    const b = clampCursor(state.symbols, Math.max(from, to))
+    if (a === b) return state
+    return { symbols: [...state.symbols.slice(0, a), ...state.symbols.slice(b)], cursorIndex: a }
+}
+
 /** Removes the symbol to the LEFT of the cursor (Backspace). */
 export function deleteLeft(state: EditorStaffState): EditorStaffState {
     const { symbols, cursorIndex } = state
