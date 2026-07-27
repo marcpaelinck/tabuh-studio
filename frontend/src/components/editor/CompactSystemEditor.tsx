@@ -22,7 +22,7 @@ import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable 
 import { CSS } from '@dnd-kit/utilities'
 import type { Position, PositionGroup } from '@tabuhstudio/shared'
 import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
-import { useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Modal, Popover, Radio, RadioGroup, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
@@ -117,6 +117,9 @@ export function CompactSystemEditor({
     className,
     style
 }: CompactSystemEditorProps) {
+    // The focusable editor surface, so undo/redo can route focus back to this system.
+    const containerRef = useRef<HTMLDivElement>(null)
+    const focusEditor = useCallback(() => containerRef.current?.focus(), [])
     const {
         lines,
         cursor,
@@ -131,7 +134,7 @@ export function CompactSystemEditor({
         removeLine,
         addPosition,
         removePosition
-    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange })
+    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor })
     const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
     // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
     // const [maxCols, setMaxCols] = useState<number>(0)
@@ -507,6 +510,7 @@ export function CompactSystemEditor({
                 rows={rows}
                 grid={{ ref, left: '9rem', widthCh: notationWidth }}
                 rowWidthCh={notationWidth}
+                containerRef={containerRef}
                 onKeyDown={onKeyDown}
                 onPaste={onPaste}
                 onFocus={onFocus}

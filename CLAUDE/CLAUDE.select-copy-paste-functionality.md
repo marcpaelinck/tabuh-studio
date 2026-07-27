@@ -105,9 +105,11 @@ selection abstraction that does not exist yet.** Building it is the first real t
 
 ### Overwrite mode (new)
 
-- `Insert` toggles between **insert** (current, default) and **overwrite** mode; the
-  mode is a controller/store flag surfaced to the user via the cursor style (bar vs.
-  block/underline).
+- `Insert` toggles between **insert** (current, default) and **overwrite** mode; on
+  MacBooks (no `Insert` key) `Ctrl/Cmd`+`Shift`+`O` does the same, and a toolbar
+  **INS/OVR toggle** (in the editor's sticky top bar, compact view only) toggles and
+  shows the current mode. The flag lives in `useEditorStateStore`; the caret is drawn as
+  a block over the target symbol in overwrite mode.
 - In overwrite mode, typing a symbol **replaces** the symbol at the cursor and advances;
   at end-of-line it degrades to insert (nothing to overwrite).
 - Overwrite affects **single-symbol typing only**. Paste stays insert-only (except when

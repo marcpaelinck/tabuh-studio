@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
+import { useEditorStateStore } from '../stores/useEditorStateStore'
 import { useScoreStore } from '../stores/useScoreStore'
 import type { ExecutionItem } from '../typing/execution'
 import {
@@ -348,6 +349,11 @@ export function useScoreManager() {
     const executeItemAction = useCallback(
         (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => {
             debug(`processing ${fieldname}`)
+            // Structural changes to the system list invalidate the notation-edit history
+            // (Option A): drop it so undo never targets a moved/removed system.
+            if (['new', 'copy', 'move', 'delete'].includes(fieldname)) {
+                useEditorStateStore.getState().clearHistory()
+            }
             // Callback functions have to pass a function to state setters if they need to
             // access to the current value of that state.
             updateCurrentScore(

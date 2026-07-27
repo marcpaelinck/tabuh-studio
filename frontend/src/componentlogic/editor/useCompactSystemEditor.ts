@@ -27,9 +27,9 @@
 
 import type { Keystroke, NoteObject, Position } from '@tabuhstudio/shared'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import { useEditorStateStore } from '../../stores/useEditorStateStore'
+import { registerEditor, useEditorStateStore, type EditorRestorer } from '../../stores/useEditorStateStore'
 import { castGroupToSolo, type CastingInstruction } from '../castingRulesManager'
 import {
     applyString,
@@ -70,13 +70,15 @@ interface CompactEditorState {
 
 export interface UseCompactSystemEditorOptions {
     initialLines: CompactLine[]
-    /** UUID of the system this editor edits (used to scope the published selection). */
+    /** UUID of the system this editor edits (used to scope the selection + undo history). */
     systemUuid: string
     keyMap?: KeyMap
     /** System-wide casting context; used when splitting a position out of a group. */
     castingInstructions?: CastingInstruction[]
     /** Called with the updated lines whenever an edit changes the notation or structure. */
     onChange?: (lines: CompactLine[]) => void
+    /** Focuses this editor's DOM surface (used to route focus on undo/redo). */
+    focusEditor?: () => void
 }
 
 export interface CompactEditorController {
@@ -149,7 +151,8 @@ export function useCompactSystemEditor({
     systemUuid,
     keyMap = defaultKeyMap,
     castingInstructions,
-    onChange
+    onChange,
+    focusEditor
 }: UseCompactSystemEditorOptions): CompactEditorController {
     const [state, setState] = useState<CompactEditorState>(() => ({
         lines: initialLines,
@@ -159,18 +162,46 @@ export function useCompactSystemEditor({
     const [focused, setFocused] = useState(false)
     const setSelection = useEditorStateStore((s) => s.setSelection)
 
+    // Latest state, read synchronously by the undo/redo restorer (see registerEditor).
+    const stateRef = useRef(state)
+    stateRef.current = state
+
     // Publish the selection to the shared store (only the focused editor owns it), so
     // other components can read it. Editing authority stays in this controller.
     useEffect(() => {
         if (!focused) return
         const range = selectionRange(state)
         const line = state.lines[state.cursor.line]
-        setSelection(
-            range && line
-                ? { systemUuid, lineId: line.id, anchor: range[0], focus: range[1] }
-                : null
-        )
+        setSelection(range && line ? { systemUuid, lineId: line.id, anchor: range[0], focus: range[1] } : null)
     }, [state, focused, systemUuid, setSelection])
+
+    // Register this editor so the store can route undo/redo to it (by system uuid).
+    useEffect(() => {
+        const restorer: EditorRestorer = {
+            snapshot: (lineId) => {
+                const st = stateRef.current
+                const idx = st.lines.findIndex((l) => l.id === lineId)
+                if (idx < 0) return null
+                const cursor = st.cursor.line === idx ? st.cursor.index : st.lines[idx].notation.length
+                return { systemUuid, lineId, symbols: st.lines[idx].notation, cursor }
+            },
+            apply: (entry) => {
+                setState((st) => {
+                    const idx = st.lines.findIndex((l) => l.id === entry.lineId)
+                    if (idx < 0) return st
+                    const lines = st.lines.with(idx, { ...st.lines[idx], notation: entry.symbols })
+                    onChange?.(lines)
+                    return {
+                        lines,
+                        cursor: { line: idx, index: clampCursor(entry.symbols, entry.cursor) },
+                        anchor: null
+                    }
+                })
+                focusEditor?.()
+            }
+        }
+        return registerEditor(systemUuid, restorer)
+    }, [systemUuid, onChange, focusEditor])
 
     // Applies a pure single-line op to the active line and clears the selection anchor.
     // When `collapse` is true (the default, for text edits) any selection is deleted
@@ -194,12 +225,16 @@ export function useCompactSystemEditor({
             if (!notationChanged && !cursorChanged && !anchorChanged) return st
             let lines = st.lines
             if (notationChanged) {
+                // Snapshot the line BEFORE the edit for undo (dedup handles StrictMode).
+                useEditorStateStore
+                    .getState()
+                    .pushHistory({ systemUuid, lineId: line.id, symbols: line.notation, cursor: st.cursor.index })
                 lines = st.lines.with(st.cursor.line, { ...line, notation: result.symbols })
                 onChange?.(lines)
             }
             return { lines, cursor: { line: st.cursor.line, index: result.cursorIndex }, anchor: null }
         },
-        [onChange]
+        [onChange, systemUuid]
     )
 
     // Moves the caret. `extend` keeps/creates a selection anchor on the same line; a
@@ -243,8 +278,22 @@ export function useCompactSystemEditor({
         (e: KeyboardEvent<HTMLDivElement>) => {
             const ctrl = e.ctrlKey || e.metaKey
 
+            // Undo / redo, handled before everything else.
+            if (ctrl && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) {
+                e.preventDefault()
+                useEditorStateStore.getState().undo()
+                return
+            }
+            if (ctrl && (e.key === 'y' || e.key === 'Y' || ((e.key === 'z' || e.key === 'Z') && e.shiftKey))) {
+                e.preventDefault()
+                useEditorStateStore.getState().redo()
+                return
+            }
+
             // Mode + clipboard shortcuts, handled before the key map.
-            if (e.key === 'Insert') {
+            // Overwrite toggle: `Insert` (PC keyboards) or Ctrl/Cmd+Shift+O (works on
+            // MacBooks, which have no Insert key).
+            if (e.key === 'Insert' || (ctrl && e.shiftKey && (e.key === 'o' || e.key === 'O'))) {
                 e.preventDefault()
                 useEditorStateStore.getState().toggleOverwrite()
                 return
@@ -365,8 +414,12 @@ export function useCompactSystemEditor({
 
     // Insert a new staff seeded with `positions` and empty notation. The cursor moves
     // into the new line. (Columns are the user's to align; no auto-padding.)
+    // Structural edits clear the undo history (Option A, see CLAUDE.select-copy-paste-functionality.md): entries reference lines by id,
+    // and restructuring makes past snapshots ambiguous. Cleared outside the updater so it
+    // runs once (StrictMode double-invokes the updater).
     const addLine = useCallback(
-        (atIndex: number, positions: Position[]) =>
+        (atIndex: number, positions: Position[]) => {
+            useEditorStateStore.getState().clearHistory()
             setState((st) => {
                 if (positions.length === 0) return st
                 const newLine: CompactLine = { id: uuidv4(), positions: [...positions], notation: [] }
@@ -374,32 +427,41 @@ export function useCompactSystemEditor({
                 const lines = [...st.lines.slice(0, idx), newLine, ...st.lines.slice(idx)]
                 onChange?.(lines)
                 return { lines, cursor: { line: idx, index: 0 }, anchor: null }
-            }),
+            })
+        },
         [onChange]
     )
 
     const removeLine = useCallback(
-        (index: number) =>
+        (index: number) => {
+            useEditorStateStore.getState().clearHistory()
             setState((st) => {
                 if (index < 0 || index >= st.lines.length) return st
                 const lines = st.lines.filter((_, i) => i !== index)
                 onChange?.(lines)
                 if (lines.length === 0) return { lines, cursor: { line: 0, index: 0 }, anchor: null }
                 const line = Math.min(lines.length - 1, st.cursor.line > index ? st.cursor.line - 1 : st.cursor.line)
-                return { lines, cursor: { line, index: clampCursor(lines[line].notation, st.cursor.index) }, anchor: null }
-            }),
+                return {
+                    lines,
+                    cursor: { line, index: clampCursor(lines[line].notation, st.cursor.index) },
+                    anchor: null
+                }
+            })
+        },
         [onChange]
     )
 
     const addPosition = useCallback(
-        (lineIndex: number, position: Position) =>
+        (lineIndex: number, position: Position) => {
+            useEditorStateStore.getState().clearHistory()
             setState((st) => {
                 const line = st.lines[lineIndex]
                 if (!line || line.positions.includes(position)) return st
                 const lines = st.lines.with(lineIndex, { ...line, positions: [...line.positions, position] })
                 onChange?.(lines)
                 return { ...st, lines }
-            }),
+            })
+        },
         [onChange]
     )
 
@@ -407,7 +469,8 @@ export function useCompactSystemEditor({
     // carrying the cast notation it had (see castGroupToSolo). A group's last position
     // cannot be removed (remove the whole line instead) — the UI disables that case.
     const removePosition = useCallback(
-        (lineIndex: number, position: Position) =>
+        (lineIndex: number, position: Position) => {
+            useEditorStateStore.getState().clearHistory()
             setState((st) => {
                 const line = st.lines[lineIndex]
                 if (!line || !line.positions.includes(position) || line.positions.length <= 1) return st
@@ -417,7 +480,8 @@ export function useCompactSystemEditor({
                 const lines = [...st.lines.slice(0, lineIndex), reduced, solo, ...st.lines.slice(lineIndex + 1)]
                 onChange?.(lines)
                 return { ...st, lines, anchor: null }
-            }),
+            })
+        },
         [onChange, castingInstructions]
     )
 

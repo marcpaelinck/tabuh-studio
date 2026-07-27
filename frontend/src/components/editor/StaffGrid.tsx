@@ -44,6 +44,8 @@ export interface StaffGridProps {
     grid?: { ref?: RefObject<HTMLDivElement | null>; left: string; widthCh: number; style?: CSSProperties }
     /** Shared width (in columns) for each staff row, so rows line up. */
     rowWidthCh?: number
+    /** The focusable container element (so callers can move focus here, e.g. on undo). */
+    containerRef?: RefObject<HTMLDivElement | null>
     /** Read-only: no tab focus, default cursor, aria-readonly. */
     readOnly?: boolean
     onKeyDown?: (e: KeyboardEvent<HTMLDivElement>) => void
@@ -58,6 +60,7 @@ export function StaffGrid({
     rows,
     grid,
     rowWidthCh,
+    containerRef,
     readOnly,
     onKeyDown,
     onPaste,
@@ -71,6 +74,7 @@ export function StaffGrid({
     const notationFont = `balifontspaced${editorFontSize}`
     return (
         <div
+            ref={containerRef}
             tabIndex={readOnly ? -1 : 0}
             role="textbox"
             aria-multiline="true"

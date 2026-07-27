@@ -2,8 +2,9 @@ import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, useDialog, VStack } from 'rsuite'
+import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, Toggle, useDialog, VStack } from 'rsuite'
 import { usePartManager } from '../../componentlogic/usePartManager'
+import { useEditorStateStore } from '../../stores/useEditorStateStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore, type EditorView } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
@@ -56,6 +57,10 @@ export default function EditorWindow({
     // const editorView = useUserSelectionStore((state) => state.editorView)
     const { selectedCursorStyle, editorView, setEditorView } = useUserSelectionStore()
     const { labelDict } = useScoreStore()
+    // Insert/overwrite typing mode (global editor state). Selector-scoped so the toolbar
+    // doesn't re-render on unrelated editor-state changes (e.g. selection updates).
+    const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
+    const setOverwriteMode = useEditorStateStore((s) => s.setOverwriteMode)
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -226,6 +231,20 @@ export default function EditorWindow({
                                 />
                             </FeatureUnderDevelopment>
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
+                            {editorView === 'compact' && (
+                                <div
+                                    className="flex items-center gap-2"
+                                    title="Toggle insert / overwrite typing  (Insert, or Ctrl/⌘ + Shift + O)">
+                                    <Text size="sm">Typing:</Text>
+                                    <Toggle
+                                        size="sm"
+                                        checked={overwriteMode}
+                                        onChange={(checked) => setOverwriteMode(checked)}
+                                        checkedChildren="OVR"
+                                        unCheckedChildren="INS"
+                                    />
+                                </div>
+                            )}
                         </HStack>
                     </div>
                     {loading ? <Placeholder.Grid rows={12} columns={6} /> : <>{systems}</>}
