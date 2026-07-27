@@ -201,17 +201,12 @@ export function MainMenu({
             <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
                 <Nav.Item eventKey="keyboard-edit">Edit mappings...</Nav.Item>
                 <Nav.Item
-                    disabled
                     active={keyboard == 'regular'}
                     onSelect={() => setKeyboard('regular')}
                     eventKey="keyboard-regular">
                     Regular
                 </Nav.Item>
-                <Nav.Item
-                    disabled
-                    active={keyboard == 'laras'}
-                    onSelect={() => setKeyboard('laras')}
-                    eventKey="keyboard-laras">
+                <Nav.Item active={keyboard == 'laras'} onSelect={() => setKeyboard('laras')} eventKey="keyboard-laras">
                     Laras
                 </Nav.Item>
             </Nav.Menu>

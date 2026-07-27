@@ -118,7 +118,7 @@ export function SummaryItem({ item, sysData, score, labels, execute, options, di
             formtitle: `system # ${sysData.id}`,
             fieldval: sysData.execution?.map((item) => item.tooltipshort).join(' | ') || '',
             textcolor: 'green',
-            buttonTooltip: 'Execution items (playing sequence, tempo & dynamics).',
+            buttonTooltip: 'Execution: playing sequence, tempo & dynamics.',
             fieldTooltip: sysData.execution?.map((item) => item.tooltip).join('\n') || ''
         },
         kempli: {
