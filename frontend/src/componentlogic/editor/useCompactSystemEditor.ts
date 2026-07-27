@@ -101,6 +101,8 @@ export interface CompactEditorController {
     addPosition: (lineIndex: number, position: Position) => void
     /** Remove `position` from a multi-position group, splitting it into its own solo staff. */
     removePosition: (lineIndex: number, position: Position) => void
+    /** Replace the whole notation of the line at `lineIndex` (e.g. copy-from-system). Undoable. */
+    replaceLineNotation: (lineIndex: number, notation: NoteObject[]) => void
 }
 
 function toKeystroke(e: KeyboardEvent): Keystroke {
@@ -485,6 +487,32 @@ export function useCompactSystemEditor({
         [onChange, castingInstructions]
     )
 
+    // Replace a whole line's notation (e.g. copy the same staff's notation from another
+    // system). This is a notation edit (not a structural one), so it is undoable: a
+    // pre-edit snapshot is pushed just like a keystroke edit.
+    const replaceLineNotation = useCallback(
+        (lineIndex: number, notation: NoteObject[]) =>
+            setState((st) => {
+                const line = st.lines[lineIndex]
+                if (!line) return st
+                useEditorStateStore.getState().pushHistory({
+                    systemUuid,
+                    lineId: line.id,
+                    symbols: line.notation,
+                    cursor: st.cursor.index
+                })
+                const lines = st.lines.with(lineIndex, { ...line, notation })
+                onChange?.(lines)
+                const sameLine = st.cursor.line === lineIndex
+                return {
+                    lines,
+                    cursor: { line: st.cursor.line, index: sameLine ? clampCursor(notation, st.cursor.index) : st.cursor.index },
+                    anchor: sameLine ? null : st.anchor
+                }
+            }),
+        [onChange, systemUuid]
+    )
+
     return {
         lines: state.lines,
         cursor: state.cursor,
@@ -498,6 +526,7 @@ export function useCompactSystemEditor({
         addLine,
         removeLine,
         addPosition,
-        removePosition
+        removePosition,
+        replaceLineNotation
     }
 }

@@ -20,10 +20,11 @@
 import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { Position, PositionGroup } from '@tabuhstudio/shared'
+import { NoteObject, type Position, type PositionGroup } from '@tabuhstudio/shared'
 import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
+import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react'
-import { Button, Modal, Popover, Radio, RadioGroup, Tag, Tooltip, Whisper } from 'rsuite'
+import { Button, Modal, Popover, Radio, RadioGroup, SelectPicker, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
@@ -133,7 +134,8 @@ export function CompactSystemEditor({
         addLine,
         removeLine,
         addPosition,
-        removePosition
+        removePosition,
+        replaceLineNotation
     } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor })
     const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
     const showExpansion = useEditorStateStore((s) => s.showExpansion)
@@ -149,6 +151,14 @@ export function CompactSystemEditor({
     // Open staff dialog: the New / Modify popup for the label menu of line `li`.
     const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
     const [newPlacement, setNewPlacement] = useState<'above' | 'below'>('below')
+    // Open "Copy from…" dialog: the current line, its label, and the systems that have a
+    // matching staff (same position set) with the notation to copy. `source` is the picked one.
+    const [copyDialog, setCopyDialog] = useState<{
+        li: number
+        label: string
+        sources: { uuid: string; label: string; notation: NoteSymbol[] }[]
+    } | null>(null)
+    const [copySource, setCopySource] = useState<string | null>(null)
     // Per-line handle to the label-menu overlay, so a menu item can close its own menu.
     const menuRefs = useRef<Record<number, OverlayTriggerHandle | null>>({})
 
@@ -178,6 +188,36 @@ export function CompactSystemEditor({
         setStaffDialog(null)
         setNewStaffs([])
         setNewPlacement('below')
+    }
+
+    // "Copy from…": open a dialog listing the OTHER systems that contain a staff with the
+    // SAME position set as line `li`, so its notation can be copied into this staff.
+    const samePositions = (a: Position[], b: Position[]) => a.length === b.length && a.every((p) => b.includes(p))
+    const openCopyDialog = (li: number) => {
+        const line = lines[li]
+        if (!line) return
+        const label = compactGroupLabel(line.positions, getPositionGroups(orchestra)).label
+        const score = useScoreStore.getState().currentScore
+        const sources = (score?.systems ?? [])
+            .filter((sys) => sys.uuid !== systemUuid)
+            .map((sys) => {
+                const match = (sys.groups ?? []).find((g) => samePositions(g.positions, line.positions))
+                return match ? { uuid: sys.uuid, label: sys.label ?? `# ${sys.id}`, notation: match.notation } : null
+            })
+            .filter((s): s is { uuid: string; label: string; notation: NoteSymbol[] } => s !== null)
+        setCopySource(null)
+        setCopyDialog({ li, label, sources })
+    }
+    const confirmCopy = () => {
+        if (!copyDialog || !copySource) return
+        const source = copyDialog.sources.find((s) => s.uuid === copySource)
+        if (source) {
+            replaceLineNotation(
+                copyDialog.li,
+                source.notation.map((sym) => new NoteObject(sym, undefined))
+            )
+        }
+        setCopyDialog(null)
     }
 
     // The label menu: New… / Modify… / Delete for one line. New/Modify open a popup
@@ -211,6 +251,15 @@ export function CompactSystemEditor({
                             setStaffDialog({ kind: 'modify', li })
                         }}>
                         Modify…
+                    </button>
+                    <button
+                        type="button"
+                        className={menuItemClass}
+                        onClick={() => {
+                            closeMenu()
+                            openCopyDialog(li)
+                        }}>
+                        Copy from…
                     </button>
                     <button
                         type="button"
@@ -521,6 +570,43 @@ export function CompactSystemEditor({
                 style={style}
             />
             {renderStaffDialog()}
+            {copyDialog && (
+                <Modal
+                    size="xs"
+                    open
+                    onClose={() => setCopyDialog(null)}
+                    style={{ marginLeft: '6rem', marginRight: 'auto' }}>
+                    <Modal.Header>
+                        <Modal.Title>
+                            Copy <em>{copyDialog.label}</em> notation from:
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {copyDialog.sources.length === 0 ? (
+                            <div className="text-sm text-gray-500">
+                                No other system has a “{copyDialog.label}” staff.
+                            </div>
+                        ) : (
+                            <SelectPicker
+                                block
+                                cleanable={false}
+                                data={copyDialog.sources.map((s) => ({ label: s.label, value: s.uuid }))}
+                                value={copySource}
+                                onChange={(v) => setCopySource(v as string | null)}
+                                placeholder="Select a system"
+                            />
+                        )}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button appearance="subtle" onClick={() => setCopyDialog(null)}>
+                            Cancel
+                        </Button>
+                        <Button appearance="primary" disabled={!copySource} onClick={confirmCopy}>
+                            Copy
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            )}
         </>
     )
 }
