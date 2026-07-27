@@ -67,8 +67,7 @@ export function MainMenu({
     //     state.selectedScoreOption,
     //     state.setSelectedScoreOption
     // ])
-    const selectedScoreOption = useUserSelectionStore((state) => state.selectedScoreOption)
-    const setSelectedScoreOption = useUserSelectionStore((state) => state.setSelectedScoreOption)
+    const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
 
     async function performAction() {
         switch (activeKey) {
@@ -127,7 +126,11 @@ export function MainMenu({
     }, [activeKey])
 
     const selectScoreDialog = (
-        <Modal className="w-[20rem]" open={scoreSelector} onClose={() => setScoreSelector(false)}>
+        <Modal
+            className="w-[20rem]"
+            open={scoreSelector}
+            onOpen={() => setSelectedScoreOption(null)}
+            onClose={() => setScoreSelector(false)}>
             <Modal.Header>
                 <Modal.Title>Select a notation</Modal.Title>
             </Modal.Header>
