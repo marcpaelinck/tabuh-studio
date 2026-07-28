@@ -183,7 +183,7 @@ export function useCompactSystemEditor({
         anchor: null
     }))
     const [focused, setFocused] = useState(false)
-    const { setSelection } = useEditorStateStore()
+    const setSelection = useEditorStateStore((s) => s.setSelection)
 
     // Latest state, read synchronously by the undo/redo restorer (see registerEditor).
     const stateRef = useRef(state)
@@ -229,18 +229,18 @@ export function useCompactSystemEditor({
         return registerEditor(systemUuid, restorer)
     }, [systemUuid, onChange, focusEditor])
 
-    // Applies a pure single-line op to the active line and clears the selection anchor.
-    // When `collapse` is true (the default, for text edits) any selection is deleted
-    // FIRST so the op replaces it; octave/modifier tweaks pass `collapse = false` so they
-    // act on the caret without deleting the selection.
-    const editActiveLine = useCallback(
-        (
-            st: CompactEditorState,
-            op: (s: EditorStaffState) => EditorStaffState,
-            collapse = true
-        ): CompactEditorState => {
+    // Runs an edit on the active line and commits it. IMPORTANT: the side effects (the
+    // undo snapshot via `pushHistory`, and the debounced `onChange`) run HERE, in the
+    // event handler — never inside a `setState` updater. A store write inside an updater
+    // executes during the render phase and would update store-subscribed components
+    // mid-render (React: "cannot update a component while rendering a different one").
+    // When `collapse` is true (the default, for text edits) any selection is deleted first
+    // so the op replaces it; octave/modifier tweaks pass `collapse = false`.
+    const runEdit = useCallback(
+        (op: (s: EditorStaffState) => EditorStaffState, collapse = true) => {
+            const st = stateRef.current
             const line = st.lines[st.cursor.line]
-            if (!line) return st
+            if (!line) return
             const range = collapse ? selectionRange(st) : null
             const base: EditorStaffState = { symbols: line.notation, cursorIndex: st.cursor.index }
             const collapsed = range ? deleteRange(base, range[0], range[1]) : base
@@ -248,17 +248,23 @@ export function useCompactSystemEditor({
             const notationChanged = result.symbols !== line.notation
             const cursorChanged = result.cursorIndex !== st.cursor.index
             const anchorChanged = st.anchor !== null
-            if (!notationChanged && !cursorChanged && !anchorChanged) return st
-            let lines = st.lines
+            if (!notationChanged && !cursorChanged && !anchorChanged) return
+            const lines = notationChanged
+                ? st.lines.with(st.cursor.line, { ...line, notation: result.symbols })
+                : st.lines
             if (notationChanged) {
                 // Snapshot the line BEFORE the edit for undo (dedup handles StrictMode).
                 useEditorStateStore
                     .getState()
                     .pushHistory({ systemUuid, lineId: line.id, symbols: line.notation, cursor: st.cursor.index })
-                lines = st.lines.with(st.cursor.line, { ...line, notation: result.symbols })
                 onChange?.(lines)
             }
-            return { lines, cursor: { line: st.cursor.line, index: result.cursorIndex }, anchor: null }
+            const next: CompactEditorState = {
+                lines,
+                cursor: { line: st.cursor.line, index: result.cursorIndex },
+                anchor: null
+            }
+            setState(() => next)
         },
         [onChange, systemUuid]
     )
@@ -281,19 +287,19 @@ export function useCompactSystemEditor({
     )
 
     // Copy (or cut) the selection — or, with no selection, copy the whole active line
-    // (cut with no selection is a no-op). Writes both the in-app store and the OS clipboard.
-    const copyActive = useCallback(
-        (st: CompactEditorState, cut: boolean): CompactEditorState => {
+    // (cut with no selection is a no-op). Runs in the event handler (store write + clipboard).
+    const handleCopyCut = useCallback(
+        (cut: boolean) => {
+            const st = stateRef.current
             const line = st.lines[st.cursor.line]
-            if (!line) return st
+            if (!line) return
             const range = selectionRange(st)
             const text = serializeStaff(range ? line.notation.slice(range[0], range[1]) : line.notation)
             useEditorStateStore.getState().setClipboard(text)
             writeOsClipboard(text)
-            if (cut && range) return editActiveLine(st, (s) => s) // identity op → selection is deleted
-            return st
+            if (cut && range) runEdit((s) => s) // identity op → the selection is deleted
         },
-        [editActiveLine]
+        [runEdit]
     )
 
     const selectAll = useCallback((st: CompactEditorState): CompactEditorState => {
@@ -333,12 +339,12 @@ export function useCompactSystemEditor({
             }
             if (ctrl && (e.key === 'c' || e.key === 'C')) {
                 e.preventDefault()
-                setState((st) => copyActive(st, false))
+                handleCopyCut(false)
                 return
             }
             if (ctrl && (e.key === 'x' || e.key === 'X')) {
                 e.preventDefault()
-                setState((st) => copyActive(st, true))
+                handleCopyCut(true)
                 return
             }
             // Ctrl+Arrow (and Ctrl+Shift+Arrow): jump one beat (or four notes) left/right,
@@ -366,64 +372,71 @@ export function useCompactSystemEditor({
             if (!action) return
             e.preventDefault()
             if (action.type === 'ignore') return
-            const overwrite = useEditorStateStore.getState().overwriteMode
+            // Selection / overwrite decided from the latest committed state.
+            const st0 = stateRef.current
+            const sel = selectionRange(st0)
+            const over = useEditorStateStore.getState().overwriteMode && !sel
             const shift = e.shiftKey
-
-            setState((st) => {
-                const sel = selectionRange(st)
-                const over = overwrite && !sel // overwrite only applies when typing without a selection
-                switch (action.type) {
-                    case 'cursorLeft':
-                        return applyMove(st, (s) => computeLeftRight(s, -1), shift)
-                    case 'cursorRight':
-                        return applyMove(st, (s) => computeLeftRight(s, 1), shift)
-                    case 'cursorUp':
-                        return applyMove(st, (s) => computeUpDown(s, -1), shift)
-                    case 'cursorDown':
-                        return applyMove(st, (s) => computeUpDown(s, 1), shift)
-                    case 'cursorStart':
-                        return applyMove(st, (s) => ({ line: s.cursor.line, index: 0 }), shift)
-                    case 'cursorEnd':
-                        return applyMove(
-                            st,
-                            (s) => ({ line: s.cursor.line, index: s.lines[s.cursor.line].notation.length }),
-                            shift
+            switch (action.type) {
+                // Cursor moves are pure — safe to run inside a functional setState.
+                case 'cursorLeft':
+                    setState((st) => applyMove(st, (s) => computeLeftRight(s, -1), shift))
+                    break
+                case 'cursorRight':
+                    setState((st) => applyMove(st, (s) => computeLeftRight(s, 1), shift))
+                    break
+                case 'cursorUp':
+                    setState((st) => applyMove(st, (s) => computeUpDown(s, -1), shift))
+                    break
+                case 'cursorDown':
+                    setState((st) => applyMove(st, (s) => computeUpDown(s, 1), shift))
+                    break
+                case 'cursorStart':
+                    setState((st) => applyMove(st, (s) => ({ line: s.cursor.line, index: 0 }), shift))
+                    break
+                case 'cursorEnd':
+                    setState((st) =>
+                        applyMove(st, (s) => ({ line: s.cursor.line, index: s.lines[s.cursor.line].notation.length }), shift)
+                    )
+                    break
+                // Edits run through runEdit (side effects happen in the handler, not in render).
+                case 'octaveUp':
+                    runEdit((s) => changeOctave(s, 1, COMPACT_POSITION), false)
+                    break
+                case 'octaveDown':
+                    runEdit((s) => changeOctave(s, -1, COMPACT_POSITION), false)
+                    break
+                case 'deleteLeft':
+                    // With a selection, runEdit deletes it (identity op); else delete left.
+                    runEdit(sel ? (s) => s : deleteLeft)
+                    break
+                case 'deleteRight':
+                    runEdit(sel ? (s) => s : deleteRight)
+                    break
+                case 'insertChar':
+                    runEdit((s) =>
+                        over ? overwriteChar(s, e.key, COMPACT_POSITION) : typeChar(s, e.key, COMPACT_POSITION)
+                    )
+                    break
+                case 'insertSymbol':
+                    if (action.value)
+                        runEdit((s) =>
+                            over
+                                ? overwriteSymbol(s, action.value!, COMPACT_POSITION)
+                                : insertSymbol(s, action.value!, COMPACT_POSITION)
                         )
-                    case 'octaveUp':
-                        return editActiveLine(st, (s) => changeOctave(s, 1, COMPACT_POSITION), false)
-                    case 'octaveDown':
-                        return editActiveLine(st, (s) => changeOctave(s, -1, COMPACT_POSITION), false)
-                    case 'deleteLeft':
-                        // With a selection, editActiveLine deletes it (identity op); else delete left.
-                        return editActiveLine(st, sel ? (s) => s : deleteLeft)
-                    case 'deleteRight':
-                        return editActiveLine(st, sel ? (s) => s : deleteRight)
-                    case 'insertChar':
-                        return editActiveLine(st, (s) =>
-                            over ? overwriteChar(s, e.key, COMPACT_POSITION) : typeChar(s, e.key, COMPACT_POSITION)
+                    break
+                case 'insertString':
+                    if (action.value)
+                        runEdit((s) =>
+                            over
+                                ? overwriteString(s, action.value!, COMPACT_POSITION)
+                                : applyString(s, action.value!, COMPACT_POSITION)
                         )
-                    case 'insertSymbol':
-                        return action.value
-                            ? editActiveLine(st, (s) =>
-                                  over
-                                      ? overwriteSymbol(s, action.value!, COMPACT_POSITION)
-                                      : insertSymbol(s, action.value!, COMPACT_POSITION)
-                              )
-                            : st
-                    case 'insertString':
-                        return action.value
-                            ? editActiveLine(st, (s) =>
-                                  over
-                                      ? overwriteString(s, action.value!, COMPACT_POSITION)
-                                      : applyString(s, action.value!, COMPACT_POSITION)
-                              )
-                            : st
-                    default:
-                        return st
-                }
-            })
+                    break
+            }
         },
-        [keyMap, editActiveLine, applyMove, copyActive, selectAll]
+        [keyMap, runEdit, applyMove, handleCopyCut, selectAll]
     )
 
     // Paste: replace the selection (if any) with the first clipboard line's symbols,
@@ -435,11 +448,9 @@ export function useCompactSystemEditor({
             e.preventDefault()
             const firstLine = text.split(/\r?\n/)[0] ?? ''
             if (!firstLine) return
-            setState((st) =>
-                editActiveLine(st, (s) => [...firstLine].reduce((acc, ch) => typeChar(acc, ch, COMPACT_POSITION), s))
-            )
+            runEdit((s) => [...firstLine].reduce((acc, ch) => typeChar(acc, ch, COMPACT_POSITION), s))
         },
-        [editActiveLine]
+        [runEdit]
     )
 
     const setCursor = useCallback(
@@ -535,27 +546,29 @@ export function useCompactSystemEditor({
 
     // Replace a whole line's notation (e.g. copy the same staff's notation from another
     // system). This is a notation edit (not a structural one), so it is undoable: a
-    // pre-edit snapshot is pushed just like a keystroke edit.
+    // pre-edit snapshot is pushed just like a keystroke edit. Side effects run in the
+    // event handler (not inside the setState updater / render phase).
     const replaceLineNotation = useCallback(
-        (lineIndex: number, notation: NoteObject[]) =>
-            setState((st) => {
-                const line = st.lines[lineIndex]
-                if (!line) return st
-                useEditorStateStore
-                    .getState()
-                    .pushHistory({ systemUuid, lineId: line.id, symbols: line.notation, cursor: st.cursor.index })
-                const lines = st.lines.with(lineIndex, { ...line, notation })
-                onChange?.(lines)
-                const sameLine = st.cursor.line === lineIndex
-                return {
-                    lines,
-                    cursor: {
-                        line: st.cursor.line,
-                        index: sameLine ? clampCursor(notation, st.cursor.index) : st.cursor.index
-                    },
-                    anchor: sameLine ? null : st.anchor
-                }
-            }),
+        (lineIndex: number, notation: NoteObject[]) => {
+            const st = stateRef.current
+            const line = st.lines[lineIndex]
+            if (!line) return
+            useEditorStateStore
+                .getState()
+                .pushHistory({ systemUuid, lineId: line.id, symbols: line.notation, cursor: st.cursor.index })
+            const lines = st.lines.with(lineIndex, { ...line, notation })
+            onChange?.(lines)
+            const sameLine = st.cursor.line === lineIndex
+            const next: CompactEditorState = {
+                lines,
+                cursor: {
+                    line: st.cursor.line,
+                    index: sameLine ? clampCursor(notation, st.cursor.index) : st.cursor.index
+                },
+                anchor: sameLine ? null : st.anchor
+            }
+            setState(() => next)
+        },
         [onChange, systemUuid]
     )
 

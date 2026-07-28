@@ -72,3 +72,7 @@ Initial release
 - `Bugfix` Tempo is now correct when user fast forwards/backwards playback with the progress slider.
 - `Bugfix` Tremolo playback is now correct.
 - `Changed` Decreased acceleration rate of accelerationg tremolo to make it sound more 'natural'.
+
+## 1.1.4h 2026-07-28
+
+- `Fixed` Error: Cannot update a component while rendering a different component

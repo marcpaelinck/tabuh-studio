@@ -140,7 +140,8 @@ export function CompactSystemEditor({
         removePosition,
         replaceLineNotation
     } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor, beatStops })
-    const { overwriteMode, showExpansion } = useEditorStateStore()
+    const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
+    const showExpansion = useEditorStateStore((s) => s.showExpansion)
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const { orchestra, orchestraPositions } = useScoreStore()
     // Staffs queued in the New-staff dialog's "New staffs" basket, before they are created.
