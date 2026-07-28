@@ -137,13 +137,9 @@ export function CompactSystemEditor({
         removePosition,
         replaceLineNotation
     } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor })
-    const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
-    const showExpansion = useEditorStateStore((s) => s.showExpansion)
-    // const [gridStyle, setGridStyle] = useState<Record<string, string>>({})
-    // const [maxCols, setMaxCols] = useState<number>(0)
+    const { overwriteMode, showExpansion } = useEditorStateStore()
     // Positions chosen for a NEW staff, before it is created (add above/below).
-    const orchestra = useScoreStore((state) => state.orchestra)
-    const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
+    const { orchestra, orchestraPositions } = useScoreStore()
     // Staffs queued in the New-staff dialog's "New staffs" basket, before they are created.
     const [newStaffs, setNewStaffs] = useState<NewStaffItem[]>([])
     // 5px pointer-move threshold: a click removes a basket chip, a drag reorders it.
