@@ -63,3 +63,12 @@ Initial release
 - `Added` Select-copy-paste functionality per staff with limited clipboard functionality.
 - `Added` Staff 'Copy from' menu option.
 - `Changed` Improved error handling of execution items form.
+
+## 1.1.4 2026-07-28
+
+- `Fixed` Shift-Arrow no longer move cursor past staff boundaries.
+- `Added` Ctrl-Arrow and Ctrl-Shift-Arrow moves cursor to next/previous beat (or group of 4 notes).
+- `Changed` Refactored (standardized) assignment of Zustand store states.
+- `Bugfix` Tempo is now correct when user fast forwards/backwards playback with the progress slider.
+- `Bugfix` Tremolo playback is now correct.
+- `Changed` Decreased acceleration rate of accelerationg tremolo to make it sound more 'natural'.
