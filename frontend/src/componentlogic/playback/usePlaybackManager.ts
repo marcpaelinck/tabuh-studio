@@ -285,18 +285,16 @@ export function usePlaybackManager() {
 
             // CREATE TEMPO ACTION
             // Gradual changes will be implemented by changing the tempo at the start of each symbol in the measure.
-            // first determine the max. measure length
+            // Always set the tempo, even if there is no change. This will ensure the correct tempo is set if the user
+            // scrolls with the progress bar.
             const [startTempo, endTempo] = currentStep.tempo
             if (startTempo == endTempo) {
-                if (currentStep.tempo[0] != currentTempo) {
-                    // Immediate change
-                    const newTempo = startTempo
-                    newTimeLine.tempoactions.push({
-                        time: n2TO(beatStartTime),
-                        params: { bpm: newTempo, pbSpeed: playbackSpeed }
-                    })
-                    currentTempo = newTempo
-                }
+                const newTempo = startTempo
+                newTimeLine.tempoactions.push({
+                    time: n2TO(beatStartTime),
+                    params: { bpm: newTempo, pbSpeed: playbackSpeed }
+                })
+                currentTempo = newTempo
             } else {
                 // Gradual change
                 for (var t = 0; t < currentStep.duration; t++) {
