@@ -79,6 +79,9 @@ export interface UseCompactSystemEditorOptions {
     onChange?: (lines: CompactLine[]) => void
     /** Focuses this editor's DOM surface (used to route focus on undo/redo). */
     focusEditor?: () => void
+    /** Column indices where each beat STARTS (for Ctrl+Arrow beat jumps). Empty when there
+     *  is no kempli beat, in which case Ctrl+Arrow moves by four notes instead. */
+    beatStops?: number[]
 }
 
 export interface CompactEditorController {
@@ -140,6 +143,23 @@ function computeUpDown(st: CompactEditorState, delta: -1 | 1): CompactCursor | n
     return { line, index: clampCursor(st.lines[line].notation, st.cursor.index) }
 }
 
+/**
+ * New caret index for a Ctrl+Arrow "beat" jump within a line of length `len`.
+ * With `beatStops` (beat start columns) it snaps to the next/previous beat start;
+ * otherwise it steps four notes. Always clamped to [0, len] — the jump never leaves
+ * the staff (0 and len are treated as stops).
+ */
+function computeBeatMove(len: number, from: number, delta: number, beatStops: number[]): number {
+    if (beatStops.length > 0) {
+        const stops = Array.from(new Set([0, len, ...beatStops.filter((s) => s >= 0 && s <= len)])).sort(
+            (a, b) => a - b
+        )
+        const target = delta > 0 ? stops.find((s) => s > from) : [...stops].reverse().find((s) => s < from)
+        return target ?? (delta > 0 ? len : 0)
+    }
+    return Math.max(0, Math.min(len, from + (delta > 0 ? 4 : -4)))
+}
+
 const writeOsClipboard = (text: string) => {
     try {
         navigator.clipboard?.writeText(text).catch(() => {})
@@ -154,7 +174,8 @@ export function useCompactSystemEditor({
     keyMap = defaultKeyMap,
     castingInstructions,
     onChange,
-    focusEditor
+    focusEditor,
+    beatStops = []
 }: UseCompactSystemEditorOptions): CompactEditorController {
     const [state, setState] = useState<CompactEditorState>(() => ({
         lines: initialLines,
@@ -162,11 +183,14 @@ export function useCompactSystemEditor({
         anchor: null
     }))
     const [focused, setFocused] = useState(false)
-    const setSelection = useEditorStateStore((s) => s.setSelection)
+    const { setSelection } = useEditorStateStore()
 
     // Latest state, read synchronously by the undo/redo restorer (see registerEditor).
     const stateRef = useRef(state)
     stateRef.current = state
+    // Beat start columns, read synchronously in the Ctrl+Arrow handler (no stale closure).
+    const beatStopsRef = useRef(beatStops)
+    beatStopsRef.current = beatStops
 
     // Publish the selection to the shared store (only the focused editor owns it), so
     // other components can read it. Editing authority stays in this controller.
@@ -240,13 +264,15 @@ export function useCompactSystemEditor({
     )
 
     // Moves the caret. `extend` keeps/creates a selection anchor on the same line; a
-    // move that crosses to another line cancels the (single-line) selection.
+    // move that crosses to another line leaves the cursor and selection unchanged
+    // (selection is single-line only, so a shift-move never steps off the current staff).
     const applyMove = useCallback(
         (st: CompactEditorState, compute: (s: CompactEditorState) => CompactCursor | null, extend: boolean) => {
             const next = compute(st)
             if (!next) return extend || st.anchor === null ? st : { ...st, anchor: null }
             if (extend) {
-                if (next.line !== st.cursor.line) return { ...st, cursor: next, anchor: null }
+                // Do not extend across staves: if the move would leave this line, no-op.
+                if (next.line !== st.cursor.line) return st
                 return { ...st, cursor: next, anchor: st.anchor ?? st.cursor.index }
             }
             return { ...st, cursor: next, anchor: null }
@@ -313,6 +339,26 @@ export function useCompactSystemEditor({
             if (ctrl && (e.key === 'x' || e.key === 'X')) {
                 e.preventDefault()
                 setState((st) => copyActive(st, true))
+                return
+            }
+            // Ctrl+Arrow (and Ctrl+Shift+Arrow): jump one beat (or four notes) left/right,
+            // clamped to the current staff. Shift extends the selection; both stay in-staff.
+            if (ctrl && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                e.preventDefault()
+                const delta = e.key === 'ArrowRight' ? 1 : -1
+                const extend = e.shiftKey
+                setState((st) =>
+                    applyMove(
+                        st,
+                        (s) => {
+                            const line = s.lines[s.cursor.line]
+                            if (!line) return null
+                            const index = computeBeatMove(line.notation.length, s.cursor.index, delta, beatStopsRef.current)
+                            return { line: s.cursor.line, index }
+                        },
+                        extend
+                    )
+                )
                 return
             }
 
@@ -495,18 +541,18 @@ export function useCompactSystemEditor({
             setState((st) => {
                 const line = st.lines[lineIndex]
                 if (!line) return st
-                useEditorStateStore.getState().pushHistory({
-                    systemUuid,
-                    lineId: line.id,
-                    symbols: line.notation,
-                    cursor: st.cursor.index
-                })
+                useEditorStateStore
+                    .getState()
+                    .pushHistory({ systemUuid, lineId: line.id, symbols: line.notation, cursor: st.cursor.index })
                 const lines = st.lines.with(lineIndex, { ...line, notation })
                 onChange?.(lines)
                 const sameLine = st.cursor.line === lineIndex
                 return {
                     lines,
-                    cursor: { line: st.cursor.line, index: sameLine ? clampCursor(notation, st.cursor.index) : st.cursor.index },
+                    cursor: {
+                        line: st.cursor.line,
+                        index: sameLine ? clampCursor(notation, st.cursor.index) : st.cursor.index
+                    },
                     anchor: sameLine ? null : st.anchor
                 }
             }),
