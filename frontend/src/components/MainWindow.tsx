@@ -184,13 +184,12 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [isMobile] = useMediaQuery('(max-width: 768px)')
     const isExpandedSidenav = sidenavExpanded && !isMobile
     const { mainView, setMainView } = useUserSelectionStore()
-    const { screenSize } = useEnvironmentStore()
+    const { screenSize, environment } = useEnvironmentStore()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
     // Mobile hamburger holding the playback menu. `pbMenu*` to avoid confusion with the Sidenav.
     const [pbMenuOpen, setPbMenuOpen] = useState(false)
     const pbMenuRef = useRef<HTMLDivElement>(null) // wraps the button + panel
     const { user, login, logout } = useAuth()
-    const { environment } = useEnvironmentStore()
     const appInfo = useAppInfo()
     const dialog = useDialog()
 
@@ -237,8 +236,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
     const { loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
-    const currentScore = useScoreStore((state) => state.currentScore)
-    const scoreInfoList = useScoreStore((state) => state.scoreInfoList)
+    const { currentScore, scoreInfoList } = useScoreStore()
     const {
         score,
         validation,
@@ -253,8 +251,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
-    const selectedSpeedOption = useUserSelectionStore((state) => state.selectedSpeedOption)
-    const selectedScoreOption = useUserSelectionStore((state) => state.selectedScoreOption)
+    const { selectedSpeedOption, selectedScoreOption } = useUserSelectionStore()
 
     // ──  MENU AND SELECTORS SETTINGS ─────────────────────────────────────────────
 

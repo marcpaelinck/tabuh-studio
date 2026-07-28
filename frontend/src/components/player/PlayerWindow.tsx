@@ -3,7 +3,7 @@ import { Activity, useEffect, useRef, useState, type Dispatch, type JSX, type Re
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
-import { useUserSelectionStore, type UserSelections } from '../../stores/useUserSettingsStore'
+import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import { type Appearance } from '../../typing/interface'
 import { type PlaybackCallbackFunctions, type TimeLine } from '../../typing/playback'
@@ -36,9 +36,7 @@ export default function PlayerWindow({
     const currentFocusRef = useRef<Position[]>([])
     const currentPanggulRef = useRef<Position[]>([])
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
-    const selectedPanggulOption = useUserSelectionStore((state: UserSelections) => state.selectedPanggulOption)
-    const selectedCursorStyle = useUserSelectionStore((state: UserSelections) => state.selectedCursorStyle)
-    const selectedFocusOption = useUserSelectionStore((state: UserSelections) => state.selectedFocusOption)
+    const { selectedPanggulOption, selectedCursorStyle, selectedFocusOption } = useUserSelectionStore()
 
     useEffect(() => {
         visibleRef.current = visible

@@ -66,17 +66,14 @@ export function useScoreReader(source: 'database' | 'file'): {
     saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
     isLoading: boolean
 } {
-    const setScoreInfoList = useScoreStore((state) => state.setScoreInfoList)
-    const setCurrentScore = useScoreStore((state) => state.setCurrentScore)
-    const setOrchestra = useScoreStore((state) => state.setOrchestra)
-    const setAvailablePositions = useScoreStore((state) => state.setOrchestraPositions)
-    const setAllowedPositionGroups = useScoreStore((state) => state.setAllowedPositionGroups)
+    const { setScoreInfoList, setCurrentScore, setOrchestra, setOrchestraPositions, setAllowedPositionGroups } =
+        useScoreStore()
+    const { beatPosition } = useScoreStore()
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const beatPosition = useScoreStore((state) => state.beatPosition)
 
     function setScoreStates(score: Score): void {
         setCurrentScore(score)
-        setAvailablePositions(instrumentGroups[score.instrumenttype]?.positions || [])
+        setOrchestraPositions(instrumentGroups[score.instrumenttype]?.positions || [])
         setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype])
         setOrchestra(score.instrumenttype)
     }

@@ -49,9 +49,8 @@ function gotoItemTargetName(destination: System) {
 }
 
 export function useScoreManager() {
-    const beatPosition = useScoreStore((state) => state.beatPosition)
-    const { currentScore: score, setCurrentScore: setScore } = useScoreStore()
-    const updateCurrentScore = useScoreStore((state) => state.updateCurrentScore)
+    const { beatPosition } = useScoreStore()
+    const { currentScore: score, setCurrentScore: setScore, updateCurrentScore } = useScoreStore()
     const { labelDict, setLabelDict } = useScoreStore()
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)

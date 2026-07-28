@@ -68,9 +68,7 @@ export function Animation({
     })
 
     const [panggulMenuItems, setPanggulMenuItems] = useState<ExtendedOption<Position[]>[]>([])
-    const selectedFocusOption = useUserSelectionStore((state) => state.selectedFocusOption)
-    const selectedPanggulOption = useUserSelectionStore((state) => state.selectedPanggulOption)
-    const setSelectedPanggulOption = useUserSelectionStore((state) => state.setSelectedPanggulOption)
+    const { selectedFocusOption, selectedPanggulOption, setSelectedPanggulOption } = useUserSelectionStore()
 
     useEffect(() => debug(`SELECTED PANGGUL: ${JSON.stringify(selectedPanggulOption)}`), [selectedPanggulOption])
 

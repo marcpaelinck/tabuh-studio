@@ -79,19 +79,17 @@ export const SystemNode = memo(function SystemNode({
     const systemUuid = systemData.uuid
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
-    const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
-    const beatPosition = useScoreStore((state) => state.beatPosition)
-    const orchestra = useScoreStore((state) => state.orchestra)
+    const { orchestraPositions, beatPosition, orchestra } = useScoreStore()
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
     const expandedNotationRef = useRef<HTMLDivElement>(null)
     const systemGridRef = useRef<HTMLDivElement>(null)
 
     // Global editor view (compact = editable grouped view; expanded = read-only per-position).
-    const editorView = useUserSelectionStore((state) => state.editorView)
+    const { editorView } = useUserSelectionStore()
     // Active keyboard mapping: compile the selected (editable) definition into a runnable KeyMap.
-    const selectedKeyMapId = useUserSelectionStore((state) => state.selectedKeyMapId)
-    const keyMaps = useKeyMapStore((state) => state.keyMaps)
+    const { selectedKeyMapId } = useUserSelectionStore()
+    const { keyMaps } = useKeyMapStore()
     const keyMap = useMemo(() => {
         const def = keyMaps.find((k) => k.id === selectedKeyMapId) ?? keyMaps[0]
         return def ? compileKeyMap(def) : compileKeyMap({ id: 'default', name: 'Default', mappings: [] })
@@ -291,6 +289,10 @@ export const SystemNode = memo(function SystemNode({
     // Per-beat column widths for the compact grid, derived from the system's beat slices.
     const beatColWidths = systemData.beatSlices.map((slice) => slice.end - slice.start) ?? []
 
+    // Beat start columns for Ctrl+Arrow beat jumps. Empty when there is no kempli beat
+    // (kempli 'off'), in which case Ctrl+Arrow falls back to a four-note step.
+    const beatStops = systemData.kempli.state === 'off' ? [] : systemData.beatSlices.map((slice) => slice.start)
+
     // Universe of positions the system may contain (KEMPLI only when written as notation).
     const availablePositions = orchestraPositions.filter(
         (p) => p !== beatPosition || systemData.kempli.state === 'notation'
@@ -336,6 +338,7 @@ export const SystemNode = memo(function SystemNode({
                                 key={`compact-${systemData.uuid}`}
                                 systemUuid={systemData.uuid}
                                 initialLines={compactLines}
+                                beatStops={beatStops}
                                 notationWidth={notationWidth}
                                 kempliFrequency={systemData.kempli.frequency}
                                 availablePositions={availablePositions}

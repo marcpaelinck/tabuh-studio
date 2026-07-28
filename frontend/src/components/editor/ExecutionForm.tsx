@@ -137,8 +137,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     const [formValue, setFormValue] = useState<FormValueType>({ type: '', conditions: [] })
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
     const [loop, setLoop] = useState<number | undefined>(undefined) // loop count if a loop item exists
-    const beatPosition = useScoreStore((state) => state.beatPosition)
-    const orchestraPositions = useScoreStore((state) => state.orchestraPositions)
+    const { beatPosition, orchestraPositions } = useScoreStore()
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label as string]))
     const positionOptions = positionOptionsForSystem(systemData.staffs, orchestraPositions, beatPosition)

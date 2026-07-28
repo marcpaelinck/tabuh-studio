@@ -78,7 +78,7 @@ export function usePlaybackManager() {
     const [timeLine, setTimeline] = useState<TimeLine>({} as TimeLine)
     const [playbackProgress, setPlaybackProgress] = useState<number>(0)
     const [playbackTempo, setPlaybackTempo] = useState<number>(60)
-    const beatPosition = useScoreStore((state) => state.beatPosition)
+    const { beatPosition } = useScoreStore()
     const { mainView } = useUserSelectionStore()
 
     var tempoLookup: Record<number, Record<number, number>> = {}

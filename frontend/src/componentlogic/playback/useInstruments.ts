@@ -159,8 +159,7 @@ export const useInstruments = (outroTime: number = playerOutroTime) => {
     const samplers: Record<string, Tone.Sampler | null> = useMemo(() => {
         return createSamplers()
     }, [])
-    const selectedFocusOption = useUserSelectionStore((store) => store.selectedFocusOption)
-    const selectedPanggulOption = useUserSelectionStore((store) => store.selectedPanggulOption)
+    const { selectedFocusOption, selectedPanggulOption } = useUserSelectionStore()
     const focusRef = useRef<Position[]>([])
     const panggulRef = useRef<Position[]>([])
 

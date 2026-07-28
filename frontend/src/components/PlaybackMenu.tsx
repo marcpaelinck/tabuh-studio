@@ -19,14 +19,10 @@ export interface PlayerMenuProps {
 export default function PlaybackMenu({ appAppearance, score, scoreMenuOptions }: PlayerMenuProps): JSX.Element {
     const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
     const [speedMenuItems, setSpeedMenuItems] = useState<ExtendedOption<number>[]>([])
-    const selectedScoreOption = useUserSelectionStore((state) => state.selectedScoreOption)
-    const setSelectedScoreOption = useUserSelectionStore((state) => state.setSelectedScoreOption)
-    const selectedFocusOption = useUserSelectionStore((state) => state.selectedFocusOption)
-    const setSelectedFocusOption = useUserSelectionStore((state) => state.setSelectedFocusOption)
-    const selectedSpeedOption = useUserSelectionStore((state) => state.selectedSpeedOption)
-    const setSelectedSpeedOption = useUserSelectionStore((state) => state.setSelectedSpeedOption)
-    const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
-    const setSelectedCursorStyle = useUserSelectionStore((state) => state.setSelectedCursorStyle)
+    const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
+    const { selectedFocusOption, setSelectedFocusOption } = useUserSelectionStore()
+    const { selectedSpeedOption, setSelectedSpeedOption } = useUserSelectionStore()
+    const { selectedCursorStyle, setSelectedCursorStyle } = useUserSelectionStore()
 
     useEffect(() => {
         const updateFixedMenus = async () => {

@@ -53,8 +53,6 @@ export default function EditorWindow({
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
-    // const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
-    // const editorView = useUserSelectionStore((state) => state.editorView)
     const { selectedCursorStyle, editorView, setEditorView } = useUserSelectionStore()
     const { labelDict } = useScoreStore()
     // Insert/overwrite typing mode (global editor state). Selector-scoped so the toolbar

@@ -102,14 +102,8 @@ interface KeyMapEditorProps {
 }
 
 export function KeyMapEditor({ open, setOpen }: KeyMapEditorProps) {
-    const keyMaps = useKeyMapStore((s) => s.keyMaps)
-    const updateMappings = useKeyMapStore((s) => s.updateMappings)
-    const addKeyMap = useKeyMapStore((s) => s.addKeyMap)
-    const importKeyMap = useKeyMapStore((s) => s.importKeyMap)
-    const renameKeyMap = useKeyMapStore((s) => s.renameKeyMap)
-
-    const selectedKeyMapId = useUserSelectionStore((s) => s.selectedKeyMapId)
-    const setSelectedKeyMapId = useUserSelectionStore((s) => s.setSelectedKeyMapId)
+    const { keyMaps, updateMappings, addKeyMap, importKeyMap, renameKeyMap } = useKeyMapStore()
+    const { selectedKeyMapId, setSelectedKeyMapId } = useUserSelectionStore()
 
     const selected = keyMaps.find((k) => k.id === selectedKeyMapId) ?? keyMaps[0]
 

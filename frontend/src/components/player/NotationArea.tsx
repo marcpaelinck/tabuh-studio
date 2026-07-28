@@ -49,9 +49,7 @@ export default function NotationArea({ notation, visible, updatePlaybackFunction
     const selectedFocusRef = useRef<Position[]>([])
     const selectedPanggulRef = useRef<Position[]>([])
     const selectedCursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
-    const selectedFocusOption = useUserSelectionStore((state) => state.selectedFocusOption)
-    const selectedPanggulOption = useUserSelectionStore((state) => state.selectedPanggulOption)
-    const selectedCursorStyle = useUserSelectionStore((state) => state.selectedCursorStyle)
+    const { selectedFocusOption, selectedPanggulOption, selectedCursorStyle } = useUserSelectionStore()
 
     useEffect(() => {
         selectedFocusRef.current = selectedFocusOption.objValue

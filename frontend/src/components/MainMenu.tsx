@@ -63,10 +63,6 @@ export function MainMenu({
     // The keyboard-mapping editor drawer.
     const [keyMapEditorOpen, setKeyMapEditorOpen] = useState<boolean>(false)
     const dialog = useDialog()
-    // const [selectedScoreOption, setSelectedScoreOption] = useUserSelectionStore((state) => [
-    //     state.selectedScoreOption,
-    //     state.setSelectedScoreOption
-    // ])
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
 
     async function performAction() {

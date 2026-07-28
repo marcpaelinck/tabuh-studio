@@ -47,6 +47,8 @@ export interface CompactSystemEditorProps {
     notationWidth: number
     /** Uniform kempli frequency, if any — used for the repeating kempli grid line. */
     kempliFrequency?: number
+    /** Beat start columns for Ctrl+Arrow beat jumps (empty when there is no kempli beat). */
+    beatStops?: number[]
     /** Universe of positions the system may contain (KEMPLI only when kempli.state === 'notation'). */
     availablePositions: Position[]
     /** System-wide casting context, used when a position is split out of a group. */
@@ -109,6 +111,7 @@ export function CompactSystemEditor({
     initialLines,
     notationWidth,
     kempliFrequency,
+    beatStops,
     availablePositions,
     castingInstructions,
     staffs,
@@ -136,7 +139,7 @@ export function CompactSystemEditor({
         addPosition,
         removePosition,
         replaceLineNotation
-    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor })
+    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor, beatStops })
     const { overwriteMode, showExpansion } = useEditorStateStore()
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const { orchestra, orchestraPositions } = useScoreStore()
