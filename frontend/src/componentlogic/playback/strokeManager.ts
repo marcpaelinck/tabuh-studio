@@ -28,7 +28,7 @@ const strokes = {
         // The duration of the tremolo can be extended by adding consecutive tremolo notes. This will not alter the tremolo frequency.
         // ACCELERATING TREMOLO
         // Same as tremolo, but with decreasing duration of the notes.
-        // The duration and beat frequencies of this type of tremolo is currently fixed and is independent of the number of base notes.
+        // The duration and beat frequencies of this type of tremolo is fixed and is independent of the number of base notes.
         // The effect of two consecutive tremolo notes is that these notes will be alternated throughout the motif.
         // e.g. consecutive acc tremolo notes DONG and DENG will result in a motif DONG-DENG-DONG-DENG etc. with as many notes as the
         // length of `accelerating_motif`. The total duration will be the same as the duration of a single acc tremolo note.
@@ -36,7 +36,7 @@ const strokes = {
         // accelerating_velocity - Relative velocity value (0-1) for each note. The number of values should match that of `accelerating_motif`.
         {
             notes_per_basenote: 3,
-            accelerating_motif: [48, 40, 32, 26, 22, 18, 14, 10, 10, 10, 10, 10],
+            accelerating_motif: [48, 42, 37, 32, 28, 24, 21, 18, 16, 14, 13, 12],
             accelerating_velocity: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5]
         },
     rake:
