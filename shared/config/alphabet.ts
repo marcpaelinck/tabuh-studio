@@ -269,12 +269,12 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Norot',
         description: '4-note partial norot pattern. Combines with three trailing spaces.',
         positions: positionGroups.MELODIC.positions
-    // },
-    // '!': {
-    //     kind: 'error',
-    //     category: 'all',
-    //     name: 'Invalid symbol',
-    //     description: 'Invalid symbol',
-    //     positions: Object.keys(positionConfigs) as Position[]
+    },
+    '!': {
+        kind: 'error',
+        category: 'all',
+        name: 'Invalid symbol',
+        description: 'Invalid symbol',
+        positions: Object.keys(positionConfigs) as Position[]
     }
 }
