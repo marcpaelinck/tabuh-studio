@@ -75,7 +75,7 @@ The `disabled` prop must be applied to the `<Dropdown disabled>` itself (not onl
 
 ### Position label menu (`components/editor/CompactSystemEditor.tsx`)
 
-Each staff line's position label (e.g. `ga/ug`, `rey13`) is a click menu with three items: **Add…**, **Modify…**, and **Delete &lt;label&gt;**.
+Each staff line's position label (e.g. `ga/ug`, `rey13`) is a click menu with four items: **Add…**, **Modify…**, **Copy from…**, and **Delete &lt;label&gt;**.
 
 It is rendered as an uncontrolled `Whisper trigger="click"` + `Popover` rather than an inline `Dropdown`. An inline dropdown is trapped inside this system's `relative z-10` StaffGrid stacking context and gets painted over by the next system's labels; the `Whisper`/`Popover` is **portaled to `<body>`** (z-index 1060) so it sits above every system. The `Whisper` is kept uncontrolled (no `open`/`onOpen`, which deadlocked); instead a `menuRefs` map of `OverlayTriggerHandle`s lets each item call `menuRefs.current[li].close()` before running its action.
 
@@ -85,6 +85,13 @@ Item behaviour:
 
 - **Add…** opens `renderStaffDialog` in `new` mode — a multi-staff picker with a positions list, a position-groups list, and a "New staffs" basket (dnd-kit reorderable), plus an above/below placement choice. On create it inserts each basket item as a new line.
 - **Modify…** opens the same dialog in `modify` mode to edit that line's positions (add/remove).
+- **Copy from…** copies this staff's notation from another system (see below).
 - **Delete &lt;label&gt;** removes the line immediately (no confirmation), is disabled when only one line remains, and is shown in red otherwise.
 
 The empty-system "+ Add staff" button reuses the same `renderStaffDialog` (`new` mode) with no reference line, in which case the before/after choice is omitted.
+
+#### Copy from… (copy a staff's notation from another system)
+
+`openCopyDialog(li)` builds a list of the **other** systems (read from `useScoreStore.getState().currentScore`) that contain a group whose position set is **identical** to the current line's (`samePositions` — same length and same members). Restricting to an exact position-set match is what "the same position or group label" reduces to: the compact label is a deterministic function of the positions, so identical positions ⇒ identical label, and you can only copy like-for-like (a *reyong* group from a system that also has *reyong* as one group, a lone *ugal* from another lone *ugal*, etc.).
+
+The dialog is a small `Modal` (nudged left like the other label-menu dialogs) titled **"Copy _‹label›_ notation from:"** (the current staff's label, italicised) with a `SelectPicker` of the matching systems (shown by `System.label`, or `System <id>`); if none match it shows an explanatory message and offers only Cancel. On **Copy**, the chosen source group's `NoteSymbol[]` is converted to `NoteObject[]` and written into the current line via the controller's `replaceLineNotation(lineIndex, notation)`, which **replaces** the existing notation (empty or not), commits through the normal `onChange` → `expandSystem` pipeline, and pushes a single **undo** snapshot (so ⌘/Ctrl+Z restores the previous notation).
