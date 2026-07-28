@@ -68,6 +68,7 @@ export interface CreateStrokeArgs {
     velocity: ToneJS.Unit.NormalRange // current velocity
     prevaction: PlaybackSamplerAction | undefined // previous action created for this position
     isLast: boolean // true if this is the last symbol in the current position's notation
+    skip?: boolean // Can be used when multiple notes are combined into a single stroke pattern
 }
 // Checks if there is a sample for the note's stroke. If not, the stroke is emulated.
 // Returns a list of PlaybackSamplerAction objects.
@@ -296,30 +297,25 @@ function gracenoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 }
 
 function tremoloAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
-    // Skip if the previous symbol is also a tremolo note.
-    // In that case the motif has already been generated.
-    if (args.prevnote && args.prevnote.stroke.tremolo) return []
-
     const duration = 1 / strokes.tremolo.notes_per_basenote
     const returnValue: PlaybackSamplerAction[] = []
-    const notes: NoteObject[] = [new NoteObject(args.note.canonicalSymbol.slice(0, -1), args.position)]
-    // Include the next symbol if it is also a tremolo note
-    if (args.nextnote && args.nextnote.stroke.tremolo)
-        notes.push(new NoteObject(args.nextnote?.canonicalSymbol.slice(0, -1), args.position))
-    const totalNotes = notes.length * strokes.tremolo.notes_per_basenote
-
-    for (var idx = 0; idx <= totalNotes; idx++) {
+    const note = new NoteObject(
+        args.note.symbol.prefix + args.note.symbol.pitch + args.note.symbol.octave,
+        args.position
+    )
+    // Include the next symbol if it is also a tremolo note and it has a different tone
+    const totalNotes = strokes.tremolo.notes_per_basenote
+    for (var idx = 0; idx < totalNotes; idx++) {
         // Alternate the note to be selected
-        const noteIdx = idx % notes.length
         const count = idx + 1
         returnValue.push({
-            time: n2TO(args.time + count * duration),
+            time: n2TO(args.time + idx * duration),
             timeMs: args.timeMs + BaseNoteEquiv2Millis(count * duration, args.bpm),
             ismuted: count < totalNotes,
             params: {
                 duration: n2TO(duration),
                 position: args.position,
-                note: notes[noteIdx],
+                note: note,
                 bpm: args.bpm,
                 velocity: args.velocity,
                 isLast: args.isLast && count == totalNotes,

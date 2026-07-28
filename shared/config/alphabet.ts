@@ -75,7 +75,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Stroke 2 panggul',
         description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
-        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', ]
+        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2']
     },
     '(': {
         kind: 'tone',
@@ -226,6 +226,14 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWithPrefix: true,
         name: 'Muted',
         description: 'Mutes note during the stroke.',
+        positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
+    },
+    ';': {
+        kind: 'modifier',
+        combinesWith: ['melodic', 'percussion'],
+        combinesWithPrefix: false,
+        name: 'Tremolo',
+        description: 'Repeated succession of the same note.',
         positions: positionGroups.MELODIC.positions.concat(positionGroups.PERCUSSION.positions)
     },
     ':': {

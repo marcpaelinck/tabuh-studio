@@ -374,8 +374,8 @@ export function usePlaybackManager() {
                     } else if (note.isMutingSilence) {
                         if (currAction[position]) currAction[position].ismuted = true
                     } else {
-                        // Convert potential motifs to individual note sampler actions.
-                        const motifNoteActions: PlaybackSamplerAction[] = createNoteActions({
+                        // Convert potential stroke patterns to individual note sampler actions.
+                        const strokeNoteActions: PlaybackSamplerAction[] = createNoteActions({
                             samplerFunction: pbFunctionsRef.current.play,
                             time: currTime,
                             timeMs: currTimeMs,
@@ -396,7 +396,7 @@ export function usePlaybackManager() {
                         })
                         // Update note's duration
                         // and push the note in the `sampleractions` array.
-                        motifNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
+                        strokeNoteActions.forEach((noteAction: PlaybackSamplerAction, idx) => {
                             currAction[position] = noteAction
                             if (endOfMeasure && noteAction.params.isLastOfMotif && currentStep!.waitMsAfter) {
                                 // Extend the last note of the beat with wait time if it is indicated in the score.
@@ -590,17 +590,6 @@ export function usePlaybackManager() {
                 const animationAction = {
                     time: action.time,
                     params: { position: position, currnotes: aNotes, nextnotes: nextANotes, timeuntilMs: timeUntilMs }
-                }
-                if (
-                    position == 'PEMADE_POLOS' &&
-                    TO2n(action.params.duration) >= 3 &&
-                    action.params.note.canonicalSymbol == 'a,' &&
-                    143 < TO2n(action.time) &&
-                    TO2n(action.time) < 148
-                ) {
-                    debug('--')
-                    debug(action)
-                    debug(nextAction)
                 }
                 newTimeLine.animationactions.push(animationAction)
             })
