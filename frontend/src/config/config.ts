@@ -210,9 +210,10 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         XDUNG1: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' }, // Baleganjur
         XDANG1: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
         XDENG2: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'OPEN' },
+        XDUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDUNG1_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' }, // Baleganjur
+        XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'MUTED' },
         XDONG1_MUTED: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
