@@ -174,21 +174,33 @@ export function MainMenu({
     return (
         <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
             <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />}>
-                <Nav.Item eventKey="score-new">New...</Nav.Item>
-                <Nav.Item eventKey="file-open">Open...</Nav.Item>
-                <Nav.Item disabled={!score} eventKey="score-details">
+                <Nav.Item className="text-xs" eventKey="score-new">
+                    New...
+                </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-open">
+                    Open...
+                </Nav.Item>
+                <Nav.Item className="text-xs" disabled={!score} eventKey="score-details">
                     Score details...
                 </Nav.Item>
-                <Nav.Item disabled={!user} eventKey="file-save" className="block width-xl">
+                <Nav.Item disabled={!user} eventKey="file-save" className="text-xs block width-xl">
                     <div className="block width-xl">Save</div>
                     {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
                 </Nav.Item>
-                <Nav.Item eventKey="file-export">Export...</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="1" title="Import" icon={<TbFileImport />}>
-                <Nav.Item eventKey="file-open-json">Tabuh Studio...</Nav.Item>
-                <Nav.Item eventKey="file-import-notation">TS Script...</Nav.Item>
-                <Nav.Item eventKey="file-import-laras">Laras...</Nav.Item>
+            <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />}>
+                <Nav.Item className="text-xs" eventKey="file-open-json">
+                    Open Tabuh Studio...
+                </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-import-notation">
+                    Open TS Script...
+                </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-import-laras">
+                    Open Laras...
+                </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-export">
+                    Export...
+                </Nav.Item>
             </Nav.Menu>
             <Nav.Menu
                 disabled
@@ -198,14 +210,21 @@ export function MainMenu({
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
             <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
-                <Nav.Item eventKey="keyboard-edit">Edit mappings...</Nav.Item>
+                <Nav.Item className="text-xs" eventKey="keyboard-edit">
+                    Edit mappings...
+                </Nav.Item>
                 <Nav.Item
+                    className="text-xs"
                     active={keyboard == 'regular'}
                     onSelect={() => setKeyboard('regular')}
                     eventKey="keyboard-regular">
                     Regular
                 </Nav.Item>
-                <Nav.Item active={keyboard == 'laras'} onSelect={() => setKeyboard('laras')} eventKey="keyboard-laras">
+                <Nav.Item
+                    className="text-xs"
+                    active={keyboard == 'laras'}
+                    onSelect={() => setKeyboard('laras')}
+                    eventKey="keyboard-laras">
                     Laras
                 </Nav.Item>
             </Nav.Menu>
@@ -213,10 +232,10 @@ export function MainMenu({
                 <Nav.Item disabled eventKey="settings-instruments">
                     Instrument definitions
                 </Nav.Item>
-                <Nav.Item disabled eventKey="settings-keyboard">
+                <Nav.Item className="text-xs" disabled eventKey="settings-keyboard">
                     Keyboard definitions
                 </Nav.Item>
-                <Nav.Item disabled eventKey="settings-colors">
+                <Nav.Item className="text-xs" disabled eventKey="settings-colors">
                     Color schemes
                 </Nav.Item>
             </Nav.Menu>
