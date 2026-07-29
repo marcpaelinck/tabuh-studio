@@ -8,7 +8,7 @@ I need the app to generate a human-readable version of `Score` objects in PDF fo
 
 The Python code comes from a predecessor of Tabuh Studio called `gamelan-notation`. This application runs locally on a computer and can convert `TS Script` notation files (the .tsv input format that is used by the `tabuhParser` in Tabuh Studio) into several formats, including MIDI and PDF. The PDF export is essentially a formatted version of the `TS Script` format.
 
-I added the following documents in the current `CLAUDE/PDF generator` folder.
+I added the following documents in folder `CLAUDE/PDF generator docs`.
 
 **score_to_pdf.py** and **formatting.py**: The main modules of the Python PDF generator.
 **Sinom_Ladrang_GK.tsv**, **Sinom_Ladrang_GK.json**, **Sinom_Ladrang_GK.txt**, **Sinom_Ladrang_GK.pdf** The same score in four different formats: 
