@@ -99,6 +99,16 @@ const lookup = Object.fromEntries(
     })
 )
 
+/**
+ * The Western note name(s) a symbol maps to for a given position — the same mapping the
+ * sampler uses to pick samples (see `lookup`). Returns 0..n names (a key can trigger
+ * several pitches, e.g. octave doubling). Reused by the MIDI export so exported pitches
+ * match playback. Note: these are 12-TET nominal names, not true pelog/slendro tuning.
+ */
+export function noteNamesForSymbol(position: Position, canonicalSymbol: string): string[] {
+    return lookup[position]?.symbol2idxs[canonicalSymbol] ?? []
+}
+
 const createInstrument = (
     position: Position,
     samplers: Record<Position, Tone.Sampler | null>,

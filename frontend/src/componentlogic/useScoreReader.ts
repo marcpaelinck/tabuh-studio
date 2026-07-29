@@ -18,6 +18,8 @@ import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 import { allowedPositionGroups } from './castingRulesManager'
 import { expandSystem } from './expandNotation'
+import { generateMidiFile } from './playback/midiGenerator'
+import { buildTimeline } from './playback/timelineBuilder'
 
 export function persistCachedChanges(score: Score | undefined): Score | undefined {
     if (!score) return
@@ -63,7 +65,7 @@ function toScoreInfo(item: ScoreListItem): ScoreInfo {
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader(source: 'database' | 'file'): {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
+    saveScore: (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile') => Promise<boolean>
     isLoading: boolean
 } {
     const { setScoreInfoList, setCurrentScore, setOrchestra, setOrchestraPositions, setAllowedPositionGroups } =
@@ -109,9 +111,12 @@ export function useScoreReader(source: 'database' | 'file'): {
     }
 
     const saveScore = useCallback(
-        async (score: Score | undefined, destination: 'database' | 'file'): Promise<boolean> => {
+        async (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile'): Promise<boolean> => {
             // if (!newScoreInfo || same<ScoreInfo>(newScoreInfo, scoreInfo)) return
             var isSuccess = false
+            // MIDI export needs the object notation (objNotation), so it uses the original
+            // score; the JSON/DB paths use a stripped clone.
+            if (destination == 'midifile') return await saveScoreToMidiFile(score)
             // Create a copy of the score object and remove the object versions of the notation
             const scoreNoObject = structuredClone(score)
             scoreNoObject?.systems.forEach((system) => {
@@ -121,10 +126,10 @@ export function useScoreReader(source: 'database' | 'file'): {
                 })
             })
             if (destination == 'database') isSuccess = await saveScoreToDb(scoreNoObject)
-            else if (destination == 'file') isSuccess = await saveScoreToLocalFile(scoreNoObject)
+            else if (destination == 'jsonfile') isSuccess = await saveScoreToLocalFile(scoreNoObject)
             return isSuccess
         },
-        []
+        [beatPosition]
     )
 
     // Loads a Score object description from a JSON file on the web server.
@@ -238,40 +243,61 @@ export function useScoreReader(source: 'database' | 'file'): {
     }
 
     // Saves or updates the database with the Score object.
-    async function saveScoreToLocalFile(score: Score | undefined): Promise<boolean> {
-        if (!score) return false
-
+    // Shared "save content to a local file": File System Access API where available
+    // (Chrome/Edge), with a Blob + anchor-download fallback (Firefox/Safari).
+    async function saveToLocalFile(
+        content: BlobPart,
+        suggestedName: string,
+        mimeType: string,
+        extension: string,
+        description: string
+    ): Promise<boolean> {
         try {
-            const json = scoreToFormattedJson(score)
-            // const json = JSON.stringify(score, null, 4)
-
-            // Use File System Access API if available (Chrome/Edge)
             if ('showSaveFilePicker' in window && typeof window.showSaveFilePicker === 'function') {
                 const handle = await window.showSaveFilePicker({
-                    suggestedName: `${score.title.replace(/[^a-z0-9]/gi, '_')}.json`,
-                    types: [{ description: 'JSON score file', accept: { 'application/json': ['.json'] } }]
+                    suggestedName,
+                    types: [{ description, accept: { [mimeType]: [extension] } }]
                 })
                 const writable = await handle.createWritable()
-                await writable.write(json)
+                await writable.write(content)
                 await writable.close()
                 return true
             }
-
-            // Fallback for Firefox and Safari
-            const blob = new Blob([json], { type: 'application/json' })
+            const blob = new Blob([content], { type: mimeType })
             const url = URL.createObjectURL(blob)
             const anchor = document.createElement('a')
             anchor.href = url
-            anchor.download = `${score.title.replace(/[^a-z0-9]/gi, '_')}.json`
+            anchor.download = suggestedName
             anchor.click()
             URL.revokeObjectURL(url)
             return true
         } catch (err) {
             // User cancelled the dialog — not a real error
             if (err instanceof DOMException && err.name === 'AbortError') return false
-            console.error('Failed to save score to local file:', err)
+            console.error('Failed to save file:', err)
             return false
         }
+    }
+
+    const fileStem = (score: Score) => score.title.replace(/[^a-z0-9]/gi, '_')
+
+    async function saveScoreToLocalFile(score: Score | undefined): Promise<boolean> {
+        if (!score) return false
+        const json = scoreToFormattedJson(score)
+        return saveToLocalFile(json, `${fileStem(score)}.json`, 'application/json', '.json', 'JSON score file')
+    }
+
+    // Exports the whole score as a Standard MIDI File (one track per position). Builds the
+    // resolved playback timeline (whole score, all systems) and translates it to MIDI.
+    async function saveScoreToMidiFile(score: Score | undefined): Promise<boolean> {
+        if (!score) return false
+        const timeline = buildTimeline(
+            { actionType: 'load', playbackType: 'multiple', score, systemIndex: 0 },
+            { useCache: true, beatPosition }
+        )
+        if (!timeline) return false
+        const bytes = generateMidiFile(timeline) as BlobPart
+        return saveToLocalFile(bytes, `${fileStem(score)}.mid`, 'audio/midi', '.mid', 'MIDI file')
     }
 
     async function loadScoreListFromDb() {

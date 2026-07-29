@@ -28,6 +28,7 @@ type Action =
     | 'file-import-laras'
     | 'file-save'
     | 'file-export'
+    | 'file-export-midi'
     | 'instruments-select'
     | 'settings-instruments'
     | 'settings-keyboard'
@@ -37,7 +38,7 @@ interface TabuhEditorMenuProps {
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    saveScore: (score: Score | undefined, destination: 'database' | 'file') => Promise<boolean>
+    saveScore: (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile') => Promise<boolean>
     newScore: (fields: ScoreDetailsValues) => void
     updateScoreMeta: (meta: { title: string; composer: string }) => void
     keyboard: KeyboardType
@@ -97,7 +98,15 @@ export function MainMenu({
                 // Persist cached changes and empty caches
                 const persistedScore = persistCachedChanges(score)
                 if (persistedScore) {
-                    saveScore(persistedScore, 'file')
+                    saveScore(persistedScore, 'jsonfile')
+                }
+                break
+            }
+            case 'file-export-midi': {
+                // Persist cached changes so the export includes unsaved edits.
+                const persistedScore = persistCachedChanges(score)
+                if (persistedScore) {
+                    saveScore(persistedScore, 'midifile')
                 }
                 break
             }
@@ -199,7 +208,10 @@ export function MainMenu({
                     Open Laras...
                 </Nav.Item>
                 <Nav.Item className="text-xs" eventKey="file-export">
-                    Export...
+                    Export Tabuh Studio...
+                </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-export-midi">
+                    Export MIDI...
                 </Nav.Item>
             </Nav.Menu>
             <Nav.Menu

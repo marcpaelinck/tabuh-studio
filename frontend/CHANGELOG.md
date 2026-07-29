@@ -76,3 +76,7 @@ Initial release
 ## 1.1.4h 2026-07-28
 
 - `Fixed` Error: Cannot update a component while rendering a different component
+
+## 1.1.5a 2026-07-29
+
+- `Added` export to MIDI file.
