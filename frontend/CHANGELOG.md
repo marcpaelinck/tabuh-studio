@@ -77,6 +77,7 @@ Initial release
 
 - `Fixed` Error: Cannot update a component while rendering a different component
 
-## 1.1.5a 2026-07-29
+## 1.1.5 2026-07-29
 
-- `Added` export to MIDI file.
+- `Added` export to MIDI.
+- `Added` export to PDF.
