@@ -264,3 +264,45 @@ As an example: the default mapping of the keyboard letter 'A' (capital 'a') shou
 
 ## Note
 The application currently has an input state machine (`editorCursorManager.ts`) and a keyboard handler (`useKeyboardListener.ts`) that are based on an outdated concept. These will need to be replaced with the new code.
+
+---
+
+## Pitfall: never write to a store inside a `setState` updater
+
+### The symptom
+After the app's initial load, the first notation edit (add / delete / modify a note) logged:
+
+> Cannot update a component (`CompactSystemEditor`) while rendering a different component (`CompactSystemEditor`).
+
+React only prints each unique warning once, so it looked like a one-off, but it happened on **every** edit.
+
+### The cause
+Each system's editor state lives in its own `useCompactSystemEditor` controller, while the cross-cutting editor state (undo/redo history, clipboard, overwrite flag, selection) lives in a shared Zustand store, `useEditorStateStore`.
+
+The edit helper performed its side effects *inside* a `setState` updater:
+
+```ts
+setState((st) => editActiveLine(st, op))   // the updater runs during the RENDER phase
+// …and editActiveLine did, synchronously:
+useEditorStateStore.getState().pushHistory(before)   // a Zustand `set`
+```
+
+A React state updater runs during the render phase and must be **pure**. A Zustand `set` is a side effect: it synchronously notifies its subscribers. `CompactSystemEditor` subscribes to the store, so pushing an undo snapshot mid-render tried to re-render a `CompactSystemEditor` while another one was rendering — exactly what the warning describes.
+
+Two things made it worse:
+- `onChange` was also called inside the updater, but it is debounced (`setTimeout`), so it never touched React/store state synchronously and never tripped the warning — which is why this pattern had gone unnoticed.
+- `CompactSystemEditor` had been changed to subscribe to the **whole** store (`useEditorStateStore()` with no selector), so *any* `set` — including the undo-stack growing on each keystroke — notified it.
+
+### The fix
+Move every synchronous store write out of the render phase and into the event handler:
+
+- `editActiveLine` → **`runEdit`**: reads the current state from a `stateRef`, runs the side effects (`pushHistory`, `onChange`) in the handler, then commits a pure `setState(() => next)`.
+- `copyActive` → **`handleCopyCut`**: same pattern for `setClipboard`.
+- `replaceLineNotation` (copy-a-staff-from-another-system): `pushHistory` / `onChange` moved out of its updater.
+- `onKeyDown`: pure cursor moves stay as functional `setState((st) => applyMove(…))`; edits go through `runEdit`; `onPaste` uses `runEdit`.
+- The structural ops already called `clearHistory()` outside their updaters, so they were fine.
+
+Also reverted `CompactSystemEditor` (and the controller's `setSelection`) to **selector** subscriptions (`useEditorStateStore(s => s.overwriteMode)`, …) instead of subscribing to the whole store — this removes the amplifier and avoids re-rendering every system's editor on unrelated store changes.
+
+### The rule of thumb
+A `setState` updater must be pure. If an action needs both a React state change **and** a store write (or any other side effect), do the side effect in the event handler, read the current state from a ref, and finish with `setState(() => next)`. Debounced/`setTimeout` writes are the exception only because they defer the effect out of the render phase.
