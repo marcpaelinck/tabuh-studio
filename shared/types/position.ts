@@ -51,6 +51,7 @@ export type PositionGroup =
     | 'REYONG_13'
     | 'REYONG_24'
     | 'REYONG'
+    | 'REYONGB'
     | 'POKOK'
     | 'MELODIC'
     | 'DAUN'

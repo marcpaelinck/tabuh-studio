@@ -29,6 +29,7 @@ type Action =
     | 'file-save'
     | 'file-export'
     | 'file-export-midi'
+    | 'file-export-pdf'
     | 'instruments-select'
     | 'settings-instruments'
     | 'settings-keyboard'
@@ -38,7 +39,10 @@ interface TabuhEditorMenuProps {
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
     score: Score | undefined
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    saveScore: (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile') => Promise<boolean>
+    saveScore: (
+        score: Score | undefined,
+        destination: 'database' | 'jsonfile' | 'midifile' | 'pdffile'
+    ) => Promise<boolean>
     newScore: (fields: ScoreDetailsValues) => void
     updateScoreMeta: (meta: { title: string; composer: string }) => void
     keyboard: KeyboardType
@@ -58,6 +62,12 @@ export function MainMenu({
     user
 }: TabuhEditorMenuProps) {
     const [activeKey, setActiveKey] = useState<Action | undefined>(undefined)
+    // The currently expanded top-level menu (accordion: opening one collapses the others).
+    const [openMenu, setOpenMenu] = useState<string | null>(null)
+    const menuProps = (key: string) => ({
+        open: openMenu === key,
+        onToggle: (open: boolean) => setOpenMenu(open ? key : null)
+    })
     const [scoreSelector, setScoreSelector] = useState<boolean>(false)
     // The New / Score details dialog (null when closed).
     const [scoreDialogMode, setScoreDialogMode] = useState<'new' | 'edit' | null>(null)
@@ -107,6 +117,14 @@ export function MainMenu({
                 const persistedScore = persistCachedChanges(score)
                 if (persistedScore) {
                     saveScore(persistedScore, 'midifile')
+                }
+                break
+            }
+            case 'file-export-pdf': {
+                // Persist cached changes so the export includes unsaved edits.
+                const persistedScore = persistCachedChanges(score)
+                if (persistedScore) {
+                    saveScore(persistedScore, 'pdffile')
                 }
                 break
             }
@@ -182,7 +200,7 @@ export function MainMenu({
 
     return (
         <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
-            <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />}>
+            <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />} {...menuProps('0')}>
                 <Nav.Item className="text-xs" eventKey="score-new">
                     New...
                 </Nav.Item>
@@ -197,7 +215,7 @@ export function MainMenu({
                     {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
                 </Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />}>
+            <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />} {...menuProps('1')}>
                 <Nav.Item className="text-xs" eventKey="file-open-json">
                     Open Tabuh Studio...
                 </Nav.Item>
@@ -213,15 +231,19 @@ export function MainMenu({
                 <Nav.Item className="text-xs" eventKey="file-export-midi">
                     Export MIDI...
                 </Nav.Item>
+                <Nav.Item className="text-xs" eventKey="file-export-pdf">
+                    Export PDF...
+                </Nav.Item>
             </Nav.Menu>
             <Nav.Menu
                 disabled
                 eventKey="2"
                 title="Instruments"
-                icon={<TsGongIcon height="1em" width="1em" color="black" />}>
+                icon={<TsGongIcon height="1em" width="1em" color="black" />}
+                {...menuProps('2')}>
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
-            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />}>
+            <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />} {...menuProps('3')}>
                 <Nav.Item className="text-xs" eventKey="keyboard-edit">
                     Edit mappings...
                 </Nav.Item>
@@ -240,7 +262,7 @@ export function MainMenu({
                     Laras
                 </Nav.Item>
             </Nav.Menu>
-            <Nav.Menu disabled eventKey="4" title="Settings" icon={<IoSettingsOutline />}>
+            <Nav.Menu disabled eventKey="4" title="Settings" icon={<IoSettingsOutline />} {...menuProps('4')}>
                 <Nav.Item disabled eventKey="settings-instruments">
                     Instrument definitions
                 </Nav.Item>

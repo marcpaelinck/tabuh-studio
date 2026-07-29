@@ -4,7 +4,7 @@ This document discusses the requirement for a PDF generator that creates a PDF d
 
 ## Context
 
-I need the app to generate a human-readable version of `Score` objects in PDF format. I have a Python application which performs this conversion. I would like to to reproduce this functionality in TypeScript in Tabuh Studio.
+I need the Tabuh Studio app to generate a human-readable version of `Score` objects in PDF format. I have a Python application which performs this conversion. I would like to to reproduce this functionality in TypeScript in Tabuh Studio.
 
 The Python code comes from a predecessor of Tabuh Studio called `gamelan-notation`. This application runs locally on a computer and can convert `TS Script` notation files (the .tsv input format that is used by the `tabuhParser` in Tabuh Studio) into several formats, including MIDI and PDF. The PDF export is essentially a formatted version of the `TS Script` format.
 
@@ -17,8 +17,19 @@ I added the following documents in folder `CLAUDE/PDF generator docs`.
 - Sinom_Ladrang_GK.txt: a dump of the Python script's `Score` object
 - Sinom_Ladrang_GK.pdf: the Python script's PDF output
 
+## Requested functionality
+
+- A new menu item `File - Export PDF...` should be added to the main menu. When selected, it should export the current score to a PDF file.
+- The PDF layout should be similar to the PDFs produced by the `gamelan-notation` Python script.
 
 # Python code
+
+This section contains information about the `gamelan-notation` Python code that is currently used to generate PDF versions of the scores. 
+
+The application can read a `TS Script` (.tsv) file and convert it internally to an object model of a `Score`. This object model is similar to the one used in the Tabuh Studio app, but it is more comples and uses Beats and Measures explicitly, whereas in Tabuh Studio these two concepts are virtual and only globally represented as BeatSlice objects.
+
+As soon as it has createdd the object model of a `Score` the `gamelan-notation` appplication can produce exports as PDF, MIDI and JSON documents.
+The following information focuses on the code that is used for the generation of PDF exports.
 
 ## score_to_pdf.py
 
@@ -887,3 +898,183 @@ This function can be ignored. Staves in Tabuh Studio do not need cleaning.
 
 **has_kempli_beat**
 Determines whether a Gongan has a kempli beat. In Tabuh Studio this information is directly available from the `Score` object.
+
+---
+
+# Implementation plan (agreed) + Phase 0 result
+
+## Decisions
+
+- **Notation source:** start with the **compact** grouped notation (one row per
+  `System.group`, tag = `compactGroupLabel`). The generator is built around an
+  intermediate model (below) so **expanded** (per-position) and **single-position**
+  exports can be added later without touching the renderer.
+- **Excludable execution items:** the model builder takes an `excludeExecutionTypes`
+  option (a list of `ExecutionItemType`s to omit from the metadata rows). Wired as an
+  option now; a settings UI can drive it later.
+- **`omit_octave_diacritics`:** `[REYONG_1, REYONG_2, REYONG_3, REYONG_4]` — octave
+  diacritic characters are stripped from those positions' notation text.
+- **Skipped:** comments and gongan-type (don't exist in the TS model). PART metadata is
+  deferred (parts come later).
+- **Header:** reproduce the datestamp (score DB datetime, else now) and the
+  `https://swarasanti.nl/music-notation/` hyperlink, as in the Python.
+- **Save path:** a new `'pdffile'` destination on the `saveScore` dispatcher +
+  `saveScoreToPdfFile`, reusing the `saveToLocalFile` helper, and a `File → Export PDF…`
+  menu item — mirroring the MIDI export.
+- **Fidelity:** close-and-iterate against `Sinom_Ladrang_GK.pdf`; different page layout /
+  line height / systems-per-page are acceptable as long as the page count is in the same
+  ballpark. Not pixel-perfect.
+
+## Phase 0 — font spike (DONE)
+
+`baliMusic5.ttf` was analysed and test-rendered:
+
+- The font has **no GSUB**; the combining modifiers (`,` `<` `/` `_` …) have
+  **advanceWidth = 0 with negative left-side-bearing** (e.g. `_` lsb = −1260 units). So
+  glyph overlap comes from the metrics, **not** OpenType shaping.
+- A `pdf-lib` test PDF (which applies **no** GPOS) embedding the TTF rendered every
+  combining case correctly (octave dots/bars, grace slashes, overlines). See
+  `outputs/pdfspike/balifont_spike.pdf`.
+
+**Conclusion:** the font renders faithfully with a plain advance-width renderer, so
+**`pdf-lib`** is the chosen library (exact control over columns / rules / measurement, one
+font object for measure + draw, client-side, embeds the TTF). `pdfmake` remains a fallback
+but isn't needed.
+
+## Library
+
+`pdf-lib` (+ `@pdf-lib/fontkit` for TTF embedding). Add both to `frontend/package.json`.
+The BaliMusic TTF is fetched at runtime from `/fonts/baliMusic5.ttf`; Helvetica /
+Helvetica-Bold / Courier / Courier-Bold are the built-in standard fonts.
+
+## Module structure
+
+- `componentlogic/export/pdfModel.ts` — **pure**, pdf-lib-agnostic. Builds a
+  `PdfDocumentModel` from a `Score`:
+  ```ts
+  interface PdfMetaRow { text: string; beatIndex: number; align: 'left'|'right'; style: MetaStyle }
+  interface PdfNotationRow { tag: string; beats: string[] }   // beats.length = beat count
+  interface PdfSystemBlock {
+      gonganId: number
+      hasKempli: boolean
+      above: PdfMetaRow[]        // PART(later)/TEMPO/DYNAMICS/LABEL
+      rows: PdfNotationRow[]     // one per group (compact) / position (later)
+      below: PdfMetaRow[]        // LOOP/GOTO/SEQUENCE
+  }
+  interface PdfDocumentModel { title: string; datestamp: string; systems: PdfSystemBlock[] }
+
+  interface BuildPdfOptions {
+      source?: 'compact' | 'expanded' | { position: Position }   // default 'compact'
+      excludeExecutionTypes?: ExecutionItemType[]
+      omitOctaveDiacritics?: Position[]                          // default REYONG_1..4
+  }
+  export function buildPdfModel(score: Score, opts?: BuildPdfOptions): PdfDocumentModel
+  ```
+  - Beat columns come from `System.beatSlices`; a group's per-beat text is
+    `group.notation.slice(slice.start, slice.end).join('')`, with the symbol transforms
+    (grace-note stroke drop; octave-diacritic strip for `omitOctaveDiacritics` rows —
+    reuse `OCTAVE_MODIFIERS` from shared).
+  - Metadata rows map from `System.execution` (`tempo`→"faster/slower", `dynamics`,
+    `goto`→"go to …", `loop`→"play NX", `sequence`) + `System.label` (LABEL), filtered by
+    `excludeExecutionTypes`. `executionItemTooltip` can supply readable text.
+- `componentlogic/export/pdfGenerator.ts` — consumes the model + `pdf-lib`. Owns the
+  layout constants (A4, margins, tag colwidth 2.3cm, styles/colours mirroring
+  `formatting.py`), font embedding, text measurement (`font.widthOfTextAtSize`), the
+  flow layout, the per-page header (title/page/date/hyperlink + rule), and pagination that
+  keeps each gongan together. `export async function generatePdf(model): Promise<Uint8Array>`.
+
+  **Beat grid (per the requirement change):** the notation is rendered as a single
+  continuous line per group in the BaliMusic font, whose column glyphs are effectively
+  monospaced (base ttf column advance ≈ 0.654 em, modifiers advance 0), so columns align
+  on a fixed cell grid `W = fontSize × 0.654`. Instead of drawing lines *between* beat
+  columns, we draw the editor-style background grid: **green** vertical lines (behind the
+  notes) at the kempli-beat boundaries, i.e. at `x = tagRight + beatSlices[j].start × W`,
+  spanning the system's notation-row block; **no gray per-column lines**. Kempli lines are
+  drawn only when `kempli.state !== 'off'` (matching the editor, which shows no kempli
+  highlight when off). Green ≈ `gridColorsExpanded.kempli` (`rgb(0,255,0)` with alpha).
+- `useScoreReader.ts` — `saveScore` destination `'database' | 'jsonfile' | 'midifile' |
+  'pdffile'`; `saveScoreToPdfFile(score)` = `buildPdfModel` → `generatePdf` →
+  `saveToLocalFile(bytes, '<title>.pdf', 'application/pdf', '.pdf', 'PDF document')`.
+- `components/MainMenu.tsx` — `File → Export PDF…` (`file-export-pdf`) →
+  `saveScore(persistCachedChanges(score), 'pdffile')`; widen the prop type.
+
+## Phasing
+
+- **Phase 1 — grid + header + save path.** Model builder (compact), the notation grid
+  (tag + measured beat columns + vertical rules, gongan id, keep-together, page header
+  with datestamp/hyperlink), `omit_octave_diacritics`, and the `'pdffile'` save + menu
+  wiring. Metadata rows placed simply (each directive at its beat column, no spanning).
+  Produces a readable, paginated notation PDF.
+- **Phase 2 — metadata fidelity.** Port the spanning / adjacent-cell merging / dot-filling
+  and exact styles/colours from `_append_single_metadata_type` to approach the sample.
+- **Phase 3 — extra sources.** Expanded and single-position exports (the model already
+  abstracts this), and the excludable-items settings UI. PART metadata once parts land.
+
+## Caveats to keep in mind
+
+- pdf-lib has no layout engine — Phase 1 implements a small flow/table layout (measure row
+  heights, place top-to-bottom, break pages when full, draw vertical beat rules). Modest,
+  and full control.
+- The exact octave-diacritic character set should be confirmed against
+  `shared/config/alphabet.ts` (the TS equivalent of the Python font table); Phase 1 uses
+  `OCTAVE_MODIFIERS`.
+- `generatePdf` is async (it fetches the TTF); the save path is already async.
+
+---
+
+# Phase 1 — as built
+
+Implemented and verified end-to-end by rendering `Sinom_Ladrang_GK.json` (3 pages, same
+as the Python output). Files added / touched:
+
+### `componentlogic/export/pdfModel.ts` (pure)
+
+`buildPdfModel(score, opts?)` → `PdfDocumentModel`. Per system (only those with
+`groups`): one `PdfNotationRow` per group (`tag = compactGroupLabel(...).label`, `text =
+group.notation.join('')`, octave diacritics stripped when every position of the group is
+in `omitOctaveDiacritics`, default `REYONG_1..4`); `columnCount = max notation length`;
+`kempliColumns = kempli.state !== 'off' ? beatSlices.map(s => s.start) : null`; metadata
+`above` (tempo/dynamics at their `fromBeat` column) + `below` (goto/loop right-aligned,
+sequence left) from `execution` (text via `executionItemTooltip`, filtered by
+`excludeExecutionTypes`) plus the `label` row. `source` ('compact' only) and
+`excludeExecutionTypes` are options for the future expanded/single-position modes and the
+settings UI.
+
+### `componentlogic/export/pdfGenerator.ts` (pdf-lib)
+
+`generatePdf(model): Promise<Uint8Array>`. Fetches `/fonts/baliMusic5.ttf` and embeds it;
+standard Helvetica/Courier variants for text. Fixed-cell notation (`cellW =
+bali.widthOfTextAtSize('u', 9)`), green kempli lines behind the notes, tag column + gongan
+id, per-page header, keep-each-gongan-together pagination.
+
+**WinAnsi sanitiser (important):** pdf-lib's standard fonts only encode WinAnsi, but
+tooltips contain characters outside it (notably `→`), which makes `drawText` throw. A
+`winAnsi()` helper maps the common ones (`→`→`->`, dashes, quotes, `…`, `×`) and replaces
+anything else out of range; it is applied to every standard-font string (title, tags,
+metadata). Notation text uses the embedded TTF and needs no sanitising.
+
+### Save + menu
+
+`useScoreReader` gained the `'pdffile'` destination → `saveScoreToPdfFile` (build model →
+`generatePdf` → shared `saveToLocalFile('<title>.pdf', 'application/pdf')`), using the
+un-stripped score. `MainMenu` gained `File → Export PDF…` (`file-export-pdf`). Deps
+`pdf-lib` + `@pdf-lib/fontkit` added to `frontend/package.json`.
+
+### Corrections applied after the first render
+
+1. The "notation explained" hyperlink is drawn **above** the header separator line.
+2. Kempli lines are **centred on the beat's first symbol** (`x = tagRight + (col+0.5)×W`),
+   like the editor grid, not on the symbol's left edge.
+3. `play` / `go to` metadata **right-aligns to the system's right edge** (`tagRight +
+   columnCount×W`), not the page margin.
+4/5/6. Position tags use `compactGroupLabel` (i.e. the `positionGroups` / `positionConfigs`
+   names — `Ugal`, `Gangsa`, `Calung`, `Kendang`, …), which fit the tag column; the doubled
+   / truncated labels seen earlier were an artefact of a throw-away test tag, not the model.
+
+### Notes / not yet done
+
+- Legacy scores without compact `groups` are **out of scope** (not supported).
+- Metadata is Phase-1 simple: full tooltip text, placed at its beat, no spanning / dotted
+  gradual lines — that's the Phase 2 fidelity pass.
+- Very long systems can run near the right margin (single line, like the Python).
+- Build not run in-sandbox; requires `npm install` (for the two new deps) + `npm run build`.

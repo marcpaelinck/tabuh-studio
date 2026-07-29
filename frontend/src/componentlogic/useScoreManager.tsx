@@ -50,7 +50,7 @@ function gotoItemTargetName(destination: System) {
 
 export function useScoreManager() {
     const { beatPosition } = useScoreStore()
-    const { currentScore: score, setCurrentScore: setScore, updateCurrentScore } = useScoreStore()
+    const { currentScore: score, orchestra, setCurrentScore: setScore, updateCurrentScore } = useScoreStore()
     const { labelDict, setLabelDict } = useScoreStore()
     const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
@@ -148,8 +148,8 @@ export function useScoreManager() {
                     item.targetname = 'target unknown'
                     console.error(`system ${item} of goto directive not found.`)
                 }
-                item.tooltip = executionItemTooltip(item, 'long')
-                item.tooltipshort = executionItemTooltip(item, 'short')
+                item.tooltip = executionItemTooltip(item, 'long', orchestra)
+                item.tooltipshort = executionItemTooltip(item, 'short', orchestra)
             }
             debug(`${item.tooltip} -- ${item.tooltipshort}`)
         })
@@ -200,8 +200,8 @@ export function useScoreManager() {
                             debug(`found goto destination ${destination.uuid}`)
                             {
                                 goto.targetname = gotoItemTargetName(destination)
-                                goto.tooltip = executionItemTooltip(goto, 'long')
-                                goto.tooltipshort = executionItemTooltip(goto, 'short')
+                                goto.tooltip = executionItemTooltip(goto, 'long', orchestra)
+                                goto.tooltipshort = executionItemTooltip(goto, 'short', orchestra)
                             }
                         } else {
                             goto.targetname = 'Error: goto target not found.'

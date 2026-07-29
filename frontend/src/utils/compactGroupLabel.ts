@@ -12,7 +12,8 @@ type PositionGroupKey = keyof typeof positionGroups
 
 export function compactGroupLabel(
     positions: Position[],
-    positionGrouping: Record<PositionGroupKey, Position[]>
+    positionGrouping: Record<PositionGroupKey, Position[]>,
+    toLower: boolean = false
 ): { label: string; tooltip: string } {
     const groupEntries = Object.entries(positionGrouping) as [PositionGroupKey, Position[]][]
     const names = positions.map((p) => positionConfigs[p]?.name ?? p)
@@ -38,5 +39,5 @@ export function compactGroupLabel(
     })
 
     parts.sort((a, b) => a.firstIdx - b.firstIdx)
-    return { label: parts.map((x) => x.abbr).join('/'), tooltip }
+    return { label: parts.map((x) => (toLower ? x.abbr.toLowerCase() : x.abbr)).join('/'), tooltip }
 }

@@ -1,7 +1,9 @@
-import type { Position } from '@tabuhstudio/shared'
+import type { InstrumentGroup, Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import _ from 'lodash'
+import { getPositionGroups } from '../config/position-functions'
 import type { ExecutionItem } from '../typing/execution'
+import { compactGroupLabel } from './compactGroupLabel'
 
 export function executionItemSeqId(item: ExecutionItem) {
     const typeSeq = {
@@ -49,10 +51,14 @@ function toOrdinal(val: number): string {
 
 function positionsText(positions: Position[] | undefined): string {
     if (!positions || positions.length === 0) return 'all positions'
-    return positions.map((p) => positionConfigs[p]?.name ?? p).join(', ')
+    return positions.map((p) => positionConfigs[p]?.name.toLowerCase() ?? p).join(', ')
 }
 
-export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long'): string {
+export function executionItemTooltip(
+    item: ExecutionItem,
+    length: 'short' | 'long',
+    orchestra: InstrumentGroup
+): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []
@@ -136,13 +142,16 @@ export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'lon
         andloopcondition = ', ' + loopcond
     }
     // Compose the long tooltip version
+    var positions = ''
+    if (item.type == 'dynamics' && item.positions.length > 0)
+        positions = compactGroupLabel(item.positions, getPositionGroups(orchestra), true).label + ': '
     switch (true) {
         case !nbrOfPasses:
-            return `${instruction}${loopcondition}`
+            return `${positions}${instruction}${loopcondition}`
         case nbrOfPasses && !item.nthpass:
-            return `${instruction} ${preposition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}${andloopcondition}`
+            return `${positions}${instruction} ${preposition} ${nbrOfPasses > 1 ? 'passes' : 'pass'} ${toText(item.passes)}${andloopcondition}`
         case nbrOfPasses && item.nthpass:
-            return `${instruction} ${preposition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}${andloopcondition}`
+            return `${positions}${instruction} ${preposition} every ${toText(sortedPasses, true)} ${nbrOfPasses > 1 ? 'passes' : 'pass'}${andloopcondition}`
         default:
             return `Invalid combination: missing one or more pass numbers.`
     }

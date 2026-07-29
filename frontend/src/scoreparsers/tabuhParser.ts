@@ -1,7 +1,7 @@
 // Parser for imported scores with `Notation` formatting
 import type { SyntaxNode } from '@lezer/common'
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
-import type { NoteSymbol, UUID } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { InstrumentGroup, NoteSymbol, UUID } from '@tabuhstudio/shared/types/basetypes.ts'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -98,7 +98,7 @@ export function parseNotation(content: string): ParserReturnValue {
             case 'Gongan': {
                 gonganCounter++
                 const systemuuid = uuidv4()
-                const metaData = getMetadata(node, gonganCounter, systemuuid, content)
+                const metaData = getMetadata(node, gonganCounter, systemuuid, scoreByMeasure.instrumenttype, content)
                 const notationByMeasure: GroupedNotationByMeasure[] = getNotationByMeasure(node, content)
                 const systemByMeasure: SystemByMeasure = {
                     uuid: systemuuid,
@@ -512,6 +512,7 @@ function getMetadata(
     gonganNode: SyntaxNode | null,
     systemid: number,
     systemuuid: string,
+    orchestra: InstrumentGroup,
     content: string
 ): ProcessingInstruction[] {
     const metaData: ProcessingInstruction[] = []
@@ -521,7 +522,7 @@ function getMetadata(
     metadataNodes.forEach((child, index) => {
         const metaDataItem = child.getChild('Metadata')
         if (metaDataItem) {
-            const item = parseMetadata(metaDataItem, index + 1, systemid, systemuuid, content)
+            const item = parseMetadata(metaDataItem, index + 1, systemid, systemuuid, orchestra, content)
             if (item) metaData.push(item)
         }
     })
@@ -535,6 +536,7 @@ function parseMetadata(
     seqNr: number,
     systemid: number,
     systemuuid: string,
+    orchestra: InstrumentGroup,
     content: string
 ): ProcessingInstruction | undefined {
     if (!metadataNode) return undefined
@@ -586,7 +588,7 @@ function parseMetadata(
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GonganMetadata': {
@@ -596,7 +598,7 @@ function parseMetadata(
             const value = { value: 'off' as KempliValue }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as KempliItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'GotoMetadata': {
@@ -604,7 +606,7 @@ function parseMetadata(
             const value = { targetname: getValue<string>(node, 'StringValue', content), targetuuid: '' }
             const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as GotoItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'KempliMetadata': {
@@ -612,7 +614,7 @@ function parseMetadata(
             const baseAttr = { type: 'kempli' }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as KempliItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'LabelMetadata': {
@@ -624,7 +626,7 @@ function parseMetadata(
             const value = { count: getValue<number>(node, 'IntegerValue', content) }
             const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'PartMetadata': {
@@ -638,7 +640,7 @@ function parseMetadata(
             const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }
             const value = { labels: getValueList<string>(node, 'StringList', content), uuids: [] }
             const item = Object.assign(baseAttr, value) as SequenceItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'SuppressMetadata': {
@@ -646,7 +648,7 @@ function parseMetadata(
             const value = { positions: tagsToPositions(getValueList<string>(node, 'StringList', content) || []) }
             const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'TempoMetadata': {
@@ -663,7 +665,7 @@ function parseMetadata(
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         case 'WaitMetadata': {
@@ -671,7 +673,7 @@ function parseMetadata(
             const value = { seconds: getValue<number>(node, 'FloatValue', content) }
             const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
             const item = Object.assign(baseAttr, value, parameters) as WaitItem
-            updateSeqAndTooltips(item)
+            updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
         }
         default: {
@@ -753,10 +755,10 @@ function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], co
     return parameters
 }
 
-function updateSeqAndTooltips(item: ExecutionItem) {
+function updateSeqAndTooltips(item: ExecutionItem, orchestra: InstrumentGroup) {
     item.seqId = executionItemSeqId(item)
-    item.tooltip = executionItemTooltip(item, 'long')
-    item.tooltipshort = executionItemTooltip(item, 'short')
+    item.tooltip = executionItemTooltip(item, 'long', orchestra)
+    item.tooltipshort = executionItemTooltip(item, 'short', orchestra)
 }
 
 interface GenericGradualValue {

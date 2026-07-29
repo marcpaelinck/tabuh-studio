@@ -221,3 +221,108 @@ In `MainMenu.tsx`:
 ## New dependency
 
 `@tonejs/midi` (add to `frontend/package.json`).
+
+---
+
+# Phase 1 — as built
+
+Implemented as planned, with the small deviations noted below. Files touched:
+
+### New: `componentlogic/playback/timelineBuilder.ts` (pure)
+
+`buildTimeline(pbAction, opts)` — extracted verbatim from
+`usePlaybackManager.createTimelineFromScore`. The former hook-scope values became
+`BuildTimelineOptions`:
+
+```ts
+interface BuildTimelineOptions {
+    useCache?: boolean
+    intro?: number
+    outro?: number
+    playbackSpeed?: number        // stamped into tempo actions only
+    beatPosition: Position        // required
+    samplerFunction?: SamplerFunction  // stored on each action; a no-op is fine for export
+}
+```
+
+`tempoLookup` is now a local `const` of `buildTimeline`; the module no longer calls
+`setTotalDurationMs` (the caller reads `timeline.totalDurationMs`). The private helpers
+`getNotationParagraphs`, `tempoAt`, `extendLastSamplerAction`, `setLastSamplerActionEndtime`
+and `samplerAction2AnimationNotes` moved with it (the first is module-level; `tempoAt`
+closes over the local `tempoLookup`).
+
+**Deviation from the plan:** the `withNotation` flag was *not* added. `buildTimeline`
+always calls `getNotationParagraphs`. It's harmless (a few `createElement` calls whose
+result the MIDI path ignores), and it keeps the builder and its single wrapper simpler. If
+export ever needs to avoid building React elements, add the flag then.
+
+### `componentlogic/playback/usePlaybackManager.ts`
+
+`createTimelineFromScore` is now a thin wrapper:
+
+```ts
+const newTimeLine = buildTimeline(pbAction, {
+    useCache, intro, outro, playbackSpeed, beatPosition,
+    samplerFunction: pbFunctionsRef.current.play
+})
+if (newTimeLine) setTotalDurationMs(newTimeLine.totalDurationMs)
+return newTimeLine
+```
+
+Behaviour-identical for playback. Imports were trimmed to those still used by the
+scheduler (`createPlaybackSchedule`) and the hook shell.
+
+### `componentlogic/playback/useInstruments.ts`
+
+Exported the pitch mapping the sampler already uses:
+
+```ts
+export function noteNamesForSymbol(position: Position, canonicalSymbol: string): string[] {
+    return lookup[position]?.symbol2idxs[canonicalSymbol] ?? []
+}
+```
+
+### New: `componentlogic/playback/midiGenerator.ts` (pure)
+
+`generateMidiFile(timeline: TimeLine): Uint8Array` (`@tonejs/midi`). Groups
+`timeline.sampleractions` by `params.position` → one `midi.addTrack()` each (kempli/beat
+position included automatically); per action `time = timeMs/1000`,
+`duration = To2Millis(params.duration, params.bpm)/1000`, `velocity = params.velocity`
+(clamped 0–1 — `@tonejs/midi` uses the same range, so no ×127), one `addNote({ name, … })`
+per name from `noteNamesForSymbol`. Rests (`note.isMutingSilence`) are skipped; muted
+notes (`action.ismuted`) are emitted as-is with a comment marking the future split point.
+Single default header tempo — absolute times make the timing correct regardless.
+
+### `componentlogic/useScoreReader.ts`
+
+- `saveScore` destination widened to `'database' | 'jsonfile' | 'midifile'` (the JSON
+  export renamed from `'file'`). `saveScore` was **not** renamed to `exportScore` (left as
+  a smaller-diff choice; can revisit).
+- `'midifile'` returns early and calls `saveScoreToMidiFile(score)` on the **un-stripped**
+  score (the builder needs `objNotation`); the DB/JSON paths still use the stripped clone.
+- `saveScoreToMidiFile` builds a whole-score timeline
+  (`{ actionType: 'load', playbackType: 'multiple', score, systemIndex: 0 }`,
+  `{ useCache: true, beatPosition }`) → `generateMidiFile` → download.
+- The File-System-Access + Blob-fallback logic was factored into a shared
+  `saveToLocalFile(content, suggestedName, mimeType, extension, description)` used by both
+  the JSON and MIDI savers. `saveScore`'s dependency array gained `beatPosition`.
+
+### `components/MainMenu.tsx`
+
+- New File-menu item **Export MIDI…** (`eventKey="file-export-midi"`).
+- `case 'file-export-midi'` mirrors `'file-export'`:
+  `saveScore(persistCachedChanges(score), 'midifile')`.
+- Updated the (duplicated) `saveScore` prop type and changed the existing export call from
+  `'file'` to `'jsonfile'`.
+
+### Notes / caveats confirmed during implementation
+
+- `@tonejs/midi` types verified against the installed package: `Midi.toArray(): Uint8Array`
+  and `addNote` accepts `{ name } & { velocity? } & { time, duration? }`.
+- The `'database' | 'file'` occurrences elsewhere (`useScoreReader(source)`,
+  `MainWindow.dataSource`) are the unrelated *load source*, not the save destination — left
+  untouched.
+- Pitches are the app's 12-TET nominal note names (not true pelog/slendro).
+- Verify locally (`npm run build`): playback unchanged after the extraction, and a
+  multi-system score with loops/tempo/dynamics/kempli exports a `.mid` with one track per
+  position and dynamics as velocity.

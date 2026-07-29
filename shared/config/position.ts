@@ -7,7 +7,7 @@ import type { Position, PositionConfig, PositionGroup } from '../types/position'
 export const positionGroups: Record<PositionGroup, { positions: Position[]; name: string }> = {
     PEMADE: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], name: 'Pemade' },
     KANTILAN: { positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Kantilan' },
-    GANGSA_POLOS: { positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'], name: 'gangsa p' },
+    GANGSA_POLOS: { positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'], name: 'Gangsa p' },
     GANGSA_SANGSIH: { positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'], name: 'Gangsa s' },
     GANGSA: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Gangsa' },
     GANGSA_RANGE: {
@@ -16,7 +16,8 @@ export const positionGroups: Record<PositionGroup, { positions: Position[]; name
     },
     REYONG_13: { positions: ['REYONG_1', 'REYONG_3'], name: 'reyong 1+3' },
     REYONG_24: { positions: ['REYONG_2', 'REYONG_4'], name: 'reyong 2+4' },
-    REYONG: { positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
+    REYONG: { positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'], name: 'Reyong' },
+    REYONGB: { positions: ['REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
     POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
     MELODIC: {
         positions: [

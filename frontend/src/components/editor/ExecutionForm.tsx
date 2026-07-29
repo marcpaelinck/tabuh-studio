@@ -137,7 +137,7 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
     const [formValue, setFormValue] = useState<FormValueType>({ type: '', conditions: [] })
     const [dirtyForm, setDirtyForm] = useState<boolean>(false)
     const [loop, setLoop] = useState<number | undefined>(undefined) // loop count if a loop item exists
-    const { beatPosition, orchestraPositions } = useScoreStore()
+    const { beatPosition, orchestra, orchestraPositions } = useScoreStore()
 
     const uuidToNameLookup = Object.fromEntries(sysOptions.map((el) => [el.value, el.label as string]))
     const positionOptions = positionOptionsForSystem(systemData.staffs, orchestraPositions, beatPosition)
@@ -190,8 +190,8 @@ export function ExecutionForm({ systemData, title, open, sysOptions, setOpen, on
         let newItem = executionItemRegistry[item.type].fromForm(formValue, base, { uuidToName: uuidToNameLookup })
         newItem = {
             ...newItem,
-            tooltip: executionItemTooltip(newItem, 'long'),
-            tooltipshort: executionItemTooltip(newItem, 'short')
+            tooltip: executionItemTooltip(newItem, 'long', orchestra),
+            tooltipshort: executionItemTooltip(newItem, 'short', orchestra)
         }
         const newItemList = [...itemList]
         newItemList.splice(selectedListElement, 1, newItem)

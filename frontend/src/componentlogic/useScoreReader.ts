@@ -18,6 +18,8 @@ import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 import { allowedPositionGroups } from './castingRulesManager'
 import { expandSystem } from './expandNotation'
+import { generatePdf } from './export/pdfGenerator'
+import { buildPdfModel } from './export/pdfModel'
 import { generateMidiFile } from './playback/midiGenerator'
 import { buildTimeline } from './playback/timelineBuilder'
 
@@ -34,7 +36,7 @@ export function persistCachedChanges(score: Score | undefined): Score | undefine
     return newScore
 }
 
-// Seta the score's UUID if missing and creates NoteObject notation
+// Set the score's UUID if missing and creates NoteObject notation
 function postprocessScore(score: Score, beatPosition: Position): Score {
     if (!score.uuid) score.uuid = uuidv4()
     for (const system of score.systems) {
@@ -45,9 +47,9 @@ function postprocessScore(score: Score, beatPosition: Position): Score {
             staff.objNotation = NoteObject.fromNotation(staff.notation, _pos as Position)
         })
         for (const item of system.execution ?? []) {
-            item.tooltip = executionItemTooltip(item, 'long')
+            item.tooltip = executionItemTooltip(item, 'long', score.instrumenttype)
             debug(`setting tooltip to '${item.tooltip}'`)
-            item.tooltipshort = executionItemTooltip(item, 'short')
+            item.tooltipshort = executionItemTooltip(item, 'short', score.instrumenttype)
         }
     }
     return score
@@ -65,7 +67,10 @@ function toScoreInfo(item: ScoreListItem): ScoreInfo {
 // Loads and parses a score when a new tabuh (score title) is selected
 export function useScoreReader(source: 'database' | 'file'): {
     loadScore: (format: ScoreFormat, scoreInfo?: ScoreInfo) => void
-    saveScore: (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile') => Promise<boolean>
+    saveScore: (
+        score: Score | undefined,
+        destination: 'database' | 'jsonfile' | 'midifile' | 'pdffile'
+    ) => Promise<boolean>
     isLoading: boolean
 } {
     const { setScoreInfoList, setCurrentScore, setOrchestra, setOrchestraPositions, setAllowedPositionGroups } =
@@ -111,12 +116,16 @@ export function useScoreReader(source: 'database' | 'file'): {
     }
 
     const saveScore = useCallback(
-        async (score: Score | undefined, destination: 'database' | 'jsonfile' | 'midifile'): Promise<boolean> => {
+        async (
+            score: Score | undefined,
+            destination: 'database' | 'jsonfile' | 'midifile' | 'pdffile'
+        ): Promise<boolean> => {
             // if (!newScoreInfo || same<ScoreInfo>(newScoreInfo, scoreInfo)) return
             var isSuccess = false
-            // MIDI export needs the object notation (objNotation), so it uses the original
-            // score; the JSON/DB paths use a stripped clone.
+            // MIDI and PDF export need the object notation (objNotation) / groups, so they use
+            // the original score; the JSON/DB paths use a stripped clone.
             if (destination == 'midifile') return await saveScoreToMidiFile(score)
+            if (destination == 'pdffile') return await saveScoreToPdfFile(score)
             // Create a copy of the score object and remove the object versions of the notation
             const scoreNoObject = structuredClone(score)
             scoreNoObject?.systems.forEach((system) => {
@@ -298,6 +307,14 @@ export function useScoreReader(source: 'database' | 'file'): {
         if (!timeline) return false
         const bytes = generateMidiFile(timeline) as BlobPart
         return saveToLocalFile(bytes, `${fileStem(score)}.mid`, 'audio/midi', '.mid', 'MIDI file')
+    }
+
+    // Exports the score as a formatted notation PDF (compact grouped notation).
+    async function saveScoreToPdfFile(score: Score | undefined): Promise<boolean> {
+        if (!score) return false
+        const model = buildPdfModel(score)
+        const bytes = (await generatePdf(model)) as BlobPart
+        return saveToLocalFile(bytes, `${fileStem(score)}.pdf`, 'application/pdf', '.pdf', 'PDF document')
     }
 
     async function loadScoreListFromDb() {
