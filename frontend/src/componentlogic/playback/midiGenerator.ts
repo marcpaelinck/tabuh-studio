@@ -24,7 +24,7 @@ import { Midi } from '@tonejs/midi'
 import { baseNoteValue } from '../../config/config'
 import type { PlaybackSamplerAction, TimeLine } from '../../typing/playback'
 import { TO2n } from '../../utils/timeunits'
-import { noteNamesForSymbol } from './pitchMap'
+import { symbolMidis } from './pitchMap'
 
 const clamp01 = (v: number): number => Math.max(0, Math.min(1, v))
 
@@ -124,8 +124,8 @@ export function generateMidiFile(timeline: TimeLine): Uint8Array {
             const durationTicks = Math.max(1, toTicks(TO2n(action.params.duration)))
             const velocity = clamp01(action.params.velocity)
             // A symbol can map to several pitches (octave doubling / chord keys) → one note each.
-            for (const name of noteNamesForSymbol(position, action.params.note.canonicalSymbol)) {
-                track.addNote({ name, ticks, durationTicks, velocity })
+            for (const midiNote of symbolMidis(position, action.params.note.canonicalSymbol)) {
+                track.addNote({ midi: midiNote, ticks, durationTicks, velocity })
             }
         }
     }

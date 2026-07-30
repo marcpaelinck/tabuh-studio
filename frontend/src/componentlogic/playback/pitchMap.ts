@@ -1,74 +1,129 @@
-// Pure pitch-mapping module.
+// Pure pitch-mapping module for the MIDI export and its note-map PDF.
 //
-// The sampler assigns each position's unique Tabuh note names (the values of
-// `positionConfigs[position].symbolToNoteNames`, de-duplicated in insertion order) to the
-// chromatic Western note names in `NOTES` (C1…B3), one per index. That nominal 12-TET
-// mapping is what the app actually plays, and therefore what the MIDI export must emit and
-// what the note-map PDF must document. Keeping the derivation here — pure, framework-free —
-// lets `useInstruments` (playback), `midiGenerator` (export) and `midiNoteMap` (the PDF)
-// share a single source of truth so their pitches always agree.
+// A Tabuh note name (DING1, DONG1, …) is only meaningful once combined with an *instrument*
+// (`positionConfigs[position].instrument`): the same name is a different sample on a
+// different instrument. The MIDI mapping is therefore built **per instrument**, not per
+// position. All the distinct note names an instrument can produce — across every position
+// that plays it, and including the abbreviated (`_ABBR`), muted (`_MUTED`) and byot (`X…`)
+// variants — are pooled, ordered by pitch, and assigned consecutive MIDI numbers from C1.
+//
+// Doing this per instrument (rather than per position) means a given note keeps one MIDI
+// number no matter which position plays it, and two different notes never collide. (The old
+// per-position scheme collided, e.g. reyong-2 DUNG0 and reyong-4 DONG1 both landing on MIDI
+// 24, because each reyong position only uses a subset of the reyong's range.)
+//
+// This is independent of the sampler's own per-position note→sample lookup in
+// `useInstruments`; those pitches are internal handles for Tone.Sampler and need not match
+// the exported MIDI numbers. Pitches here are nominal 12-TET, not true pelog/slendro tuning.
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import { NOTES } from '../../config/config'
+import type { Instrument } from '@tabuhstudio/shared/types/basetypes'
 
-export interface PositionPitchMap {
-    /** Unique Tabuh note names, in the order the sampler assigns them to NOTES. */
-    noteNames: string[]
-    /** Tabuh note name → assigned Western pitch (a NOTES entry, e.g. "C1"). */
-    pitchByNoteName: Record<string, string>
-    /** Notation symbol → the Western pitch name(s) it plays (0..n; n>1 for chord keys). */
-    symbolToPitches: Record<string, string[]>
-    /** Western pitch name → the notation symbol(s) that produce it. */
-    symbolsByPitch: Record<string, string[]>
+/** MIDI number of the lowest note assigned to every instrument (C1). */
+const MIDI_BASE = 24
+
+const PITCH_CLASS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+/** Scientific pitch name for a MIDI number (C-1 = 0, C4 = 60 — matches @tonejs/midi). */
+export function midiToPitchName(midi: number): string {
+    return PITCH_CLASS[((midi % 12) + 12) % 12] + (Math.floor(midi / 12) - 1)
 }
 
-function build(position: Position): PositionPitchMap {
-    const symbolToNoteNames = positionConfigs[position]?.symbolToNoteNames ?? {}
-    const noteNames = [...new Set(Object.values(symbolToNoteNames).flat())]
-    const pitchByNoteName: Record<string, string> = {}
-    noteNames.forEach((name, i) => {
-        pitchByNoteName[name] = NOTES[i]
-    })
-    const symbolToPitches: Record<string, string[]> = {}
-    const symbolsByPitch: Record<string, string[]> = {}
-    for (const [symbol, names] of Object.entries(symbolToNoteNames)) {
-        const pitches = names.map((n) => pitchByNoteName[n])
-        symbolToPitches[symbol] = pitches
-        for (const pitch of pitches) (symbolsByPitch[pitch] ??= []).push(symbol)
+// Pitch ordering for note names. Tone within an octave follows the Balinese sequence; each
+// pitch's open / abbreviated / muted / byot variants are kept adjacent and after the open
+// note. Names that don't match (kendang, gongs, cengceng, …) sort last, keeping first-seen
+// order, which is fine as those instruments each have a single position.
+const TONE_ORDER = ['DING', 'DONG', 'DENG', 'DEUNG', 'DUNG', 'DANG']
+const NOTE_RE = /^(X?)(DING|DONG|DENG|DEUNG|DUNG|DANG)(\d+)(?:_(ABBR|MUTED))?$/
+
+function sortKey(name: string): number {
+    const m = NOTE_RE.exec(name)
+    if (!m) return Number.MAX_SAFE_INTEGER
+    const [, x, tone, octave, variant] = m
+    const variantIdx = (variant === 'ABBR' ? 1 : variant === 'MUTED' ? 2 : 0) + (x ? 3 : 0)
+    return parseInt(octave, 10) * 1000 + TONE_ORDER.indexOf(tone) * 10 + variantIdx
+}
+
+/** Positions grouped by their instrument, in `positionConfigs` declaration order. */
+const positionsByInstrument = ((): Record<Instrument, Position[]> => {
+    const acc = {} as Record<Instrument, Position[]>
+    for (const [position, cfg] of Object.entries(positionConfigs)) {
+        ;(acc[cfg.instrument] ??= []).push(position as Position)
     }
-    return { noteNames, pitchByNoteName, symbolToPitches, symbolsByPitch }
+    return acc
+})()
+
+/** note name → MIDI number, per instrument (the pooled, pitch-ordered assignment). */
+const midiByNoteName = ((): Record<Instrument, Record<string, number>> => {
+    const acc = {} as Record<Instrument, Record<string, number>>
+    for (const [instrument, positions] of Object.entries(positionsByInstrument)) {
+        const names: string[] = []
+        const seen = new Set<string>()
+        for (const position of positions) {
+            for (const name of Object.values(positionConfigs[position].symbolToNoteNames).flat()) {
+                if (!seen.has(name)) {
+                    seen.add(name)
+                    names.push(name)
+                }
+            }
+        }
+        // Stable sort by pitch (Array.prototype.sort is stable), so unparsed names keep order.
+        names.sort((a, b) => sortKey(a) - sortKey(b))
+        const map: Record<string, number> = {}
+        names.forEach((name, i) => (map[name] = MIDI_BASE + i))
+        acc[instrument as Instrument] = map
+    }
+    return acc
+})()
+
+const instrumentOf = (position: Position): Instrument | undefined => positionConfigs[position]?.instrument
+
+/**
+ * The MIDI note number(s) a symbol plays for a given position (0..n; n>1 for chord keys),
+ * using the position's instrument-wide mapping. Reused by the MIDI export.
+ */
+export function symbolMidis(position: Position, canonicalSymbol: string): number[] {
+    const instrument = instrumentOf(position)
+    if (!instrument) return []
+    const map = midiByNoteName[instrument]
+    return (positionConfigs[position].symbolToNoteNames[canonicalSymbol] ?? []).map((name) => map[name])
 }
 
-const cache = Object.fromEntries((Object.keys(positionConfigs) as Position[]).map((p) => [p, build(p)])) as Record<
-    Position,
-    PositionPitchMap
->
+export interface NoteMapRow {
+    midi: number
+    pitch: string // scientific name, e.g. "C1"
+    note: string // Tabuh note name, e.g. "DING1"
+    symbols: string // notation symbol(s) producing this note, in this position
+}
 
-const EMPTY: PositionPitchMap = { noteNames: [], pitchByNoteName: {}, symbolToPitches: {}, symbolsByPitch: {} }
-
-/** The full pitch mapping for a position (see `PositionPitchMap`). */
-export function positionPitchMap(position: Position): PositionPitchMap {
-    return cache[position] ?? EMPTY
+/** The instrument a position plays. */
+export function instrumentForPosition(position: Position): Instrument | undefined {
+    return instrumentOf(position)
 }
 
 /**
- * The Western note name(s) a symbol maps to for a given position — the same mapping the
- * sampler uses to pick samples. Returns 0..n names (a key can trigger several pitches, e.g.
- * octave doubling / chord keys). Reused by the MIDI export so exported pitches match
- * playback. Note: 12-TET nominal names, not true pelog/slendro tuning.
+ * The note-map rows for a whole instrument: every distinct note the instrument can play
+ * (pooled across all its positions), with its MIDI number and the notation symbol(s) that
+ * produce it (aggregated over the instrument's positions), sorted by MIDI number.
  */
-export function noteNamesForSymbol(position: Position, canonicalSymbol: string): string[] {
-    return cache[position]?.symbolToPitches[canonicalSymbol] ?? []
-}
+export function instrumentNoteMapRows(instrument: Instrument): NoteMapRow[] {
+    const map = midiByNoteName[instrument]
+    if (!map) return []
 
-const PITCH_CLASS: Record<string, number> = {
-    C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, A: 9, 'A#': 10, B: 11
-}
+    const symbolsByNote: Record<string, string[]> = {}
+    for (const position of positionsByInstrument[instrument] ?? []) {
+        for (const [symbol, names] of Object.entries(positionConfigs[position].symbolToNoteNames)) {
+            for (const name of names) (symbolsByNote[name] ??= []).push(symbol)
+        }
+    }
 
-/** MIDI note number for a scientific pitch name (C-1 = 0, C4 = 60 — matches @tonejs/midi). */
-export function pitchToMidi(name: string): number {
-    const m = /^([A-G]#?)(-?\d+)$/.exec(name ?? '')
-    if (!m) return 0
-    return PITCH_CLASS[m[1]] + (parseInt(m[2], 10) + 1) * 12
+    return Object.keys(map)
+        .map((note) => ({
+            midi: map[note],
+            pitch: midiToPitchName(map[note]),
+            note,
+            symbols: [...new Set(symbolsByNote[note] ?? [])].join('  ')
+        }))
+        .sort((a, b) => a.midi - b.midi)
 }

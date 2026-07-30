@@ -1,18 +1,41 @@
 // MIDI note-map PDF.
 //
-// Companion to the MIDI export: a reference sheet that maps every MIDI pitch in the
-// exported file back to its Tabuh Studio note and notation symbol(s), grouped by track
-// (= instrument position). The MIDI export assigns each position's distinct note names —
-// including the abbreviated and muted variants — to its own chromatic pitch, so this map is
-// what lets a DAW user tell which MIDI note is which gamelan note.
+// Companion to the MIDI export: a reference sheet that maps every MIDI pitch in the exported
+// file back to its Tabuh Studio note and notation symbol(s), grouped **per instrument** (the
+// pitch mapping and GM program are both per instrument, so several positions of the same
+// instrument — e.g. the four reyong — share one block). It lets a DAW user tell which MIDI
+// note is which gamelan note.
 //
 // Pure builder (`buildMidiNoteMapModel`) + pdf-lib renderer (`generateMidiNoteMapPdf`).
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import type { Instrument } from '@tabuhstudio/shared/types/basetypes'
 import { PDFDocument, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { gmProgram } from '../playback/midiGenerator'
-import { pitchToMidi, positionPitchMap } from '../playback/pitchMap'
+import { instrumentNoteMapRows } from '../playback/pitchMap'
+
+// Display names for the instruments (the `Instrument` enum values are upper-cased ids).
+const INSTRUMENT_NAMES: Record<Instrument, string> = {
+    UGAL: 'Ugal',
+    GENDER_RAMBAT: 'Gender rambat',
+    TROMPONG: 'Trompong',
+    PEMADE: 'Pemade',
+    KANTILAN: 'Kantilan',
+    REYONG: 'Reyong',
+    PENYACAH: 'Penyacah',
+    CALUNG: 'Calung',
+    JEGOGAN: 'Jegogan',
+    GONGS: 'Gongs',
+    CENGCENG: 'Cengceng',
+    CENGCENG_KOPYAK: 'Cengceng kopyak',
+    KENDANG_WADON: 'Kendang wadon',
+    KENDANG_LANANG: 'Kendang lanang',
+    KEMPLI: 'Kempli',
+    REYONGB: 'Reyong (baleganjur)',
+    PONGGANG: 'Ponggang',
+    TAWATAWA: 'Tawa tawa'
+}
 
 // GM program names (0-based) for the programs the exporter uses; falls back to "Program N".
 const GM_NAMES: Record<number, string> = {
@@ -44,9 +67,10 @@ export interface MidiNoteMapRow {
     symbols: string // notation symbol(s) producing this pitch
 }
 
-export interface MidiNoteMapTrack {
-    position: Position
-    trackName: string
+/** One block of the note map — a whole instrument. */
+export interface MidiNoteMapInstrument {
+    instrument: Instrument
+    name: string
     gmProgram: number // 0-based
     gmName: string
     rows: MidiNoteMapRow[]
@@ -55,38 +79,35 @@ export interface MidiNoteMapTrack {
 export interface MidiNoteMapModel {
     title: string
     datestamp: string
-    tracks: MidiNoteMapTrack[]
+    instruments: MidiNoteMapInstrument[]
 }
 
 function formatDatestamp(d: Date): string {
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }).toLowerCase()
 }
 
-/** Builds the note-map model for the given tracks (positions), in track order. */
+/**
+ * Builds the note-map model from the exported track positions: one block per distinct
+ * instrument (in first-seen track order), each showing the instrument's full pooled note
+ * range with its instrument-consistent MIDI numbers.
+ */
 export function buildMidiNoteMapModel(scoreTitle: string, positions: Position[]): MidiNoteMapModel {
-    const tracks: MidiNoteMapTrack[] = positions.map((position) => {
-        const map = positionPitchMap(position)
-        const rows: MidiNoteMapRow[] = map.noteNames
-            .map((note) => {
-                const pitch = map.pitchByNoteName[note]
-                return {
-                    midi: pitchToMidi(pitch),
-                    pitch,
-                    note,
-                    symbols: [...new Set(map.symbolsByPitch[pitch] ?? [])].join('  ')
-                }
-            })
-            .sort((a, b) => a.midi - b.midi)
+    const instruments: MidiNoteMapInstrument[] = []
+    const seen = new Set<Instrument>()
+    for (const position of positions) {
+        const instrument = positionConfigs[position]?.instrument
+        if (!instrument || seen.has(instrument)) continue
+        seen.add(instrument)
         const program = gmProgram(position)
-        return {
-            position,
-            trackName: positionConfigs[position]?.name ?? position,
+        instruments.push({
+            instrument,
+            name: INSTRUMENT_NAMES[instrument] ?? instrument,
             gmProgram: program,
             gmName: gmName(program),
-            rows
-        }
-    })
-    return { title: scoreTitle, datestamp: formatDatestamp(new Date()), tracks }
+            rows: instrumentNoteMapRows(instrument)
+        })
+    }
+    return { title: scoreTitle, datestamp: formatDatestamp(new Date()), instruments }
 }
 
 // ---- Rendering ----
@@ -141,7 +162,7 @@ function addLink(doc: PDFDocument, page: PDFPage, x: number, y: number, w: numbe
     page.node.addAnnot(doc.context.register(annot))
 }
 
-const blockHeight = (t: MidiNoteMapTrack): number => HEAD_H + t.rows.length * ROW_H
+const blockHeight = (t: MidiNoteMapInstrument): number => HEAD_H + t.rows.length * ROW_H
 
 /** Truncates text to fit `maxW` at `size` in `font`, appending "…" when clipped. */
 function fit(text: string, font: PDFFont, size: number, maxW: number): string {
@@ -199,8 +220,8 @@ export async function generateMidiNoteMapPdf(model: MidiNoteMapModel): Promise<U
         y = colTop
     }
 
-    const drawBlock = (x: number, top: number, t: MidiNoteMapTrack): void => {
-        page.drawText(winAnsi(`${t.trackName}  ·  GM ${t.gmProgram + 1} ${t.gmName}`), {
+    const drawBlock = (x: number, top: number, t: MidiNoteMapInstrument): void => {
+        page.drawText(winAnsi(`${t.name}  ·  GM ${t.gmProgram + 1} ${t.gmName}`), {
             x,
             y: top - HEAD_SIZE,
             size: HEAD_SIZE,
@@ -231,7 +252,7 @@ export async function generateMidiNoteMapPdf(model: MidiNoteMapModel): Promise<U
         }
     }
 
-    for (const t of model.tracks) {
+    for (const t of model.instruments) {
         const h = blockHeight(t)
         if (y - h < BOTTOM && y < colTop) {
             col++

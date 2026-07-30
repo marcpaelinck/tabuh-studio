@@ -102,10 +102,8 @@ const lookup = Object.fromEntries(
     })
 )
 
-// The symbol → Western-pitch mapping used by the sampler (and re-derived identically in
-// `pitchMap`) is exported from the pure `pitchMap` module so playback, MIDI export and the
-// note-map PDF share one source of truth.
-export { noteNamesForSymbol } from './pitchMap'
+// The MIDI export derives its own pitch mapping (per instrument) in the pure `pitchMap`
+// module; the sampler keeps its per-position `lookup` above.
 
 const createInstrument = (
     position: Position,

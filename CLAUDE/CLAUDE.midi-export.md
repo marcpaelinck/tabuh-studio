@@ -379,25 +379,43 @@ lands at tick 1920 = 4.0 s at 60 BPM.
 - New export `midiTrackPositions(timeline)` returns the track positions in order, so the
   note-map PDF documents exactly the tracks in the file.
 
-## `componentlogic/playback/pitchMap.ts` (new, pure)
+## `componentlogic/playback/pitchMap.ts` (new, pure) — **per instrument**
 
-Single source of truth for the symbol → Western-pitch mapping. The sampler assigns each
-position's de-duplicated note names (values of `symbolToNoteNames`, in insertion order) to
-`NOTES` (C1…B3), one per index — so the abbreviated (`_ABBR`) and muted (`_MUTED`) variants
-each get their **own** pitch. Exposes `positionPitchMap(position)`
-(`noteNames`, `pitchByNoteName`, `symbolToPitches`, `symbolsByPitch`),
-`noteNamesForSymbol(position, symbol)`, and `pitchToMidi(name)` (C-1 = 0, C4 = 60, matching
-`@tonejs/midi`). `useInstruments` now re-exports `noteNamesForSymbol` from here so playback,
-export and the note map can never diverge.
+The MIDI pitch mapping is built **per instrument**, not per position. A note name (`DING1`)
+is only meaningful with an instrument (`positionConfigs[position].instrument`); the same name
+is a different sample on a different instrument. So for each instrument all the distinct note
+names it can produce — pooled across **every position** that plays it, and including the
+`_ABBR`, `_MUTED` and byot (`X…`) variants — are collected, ordered by pitch (Balinese tone
+order within an octave, each pitch's open/abbr/muted/byot variants kept adjacent, unparsed
+names last), and assigned consecutive MIDI numbers from **C1 (24)**.
 
-## `componentlogic/export/midiNoteMap.ts` (new)
+Why per instrument: each reyong *position* only uses a subset of the reyong's range, so the
+old per-position scheme collided — e.g. reyong-2 `DUNG0` and reyong-4 `DONG1` both landed on
+MIDI 24. Pooling per instrument means a note keeps one MIDI number whichever position plays
+it (`DING1` = 36 in reyong 1/2/3) and no two notes collide. The reyong union is 48 notes
+(C1–B4), which is why MIDI numbers are generated directly rather than via the 36-entry
+`NOTES` array.
 
-- `buildMidiNoteMapModel(scoreTitle, positions)`: per track (position), one row per unique
-  note name — `{ midi, pitch (e.g. "C1"), note (e.g. "DING1"), symbols }` — sorted by MIDI
-  number. `symbols` lists the notation symbol(s) that produce that pitch (so e.g. Calung's
-  `i` and `i/` share a pitch; reyong chord keys `t`/`b` appear on their component pitches).
-- `generateMidiNoteMapPdf(model)`: pdf-lib, A4, two-column flow of per-track tables (small
-  Helvetica/Courier), a header with title + datestamp + the swarasanti hyperlink and a
+Exposes `symbolMidis(position, symbol)` (the MIDI note number(s) a symbol plays, used by the
+export — which is per position/track), `instrumentNoteMapRows(instrument)` (a whole
+instrument's rows: `{ midi, pitch, note, symbols }` sorted by MIDI, pooled across all the
+instrument's positions with symbols aggregated), `instrumentForPosition(position)` and
+`midiToPitchName(midi)`. This is deliberately independent of the sampler's own per-position
+note→sample lookup in `useInstruments` (those pitches are internal Tone.Sampler handles and
+needn't match the exported MIDI numbers).
+
+## `componentlogic/export/midiNoteMap.ts` (new) — grouped **per instrument**
+
+- `buildMidiNoteMapModel(scoreTitle, positions)`: derives the distinct instruments from the
+  exported track positions (first-seen order) and emits **one block per instrument**, so the
+  four reyong positions collapse to a single "Reyong" block and `PEMADE_POLOS`/`_SANGSIH` to
+  one "Pemade". Each block carries the instrument display name (`INSTRUMENT_NAMES`), its GM
+  program, and `instrumentNoteMapRows(instrument)` — the instrument's full pooled note range,
+  one row per note `{ midi, pitch (e.g. "C1"), note (e.g. "DING1"), symbols }` sorted by MIDI.
+  `symbols` aggregates, across the instrument's positions, the notation symbol(s) that produce
+  that note (e.g. reyong `DING1` → `i  t  b`).
+- `generateMidiNoteMapPdf(model)`: pdf-lib, A4, two-column flow of per-instrument tables
+  (small Helvetica/Courier), a header with title + datestamp + the swarasanti hyperlink and a
   "nominal 12-TET" caveat. Standard fonts only (no embedded font needed).
 
 ## `componentlogic/useScoreReader.ts` — two files, one folder
