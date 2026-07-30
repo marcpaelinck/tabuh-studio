@@ -88,3 +88,7 @@ Initial release
 - `Removed` Editor: removed parts indicator.
 - `Changed` Parts attribute no longer read (from imported files) or used.
 - `Added` MIDI tempo map (in MIDI file) and program assignment table (separate PDF).
+
+## 1.1.7 2026-07-30
+
+- `Changed` MIDI generator: set notemap according to test user settings in Ableton

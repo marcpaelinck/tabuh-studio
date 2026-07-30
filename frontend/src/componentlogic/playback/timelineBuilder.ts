@@ -19,7 +19,13 @@ import { createElement } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { defaultBeatFrequency, defaultTempo, dynamicsToNumber, noteConfigs } from '../../config/config'
 import type { FlowStep } from '../../typing/execution'
-import type { AnimationNote, PlaybackAction, PlaybackSamplerAction, SamplerFunction, TimeLine } from '../../typing/playback'
+import type {
+    AnimationNote,
+    PlaybackAction,
+    PlaybackSamplerAction,
+    SamplerFunction,
+    TimeLine
+} from '../../typing/playback'
 import type { Note, Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { getSystemDuration } from '../../utils/objectUtils'
@@ -37,6 +43,8 @@ export interface BuildTimelineOptions {
     playbackSpeed?: number
     /** The kempli/beat position. */
     beatPosition: Position
+    /** If true, all strokes will be emulated, even if there are samples for them. */
+    forceStrokeEmulation?: boolean
     /** Sampler callback stored on each sampler action (a no-op is fine for MIDI export). */
     samplerFunction?: SamplerFunction
 }
@@ -322,7 +330,8 @@ export function buildTimeline(pbAction: PlaybackAction, opts: BuildTimelineOptio
                             (noteIdx / objNotation.length) *
                                 (currentStep!.dynamics[position][1] - currentStep!.dynamics[position][0]),
                         prevaction: _.last(newTimeLine.sampleractions),
-                        isLast: lastStep && endOfMeasure
+                        isLast: lastStep && endOfMeasure,
+                        forceEmulation: opts.forceStrokeEmulation
                     })
                     // Update note's duration
                     // and push the note in the `sampleractions` array.
@@ -468,7 +477,8 @@ export function buildTimeline(pbAction: PlaybackAction, opts: BuildTimelineOptio
                     bpm: currentStep.tempo[0],
                     velocity: dynamicsToNumber['mf'],
                     prevaction: undefined,
-                    isLast: lastStep && beatOffset + currentStep.system.kempli.frequency! > systemDuration
+                    isLast: lastStep && beatOffset + currentStep.system.kempli.frequency! > systemDuration,
+                    forceEmulation: opts.forceStrokeEmulation
                 })
                 // createNoteActions always returns an array containing 1 or more actions
                 if (strokeNoteActions) {

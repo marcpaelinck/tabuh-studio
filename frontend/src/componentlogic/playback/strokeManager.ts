@@ -68,7 +68,7 @@ export interface CreateStrokeArgs {
     velocity: ToneJS.Unit.NormalRange // current velocity
     prevaction: PlaybackSamplerAction | undefined // previous action created for this position
     isLast: boolean // true if this is the last symbol in the current position's notation
-    skip?: boolean // Can be used when multiple notes are combined into a single stroke pattern
+    forceEmulation?: boolean // If true, the stroke will be emulated even if there is a sample
 }
 // Checks if there is a sample for the note's stroke. If not, the stroke is emulated.
 // Returns a list of PlaybackSamplerAction objects.
@@ -184,7 +184,7 @@ function openNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample()) {
+    if (args.note.hasSample() || args.forceEmulation) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {
@@ -206,7 +206,7 @@ function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample()) {
+    if (args.note.hasSample() || args.forceEmulation) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {

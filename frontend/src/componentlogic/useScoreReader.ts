@@ -343,7 +343,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         if (!score) return false
         const timeline = buildTimeline(
             { actionType: 'load', playbackType: 'multiple', score, systemIndex: 0 },
-            { useCache: true, beatPosition }
+            { useCache: true, beatPosition, forceStrokeEmulation: true }
         )
         if (!timeline) return false
         const stem = fileStem(score)
