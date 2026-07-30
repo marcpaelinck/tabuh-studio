@@ -22,8 +22,7 @@ const DefaultObjectFactory = {
             composer: '',
             instrumenttype: 'UNDEFINED',
             positions: [],
-            systems: [],
-            parts: {}
+            systems: []
         } as Score
     }
 }

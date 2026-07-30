@@ -78,8 +78,7 @@ export function parseLaras(content: string): ParserReturnValue {
         composer: '',
         instrumenttype: 'GONG_KEBYAR',
         systems: [],
-        positions: [],
-        parts: {}
+        positions: []
     }
     let currentSystem: System | null = null
 
@@ -98,15 +97,13 @@ export function parseLaras(content: string): ParserReturnValue {
                 break
             }
             case 'SystemHeader': {
-                const title = cleanString(getText(node.getChild('String')!))
-                const found = title.match(/(?<partname>[^\[]+) \[\d+\]/)
-                const partname =
-                    found && found.groups && 'partname' in found.groups ? found.groups['partname'] : undefined
+                const label = cleanString(getText(node.getChild('String')!))
                 currTempo = parseInt(getText(node.getChild('Number')!))
                 currentSystem = {
                     uuid: uuidv4(),
                     id: score.systems.length + 1,
                     index: score.systems.length,
+                    label,
                     groups: [],
                     staffs: {},
                     beatSlices: [],
@@ -124,10 +121,6 @@ export function parseLaras(content: string): ParserReturnValue {
                     ]
                 }
                 score.systems.push(currentSystem!)
-                if (partname) {
-                    if (!(partname in score.parts)) score.parts['partname'] = [partname]
-                    else score.parts['partname'].push(partname)
-                }
                 break
             }
             case 'SectionData': {

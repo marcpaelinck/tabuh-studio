@@ -237,16 +237,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const { loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
     const { currentScore, scoreInfoList } = useScoreStore()
-    const {
-        score,
-        validation,
-        localCacheState,
-        updateSystem,
-        updateParts,
-        executeItemAction,
-        newScore,
-        updateScoreMeta
-    } = useScoreManager()
+    const { score, validation, localCacheState, updateSystem, executeItemAction, newScore, updateScoreMeta } =
+        useScoreManager()
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
@@ -393,7 +385,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             visible={mainView == 'editor'}
             loading={isLoadingScore}
             score={score}
-            updateParts={updateParts}
             executeItemAction={executeItemAction}
             updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackState={playbackState}

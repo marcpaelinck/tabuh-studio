@@ -28,12 +28,6 @@ export interface PartInstruction {
 
 export interface PostProcessing {
     copy?: CopyInstruction
-    part?: PartInstruction
-}
-
-export interface PostProcessing {
-    copy?: CopyInstruction
-    part?: PartInstruction
 }
 
 export interface ParserReturnValue {

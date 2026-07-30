@@ -172,13 +172,6 @@ export function useScoreManager() {
         })
     }, [])
 
-    const updateParts = useCallback((parts: Record<string, string[]>) => {
-        if (!score) return
-        const newScore: Score = { ...score }
-        newScore.parts = { ...parts }
-        setScore(newScore)
-    }, [])
-
     function updatePointers(newSystemData: System[]) {
         // Update fields that depend on pointers to another system
         newSystemData.map((systemData) => {
@@ -372,7 +365,6 @@ export function useScoreManager() {
             title: fields.title,
             composer: fields.composer,
             instrumenttype: fields.instrumenttype,
-            parts: {},
             positions: [],
             systems: [{ ...createEmptySystem({ ...DEFAULT_KEMPLI }), id: 1, index: 0 }]
         }
@@ -393,7 +385,6 @@ export function useScoreManager() {
         getScore,
         updateScore,
         updateSystem,
-        updateParts,
         executeItemAction,
         newScore,
         updateScoreMeta

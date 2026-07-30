@@ -20,13 +20,7 @@ import type {
     TempoItem,
     WaitItem
 } from '../typing/execution.ts'
-import type {
-    Attribute,
-    ParserReturnValue,
-    PartInstruction,
-    PostProcessing,
-    ProcessingInstruction
-} from '../typing/parsers.ts'
+import type { Attribute, ParserReturnValue, PostProcessing, ProcessingInstruction } from '../typing/parsers.ts'
 import type { GroupedNotation, Score, System } from '../typing/score.ts'
 import { debug } from '../utils/debugger.ts'
 import { executionItemSeqId, executionItemTooltip } from '../utils/executionItems.ts'
@@ -71,7 +65,6 @@ export function parseNotation(content: string): ParserReturnValue {
         title: '',
         composer: '',
         instrumenttype: 'UNDEFINED',
-        parts: {},
         positions: [],
         systems: []
     } as ScoreByMeasure
@@ -252,31 +245,6 @@ function postProcess(scoreByMeasure: ScoreByMeasure, postProcessingInstructions:
         system.kempli = deriveKempli(system.kempli, system.execution, colWidths, hasKempliNotation)
         // ensure that there is a kempli staff if the kempli state is 'notation'.
         if (system.kempli.state == 'notation' && !hasKempliNotation) addKempliNotationByMeasure(system, colWidths)
-    }
-
-    // Generate and assign the score's `parts` attribute.
-    // Parts instructions only contain the first system of the part. Assume that
-    // each part should be extended until the next part or the end of the score.
-    const partPostProcessing: PostProcessing[] =
-        postProcessingInstructions.filter((instr) => instr.part != undefined) || []
-    // Extract the part definitions (PartInstruction) and sort them by system ID.
-    const partsInstr = partPostProcessing
-        .map((instr) => instr.part!)
-        .sort((part1, part2) => part1.systemid - part2.systemid) as PartInstruction[]
-    // Create [part, next part] pairs
-    const pairs = _.zip(
-        partsInstr,
-        partsInstr
-            .toSpliced(0, 1)
-            .concat([{ name: '', systemid: Number.MAX_SAFE_INTEGER, systemuuid: '' } as PartInstruction])
-    )
-
-    for (const [part, next] of pairs) {
-        if (!part || !next) continue
-        const partSystems = scoreByMeasure.systems.filter(
-            (system) => system.id >= part?.systemid && system.id < next.systemid
-        )
-        scoreByMeasure.parts[part.name] = partSystems.map((system) => system.uuid)
     }
 
     // Finally, flatten the notation from measure based to system based
@@ -628,13 +596,6 @@ function parseMetadata(
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
-        }
-        case 'PartMetadata': {
-            const partName: string = getValue<string>(node, 'StringValue', content) as string
-            return {
-                type: 'postprocessing',
-                value: { part: { name: partName, systemid: systemid, systemuuid: systemuuid } } as PostProcessing
-            } as ProcessingInstruction
         }
         case 'SequenceMetadata': {
             const baseAttr = { type: 'sequence', seqId: seqNr, tooltip: '', tooltipshort: '' }

@@ -79,7 +79,7 @@ export type Score = {
     title: string
     composer: string
     instrumenttype: InstrumentGroup
-    parts: Record<string, UUID[]>
+    parts?: Record<string, UUID[]> // deprecated
     positions: Position[]
     systems: System[]
 }

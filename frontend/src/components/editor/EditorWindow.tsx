@@ -3,7 +3,6 @@ import _ from 'lodash'
 import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, Toggle, useDialog, VStack } from 'rsuite'
-import { usePartManager } from '../../componentlogic/usePartManager'
 import { useEditorStateStore } from '../../stores/useEditorStateStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore, type EditorView } from '../../stores/useUserSettingsStore'
@@ -18,7 +17,6 @@ import type { Score, System, SystemActionValue } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { FeatureUnderDevelopment } from '../Feature'
 import { ExecutionFormContext } from './executionFormContext'
-import { PartIndicator } from './PartIndicator'
 import { SystemNode } from './SystemNode'
 
 export type SystemCursorFunction = (cursor: EditorCursorParameters) => void
@@ -27,7 +25,6 @@ interface EditorWindowProps {
     visible: boolean
     loading: boolean
     score: Score
-    updateParts: (parts: Record<string, string[]>) => void
     executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
     updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
@@ -39,17 +36,12 @@ export default function EditorWindow({
     visible,
     loading,
     score,
-    updateParts,
     executeItemAction,
     updatePlaybackFunctions,
     playbackState,
     playback,
     updateSystem
 }: EditorWindowProps & HTMLAttributes<HTMLDivElement>) {
-    const { selectionOn, getPartName, getPartColor, toggleSelection, extendSelection } = usePartManager(
-        score,
-        updateParts
-    )
     const [gotoTargets, setGotoTargets] = useState<Set<UUID>>(new Set())
     const visibleRef = useRef<boolean>(visible)
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
@@ -154,30 +146,14 @@ export default function EditorWindow({
 
     const systems = useMemo(() => {
         if (!score) return
-        // currPartName is used to determine the first system of the part so that the part name only appears once.
-        var rangePartName: string = ''
         return score.systems.map((systemData) => {
             // Structure:
             // - Panel Header: contains context menu and System summary information
             // - Panel content (visible when panel is expanded): System grid (SystemNode)
-            const partName = getPartName(systemData.uuid)
-            const partColor = getPartColor(partName)
-            const firstOfRange = partName != rangePartName
-            if (firstOfRange) rangePartName = partName
             return (
                 // <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
                 <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0 flex">
                     <Row>
-                        <PartIndicator
-                            key={`key-${systemData.uuid}`}
-                            uuid={systemData.uuid}
-                            partName={partName}
-                            partColor={partColor}
-                            firstOfRange={firstOfRange}
-                            selectionOn={selectionOn}
-                            toggleSelection={toggleSelection}
-                            extendSelection={extendSelection}
-                        />
                         <Col span={23} className="flex">
                             <SystemNode
                                 className="flex"
@@ -203,7 +179,7 @@ export default function EditorWindow({
         })
         // `visible` is included so the systems (and their grid-paint effect) refresh when the
         // editor is revealed from the player view.
-    }, [score, playbackState, selectionOn, visible])
+    }, [score, playbackState, visible])
 
     return (
         // While an execution form is open, mark the editor content inert (no editing)

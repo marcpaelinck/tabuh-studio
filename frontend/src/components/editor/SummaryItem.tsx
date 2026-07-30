@@ -1,6 +1,6 @@
 // The system summary contains the fields and buttons that appear in the header of each collapsible system section.
 // This summary contains buttons optionally combined with a text field. The item type determines the button's action
-// such as editing a field name (e.g. `part` or `label`) setting execution items (dynamics, tempo, sequence, etc.).
+// such as editing a field name (e.g. `label` or `kempli`) setting execution items (dynamics, tempo, sequence, etc.).
 // After the action is performed the field will contain the result of the action (e.g. new field value or id/label
 // of copied system).
 import { useContext, useEffect, useRef, useState, type HTMLAttributes, type MouseEvent } from 'react'
