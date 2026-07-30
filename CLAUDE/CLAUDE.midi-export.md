@@ -326,3 +326,107 @@ Single default header tempo — absolute times make the timing correct regardles
 - Verify locally (`npm run build`): playback unchanged after the extraction, and a
   multi-system score with loops/tempo/dynamics/kempli exports a `.mid` with one track per
   position and dynamics as velocity.
+
+---
+
+# Phase 2 — as built
+
+Scope (agreed): **tempo map** + **General-MIDI programs**, plus a **note-map PDF** exported
+alongside the `.mid`. Out of scope: track selection and true tuning. Deferred: the
+muted-note split.
+
+## Time model → ticks
+
+Everything is placed in **MIDI ticks** (musical time) rather than absolute seconds, so the
+tempo map alone defines real time and a DAW's bar grid follows the actual tempo. The app's
+internal unit is the *BaseNote* (`baseNoteValue = 16`, i.e. a 1/16 note); a sampler action's
+`time` and `params.duration` are `TimeObject`s in BaseNote units (`n2TO`/`TO2n`). With
+`PPQ = 480`:
+
+```
+ticksPerBaseNote = PPQ * 4 / baseNoteValue = 480 * 4 / 16 = 120
+```
+
+(one base note = a 1/16 note = 480/4 = 120 ticks). `toTicks(bn) = round(bn * 120)`. Verified:
+a note at BaseNote time 2 lands at tick 240 = 0.5 s at 60 BPM; a tempo change at BaseNote 16
+lands at tick 1920 = 4.0 s at 60 BPM.
+
+## `componentlogic/playback/midiGenerator.ts` (rewritten)
+
+- **Tempo map** from `timeline.tempoactions`: each becomes `{ ticks: toTicks(TO2n(time)),
+  bpm }`, consecutive equal BPMs collapsed, an event at tick 0 guaranteed. Written via
+  `midi.header.tempos = […]; midi.header.update()`. Gradual tempo changes already come
+  through as one action per column, so they export as a staircase of events.
+- **Notes** placed with `ticks` + `durationTicks` (not seconds), so they stay locked to the
+  tempo map. Velocity (dynamics) and the multi-pitch chord expansion via
+  `noteNamesForSymbol` are unchanged from Phase 1.
+- **General MIDI**: `gmProgram(position)` → `GM_PROGRAM_BY_INSTRUMENT[positionConfigs[
+  position].instrument]`. A *position* uniquely identifies an *instrument* (the new
+  `PositionConfig.instrument` attribute), and note names like `DONG0` are only unique once
+  combined with an instrument — so the program is keyed by **instrument**, one distinct
+  program each (two positions of the same instrument, e.g. `PEMADE_POLOS`/`PEMADE_SANGSIH`,
+  share a program but remain separate tracks). GM has no gamelan voices, so these are
+  best-effort idiophone/mallet approximations grouped by register (0-based / GM#):
+  KANTILAN 8/9 Celesta, PEMADE 9/10 Glockenspiel, GENDER_RAMBAT 10/11 Music Box, UGAL 11/12
+  Vibraphone, CALUNG 12/13 Marimba, PENYACAH 13/14 Xylophone, REYONG 14/15 Tubular Bells,
+  JEGOGAN 15/16 Dulcimer, TROMPONG 112/113 Tinkle Bell, REYONGB 113/114 Agogo, PONGGANG
+  114/115 Steel Drums, KEMPLI 115/116 Woodblock, GONGS 116/117 Taiko Drum, KENDANG_WADON
+  117/118 Melodic Tom, KENDANG_LANANG 118/119 Synth Drum, CENGCENG 119/120 Reverse Cymbal,
+  TAWATAWA 47/48 Timpani, CENGCENG_KOPYAK 126/127 Applause. `GM_PROGRAM_BY_INSTRUMENT` is a
+  complete `Record<Instrument, number>` (TS enforces every instrument is covered); the
+  matching display names live in `GM_NAMES` in `midiNoteMap.ts`. Each track also gets its own
+  channel, skipping channel 9 (GM percussion), wrapping past 15.
+- New export `midiTrackPositions(timeline)` returns the track positions in order, so the
+  note-map PDF documents exactly the tracks in the file.
+
+## `componentlogic/playback/pitchMap.ts` (new, pure)
+
+Single source of truth for the symbol → Western-pitch mapping. The sampler assigns each
+position's de-duplicated note names (values of `symbolToNoteNames`, in insertion order) to
+`NOTES` (C1…B3), one per index — so the abbreviated (`_ABBR`) and muted (`_MUTED`) variants
+each get their **own** pitch. Exposes `positionPitchMap(position)`
+(`noteNames`, `pitchByNoteName`, `symbolToPitches`, `symbolsByPitch`),
+`noteNamesForSymbol(position, symbol)`, and `pitchToMidi(name)` (C-1 = 0, C4 = 60, matching
+`@tonejs/midi`). `useInstruments` now re-exports `noteNamesForSymbol` from here so playback,
+export and the note map can never diverge.
+
+## `componentlogic/export/midiNoteMap.ts` (new)
+
+- `buildMidiNoteMapModel(scoreTitle, positions)`: per track (position), one row per unique
+  note name — `{ midi, pitch (e.g. "C1"), note (e.g. "DING1"), symbols }` — sorted by MIDI
+  number. `symbols` lists the notation symbol(s) that produce that pitch (so e.g. Calung's
+  `i` and `i/` share a pitch; reyong chord keys `t`/`b` appear on their component pitches).
+- `generateMidiNoteMapPdf(model)`: pdf-lib, A4, two-column flow of per-track tables (small
+  Helvetica/Courier), a header with title + datestamp + the swarasanti hyperlink and a
+  "nominal 12-TET" caveat. Standard fonts only (no embedded font needed).
+
+## `componentlogic/useScoreReader.ts` — two files, one folder
+
+The MIDI export now writes **both** `<stem>.mid` and `<stem> - MIDI note map.pdf` into a
+single folder the user picks once, via the new `saveFilesToFolder(files)`:
+`window.showDirectoryPicker({ mode: 'readwrite' })` then `dir.getFileHandle(name,
+{ create: true })` + `createWritable()`. The picker is opened **before** any bytes are
+generated (content is produced lazily through each file's `make()` thunk) so it runs inside
+the click's user gesture; the async note-map PDF build happens after the folder is granted.
+Firefox/Safari (no `showDirectoryPicker`) fall back to two ordinary downloads. The
+single-file JSON/PDF exports still use the existing `saveToLocalFile` (`showSaveFilePicker`).
+
+## Verified (sandbox spike)
+
+- MIDI round-trip (`@tonejs/midi`): PPQ 480; tempo map `t0=60 → t1920=90 → t5760=120` with a
+  duplicate BPM dropped; per-track GM programs and channels as above; reyong chord key `t`
+  emits two simultaneous notes; note times track the tempo map; velocity preserved.
+- Note-map PDF rendered and inspected: two-column tables, correct GM labels (1-based
+  display), pitch/note/symbol columns aligned (note column widened for `XDUNG0_MUTED`-length
+  names), header + working hyperlink.
+
+## Still deferred (Phase 3)
+
+- Muted-note split to a separate track/samples; a dialog to choose which positions/tracks to
+  include; optional true pelog/slendro tuning via pitch-bend/MTS.
+
+## To do locally
+
+`npm run build` (I can't build in-sandbox). Then export a score and confirm in a DAW: bar
+grid follows tempo changes, each track carries its GM program, and the note-map PDF lands in
+the chosen folder next to the `.mid`.

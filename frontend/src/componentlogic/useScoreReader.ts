@@ -18,9 +18,10 @@ import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 import { allowedPositionGroups } from './castingRulesManager'
 import { expandSystem } from './expandNotation'
+import { buildMidiNoteMapModel, generateMidiNoteMapPdf } from './export/midiNoteMap'
 import { generatePdf } from './export/pdfGenerator'
 import { buildPdfModel } from './export/pdfModel'
-import { generateMidiFile } from './playback/midiGenerator'
+import { generateMidiFile, midiTrackPositions } from './playback/midiGenerator'
 import { buildTimeline } from './playback/timelineBuilder'
 
 export function persistCachedChanges(score: Score | undefined): Score | undefined {
@@ -288,6 +289,45 @@ export function useScoreReader(source: 'database' | 'file'): {
         }
     }
 
+    // Saves several files into a single folder the user picks once (File System Access API,
+    // Chrome/Edge), falling back to individual downloads (Firefox/Safari). The directory
+    // picker is opened *before* any content is generated so it runs within the click's user
+    // gesture. Content is produced lazily via `make` so the (async) PDF build happens after.
+    async function saveFilesToFolder(
+        files: { name: string; mime: string; make: () => BlobPart | Promise<BlobPart> }[]
+    ): Promise<boolean> {
+        try {
+            const picker = (window as unknown as { showDirectoryPicker?: (o?: object) => Promise<any> })
+                .showDirectoryPicker
+            if (typeof picker === 'function') {
+                const dir: any = await picker({ mode: 'readwrite' })
+                for (const f of files) {
+                    const content = await f.make()
+                    const handle = await dir.getFileHandle(f.name, { create: true })
+                    const writable = await handle.createWritable()
+                    await writable.write(content)
+                    await writable.close()
+                }
+                return true
+            }
+            // Fallback: download each file to the browser's default download folder.
+            for (const f of files) {
+                const blob = new Blob([await f.make()], { type: f.mime })
+                const url = URL.createObjectURL(blob)
+                const anchor = document.createElement('a')
+                anchor.href = url
+                anchor.download = f.name
+                anchor.click()
+                URL.revokeObjectURL(url)
+            }
+            return true
+        } catch (err) {
+            if (err instanceof DOMException && err.name === 'AbortError') return false // user cancelled
+            console.error('Failed to save files:', err)
+            return false
+        }
+    }
+
     const fileStem = (score: Score) => score.title.replace(/[^a-z0-9]/gi, '_')
 
     async function saveScoreToLocalFile(score: Score | undefined): Promise<boolean> {
@@ -296,7 +336,8 @@ export function useScoreReader(source: 'database' | 'file'): {
         return saveToLocalFile(json, `${fileStem(score)}.json`, 'application/json', '.json', 'JSON score file')
     }
 
-    // Exports the whole score as a Standard MIDI File (one track per position). Builds the
+    // Exports the whole score as a Standard MIDI File (one track per position) plus a
+    // companion note-map PDF, both written into a single folder the user picks. Builds the
     // resolved playback timeline (whole score, all systems) and translates it to MIDI.
     async function saveScoreToMidiFile(score: Score | undefined): Promise<boolean> {
         if (!score) return false
@@ -305,8 +346,17 @@ export function useScoreReader(source: 'database' | 'file'): {
             { useCache: true, beatPosition }
         )
         if (!timeline) return false
-        const bytes = generateMidiFile(timeline) as BlobPart
-        return saveToLocalFile(bytes, `${fileStem(score)}.mid`, 'audio/midi', '.mid', 'MIDI file')
+        const stem = fileStem(score)
+        const positions = midiTrackPositions(timeline)
+        return saveFilesToFolder([
+            { name: `${stem}.mid`, mime: 'audio/midi', make: () => generateMidiFile(timeline) as BlobPart },
+            {
+                name: `${stem} - MIDI note map.pdf`,
+                mime: 'application/pdf',
+                make: async () =>
+                    (await generateMidiNoteMapPdf(buildMidiNoteMapModel(score.title, positions))) as BlobPart
+            }
+        ])
     }
 
     // Exports the score as a formatted notation PDF (compact grouped notation).

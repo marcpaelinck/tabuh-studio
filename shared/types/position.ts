@@ -1,3 +1,5 @@
+import type { Instrument } from './basetypes'
+
 export type Modifiers = { before: string[]; after: string[] }
 
 export type PositionConfig = {
@@ -6,6 +8,7 @@ export type PositionConfig = {
     // sampletemplate should contain the string '{note}' where the note name should appear in the
     // sample file name.
     name: string
+    instrument: Instrument
     type: string
     svg_file: string
     sampletemplate: string
