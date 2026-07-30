@@ -1,7 +1,7 @@
 import type { Position } from '@tabuhstudio/shared'
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
-import { animationConfig, colorPalette, type ColorName } from '../../config/config'
+import { animationConfig, type CSSColors } from '../../config/config'
 import type { SVGInfo } from '../../typing/animation'
 import type { AnimationNote, AnimmationFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
@@ -11,29 +11,34 @@ const strikeDuration = 600 // duration of the stroke
 const bezier = 'cubic-bezier(0,.25,1,.71)' // default timing curve
 const bezierStroke = 'cubic-bezier(.99,-0.01,1,.51)' // timing curve for stroke (accelerates toward stroke)
 
-// Retrieves the highlight color values [R, G, B] for the given note (instrument key).
+// Retrieves the highlight color for the given note (instrument key).
 // PositionSeq can be used in case multiple positions are animated on the same instrument. The corresponding color
 // will then be selected from the list of colors, reusing the colors if positionSeq is larger than the number of
 // available colors.
-const getHighlightRGB = (note: AnimationNote, positionSeq: number = 0): number[] => {
-    const colors: ColorName[] =
+const getHighlightColor = (note: AnimationNote, positionSeq: number = 0): CSSColors => {
+    const colors: CSSColors[] =
         animationConfig.highlight[note.tone] ||
         animationConfig.highlight[note.muting] ||
         Object.values(animationConfig.highlight)[0]
-    if (!colors) return []
+    if (!colors) return 'cyan'
     var color_id = positionSeq % colors.length
-    var colorName: ColorName = colors[color_id] as ColorName
-    return colorPalette[colorName].rgb || []
+    return colors[color_id] as CSSColors
 }
 
+/**
+ * Generates a Keyframe effect that highlights a note key. The highlight gradually fades.
+ * @param keyElement
+ * @param note
+ * @param positionIndex
+ */
 async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {
     const durationMillis = Math.min(Tone.Time(note.duration).toMilliseconds(), 3000)
-    const rgb: number[] = getHighlightRGB(note, positionIndex)
+    const color: string = getHighlightColor(note, positionIndex)
     var highlightKeyframes = new KeyframeEffect(
         keyElement,
         [
-            { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},1)`, offset: 0, easing: bezier },
-            { fill: `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0)`, offset: 1, easing: bezier }
+            { fill: `${color}`, opacity: 1, offset: 0, easing: bezier },
+            { fill: `${color}`, opacity: 0, offset: 1, easing: bezier }
         ],
         { duration: durationMillis }
     )

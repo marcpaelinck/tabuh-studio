@@ -1,18 +1,7 @@
-import { SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS, type Position } from '@tabuhstudio/shared'
+import { type Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck, SOUNDS_FOLDER } from './config'
-
-export function soundFiles(notes: string[], fileTemplate: string): string[] {
-    return notes.map(([tone, muting]) => fileTemplate.replace('{tone}', `${tone}`).replace('{muting}', `${muting}`))
-}
-
-export function soundFile(note: string, fileTemplate: string): string {
-    return fileTemplate.replace('{note}', note)
-}
-
-export const isExtension = (symbol: string): boolean => SILENCE_EXTENDING_CHARS.has(symbol)
-export const isMuting = (symbol: string): boolean => SILENCE_MUTING_CHARS.has(symbol)
 
 // Checks if all sound files can be found.
 // File names should be formatted as {instrumentarium}_{instrument}_{tone}_{muting}.mp3

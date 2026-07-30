@@ -1,5 +1,4 @@
 import type { InstrumentGroup, Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
 import _ from 'lodash'
 import { getPositionGroups } from '../config/position-functions'
 import type { ExecutionItem } from '../typing/execution'
@@ -49,9 +48,9 @@ function toOrdinal(val: number): string {
     }
 }
 
-function positionsText(positions: Position[] | undefined): string {
+function positionsText(positions: Position[] | undefined, orchestra: InstrumentGroup): string {
     if (!positions || positions.length === 0) return 'all positions'
-    return positions.map((p) => positionConfigs[p]?.name.toLowerCase() ?? p).join(', ')
+    return compactGroupLabel(positions, getPositionGroups(orchestra), true).label
 }
 
 export function executionItemTooltip(
@@ -98,8 +97,8 @@ export function executionItemTooltip(
         }
         case 'suppress': {
             const beatsText = item.beats && item.beats.length ? ` on beat ${toText(item.beats)}` : ''
-            shortTooltip = `suppress ${positionsText(item.positions)}`
-            instruction = `suppress ${positionsText(item.positions)}${beatsText}`
+            shortTooltip = `suppress ${positionsText(item.positions, orchestra)}`
+            instruction = `suppress ${positionsText(item.positions, orchestra)}${beatsText}`
             preposition = 'on'
             break
         }

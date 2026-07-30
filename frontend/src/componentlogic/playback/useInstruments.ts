@@ -11,7 +11,6 @@ import {
     playerOutroTime,
     SOUNDS_FOLDER
 } from '../../config/config'
-import { soundFile } from '../../config/configfunctions'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
@@ -77,6 +76,10 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
         ]
     })
     return Object.fromEntries(entries)
+}
+
+export function soundFile(note: string, fileTemplate: string): string {
+    return fileTemplate.replace('{note}', note)
 }
 
 const lookup = Object.fromEntries(
