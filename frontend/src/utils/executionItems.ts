@@ -53,6 +53,28 @@ function positionsText(positions: Position[] | undefined, orchestra: InstrumentG
     return compactGroupLabel(positions, getPositionGroups(orchestra), true).label
 }
 
+/**
+ * Contatenates the list op labels with arrow chars.
+ * Breaks the result into multiple lines.
+ * @param labels
+ * @returns
+ */
+function sequenceMultiLine(labels: string[]) {
+    const offset = 10
+    const maxLineLength = 50
+    const lines: string[] = []
+    var newLine = ''
+    labels.forEach((label, idx) => {
+        if (newLine.length >= maxLineLength) {
+            lines.push(newLine)
+            newLine = ''
+        }
+        newLine = newLine.concat(label + (idx < labels.length - 1 ? ' → ' : ''))
+    })
+    if (newLine.length > 0) lines.push(newLine)
+    return lines.join('\n' + ' '.repeat(offset))
+}
+
 export function executionItemTooltip(
     item: ExecutionItem,
     length: 'short' | 'long',
@@ -87,11 +109,11 @@ export function executionItemTooltip(
             break
         }
         case 'sequence': {
-            const seq = item.labels.join(' → ')
+            const seq = sequenceMultiLine(item.labels)
             shortTooltip =
                 `seq:${item.labels.slice(0, Math.min(3, item.labels.length)).join('→')}` +
                 (item.labels.length > 3 ? '...' : '')
-            instruction = `play sequence ${seq}`
+            instruction = `sequence ${seq}`
             preposition = 'after'
             break
         }
