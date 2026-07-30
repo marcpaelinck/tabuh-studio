@@ -31,8 +31,6 @@ export default function PlaybackMenu({ appAppearance, score, scoreMenuOptions }:
         updateFixedMenus()
     }, [])
 
-    useEffect(() => console.log(`FOCUS=${selectedFocusOption.value}`), [selectedFocusOption])
-
     useEffect(() => debug(`SELECTED SPEED: ${JSON.stringify(selectedSpeedOption)}`), [selectedSpeedOption])
 
     useEffect(() => {

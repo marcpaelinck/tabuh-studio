@@ -181,7 +181,6 @@ export function usePlaybackManager() {
         intro = mainView == 'player' ? playerIntroTime : editorIntroTime,
         outro = mainView == 'player' ? playerOutroTime : editorOutroTime
     }: SchedulePlaybackParams): void {
-        console.log(`${mainView} ${mainView == 'player' ? playerIntroTime : editorIntroTime}`)
         const newTimeLine = createTimelineFromScore(pbAction, useCache, intro, outro)
         if (newTimeLine) {
             createPlaybackSchedule(newTimeLine, playbackSpeed)
