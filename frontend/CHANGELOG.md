@@ -81,3 +81,10 @@ Initial release
 
 - `Added` export to MIDI.
 - `Added` export to PDF.
+
+## 1.1.6 2026-07-30
+
+- `Changed` Cleaned up config
+- `Removed` Editor: removed parts indicator.
+- `Changed` Parts attribute no longer read (from imported files) or used.
+- `Added` MIDI tempo map (in MIDI file) and program assignment table (separate PDF).
