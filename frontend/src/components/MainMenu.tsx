@@ -1,8 +1,8 @@
-import { useEffect, useState, type Dispatch } from 'react'
+import { useEffect, useMemo, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { TbFileImport } from 'react-icons/tb'
-import { Box, Modal, Nav, SelectPicker, useDialog } from 'rsuite'
+import { Button, ButtonGroup, Drawer, Nav, SelectPicker, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
@@ -76,6 +76,21 @@ export function MainMenu({
     const dialog = useDialog()
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
 
+    // Orchestra (InstrumentGroup) filter for the Open drawer. Options are the distinct
+    // orchestra types actually present among the available scores, so new orchestra types
+    // appear automatically once scores exist for them.
+    const [orchestra, setOrchestra] = useState<string | null>(null)
+    const orchestraOptions = useMemo(
+        () =>
+            [...new Set(scoreMenuOptions.map((o) => o.objValue.instrumentgroup))]
+                .sort()
+                .map((g) => ({ label: g.replace(/_/g, ' '), value: g })),
+        [scoreMenuOptions]
+    )
+    const filteredScoreOptions = orchestra
+        ? scoreMenuOptions.filter((o) => o.objValue.instrumentgroup === orchestra)
+        : scoreMenuOptions
+
     async function performAction() {
         switch (activeKey) {
             case 'score-new':
@@ -87,9 +102,20 @@ export function MainMenu({
             case 'keyboard-edit':
                 setKeyMapEditorOpen(true)
                 break
-            case 'file-open':
+            case 'file-open': {
+                // Reset the selection and default the orchestra filter before opening (the
+                // Drawer has no onOpen hook). Default to the current score's orchestra when it
+                // has scores available, otherwise the first available orchestra.
+                setSelectedScoreOption(null)
+                const groups = orchestraOptions.map((o) => o.value)
+                setOrchestra(
+                    score?.instrumenttype && groups.includes(score.instrumenttype)
+                        ? score.instrumenttype
+                        : (groups[0] ?? null)
+                )
                 setScoreSelector(true)
                 break
+            }
             case 'file-save':
                 if (score) {
                     const persistedScore = persistCachedChanges(score)
@@ -149,22 +175,32 @@ export function MainMenu({
     }, [activeKey])
 
     const selectScoreDialog = (
-        <Modal
-            className="w-[20rem]"
-            open={scoreSelector}
-            onOpen={() => setSelectedScoreOption(null)}
-            onClose={() => setScoreSelector(false)}>
-            <Modal.Header>
-                <Modal.Title>Select a notation</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Box className="grid content-center">
+        <Drawer size="xs" open={scoreSelector} onClose={() => setScoreSelector(false)}>
+            <Drawer.Header>
+                <Drawer.Title>Select a notation</Drawer.Title>
+            </Drawer.Header>
+            <Drawer.Body>
+                <div className="flex flex-col gap-3">
+                    <div>
+                        <div className="text-xs mb-1">orchestra:</div>
+                        <ButtonGroup vertical className="w-full">
+                            {orchestraOptions.map((o) => (
+                                <Button
+                                    key={o.value}
+                                    appearance={orchestra === o.value ? 'primary' : 'default'}
+                                    onClick={() => setOrchestra(o.value)}>
+                                    {o.label}
+                                </Button>
+                            ))}
+                        </ButtonGroup>
+                    </div>
                     <SelectPicker
                         id="scoreselector"
+                        block
                         searchable={false}
                         cleanable={false}
                         label="score:"
-                        data={scoreMenuOptions}
+                        data={filteredScoreOptions}
                         value={selectedScoreOption?.value}
                         onSelect={(value, item) => {
                             setScoreSelector(false)
@@ -176,9 +212,9 @@ export function MainMenu({
                             if (value === null) setSelectedScoreOption(null)
                         }}
                     />
-                </Box>
-            </Modal.Body>
-        </Modal>
+                </div>
+            </Drawer.Body>
+        </Drawer>
     )
 
     const scoreDetailsDialog = (

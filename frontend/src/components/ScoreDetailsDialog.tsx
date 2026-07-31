@@ -10,7 +10,7 @@
 import { instrumentGroups, type InstrumentGroup } from '@tabuhstudio/shared'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Input, InputGroup, Modal, SelectPicker } from 'rsuite'
+import { Button, Drawer, Input, InputGroup, SelectPicker } from 'rsuite'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
 const instrumentLabels: Partial<Record<InstrumentGroup, string>> = Object.fromEntries(
@@ -65,11 +65,19 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
     }
 
     return (
-        <Modal className="w-[24rem]" open={open} onClose={onClose}>
-            <Modal.Header>
-                <Modal.Title>{mode === 'new' ? 'New score' : 'Score details'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+        <Drawer open={open} size="sm" onClose={onClose}>
+            <Drawer.Header>
+                <Drawer.Title>{mode === 'new' ? 'New score' : 'Score details'}</Drawer.Title>
+                <Drawer.Actions>
+                    <Button onClick={onClose} appearance="subtle">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleSubmit} appearance="primary" disabled={!valid}>
+                        {mode === 'new' ? 'Create' : 'Save'}
+                    </Button>
+                </Drawer.Actions>
+            </Drawer.Header>
+            <Drawer.Body>
                 <div className="flex flex-col gap-3">
                     <div>
                         <div className="text-xs mb-1">Title *</div>
@@ -98,15 +106,7 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                         <Input value={composer} onChange={setComposer} placeholder="Composer (optional)" />
                     </div>
                 </div>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={onClose} appearance="subtle">
-                    Cancel
-                </Button>
-                <Button onClick={handleSubmit} appearance="primary" disabled={!valid}>
-                    {mode === 'new' ? 'Create' : 'Save'}
-                </Button>
-            </Modal.Footer>
-        </Modal>
+            </Drawer.Body>
+        </Drawer>
     )
 }
