@@ -8,7 +8,7 @@ I have conceived a way to reduce the amount of typing by introducing two types o
 1. Aggregation of positions: the possibility to write notation that applies to multiple positions.
 2. Shorthand symbols: symbols that stand for a sequence of symbols.
 
-I have implemented these in a text file format which I call the Tabuh format. You can find an example of an entire Tabuh notation file in file `frontend/CLAUDE/Tabuh notation example.tsv` and a screenshot of the same file in `frontend/CLAUDE/Tabuh notation example.png`, displaying the file with the BaliMusic font.
+I have implemented these in a text file format which I call the Tabuh format. You can find an example of an entire Tabuh notation file in file `CLAUDE/Dual editor docs/Tabuh notation example.tsv` and a screenshot of the same file in `CLAUDE/Dual editor docs/Tabuh notation example.png`, displaying the file with the BaliMusic font.
 
 ### Position aggregation
 
@@ -16,7 +16,7 @@ If there is no ambiguity, the Tabuh notation format allows the notation for mult
 
 ### Shorthand notation
 
-Some symbol modifiers can be used to create shorthand symbols. Currently only the modifier `n` is being used in this context. `n` stands for `norot` which is a specific note pattern in Balinese music. I added an extract of a notation file `frontend/CLAUDE/Norot example.tsv` and corresponding screenshot `frontend/CLAUDE/Norot example.png`. The symbols `in` and `un` in this example stand for a fixed pattern of four symbols which can be different for each position and can also differ per beat.
+Some symbol modifiers can be used to create shorthand symbols. Currently only the modifier `n` is being used in this context. `n` stands for `norot` which is a specific note pattern in Balinese music. I added an extract of a notation file `Norot example.tsv` and corresponding screenshot `Norot example.png` in folder `CLAUDE/Dual editor docs`. The symbols `in` and `un` in this example stand for a fixed pattern of four symbols which can be different for each position and can also differ per beat.
  
 ### Current implementation
 

@@ -18,7 +18,7 @@ See the `Terminology` section in CLAUDE.md  for a description of each type.
 
 ## The Execution Form
 
-Files `/CLAUDE/Execution-form-x.png` (x = 1, 2, 3) contain snapshots of the form. The form consists of two parts. The top part contains a list of execution items, `ExecutionForm`. Items can be selected or deleted and new items can be added here. When an item is selected, the item's details appear in a form below the list, the `ExecutionItemForm`. This form enables to edit the item's attributes. The number and type of fields of the second form can vary, depending on the selected item type.
+Files `/CLAUDE/Execution-form-x.png` (x = 1, 2, 3) in folder `CLAUDE/Execution form docs` contain snapshots of the form. The form consists of two parts. The top part contains a list of execution items, `ExecutionForm`. Items can be selected or deleted and new items can be added here. When an item is selected, the item's details appear in a form below the list, the `ExecutionItemForm`. This form enables to edit the item's attributes. The number and type of fields of the second form can vary, depending on the selected item type.
 
 ## Where the code resides
 
