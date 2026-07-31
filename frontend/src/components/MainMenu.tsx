@@ -1,8 +1,9 @@
+import type { InstrumentGroup } from '@tabuhstudio/shared'
 import { useEffect, useMemo, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { TbFileImport } from 'react-icons/tb'
-import { Button, ButtonGroup, Drawer, Nav, SelectPicker, useDialog } from 'rsuite'
+import { Button, ButtonGroup, Drawer, List, Nav, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
@@ -79,7 +80,8 @@ export function MainMenu({
     // Orchestra (InstrumentGroup) filter for the Open drawer. Options are the distinct
     // orchestra types actually present among the available scores, so new orchestra types
     // appear automatically once scores exist for them.
-    const [orchestra, setOrchestra] = useState<string | null>(null)
+    const [orchestra, setOrchestra] = useState<InstrumentGroup | null>(null)
+    const DEFAULT_ORCHESTRA: InstrumentGroup = 'GONG_KEBYAR'
     const orchestraOptions = useMemo(
         () =>
             [...new Set(scoreMenuOptions.map((o) => o.objValue.instrumentgroup))]
@@ -111,7 +113,9 @@ export function MainMenu({
                 setOrchestra(
                     score?.instrumenttype && groups.includes(score.instrumenttype)
                         ? score.instrumenttype
-                        : (groups[0] ?? null)
+                        : groups.includes(DEFAULT_ORCHESTRA)
+                          ? DEFAULT_ORCHESTRA
+                          : ((groups[0] as InstrumentGroup) ?? null)
                 )
                 setScoreSelector(true)
                 break
@@ -180,7 +184,7 @@ export function MainMenu({
                 <Drawer.Title>Select a notation</Drawer.Title>
             </Drawer.Header>
             <Drawer.Body>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-3 h-full">
                     <div>
                         <div className="text-xs mb-1">orchestra:</div>
                         <ButtonGroup vertical className="w-full">
@@ -188,30 +192,30 @@ export function MainMenu({
                                 <Button
                                     key={o.value}
                                     appearance={orchestra === o.value ? 'primary' : 'default'}
-                                    onClick={() => setOrchestra(o.value)}>
+                                    onClick={() => setOrchestra(o.value as InstrumentGroup)}>
                                     {o.label}
                                 </Button>
                             ))}
                         </ButtonGroup>
                     </div>
-                    <SelectPicker
-                        id="scoreselector"
-                        block
-                        searchable={false}
-                        cleanable={false}
-                        label="score:"
-                        data={filteredScoreOptions}
-                        value={selectedScoreOption?.value}
-                        onSelect={(value, item) => {
-                            setScoreSelector(false)
-                            setSelectedScoreOption(item as ExtendedOption<ScoreInfo>)
-                        }}
-                        // Onchange needed because value can be null / initial selector state is unselected
-                        // (also needed if cleanable==true)
-                        onChange={(value, e) => {
-                            if (value === null) setSelectedScoreOption(null)
-                        }}
-                    />
+                    <div className="flex flex-1 min-h-0 flex-col">
+                        <div className="text-xs mb-1">score:</div>
+                        <List bordered hover divider={false} className="flex-1 min-h-0" style={{ overflowY: 'auto' }}>
+                            {filteredScoreOptions.map((o) => (
+                                <List.Item
+                                    key={o.value}
+                                    className={`cursor-pointer text-sm ${
+                                        o.value === selectedScoreOption?.value ? 'bg-blue-100' : ''
+                                    }`}
+                                    onClick={() => {
+                                        setScoreSelector(false)
+                                        setSelectedScoreOption(o)
+                                    }}>
+                                    {o.label}
+                                </List.Item>
+                            ))}
+                        </List>
+                    </div>
                 </div>
             </Drawer.Body>
         </Drawer>
