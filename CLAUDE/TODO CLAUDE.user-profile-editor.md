@@ -1,13 +1,10 @@
-# User Onboarding
-The app has become fairly complex and might be daunting for new users. It requires information to guide the user's first steps. A 'guided tour' is an accessible way for a new user to get acquainted with the app's structure.
+# User Profile Editor
+The app lacks a mean for the user to manage their own profile.
 
-# CLAUDE's advice
-I asked CLAUDE to advise me which package to use. This is CLAUDE's conclusion. 
-
-The MIT-licensed, no-strings options are @reactour/tour, react-joyride, and driver.js. How they differ:
-
-@reactour/tour — React-idiomatic: steps as a data array, JSX allowed in tooltip content, a useTour() hook. Nice if you want tour steps wired to your app's state/components.
-driver.js — tiny (~5 kB, zero deps), framework-agnostic, imperative API. Dead simple highlight-and-step tours. Works fine in React, just not "component-y."
-react-joyride — the most-installed React-specific one, mature and flexible, but historically lagged on peer-deps for new React majors, so confirm it declares React 19 support (or you'll be reaching for overrides).
-
-For your app specifically — React 19 + Vite + TS, a focused editor where a guided "here's the menu, here's the toolbar, here's playback" walkthrough is all you likely need — I'd recommend driver.js for the least friction and smallest footprint, or @reactour/tour if you'd rather keep it fully in React with JSX step content and hooks. Both are MIT and clean on React 19. I'd avoid Intro.js purely on the licensing overhead, not the functionality.
+# Requirements
+- When the 'profile' logo (above the main menu) is clicked, a popup menu should appear with the following options.
+	- `Login...` if the user is not logged in, otherwise `Logout`
+	- `Create an account...`
+	- `Edit my profile...`: only visible if the user is logged in
+- The `Login...` option should open a login form similar to the current one, but in a drawer similar to that of the main menu `Notation - Open...`.
+- The `Create profile...` should open a form requesting the user's first and last name, email address and password. There should be a second password field to confirm that the password is entered correctly. If both password fields differ, the field should display a warning. All fields should have a SchemaModel that checks for the correctness of the field input. The Form should have a `Register` and `Cancel` butten. If the user clicks `Register` and some field content is incorrect, a message should be displayed near the erroneous fields using the SchemaModel's default error check. There should also be a check that the email address is not in use by another registered user. Otherwise an email should be sent to the user's email address with a confirmation link with a limited validity period. If the confirmation link is clicked within the time limit, a new user should be created.
