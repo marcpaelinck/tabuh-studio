@@ -64,6 +64,14 @@ export function usePlaybackManager() {
     const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
         useRef<PlaybackCallbackFunctions>(defaultCallbackFunctions)
 
+    // The live playback speed, so the (stable) scheduled tempo callback applies the CURRENT
+    // speed rather than the value baked into the schedule when playback started. Without this,
+    // changing speed mid-playback is instantly reverted by the next scheduled tempo event.
+    const playbackSpeedRef: RefObject<number> = useRef<number>(playbackSpeed)
+    useEffect(() => {
+        playbackSpeedRef.current = playbackSpeed
+    }, [playbackSpeed])
+
     useEffect(() => {
         updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
     }, [])
@@ -71,20 +79,18 @@ export function usePlaybackManager() {
     useEffect(() => {
         // Immediately change tempo when playback speed is changed by the user.
         // Tempo changes that are scheduled to fire after the current time
-        // will take the new playback speed into account.
+        // will take the new playback speed into account (see changeTempo).
         Tone.getTransport().bpm.value = playbackTempo * playbackSpeed
     }, [playbackSpeed])
 
-    // Callback function for the playback scheduler
-    const changeTempo = useCallback(
-        (time: number, params: TempoFunctionParameters): void => {
-            if (params.bpm != undefined) {
-                Tone.getTransport().bpm.setValueAtTime(params.bpm * params.pbSpeed, time)
-                setPlaybackTempo(params.bpm)
-            }
-        },
-        [playbackSpeed]
-    )
+    // Callback function for the playback scheduler. Uses the live speed ref so mid-playback
+    // speed changes stick for every subsequent scheduled tempo event.
+    const changeTempo = useCallback((time: number, params: TempoFunctionParameters): void => {
+        if (params.bpm != undefined) {
+            Tone.getTransport().bpm.setValueAtTime(params.bpm * playbackSpeedRef.current, time)
+            setPlaybackTempo(params.bpm)
+        }
+    }, [])
 
     const updateProgress = useCallback(() => {
         setPlaybackProgress(Tone.getTransport().seconds)

@@ -1,5 +1,5 @@
 import type { Dispatch, JSX, RefObject } from 'react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Activity, useEffect, useMemo, useRef, useState } from 'react'
 import { Grid, HStack, Row, SelectPicker, Toggle } from 'rsuite'
 import 'rsuite/Toggle/styles/index.css'
 import { theme } from '../../config/config'
@@ -12,6 +12,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/DropDown/styles/index.css';
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { ReactSVG } from 'react-svg'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
 import { debug } from '../../utils/debugger'
@@ -57,6 +58,8 @@ export function Animation({
     updatePlaybackFunctions
 }: AnimationProps): JSX.Element {
     const defaultSvgSize = appAppearance == 'playerOnly' ? 100 : 50 // percent
+    // On mobile the animation area is a bounded flex column so the SVG fills the leftover space.
+    const mobile = appAppearance == 'playerOnly'
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
     const [notationVisible, setNotationVisible] = useState<boolean>(true)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
@@ -136,17 +139,43 @@ export function Animation({
 
     const svgImage = useMemo(() => {
         return (
-            <ResizableSVG
-                src={positionToSvg(selectedFocusOption?.objValue)}
-                defaultSize={defaultSvgSize}
-                afterInjection={setSvgStates}
-            />
+            <>
+                <Activity mode={appAppearance == 'full' ? 'visible' : 'hidden'}>
+                    <ResizableSVG
+                        src={positionToSvg(selectedFocusOption?.objValue)}
+                        defaultSize={defaultSvgSize}
+                        afterInjection={setSvgStates}
+                    />
+                </Activity>
+                <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
+                    <ReactSVG
+                        src={positionToSvg(selectedFocusOption?.objValue)}
+                        className="h-full w-full [&_div]:h-full [&_div]:w-full"
+                        beforeInjection={(svg) => {
+                            // The parent row is a bounded flex area (flex-1 min-h-0), so the
+                            // browser computes the leftover height for us. Fill that box and keep
+                            // the aspect ratio (contained + centred) → the image is exactly as
+                            // large as the remaining space allows, and can never push the player
+                            // controls off-screen. No magic height constant needed.
+                            svg.setAttribute('preserveAspectRatio', 'xMidYMid meet')
+                            svg.removeAttribute('width')
+                            svg.removeAttribute('height')
+                            svg.style.display = 'block'
+                            svg.style.width = '100%'
+                            svg.style.height = '100%'
+                        }}
+                        afterInjection={setSvgStates}
+                    />
+                </Activity>
+            </>
         )
     }, [selectedFocusOption])
 
     return selectedFocusOption.objValue.length > 0 ? (
-        <div className="m-0 md:m-6 w-full md:w-95/100 " id="animationgrid">
-            <Grid fluid id="Animation" color="black" className="min-w-0">
+        <div
+            className={`m-0 md:m-6 w-full md:w-95/100 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}
+            id="animationgrid">
+            <Grid fluid id="Animation" color="black" className={`min-w-0 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
                     <HStack className="w-full" justifyContent="center">
                         <Toggle
@@ -186,7 +215,7 @@ export function Animation({
                         updatePlaybackFunctions={updatePlaybackFunctions}
                     />
                 </Row>
-                <Row id="svg-embed-row" className="pt-2 pl-4 pr-4">
+                <Row id="svg-embed-row" className={`pt-2 pl-4 pr-4 ${mobile ? 'flex-1 min-h-0' : ''}`}>
                     {svgImage}
                 </Row>
             </Grid>

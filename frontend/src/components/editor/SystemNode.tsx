@@ -189,7 +189,7 @@ export const SystemNode = memo(function SystemNode({
             .filter((sysData) => !labelledUuid.includes(sysData.uuid))
             .map((sysData) => ({ label: `#${sysData.id}`, value: sysData.uuid }))
         // Merge both lists
-        var options = [...labelOptions, ...idOptions]
+        var options: InputOption<string | undefined>[] = [...labelOptions, ...idOptions]
         // Remove the systemData item for which the list is being created
         options = options.filter((o) => o.value != self.uuid)
         // Add 'self' to the start of the list if requested.
@@ -252,7 +252,7 @@ export const SystemNode = memo(function SystemNode({
                     <SummaryItem
                         item="execution"
                         sysData={systemData}
-                        options={systemSelectorOptions(systemData, false, false)}
+                        options={systemSelectorOptions(systemData, false, false) as InputOption<string>[]}
                         execute={execute}
                         disabled={headerDisabled}
                     />

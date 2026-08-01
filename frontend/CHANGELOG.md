@@ -92,3 +92,7 @@ Initial release
 ## 1.1.7 2026-07-30
 
 - `Changed` MIDI generator: set notemap according to test user settings in Ableton
+
+## 1.1.8 2026-08-01
+
+- `Changed` New mobile layout: the menu now resides a the bottom to emulate modern mobile apps.

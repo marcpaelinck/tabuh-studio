@@ -1,9 +1,8 @@
-import type { InstrumentGroup } from '@tabuhstudio/shared'
-import { useEffect, useMemo, useState, type Dispatch } from 'react'
+import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { TbFileImport } from 'react-icons/tb'
-import { Button, ButtonGroup, Drawer, List, Nav, useDialog } from 'rsuite'
+import { Drawer, Nav, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
@@ -12,6 +11,7 @@ import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
 import { KeyMapEditor } from './editor/KeyMapEditor'
+import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 
 type Action =
@@ -77,21 +77,8 @@ export function MainMenu({
     const dialog = useDialog()
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
 
-    // Orchestra (InstrumentGroup) filter for the Open drawer. Options are the distinct
-    // orchestra types actually present among the available scores, so new orchestra types
-    // appear automatically once scores exist for them.
-    const [orchestra, setOrchestra] = useState<InstrumentGroup | null>(null)
-    const DEFAULT_ORCHESTRA: InstrumentGroup = 'GONG_KEBYAR'
-    const orchestraOptions = useMemo(
-        () =>
-            [...new Set(scoreMenuOptions.map((o) => o.objValue.instrumentgroup))]
-                .sort()
-                .map((g) => ({ label: g.replace(/_/g, ' '), value: g })),
-        [scoreMenuOptions]
-    )
-    const filteredScoreOptions = orchestra
-        ? scoreMenuOptions.filter((o) => o.objValue.instrumentgroup === orchestra)
-        : scoreMenuOptions
+    // Preferred orchestra when opening the score browser with no score loaded.
+    const DEFAULT_ORCHESTRA = 'GONG_KEBYAR'
 
     async function performAction() {
         switch (activeKey) {
@@ -104,22 +91,12 @@ export function MainMenu({
             case 'keyboard-edit':
                 setKeyMapEditorOpen(true)
                 break
-            case 'file-open': {
-                // Reset the selection and default the orchestra filter before opening (the
-                // Drawer has no onOpen hook). Default to the current score's orchestra when it
-                // has scores available, otherwise the first available orchestra.
+            case 'file-open':
+                // Reset the selection before opening (the Drawer has no onOpen hook); the
+                // ScoreBrowser handles the orchestra default.
                 setSelectedScoreOption(null)
-                const groups = orchestraOptions.map((o) => o.value)
-                setOrchestra(
-                    score?.instrumenttype && groups.includes(score.instrumenttype)
-                        ? score.instrumenttype
-                        : groups.includes(DEFAULT_ORCHESTRA)
-                          ? DEFAULT_ORCHESTRA
-                          : ((groups[0] as InstrumentGroup) ?? null)
-                )
                 setScoreSelector(true)
                 break
-            }
             case 'file-save':
                 if (score) {
                     const persistedScore = persistCachedChanges(score)
@@ -184,39 +161,16 @@ export function MainMenu({
                 <Drawer.Title>Select a notation</Drawer.Title>
             </Drawer.Header>
             <Drawer.Body>
-                <div className="flex flex-col gap-3 h-full">
-                    <div>
-                        <div className="text-xs mb-1">orchestra:</div>
-                        <ButtonGroup vertical className="w-full">
-                            {orchestraOptions.map((o) => (
-                                <Button
-                                    key={o.value}
-                                    appearance={orchestra === o.value ? 'primary' : 'default'}
-                                    onClick={() => setOrchestra(o.value as InstrumentGroup)}>
-                                    {o.label}
-                                </Button>
-                            ))}
-                        </ButtonGroup>
-                    </div>
-                    <div className="flex flex-1 min-h-0 flex-col">
-                        <div className="text-xs mb-1">score:</div>
-                        <List bordered hover divider={false} className="flex-1 min-h-0" style={{ overflowY: 'auto' }}>
-                            {filteredScoreOptions.map((o) => (
-                                <List.Item
-                                    key={o.value}
-                                    className={`cursor-pointer text-sm ${
-                                        o.value === selectedScoreOption?.value ? 'bg-blue-100' : ''
-                                    }`}
-                                    onClick={() => {
-                                        setScoreSelector(false)
-                                        setSelectedScoreOption(o)
-                                    }}>
-                                    {o.label}
-                                </List.Item>
-                            ))}
-                        </List>
-                    </div>
-                </div>
+                <ScoreBrowser
+                    key={scoreSelector ? 'open' : 'closed'}
+                    scoreMenuOptions={scoreMenuOptions}
+                    defaultInstrumentGroup={score?.instrumenttype ?? DEFAULT_ORCHESTRA}
+                    selectedValue={selectedScoreOption?.value}
+                    onSelect={(o) => {
+                        setScoreSelector(false)
+                        setSelectedScoreOption(o)
+                    }}
+                />
             </Drawer.Body>
         </Drawer>
     )

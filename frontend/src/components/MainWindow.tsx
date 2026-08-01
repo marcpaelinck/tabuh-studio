@@ -1,8 +1,9 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
 import type { UUID } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { Position } from '@tabuhstudio/shared'
 import { Activity, useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
-import { BsList, BsPerson, BsPersonFillCheck } from 'react-icons/bs'
+import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
     Button,
     Col,
@@ -16,12 +17,15 @@ import {
     Modal,
     PasswordInput,
     Popover,
+    Radio,
+    RadioGroup,
     Row,
     SchemaModel,
     SegmentedControl,
     Sidebar,
     Sidenav,
     StringType,
+    Text,
     useDialog,
     useMediaQuery,
     type FormInstance
@@ -30,16 +34,18 @@ import { playbackReducerFactory } from '../componentlogic/playback/playbackReduc
 import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManager'
 import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
-import { noCursor, type KeyboardType } from '../config/config'
+import { noCursor, speedList, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
 import { useScoreStore } from '../stores/useScoreStore.tsx'
-import { useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore.tsx'
+import { focusDefaultOption, useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore.tsx'
+import type { PlaybackCursorStyle } from '../typing/animation'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
+import { createFocusMenuItems, createSpeedMenuItems } from '../utils/selectorsUtils'
 import {
     chars,
     Dashboard,
@@ -50,9 +56,12 @@ import {
 } from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
 import { MainMenu } from './MainMenu'
+import { MobileBottomNav } from './MobileBottomNav'
+import { OptionList } from './OptionList'
 import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
+import { ScoreBrowser } from './ScoreBrowser'
 
 interface LoginDialogProps {
     open: boolean
@@ -186,9 +195,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const { mainView, setMainView } = useUserSelectionStore()
     const { screenSize, environment } = useEnvironmentStore()
     const [appAppearance, setAppAppearance] = useState<Appearance>('full')
-    // Mobile hamburger holding the playback menu. `pbMenu*` to avoid confusion with the Sidenav.
-    const [pbMenuOpen, setPbMenuOpen] = useState(false)
-    const pbMenuRef = useRef<HTMLDivElement>(null) // wraps the button + panel
     const { user, login, logout } = useAuth()
     const appInfo = useAppInfo()
     const dialog = useDialog()
@@ -215,22 +221,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setAppAppearance(screenSize?.abbr.includes('lg') ? 'full' : 'playerOnly')
     }, [screenSize])
 
-    // Close the mobile playback menu on a click outside it. Clicks inside the menu, on
-    // its button, or inside an rsuite overlay portal (e.g. a SelectPicker dropdown,
-    // which renders on document.body) are ignored so the menu stays open while in use.
-    useEffect(() => {
-        if (!pbMenuOpen) return
-        function onPointerDown(e: PointerEvent) {
-            const target = e.target as HTMLElement | null
-            if (!target) return
-            if (pbMenuRef.current?.contains(target)) return
-            if (target.closest('.rs-picker-popup, .rs-popover, .rs-picker-menu')) return
-            setPbMenuOpen(false)
-        }
-        document.addEventListener('pointerdown', onPointerDown)
-        return () => document.removeEventListener('pointerdown', onPointerDown)
-    }, [pbMenuOpen])
-
     // ── DASHBOARD WARNINGS ─────────────────────────────────────────────
 
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
@@ -243,9 +233,29 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
-    const { selectedSpeedOption, selectedScoreOption } = useUserSelectionStore()
+    const {
+        selectedSpeedOption,
+        setSelectedSpeedOption,
+        selectedScoreOption,
+        setSelectedScoreOption,
+        selectedFocusOption,
+        setSelectedFocusOption,
+        selectedCursorStyle,
+        setSelectedCursorStyle,
+        mobileTab,
+        setMobileTab
+    } = useUserSelectionStore()
 
     // ──  MENU AND SELECTORS SETTINGS ─────────────────────────────────────────────
+
+    // Focus / speed option lists (shared by the desktop PlaybackMenu and the mobile views).
+    // Speed is fixed; focus depends on the loaded score and is reset to "No Focus" on change.
+    const speedMenuItems = useMemo(() => createSpeedMenuItems(speedList), [])
+    const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
+    useEffect(() => {
+        if (score) setFocusMenuItems(createFocusMenuItems(score))
+        setSelectedFocusOption(focusDefaultOption)
+    }, [score])
 
     useEffect(() => {
         if (selectedScoreOption && selectedScoreOption.objValue) loadScore('JSON', selectedScoreOption?.objValue)
@@ -364,8 +374,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     )
 
     const playbackMenu = useMemo(
-        () => <PlaybackMenu appAppearance={appAppearance} scoreMenuOptions={scoreMenuOptions} score={score} />,
-        [appAppearance, scoreMenuOptions, score]
+        () => <PlaybackMenu focusMenuItems={focusMenuItems} speedMenuItems={speedMenuItems} />,
+        [focusMenuItems, speedMenuItems]
     )
 
     const playerWindow = (
@@ -475,46 +485,92 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                     {fullApplication}
                 </Container>
             </Activity>
-            {/* Container for small screens only displays the Player Window.
-                Full-viewport flex column so the player fills down to the screen edge. */}
+            {/* Small screens: a top bar, a full-screen view chosen by the bottom nav, and the
+                VLC-style bottom navigation. The player is always mounted and visible; the
+                Scores/Focus/Speed views overlay it (see the note on the view area below). */}
             <Activity mode={appAppearance == 'playerOnly' ? 'visible' : 'hidden'}>
-                <div className="flex flex-col h-dvh min-h-0 p-1">
-                    {/* Hamburger menu holding the playback menu; stays open until a click outside. */}
-                    <HStack ref={pbMenuRef} className="align-top">
-                        <IconButton
-                            icon={<BsList style={{ fontSize: '2rem' }} />}
-                            size="lg"
-                            appearance="subtle"
-                            aria-label="Open playback menu"
-                            aria-expanded={pbMenuOpen}
-                            onClick={() => setPbMenuOpen((open) => !open)}
-                            className="p-0"
-                        />
-                        {/* Keep the menu mounted and toggle only CSS visibility. Wrapping it in
-                            <Activity> (or `pbMenuOpen && …`) tears down and re-runs PlaybackMenu's
-                            effects on every open, which would reset the focus even when the score
-                            is unchanged. display:none hides it without touching its effects. */}
-                        <div
-                            className="absolute left-0 top-0 z-50 mt-1 ml-1 rounded-md border bg-white p-2 shadow-lg"
-                            style={{ minWidth: '16rem', display: pbMenuOpen ? 'block' : 'none' }}>
-                            {playbackMenu}
-                        </div>
+                <div className="flex flex-col h-dvh min-h-0">
+                    {/* Top bar: score title (left) + logo/about (right). */}
+                    <div className="flex items-center justify-between border-b px-3 py-2">
+                        <span className="truncate text-lg font-medium">{score?.title ?? ''}</span>
                         <TsLogoIcon
                             environment={environment}
-                            remSize={2.5}
+                            remSize={2.2}
                             onClick={() => infoDlg()}
-                            className="mt-2"
-                            style={{
-                                marginLeft: 'auto',
-                                marginRight: '0.5rem',
-                                marginTop: '0.5rem',
-                                cursor: 'pointer'
-                            }}
+                            style={{ cursor: 'pointer' }}
                         />
-                    </HStack>
-                    <Container id="player-only" className="flex-1 min-h-0">
-                        {playerWindow}
-                    </Container>
+                    </div>
+
+                    {/* View area, filling the space between top bar and bottom nav. The player
+                        stays mounted AND visible whichever tab is active — its playback refs
+                        (focus, speed, cursor) are updated by effects that React unmounts when a
+                        component is hidden, so hiding it would freeze the values the scheduled
+                        animation callback reads. The Scores/Focus/Speed views overlay it instead. */}
+                    <div className="relative min-h-0 flex-1">
+                        <div className="flex h-full flex-col">
+                            <HStack className="justify-end px-3 pt-1" spacing={6}>
+                                <Text className="text-(--rs-text-secondary) text-xs">cursor:</Text>
+                                <RadioGroup
+                                    inline
+                                    value={selectedCursorStyle}
+                                    onChange={(value) => setSelectedCursorStyle(value as PlaybackCursorStyle)}>
+                                    <Radio value="Beat">beat</Radio>
+                                    <Radio value="System">system</Radio>
+                                </RadioGroup>
+                            </HStack>
+                            <div className="min-h-0 flex-1">{playerWindow}</div>
+                        </div>
+
+                        {mobileTab != 'player' && (
+                            <div className="absolute inset-0 overflow-auto bg-white p-3">
+                                {mobileTab == 'scores' && (
+                                    <ScoreBrowser
+                                        scoreMenuOptions={scoreMenuOptions}
+                                        defaultInstrumentGroup={score?.instrumenttype ?? 'GONG_KEBYAR'}
+                                        selectedValue={selectedScoreOption?.value}
+                                        onSelect={(o) => {
+                                            setSelectedScoreOption(o)
+                                            setMobileTab('player')
+                                        }}
+                                    />
+                                )}
+                                {mobileTab == 'focus' && (
+                                    <div className="flex h-full flex-col gap-2">
+                                        <div className="text-xs">focus:</div>
+                                        <OptionList
+                                            data={focusMenuItems}
+                                            selectedValue={selectedFocusOption.value}
+                                            onSelect={(o) => {
+                                                setSelectedFocusOption(o)
+                                                setMobileTab('player')
+                                            }}
+                                            className="flex-1 min-h-0"
+                                        />
+                                    </div>
+                                )}
+                                {mobileTab == 'speed' && (
+                                    <div className="flex h-full flex-col gap-2">
+                                        <div className="text-xs">speed:</div>
+                                        <OptionList
+                                            data={speedMenuItems}
+                                            selectedValue={selectedSpeedOption.value}
+                                            onSelect={(o) => {
+                                                setSelectedSpeedOption(o)
+                                                setMobileTab('player')
+                                            }}
+                                            className="flex-1 min-h-0"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <MobileBottomNav
+                        active={mobileTab}
+                        onChange={setMobileTab}
+                        speedValue={selectedSpeedOption.value}
+                    />
                 </div>
             </Activity>
         </>
