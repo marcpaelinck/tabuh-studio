@@ -1078,3 +1078,66 @@ un-stripped score. `MainMenu` gained `File → Export PDF…` (`file-export-pdf`
   gradual lines — that's the Phase 2 fidelity pass.
 - Very long systems can run near the right margin (single line, like the Python).
 - Build not run in-sandbox; requires `npm install` (for the two new deps) + `npm run build`.
+
+---
+
+# Phase 2a — as built (metadata fidelity, part 1)
+
+Scope (agreed): beat-column anchoring, gradual **"faster/slower"** tempo phrasing with
+dot-fill, and **"`<tags>`: `<value>`"** dynamics. Row-merging + expand-to-fit are **Phase 2b**;
+PART and comments stay out of scope.
+
+## Model (`pdfModel.ts`)
+
+`PdfMetaRow` is now structured: `{ style, align, fromBeat, toBeat, prefix?, value?, suffix?,
+labels?, dotFill? }` — a beat span (0-based) plus runs the renderer measures/fills.
+`PdfSystemBlock` gained `beatStarts` / `beatEnds` (from `beatSlices`) for anchoring.
+
+- **Tempo — flow-based.** `collectTempoOccurrences(score)` runs the real execution flow
+  (`executionManager`, capped at 20 000 steps) and records, per tempo item, every application
+  `{ pass, iteration, before }` where `before` is the tempo carried by the flow just before
+  the item's beat. The **first** application establishes the opening tempo and is suppressed.
+  Verdict = **faster/slower**: a gradual item with an explicit `fromValue` compares against
+  it; otherwise against the flow `before` (per the user's remark 1). `buildTempoRowsBySystem`
+  then, per item: if all occurrences agree → **one** directive with the item's declared
+  `(pass …, iter. …)` suffix; if they **conflict** → **one directive per verdict group**,
+  labelled only with the dimension(s) (pass and/or iteration) that distinguish the groups
+  (remark 2). Gradual items get `dotFill:'after'`; the span is `fromBeat…toBeat`.
+  - `itemApplies(item, pass, iteration)` mirrors `executionManager`'s pass/`nthpass`/iteration
+    matching so occurrence detection agrees with playback.
+- **Dynamics** (no flow needed — the value is fixed): `<tags>: <value>` where `<tags>` is the
+  aggregated position label (`compactGroupLabel(...).toLowerCase()`, e.g. `gangsa`), `<value>`
+  the abbreviation (`mf`/`mp`/`f`…). Gradual → `dotFill:'beforeValue'`; span `fromBeat…toBeat`;
+  suffix from declared passes/iterations.
+- **Label / goto / loop / sequence**: goto = `go to <label>` (blue), loop = `play NX`, both
+  right-aligned to the system end with a pass suffix; sequence unchanged (wrapped); label at
+  beat 1.
+- **Suffix format** (`conditionSuffix`): `(pass 1,2)`, `(iter. 8)`, `(pass 3, iter. 8)`
+  (remarks 3–4); positive ids only.
+
+## Renderer (`pdfGenerator.ts`)
+
+`drawMeta(row, sys, systemRight)` now anchors to beat columns (`beatLeftX/​beatRightX` off the
+fixed `cellW` grid), composes coloured runs (prefix / value / labels / suffix — labels in blue
+Courier-Bold, tempo/dynamics in Helvetica-Oblique 8 black, goto/loop Helvetica 9 blue), and
+dot-fills the span for gradual tempo (`after` the word) / dynamics (`beforeValue`). Right-aligned
+rows end at the system's right edge. `blockHeight` unchanged (one line per row; sequence multi).
+
+## Verified (sandbox spike)
+
+- Pure logic asserted: suffix format, verdict (incl. gradual `fromValue`), initial-tempo
+  suppression, no-change suppression, and conflict split → per-pass directives with iteration
+  omitted when only the pass distinguishes.
+- Rendered Puspa Mekar systems 1–4 (with hand-built flow occurrences) and compared to
+  `Puspa Mekar.pdf`: `gangsa: mf` (system 1, tempo suppressed), `slower……. (pass 3, iter. 8)`
+  with dot-fill, `gangsa: mp (iter. 1)` anchored at beat 4, `gangsa: f (pass 1,2, iter. 7)` and
+  `P1` at beat 1 — correct order, placement, styles and (user-preferred) suffixes.
+
+## Notes
+
+- The full pipeline (real `executionManager` occurrences) can't run in-sandbox (the saved
+  JSON lacks `objNotation`; needs the app's postprocessing) — confirm with `npm run build`.
+- Output intentionally differs from the Python reference in the suffix wording
+  (`(pass 3, iter. 8)` vs `(pass 3) (iteration 8)`) and uses flow-based current tempo rather
+  than the Python's document-order tracking.
+- Row-merging and expand-to-fit remain for **Phase 2b**.

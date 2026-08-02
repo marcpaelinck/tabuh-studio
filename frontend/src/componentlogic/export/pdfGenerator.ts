@@ -219,23 +219,75 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         y -= META_ROW_H
     }
 
-    // `systemRight` is the x of the notation's right edge — where right-aligned metadata
-    // (play / go to) ends, rather than the page margin.
-    const drawMeta = (row: PdfMetaRow, systemRight: number) => {
+    // Beat-column x helpers (fixed monospaced cell grid).
+    const beatLeftX = (sys: PdfSystemBlock, b: number) =>
+        NOTATION_LEFT + (sys.beatStarts[Math.min(b, sys.beatStarts.length - 1)] ?? 0) * cellW
+    const beatRightX = (sys: PdfSystemBlock, b: number) =>
+        NOTATION_LEFT + (sys.beatEnds[Math.min(b, sys.beatEnds.length - 1)] ?? sys.columnCount) * cellW
+
+    type Run = { text: string; font: PDFFont; size: number; color: ReturnType<typeof rgb> }
+
+    // Draws one metadata directive as a row of runs, anchored to its beat span. Gradual
+    // tempo/dynamics get a dotted fill across the span; right-aligned rows (goto/loop) end at
+    // the system's right edge.
+    const drawMeta = (row: PdfMetaRow, sys: PdfSystemBlock, systemRight: number) => {
         if (row.style === 'sequence' && row.labels) {
             drawSequence(row.labels)
             return
         }
-        const { font, size, color } = metaFont(row.style, f)
-        const text = winAnsi(row.text)
-        const baseline = y - size
-        let x: number
-        if (row.align === 'right') {
-            x = systemRight - font.widthOfTextAtSize(text, size)
+        const base = metaFont(row.style, f)
+        const baseline = y - base.size
+        const mk = (text: string, font = base.font, color = base.color): Run => ({
+            text: winAnsi(text),
+            font,
+            size: base.size,
+            color
+        })
+        const runW = (r: Run) => r.font.widthOfTextAtSize(r.text, r.size)
+
+        const runs: Run[] = []
+        if (row.style === 'label') {
+            runs.push(mk(row.value ?? ''))
+        } else if (row.style === 'goto') {
+            if (row.prefix) runs.push(mk(row.prefix, f.helv, BLUE))
+            ;(row.labels ?? []).forEach((lbl, i) => runs.push(mk((i ? ', ' : '') + lbl, f.courierBold, BLUE)))
+            if (row.suffix) runs.push(mk(row.suffix, f.helv, BLUE))
+        } else if (row.style === 'loop') {
+            if (row.prefix) runs.push(mk(row.prefix, f.helv, BLUE))
+            if (row.value) runs.push(mk(row.value, f.helv, BLUE))
+            if (row.suffix) runs.push(mk(row.suffix, f.helv, BLUE))
         } else {
-            x = NOTATION_LEFT + row.column * cellW
+            // tempo / dynamics: prefix [dots] value suffix — dots position depends on dotFill.
+            const pre: Run[] = []
+            const post: Run[] = []
+            if (row.dotFill === 'beforeValue') {
+                if (row.prefix) pre.push(mk(row.prefix))
+                if (row.value) post.push(mk(row.value))
+                if (row.suffix) post.push(mk(row.suffix))
+            } else {
+                if (row.prefix) pre.push(mk(row.prefix))
+                if (row.value) pre.push(mk(row.value))
+                if (row.suffix) post.push(mk(row.suffix))
+            }
+            let dots = ''
+            if (row.dotFill) {
+                const spanW = beatRightX(sys, row.toBeat) - beatLeftX(sys, row.fromBeat)
+                const textW = [...pre, ...post].reduce((s, r) => s + runW(r), 0)
+                const dw = base.font.widthOfTextAtSize('.', base.size)
+                const n = Math.floor((spanW - textW) / dw)
+                if (n > 0) dots = '.'.repeat(n)
+            }
+            runs.push(...pre)
+            if (dots) runs.push(mk(dots))
+            runs.push(...post)
         }
-        page.drawText(text, { x, y: baseline, size, font, color })
+
+        const totalW = runs.reduce((s, r) => s + runW(r), 0)
+        let x = row.align === 'right' ? systemRight - totalW : beatLeftX(sys, row.fromBeat)
+        for (const r of runs) {
+            page.drawText(r.text, { x, y: baseline, size: r.size, font: r.font, color: r.color })
+            x += runW(r)
+        }
         y -= META_ROW_H
     }
 
@@ -246,7 +298,7 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         const systemRight = NOTATION_LEFT + sys.columnCount * cellW
 
         // Metadata above.
-        for (const row of sys.above) drawMeta(row, systemRight)
+        for (const row of sys.above) drawMeta(row, sys, systemRight)
 
         // Green kempli lines behind the notation rows, centred on each beat's first symbol
         // (like the editor's grid), not on the symbol's left edge.
@@ -292,7 +344,7 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         })
 
         // Metadata below.
-        for (const row of sys.below) drawMeta(row, systemRight)
+        for (const row of sys.below) drawMeta(row, sys, systemRight)
 
         y -= SPACE_AFTER
     }
