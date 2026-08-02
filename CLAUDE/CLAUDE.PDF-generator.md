@@ -1140,4 +1140,48 @@ rows end at the system's right edge. `blockHeight` unchanged (one line per row; 
 - Output intentionally differs from the Python reference in the suffix wording
   (`(pass 3, iter. 8)` vs `(pass 3) (iteration 8)`) and uses flow-based current tempo rather
   than the Python's document-order tracking.
-- Row-merging and expand-to-fit remain for **Phase 2b**.
+
+---
+
+# Phase 2b — as built (metadata fidelity, part 2: row merging)
+
+Scope: pack non-overlapping directives onto shared lines (Python row merging), using each
+directive's actual text width as its occupied interval (expand-to-fit). All in the renderer
+(`pdfGenerator.ts`); the model is unchanged.
+
+## Renderer
+
+`drawMeta` was split into pure layout + packing + draw:
+
+- `layoutMeta(row, sys, systemRight)` → `{ x0, x1, size, runs[] }`: builds the coloured runs
+  (as in 2a) at absolute x and returns the occupied x-interval. Left-aligned rows start at
+  `beatLeftX(fromBeat)`; right-aligned (goto/loop) end at `systemRight`; the interval uses the
+  real drawn width (dots included), which is the fixed-grid equivalent of the Python's
+  expand-into-adjacent-cells — text simply occupies whatever width it needs.
+- `packLines(rows, sys, systemRight)` → `MetaLine[]`: walks the rows in order; a directive
+  joins the current line when its `[x0,x1]` doesn't overlap (within `MERGE_GAP = 6pt`) any
+  directive already on it, otherwise it starts a new line. Sequence rows are never packed
+  (they wrap over several lines) and flush the current line. This mirrors the Python's
+  "merge with the previous metadata row when the cells don't overlap".
+- `linesHeight(lines)` replaces the old `blockHeight` term for the keep-gongan-together page
+  break (counts packed lines; sequence counts its wrapped line count).
+- `drawLine(line)` draws every run of every directive on the line at one baseline
+  (`y - max size`) and advances `y` by one `META_ROW_H`.
+
+The main loop now packs `above` and `below` once per system (reused for the height check and
+for drawing).
+
+## Verified (sandbox spike)
+
+Re-rendered Puspa Mekar 1–4 plus a synthetic system:
+- System 2 (four directives all anchored around beat 1) stays on **4 lines** — overlapping,
+  not merged (matches the reference).
+- System 4 (`gangsa: f (iter. 5)` at beat 1 + `gangsa: mp (iter. 1)` at beat 4) now merges
+  onto **one** line — matching the reference (2a had put them on two lines).
+- A synthetic pair of far-apart dynamics also merges cleanly with a visible gap.
+
+## Notes
+
+- Same in-sandbox caveat as 2a (needs `npm run build` for the real `executionManager` flow).
+- Phase 2 (metadata fidelity) is now complete. Remaining PDF work is **Phase 3**: expanded /
+  single-position sources, the excludable-items settings UI, and PART once parts land.

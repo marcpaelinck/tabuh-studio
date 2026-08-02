@@ -174,14 +174,6 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         return lines
     }
 
-    const blockHeight = (sys: PdfSystemBlock): number => {
-        const belowH = sys.below.reduce(
-            (h, r) => h + (r.style === 'sequence' && r.labels ? seqLineCount(r.labels) : 1) * META_ROW_H,
-            0
-        )
-        return sys.above.length * META_ROW_H + sys.rows.length * NOTATION_ROW_H + belowH + SPACE_AFTER
-    }
-
     let page = doc.addPage(A4)
     let pageNo = 1
     drawHeader(page, pageNo, model, f)
@@ -226,17 +218,15 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         NOTATION_LEFT + (sys.beatEnds[Math.min(b, sys.beatEnds.length - 1)] ?? sys.columnCount) * cellW
 
     type Run = { text: string; font: PDFFont; size: number; color: ReturnType<typeof rgb> }
+    type PositionedRun = Run & { x: number }
+    type Positioned = { x0: number; x1: number; size: number; runs: PositionedRun[] }
+    type MetaLine = { kind: 'metas'; metas: Positioned[] } | { kind: 'seq'; labels: string[] }
 
-    // Draws one metadata directive as a row of runs, anchored to its beat span. Gradual
-    // tempo/dynamics get a dotted fill across the span; right-aligned rows (goto/loop) end at
-    // the system's right edge.
-    const drawMeta = (row: PdfMetaRow, sys: PdfSystemBlock, systemRight: number) => {
-        if (row.style === 'sequence' && row.labels) {
-            drawSequence(row.labels)
-            return
-        }
+    // Lays out one directive's runs at absolute x (no drawing, no y). Gradual tempo/dynamics
+    // get a dotted fill across their beat span; right-aligned rows (goto/loop) end at the
+    // system's right edge. Returns the occupied x-interval [x0, x1] for row packing.
+    const layoutMeta = (row: PdfMetaRow, sys: PdfSystemBlock, systemRight: number): Positioned => {
         const base = metaFont(row.style, f)
-        const baseline = y - base.size
         const mk = (text: string, font = base.font, color = base.color): Run => ({
             text: winAnsi(text),
             font,
@@ -283,22 +273,71 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         }
 
         const totalW = runs.reduce((s, r) => s + runW(r), 0)
-        let x = row.align === 'right' ? systemRight - totalW : beatLeftX(sys, row.fromBeat)
-        for (const r of runs) {
-            page.drawText(r.text, { x, y: baseline, size: r.size, font: r.font, color: r.color })
+        const x0 = row.align === 'right' ? systemRight - totalW : beatLeftX(sys, row.fromBeat)
+        let x = x0
+        const positioned: PositionedRun[] = runs.map((r) => {
+            const pr = { ...r, x }
             x += runW(r)
+            return pr
+        })
+        return { x0, x1: x, size: base.size, runs: positioned }
+    }
+
+    // Packs directives into lines (Phase 2b row merging): a directive joins the current line
+    // if its x-interval doesn't overlap (within MERGE_GAP) anything already on it, else it
+    // starts a new line. Sequence rows are never packed (they wrap over several lines).
+    const MERGE_GAP = 6
+    const packLines = (rows: PdfMetaRow[], sys: PdfSystemBlock, systemRight: number): MetaLine[] => {
+        const lines: MetaLine[] = []
+        let cur: Positioned[] = []
+        const flush = () => {
+            if (cur.length) lines.push({ kind: 'metas', metas: cur })
+            cur = []
         }
+        for (const row of rows) {
+            if (row.style === 'sequence' && row.labels) {
+                flush()
+                lines.push({ kind: 'seq', labels: row.labels })
+                continue
+            }
+            const p = layoutMeta(row, sys, systemRight)
+            if (cur.some((q) => p.x0 < q.x1 + MERGE_GAP && q.x0 < p.x1 + MERGE_GAP)) {
+                flush()
+                cur = [p]
+            } else cur.push(p)
+        }
+        flush()
+        return lines
+    }
+
+    const linesHeight = (lines: MetaLine[]): number =>
+        lines.reduce((h, ln) => h + (ln.kind === 'seq' ? seqLineCount(ln.labels) : 1) * META_ROW_H, 0)
+
+    // Draws one packed line at the current y and advances y past it.
+    const drawLine = (line: MetaLine) => {
+        if (line.kind === 'seq') {
+            drawSequence(line.labels)
+            return
+        }
+        const baseline = y - Math.max(...line.metas.map((m) => m.size))
+        for (const meta of line.metas)
+            for (const r of meta.runs)
+                page.drawText(r.text, { x: r.x, y: baseline, size: r.size, font: r.font, color: r.color })
         y -= META_ROW_H
     }
 
     for (const sys of model.systems) {
-        // Keep each gongan together: if it won't fit and this isn't a fresh page, break.
-        if (y - blockHeight(sys) < BOTTOM && y < PAGE_H - BODY_TOP - 1) newPage()
-
         const systemRight = NOTATION_LEFT + sys.columnCount * cellW
+        const aboveLines = packLines(sys.above, sys, systemRight)
+        const belowLines = packLines(sys.below, sys, systemRight)
+
+        // Keep each gongan together: if it won't fit and this isn't a fresh page, break.
+        const blockH =
+            linesHeight(aboveLines) + sys.rows.length * NOTATION_ROW_H + linesHeight(belowLines) + SPACE_AFTER
+        if (y - blockH < BOTTOM && y < PAGE_H - BODY_TOP - 1) newPage()
 
         // Metadata above.
-        for (const row of sys.above) drawMeta(row, sys, systemRight)
+        for (const line of aboveLines) drawLine(line)
 
         // Green kempli lines behind the notation rows, centred on each beat's first symbol
         // (like the editor's grid), not on the symbol's left edge.
@@ -344,7 +383,7 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         })
 
         // Metadata below.
-        for (const row of sys.below) drawMeta(row, sys, systemRight)
+        for (const line of belowLines) drawLine(line)
 
         y -= SPACE_AFTER
     }
