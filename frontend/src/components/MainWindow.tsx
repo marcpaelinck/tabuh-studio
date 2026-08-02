@@ -1,7 +1,7 @@
 import ArrowLeftLineIcon from '@rsuite/icons/ArrowLeftLine'
 import ArrowRightLineIcon from '@rsuite/icons/ArrowRightLine'
-import type { UUID } from '@tabuhstudio/shared/types/basetypes.ts'
 import type { Position } from '@tabuhstudio/shared'
+import type { UUID } from '@tabuhstudio/shared/types/basetypes.ts'
 import { Activity, useEffect, useMemo, useReducer, useRef, useState, type Dispatch } from 'react'
 import { BsPerson, BsPersonFillCheck } from 'react-icons/bs'
 import {
@@ -17,15 +17,12 @@ import {
     Modal,
     PasswordInput,
     Popover,
-    Radio,
-    RadioGroup,
     Row,
     SchemaModel,
     SegmentedControl,
     Sidebar,
     Sidenav,
     StringType,
-    Text,
     useDialog,
     useMediaQuery,
     type FormInstance
@@ -40,8 +37,12 @@ import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
 import { useScoreStore } from '../stores/useScoreStore.tsx'
-import { focusDefaultOption, useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore.tsx'
-import type { PlaybackCursorStyle } from '../typing/animation'
+import {
+    focusDefaultOption,
+    panggulDefaultOption,
+    useUserSelectionStore,
+    type MainView
+} from '../stores/useUserSettingsStore.tsx'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -240,8 +241,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setSelectedScoreOption,
         selectedFocusOption,
         setSelectedFocusOption,
-        selectedCursorStyle,
-        setSelectedCursorStyle,
+        setSelectedPanggulOption,
         mobileTab,
         setMobileTab
     } = useUserSelectionStore()
@@ -255,6 +255,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     useEffect(() => {
         if (score) setFocusMenuItems(createFocusMenuItems(score))
         setSelectedFocusOption(focusDefaultOption)
+        debug(`setting panggul option to ${JSON.stringify(panggulDefaultOption)}`)
+        setSelectedPanggulOption(panggulDefaultOption)
     }, [score])
 
     useEffect(() => {
@@ -508,16 +510,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                         animation callback reads. The Scores/Focus/Speed views overlay it instead. */}
                     <div className="relative min-h-0 flex-1">
                         <div className="flex h-full flex-col">
-                            <HStack className="justify-end px-3 pt-1" spacing={6}>
-                                <Text className="text-(--rs-text-secondary) text-xs">cursor:</Text>
-                                <RadioGroup
-                                    inline
-                                    value={selectedCursorStyle}
-                                    onChange={(value) => setSelectedCursorStyle(value as PlaybackCursorStyle)}>
-                                    <Radio value="Beat">beat</Radio>
-                                    <Radio value="System">system</Radio>
-                                </RadioGroup>
-                            </HStack>
                             <div className="min-h-0 flex-1">{playerWindow}</div>
                         </div>
 

@@ -61,7 +61,7 @@ export function Animation({
     // On mobile the animation area is a bounded flex column so the SVG fills the leftover space.
     const mobile = appAppearance == 'playerOnly'
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
-    const [notationVisible, setNotationVisible] = useState<boolean>(true)
+    const [notationVisible, setNotationVisible] = useState<boolean>(false)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -78,7 +78,7 @@ export function Animation({
     useEffect(() => {
         debug(`new focus: ${JSON.stringify(selectedFocusOption.objValue)}`)
         initializeAnimationOptionsMenu(selectedFocusOption)
-    }, [selectedFocusOption])
+    }, [selectedFocusOption, appAppearance])
 
     // Initialize the selected pangul option. Dependency svgInfoRef.current is necessary
     // because it might not be initialized before selectedPanggulOption gets its initial value.
@@ -108,6 +108,7 @@ export function Animation({
             menuItems.push({ label: 'Highlight', value: 'Highlight', objValue: [] })
         }
         setPanggulMenuItems(menuItems)
+        debug(`setting panggul option to ${JSON.stringify(menuItems[0])}`)
         setSelectedPanggulOption(menuItems[0])
     }
 
@@ -129,7 +130,6 @@ export function Animation({
             } else if (panggul && !panggul.classList.contains('invisible')) {
                 panggul.classList.add('invisible')
             }
-            setSelectedPanggulOption(selection)
         }
     }
 
@@ -169,13 +169,17 @@ export function Animation({
                 </Activity>
             </>
         )
-    }, [selectedFocusOption])
+    }, [selectedFocusOption, selectedPanggulOption])
 
     return selectedFocusOption.objValue.length > 0 ? (
         <div
             className={`m-0 md:m-6 w-full md:w-95/100 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}
             id="animationgrid">
-            <Grid fluid id="Animation" color="black" className={`min-w-0 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}>
+            <Grid
+                fluid
+                id="Animation"
+                color="black"
+                className={`min-w-0 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
                     <HStack className="w-full" justifyContent="center">
                         <Toggle
