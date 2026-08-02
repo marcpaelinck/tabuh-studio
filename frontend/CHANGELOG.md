@@ -96,3 +96,7 @@ Initial release
 ## 1.1.8 2026-08-01
 
 - `Changed` New mobile layout: the menu now resides a the bottom to emulate modern mobile apps.
+
+## 1.1.9 2026-08-01
+
+- `Changed` Improved PDF export (relative tempo, more compact), added suppress item.
