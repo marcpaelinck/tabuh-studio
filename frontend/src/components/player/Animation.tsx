@@ -179,6 +179,7 @@ export function Animation({
                 fluid
                 id="Animation"
                 color="black"
+                style={{ marginInline: 'revert' }}
                 className={`min-w-0 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
                     <HStack className="w-full" justifyContent="center">
