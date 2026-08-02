@@ -23,13 +23,14 @@ import type {
     GotoItem,
     LoopItem,
     SequenceItem,
+    SuppressItem,
     TempoItem
 } from '../../typing/execution'
 import type { Score, System } from '../../typing/score'
 import { compactGroupLabel } from '../../utils/compactGroupLabel'
 import { executionManager } from '../playback/executionManager'
 
-export type PdfMetaStyle = 'label' | 'tempo' | 'dynamics' | 'goto' | 'loop' | 'sequence'
+export type PdfMetaStyle = 'label' | 'tempo' | 'dynamics' | 'goto' | 'loop' | 'sequence' | 'suppress'
 
 /**
  * A metadata directive line. It is anchored to a beat span (`fromBeat`..`toBeat`, 0-based
@@ -88,7 +89,14 @@ export interface BuildPdfOptions {
 }
 
 const DEFAULT_OMIT_OCTAVE: Position[] = ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4']
-const SHOWN_TYPES: ReadonlySet<ExecutionItemType> = new Set(['tempo', 'dynamics', 'goto', 'loop', 'sequence'])
+const SHOWN_TYPES: ReadonlySet<ExecutionItemType> = new Set([
+    'tempo',
+    'dynamics',
+    'goto',
+    'loop',
+    'sequence',
+    'suppress'
+])
 
 /** Strips the octave-modifier characters (e.g. `,` `<`) from a notation string. */
 function stripOctaveDiacritics(text: string): string {
@@ -264,9 +272,13 @@ function buildSystemBlock(
     const lastBeat = Math.max(0, sys.beatSlices.length - 1)
     const beatIdx = (beat1: number) => Math.min(Math.max(0, beat1 - 1), lastBeat)
 
-    // ABOVE: tempo (from the flow), then dynamics, then label.
-    const above: PdfMetaRow[] = [...(exclude.has('tempo') ? [] : tempoRows)]
-    const below: PdfMetaRow[] = []
+    // Collect the metadata by kind, then order the ABOVE block as: label first, then
+    // suppress, then tempo (from the flow) and dynamics last.
+    const labelRows: PdfMetaRow[] = sys.label
+        ? [{ style: 'label', align: 'left', fromBeat: 0, toBeat: 0, value: sys.label }]
+        : []
+    const suppressRows: PdfMetaRow[] = []
+    const dynamicsRows: PdfMetaRow[] = []
     const gotoRows: PdfMetaRow[] = []
     const loopRows: PdfMetaRow[] = []
     const sequenceRows: PdfMetaRow[] = []
@@ -275,10 +287,10 @@ function buildSystemBlock(
         if (exclude.has(item.type) || !SHOWN_TYPES.has(item.type)) continue
         if (item.type === 'dynamics') {
             const d = item as DynamicsItem
-            const tags = d.positions.length ? compactGroupLabel(d.positions, groups).label.toLowerCase() : ''
+            const tags = d.positions.length ? compactGroupLabel(d.positions, groups, true).label : ''
             const from = beatIdx(d.fromBeat)
             const to = d.isGradual && d.toBeat ? Math.max(from, beatIdx(d.toBeat)) : from
-            above.push({
+            dynamicsRows.push({
                 style: 'dynamics',
                 align: 'left',
                 fromBeat: from,
@@ -287,6 +299,19 @@ function buildSystemBlock(
                 value: d.dynamics,
                 suffix: conditionSuffix(d.passes, d.iterations) || undefined,
                 dotFill: to > from ? 'beforeValue' : undefined
+            })
+        } else if (item.type === 'suppress') {
+            const s = item as SuppressItem
+            const tags = s.positions && s.positions.length ? compactGroupLabel(s.positions, groups, true).label : 'all'
+            const from = s.beats && s.beats.length ? beatIdx(Math.min(...s.beats)) : 0
+            suppressRows.push({
+                style: 'suppress',
+                align: 'left',
+                fromBeat: from,
+                toBeat: from,
+                prefix: 'suppress ',
+                value: tags,
+                suffix: conditionSuffix(s.passes, s.iterations) || undefined
             })
         } else if (item.type === 'goto') {
             const g = item as GotoItem
@@ -322,11 +347,15 @@ function buildSystemBlock(
         }
     }
 
-    // Label row (blue), above the notation, anchored at the first beat.
-    if (sys.label) above.push({ style: 'label', align: 'left', fromBeat: 0, toBeat: 0, value: sys.label })
-
+    // ABOVE: label first, then suppress, then tempo + dynamics last.
+    const above: PdfMetaRow[] = [
+        ...labelRows,
+        ...suppressRows,
+        ...(exclude.has('tempo') ? [] : tempoRows),
+        ...dynamicsRows
+    ]
     // BELOW order mirrors the Python: loop, goto, sequence.
-    below.push(...loopRows, ...gotoRows, ...sequenceRows)
+    const below: PdfMetaRow[] = [...loopRows, ...gotoRows, ...sequenceRows]
 
     return { gonganId: sys.id, columnCount, beatStarts, beatEnds, kempliColumns, above, rows, below }
 }

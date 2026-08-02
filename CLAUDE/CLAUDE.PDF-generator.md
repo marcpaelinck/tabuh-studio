@@ -1185,3 +1185,16 @@ Re-rendered Puspa Mekar 1–4 plus a synthetic system:
 - Same in-sandbox caveat as 2a (needs `npm run build` for the real `executionManager` flow).
 - Phase 2 (metadata fidelity) is now complete. Remaining PDF work is **Phase 3**: expanded /
   single-position sources, the excludable-items settings UI, and PART once parts land.
+
+## Follow-up tweaks (post Phase 2)
+
+- **Suppress directives** are now shown (above the notation), styled like tempo/dynamics
+  (Helvetica-Oblique 8, black): `suppress <grouped positions>` where the positions are
+  aggregated via `compactGroupLabel(..., toLower)` (e.g. `suppress gangsa`); empty positions
+  render as `suppress all`. Anchored at the first of the item's `beats` (else beat 1), with the
+  usual `(pass …, iter. …)` suffix. `'suppress'` added to `PdfMetaStyle` and `SHOWN_TYPES`.
+- **Above-block order** is now: **label first**, then suppress, then **tempo and dynamics
+  last** (previously the label came last). `buildSystemBlock` collects each kind into its own
+  list and assembles `above = [label, suppress, tempo, dynamics]`.
+- Verified via spike: a system with label + suppress + tempo + dynamics renders in that order,
+  and the Sinom suppress item (4 gangsa positions, pass 1) shows as `suppress gangsa (pass 1)`.

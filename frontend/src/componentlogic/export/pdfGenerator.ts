@@ -67,6 +67,7 @@ function metaFont(style: PdfMetaStyle, f: Fonts): { font: PDFFont; size: number;
             return { font: f.courierBold, size: 9, color: BLUE }
         case 'tempo':
         case 'dynamics':
+        case 'suppress':
             return { font: f.helvObl, size: 8, color: BLACK }
         case 'goto':
         case 'loop':
