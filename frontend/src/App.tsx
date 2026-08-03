@@ -1,6 +1,7 @@
 import Favicon from 'react-favicon'
 import { CustomProvider, VStack } from 'rsuite'
 import 'rsuite/dist/rsuite.css'
+import { EmailLinkHandler } from './components/EmailLinkHandler'
 import { MainWindow } from './components/MainWindow'
 import { FRAMESTYLE } from './config/config'
 import { AuthProvider } from './context/AuthContext'
@@ -15,6 +16,7 @@ export default function App() {
     return (
         <CustomProvider>
             <Favicon url={logoURL} />
+            <EmailLinkHandler />
             <AuthProvider>
                 <div className="flex w-full min-h-0 ">
                     <VStack id="vstack" className="flex w-full" align="center">

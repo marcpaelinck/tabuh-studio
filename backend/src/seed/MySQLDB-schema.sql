@@ -1,9 +1,28 @@
 CREATE TABLE users (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   email         VARCHAR(255) NOT NULL UNIQUE,
+  first_name    VARCHAR(100) NOT NULL DEFAULT '',
+  last_name     VARCHAR(100) NOT NULL DEFAULT '',
   password_hash VARCHAR(255) NOT NULL,
-  role          ENUM('public','editor','admin') NOT NULL DEFAULT 'public',
-  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+  role          ENUM('viewer','editor','admin') NOT NULL DEFAULT 'viewer',
+  created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Short-lived, single-use tokens for email verification / password reset / email change.
+-- `user_id` is NULL for a pending registration (the users row is only created on confirmation);
+-- `payload` then holds the pending signup data (first/last name, email, password_hash).
+CREATE TABLE auth_tokens (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT NULL,
+  type        ENUM('verify_email','reset_password','change_email') NOT NULL,
+  token_hash  CHAR(64) NOT NULL,
+  payload     JSON NULL,
+  expires_at  DATETIME NOT NULL,
+  used_at     DATETIME NULL,
+  created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_auth_tokens_hash (token_hash),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE instrument_sets (

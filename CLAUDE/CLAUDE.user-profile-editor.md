@@ -71,4 +71,60 @@ mail.tabuh.studio
 - Not yet done: registration, email confirmation, profile editing, password reset, mailer,
   DB migration to `first_name`/`last_name`, and the token table — all phases 2/3.
 - Needs `npm run build` (frontend) and the backend restart to verify.
+
+# Phase 2 — as built (registration + email confirmation)
+
+## Database
+- Seed schema (`MySQLDB-schema.sql`) updated: `users` now has `first_name`, `last_name`,
+  `updated_at`, roles `ENUM('viewer','editor','admin')` default `viewer`. New `auth_tokens`
+  table (single-use, hashed tokens; `user_id` NULL + `payload` JSON for pending signups).
+- Migration for the live DB: `backend/src/seed/migrations/002_user_profile.sql` (split
+  `name` → first/last, `public` → `viewer`, add `auth_tokens`). **Run it once.**
+
+## Backend
+- `mailer.ts` (nodemailer): reads `MAIL_*` env; when `MAIL_HOST` is unset it runs in **dev
+  mode** and logs the email (incl. the link) instead of sending — so registration works
+  locally without SMTP. Added `nodemailer` + `@types/nodemailer` to `package.json` (**run
+  `npm install`**).
+- `auth.ts`: `login` and `/me` now return `{ id, firstName, lastName, name, email, role }`
+  (JWT payloads carry only `{ id, email, role }`). New `POST /auth/register` (checks email
+  isn't taken, stores a pending signup + hashed `verify_email` token, emails the confirmation
+  link, TTL `VERIFY_TTL_HOURS`, default 24h) and `POST /auth/verify-email` (consumes the token,
+  creates the `users` row with role `viewer`). Confirmation link →
+  `${APP_URL}/?token=…&type=verify`.
+
+## Frontend
+- `apiService`: `apiRegister`, `apiVerifyEmail`; `ApiUser`/`AuthUser` gained `firstName`/
+  `lastName` (kept `name` for display).
+- `RegisterDrawer` (rsuite Form + SchemaModel): first/last name, email, password + confirm
+  (confirm uses `addRule` to match); shows inline errors and a server-error banner; on success
+  shows a "check your email" message. Wired to the profile menu's **Create an account…** item.
+- `EmailLinkHandler` (rendered in `App`): on load, reads `?token=…&type=verify` from the URL,
+  strips it from the address bar, calls `apiVerifyEmail`, and toasts success/failure. (`reset`
+  is phase 3.)
+
+## Required `.env` (backend) — add these
+```
+APP_URL=https://tabuh.studio            # front-end base for email links (dev: http://localhost:5173)
+MAIL_HOST=mail.tabuh.studio             # omit to run the mailer in dev/log mode
+MAIL_PORT=587                           # 587 STARTTLS or 465 SSL
+MAIL_USER=...                           # SMTP username
+MAIL_PASS=...                           # SMTP password
+MAIL_FROM=Tabuh Studio <no-reply@tabuh.studio>
+VERIFY_TTL_HOURS=24                     # confirmation-link validity (optional)
+```
+
+## Manual steps to run Phase 2
+1. `cd backend && npm install` (nodemailer + types).
+2. Apply `backend/src/seed/migrations/002_user_profile.sql` to the database.
+3. Add the `.env` vars above (or leave `MAIL_HOST` unset to log links in dev).
+4. `npm run build` (frontend) + restart the backend.
+
+## Notes / decisions
+- Confirmation does **not** auto-login (avoids magic-link login surface); the user logs in
+  after confirming. Tokens are hashed at rest, single-use, and expire.
+- The register endpoint returns "email already registered" (per the spec) — a deliberate,
+  minor email-enumeration trade-off for clearer UX.
+- Phases remaining: 3 (edit profile incl. verified email change, change-password notice,
+  forgot-password reset, GDPR delete) and 4 (admin "Manage users").
  

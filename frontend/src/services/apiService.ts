@@ -25,8 +25,17 @@ export async function apiVersion() {
 
 // ── Auth ──────────────────────────────────────────────────────
 
+export interface ApiUser {
+    id: number
+    firstName: string
+    lastName: string
+    name: string
+    email: string
+    role: string
+}
+
 export async function apiLogin(email: string, password: string) {
-    return request<{ user: { id: number; name: string; email: string; role: string } }>('/auth/login', {
+    return request<{ user: ApiUser }>('/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password })
     })
@@ -41,7 +50,21 @@ export async function apiRefreshToken() {
 }
 
 export async function apiMe() {
-    return request<{ user: { id: number; name: string; email: string; role: string } }>('/auth/me')
+    return request<{ user: ApiUser }>('/auth/me')
+}
+
+export async function apiRegister(firstName: string, lastName: string, email: string, password: string) {
+    return request<{ ok: true }>('/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ firstName, lastName, email, password })
+    })
+}
+
+export async function apiVerifyEmail(token: string) {
+    return request<{ ok: true; email: string }>('/auth/verify-email', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+    })
 }
 
 // ── Scores ────────────────────────────────────────────────────

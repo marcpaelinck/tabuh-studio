@@ -3,6 +3,8 @@ import { apiLogin, apiLogout, apiMe, apiRefreshToken } from '../services/apiServ
 
 export interface AuthUser {
     id: number
+    firstName: string
+    lastName: string
     name: string
     email: string
     role: string

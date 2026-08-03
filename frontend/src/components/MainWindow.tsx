@@ -65,6 +65,7 @@ import { OptionList } from './OptionList'
 import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
+import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 
 interface LoginDialogProps {
@@ -140,6 +141,7 @@ interface NavHeaderProps {
 }
 function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
+    const [openRegister, setOpenRegister] = useState<boolean>(false)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -170,7 +172,9 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                         ) : (
                             <Dropdown.Item onSelect={runAndClose(() => setOpenLogin(true))}>Login...</Dropdown.Item>
                         )}
-                        <Dropdown.Item disabled>Create an account...</Dropdown.Item>
+                        <Dropdown.Item onSelect={runAndClose(() => setOpenRegister(true))}>
+                            Create an account...
+                        </Dropdown.Item>
                         {user && <Dropdown.Item disabled>Edit my profile...</Dropdown.Item>}
                         {user?.role === 'admin' && <Dropdown.Item disabled>Manage users...</Dropdown.Item>}
                     </Dropdown.Menu>
@@ -196,6 +200,7 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                 <div className="text-[0.75rem]">{expanded && user ? ` ${user.name} (${user?.role})` : ''}</div>
             </HStack>
             <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
+            <RegisterDrawer open={openRegister} onClose={() => setOpenRegister(false)} />
         </>
     )
 }
