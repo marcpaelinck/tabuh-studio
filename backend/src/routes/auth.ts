@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken'
 import { RowDataPacket } from 'mysql2'
 import { z } from 'zod'
 import pool from '../db/pool'
+import { requireAuth, type AuthenticatedRequest } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 
 const router = Router()
@@ -75,6 +76,25 @@ router.post('/refresh', async (req: Request, res: Response) => {
         }).json({ ok: true })
     } catch {
         res.status(401).json({ error: 'Invalid refresh token' })
+    }
+})
+
+// Returns the currently authenticated user (from the DB, so name/email/role are fresh).
+// Used by the frontend to restore the session after a silent token refresh and to prefill
+// the profile editor.
+router.get('/me', requireAuth, async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT id, name, email, role FROM users WHERE id = ?', [id])
+        const user = rows[0]
+        if (!user) {
+            res.status(404).json({ error: 'User not found' })
+            return
+        }
+        res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
     }
 })
 

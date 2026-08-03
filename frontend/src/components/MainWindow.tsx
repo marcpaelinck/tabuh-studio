@@ -9,12 +9,13 @@ import {
     Col,
     Container,
     Content,
+    Drawer,
+    Dropdown,
     Form,
     Grid,
     Header,
     HStack,
     IconButton,
-    Modal,
     PasswordInput,
     Popover,
     Row,
@@ -25,7 +26,9 @@ import {
     StringType,
     useDialog,
     useMediaQuery,
-    type FormInstance
+    Whisper,
+    type FormInstance,
+    type WhisperInstance
 } from 'rsuite'
 import { playbackReducerFactory } from '../componentlogic/playback/playbackReducer'
 import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManager'
@@ -97,21 +100,23 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
     }
 
     return (
-        <Modal className="w-[20rem]" open={open} onClose={() => setOpen(false)}>
-            <Modal.Header>
-                <Modal.Title>Login</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form
-                    fluid
-                    ref={formRef}
-                    onChange={setFormValue}
-                    // onCheck={setFormError}
-                    formValue={formValue}
-                    model={model}>
+        <Drawer open={open} size="sm" onClose={() => setOpen(false)}>
+            <Drawer.Header>
+                <Drawer.Title>Login</Drawer.Title>
+                <Drawer.Actions>
+                    <Button onClick={() => setOpen(false)} appearance="subtle">
+                        Cancel
+                    </Button>
+                    <Button appearance="primary" onClick={handleSubmit}>
+                        Login
+                    </Button>
+                </Drawer.Actions>
+            </Drawer.Header>
+            <Drawer.Body>
+                <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue} model={model}>
                     <Form.Group controlId="username-7">
                         <Form.Label>Username</Form.Label>
-                        <Form.Control name="username" w={200} />
+                        <Form.Control name="username" />
                         <Form.Text tooltip>Required</Form.Text>
                     </Form.Group>
                     <Form.Group controlId="password-7">
@@ -119,13 +124,9 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
                         <Form.Control name="password" type="password" autoComplete="off" accepter={PasswordInput} />
                         <Form.Text tooltip>Required</Form.Text>
                     </Form.Group>
-
-                    <Button appearance="primary" onClick={handleSubmit}>
-                        Login
-                    </Button>
                 </Form>
-            </Modal.Body>
-        </Modal>
+            </Drawer.Body>
+        </Drawer>
     )
 }
 
@@ -139,7 +140,6 @@ interface NavHeaderProps {
 }
 function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
-    const [logoutMenu, setLogoutMenu] = useState<boolean>(false)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -148,16 +148,36 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
     }
     const expKey = String(expanded) as 'true' | 'false'
 
-    const logoutPop = (
-        <Popover visible={logoutMenu}>
-            <a
-                onClick={async () => {
-                    setLogoutMenu(false)
-                    logout()
-                }}>
-                logout
-            </a>
-        </Popover>
+    // Profile menu — a Whisper + Popover overlay so it floats OVER the menu rather than pushing
+    // it down (an rsuite Dropdown inside a Sidenav renders inline as an accordion submenu).
+    // Login/Logout toggles on auth state; the other items are placeholders wired in later
+    // phases of the user-profile feature ("Manage users" is admin-only).
+    const menuRef = useRef<WhisperInstance>(null)
+    const runAndClose = (fn: () => void) => () => {
+        menuRef.current?.close()
+        fn()
+    }
+    const profileMenu = (
+        <Whisper
+            ref={menuRef}
+            placement="bottomStart"
+            trigger="click"
+            speaker={
+                <Popover full>
+                    <Dropdown.Menu>
+                        {user ? (
+                            <Dropdown.Item onSelect={runAndClose(() => logout())}>Logout</Dropdown.Item>
+                        ) : (
+                            <Dropdown.Item onSelect={runAndClose(() => setOpenLogin(true))}>Login...</Dropdown.Item>
+                        )}
+                        <Dropdown.Item disabled>Create an account...</Dropdown.Item>
+                        {user && <Dropdown.Item disabled>Edit my profile...</Dropdown.Item>}
+                        {user?.role === 'admin' && <Dropdown.Item disabled>Manage users...</Dropdown.Item>}
+                    </Dropdown.Menu>
+                </Popover>
+            }>
+            <IconButton aria-label="Profile menu" icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />} />
+        </Whisper>
     )
 
     return (
@@ -172,13 +192,9 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                 {expanded ? '  Tabuh Studio' : ''}
             </HStack>
             <HStack justify={expandedfmt[expKey].justify} className="mt-3">
-                <IconButton
-                    icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />}
-                    onClick={() => (user ? setLogoutMenu(true) : setOpenLogin(true))}
-                />
+                {profileMenu}
                 <div className="text-[0.75rem]">{expanded && user ? ` ${user.name} (${user?.role})` : ''}</div>
             </HStack>
-            {user && logoutPop}
             <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
         </>
     )

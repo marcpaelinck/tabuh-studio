@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { apiLogin, apiLogout, apiRefreshToken } from '../services/apiService'
+import { apiLogin, apiLogout, apiMe, apiRefreshToken } from '../services/apiService'
 
 export interface AuthUser {
     id: number
@@ -23,23 +23,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
-    // On mount, try to refresh the token silently.
-    // If the user has a valid refresh token cookie from a previous session
-    // this will restore their session without requiring a new login.
+    // On mount, silently refresh the access token from the refresh-token cookie, then load
+    // the user via /me so the session (name / email / role) is restored without a new login.
     useEffect(() => {
         apiRefreshToken()
-            .then(() => {
-                // Refresh succeeded but we don't get user info back from /refresh.
-                // We could add a /api/auth/me endpoint, or store user info in
-                // localStorage as non-sensitive display data. For now we just
-                // mark auth as resolved — the score list will load for everyone
-                // and editor routes will be gated server-side.
-                setIsLoading(false)
-            })
+            .then(() => apiMe())
+            .then(({ user }) => setUser(user))
             .catch(() => {
-                // No valid session — user needs to log in
-                setIsLoading(false)
+                // No valid session — the user needs to log in.
             })
+            .finally(() => setIsLoading(false))
     }, [])
 
     const login = useCallback(async (email: string, password: string) => {

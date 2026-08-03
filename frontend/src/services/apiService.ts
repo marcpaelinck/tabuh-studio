@@ -40,6 +40,10 @@ export async function apiRefreshToken() {
     return request('/auth/refresh', { method: 'POST' })
 }
 
+export async function apiMe() {
+    return request<{ user: { id: number; name: string; email: string; role: string } }>('/auth/me')
+}
+
 // ── Scores ────────────────────────────────────────────────────
 // Scores are addressed by their uuid (the stable identity shared with the score
 // JSON content and the .tsv notation files), not by the numeric primary key.

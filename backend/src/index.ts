@@ -81,8 +81,12 @@ const authLimit = rateLimit({
 //  ── API rate limiting — only applies to /api/* routes ─────────
 app.use('/api', readLimit)
 
-// More specific limits override for specific routes
-app.use('/api/auth', authLimit)
+// More specific limits override for specific routes. GET /api/auth/* (e.g. /me, called on
+// every page load) uses the generous read limit; the sensitive POSTs keep the strict auth limit.
+app.use('/api/auth', (req, res, next) => {
+    if (req.method === 'GET') return readLimit(req, res, next)
+    return authLimit(req, res, next)
+})
 app.use('/api/scores', (req, res, next) => {
     if (req.method === 'GET') return readLimit(req, res, next)
     return writeLimit(req, res, next)

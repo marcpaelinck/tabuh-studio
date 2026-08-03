@@ -6,8 +6,8 @@ import pool from '../db/pool'
 dotenv.config()
 
 async function createAdminUser() {
-    const email = 'marc.paelinck@proton.me' // ← change this
-    const password = 'klm94565' // ← change this
+    const email = 'me@domain.com' // ← change this
+    const password = 'mypassword' // ← change this
     const role = 'admin'
 
     try {
