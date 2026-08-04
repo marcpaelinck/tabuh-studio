@@ -34,6 +34,30 @@ function makeToken(): { raw: string; hash: string } {
 }
 const hashToken = (raw: string) => crypto.createHash('sha256').update(raw).digest('hex')
 
+/**
+ * Signs access + refresh tokens for a session and sets them as httpOnly cookies.
+ * `tv` (token_version) is embedded so /refresh can reject tokens issued before a
+ * password change/reset (see requireAuth/refresh).
+ */
+function issueSession(res: Response, claims: { id: number; email: string; role: string; tv: number }) {
+    const accessToken = jwt.sign(claims, process.env.JWT_SECRET!, { expiresIn: process.env.JWT_EXPIRY as any })
+    const refreshToken = jwt.sign(claims, process.env.JWT_REFRESH_SECRET!, {
+        expiresIn: process.env.JWT_REFRESH_EXPIRY as any
+    })
+    res.cookie('access_token', accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000
+    }).cookie('refresh_token', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/api/auth/refresh'
+    })
+}
+
 /** Assembles the user object returned to the client from a DB row. */
 function userView(row: RowDataPacket) {
     return {
@@ -50,7 +74,7 @@ router.post('/login', validate(loginSchema), async (req: Request, res: Response)
     const { email, password } = req.body
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT id, first_name, last_name, email, role, password_hash FROM users WHERE email = ?',
+            'SELECT id, first_name, last_name, email, role, token_version, password_hash FROM users WHERE email = ?',
             [email]
         )
         const user = rows[0]
@@ -59,27 +83,8 @@ router.post('/login', validate(loginSchema), async (req: Request, res: Response)
             return
         }
 
-        const payload = { id: user.id, email: user.email, role: user.role }
-
-        const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: process.env.JWT_EXPIRY as any })
-        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
-            expiresIn: process.env.JWT_REFRESH_EXPIRY as any
-        })
-
-        res.cookie('access_token', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 15 * 60 * 1000
-        })
-            .cookie('refresh_token', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-                path: '/api/auth/refresh'
-            })
-            .json({ user: userView(user) })
+        issueSession(res, { id: user.id, email: user.email, role: user.role, tv: user.token_version })
+        res.json({ user: userView(user) })
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
@@ -97,9 +102,21 @@ router.post('/refresh', async (req: Request, res: Response) => {
             id: number
             email: string
             role: string
+            tv?: number
+        }
+        // Reject tokens issued before the user's last password change/reset. Also picks up the
+        // current email/role, so a refreshed access token stays in sync with the DB.
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT email, role, token_version FROM users WHERE id = ?',
+            [payload.id]
+        )
+        const user = rows[0]
+        if (!user || (payload.tv ?? 0) !== user.token_version) {
+            res.status(401).json({ error: 'Session expired, please log in again' })
+            return
         }
         const accessToken = jwt.sign(
-            { id: payload.id, email: payload.email, role: payload.role },
+            { id: payload.id, email: user.email, role: user.role, tv: user.token_version },
             process.env.JWT_SECRET!,
             { expiresIn: process.env.JWT_EXPIRY as any }
         )
@@ -313,11 +330,11 @@ const changePasswordSchema = z.object({
 
 // Change password (requires the current one). Emails a notice with a reset link in case it wasn't the user.
 router.post('/change-password', requireAuth, validate(changePasswordSchema), async (req: Request, res: Response) => {
-    const { id } = (req as AuthenticatedRequest).user!
+    const { id, role } = (req as AuthenticatedRequest).user!
     const { currentPassword, newPassword } = req.body
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT first_name, email, password_hash FROM users WHERE id = ?',
+            'SELECT first_name, email, token_version, password_hash FROM users WHERE id = ?',
             [id]
         )
         const u = rows[0]
@@ -329,7 +346,15 @@ router.post('/change-password', requireAuth, validate(changePasswordSchema), asy
             res.status(400).json({ error: 'Your current password is incorrect.' })
             return
         }
-        await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [await bcrypt.hash(newPassword, 12), id])
+        // Bump token_version to invalidate all OTHER sessions, then re-issue this one so the
+        // user who just changed their password stays logged in.
+        const newTv = u.token_version + 1
+        await pool.query('UPDATE users SET password_hash = ?, token_version = ? WHERE id = ?', [
+            await bcrypt.hash(newPassword, 12),
+            newTv,
+            id
+        ])
+        issueSession(res, { id, email: u.email, role, tv: newTv })
         // Emailed reset link so the real owner can undo an unauthorized change.
         const { raw, hash } = makeToken()
         await pool.query(
@@ -389,7 +414,9 @@ router.post('/reset-password', validate(resetSchema), async (req: Request, res: 
             return
         }
         await pool.query('UPDATE auth_tokens SET used_at = NOW() WHERE id = ?', [tokenRow.id])
-        await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [
+        // Bump token_version so any session that existed before the reset is invalidated at
+        // its next /refresh (e.g. an attacker who prompted the reset).
+        await pool.query('UPDATE users SET password_hash = ?, token_version = token_version + 1 WHERE id = ?', [
             await bcrypt.hash(newPassword, 12),
             tokenRow.user_id
         ])

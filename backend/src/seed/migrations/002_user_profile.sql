@@ -1,4 +1,4 @@
--- Migration 002 — user profile feature (phase 2)
+-- Migration 002 — user profile feature (phase 2) Backend version 1.1.1
 -- Run once against the existing database. Safe to run inside a transaction on a backup first.
 
 -- 1. Split the single `name` column into first_name / last_name.

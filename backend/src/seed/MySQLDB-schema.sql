@@ -5,6 +5,9 @@ CREATE TABLE users (
   last_name     VARCHAR(100) NOT NULL DEFAULT '',
   password_hash VARCHAR(255) NOT NULL,
   role          ENUM('viewer','editor','admin') NOT NULL DEFAULT 'viewer',
+  -- Bumped whenever all of a user's sessions should be invalidated (password reset/change).
+  -- Embedded as the `tv` claim in JWTs and re-checked at /refresh.
+  token_version INT NOT NULL DEFAULT 0,
   created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

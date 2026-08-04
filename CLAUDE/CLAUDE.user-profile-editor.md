@@ -165,11 +165,16 @@ No DB change needed — reuses the `auth_tokens` table (types `change_email` / `
 RESET_TTL_HOURS=2        # password-reset / password-changed link validity (optional, default 2)
 ```
 
-## Known limitation (recommended follow-up)
-Sessions use stateless JWTs, so changing/resetting a password does **not** invalidate an
-already-issued refresh token — an existing session survives up to the refresh window. To fully
-revoke on password change, add a `token_version` (or `password_changed_at`) to `users`, include
-it in the JWT payload, and re-check it in `/auth/refresh`. Deferred to a hardening pass.
+## Session invalidation on password change/reset — as built
+Implemented via `users.token_version` (migration `003_token_version.sql`). The value is embedded
+as the `tv` claim in the JWTs at login; `/auth/refresh` re-reads it from the DB and rejects any
+token whose `tv` is stale. `reset-password` bumps `token_version` (killing sessions that existed
+before the reset — e.g. an attacker who prompted it); `change-password` bumps it too but
+re-issues the actor's own cookies so they stay logged in. Access tokens are stateless (no
+per-request DB check), so revocation of other sessions takes effect at their next `/refresh`
+(≤ the 15-min access-token lifetime). Note: an already-open tab isn't force-refreshed, so the
+logout is felt on its next reload/refresh — add a 401→refresh interceptor if prompt eviction is
+wanted.
 
 ## Manual steps to run Phase 3
 1. `npm run build` (frontend) + restart the backend. (No new deps, no migration.)
@@ -197,6 +202,9 @@ No DB change, no new deps.
 1. `npm run build` (frontend) + restart the backend.
 
 ---
-All four phases of the user-profile feature are now implemented. Open follow-up (from phase 3):
-optional session invalidation on password change via a JWT `token_version`.
+All four phases of the user-profile feature are now implemented, plus the `token_version`
+session-invalidation hardening (see "Session invalidation … as built" above).
+
+Manual step for the token_version change: apply `backend/src/seed/migrations/003_token_version.sql`,
+then rebuild/restart. No new deps.
  
