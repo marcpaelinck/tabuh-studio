@@ -25,8 +25,6 @@ const loginSchema = z.object({ email: z.email(), password: z.string().min(8) })
 const VERIFY_TTL_HOURS = Number(process.env.VERIFY_TTL_HOURS || 24)
 const RESET_TTL_HOURS = Number(process.env.RESET_TTL_HOURS || 2)
 
-const inHours = (h: number) => new Date(Date.now() + h * 3600 * 1000)
-
 /** Creates a random token and its sha256 hash (only the hash is stored). */
 function makeToken(): { raw: string; hash: string } {
     const raw = crypto.randomBytes(32).toString('hex')
@@ -180,10 +178,9 @@ router.post('/register', validate(registerSchema), async (req: Request, res: Res
         )
         const { raw, hash } = makeToken()
         const payload = JSON.stringify({ first_name: firstName, last_name: lastName, email, password_hash })
-        const expiresAt = new Date(Date.now() + VERIFY_TTL_HOURS * 3600 * 1000)
         await pool.query(
-            "INSERT INTO auth_tokens (user_id, type, token_hash, payload, expires_at) VALUES (NULL, 'verify_email', ?, ?, ?)",
-            [hash, payload, expiresAt]
+            "INSERT INTO auth_tokens (user_id, type, token_hash, payload, expires_at) VALUES (NULL, 'verify_email', ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))",
+            [hash, payload, VERIFY_TTL_HOURS]
         )
         const link = `${APP_URL}/?token=${raw}&type=verify`
         const mail = verificationEmail(firstName, link, VERIFY_TTL_HOURS)
@@ -280,8 +277,8 @@ router.post('/change-email', requireAuth, validate(changeEmailSchema), async (re
         await pool.query("DELETE FROM auth_tokens WHERE type = 'change_email' AND used_at IS NULL AND user_id = ?", [id])
         const { raw, hash } = makeToken()
         await pool.query(
-            "INSERT INTO auth_tokens (user_id, type, token_hash, payload, expires_at) VALUES (?, 'change_email', ?, ?, ?)",
-            [id, hash, JSON.stringify({ new_email: newEmail }), inHours(VERIFY_TTL_HOURS)]
+            "INSERT INTO auth_tokens (user_id, type, token_hash, payload, expires_at) VALUES (?, 'change_email', ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))",
+            [id, hash, JSON.stringify({ new_email: newEmail }), VERIFY_TTL_HOURS]
         )
         const link = `${APP_URL}/?token=${raw}&type=change_email`
         const confirm = emailChangeConfirmEmail(u.first_name, link, VERIFY_TTL_HOURS)
@@ -358,8 +355,8 @@ router.post('/change-password', requireAuth, validate(changePasswordSchema), asy
         // Emailed reset link so the real owner can undo an unauthorized change.
         const { raw, hash } = makeToken()
         await pool.query(
-            "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, ?)",
-            [id, hash, inHours(RESET_TTL_HOURS)]
+            "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, DATE_ADD(NOW(), INTERVAL ? HOUR))",
+            [id, hash, RESET_TTL_HOURS]
         )
         const link = `${APP_URL}/?token=${raw}&type=reset`
         const mail = passwordChangedEmail(u.first_name, link, RESET_TTL_HOURS)
@@ -385,8 +382,8 @@ router.post('/forgot-password', validate(forgotSchema), async (req: Request, res
             await pool.query("DELETE FROM auth_tokens WHERE type = 'reset_password' AND used_at IS NULL AND user_id = ?", [u.id])
             const { raw, hash } = makeToken()
             await pool.query(
-                "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, ?)",
-                [u.id, hash, inHours(RESET_TTL_HOURS)]
+                "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, DATE_ADD(NOW(), INTERVAL ? HOUR))",
+                [u.id, hash, RESET_TTL_HOURS]
             )
             const link = `${APP_URL}/?token=${raw}&type=reset`
             const mail = passwordResetEmail(u.first_name, link, RESET_TTL_HOURS)
