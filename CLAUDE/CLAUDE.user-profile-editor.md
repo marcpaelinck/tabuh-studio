@@ -174,4 +174,29 @@ it in the JWT payload, and re-check it in `/auth/refresh`. Deferred to a hardeni
 ## Manual steps to run Phase 3
 1. `npm run build` (frontend) + restart the backend. (No new deps, no migration.)
 2. Optionally set `RESET_TTL_HOURS` in `backend/.env`.
+
+# Phase 4 — as built (admin: manage users)
+
+No DB change, no new deps.
+
+## Backend (`auth.ts`, all guarded by `requireRole('admin')`)
+- `GET /auth/users` — list all users (id, first/last name, name, email, role, createdAt).
+- `PATCH /auth/users/:id/role` — set a user's role (`viewer`/`editor`/`admin`). Rejects
+  changing your **own** role (prevents locking out the last admin).
+- `DELETE /auth/users/:id` — delete a user (scores + tokens cascade). Rejects deleting
+  **yourself** (use "Edit my profile" for that).
+
+## Frontend
+- `ManageUsersDrawer` — lists users with a per-row role `SelectPicker` and a delete button
+  (delete asks for confirmation in a modal). The admin's own row is locked (role disabled, no
+  delete, marked "(you)"). Errors show in a banner; changes update the list in place.
+- `apiService`: `apiListUsers`, `apiSetUserRole`, `apiDeleteUser` (+ `AdminUser` type).
+- Profile menu **Manage users…** is wired (visible only to `admin`).
+
+## Manual steps to run Phase 4
+1. `npm run build` (frontend) + restart the backend.
+
+---
+All four phases of the user-profile feature are now implemented. Open follow-up (from phase 3):
+optional session invalidation on password change via a JWT `token_version`.
  

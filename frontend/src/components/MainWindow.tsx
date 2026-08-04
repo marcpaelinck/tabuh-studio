@@ -68,6 +68,7 @@ import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
 import { EditProfileDrawer } from './EditProfileDrawer'
+import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 
@@ -218,6 +219,7 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [openRegister, setOpenRegister] = useState<boolean>(false)
     const [openProfile, setOpenProfile] = useState<boolean>(false)
+    const [openManageUsers, setOpenManageUsers] = useState<boolean>(false)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -256,7 +258,11 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                                 Edit my profile...
                             </Dropdown.Item>
                         )}
-                        {user?.role === 'admin' && <Dropdown.Item disabled>Manage users...</Dropdown.Item>}
+                        {user?.role === 'admin' && (
+                            <Dropdown.Item onSelect={runAndClose(() => setOpenManageUsers(true))}>
+                                Manage users...
+                            </Dropdown.Item>
+                        )}
                     </Dropdown.Menu>
                 </Popover>
             }>
@@ -282,6 +288,7 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
             <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
             <RegisterDrawer open={openRegister} onClose={() => setOpenRegister(false)} />
             <EditProfileDrawer open={openProfile} onClose={() => setOpenProfile(false)} />
+            <ManageUsersDrawer open={openManageUsers} onClose={() => setOpenManageUsers(false)} />
         </>
     )
 }

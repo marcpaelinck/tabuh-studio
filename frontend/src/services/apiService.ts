@@ -116,6 +116,33 @@ export async function apiDeleteAccount(password: string) {
     })
 }
 
+// ── Admin: manage users ───────────────────────────────────────────────
+
+export interface AdminUser {
+    id: number
+    firstName: string
+    lastName: string
+    name: string
+    email: string
+    role: string
+    createdAt: string
+}
+
+export async function apiListUsers() {
+    return request<{ users: AdminUser[] }>('/auth/users')
+}
+
+export async function apiSetUserRole(id: number, role: string) {
+    return request<{ ok: true }>(`/auth/users/${id}/role`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role })
+    })
+}
+
+export async function apiDeleteUser(id: number) {
+    return request<{ ok: true }>(`/auth/users/${id}`, { method: 'DELETE' })
+}
+
 // ── Scores ────────────────────────────────────────────────────
 // Scores are addressed by their uuid (the stable identity shared with the score
 // JSON content and the .tsv notation files), not by the numeric primary key.

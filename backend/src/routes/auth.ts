@@ -14,7 +14,7 @@ import {
     sendMail,
     verificationEmail
 } from '../mailer'
-import { requireAuth, type AuthenticatedRequest } from '../middleware/auth'
+import { requireAuth, requireRole, type AuthenticatedRequest } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 
 const router = Router()
@@ -432,6 +432,84 @@ router.post('/delete-account', requireAuth, validate(deleteAccountSchema), async
                 path: '/api/auth/refresh'
             })
             .json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ── Admin: manage users ────────────────────────────────────────────────
+// All guarded by requireRole('admin'). An admin cannot change their own role or delete
+// themselves here (prevents locking the last admin out or self-deletion by accident).
+
+router.get('/users', requireAuth, requireRole('admin'), async (_req: Request, res: Response) => {
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT id, first_name, last_name, email, role, created_at FROM users ORDER BY created_at ASC, id ASC'
+        )
+        res.json({
+            users: rows.map((r) => ({
+                id: r.id,
+                firstName: r.first_name,
+                lastName: r.last_name,
+                name: `${r.first_name ?? ''} ${r.last_name ?? ''}`.trim(),
+                email: r.email,
+                role: r.role,
+                createdAt: r.created_at
+            }))
+        })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+const roleSchema = z.object({ role: z.enum(['viewer', 'editor', 'admin']) })
+
+router.patch('/users/:id/role', requireAuth, requireRole('admin'), validate(roleSchema), async (req: Request, res: Response) => {
+    const targetId = Number(req.params.id)
+    const { id: selfId } = (req as AuthenticatedRequest).user!
+    const { role } = req.body
+    if (!Number.isInteger(targetId)) {
+        res.status(400).json({ error: 'Invalid user id.' })
+        return
+    }
+    if (targetId === selfId) {
+        res.status(400).json({ error: "You can't change your own role." })
+        return
+    }
+    try {
+        const [result] = await pool.query<ResultSetHeader>('UPDATE users SET role = ? WHERE id = ?', [role, targetId])
+        if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'User not found.' })
+            return
+        }
+        res.json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+router.delete('/users/:id', requireAuth, requireRole('admin'), async (req: Request, res: Response) => {
+    const targetId = Number(req.params.id)
+    const { id: selfId } = (req as AuthenticatedRequest).user!
+    if (!Number.isInteger(targetId)) {
+        res.status(400).json({ error: 'Invalid user id.' })
+        return
+    }
+    if (targetId === selfId) {
+        res.status(400).json({ error: "You can't delete your own account here — use 'Edit my profile'." })
+        return
+    }
+    try {
+        // Removes the user and, via ON DELETE CASCADE, their scores and tokens.
+        const [result] = await pool.query<ResultSetHeader>('DELETE FROM users WHERE id = ?', [targetId])
+        if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'User not found.' })
+            return
+        }
+        res.json({ ok: true })
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
