@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { apiLogin, apiLogout, apiMe, apiRefreshToken } from '../services/apiService'
+import { apiDeleteAccount, apiLogin, apiLogout, apiMe, apiRefreshToken, apiUpdateProfile } from '../services/apiService'
 
 export interface AuthUser {
     id: number
@@ -15,6 +15,8 @@ interface AuthContextValue {
     isLoading: boolean
     login: (email: string, password: string) => Promise<void>
     logout: () => Promise<void>
+    updateProfile: (firstName: string, lastName: string) => Promise<void>
+    deleteAccount: (password: string) => Promise<void>
     isEditor: boolean
     isAdmin: boolean
 }
@@ -47,6 +49,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
     }, [])
 
+    const updateProfile = useCallback(async (firstName: string, lastName: string) => {
+        const { user } = await apiUpdateProfile(firstName, lastName)
+        setUser(user)
+    }, [])
+
+    const deleteAccount = useCallback(async (password: string) => {
+        await apiDeleteAccount(password)
+        setUser(null)
+    }, [])
+
     return (
         <AuthContext.Provider
             value={{
@@ -54,6 +66,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 isLoading,
                 login,
                 logout,
+                updateProfile,
+                deleteAccount,
                 isEditor: user?.role === 'editor' || user?.role === 'admin',
                 isAdmin: user?.role === 'admin'
             }}>

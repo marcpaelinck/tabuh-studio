@@ -5,7 +5,15 @@ import jwt from 'jsonwebtoken'
 import { ResultSetHeader, RowDataPacket } from 'mysql2'
 import { z } from 'zod'
 import pool from '../db/pool'
-import { APP_URL, sendMail, verificationEmail } from '../mailer'
+import {
+    APP_URL,
+    emailChangeConfirmEmail,
+    emailChangeNoticeEmail,
+    passwordChangedEmail,
+    passwordResetEmail,
+    sendMail,
+    verificationEmail
+} from '../mailer'
 import { requireAuth, type AuthenticatedRequest } from '../middleware/auth'
 import { validate } from '../middleware/validate'
 
@@ -13,8 +21,11 @@ const router = Router()
 
 const loginSchema = z.object({ email: z.email(), password: z.string().min(8) })
 
-// Validity of an account-confirmation link.
+// Link validity windows.
 const VERIFY_TTL_HOURS = Number(process.env.VERIFY_TTL_HOURS || 24)
+const RESET_TTL_HOURS = Number(process.env.RESET_TTL_HOURS || 2)
+
+const inHours = (h: number) => new Date(Date.now() + h * 3600 * 1000)
 
 /** Creates a random token and its sha256 hash (only the hash is stored). */
 function makeToken(): { raw: string; hash: string } {
@@ -195,6 +206,232 @@ router.post('/verify-email', validate(verifySchema), async (req: Request, res: R
             [data.email, data.first_name, data.last_name, data.password_hash]
         )
         res.json({ ok: true, email: data.email })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ── Profile editing (authenticated) ───────────────────────────────────
+
+const profileSchema = z.object({
+    firstName: z.string().trim().min(1).max(100),
+    lastName: z.string().trim().min(1).max(100)
+})
+
+// Update first/last name — applies immediately.
+router.patch('/profile', requireAuth, validate(profileSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const { firstName, lastName } = req.body
+    try {
+        await pool.query('UPDATE users SET first_name = ?, last_name = ? WHERE id = ?', [firstName, lastName, id])
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT id, first_name, last_name, email, role FROM users WHERE id = ?',
+            [id]
+        )
+        res.json({ user: userView(rows[0]) })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+const changeEmailSchema = z.object({ newEmail: z.email() })
+
+// Request an email change — sends a confirmation link to the NEW address (change is deferred
+// until confirmed) and a heads-up notice to the current address.
+router.post('/change-email', requireAuth, validate(changeEmailSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const { newEmail } = req.body
+    try {
+        const [taken] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [newEmail])
+        if (taken.length) {
+            res.status(409).json({ error: 'This email address is already in use.' })
+            return
+        }
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT first_name, email FROM users WHERE id = ?', [id])
+        const u = rows[0]
+        if (!u) {
+            res.status(404).json({ error: 'User not found' })
+            return
+        }
+        if (u.email === newEmail) {
+            res.status(400).json({ error: 'That is already your email address.' })
+            return
+        }
+        // Drop any earlier pending change for this user.
+        await pool.query("DELETE FROM auth_tokens WHERE type = 'change_email' AND used_at IS NULL AND user_id = ?", [id])
+        const { raw, hash } = makeToken()
+        await pool.query(
+            "INSERT INTO auth_tokens (user_id, type, token_hash, payload, expires_at) VALUES (?, 'change_email', ?, ?, ?)",
+            [id, hash, JSON.stringify({ new_email: newEmail }), inHours(VERIFY_TTL_HOURS)]
+        )
+        const link = `${APP_URL}/?token=${raw}&type=change_email`
+        const confirm = emailChangeConfirmEmail(u.first_name, link, VERIFY_TTL_HOURS)
+        await sendMail({ to: newEmail, subject: confirm.subject, html: confirm.html, text: confirm.text })
+        const notice = emailChangeNoticeEmail(u.first_name, newEmail)
+        await sendMail({ to: u.email, subject: notice.subject, html: notice.html, text: notice.text })
+        res.json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// Confirm an email change from the link (front-end reads the token). Public — the token is the proof.
+router.post('/confirm-email-change', validate(verifySchema), async (req: Request, res: Response) => {
+    const { token } = req.body
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            "SELECT id, user_id, payload FROM auth_tokens WHERE token_hash = ? AND type = 'change_email' AND used_at IS NULL AND expires_at > NOW() LIMIT 1",
+            [hashToken(token)]
+        )
+        const tokenRow = rows[0]
+        if (!tokenRow) {
+            res.status(400).json({ error: 'This link is invalid or has expired.' })
+            return
+        }
+        const data = typeof tokenRow.payload === 'string' ? JSON.parse(tokenRow.payload) : tokenRow.payload
+        await pool.query('UPDATE auth_tokens SET used_at = NOW() WHERE id = ?', [tokenRow.id])
+        const [taken] = await pool.query<RowDataPacket[]>('SELECT id FROM users WHERE email = ?', [data.new_email])
+        if (taken.length) {
+            res.status(409).json({ error: 'This email address is already in use.' })
+            return
+        }
+        await pool.query('UPDATE users SET email = ? WHERE id = ?', [data.new_email, tokenRow.user_id])
+        res.json({ ok: true, email: data.new_email })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+const changePasswordSchema = z.object({
+    currentPassword: z.string().min(1),
+    newPassword: z.string().min(8).max(200)
+})
+
+// Change password (requires the current one). Emails a notice with a reset link in case it wasn't the user.
+router.post('/change-password', requireAuth, validate(changePasswordSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const { currentPassword, newPassword } = req.body
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT first_name, email, password_hash FROM users WHERE id = ?',
+            [id]
+        )
+        const u = rows[0]
+        if (!u) {
+            res.status(404).json({ error: 'User not found' })
+            return
+        }
+        if (!(await bcrypt.compare(currentPassword, u.password_hash))) {
+            res.status(400).json({ error: 'Your current password is incorrect.' })
+            return
+        }
+        await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [await bcrypt.hash(newPassword, 12), id])
+        // Emailed reset link so the real owner can undo an unauthorized change.
+        const { raw, hash } = makeToken()
+        await pool.query(
+            "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, ?)",
+            [id, hash, inHours(RESET_TTL_HOURS)]
+        )
+        const link = `${APP_URL}/?token=${raw}&type=reset`
+        const mail = passwordChangedEmail(u.first_name, link, RESET_TTL_HOURS)
+        await sendMail({ to: u.email, subject: mail.subject, html: mail.html, text: mail.text })
+        res.json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ── Forgot / reset password (public) ──────────────────────────────────
+
+const forgotSchema = z.object({ email: z.email() })
+
+// Always responds the same way to avoid revealing whether an address is registered.
+router.post('/forgot-password', validate(forgotSchema), async (req: Request, res: Response) => {
+    const { email } = req.body
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT id, first_name FROM users WHERE email = ?', [email])
+        const u = rows[0]
+        if (u) {
+            await pool.query("DELETE FROM auth_tokens WHERE type = 'reset_password' AND used_at IS NULL AND user_id = ?", [u.id])
+            const { raw, hash } = makeToken()
+            await pool.query(
+                "INSERT INTO auth_tokens (user_id, type, token_hash, expires_at) VALUES (?, 'reset_password', ?, ?)",
+                [u.id, hash, inHours(RESET_TTL_HOURS)]
+            )
+            const link = `${APP_URL}/?token=${raw}&type=reset`
+            const mail = passwordResetEmail(u.first_name, link, RESET_TTL_HOURS)
+            await sendMail({ to: email, subject: mail.subject, html: mail.html, text: mail.text })
+        }
+        res.json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+const resetSchema = z.object({ token: z.string().min(10), newPassword: z.string().min(8).max(200) })
+
+router.post('/reset-password', validate(resetSchema), async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            "SELECT id, user_id FROM auth_tokens WHERE token_hash = ? AND type = 'reset_password' AND used_at IS NULL AND expires_at > NOW() LIMIT 1",
+            [hashToken(token)]
+        )
+        const tokenRow = rows[0]
+        if (!tokenRow) {
+            res.status(400).json({ error: 'This reset link is invalid or has expired.' })
+            return
+        }
+        await pool.query('UPDATE auth_tokens SET used_at = NOW() WHERE id = ?', [tokenRow.id])
+        await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [
+            await bcrypt.hash(newPassword, 12),
+            tokenRow.user_id
+        ])
+        res.json({ ok: true })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ── Account deletion (GDPR) ────────────────────────────────────────────
+
+const deleteAccountSchema = z.object({ password: z.string().min(1) })
+
+router.post('/delete-account', requireAuth, validate(deleteAccountSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const { password } = req.body
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT password_hash FROM users WHERE id = ?', [id])
+        const u = rows[0]
+        if (!u) {
+            res.status(404).json({ error: 'User not found' })
+            return
+        }
+        if (!(await bcrypt.compare(password, u.password_hash))) {
+            res.status(400).json({ error: 'Your password is incorrect.' })
+            return
+        }
+        // Removes the user and, via ON DELETE CASCADE, their scores and tokens.
+        await pool.query('DELETE FROM users WHERE id = ?', [id])
+        res.clearCookie('access_token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        })
+            .clearCookie('refresh_token', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                path: '/api/auth/refresh'
+            })
+            .json({ ok: true })
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })

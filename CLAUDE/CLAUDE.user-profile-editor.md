@@ -127,4 +127,51 @@ VERIFY_TTL_HOURS=24                     # confirmation-link validity (optional)
   minor email-enumeration trade-off for clearer UX.
 - Phases remaining: 3 (edit profile incl. verified email change, change-password notice,
   forgot-password reset, GDPR delete) and 4 (admin "Manage users").
+
+# Phase 3 — as built (edit profile, email/password change, forgot-password, GDPR delete)
+
+No DB change needed — reuses the `auth_tokens` table (types `change_email` / `reset_password`).
+
+## Backend (`auth.ts` + `mailer.ts`)
+- `PATCH /auth/profile` (auth) — update first/last name immediately; returns the fresh user.
+- `POST /auth/change-email` (auth) — checks the new address is free, stores a `change_email`
+  token, emails a confirmation link to the **new** address, and a heads-up notice to the
+  **current** one. The address only changes on confirmation.
+- `POST /auth/confirm-email-change` (public, token) — applies the new email.
+- `POST /auth/change-password` (auth) — verifies the current password, updates it, and emails
+  a "was this you?" notice containing a reset link.
+- `POST /auth/forgot-password` (public) — always responds `{ok:true}` (no email enumeration);
+  emails a reset link if the address exists.
+- `POST /auth/reset-password` (public, token) — sets a new password.
+- `POST /auth/delete-account` (auth) — verifies the password, deletes the user (scores +
+  tokens cascade), clears the auth cookies. GDPR.
+- New mail templates: email-change confirm/notice, password-reset, password-changed. Reset
+  links use `?type=reset`; email-change links use `?type=change_email`.
+
+## Frontend
+- `EditProfileDrawer` — four sections (name / email / password / delete account), each with its
+  own submit + inline success/error. Delete requires the password and a confirm step.
+- `ResetPasswordDrawer` — set-new-password form, opened by `EmailLinkHandler` for `?type=reset`.
+- `LoginDialog` now shows login errors and has a **Forgot password?** mode (email → reset link).
+- `EmailLinkHandler` handles `verify` (phase 2), `change_email` (auto-confirm + toast) and
+  `reset` (opens the reset drawer).
+- `AuthContext`: added `updateProfile` and `deleteAccount`; `apiService` gained the matching
+  calls (`apiUpdateProfile`, `apiChangeEmail`, `apiConfirmEmailChange`, `apiChangePassword`,
+  `apiForgotPassword`, `apiResetPassword`, `apiDeleteAccount`).
+- Profile menu **Edit my profile…** is wired (logged-in only).
+
+## Env (backend) — one addition
+```
+RESET_TTL_HOURS=2        # password-reset / password-changed link validity (optional, default 2)
+```
+
+## Known limitation (recommended follow-up)
+Sessions use stateless JWTs, so changing/resetting a password does **not** invalidate an
+already-issued refresh token — an existing session survives up to the refresh window. To fully
+revoke on password change, add a `token_version` (or `password_changed_at`) to `users`, include
+it in the JWT payload, and re-check it in `/auth/refresh`. Deferred to a hardening pass.
+
+## Manual steps to run Phase 3
+1. `npm run build` (frontend) + restart the backend. (No new deps, no migration.)
+2. Optionally set `RESET_TTL_HOURS` in `backend/.env`.
  

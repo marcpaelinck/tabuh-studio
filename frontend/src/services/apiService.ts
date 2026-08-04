@@ -67,6 +67,55 @@ export async function apiVerifyEmail(token: string) {
     })
 }
 
+export async function apiUpdateProfile(firstName: string, lastName: string) {
+    return request<{ user: ApiUser }>('/auth/profile', {
+        method: 'PATCH',
+        body: JSON.stringify({ firstName, lastName })
+    })
+}
+
+export async function apiChangeEmail(newEmail: string) {
+    return request<{ ok: true }>('/auth/change-email', {
+        method: 'POST',
+        body: JSON.stringify({ newEmail })
+    })
+}
+
+export async function apiConfirmEmailChange(token: string) {
+    return request<{ ok: true; email: string }>('/auth/confirm-email-change', {
+        method: 'POST',
+        body: JSON.stringify({ token })
+    })
+}
+
+export async function apiChangePassword(currentPassword: string, newPassword: string) {
+    return request<{ ok: true }>('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ currentPassword, newPassword })
+    })
+}
+
+export async function apiForgotPassword(email: string) {
+    return request<{ ok: true }>('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+    })
+}
+
+export async function apiResetPassword(token: string, newPassword: string) {
+    return request<{ ok: true }>('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, newPassword })
+    })
+}
+
+export async function apiDeleteAccount(password: string) {
+    return request<{ ok: true }>('/auth/delete-account', {
+        method: 'POST',
+        body: JSON.stringify({ password })
+    })
+}
+
 // ── Scores ────────────────────────────────────────────────────
 // Scores are addressed by their uuid (the stable identity shared with the score
 // JSON content and the .tsv notation files), not by the numeric primary key.

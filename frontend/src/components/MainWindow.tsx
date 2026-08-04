@@ -16,6 +16,7 @@ import {
     Header,
     HStack,
     IconButton,
+    Message,
     PasswordInput,
     Popover,
     Row,
@@ -36,6 +37,7 @@ import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { noCursor, speedList, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
+import { apiForgotPassword } from '../services/apiService'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
 import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
@@ -65,6 +67,7 @@ import { OptionList } from './OptionList'
 import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
+import { EditProfileDrawer } from './EditProfileDrawer'
 import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 
@@ -75,57 +78,129 @@ interface LoginDialogProps {
 }
 
 function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
-    interface FormValue {
-        username: string
-        password: string
-    }
     const formRef = useRef<FormInstance>(null)
-    const model = SchemaModel<FormValue>({ username: StringType().isRequired(), password: StringType().isRequired() })
+    const forgotRef = useRef<FormInstance>(null)
+    const model = SchemaModel({ username: StringType().isRequired(), password: StringType().isRequired() })
+    const forgotModel = SchemaModel({ email: StringType().isEmail('Enter a valid email address.').isRequired() })
 
+    const [mode, setMode] = useState<'login' | 'forgot'>('login')
     const [formValue, setFormValue] = useState<Record<string, any>>({ username: '', password: '' })
+    const [forgotValue, setForgotValue] = useState<Record<string, any>>({ email: '' })
+    const [error, setError] = useState<string | null>(null)
+    const [busy, setBusy] = useState(false)
+    const [forgotSent, setForgotSent] = useState(false)
+
+    useEffect(() => {
+        if (open) {
+            setMode('login')
+            setFormValue({ username: '', password: '' })
+            setForgotValue({ email: '' })
+            setError(null)
+            setBusy(false)
+            setForgotSent(false)
+        }
+    }, [open])
 
     const handleSubmit = async () => {
-        if (!formRef.current) return
-        if (!formRef.current.check()) {
-            console.error('Form Error')
-            return
-        }
+        setError(null)
+        if (!formRef.current?.check()) return
+        setBusy(true)
         try {
-            await login(formValue.username as string, formValue.password as string)
-        } catch (err) {
-            console.error('Login failed')
-            // setError(err instanceof Error ? err.message : 'Login failed')
-        } finally {
+            await login((formValue.username as string).trim(), formValue.password as string)
             setOpen(false)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Login failed.')
+        } finally {
+            setBusy(false)
+        }
+    }
+
+    const handleForgot = async () => {
+        setError(null)
+        if (!forgotRef.current?.check()) return
+        setBusy(true)
+        try {
+            await apiForgotPassword((forgotValue.email as string).trim())
+            setForgotSent(true)
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Could not send the reset link.')
+        } finally {
+            setBusy(false)
         }
     }
 
     return (
         <Drawer open={open} size="sm" onClose={() => setOpen(false)}>
             <Drawer.Header>
-                <Drawer.Title>Login</Drawer.Title>
+                <Drawer.Title>{mode === 'login' ? 'Login' : 'Reset password'}</Drawer.Title>
                 <Drawer.Actions>
                     <Button onClick={() => setOpen(false)} appearance="subtle">
                         Cancel
                     </Button>
-                    <Button appearance="primary" onClick={handleSubmit}>
-                        Login
-                    </Button>
+                    {mode === 'login' ? (
+                        <Button appearance="primary" onClick={handleSubmit} loading={busy}>
+                            Login
+                        </Button>
+                    ) : (
+                        !forgotSent && (
+                            <Button appearance="primary" onClick={handleForgot} loading={busy}>
+                                Send reset link
+                            </Button>
+                        )
+                    )}
                 </Drawer.Actions>
             </Drawer.Header>
             <Drawer.Body>
-                <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue} model={model}>
-                    <Form.Group controlId="username-7">
-                        <Form.Label>Username</Form.Label>
-                        <Form.Control name="username" />
-                        <Form.Text tooltip>Required</Form.Text>
-                    </Form.Group>
-                    <Form.Group controlId="password-7">
-                        <Form.Label>Password</Form.Label>
-                        <Form.Control name="password" type="password" autoComplete="off" accepter={PasswordInput} />
-                        <Form.Text tooltip>Required</Form.Text>
-                    </Form.Group>
-                </Form>
+                {error && (
+                    <Message type="error" showIcon className="mb-3">
+                        {error}
+                    </Message>
+                )}
+                {mode === 'login' ? (
+                    <>
+                        <Form fluid ref={formRef} onChange={setFormValue} formValue={formValue} model={model}>
+                            <Form.Group controlId="username-7">
+                                <Form.Label>Username</Form.Label>
+                                <Form.Control name="username" />
+                            </Form.Group>
+                            <Form.Group controlId="password-7">
+                                <Form.Label>Password</Form.Label>
+                                <Form.Control name="password" type="password" autoComplete="off" accepter={PasswordInput} />
+                            </Form.Group>
+                        </Form>
+                        <Button
+                            appearance="link"
+                            className="px-0"
+                            onClick={() => {
+                                setError(null)
+                                setMode('forgot')
+                            }}>
+                            Forgot password?
+                        </Button>
+                    </>
+                ) : forgotSent ? (
+                    <Message type="success" showIcon>
+                        If that address has an account, we've sent a reset link. Please check your inbox.
+                    </Message>
+                ) : (
+                    <>
+                        <Form fluid ref={forgotRef} onChange={setForgotValue} formValue={forgotValue} model={forgotModel}>
+                            <Form.Group controlId="forgot-email">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control name="email" type="email" autoComplete="email" />
+                            </Form.Group>
+                        </Form>
+                        <Button
+                            appearance="link"
+                            className="px-0"
+                            onClick={() => {
+                                setError(null)
+                                setMode('login')
+                            }}>
+                            ← Back to login
+                        </Button>
+                    </>
+                )}
             </Drawer.Body>
         </Drawer>
     )
@@ -142,6 +217,7 @@ interface NavHeaderProps {
 function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...rest }: NavHeaderProps) {
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [openRegister, setOpenRegister] = useState<boolean>(false)
+    const [openProfile, setOpenProfile] = useState<boolean>(false)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -175,7 +251,11 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                         <Dropdown.Item onSelect={runAndClose(() => setOpenRegister(true))}>
                             Create an account...
                         </Dropdown.Item>
-                        {user && <Dropdown.Item disabled>Edit my profile...</Dropdown.Item>}
+                        {user && (
+                            <Dropdown.Item onSelect={runAndClose(() => setOpenProfile(true))}>
+                                Edit my profile...
+                            </Dropdown.Item>
+                        )}
                         {user?.role === 'admin' && <Dropdown.Item disabled>Manage users...</Dropdown.Item>}
                     </Dropdown.Menu>
                 </Popover>
@@ -201,6 +281,7 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
             </HStack>
             <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
             <RegisterDrawer open={openRegister} onClose={() => setOpenRegister(false)} />
+            <EditProfileDrawer open={openProfile} onClose={() => setOpenProfile(false)} />
         </>
     )
 }
