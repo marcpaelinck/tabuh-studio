@@ -108,14 +108,14 @@ export type PlaybackProgressFunctionAction = { time: TimeObject; params: {} }
 
 // Callback functions used when creating a playback schedule in Tone.Transport
 export interface PlaybackCallbackFunctions {
-    tempo: TempoFunction
-    play: SamplerFunction
-    animate: AnimationFunction
-    playercursor: PlayerCursorFunction
-    editorcursor: EditorCursorFunction
-    updatedashboard: DashboardFunction
-    progress: ProgressFunction
-    generic: GenericFunction
+    tempoFunction: TempoFunction // Tempo changes
+    playFunction: SamplerFunction // Play a sample
+    animateFunction: AnimationFunction // Animate an SVG image (e.g. panggul stroke, highlight)
+    playerCursorFunction: PlayerCursorFunction // Animate the notation cursor in the player view.
+    editorCursorFunction: EditorCursorFunction // Animate the notation cursor in the editor view.
+    dashboardFunction: DashboardFunction // Update dashboard values (e.g. pass/iteration #, tempo)
+    progressFunction: ProgressFunction // Update the value of the playback progress bar.
+    finalizeFunction: GenericFunction // Function that is called at the end of the  playback.
 }
 
 export type TimeLine = {

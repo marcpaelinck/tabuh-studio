@@ -37,17 +37,18 @@ import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
 import { noCursor, speedList, type KeyboardType } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
-import { apiForgotPassword } from '../services/apiService'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
+import { apiForgotPassword } from '../services/apiService'
 import { useAppInfo } from '../stores/useAppInfo.tsx'
-import { useEnvironmentStore } from '../stores/useEnvironmentStore.tsx'
+import { useEnvironmentStore } from '../stores/useEnvironmentStore.ts'
+import { usePlaybackFunctionStore } from '../stores/usePlaybackFunctionStore.ts'
 import { useScoreStore } from '../stores/useScoreStore.tsx'
 import {
     focusDefaultOption,
     panggulDefaultOption,
     useUserSelectionStore,
     type MainView
-} from '../stores/useUserSettingsStore.tsx'
+} from '../stores/useUserSettingsStore.ts'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -61,14 +62,14 @@ import {
     type DashboardValues
 } from './Dashboard'
 import EditorWindow from './editor/EditorWindow'
+import { EditProfileDrawer } from './EditProfileDrawer'
 import { MainMenu } from './MainMenu'
+import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { MobileBottomNav } from './MobileBottomNav'
 import { OptionList } from './OptionList'
 import PlaybackMenu from './PlaybackMenu'
 import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
-import { EditProfileDrawer } from './EditProfileDrawer'
-import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 
@@ -166,7 +167,12 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
                             </Form.Group>
                             <Form.Group controlId="password-7">
                                 <Form.Label>Password</Form.Label>
-                                <Form.Control name="password" type="password" autoComplete="off" accepter={PasswordInput} />
+                                <Form.Control
+                                    name="password"
+                                    type="password"
+                                    autoComplete="off"
+                                    accepter={PasswordInput}
+                                />
                             </Form.Group>
                         </Form>
                         <Button
@@ -185,7 +191,12 @@ function LoginDialog({ open, setOpen, login }: LoginDialogProps) {
                     </Message>
                 ) : (
                     <>
-                        <Form fluid ref={forgotRef} onChange={setForgotValue} formValue={forgotValue} model={forgotModel}>
+                        <Form
+                            fluid
+                            ref={forgotRef}
+                            onChange={setForgotValue}
+                            formValue={forgotValue}
+                            model={forgotModel}>
                             <Form.Group controlId="forgot-email">
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control name="email" type="email" autoComplete="email" />
@@ -374,7 +385,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const {
         timeLine,
-        updatePlaybackCallbackFunctions,
         playbackProgress,
         setPlaybackProgress,
         playbackSpeed,
@@ -388,15 +398,16 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         audioState: 'nodata',
         playbackType: 'none'
     })
+    const { setDashboardFunction: setDashboardFunction, setFinalizeFunction } = usePlaybackFunctionStore()
 
     // ___________ UPDATE PLAYBACK FUNCTIONS ____________
 
     // TOD: eliminate `updatedashboard` which is used to change cursor info.
     // Use cursor state variable instead and update dashboard from MainWindow.
-    useEffect(
-        () => updatePlaybackCallbackFunctions({ generic: stopPlayback, updatedashboard: playbackDashboardFunction }),
-        []
-    )
+    useEffect(() => {
+        setFinalizeFunction(stopPlayback)
+        setDashboardFunction(playbackDashboardFunction)
+    }, [])
 
     async function stopPlayback(time: number) {
         playback({ actionType: 'stop' })
@@ -496,7 +507,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             player={player}
             score={score}
             timeLine={timeLine}
-            updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackSpeed={playbackSpeed}
         />
     )
@@ -507,7 +517,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
             loading={isLoadingScore}
             score={score}
             executeItemAction={executeItemAction}
-            updatePlaybackFunctions={updatePlaybackCallbackFunctions}
             playbackState={playbackState}
             playback={playback}
             updateSystem={updateSystem}

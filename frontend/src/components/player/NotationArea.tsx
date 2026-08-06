@@ -3,8 +3,9 @@
 // notation while the corresponding notes are being played.
 
 import type { Position } from '@tabuhstudio/shared'
-import { useCallback, useEffect, useRef, type Dispatch, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, type RefObject } from 'react'
 import { HStack, Radio, RadioGroup, Text } from 'rsuite'
+import { usePlaybackFunctionStore } from '../../stores/usePlaybackFunctionStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type {
     HighlightRange,
@@ -12,7 +13,7 @@ import type {
     NotationParagraph,
     PlaybackCursorStyle
 } from '../../typing/animation'
-import type { PlaybackCallbackFunctions, PlayerCursorParameters } from '../../typing/playback'
+import type { PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
 // function scrollIntoContainerView(element: HTMLElement | null, container: HTMLElement | null) {
@@ -42,10 +43,9 @@ import { debug } from '../../utils/debugger'
 interface NotationAreaProps {
     notation: NotationParagraph[] | null
     visible: boolean
-    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
 
-export default function NotationArea({ notation, visible, updatePlaybackFunctions }: NotationAreaProps) {
+export default function NotationArea({ notation, visible }: NotationAreaProps) {
     // The states that change the notation animation's behavior must be read through a ref: they are
     // captured (once, at mount) by the `[]`-memoized `animateNotationCursor` that is registered with the
     // playback engine, so reading them directly from the closure would not use their current at
@@ -57,6 +57,7 @@ export default function NotationArea({ notation, visible, updatePlaybackFunction
     const visibleRef = useRef<boolean>(visible)
     const { selectedFocusOption, selectedPanggulOption, selectedCursorStyle, setSelectedCursorStyle } =
         useUserSelectionStore()
+    const { setPlayerCursorFunction } = usePlaybackFunctionStore()
 
     useEffect(() => {
         selectedFocusRef.current = selectedFocusOption.objValue
@@ -117,7 +118,7 @@ export default function NotationArea({ notation, visible, updatePlaybackFunction
         }
     }, [])
 
-    useEffect(() => updatePlaybackFunctions({ playercursor: animateNotationCursor }), [])
+    useEffect(() => setPlayerCursorFunction(animateNotationCursor), [])
 
     return (
         <>

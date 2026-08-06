@@ -1,18 +1,14 @@
 import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
-import type { ActionDispatch, Dispatch, HTMLAttributes } from 'react'
+import type { ActionDispatch, HTMLAttributes } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Col, Grid, HStack, Placeholder, Row, SegmentedControl, Text, Toggle, useDialog, VStack } from 'rsuite'
 import { useEditorStateStore } from '../../stores/useEditorStateStore'
+import { usePlaybackFunctionStore } from '../../stores/usePlaybackFunctionStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore, type EditorView } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
-import type {
-    EditorCursorParameters,
-    PlaybackAction,
-    PlaybackCallbackFunctions,
-    PlaybackState
-} from '../../typing/playback'
+import type { EditorCursorParameters, PlaybackAction, PlaybackState } from '../../typing/playback'
 import type { Score, System, SystemActionValue } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { FeatureUnderDevelopment } from '../Feature'
@@ -26,7 +22,6 @@ interface EditorWindowProps {
     loading: boolean
     score: Score
     executeItemAction: (fieldname: string, systemData: System, value?: string | number | SystemActionValue) => void
-    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackState: PlaybackState
     playback: ActionDispatch<[action: PlaybackAction]>
     updateSystem: (sysData: System) => void
@@ -37,7 +32,6 @@ export default function EditorWindow({
     loading,
     score,
     executeItemAction,
-    updatePlaybackFunctions,
     playbackState,
     playback,
     updateSystem
@@ -52,6 +46,7 @@ export default function EditorWindow({
     const { overwriteMode, setOverwriteMode } = useEditorStateStore()
     // Show/hide the read-only expanded-notation preview under the cursor line.
     const { showExpansion, setShowExpansion } = useEditorStateStore()
+    const { setEditorCursorFunction } = usePlaybackFunctionStore()
 
     // Number of open (non-modal) execution forms. While > 0 the editor content is
     // made inert so it can't be edited, yet remains scrollable behind the Drawer.
@@ -107,7 +102,7 @@ export default function EditorWindow({
     // Pass the editorcursor function to the playbackManager.
     useEffect(() => {
         debug(`passing cursorFunction to pbManager`)
-        updatePlaybackFunctions({ editorcursor: moveEditorCursor })
+        setEditorCursorFunction(moveEditorCursor)
     }, [])
 
     const dialog = useDialog()

@@ -5,7 +5,6 @@ import 'rsuite/Toggle/styles/index.css'
 import { theme } from '../../config/config'
 import type { AnimationData, NotationParagraph, SVGInfo } from '../../typing/animation'
 import { type Appearance, type ExtendedOption } from '../../typing/interface'
-import type { PlaybackCallbackFunctions } from '../../typing/playback'
 import NotationArea from './NotationArea'
 // import 'rsuite/Slider/styles/index.css';
 // import 'rsuite/Loader/styles/index.css';
@@ -49,14 +48,8 @@ interface AnimationProps {
     notationElement: NotationParagraph[] | null
     appAppearance: Appearance
     setSVGInfo: Dispatch<SVGInfo>
-    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
 }
-export function Animation({
-    notationElement,
-    appAppearance,
-    setSVGInfo,
-    updatePlaybackFunctions
-}: AnimationProps): JSX.Element {
+export function Animation({ notationElement, appAppearance, setSVGInfo }: AnimationProps): JSX.Element {
     const defaultSvgSize = appAppearance == 'playerOnly' ? 100 : 50 // percent
     // On mobile the animation area is a bounded flex column so the SVG fills the leftover space.
     const mobile = appAppearance == 'playerOnly'
@@ -214,11 +207,7 @@ export function Animation({
                     </HStack>
                 </Row>
                 <Row id="notation-area-row" className="p-2 min-w-0">
-                    <NotationArea
-                        notation={notationElement}
-                        visible={notationVisible}
-                        updatePlaybackFunctions={updatePlaybackFunctions}
-                    />
+                    <NotationArea notation={notationElement} visible={notationVisible} />
                 </Row>
                 <Row id="svg-embed-row" className={`pt-2 pl-4 pr-4 ${mobile ? 'flex-1 min-h-0' : ''}`}>
                     {svgImage}

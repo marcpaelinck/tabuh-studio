@@ -1,12 +1,13 @@
 import type { Position } from '@tabuhstudio/shared'
-import { Activity, useEffect, useRef, useState, type Dispatch, type JSX, type RefObject } from 'react'
+import { Activity, useEffect, useRef, useState, type JSX, type RefObject } from 'react'
 import { Box, Text, VStack } from 'rsuite'
 import type { ReactElement } from 'rsuite/esm/internals/types'
 import { useAnimationEngine } from '../../componentlogic/playback/useAnimation'
+import { usePlaybackFunctionStore } from '../../stores/usePlaybackFunctionStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import { type Appearance } from '../../typing/interface'
-import { type PlaybackCallbackFunctions, type TimeLine } from '../../typing/playback'
+import { type TimeLine } from '../../typing/playback'
 import { type Score } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { Animation } from './Animation'
@@ -17,7 +18,6 @@ interface PlayerWindowProps {
     player: JSX.Element
     score: Score | undefined
     timeLine: TimeLine | undefined
-    updatePlaybackFunctions: Dispatch<Partial<PlaybackCallbackFunctions>>
     playbackSpeed: number
 }
 export default function PlayerWindow({
@@ -26,7 +26,6 @@ export default function PlayerWindow({
     player,
     score,
     timeLine,
-    updatePlaybackFunctions,
     playbackSpeed
 }: PlayerWindowProps) {
     const [notationParas, setNotationParas] = useState<ReactElement[] | null>(null)
@@ -37,6 +36,7 @@ export default function PlayerWindow({
     const currentPanggulRef = useRef<Position[]>([])
     const cursorStyleRef = useRef<PlaybackCursorStyle>('Beat')
     const { selectedPanggulOption, selectedCursorStyle, selectedFocusOption } = useUserSelectionStore()
+    const { setAnimateFunction } = usePlaybackFunctionStore()
 
     useEffect(() => {
         visibleRef.current = visible
@@ -67,7 +67,7 @@ export default function PlayerWindow({
         playbackSpeedRef,
         visibleRef
     )
-    useEffect(() => updatePlaybackFunctions({ animate: animateInstrument }), [score])
+    useEffect(() => setAnimateFunction(animateInstrument), [score])
 
     useEffect(() => {
         updateNotationParas(selectedPanggulOption.objValue, selectedFocusOption.objValue)
@@ -89,12 +89,7 @@ export default function PlayerWindow({
             }`}
             visibility={visible ? 'visible' : 'collapse'}>
             <Activity mode={selectedFocusOption.objValue.length > 0 ? 'visible' : 'hidden'}>
-                <Animation
-                    notationElement={notationParas}
-                    updatePlaybackFunctions={updatePlaybackFunctions}
-                    setSVGInfo={setSvgInfo}
-                    appAppearance={appAppearance}
-                />
+                <Animation notationElement={notationParas} setSVGInfo={setSvgInfo} appAppearance={appAppearance} />
             </Activity>
             <Activity mode={score && selectedFocusOption.objValue.length == 0 ? 'visible' : 'hidden'}>
                 <Box className="justify-items-center inline-grid w-full">

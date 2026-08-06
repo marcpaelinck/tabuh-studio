@@ -1,16 +1,31 @@
-// Contains functions that enable to convert a notation to scheduled playback actions.
-// These actions consists of audio playback, instrument animation and/or cursor movements.
-//
-// Timeline building has moved to the pure module `timelineBuilder.ts`
-// (`buildTimeline`); `createTimelineFromScore` here is a thin wrapper that also records
-// the total duration for the progress bar.
-//
-// createPlaybackSchedule:
-// Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
+/* Converts a notation to scheduled playback actions such as audio playback, instrument animation
+ * and cursor movements. The playback actions consist of callback functions that reside with the
+ * components that are involved in a playback action (Player, Animation, Editor). They are kept as
+ * state variables in the PlaybackFunctionStore. Each component containing playback functions
+ * is responsible for keeping the state variables in PlaybackFunctionStore up to date.
+ *
+ * Actions are scheduled in the Tone.js Transport schedule. Actions are playback function calls with
+ * specific arguments and a timestamp. This is done in two steps.
+ * 1. First a TimeLine object is created. It contains several lists each containing objects describing
+ *    calls to a specific playback function.
+ * 2. The Timeline list elements are translated into function calls and scheduled in the Transport schedule.
+ *
+ * After the schedule has been created the Transport scheduler fires the functions at the scheduled time.
+ * Using a single schedule for all playback actions ensures that all functions calls will be synchronized
+ * correctly.
+ *
+ * Timeline building has moved to the pure module `timelineBuilder.ts`
+ * (`buildTimeline`); `createTimelineFromScore` here is a thin wrapper that also records
+ * the total duration for the progress bar.
+ *
+ * createPlaybackSchedule:
+ * Creates events in the schedule of the Tone.Transport object, based on the TimeLine's actions.
+ */
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
 import { defaultTempo, editorIntroTime, editorOutroTime, playerIntroTime, playerOutroTime } from '../../config/config'
+import { usePlaybackFunctionStore } from '../../stores/usePlaybackFunctionStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { speedDefaultOption, useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type {
@@ -26,23 +41,9 @@ import type {
     TempoFunctionParameters,
     TimeLine
 } from '../../typing/playback'
-import { debug } from '../../utils/debugger'
 import { buildTimeline } from './timelineBuilder'
 import { useInstruments } from './useInstruments'
 
-// Most of the playback functions will be provided by the PlayerWindow and EditorWindow elements.
-export const defaultCallbackFunctions: PlaybackCallbackFunctions = {
-    tempo: (): void => {},
-    play: (): void => {
-        debug('void player')
-    },
-    animate: (): void => {},
-    playercursor: (): void => {},
-    editorcursor: (): void => {},
-    updatedashboard: (): void => {},
-    progress: (): void => {},
-    generic: (): void => {}
-}
 export interface SchedulePlaybackParams {
     pbAction: PlaybackAction
     useCache?: boolean
@@ -59,10 +60,46 @@ export function usePlaybackManager() {
     const [playbackTempo, setPlaybackTempo] = useState<number>(60)
     const { beatPosition } = useScoreStore()
     const { mainView } = useUserSelectionStore()
+    const { setTempoFunction, setPlayFunction, setProgressFunction } = usePlaybackFunctionStore()
+    const {
+        tempoFunction,
+        playFunction,
+        animateFunction,
+        playerCursorFunction,
+        editorCursorFunction,
+        dashboardFunction,
+        progressFunction,
+        finalizeFunction
+    } = usePlaybackFunctionStore()
 
-    // Use a ref object to avoid playbackFunctions being reset to defaultPlaybackFunctions. I don't understand why this happens.
+    // Using a ref object for the playback functions ensures that functions are resolved at the scheduled
+    // playback time. This ensures that state variables that are referred to from within a callback function
+    // return their current value rather than the value that they had when the function was added to the schedule.
     const pbFunctionsRef: RefObject<PlaybackCallbackFunctions> =
-        useRef<PlaybackCallbackFunctions>(defaultCallbackFunctions)
+        useRef<PlaybackCallbackFunctions>(usePlaybackFunctionStore())
+
+    // Update the reference to the playback functions whenever they are updated.
+    useEffect(() => {
+        pbFunctionsRef.current = {
+            tempoFunction,
+            playFunction,
+            animateFunction,
+            playerCursorFunction,
+            editorCursorFunction,
+            dashboardFunction,
+            progressFunction,
+            finalizeFunction
+        }
+    }, [
+        tempoFunction,
+        playFunction,
+        animateFunction,
+        playerCursorFunction,
+        editorCursorFunction,
+        dashboardFunction,
+        progressFunction,
+        finalizeFunction
+    ])
 
     // The live playback speed, so the (stable) scheduled tempo callback applies the CURRENT
     // speed rather than the value baked into the schedule when playback started. Without this,
@@ -73,7 +110,9 @@ export function usePlaybackManager() {
     }, [playbackSpeed])
 
     useEffect(() => {
-        updatePlaybackCallbackFunctions({ tempo: changeTempo, play: playInstrument, progress: updateProgress })
+        setTempoFunction(changeTempo)
+        setPlayFunction(playInstrument)
+        setProgressFunction(updateProgress)
     }, [])
 
     useEffect(() => {
@@ -97,9 +136,9 @@ export function usePlaybackManager() {
         Tone.getTransport()
     }, [])
 
-    const updatePlaybackCallbackFunctions = useCallback((functions: Partial<PlaybackCallbackFunctions>) => {
-        pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
-    }, [])
+    // const updatePlaybackCallbackFunctions = useCallback((functions: Partial<PlaybackCallbackFunctions>) => {
+    //     pbFunctionsRef.current = { ...pbFunctionsRef.current, ...functions }
+    // }, [])
 
     // Creates a timeline to play back (parts of) the score. Delegates to the pure
     // `buildTimeline`; the only side effect is recording the total duration for the UI.
@@ -116,7 +155,7 @@ export function usePlaybackManager() {
             outro,
             playbackSpeed,
             beatPosition,
-            samplerFunction: pbFunctionsRef.current.play
+            samplerFunction: pbFunctionsRef.current.playFunction
         })
         if (newTimeLine) setTotalDurationMs(newTimeLine.totalDurationMs)
         return newTimeLine
@@ -132,26 +171,35 @@ export function usePlaybackManager() {
 
         //Instrument sampler actions (notes)
         timeLine.sampleractions.forEach((action: PlaybackSamplerAction) => {
-            Tone.getTransport().schedule((time) => pbFunctionsRef.current.play(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.playFunction(time, action.params),
+                action.time
+            )
         })
 
         // Tempo actions
         // Set the initial tempo to 60 (intro time)
         const tAction: PlaybackTempoAction = { time: { '16n': 0 }, params: { bpm: defaultTempo, pbSpeed: pbSpeed } }
-        Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempo(time, tAction.params), tAction.time)
+        Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempoFunction(time, tAction.params), tAction.time)
         timeLine.tempoactions.forEach((action: PlaybackTempoAction) => {
-            Tone.getTransport().schedule((time) => pbFunctionsRef.current.tempo(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.tempoFunction(time, action.params),
+                action.time
+            )
         })
 
         // Animation actions
         timeLine.animationactions.forEach((action: PlaybackAnimationAction) => {
-            Tone.getTransport().schedule((time) => pbFunctionsRef.current.animate(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.animateFunction(time, action.params),
+                action.time
+            )
         })
 
         // Player Cursor actions
         timeLine.playercursoractions.forEach((action: PlaybackPlayerCursorAction) => {
             Tone.getTransport().schedule(
-                (time) => pbFunctionsRef.current.playercursor(time, action.params),
+                (time) => pbFunctionsRef.current.playerCursorFunction(time, action.params),
                 action.time
             )
         })
@@ -159,7 +207,7 @@ export function usePlaybackManager() {
         // Editor Cursor actions
         timeLine.editorcursoractions.forEach((action: PlaybackEditorCursorAction) => {
             Tone.getTransport().schedule(
-                (time) => pbFunctionsRef.current.editorcursor(time, action.params),
+                (time) => pbFunctionsRef.current.editorCursorFunction(time, action.params),
                 action.time
             )
         })
@@ -167,14 +215,17 @@ export function usePlaybackManager() {
         // Dashboard actions
         timeLine.dashboardactions.forEach((action: PlaybackDashboardAction) => {
             Tone.getTransport().schedule(
-                (time) => pbFunctionsRef.current.updatedashboard(time, action.params),
+                (time) => pbFunctionsRef.current.dashboardFunction(time, action.params),
                 action.time
             )
         })
 
         // Action for when end of schedule is reached
         timeLine.genericactions.forEach((action: GenericAction) => {
-            Tone.getTransport().schedule((time) => pbFunctionsRef.current.generic(time, action.params), action.time)
+            Tone.getTransport().schedule(
+                (time) => pbFunctionsRef.current.finalizeFunction(time, action.params),
+                action.time
+            )
         })
 
         // Schedule a progress counter
@@ -196,7 +247,6 @@ export function usePlaybackManager() {
 
     return {
         timeLine,
-        updatePlaybackCallbackFunctions,
         playbackProgress,
         setPlaybackProgress,
         playbackSpeed,
