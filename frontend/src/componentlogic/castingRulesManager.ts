@@ -2,7 +2,7 @@
 // These are staves that stand for multiple instruments or multiple instrument positions.
 
 import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
-import type { InstrumentGroup, NoteSymbol } from '@tabuhstudio/shared/types/basetypes.ts'
+import type { InstrumentGroup, NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 

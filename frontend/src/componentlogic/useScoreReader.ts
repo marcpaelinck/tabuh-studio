@@ -8,6 +8,7 @@ import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem, ScoreRecord } from '../services/apiService'
 import { apiCreateScore, apiGetScore, apiGetScores, apiUpdateScore } from '../services/apiService'
+import { useRecoveryStore } from '../stores/useRecoveryStore'
 import { useScoreStore } from '../stores/useScoreStore'
 import type { ScoreInfo } from '../typing/interface'
 import type { ParserReturnValue } from '../typing/parsers'
@@ -72,6 +73,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         score: Score | undefined,
         destination: 'database' | 'jsonfile' | 'midifile' | 'pdffile'
     ) => Promise<boolean>
+    recoverScore: (score: Score) => void
     isLoading: boolean
 } {
     const { setScoreInfoList, setCurrentScore, setOrchestra, setOrchestraPositions, setAllowedPositionGroups } =
@@ -110,6 +112,18 @@ export function useScoreReader(source: 'database' | 'file'): {
         }
     }, [])
 
+    // Loads a recovered score snapshot into the editor: re-derive the object-notation caches
+    // (postprocessScore) then set the score states, exactly like a DB load. The recovered work
+    // is unsaved by definition, so it is (re)marked dirty to keep it protected.
+    const recoverScore = useCallback(
+        (score: Score) => {
+            const processed = postprocessScore(structuredClone(score), beatPosition)
+            setScoreStates(processed)
+            useScoreStore.setState({ dirty: true })
+        },
+        [beatPosition]
+    )
+
     interface StaffNoObject {
         notation: NoteSymbol[]
         objNotation?: NoteObject[]
@@ -137,6 +151,13 @@ export function useScoreReader(source: 'database' | 'file'): {
             })
             if (destination == 'database') isSuccess = await saveScoreToDb(scoreNoObject)
             else if (destination == 'jsonfile') isSuccess = await saveScoreToLocalFile(scoreNoObject)
+            // A successful save to the DB or a Tabuh Studio .json export is the definition of
+            // "saved": clear the dirty flag and drop the recovery snapshot so no stale prompt
+            // appears on the next startup. (MIDI/PDF exports returned earlier and don't count.)
+            if (isSuccess && (destination == 'database' || destination == 'jsonfile')) {
+                useScoreStore.getState().markSaved()
+                useRecoveryStore.getState().clear()
+            }
             return isSuccess
         },
         [beatPosition]
@@ -399,5 +420,5 @@ export function useScoreReader(source: 'database' | 'file'): {
         setIsLoading(false)
     }
 
-    return { loadScore, saveScore, isLoading }
+    return { loadScore, saveScore, recoverScore, isLoading }
 }

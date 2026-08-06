@@ -31,6 +31,7 @@
         "@typescript-eslint/parser": "^8.63.0",
         "classnames": "^2.5.1",
         "glob": "^13.0.6",
+        "idb-keyval": "^6.2.1",
         "less-loader": "^13.0.0",
         "pdf-lib": "^1.17.1",
         "prettier": "^3.9.5",

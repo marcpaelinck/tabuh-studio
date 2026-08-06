@@ -12,6 +12,8 @@ export interface CurrentScore {
     beatPosition: Position
     allowedPositionGroups: Position[][]
     labelDict: Record<string, System>
+    /** True when currentScore has edits not yet saved to the DB or exported to a .json file. */
+    dirty: boolean
     setScoreInfoList: Dispatch<ScoreInfo[] | null>
     setOrchestra: Dispatch<InstrumentGroup>
     setOrchestraPositions: Dispatch<Position[]>
@@ -20,6 +22,8 @@ export interface CurrentScore {
     updateCurrentScore: (updater: (score: Score) => Partial<Score>) => void
     setAllowedPositionGroups: Dispatch<Position[][]>
     setLabelDict: Dispatch<Record<string, System>>
+    /** Marks the current score as saved (clears the dirty flag). */
+    markSaved: () => void
 }
 
 export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set) => ({
@@ -30,13 +34,17 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
     beatPosition: 'KEMPLI',
     allowedPositionGroups: [],
     labelDict: {},
+    dirty: false,
     setScoreInfoList: (infoList: ScoreInfo[] | null) => set(() => ({ scoreInfoList: infoList })),
+    // Loading or creating a score establishes a clean baseline (dirty = false).
     setCurrentScore: (score: Score) =>
         set(() => ({
             currentScore: score,
             orchestra: score.instrumenttype,
-            orchestraPositions: instrumentGroups[score.instrumenttype]?.positions || []
+            orchestraPositions: instrumentGroups[score.instrumenttype]?.positions || [],
+            dirty: false
         })),
+    // Every edit path goes through here, so this is where the score becomes dirty.
     updateCurrentScore: (updater) =>
         set((state) => {
             const currentScore = state.currentScore
@@ -44,14 +52,15 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
                 return { currentScore: undefined }
             }
             const attr = updater(currentScore)
-            return { currentScore: { ...currentScore, ...attr } }
+            return { currentScore: { ...currentScore, ...attr }, dirty: true }
         }),
     setOrchestra: (orchestra: InstrumentGroup) =>
         set(() => ({ orchestra: orchestra, beatPosition: instrumentGroups[orchestra]?.beatPosition })),
     setOrchestraPositions: (positions: Position[]) => set(() => ({ orchestraPositions: positions })),
     setBeatPosition: (position: Position) => set(() => ({ beatPosition: position })),
     setAllowedPositionGroups: (groups: Position[][]) => set(() => ({ allowedPositionGroups: groups })),
-    setLabelDict: (dict: Record<string, System>) => set(() => ({ labelDict: dict }))
+    setLabelDict: (dict: Record<string, System>) => set(() => ({ labelDict: dict })),
+    markSaved: () => set(() => ({ dirty: false }))
 }))
 
 //         set((state) => ({state.currentScore: (state.currentScore ? { ...state.currentScore, ...entries } : undefined)})),

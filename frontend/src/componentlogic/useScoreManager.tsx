@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
 import { useEditorStateStore } from '../stores/useEditorStateStore'
+import { captureRecoverySnapshot } from '../stores/useRecoveryStore'
 import { useScoreStore } from '../stores/useScoreStore'
 import type { ExecutionItem } from '../typing/execution'
 import {
@@ -52,11 +53,10 @@ export function useScoreManager() {
     const { beatPosition } = useScoreStore()
     const { currentScore: score, orchestra, setCurrentScore: setScore, updateCurrentScore } = useScoreStore()
     const { labelDict, setLabelDict } = useScoreStore()
-    const [indexedDb, setIndexedDb] = useState<IDBDatabase | undefined>(undefined)
     const [validation, setValidation] = useState<ValidationResult>(defaultValidationValue)
     const [localCacheState, setLocalCacheState] = useState<LocalCacheInfo>({ level: 'info', message: '' })
 
-    // Debounce timer for the (heavy) IndexedDB recovery write.
+    // Debounce timer for the (heavy) recovery-snapshot write.
     const idbTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
     useEffect(
         () => () => {
@@ -76,33 +76,6 @@ export function useScoreManager() {
     }
 
     useEffect(() => {
-        if (indexedDb) return
-        // Create a temporary Indexed database in the browser that will always contain the
-        // latest version of the score currently being edited. To be used for recovery purposes.
-        // See https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
-        const dbDeleteRequest: IDBOpenDBRequest = window.indexedDB.deleteDatabase('TabuhStudio')
-        dbDeleteRequest.onsuccess = (event) => {
-            const dbOpenRequest: IDBOpenDBRequest = window.indexedDB.open('TabuhStudio', 1)
-            dbOpenRequest.onupgradeneeded = (event) => {
-                // Save the IDBDatabase interface
-                const db = dbOpenRequest.result
-                // Create an objectStore for this database
-                debug('Creating object store')
-                db.createObjectStore('Score', { keyPath: 'uuid' })
-            }
-            dbOpenRequest.onsuccess = () => {
-                const db = dbOpenRequest.result
-                setIndexedDb(db)
-                // TODO replace this alert with an icon in the Dashboard.
-                setLocalCacheState({ level: 'info', message: '' })
-            }
-            dbOpenRequest.onerror = () =>
-                // TODO replace this alert with an icon in the Dashboard.
-                setLocalCacheState({ level: 'warning', message: '' })
-        }
-    }, [])
-
-    useEffect(() => {
         // (Re-) number the system index and id values.
         // Re-create and order the execution list
         // Should be performed at each render due to possible user actions (insert or delete system).
@@ -118,25 +91,25 @@ export function useScoreManager() {
         const scoreLabels = _.fromPairs(score.systems.filter((sys) => sys.label).map((sys) => [sys.label, sys]))
         setLabelDict(scoreLabels)
 
-        // Store the score object in the browser's IDB Database, for recovery purposes.
-        // Writing the whole score is expensive, so it is debounced: rapid score
-        // changes coalesce into a single write of the latest score once edits settle.
-        if (indexedDb) {
-            if (idbTimer.current !== null) clearTimeout(idbTimer.current)
-            idbTimer.current = setTimeout(() => {
-                idbTimer.current = null
-                const transaction = indexedDb.transaction('Score', 'readwrite')
-                const request = transaction.objectStore('Score').put(score)
-                const dateStr = new Date().toString().replace(/ GMT.*$/, '')
-                request.onsuccess = () =>
-                    setLocalCacheState({ level: 'info', message: `${dateStr}\nSaved to local cache` })
-                request.onerror = () =>
-                    setLocalCacheState({
-                        level: 'warning',
-                        message: `${dateStr}\nCould not save the current status to local storage.`
-                    })
-            }, 800)
-        } else setLocalCacheState({ level: 'warning', message: '' })
+        // Persist a recovery snapshot of the score (IndexedDB, via the recovery store). Building
+        // the canonical snapshot is expensive, so it is debounced: rapid score changes coalesce
+        // into a single write once edits settle. The snapshot carries the current dirty flag, so
+        // a restart can offer to resume genuinely unsaved work.
+        if (idbTimer.current !== null) clearTimeout(idbTimer.current)
+        idbTimer.current = setTimeout(() => {
+            idbTimer.current = null
+            const dateStr = new Date().toString().replace(/ GMT.*$/, '')
+            try {
+                captureRecoverySnapshot(score, useScoreStore.getState().dirty)
+                setLocalCacheState({ level: 'info', message: `${dateStr}\nSaved to local cache` })
+            } catch (err) {
+                console.error('Could not persist recovery snapshot:', err)
+                setLocalCacheState({
+                    level: 'warning',
+                    message: `${dateStr}\nCould not save the current status to local storage.`
+                })
+            }
+        }, 800)
 
         // Update the goto display values.
         debug('updating flow items')

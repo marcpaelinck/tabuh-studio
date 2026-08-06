@@ -72,6 +72,7 @@ import { Player } from './player/Player'
 import PlayerWindow from './player/PlayerWindow'
 import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
+import { ScoreRecoveryPrompt } from './ScoreRecoveryPrompt'
 
 interface LoginDialogProps {
     open: boolean
@@ -346,7 +347,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     const [dashboardValues, setDashboardValues] = useState<DashboardValues>(defaultDashboardValues)
 
-    const { loadScore, saveScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
+    const { loadScore, saveScore, recoverScore, isLoading: isLoadingScore } = useScoreReader(dataSource)
     const { currentScore, scoreInfoList } = useScoreStore()
     const { score, validation, localCacheState, updateSystem, executeItemAction, newScore, updateScoreMeta } =
         useScoreManager()
@@ -599,6 +600,8 @@ export function MainWindow({ dataSource }: MainWindowProps) {
 
     return (
         <>
+            {/* Offers to restore unsaved work found in the recovery snapshot on startup. */}
+            <ScoreRecoveryPrompt recoverScore={recoverScore} />
             {/* Full application is only displayed on larger screens */}
             <Activity mode={appAppearance == 'full' ? 'visible' : 'hidden'}>
                 <Container id="full-application" className="h-dvh min-w-0">
