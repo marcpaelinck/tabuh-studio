@@ -36,5 +36,6 @@ export type MenuCollectionInfo = Record<MenuName, MenuInfo>
 // This interface allows to link an additional object to an option.
 // The Option's value attribute only accepts string and numbers.
 export interface ExtendedOption<U> extends Option<string> {
+    value: string
     objValue: U
 }
