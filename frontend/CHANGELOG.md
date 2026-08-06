@@ -100,3 +100,14 @@ Initial release
 ## 1.1.9 2026-08-01
 
 - `Changed` Improved PDF export (relative tempo, more compact), added suppress item.
+
+## 1.1.10 2026-08-04
+
+- `Added` Account creator and profile editor.
+- `Added` Account manager (admin only).
+- `Added` Login token with validity.
+
+## 1.1.11 2026-08-01
+
+- `Changed` Moved playback functions to Zustand store.
+- `Added` Persist/recover score functionality (using Zustand and browser's indexed DB).
