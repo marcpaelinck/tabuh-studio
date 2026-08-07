@@ -114,6 +114,7 @@ export function MainMenu({
                     } else {
                         dialog.alert(
                             'An error occurred: the notation was not saved.\n' +
+                                'Log out and in then try again.\n' +
                                 'If the error persists choose `Export... to save\n' +
                                 ' your work to a text file.'
                         )
