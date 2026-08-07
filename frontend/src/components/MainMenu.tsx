@@ -4,6 +4,7 @@ import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { TbFileImport } from 'react-icons/tb'
 import { Drawer, Nav, useDialog } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
+import { useShowMessage } from '../componentlogic/useShowMessage'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
@@ -76,6 +77,7 @@ export function MainMenu({
     const [keyMapEditorOpen, setKeyMapEditorOpen] = useState<boolean>(false)
     const dialog = useDialog()
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
+    const { showMessage } = useShowMessage()
 
     // Preferred orchestra when opening the score browser with no score loaded.
     const DEFAULT_ORCHESTRA = 'GONG_KEBYAR'
@@ -102,6 +104,13 @@ export function MainMenu({
                     const persistedScore = persistCachedChanges(score)
                     const isSuccess = await saveScore(persistedScore, 'database')
                     if (isSuccess) {
+                        showMessage({ message: 'The score was saved to the database.', type: 'success' })
+                        // const message = (
+                        //     <Message showIcon closable header={'Success'} type="success">
+                        //         The score was saved to the database.
+                        //     </Message>
+                        // )
+                        // toaster.push(message, { duration: 5000 })
                     } else {
                         dialog.alert(
                             'An error occurred: the notation was not saved.\n' +
