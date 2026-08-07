@@ -2,7 +2,7 @@ import { useEffect, useState, type Dispatch } from 'react'
 import { FaRegKeyboard } from 'react-icons/fa6'
 import { IoFolderOpenOutline, IoSettingsOutline } from 'react-icons/io5'
 import { TbFileImport } from 'react-icons/tb'
-import { Drawer, Nav, useDialog } from 'rsuite'
+import { Drawer, Nav } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import { useShowMessage } from '../componentlogic/useShowMessage'
 import type { KeyboardType } from '../config/config'
@@ -75,7 +75,6 @@ export function MainMenu({
     const [scoreDialogMode, setScoreDialogMode] = useState<'new' | 'edit' | null>(null)
     // The keyboard-mapping editor drawer.
     const [keyMapEditorOpen, setKeyMapEditorOpen] = useState<boolean>(false)
-    const dialog = useDialog()
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
 
@@ -112,12 +111,14 @@ export function MainMenu({
                         // )
                         // toaster.push(message, { duration: 5000 })
                     } else {
-                        dialog.alert(
-                            'An error occurred: the notation was not saved.\n' +
+                        showMessage({
+                            message:
+                                'The notation could not saved.\n' +
                                 'Log out and in then try again.\n' +
                                 'If the error persists choose `Export... to save\n' +
-                                ' your work to a text file.'
-                        )
+                                ' your work to a text file.',
+                            type: 'warning'
+                        })
                     }
                 }
                 break
