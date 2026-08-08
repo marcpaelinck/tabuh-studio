@@ -1,5 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
-import { apiDeleteAccount, apiLogin, apiLogout, apiMe, apiRefreshToken, apiUpdateProfile } from '../services/apiService'
+import {
+    apiDeleteAccount,
+    apiLogin,
+    apiLogout,
+    apiMe,
+    apiRefreshToken,
+    apiUpdateProfile,
+    setAuthExpiredHandler
+} from '../services/apiService'
 
 export interface AuthUser {
     id: number
@@ -37,6 +45,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // No valid session — the user needs to log in.
             })
             .finally(() => setIsLoading(false))
+    }, [])
+
+    // When a request 401s and the token refresh also fails, the session is really gone:
+    // reflect that in the UI so the user is prompted to log in again.
+    useEffect(() => {
+        setAuthExpiredHandler(() => setUser(null))
+        return () => setAuthExpiredHandler(null)
     }, [])
 
     const login = useCallback(async (email: string, password: string) => {

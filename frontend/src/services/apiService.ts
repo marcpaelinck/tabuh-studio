@@ -1,11 +1,42 @@
 const API_BASE = '/api'
 
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+// Called when a request fails with 401 AND a token refresh could not recover the session
+// (i.e. the refresh token is gone/expired). AuthContext registers this to clear the user.
+let onAuthExpired: (() => void) | null = null
+export function setAuthExpiredHandler(handler: (() => void) | null) {
+    onAuthExpired = handler
+}
+
+// De-duplicated access-token refresh: many requests can 401 at once (e.g. after 15 min idle),
+// but they should trigger only a single /auth/refresh. Concurrent callers share this promise.
+let refreshPromise: Promise<boolean> | null = null
+function refreshAccessToken(): Promise<boolean> {
+    if (!refreshPromise) {
+        refreshPromise = fetch(`${API_BASE}/auth/refresh`, { method: 'POST', credentials: 'include' })
+            .then((r) => r.ok)
+            .catch(() => false)
+            .finally(() => {
+                refreshPromise = null
+            })
+    }
+    return refreshPromise
+}
+
+async function request<T>(path: string, options: RequestInit = {}, retried = false): Promise<T> {
     const response = await fetch(`${API_BASE}${path}`, {
         ...options,
         credentials: 'include', // sends httpOnly cookies automatically
         headers: { 'Content-Type': 'application/json', ...options.headers }
     })
+
+    // Access tokens live ~15 min; on the first 401 for a protected call, silently refresh and
+    // replay the request once. `/auth/refresh` and `/auth/login` are excluded: a 401 there is
+    // terminal (and refreshing on /auth/refresh would recurse).
+    if (response.status === 401 && !retried && path !== '/auth/refresh' && path !== '/auth/login') {
+        if (await refreshAccessToken()) return request<T>(path, options, true)
+        // Refresh failed → the session is genuinely gone; let AuthContext react.
+        onAuthExpired?.()
+    }
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({ error: response.statusText }))
