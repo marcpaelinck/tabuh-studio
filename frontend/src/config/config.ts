@@ -1,4 +1,3 @@
-import type { Position } from '@tabuhstudio/shared'
 import type { MutingType, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { DynamicsValue } from '../typing/execution'
@@ -91,8 +90,6 @@ export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1
                       'F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
 
 // INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
-
-export type InstrumentConfig = { name: string; positions: Position[] }
 
 // Translates shorthand codes used in instrumentConfigs to Note records.
 // The stroke is used for the animation.
@@ -199,20 +196,6 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         XDANG1_MUTED: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
         XDENG2_MUTED: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'MUTED' }
     }
-}
-
-export const instrumentConfigs: Record<string, InstrumentConfig> = {
-    GONGS: { name: 'Gongs', positions: ['GONGS'] },
-    KEMPLI: { name: 'Kempli', positions: ['KEMPLI'] },
-    CENGCENG: { name: 'Cengceng', positions: ['CENGCENG'] },
-    KENDANG: { name: 'Kendang', positions: ['KENDANG'] },
-    JEGOGAN: { name: 'Jegogan', positions: ['JEGOGAN'] },
-    CALUNG: { name: 'Calung', positions: ['CALUNG'] },
-    PENYACAH: { name: 'Penyacah', positions: ['PENYACAH'] },
-    PEMADE: { name: 'Pemade', positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'] },
-    KANTILAN: { name: 'Kantilan', positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'] },
-    UGAL: { name: 'Ugal', positions: ['UGAL'] },
-    REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] }
 }
 
 // ANIMATION

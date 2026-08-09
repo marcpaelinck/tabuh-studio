@@ -35,7 +35,7 @@ import { playbackReducerFactory } from '../componentlogic/playback/playbackReduc
 import { usePlaybackManager } from '../componentlogic/playback/usePlaybackManager'
 import { useScoreManager } from '../componentlogic/useScoreManager'
 import { useScoreReader } from '../componentlogic/useScoreReader'
-import { noCursor, speedList, type KeyboardType } from '../config/config'
+import { noCursor, speedList } from '../config/config'
 import { useAuth, type AuthUser } from '../context/AuthContext'
 import { TsLogoIcon } from '../reacticons/TsLogoIcon'
 import { apiForgotPassword } from '../services/apiService'
@@ -64,7 +64,6 @@ import {
 import EditorWindow from './editor/EditorWindow'
 import { EditProfileDrawer } from './EditProfileDrawer'
 import { MainMenu } from './MainMenu'
-import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { MobileBottomNav } from './MobileBottomNav'
 import { OptionList } from './OptionList'
 import PlaybackMenu from './PlaybackMenu'
@@ -231,7 +230,6 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
     const [openLogin, setOpenLogin] = useState<boolean>(false)
     const [openRegister, setOpenRegister] = useState<boolean>(false)
     const [openProfile, setOpenProfile] = useState<boolean>(false)
-    const [openManageUsers, setOpenManageUsers] = useState<boolean>(false)
 
     // Apply different formatting when the SideNav element is collapsed
     const expandedfmt = {
@@ -270,11 +268,6 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                                 Edit my profile...
                             </Dropdown.Item>
                         )}
-                        {user?.role === 'admin' && (
-                            <Dropdown.Item onSelect={runAndClose(() => setOpenManageUsers(true))}>
-                                Manage users...
-                            </Dropdown.Item>
-                        )}
                     </Dropdown.Menu>
                 </Popover>
             }>
@@ -300,7 +293,6 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
             <LoginDialog open={openLogin} setOpen={setOpenLogin} login={login} />
             <RegisterDrawer open={openRegister} onClose={() => setOpenRegister(false)} />
             <EditProfileDrawer open={openProfile} onClose={() => setOpenProfile(false)} />
-            <ManageUsersDrawer open={openManageUsers} onClose={() => setOpenManageUsers(false)} />
         </>
     )
 }
@@ -353,7 +345,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         useScoreManager()
     const [currentScoreId, setCurrentScoreId] = useState<UUID>('') // use this state to trigger events when a new score is loaded
 
-    const [keyboard, SetKeyboard] = useState<KeyboardType>('regular')
     const [scoreMenuOptions, setScoreMenuOptions] = useState<ExtendedOption<ScoreInfo>[]>([])
     const {
         selectedSpeedOption,
@@ -364,7 +355,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setSelectedFocusOption,
         setSelectedPanggulOption,
         mobileTab,
-        setMobileTab
+        setMobileTab,
+        keyboard,
+        setKeyboard: SetKeyboard
     } = useUserSelectionStore()
 
     // ──  MENU AND SELECTORS SETTINGS ─────────────────────────────────────────────
@@ -374,8 +367,14 @@ export function MainWindow({ dataSource }: MainWindowProps) {
     const speedMenuItems = useMemo(() => createSpeedMenuItems(speedList), [])
     const [focusMenuItems, setFocusMenuItems] = useState<ExtendedOption<Position[]>[]>([focusDefaultOption])
     useEffect(() => {
-        if (score) setFocusMenuItems(createFocusMenuItems(score))
-        setSelectedFocusOption(focusDefaultOption)
+        const items = score ? createFocusMenuItems(score) : [focusDefaultOption]
+        setFocusMenuItems(items)
+        // Apply the user's preferred default focus if it exists for this score, else "No Focus".
+        const prefFocus = user?.preferences?.defaultFocus
+            ? user.preferences.defaultFocus.find((pref) => pref.orchestra == score?.instrumenttype)?.focus
+            : undefined
+        const match = prefFocus ? items.find((i) => i.value === prefFocus) : undefined
+        setSelectedFocusOption(match ?? focusDefaultOption)
         debug(`setting panggul option to ${JSON.stringify(panggulDefaultOption)}`)
         setSelectedPanggulOption(panggulDefaultOption)
     }, [score])

@@ -7,17 +7,18 @@
  *                Used by the "Notation → Score details..." menu action.
  */
 
-import { instrumentGroups, type InstrumentGroup } from '@tabuhstudio/shared'
+import { orchestras } from '@tabuhstudio/shared/config/position'
+import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Drawer, Input, InputGroup, SelectPicker } from 'rsuite'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
 const instrumentLabels: Partial<Record<InstrumentGroup, string>> = Object.fromEntries(
-    _.keys(instrumentGroups).map((t) => [t as InstrumentGroup, t.replace('_', ' ')])
+    _.keys(orchestras).map((t) => [t as InstrumentGroup, t.replace('_', ' ')])
 )
 
-const instrumentOptions = _.keys(instrumentGroups).map((t) => {
+const instrumentOptions = _.keys(orchestras).map((t) => {
     return { label: instrumentLabels[t as InstrumentGroup], value: t }
 })
 

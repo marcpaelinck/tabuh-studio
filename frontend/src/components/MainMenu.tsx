@@ -12,6 +12,8 @@ import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { Score, ScoreFormat } from '../typing/score'
 import { KeyMapEditor } from './editor/KeyMapEditor'
+import { ManageUsersDrawer } from './ManageUsersDrawer'
+import { PreferencesDrawer } from './PreferencesDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 
@@ -33,6 +35,8 @@ type Action =
     | 'file-export-midi'
     | 'file-export-pdf'
     | 'instruments-select'
+    | 'settings-preferences'
+    | 'settings-manage-users'
     | 'settings-instruments'
     | 'settings-keyboard'
     | 'settings-colors'
@@ -75,11 +79,19 @@ export function MainMenu({
     const [scoreDialogMode, setScoreDialogMode] = useState<'new' | 'edit' | null>(null)
     // The keyboard-mapping editor drawer.
     const [keyMapEditorOpen, setKeyMapEditorOpen] = useState<boolean>(false)
+    // Settings drawers.
+    const [preferencesOpen, setPreferencesOpen] = useState<boolean>(false)
+    const [manageUsersOpen, setManageUsersOpen] = useState<boolean>(false)
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
 
-    // Preferred orchestra when opening the score browser with no score loaded.
+    // Preferred orchestra when opening the score browser with no score loaded: the user's
+    // preference (phase 1 supports only an orchestra filter) falls back to a fixed default.
     const DEFAULT_ORCHESTRA = 'GONG_KEBYAR'
+    const preferredOrchestra =
+        user?.preferences?.defaultScoreFilter?.type === 'orchestra'
+            ? user.preferences.defaultScoreFilter.value
+            : undefined
 
     async function performAction() {
         switch (activeKey) {
@@ -91,6 +103,12 @@ export function MainMenu({
                 break
             case 'keyboard-edit':
                 setKeyMapEditorOpen(true)
+                break
+            case 'settings-preferences':
+                setPreferencesOpen(true)
+                break
+            case 'settings-manage-users':
+                setManageUsersOpen(true)
                 break
             case 'file-open':
                 // Reset the selection before opening (the Drawer has no onOpen hook); the
@@ -175,7 +193,7 @@ export function MainMenu({
                 <ScoreBrowser
                     key={scoreSelector ? 'open' : 'closed'}
                     scoreMenuOptions={scoreMenuOptions}
-                    defaultInstrumentGroup={score?.instrumenttype ?? DEFAULT_ORCHESTRA}
+                    defaultInstrumentGroup={score?.instrumenttype ?? preferredOrchestra ?? DEFAULT_ORCHESTRA}
                     selectedValue={selectedScoreOption?.value}
                     onSelect={(o) => {
                         setScoreSelector(false)
@@ -267,7 +285,15 @@ export function MainMenu({
                     Laras
                 </Nav.Item>
             </Nav.Menu>
-            <Nav.Menu disabled eventKey="4" title="Settings" icon={<IoSettingsOutline />} {...menuProps('4')}>
+            <Nav.Menu disabled={!user} eventKey="4" title="Settings" icon={<IoSettingsOutline />} {...menuProps('4')}>
+                <Nav.Item className="text-xs" disabled={!user} eventKey="settings-preferences">
+                    Preferences...
+                </Nav.Item>
+                {user?.role === 'admin' && (
+                    <Nav.Item className="text-xs" eventKey="settings-manage-users">
+                        Manage users...
+                    </Nav.Item>
+                )}
                 <Nav.Item disabled eventKey="settings-instruments">
                     Instrument definitions
                 </Nav.Item>
@@ -281,6 +307,8 @@ export function MainMenu({
             {selectScoreDialog}
             {scoreDetailsDialog}
             <KeyMapEditor open={keyMapEditorOpen} setOpen={setKeyMapEditorOpen} />
+            <PreferencesDrawer open={preferencesOpen} onClose={() => setPreferencesOpen(false)} />
+            <ManageUsersDrawer open={manageUsersOpen} onClose={() => setManageUsersOpen(false)} />
         </Nav>
     )
 }

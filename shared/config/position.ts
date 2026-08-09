@@ -1,20 +1,51 @@
-import type { Instrument, InstrumentGroup } from '../types/basetypes'
-import type { Position, PositionConfig, PositionGroup } from '../types/position'
+import type {
+    Instrument,
+    InstrumentConfig,
+    InstrumentGroup,
+    Position,
+    PositionConfig,
+    PositionGroup
+} from '../types/position'
 
 // List of available instrument groups.
 // The staffs will appear in the editor in the given sequence.
 // prettier-ignore
-export const orchestras: Partial<Record<InstrumentGroup, { instruments: Instrument[], positions: Position[]; beatPosition: Position }>> = {
+export const orchestras: Record<InstrumentGroup, { instruments: Instrument[]; positions: Position[]; beatPosition: Position | null }> = {
     GONG_KEBYAR: {
-        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG_WADON', 'KENDANG_LANANG', 'KEMPLI'],
+        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG', 'KEMPLI'],
         positions: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG', 'KEMPLI'],
         beatPosition: 'KEMPLI'
     },
     BALEGANJUR: {
-        instruments: ['CENGCENG', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG_WADON', 'KENDANG_LANANG', 'TAWATAWA'],
+        instruments: ['CENGCENG', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
         positions: ['CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
         beatPosition: 'TAWATAWA'
+    },
+    UNDEFINED: {
+        instruments: [],
+        positions: [],
+        beatPosition: null
     }
+}
+
+export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
+    GONGS: { name: 'Gongs', positions: ['GONGS'] },
+    KEMPLI: { name: 'Kempli', positions: ['KEMPLI'] },
+    CENGCENG: { name: 'Cengceng', positions: ['CENGCENG'] },
+    KENDANG: { name: 'Kendang', positions: ['KENDANG'] },
+    JEGOGAN: { name: 'Jegogan', positions: ['JEGOGAN'] },
+    CALUNG: { name: 'Calung', positions: ['CALUNG'] },
+    PENYACAH: { name: 'Penyacah', positions: ['PENYACAH'] },
+    PEMADE: { name: 'Pemade', positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'] },
+    KANTILAN: { name: 'Kantilan', positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'] },
+    UGAL: { name: 'Ugal', positions: ['UGAL'] },
+    GENDER_RAMBAT: { name: 'Gender rambat', positions: ['GENDER_RAMBAT'] },
+    TROMPONG: { name: 'Trompong', positions: ['TROMPONG'] },
+    REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] },
+    CENGCENG_KOPYAK: { name: 'Cengceng kopyak', positions: ['CENGCENG_P', 'CENGCENG_S'] },
+    REYONGB: { name: 'Reyong baleganjur', positions: ['REYONGB_1', 'REYONGB_2'] },
+    TAWATAWA: { name: 'Tawa-tawa', positions: ['TAWATAWA'] },
+    PONGGANG: { name: 'Ponggang', positions: ['PONGGANG'] }
 }
 
 /**
@@ -125,7 +156,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     },
     KENDANG: {
         name: 'Kendang',
-        instrument: 'KENDANG_WADON',
+        instrument: 'KENDANG',
         type: 'percussion',
         volume: -15,
         svg_file: 'svg/GK_KENDANG.svg',
@@ -136,7 +167,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     },
     KENDANG_WADON: {
         name: 'Kendang',
-        instrument: 'KENDANG_WADON',
+        instrument: 'KENDANG',
         type: 'percussion',
         volume: -15,
         svg_file: 'svg/GK_KENDANG.svg',
@@ -147,7 +178,7 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     },
     KENDANG_LANANG: {
         name: 'Kendang',
-        instrument: 'KENDANG_LANANG',
+        instrument: 'KENDANG',
         type: 'percussion',
         volume: -15,
         svg_file: 'svg/GK_KENDANG.svg',

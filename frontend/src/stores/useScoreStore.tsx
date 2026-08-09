@@ -1,4 +1,5 @@
-import { instrumentGroups, type InstrumentGroup, type Position } from '@tabuhstudio/shared'
+import { orchestras } from '@tabuhstudio/shared/config/position'
+import type { InstrumentGroup, Position } from '@tabuhstudio/shared/types/position'
 import type { Dispatch } from 'react'
 import { create, type StoreApi, type UseBoundStore } from 'zustand'
 import type { ScoreInfo } from '../typing/interface'
@@ -31,7 +32,7 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
     currentScore: undefined,
     orchestra: 'UNDEFINED',
     orchestraPositions: [],
-    beatPosition: 'KEMPLI',
+    beatPosition: 'KEMPLI' as Position,
     allowedPositionGroups: [],
     labelDict: {},
     dirty: false,
@@ -41,7 +42,7 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
         set(() => ({
             currentScore: score,
             orchestra: score.instrumenttype,
-            orchestraPositions: instrumentGroups[score.instrumenttype]?.positions || [],
+            orchestraPositions: orchestras[score.instrumenttype as InstrumentGroup]?.positions || [],
             dirty: false
         })),
     // Every edit path goes through here, so this is where the score becomes dirty.
@@ -55,7 +56,7 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
             return { currentScore: { ...currentScore, ...attr }, dirty: true }
         }),
     setOrchestra: (orchestra: InstrumentGroup) =>
-        set(() => ({ orchestra: orchestra, beatPosition: instrumentGroups[orchestra]?.beatPosition })),
+        set(() => ({ orchestra: orchestra, beatPosition: orchestras[orchestra]?.beatPosition || undefined })),
     setOrchestraPositions: (positions: Position[]) => set(() => ({ orchestraPositions: positions })),
     setBeatPosition: (position: Position) => set(() => ({ beatPosition: position })),
     setAllowedPositionGroups: (groups: Position[][]) => set(() => ({ allowedPositionGroups: groups })),

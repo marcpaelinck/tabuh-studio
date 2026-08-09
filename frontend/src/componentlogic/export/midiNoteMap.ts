@@ -10,7 +10,7 @@
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Instrument } from '@tabuhstudio/shared/types/basetypes'
+import type { Instrument } from '@tabuhstudio/shared/types/position'
 import { PDFDocument, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { gmProgram } from '../playback/midiGenerator'
 import { instrumentNoteMapRows } from '../playback/pitchMap'
@@ -192,11 +192,22 @@ export async function generateMidiNoteMapPdf(model: MidiNoteMapModel): Promise<U
                 y = PAGE_H - 18
             p.drawText(lbl, { x, y, size: 9, font: helv, color: BLACK })
             p.drawText(url, { x: x + lw, y, size: 9, font: helv, color: BLACK })
-            p.drawLine({ start: { x: x + lw, y: y - 1 }, end: { x: x + lw + uw, y: y - 1 }, thickness: 0.4, color: BLACK })
+            p.drawLine({
+                start: { x: x + lw, y: y - 1 },
+                end: { x: x + lw + uw, y: y - 1 },
+                thickness: 0.4,
+                color: BLACK
+            })
             addLink(doc, p, x + lw, y - 2, uw, 11, url)
         }
         const titleY = PAGE_H - 32
-        p.drawText(winAnsi(`MIDI note map: ${model.title}`), { x: LEFT, y: titleY, size: 12, font: helvBold, color: DARK_RED })
+        p.drawText(winAnsi(`MIDI note map: ${model.title}`), {
+            x: LEFT,
+            y: titleY,
+            size: 12,
+            font: helvBold,
+            color: DARK_RED
+        })
         const ps = String(no),
             pw = helv.widthOfTextAtSize(ps, 11)
         p.drawText(ps, { x: (PAGE_W - pw) / 2, y: titleY, size: 11, font: helv, color: BLACK })
@@ -204,7 +215,12 @@ export async function generateMidiNoteMapPdf(model: MidiNoteMapModel): Promise<U
         p.drawText(model.datestamp, { x: PAGE_W - RIGHT - dw, y: titleY, size: 9, font: helv, color: BLACK })
         const note = 'Nominal 12-TET pitches (not true pelog/slendro tuning). MIDI note number: C4 = 60.'
         p.drawText(note, { x: LEFT, y: PAGE_H - 46, size: 7.5, font: helv, color: GREY })
-        p.drawLine({ start: { x: LEFT, y: PAGE_H - 52 }, end: { x: PAGE_W - RIGHT, y: PAGE_H - 52 }, thickness: 0.5, color: BLACK })
+        p.drawLine({
+            start: { x: LEFT, y: PAGE_H - 52 },
+            end: { x: PAGE_W - RIGHT, y: PAGE_H - 52 },
+            thickness: 0.5,
+            color: BLACK
+        })
     }
 
     drawHeader(page, pageNo)

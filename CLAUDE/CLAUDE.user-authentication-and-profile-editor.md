@@ -172,9 +172,8 @@ token whose `tv` is stale. `reset-password` bumps `token_version` (killing sessi
 before the reset — e.g. an attacker who prompted it); `change-password` bumps it too but
 re-issues the actor's own cookies so they stay logged in. Access tokens are stateless (no
 per-request DB check), so revocation of other sessions takes effect at their next `/refresh`
-(≤ the 15-min access-token lifetime). Note: an already-open tab isn't force-refreshed, so the
-logout is felt on its next reload/refresh — add a 401→refresh interceptor if prompt eviction is
-wanted.
+(≤ the 15-min access-token lifetime). The 401→refresh interceptor below drives that `/refresh`,
+so an evicted session is cleared on its next API call rather than only on reload.
 
 ## Manual steps to run Phase 3
 1. `npm run build` (frontend) + restart the backend. (No new deps, no migration.)
@@ -201,9 +200,36 @@ No DB change, no new deps.
 ## Manual steps to run Phase 4
 1. `npm run build` (frontend) + restart the backend.
 
+# Silent token refresh (401 → refresh → retry) — as built
+
+Frontend-only; no backend or DB change.
+
+Problem it fixes: the access-token cookie lives ~15 min, but the app only refreshed it on
+mount (`AuthContext`). After sitting idle past that window, the next protected call (e.g. saving
+a score) hit `requireAuth` with an expired/absent access token and returned 401 ("access
+denied"). A page reload silently refreshed the token via the 7-day refresh cookie, which is why
+the reload "fixed" it and the user was still logged in.
+
+Implementation (`services/apiService.ts` + `context/AuthContext.tsx`):
+- The `request` helper now intercepts a `401`: on the **first** 401 for a protected call it
+  calls `/auth/refresh` once and, on success, transparently replays the original request (a
+  `retried` flag caps it at one retry). `/auth/refresh` and `/auth/login` are excluded so a 401
+  there stays terminal and can't recurse.
+- Concurrent 401s (common after idle — several calls fire at once) share a single in-flight
+  `refreshPromise`, so only one `/auth/refresh` is sent.
+- If the refresh itself fails (refresh token truly gone/expired), `request` invokes an
+  `onAuthExpired` callback and rethrows. `AuthContext` registers it via `setAuthExpiredHandler`
+  to `setUser(null)`, dropping the UI to logged-out so the user is prompted to log in again.
+
+Net effect: the idle-then-save case re-authenticates behind the scenes (no reload); the user is
+only bounced when the refresh token is also expired — the correct moment to require a login.
+
+Manual step: `npm run build` (frontend) + restart. No new deps, no migration.
+
 ---
 All four phases of the user-profile feature are now implemented, plus the `token_version`
-session-invalidation hardening (see "Session invalidation … as built" above).
+session-invalidation hardening and the silent 401→refresh→retry interceptor (see the two
+"as built" sections above).
 
 Manual step for the token_version change: apply `backend/src/seed/migrations/003_token_version.sql`,
 then rebuild/restart. No new deps.

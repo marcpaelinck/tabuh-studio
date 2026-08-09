@@ -1,4 +1,4 @@
-import type { InstrumentGroup, Position } from '@tabuhstudio/shared'
+import type { InstrumentGroup, Position } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { getPositionGroups } from '../config/position-functions'
 import type { ExecutionItem } from '../typing/execution'

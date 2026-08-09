@@ -64,7 +64,9 @@ function userView(row: RowDataPacket) {
         lastName: row.last_name,
         name: `${row.first_name ?? ''} ${row.last_name ?? ''}`.trim(),
         email: row.email,
-        role: row.role
+        role: row.role,
+        // JSON column: mysql2 returns it already parsed (or null).
+        preferences: row.preferences ?? {}
     }
 }
 
@@ -72,7 +74,7 @@ router.post('/login', validate(loginSchema), async (req: Request, res: Response)
     const { email, password } = req.body
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT id, first_name, last_name, email, role, token_version, password_hash FROM users WHERE email = ?',
+            'SELECT id, first_name, last_name, email, role, token_version, preferences, password_hash FROM users WHERE email = ?',
             [email]
         )
         const user = rows[0]
@@ -136,7 +138,7 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
     const { id } = (req as AuthenticatedRequest).user!
     try {
         const [rows] = await pool.query<RowDataPacket[]>(
-            'SELECT id, first_name, last_name, email, role FROM users WHERE id = ?',
+            'SELECT id, first_name, last_name, email, role, preferences FROM users WHERE id = ?',
             [id]
         )
         const user = rows[0]
@@ -244,6 +246,28 @@ router.patch('/profile', requireAuth, validate(profileSchema), async (req: Reque
             [id]
         )
         res.json({ user: userView(rows[0]) })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// Per-user preferences (all keys optional; unknown keys are stripped). Phase 2 will extend
+// `defaultScoreFilter` to also accept a music-group target.
+const preferencesSchema = z.object({
+    defaultScoreFilter: z.object({ type: z.literal('orchestra'), value: z.string() }).optional(),
+    defaultFocus: z.string().optional(),
+    notationVisibleByDefault: z.boolean().optional(),
+    defaultCursorStyle: z.enum(['Beat', 'System', 'None']).optional(),
+    defaultKeyboard: z.enum(['regular', 'laras']).optional()
+})
+
+router.put('/preferences', requireAuth, validate(preferencesSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const prefs = req.body
+    try {
+        await pool.query('UPDATE users SET preferences = ? WHERE id = ?', [JSON.stringify(prefs), id])
+        res.json({ preferences: prefs })
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })

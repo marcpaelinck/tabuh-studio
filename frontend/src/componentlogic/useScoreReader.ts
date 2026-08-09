@@ -1,6 +1,7 @@
-import { instrumentGroups, NoteObject, type Position } from '@tabuhstudio/shared'
+import { NoteObject, type Position } from '@tabuhstudio/shared'
 import { orchestras } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
+import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -83,8 +84,8 @@ export function useScoreReader(source: 'database' | 'file'): {
 
     function setScoreStates(score: Score): void {
         setCurrentScore(score)
-        setOrchestraPositions(instrumentGroups[score.instrumenttype]?.positions || [])
-        setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype])
+        setOrchestraPositions(orchestras[score.instrumenttype as InstrumentGroup]?.positions || [])
+        setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype as InstrumentGroup])
         setOrchestra(score.instrumenttype)
     }
 

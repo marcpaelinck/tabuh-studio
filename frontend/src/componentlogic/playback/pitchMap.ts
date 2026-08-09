@@ -18,7 +18,7 @@
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Instrument } from '@tabuhstudio/shared/types/basetypes'
+import type { Instrument } from '@tabuhstudio/shared/types/position'
 
 const PITCH_CLASS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 

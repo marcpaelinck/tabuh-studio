@@ -54,7 +54,6 @@ export function Animation({ notationElement, appAppearance, setSVGInfo }: Animat
     // On mobile the animation area is a bounded flex column so the SVG fills the leftover space.
     const mobile = appAppearance == 'playerOnly'
     const [hasPanggul, setHasPanggul] = useState<boolean>(false)
-    const [notationVisible, setNotationVisible] = useState<boolean>(false)
     const svgInfoRef: RefObject<SVGInfo> = useRef<SVGInfo>({
         svg: null,
         panggul: null,
@@ -64,7 +63,8 @@ export function Animation({ notationElement, appAppearance, setSVGInfo }: Animat
     })
 
     const [panggulMenuItems, setPanggulMenuItems] = useState<ExtendedOption<Position[]>[]>([])
-    const { selectedFocusOption, selectedPanggulOption, setSelectedPanggulOption } = useUserSelectionStore()
+    const { selectedFocusOption, selectedPanggulOption, setSelectedPanggulOption, notationVisible, setNotationVisible } =
+        useUserSelectionStore()
 
     useEffect(() => debug(`SELECTED PANGGUL: ${JSON.stringify(selectedPanggulOption)}`), [selectedPanggulOption])
 

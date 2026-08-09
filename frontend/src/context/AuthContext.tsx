@@ -5,9 +5,12 @@ import {
     apiLogout,
     apiMe,
     apiRefreshToken,
+    apiSavePreferences,
     apiUpdateProfile,
     setAuthExpiredHandler
 } from '../services/apiService'
+import { useUserSelectionStore } from '../stores/useUserSettingsStore'
+import type { UserPreferences } from '../typing/preferences'
 
 export interface AuthUser {
     id: number
@@ -16,6 +19,7 @@ export interface AuthUser {
     name: string
     email: string
     role: string
+    preferences: UserPreferences
 }
 
 interface AuthContextValue {
@@ -25,8 +29,20 @@ interface AuthContextValue {
     logout: () => Promise<void>
     updateProfile: (firstName: string, lastName: string) => Promise<void>
     deleteAccount: (password: string) => Promise<void>
+    updatePreferences: (preferences: UserPreferences) => Promise<void>
     isEditor: boolean
     isAdmin: boolean
+}
+
+// Applies the "activated on login" preferences to the live selection store. Only the settings
+// that are live selections are seeded here; `defaultScoreFilter` (Open drawer) and `defaultFocus`
+// (applied per score-open) are read at their own use-sites from `user.preferences`.
+function seedSelectionsFromPreferences(prefs: UserPreferences | undefined) {
+    if (!prefs) return
+    const s = useUserSelectionStore.getState()
+    if (prefs.defaultCursorStyle) s.setSelectedCursorStyle(prefs.defaultCursorStyle)
+    if (prefs.defaultKeyboard) s.setKeyboard(prefs.defaultKeyboard)
+    if (typeof prefs.notationVisibleByDefault === 'boolean') s.setNotationVisible(prefs.notationVisibleByDefault)
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -40,7 +56,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         apiRefreshToken()
             .then(() => apiMe())
-            .then(({ user }) => setUser(user))
+            .then(({ user }) => {
+                setUser(user)
+                // Phase 1: seed on restore too (no local session persistence yet). Phase 3 will
+                // make a silent restore defer to the locally persisted session instead.
+                seedSelectionsFromPreferences(user.preferences)
+            })
             .catch(() => {
                 // No valid session — the user needs to log in.
             })
@@ -57,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const login = useCallback(async (email: string, password: string) => {
         const { user } = await apiLogin(email, password)
         setUser(user)
+        seedSelectionsFromPreferences(user.preferences)
     }, [])
 
     const logout = useCallback(async () => {
@@ -74,6 +96,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null)
     }, [])
 
+    // Save preferences, reflect them on the user, and apply them immediately so the change is
+    // visible without a re-login.
+    const updatePreferences = useCallback(async (preferences: UserPreferences) => {
+        await apiSavePreferences(preferences)
+        setUser((prev) => (prev ? { ...prev, preferences } : prev))
+        seedSelectionsFromPreferences(preferences)
+    }, [])
+
     return (
         <AuthContext.Provider
             value={{
@@ -83,6 +113,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 logout,
                 updateProfile,
                 deleteAccount,
+                updatePreferences,
                 isEditor: user?.role === 'editor' || user?.role === 'admin',
                 isAdmin: user?.role === 'admin'
             }}>

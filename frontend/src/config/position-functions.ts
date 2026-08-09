@@ -1,5 +1,6 @@
-import type { InstrumentGroup, Position, PositionGroup } from '@tabuhstudio/shared'
+import type { Position, PositionGroup } from '@tabuhstudio/shared'
 import { orchestras, positionGroups } from '@tabuhstudio/shared/config/position'
+import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 
 /**

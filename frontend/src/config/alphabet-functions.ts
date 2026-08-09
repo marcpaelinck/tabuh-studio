@@ -8,7 +8,8 @@ import {
     type Kind
 } from '@tabuhstudio/shared/config/alphabet'
 import { orchestras, positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { InstrumentGroup, NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
+import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
+import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 
 export interface ValidNoteObjectsAttr {

@@ -1,6 +1,7 @@
 import type { Position } from '@tabuhstudio/shared'
 import type { Dispatch } from 'react'
 import { create, type StoreApi, type UseBoundStore } from 'zustand'
+import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 
@@ -25,6 +26,10 @@ export interface UserSelections {
     mobileTab: MobileTab
     /** Id of the active keyboard mapping (see shared `keyMaps`). */
     selectedKeyMapId: string
+    /** Physical keyboard layout used for note entry. */
+    keyboard: KeyboardType
+    /** Whether the notation panel in the Animation component is shown. */
+    notationVisible: boolean
     setSelectedScoreOption: Dispatch<ExtendedOption<ScoreInfo> | null>
     setSelectedFocusOption: Dispatch<ExtendedOption<Position[]>>
     setSelectedSpeedOption: Dispatch<ExtendedOption<number>>
@@ -34,6 +39,8 @@ export interface UserSelections {
     setEditorView: Dispatch<EditorView>
     setMobileTab: Dispatch<MobileTab>
     setSelectedKeyMapId: Dispatch<string>
+    setKeyboard: Dispatch<KeyboardType>
+    setNotationVisible: Dispatch<boolean>
 }
 
 export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = create((set) => ({
@@ -46,6 +53,8 @@ export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = cr
     mainView: 'player' as MainView,
     mobileTab: 'player' as MobileTab,
     selectedKeyMapId: '1', // default keyboard mapping (see shared `keyMaps`)
+    keyboard: 'regular' as KeyboardType,
+    notationVisible: false,
     setSelectedScoreOption: (option: ExtendedOption<ScoreInfo> | null) => set(() => ({ selectedScoreOption: option })),
     setSelectedFocusOption: (option: ExtendedOption<Position[]>) => set(() => ({ selectedFocusOption: option })),
     setSelectedSpeedOption: (option: ExtendedOption<number>) => set(() => ({ selectedSpeedOption: option })),
@@ -54,5 +63,7 @@ export const useUserSelectionStore: UseBoundStore<StoreApi<UserSelections>> = cr
     setMainView: (view: MainView) => set(() => ({ mainView: view })),
     setEditorView: (view: EditorView) => set(() => ({ editorView: view })),
     setMobileTab: (tab: MobileTab) => set(() => ({ mobileTab: tab })),
-    setSelectedKeyMapId: (id: string) => set(() => ({ selectedKeyMapId: id }))
+    setSelectedKeyMapId: (id: string) => set(() => ({ selectedKeyMapId: id })),
+    setKeyboard: (keyboard: KeyboardType) => set(() => ({ keyboard })),
+    setNotationVisible: (visible: boolean) => set(() => ({ notationVisible: visible }))
 }))

@@ -1,12 +1,6 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
-import type {
-    InstrumentGroup,
-    MutingType,
-    NoteSymbol,
-    StrokeLocation,
-    ToneType,
-    UUID
-} from '@tabuhstudio/shared/types/basetypes'
+import type { MutingType, NoteSymbol, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
+import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
 import type { BeatSliceInfo, ExecutionItem } from './execution'
 

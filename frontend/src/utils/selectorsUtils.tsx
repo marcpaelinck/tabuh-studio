@@ -1,5 +1,7 @@
-import type { Position } from '@tabuhstudio/shared'
-import { instrumentConfigs, type InstrumentConfig } from '../config/config'
+import { instrumentGroups, type Position } from '@tabuhstudio/shared'
+import { instrumentConfigs, positionConfigs } from '@tabuhstudio/shared/config/position'
+import type { Instrument, InstrumentConfig, InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import _ from 'lodash'
 import { focusDefaultOption } from '../stores/useUserSettingsStore'
 import { type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
 import type { Score, System } from '../typing/score'
@@ -20,18 +22,27 @@ export function createSpeedMenuItems(values: number[]): ExtendedOption<number>[]
     })
 }
 
-export function createFocusMenuItems(score: Score): ExtendedOption<Position[]>[] {
+export function createFocusMenuItems(scoreOrOrchestra?: Score | InstrumentGroup | null): ExtendedOption<Position[]>[] {
     // Create a list of positions found in the score (multiple occurrences)
-    const posList: Position[] = score.systems
-        .map((system: System) => Object.keys(system.staffs))
-        .flat()
-        .flat() as Position[]
+    const posList: Position[] = []
+    if (scoreOrOrchestra) {
+        if (typeof scoreOrOrchestra == 'string') {
+            posList.push(...(instrumentGroups[scoreOrOrchestra as InstrumentGroup]?.positions || []))
+        } else {
+            posList.push(
+                ...(scoreOrOrchestra.systems
+                    .map((system: System) => Object.keys(system.staffs))
+                    .flat()
+                    .flat() as Position[])
+            )
+        }
+    } else posList.push(...(_.keys(positionConfigs) as Position[]))
     // Reduce to single occurrences
     const positions = Array.from(new Set(posList))
     // Select the instruments from instrumentConfigs that contain the positions
-    var instrumentList: [string, InstrumentConfig][] = Object.entries(instrumentConfigs).filter(([_, info]) =>
+    var instrumentList: [Instrument, InstrumentConfig][] = Object.entries(instrumentConfigs).filter(([_, info]) =>
         positions.includes(info.positions[0])
-    )
+    ) as [Instrument, InstrumentConfig][]
     // Sort the instrument list
     instrumentList = instrumentList.sort(([key1, _1], [key2, _2]) => key1.localeCompare(key2))
     // Create the menu items

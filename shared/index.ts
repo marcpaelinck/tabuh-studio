@@ -10,10 +10,8 @@
  *   - NoteObject class, NoteObjectError, NoteObjectFault (NoteObject.ts)
  */
 
-export { orchestras as instrumentGroups } from './config/position.ts'
-export type { InstrumentGroup } from './types/basetypes.ts'
-
 export { DEFAULT_KEMPLI } from './config/defaults.ts'
+export { orchestras as instrumentGroups } from './config/position.ts'
 
 export { keyMaps } from './config/keymap.ts'
 

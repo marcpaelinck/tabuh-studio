@@ -8,6 +8,8 @@ CREATE TABLE users (
   -- Bumped whenever all of a user's sessions should be invalidated (password reset/change).
   -- Embedded as the `tv` claim in JWTs and re-checked at /refresh.
   token_version INT NOT NULL DEFAULT 0,
+  -- Per-user app preferences (defaults applied on login). See CLAUDE.user-settings.md.
+  preferences   JSON NULL,
   created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

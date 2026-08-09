@@ -1,6 +1,25 @@
-import type { Instrument } from './basetypes'
-
 export type Modifiers = { before: string[]; after: string[] }
+
+export type InstrumentGroup = 'GONG_KEBYAR' | 'BALEGANJUR' | 'UNDEFINED'
+
+export type Instrument =
+    | 'UGAL'
+    | 'GENDER_RAMBAT'
+    | 'TROMPONG'
+    | 'PEMADE'
+    | 'KANTILAN'
+    | 'REYONG'
+    | 'PENYACAH'
+    | 'CALUNG'
+    | 'JEGOGAN'
+    | 'GONGS'
+    | 'CENGCENG'
+    | 'CENGCENG_KOPYAK'
+    | 'KENDANG'
+    | 'KEMPLI'
+    | 'REYONGB'
+    | 'PONGGANG'
+    | 'TAWATAWA'
 
 export type PositionConfig = {
     //`notes` contains a list of single notes or multiple notes that are played simultaneously.
@@ -60,3 +79,5 @@ export type PositionGroup =
     | 'DAUN'
     | 'PERCUSSION'
     | 'CENGCENG_KOPYAK'
+
+export type InstrumentConfig = { name: string; positions: Position[] }

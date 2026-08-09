@@ -21,24 +21,3 @@ export type StrokeLocation = (typeof _strokes_)[number]
 
 const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = (typeof _mutings_)[number]
-
-export type InstrumentGroup = 'GONG_KEBYAR' | 'BALEGANJUR' | 'UNDEFINED'
-export type Instrument =
-    | 'UGAL'
-    | 'GENDER_RAMBAT'
-    | 'TROMPONG'
-    | 'PEMADE'
-    | 'KANTILAN'
-    | 'REYONG'
-    | 'PENYACAH'
-    | 'CALUNG'
-    | 'JEGOGAN'
-    | 'GONGS'
-    | 'CENGCENG'
-    | 'CENGCENG_KOPYAK'
-    | 'KENDANG_WADON'
-    | 'KENDANG_LANANG'
-    | 'KEMPLI'
-    | 'REYONGB'
-    | 'PONGGANG'
-    | 'TAWATAWA'

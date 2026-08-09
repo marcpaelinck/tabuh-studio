@@ -1,3 +1,5 @@
+import type { UserPreferences } from '../typing/preferences'
+
 const API_BASE = '/api'
 
 // Called when a request fails with 401 AND a token refresh could not recover the session
@@ -63,6 +65,7 @@ export interface ApiUser {
     name: string
     email: string
     role: string
+    preferences: UserPreferences
 }
 
 export async function apiLogin(email: string, password: string) {
@@ -144,6 +147,13 @@ export async function apiDeleteAccount(password: string) {
     return request<{ ok: true }>('/auth/delete-account', {
         method: 'POST',
         body: JSON.stringify({ password })
+    })
+}
+
+export async function apiSavePreferences(preferences: UserPreferences) {
+    return request<{ preferences: UserPreferences }>('/auth/preferences', {
+        method: 'PUT',
+        body: JSON.stringify(preferences)
     })
 }
 

@@ -19,7 +19,7 @@
 
 import type { Position } from '@tabuhstudio/shared'
 import { positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Instrument } from '@tabuhstudio/shared/types/basetypes'
+import type { Instrument } from '@tabuhstudio/shared/types/position'
 import { Midi } from '@tonejs/midi'
 import { baseNoteValue } from '../../config/config'
 import type { PlaybackSamplerAction, TimeLine } from '../../typing/playback'
