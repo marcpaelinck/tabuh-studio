@@ -1,6 +1,7 @@
-import { instrumentGroups, type Position } from '@tabuhstudio/shared'
+import { type Position } from '@tabuhstudio/shared'
 import { instrumentConfigs, positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { Instrument, InstrumentConfig, InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Instrument, InstrumentConfig, Orchestra } from '@tabuhstudio/shared/types/position'
+import { orchestraPositions } from '@tabuhstudio/shared/utils/position'
 import _ from 'lodash'
 import { focusDefaultOption } from '../stores/useUserSettingsStore'
 import { type ExtendedOption, type MenuItemInfo, type ScoreInfo } from '../typing/interface'
@@ -22,12 +23,12 @@ export function createSpeedMenuItems(values: number[]): ExtendedOption<number>[]
     })
 }
 
-export function createFocusMenuItems(scoreOrOrchestra?: Score | InstrumentGroup | null): ExtendedOption<Position[]>[] {
+export function createFocusMenuItems(scoreOrOrchestra?: Score | Orchestra | null): ExtendedOption<Position[]>[] {
     // Create a list of positions found in the score (multiple occurrences)
     const posList: Position[] = []
     if (scoreOrOrchestra) {
         if (typeof scoreOrOrchestra == 'string') {
-            posList.push(...(instrumentGroups[scoreOrOrchestra as InstrumentGroup]?.positions || []))
+            posList.push(...orchestraPositions(scoreOrOrchestra))
         } else {
             posList.push(
                 ...(scoreOrOrchestra.systems

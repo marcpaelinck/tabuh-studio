@@ -3,7 +3,7 @@
 
 import { ERROR_PITCH_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import type { GroupedNotation, Staffs, System } from '../typing/score.ts'
 
@@ -82,7 +82,7 @@ const nokempyung: Partial<Position>[][] = [
     ['REYONG_2', 'REYONG_4']
 ]
 
-export const allowedPositionGroups: Record<InstrumentGroup, Position[][]> = {
+export const allowedPositionGroups: Record<Orchestra, Position[][]> = {
     GONG_KEBYAR: [
         [
             'PEMADE_POLOS',
@@ -204,11 +204,7 @@ export function castNotation(
 // universe minus the positions in use. A candidate `p` is allowed only if the
 // resulting set `group ∪ {p}` fits inside a single `allowedGroups` array (so only
 // valid aggregations can be formed). An empty group accepts any available position.
-export function candidatesFor(
-    groupPositions: Position[],
-    available: Position[],
-    orchestra: InstrumentGroup
-): Position[] {
+export function candidatesFor(groupPositions: Position[], available: Position[], orchestra: Orchestra): Position[] {
     if (groupPositions.length === 0) return available
     return available.filter((p) =>
         allowedPositionGroups[orchestra].some((grp) => [...groupPositions, p].every((x) => grp.includes(x)))

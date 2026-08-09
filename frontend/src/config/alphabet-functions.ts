@@ -7,14 +7,15 @@ import {
     type Category,
     type Kind
 } from '@tabuhstudio/shared/config/alphabet'
-import { orchestras, positionConfigs } from '@tabuhstudio/shared/config/position'
+import { orchestraConfigs, positionConfigs } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
+import { orchestraPositions } from '@tabuhstudio/shared/utils/position'
 import _ from 'lodash'
 
 export interface ValidNoteObjectsAttr {
     position?: Position
-    orchestra?: InstrumentGroup
+    orchestra?: Orchestra
     asDict: boolean
 }
 
@@ -33,15 +34,12 @@ export function validNoteObjects({
     interface LookupValue extends AlphabetItem {
         char: NoteSymbol
     }
-    if (orchestra && !(orchestra in orchestras)) return asDict ? ({} as Partial<Record<Position, NoteObject[]>>) : []
+    if (orchestra && !(orchestra in orchestraConfigs))
+        return asDict ? ({} as Partial<Record<Position, NoteObject[]>>) : []
 
     // Create a set of positions for which to return valid notes
     const positions: Set<Position> = new Set(
-        orchestra
-            ? orchestras[orchestra]!.positions
-            : position
-              ? [position]
-              : (Object.keys(positionConfigs) as Position[])
+        orchestra ? orchestraPositions(orchestra) : position ? [position] : (Object.keys(positionConfigs) as Position[])
     )
 
     // Create convenience lookup tables

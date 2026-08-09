@@ -1,6 +1,6 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
 import type { MutingType, NoteSymbol, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
 import type { BeatSliceInfo, ExecutionItem } from './execution'
 
@@ -72,7 +72,7 @@ export type Score = {
     uuid: UUID
     title: string
     composer: string
-    instrumenttype: InstrumentGroup
+    instrumenttype: Orchestra
     parts?: Record<string, UUID[]> // deprecated
     positions: Position[]
     systems: System[]

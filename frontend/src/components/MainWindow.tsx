@@ -371,8 +371,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         setFocusMenuItems(items)
         // Apply the user's preferred default focus if it exists for this score, else "No Focus".
         const prefFocus = user?.preferences?.defaultFocus
-            ? user.preferences.defaultFocus.find((pref) => pref.orchestra == score?.instrumenttype)?.focus
-            : undefined
         const match = prefFocus ? items.find((i) => i.value === prefFocus) : undefined
         setSelectedFocusOption(match ?? focusDefaultOption)
         debug(`setting panggul option to ${JSON.stringify(panggulDefaultOption)}`)

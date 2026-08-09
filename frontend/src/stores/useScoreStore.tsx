@@ -1,5 +1,6 @@
-import { orchestras } from '@tabuhstudio/shared/config/position'
-import type { InstrumentGroup, Position } from '@tabuhstudio/shared/types/position'
+import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
+import type { Orchestra, Position } from '@tabuhstudio/shared/types/position'
+import { orchestraPositions } from '@tabuhstudio/shared/utils/position'
 import type { Dispatch } from 'react'
 import { create, type StoreApi, type UseBoundStore } from 'zustand'
 import type { ScoreInfo } from '../typing/interface'
@@ -8,7 +9,7 @@ import type { Score, System } from '../typing/score'
 export interface CurrentScore {
     scoreInfoList: ScoreInfo[] | null
     currentScore: Score | undefined
-    orchestra: InstrumentGroup
+    orchestra: Orchestra
     orchestraPositions: Position[]
     beatPosition: Position
     allowedPositionGroups: Position[][]
@@ -16,7 +17,7 @@ export interface CurrentScore {
     /** True when currentScore has edits not yet saved to the DB or exported to a .json file. */
     dirty: boolean
     setScoreInfoList: Dispatch<ScoreInfo[] | null>
-    setOrchestra: Dispatch<InstrumentGroup>
+    setOrchestra: Dispatch<Orchestra>
     setOrchestraPositions: Dispatch<Position[]>
     setBeatPosition: Dispatch<Position>
     setCurrentScore: Dispatch<Score>
@@ -42,7 +43,7 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
         set(() => ({
             currentScore: score,
             orchestra: score.instrumenttype,
-            orchestraPositions: orchestras[score.instrumenttype as InstrumentGroup]?.positions || [],
+            orchestraPositions: orchestraPositions(score.instrumenttype),
             dirty: false
         })),
     // Every edit path goes through here, so this is where the score becomes dirty.
@@ -55,8 +56,8 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
             const attr = updater(currentScore)
             return { currentScore: { ...currentScore, ...attr }, dirty: true }
         }),
-    setOrchestra: (orchestra: InstrumentGroup) =>
-        set(() => ({ orchestra: orchestra, beatPosition: orchestras[orchestra]?.beatPosition || undefined })),
+    setOrchestra: (orchestra: Orchestra) =>
+        set(() => ({ orchestra: orchestra, beatPosition: orchestraConfigs[orchestra]?.beatPosition || undefined })),
     setOrchestraPositions: (positions: Position[]) => set(() => ({ orchestraPositions: positions })),
     setBeatPosition: (position: Position) => set(() => ({ beatPosition: position })),
     setAllowedPositionGroups: (groups: Position[][]) => set(() => ({ allowedPositionGroups: groups })),

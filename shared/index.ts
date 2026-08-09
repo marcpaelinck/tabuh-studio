@@ -11,7 +11,7 @@
  */
 
 export { DEFAULT_KEMPLI } from './config/defaults.ts'
-export { orchestras as instrumentGroups } from './config/position.ts'
+export { orchestraConfigs as instrumentGroups } from './config/position.ts'
 
 export { keyMaps } from './config/keymap.ts'
 

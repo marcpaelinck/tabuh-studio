@@ -1,4 +1,4 @@
-import type { InstrumentGroup, Position } from '@tabuhstudio/shared/types/position'
+import type { Orchestra, Position } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { getPositionGroups } from '../config/position-functions'
 import type { ExecutionItem } from '../typing/execution'
@@ -48,7 +48,7 @@ function toOrdinal(val: number): string {
     }
 }
 
-function positionsText(positions: Position[] | undefined, orchestra: InstrumentGroup): string {
+function positionsText(positions: Position[] | undefined, orchestra: Orchestra): string {
     if (!positions || positions.length === 0) return 'all positions'
     return compactGroupLabel(positions, getPositionGroups(orchestra), true).label
 }
@@ -75,11 +75,7 @@ function sequenceMultiLine(labels: string[]) {
     return lines.join('\n' + ' '.repeat(offset))
 }
 
-export function executionItemTooltip(
-    item: ExecutionItem,
-    length: 'short' | 'long',
-    orchestra: InstrumentGroup
-): string {
+export function executionItemTooltip(item: ExecutionItem, length: 'short' | 'long', orchestra: Orchestra): string {
     const nbrOfPasses = !item.passes ? 0 : item.passes.length
     // const maxPassNr = !item.passes ? 0 : Math.max(...item.passes)
     const sortedPasses = item.passes ? item.passes.sort() : []

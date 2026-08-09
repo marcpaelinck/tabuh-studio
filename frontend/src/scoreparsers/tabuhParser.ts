@@ -2,7 +2,7 @@
 import type { SyntaxNode } from '@lezer/common'
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
 import type { NoteSymbol, UUID } from '@tabuhstudio/shared/types/basetypes.ts'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import { type CastingInstruction } from '../componentlogic/castingRulesManager.ts'
@@ -481,7 +481,7 @@ function getMetadata(
     gonganNode: SyntaxNode | null,
     systemid: number,
     systemuuid: string,
-    orchestra: InstrumentGroup,
+    orchestra: Orchestra,
     content: string
 ): ProcessingInstruction[] {
     const metaData: ProcessingInstruction[] = []
@@ -505,7 +505,7 @@ function parseMetadata(
     seqNr: number,
     systemid: number,
     systemuuid: string,
-    orchestra: InstrumentGroup,
+    orchestra: Orchestra,
     content: string
 ): ProcessingInstruction | undefined {
     if (!metadataNode) return undefined
@@ -717,7 +717,7 @@ function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], co
     return parameters
 }
 
-function updateSeqAndTooltips(item: ExecutionItem, orchestra: InstrumentGroup) {
+function updateSeqAndTooltips(item: ExecutionItem, orchestra: Orchestra) {
     item.seqId = executionItemSeqId(item)
     item.tooltip = executionItemTooltip(item, 'long', orchestra)
     item.tooltipshort = executionItemTooltip(item, 'short', orchestra)

@@ -1,7 +1,7 @@
 import type {
     Instrument,
     InstrumentConfig,
-    InstrumentGroup,
+    Orchestra,
     Position,
     PositionConfig,
     PositionGroup
@@ -10,20 +10,17 @@ import type {
 // List of available instrument groups.
 // The staffs will appear in the editor in the given sequence.
 // prettier-ignore
-export const orchestras: Record<InstrumentGroup, { instruments: Instrument[]; positions: Position[]; beatPosition: Position | null }> = {
+export const orchestraConfigs: Record<Orchestra, { instruments: Instrument[]; beatPosition: Position | null }> = {
     GONG_KEBYAR: {
         instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG', 'KEMPLI'],
-        positions: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG', 'KEMPLI'],
         beatPosition: 'KEMPLI'
     },
     BALEGANJUR: {
         instruments: ['CENGCENG', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
-        positions: ['CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
         beatPosition: 'TAWATAWA'
     },
     UNDEFINED: {
         instruments: [],
-        positions: [],
         beatPosition: null
     }
 }

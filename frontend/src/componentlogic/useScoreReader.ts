@@ -1,7 +1,8 @@
 import { NoteObject, type Position } from '@tabuhstudio/shared'
-import { orchestras } from '@tabuhstudio/shared/config/position'
+import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
+import { orchestraPositions } from '@tabuhstudio/shared/utils/position'
 import _ from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -84,8 +85,8 @@ export function useScoreReader(source: 'database' | 'file'): {
 
     function setScoreStates(score: Score): void {
         setCurrentScore(score)
-        setOrchestraPositions(orchestras[score.instrumenttype as InstrumentGroup]?.positions || [])
-        setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype as InstrumentGroup])
+        setOrchestraPositions(orchestraPositions(score.instrumenttype))
+        setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype as Orchestra])
         setOrchestra(score.instrumenttype)
     }
 
@@ -397,7 +398,7 @@ export function useScoreReader(source: 'database' | 'file'): {
             const scores = await apiGetScores()
             if (scores) {
                 const scoreInfoList = scores
-                    .filter((score) => _.keys(orchestras).includes(score.instrument_set))
+                    .filter((score) => _.keys(orchestraConfigs).includes(score.instrument_set))
                     .map((score) => toScoreInfo(score))
                     .toSorted((i1, i2) => i1.title.localeCompare(i2.title))
                 setScoreInfoList(scoreInfoList)

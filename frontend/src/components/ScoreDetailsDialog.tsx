@@ -7,25 +7,25 @@
  *                Used by the "Notation → Score details..." menu action.
  */
 
-import { orchestras } from '@tabuhstudio/shared/config/position'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import { Button, Drawer, Input, InputGroup, SelectPicker } from 'rsuite'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
-const instrumentLabels: Partial<Record<InstrumentGroup, string>> = Object.fromEntries(
-    _.keys(orchestras).map((t) => [t as InstrumentGroup, t.replace('_', ' ')])
+const instrumentLabels: Partial<Record<Orchestra, string>> = Object.fromEntries(
+    _.keys(orchestraConfigs).map((t) => [t as Orchestra, t.replace('_', ' ')])
 )
 
-const instrumentOptions = _.keys(orchestras).map((t) => {
-    return { label: instrumentLabels[t as InstrumentGroup], value: t }
+const instrumentOptions = _.keys(orchestraConfigs).map((t) => {
+    return { label: instrumentLabels[t as Orchestra], value: t }
 })
 
 export interface ScoreDetailsValues {
     title: string
     composer: string
-    instrumenttype: InstrumentGroup
+    instrumenttype: Orchestra
 }
 
 interface ScoreDetailsDialogProps {
@@ -41,7 +41,7 @@ interface ScoreDetailsDialogProps {
 export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: ScoreDetailsDialogProps) {
     const [title, setTitle] = useState('')
     const [composer, setComposer] = useState('')
-    const [instrumenttype, setInstrumenttype] = useState<InstrumentGroup | null>(null)
+    const [instrumenttype, setInstrumenttype] = useState<Orchestra | null>(null)
 
     // (Re)seed the fields whenever the dialog opens.
     useEffect(() => {
@@ -93,7 +93,7 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                                 cleanable={false}
                                 data={instrumentOptions}
                                 value={instrumenttype}
-                                onChange={(v) => setInstrumenttype(v as InstrumentGroup | null)}
+                                onChange={(v) => setInstrumenttype(v as Orchestra | null)}
                                 placeholder="Select instrument type"
                             />
                         ) : (

@@ -2,8 +2,8 @@
 // the functions take `loop` and `goto` directives into account.
 // They also keep track of the 'current' tempo and dynamics.
 import { type Position } from '@tabuhstudio/shared'
-import { defaultBeatPosition, orchestras, positionConfigs } from '@tabuhstudio/shared/config/position'
-import type { InstrumentGroup } from '@tabuhstudio/shared/types/position'
+import { defaultBeatPosition, orchestraConfigs, positionConfigs } from '@tabuhstudio/shared/config/position'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { UUID } from 'crypto'
 import _ from 'lodash'
 import { defaultDynamics, defaultTempo } from '../../config/config'
@@ -57,7 +57,7 @@ export function executionManager(
         score.systems.map((system) => {
             const beatSlices: BeatSliceInfo[] = getBeatSlices(
                 system,
-                orchestras[score.instrumenttype as InstrumentGroup]?.beatPosition || defaultBeatPosition
+                orchestraConfigs[score.instrumenttype as Orchestra]?.beatPosition || defaultBeatPosition
             )
             const executionItems: Record<ExecutionItemType, ExecutionItem[]> = Object()
             for (const type of [
