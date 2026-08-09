@@ -1,6 +1,6 @@
 export type Modifiers = { before: string[]; after: string[] }
 
-export type Orchestra = 'GONG_KEBYAR' | 'BALEGANJUR' | 'UNDEFINED'
+export type Orchestra = 'GONG_KEBYAR' | 'BALEGANJUR'
 
 export type Instrument =
     | 'UGAL'

@@ -18,10 +18,6 @@ export const orchestraConfigs: Record<Orchestra, { instruments: Instrument[]; be
     BALEGANJUR: {
         instruments: ['CENGCENG', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
         beatPosition: 'TAWATAWA'
-    },
-    UNDEFINED: {
-        instruments: [],
-        beatPosition: null
     }
 }
 

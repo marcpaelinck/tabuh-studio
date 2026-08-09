@@ -51,16 +51,16 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
         setInstrumenttype(initial?.instrumenttype ?? null)
     }, [open])
 
-    // Title is always required; a new score also requires an instrument type.
-    const valid = title.trim().length > 0 && (mode === 'edit' || instrumenttype !== null)
+    // Title is always required; a score also requires an instrument type.
+    const valid = title.trim().length > 0 && instrumenttype !== null
 
     const handleSubmit = () => {
-        if (!valid) return
+        if (!valid || !initial?.instrumenttype) return
         onSubmit({
             title: title.trim(),
             composer: composer.trim(),
             // 'edit' keeps the existing instrument type; 'new' guarantees a value via `valid`.
-            instrumenttype: (mode === 'edit' ? initial?.instrumenttype : instrumenttype) ?? 'UNDEFINED'
+            instrumenttype: mode === 'edit' ? initial?.instrumenttype : instrumenttype
         })
         onClose()
     }
@@ -86,7 +86,7 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                     </div>
                     <div>
                         <div className="text-xs mb-1">Instrument type *</div>
-                        {mode === 'new' ? (
+                        {mode === 'new' || !initial?.instrumenttype ? (
                             <SelectPicker
                                 block
                                 searchable={false}
@@ -98,7 +98,7 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                             />
                         ) : (
                             <InputGroup>
-                                <Input readOnly value={instrumentLabels[initial?.instrumenttype ?? 'UNDEFINED']} />
+                                <Input readOnly value={instrumentLabels[initial?.instrumenttype]} />
                             </InputGroup>
                         )}
                     </div>

@@ -9,7 +9,7 @@ import type { Score, System } from '../typing/score'
 export interface CurrentScore {
     scoreInfoList: ScoreInfo[] | null
     currentScore: Score | undefined
-    orchestra: Orchestra
+    orchestra: Orchestra | undefined
     orchestraPositions: Position[]
     beatPosition: Position
     allowedPositionGroups: Position[][]
@@ -31,7 +31,7 @@ export interface CurrentScore {
 export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set) => ({
     scoreInfoList: null,
     currentScore: undefined,
-    orchestra: 'UNDEFINED',
+    orchestra: undefined,
     orchestraPositions: [],
     beatPosition: 'KEMPLI' as Position,
     allowedPositionGroups: [],

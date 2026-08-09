@@ -12,7 +12,6 @@ import type { UserPreferences } from '../typing/preferences'
 import { createFocusMenuItems } from '../utils/selectorsUtils'
 
 const orchestraOptions = Object.keys(instrumentGroups)
-    .filter((g) => g !== 'UNDEFINED')
     .sort()
     .map((g) => ({ label: g.replace(/_/g, ' '), value: g }))
 

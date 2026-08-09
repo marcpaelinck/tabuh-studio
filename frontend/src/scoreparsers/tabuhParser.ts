@@ -65,7 +65,7 @@ export function parseNotation(content: string): ParserReturnValue {
         uuid: '',
         title: '',
         composer: '',
-        instrumenttype: 'UNDEFINED',
+        instrumenttype: 'GONG_KEBYAR',
         positions: [],
         systems: []
     } as ScoreByMeasure

@@ -2,34 +2,13 @@
  * Utilities for working with plain objects (string-keyed).
  */
 
-import { EXTENDING_CHAR, KEMPLI_BEAT_CHAR, NoteObject, type Position } from '@tabuhstudio/shared'
+import { KEMPLI_BEAT_CHAR, NoteObject, type Position } from '@tabuhstudio/shared'
 import type { BPM, NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { totalDuration } from '../componentlogic/playback/strokeManager'
 import { defaultBeatFrequency } from '../config/config'
 import type { BeatSliceInfo } from '../typing/execution'
 import type { Score, System } from '../typing/score'
-
-type DefaultType = 'NoteSymbol' | 'Score'
-const DefaultObjectFactory = {
-    NoteSymbol: () => {
-        return EXTENDING_CHAR
-    },
-    Score: () => {
-        return {
-            uuid: '',
-            title: 'default',
-            composer: '',
-            instrumenttype: 'UNDEFINED',
-            positions: [],
-            systems: []
-        } as Score
-    }
-}
-
-export function defaultObject<T>(otype: DefaultType): T {
-    return DefaultObjectFactory[otype]() as T
-}
 
 const scoreKeyOrder = ['uuid', 'title', 'composer', 'instrumenttype', 'positions', 'parts', 'systems']
 const systemKeyOrder = ['uuid', 'id', 'index', 'execution', 'kempli', 'line', 'groups', 'staffs', 'kempli']
