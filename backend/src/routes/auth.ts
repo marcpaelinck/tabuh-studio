@@ -256,7 +256,8 @@ router.patch('/profile', requireAuth, validate(profileSchema), async (req: Reque
 // `defaultScoreFilter` to also accept a music-group target.
 const preferencesSchema = z.object({
     defaultScoreFilter: z.object({ type: z.literal('orchestra'), value: z.string() }).optional(),
-    defaultFocus: z.string().optional(),
+    // Map of orchestra -> focus option value.
+    defaultFocusByOrchestra: z.record(z.string(), z.string()).optional(),
     notationVisibleByDefault: z.boolean().optional(),
     defaultCursorStyle: z.enum(['Beat', 'System', 'None']).optional(),
     defaultKeyboard: z.enum(['regular', 'laras']).optional()

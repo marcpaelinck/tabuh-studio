@@ -1,19 +1,24 @@
 // Per-user preferences editor (any logged-in role). Saves to the server and applies the
-// changes immediately. Focus options depend on the loaded score, mirroring the player's own
-// focus dropdown; the other controls are global. See CLAUDE.user-settings.md.
+// changes immediately. The default focus is set per orchestra (its options are derived from the
+// orchestra's instruments, so no score needs to be open). See CLAUDE.user-settings.md.
 
 import { instrumentGroups } from '@tabuhstudio/shared'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import { useEffect, useState } from 'react'
 import { Button, Drawer, Message, SelectPicker, Toggle } from 'rsuite'
 import { useAuth } from '../context/AuthContext'
-import { useScoreStore } from '../stores/useScoreStore'
-import { focusDefaultOption } from '../stores/useUserSettingsStore'
 import type { UserPreferences } from '../typing/preferences'
 import { createFocusMenuItems } from '../utils/selectorsUtils'
 
-const orchestraOptions = Object.keys(instrumentGroups)
-    .sort()
-    .map((g) => ({ label: g.replace(/_/g, ' '), value: g }))
+const orchestras = Object.keys(instrumentGroups) as Orchestra[]
+const orchestraLabel = (o: string) => o.replace(/_/g, ' ')
+
+const orchestraOptions = orchestras.sort().map((o) => ({ label: orchestraLabel(o), value: o }))
+
+// Focus options per orchestra (stable — derived from the orchestra's instruments).
+const focusOptionsByOrchestra: Record<string, { label: string; value: string }[]> = Object.fromEntries(
+    orchestras.map((o) => [o, createFocusMenuItems(o).map((item) => ({ label: item.label, value: item.value }))])
+)
 
 const cursorOptions = [
     { label: 'Beat', value: 'Beat' },
@@ -32,14 +37,9 @@ interface PreferencesDrawerProps {
 
 export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
     const { user, updatePreferences } = useAuth()
-    const currentScore = useScoreStore((s) => s.currentScore)
-    const focusOptions = (currentScore ? createFocusMenuItems(currentScore) : [focusDefaultOption]).map((o) => ({
-        label: o.label,
-        value: o.value
-    }))
 
     const [orchestra, setOrchestra] = useState<string | null>(null)
-    const [focus, setFocus] = useState<string | null>(null)
+    const [focusByOrchestra, setFocusByOrchestra] = useState<Record<string, string | null>>({})
     const [notationVisible, setNotationVisible] = useState(false)
     const [cursorStyle, setCursorStyle] = useState<string | null>(null)
     const [keyboard, setKeyboard] = useState<string | null>(null)
@@ -51,7 +51,9 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         if (!open) return
         const p = user?.preferences ?? {}
         setOrchestra(p.defaultScoreFilter?.type === 'orchestra' ? p.defaultScoreFilter.value : null)
-        setFocus(p.defaultFocus ?? null)
+        setFocusByOrchestra(
+            Object.fromEntries(orchestras.map((o) => [o, p.defaultFocusByOrchestra?.[o] ?? null]))
+        )
         setNotationVisible(!!p.notationVisibleByDefault)
         setCursorStyle(p.defaultCursorStyle ?? null)
         setKeyboard(p.defaultKeyboard ?? null)
@@ -65,7 +67,12 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         setSaving(true)
         const prefs: UserPreferences = { notationVisibleByDefault: notationVisible }
         if (orchestra) prefs.defaultScoreFilter = { type: 'orchestra', value: orchestra }
-        if (focus) prefs.defaultFocus = focus
+        const focusMap: Partial<Record<Orchestra, string>> = {}
+        for (const o of orchestras) {
+            const v = focusByOrchestra[o]
+            if (v) focusMap[o] = v
+        }
+        if (Object.keys(focusMap).length) prefs.defaultFocusByOrchestra = focusMap
         if (cursorStyle) prefs.defaultCursorStyle = cursorStyle as UserPreferences['defaultCursorStyle']
         if (keyboard) prefs.defaultKeyboard = keyboard as UserPreferences['defaultKeyboard']
         try {
@@ -115,17 +122,23 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                         />
                     </div>
                     <div>
-                        <div className="text-sm mb-1">
-                            Default focus{currentScore ? '' : ' (open a score to choose an instrument)'}
+                        <div className="text-sm mb-1">Default focus per orchestra</div>
+                        <div className="flex flex-col gap-2">
+                            {orchestras.map((o) => (
+                                <div key={o} className="flex items-center gap-2">
+                                    <div className="w-32 shrink-0 text-xs text-gray-600">{orchestraLabel(o)}</div>
+                                    <SelectPicker
+                                        data={focusOptionsByOrchestra[o]}
+                                        value={focusByOrchestra[o] ?? null}
+                                        onChange={(v) => setFocusByOrchestra((prev) => ({ ...prev, [o]: v }))}
+                                        block
+                                        searchable={false}
+                                        placeholder="No Focus"
+                                        className="flex-1"
+                                    />
+                                </div>
+                            ))}
                         </div>
-                        <SelectPicker
-                            data={focusOptions}
-                            value={focus}
-                            onChange={setFocus}
-                            block
-                            searchable={false}
-                            placeholder="No Focus"
-                        />
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="text-sm">Show notation by default</div>

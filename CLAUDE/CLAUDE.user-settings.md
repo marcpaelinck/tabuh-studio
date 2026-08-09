@@ -65,7 +65,7 @@ Preference blob shape (all keys optional; values are plain identifiers, not UI o
 {
   "defaultScoreFilter": { "type": "orchestra", "value": "GONG_KEBYAR" },
   // phase 2 also allows: { "type": "group", "value": 42 }
-  "defaultFocus": "<focus option value>",
+  "defaultFocusByOrchestra": { "GONG_KEBYAR": "<focus option value>" },
   "notationVisibleByDefault": true,
   "defaultCursorStyle": "Beat",
   "defaultKeyboard": "regular"
@@ -113,16 +113,16 @@ Preference blob shape (all keys optional; values are plain identifiers, not UI o
   visibility to the store on explicit login **and** on silent restore (phase 1 has no local
   session yet — phase 3 will make silent restore defer to the persisted session).
   `updatePreferences(prefs)` saves, updates the user, and applies immediately.
-- **Apply points:** default focus is applied in `MainWindow`'s score-open effect (matched
-  against the score's focus options, else "No Focus"); the default-orchestra filter seeds the
-  desktop **Open** drawer default in `MainMenu`. A **New** score is unaffected (still starts with
-  the orchestra deselected).
-- **UI:** `PreferencesDrawer` (orchestra / focus / notation toggle / cursor style / keyboard).
+- **Apply points:** default focus is **per orchestra** (`defaultFocusByOrchestra`), applied in
+  `MainWindow`'s score-open effect keyed on `score.instrumenttype` (matched against the score's
+  focus options, else "No Focus"); the default-orchestra filter seeds the desktop **Open** drawer
+  default in `MainMenu`. A **New** score is unaffected (still starts with the orchestra deselected).
+- **UI:** `PreferencesDrawer` (score-filter orchestra / a focus picker per orchestra / notation
+  toggle / cursor style / keyboard). Focus options are derived from each orchestra's instruments
+  (`createFocusMenuItems(orchestra)`), so **no score needs to be open** to set focus preferences.
   The `Settings` `MainMenu` menu is enabled when logged in and holds **Preferences…** (all roles)
   and **Manage users…** (admin only, moved out of the profile popover).
 - **Not run in-sandbox:** the full frontend typecheck (time limit) — confirm with a local build.
-- **Focus-picker limitation:** focus options are derived from the currently loaded score
-  (mirroring the player's dropdown); with no score open, only "No Focus" is offered.
 
 ## Phase 2 — Music groups (repertoire, management, subscriptions, filter)
 

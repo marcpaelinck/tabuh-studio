@@ -35,8 +35,8 @@ interface AuthContextValue {
 }
 
 // Applies the "activated on login" preferences to the live selection store. Only the settings
-// that are live selections are seeded here; `defaultScoreFilter` (Open drawer) and `defaultFocus`
-// (applied per score-open) are read at their own use-sites from `user.preferences`.
+// that are live selections are seeded here; `defaultScoreFilter` (Open drawer) and
+// `defaultFocusByOrchestra` (applied per score-open) are read at their own use-sites.
 function seedSelectionsFromPreferences(prefs: UserPreferences | undefined) {
     if (!prefs) return
     const s = useUserSelectionStore.getState()

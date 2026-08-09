@@ -1,6 +1,7 @@
 // Per-user app preferences (stored server-side as JSON on the user, applied on login).
 // See CLAUDE.user-settings.md. All keys are optional — an unset key means "use the app default".
 
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from './animation'
 
@@ -10,8 +11,8 @@ export type ScoreFilterPref = { type: 'orchestra'; value: string }
 export interface UserPreferences {
     /** Pre-selected filter in the "Open" drawer (a New score always starts deselected). */
     defaultScoreFilter?: ScoreFilterPref
-    /** Focus option value applied when a score is opened. */
-    defaultFocus?: string
+    /** Focus option value applied when a score is opened, per orchestra. */
+    defaultFocusByOrchestra?: Partial<Record<Orchestra, string>>
     /** Whether the notation panel in the Animation component is shown by default. */
     notationVisibleByDefault?: boolean
     defaultCursorStyle?: PlaybackCursorStyle
