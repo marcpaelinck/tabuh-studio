@@ -139,7 +139,15 @@ export function CompactSystemEditor({
         addPosition,
         removePosition,
         replaceLineNotation
-    } = useCompactSystemEditor({ systemUuid, initialLines, keyMap, castingInstructions, onChange, focusEditor, beatStops })
+    } = useCompactSystemEditor({
+        systemUuid,
+        initialLines,
+        keyMap,
+        castingInstructions,
+        onChange,
+        focusEditor,
+        beatStops
+    })
     const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
     const showExpansion = useEditorStateStore((s) => s.showExpansion)
     // Positions chosen for a NEW staff, before it is created (add above/below).

@@ -12,10 +12,10 @@ type PositionGroupKey = keyof typeof positionGroups
 
 export function compactGroupLabel(
     positions: Position[],
-    positionGrouping: Record<PositionGroupKey, Position[]>,
+    positionGrouping: Record<PositionGroupKey, Position[]> | null,
     toLower: boolean = false
 ): { label: string; tooltip: string } {
-    const groupEntries = Object.entries(positionGrouping) as [PositionGroupKey, Position[]][]
+    const groupEntries = (positionGrouping ? Object.entries(positionGrouping) : []) as [PositionGroupKey, Position[]][]
     const names = positions.map((p) => positionConfigs[p]?.name ?? p)
     const tooltip = names.join(', ')
     if (positions.length === 0) return { label: '(empty)', tooltip: '' }

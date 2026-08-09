@@ -49,8 +49,7 @@ const GM_PROGRAM_BY_INSTRUMENT: Record<Instrument, number> = {
     // Hanging gongs, timekeepers, drums and cymbals.
     KEMPLI: 115, // Woodblock
     GONGS: 116, // Taiko Drum
-    KENDANG_WADON: 117, // Melodic Tom (low drum)
-    KENDANG_LANANG: 118, // Synth Drum (high drum)
+    KENDANG: 117, // Melodic Tom (low drum)
     CENGCENG: 119, // Reverse Cymbal
     TAWATAWA: 47, // Timpani
     CENGCENG_KOPYAK: 126 // Applause (cymbal wash)

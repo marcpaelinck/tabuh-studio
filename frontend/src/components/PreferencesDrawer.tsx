@@ -17,7 +17,10 @@ const orchestraOptions = orchestras.sort().map((o) => ({ label: orchestraLabel(o
 
 // Focus options per orchestra (stable — derived from the orchestra's instruments).
 const focusOptionsByOrchestra: Record<string, { label: string; value: string }[]> = Object.fromEntries(
-    orchestras.map((o) => [o, createFocusMenuItems(o).map((item) => ({ label: item.label, value: item.value }))])
+    orchestras.map((o) => [
+        o,
+        createFocusMenuItems(o).map((item) => ({ label: item.label as string, value: item.value }))
+    ])
 )
 
 const cursorOptions = [
@@ -51,9 +54,7 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         if (!open) return
         const p = user?.preferences ?? {}
         setOrchestra(p.defaultScoreFilter?.type === 'orchestra' ? p.defaultScoreFilter.value : null)
-        setFocusByOrchestra(
-            Object.fromEntries(orchestras.map((o) => [o, p.defaultFocusByOrchestra?.[o] ?? null]))
-        )
+        setFocusByOrchestra(Object.fromEntries(orchestras.map((o) => [o, p.defaultFocusByOrchestra?.[o] ?? null])))
         setNotationVisible(!!p.notationVisibleByDefault)
         setCursorStyle(p.defaultCursorStyle ?? null)
         setKeyboard(p.defaultKeyboard ?? null)

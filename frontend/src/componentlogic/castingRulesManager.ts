@@ -103,8 +103,7 @@ export const allowedPositionGroups: Record<Orchestra, Position[][]> = {
     BALEGANJUR: [
         ['REYONGB_1', 'REYONGB_2'],
         ['CENGCENG_P', 'CENGCENG_S']
-    ],
-    UNDEFINED: []
+    ]
 }
 
 function selectRule(
@@ -204,8 +203,9 @@ export function castNotation(
 // universe minus the positions in use. A candidate `p` is allowed only if the
 // resulting set `group ∪ {p}` fits inside a single `allowedGroups` array (so only
 // valid aggregations can be formed). An empty group accepts any available position.
-export function candidatesFor(groupPositions: Position[], available: Position[], orchestra: Orchestra): Position[] {
+export function candidatesFor(groupPositions: Position[], available: Position[], orchestra?: Orchestra): Position[] {
     if (groupPositions.length === 0) return available
+    if (!orchestra) return [] as Position[]
     return available.filter((p) =>
         allowedPositionGroups[orchestra].some((grp) => [...groupPositions, p].every((x) => grp.includes(x)))
     )
