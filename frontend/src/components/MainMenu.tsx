@@ -25,7 +25,6 @@ type Action =
     | 'login'
     | 'score-new'
     | 'score-details'
-    | 'keyboard-edit'
     | 'file-open'
     | 'file-open-json'
     | 'file-import-notation'
@@ -39,7 +38,6 @@ type Action =
     | 'settings-manage-users'
     | 'settings-instruments'
     | 'settings-keyboard'
-    | 'settings-colors'
 
 interface TabuhEditorMenuProps {
     scoreMenuOptions: ExtendedOption<ScoreInfo>[]
@@ -101,14 +99,14 @@ export function MainMenu({
             case 'score-details':
                 if (score) setScoreDialogMode('edit')
                 break
-            case 'keyboard-edit':
-                setKeyMapEditorOpen(true)
-                break
             case 'settings-preferences':
                 setPreferencesOpen(true)
                 break
             case 'settings-manage-users':
                 setManageUsersOpen(true)
+                break
+            case 'settings-keyboard':
+                setKeyMapEditorOpen(true)
                 break
             case 'file-open':
                 // Reset the selection before opening (the Drawer has no onOpen hook); the
@@ -267,9 +265,6 @@ export function MainMenu({
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
             <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />} {...menuProps('3')}>
-                <Nav.Item className="text-xs" eventKey="keyboard-edit">
-                    Edit mappings...
-                </Nav.Item>
                 <Nav.Item
                     className="text-xs"
                     active={keyboard == 'regular'}
@@ -290,19 +285,18 @@ export function MainMenu({
                     Preferences...
                 </Nav.Item>
                 {user?.role === 'admin' && (
-                    <Nav.Item className="text-xs" eventKey="settings-manage-users">
-                        Manage users...
-                    </Nav.Item>
+                    <>
+                        <Nav.Item className="text-xs" eventKey="settings-manage-users">
+                            Manage users...
+                        </Nav.Item>
+                        <Nav.Item className="text-xs" eventKey="settings-keyboard">
+                            Keyboard settings...
+                        </Nav.Item>
+                        <Nav.Item className="text-xs" disabled eventKey="settings-instruments">
+                            Instrument definitions...
+                        </Nav.Item>
+                    </>
                 )}
-                <Nav.Item disabled eventKey="settings-instruments">
-                    Instrument definitions
-                </Nav.Item>
-                <Nav.Item className="text-xs" disabled eventKey="settings-keyboard">
-                    Keyboard definitions
-                </Nav.Item>
-                <Nav.Item className="text-xs" disabled eventKey="settings-colors">
-                    Color schemes
-                </Nav.Item>
             </Nav.Menu>
             {selectScoreDialog}
             {scoreDetailsDialog}
