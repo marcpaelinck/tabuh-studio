@@ -44,6 +44,7 @@ export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
 /**
  * Possible grouping of instruments in the compact editor view.
  */
+// prettier-ignore
 export const positionGroups: Record<PositionGroup, { positions: Position[]; name: string }> = {
     PEMADE: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], name: 'Pemade' },
     KANTILAN: { positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Kantilan' },
@@ -60,57 +61,15 @@ export const positionGroups: Record<PositionGroup, { positions: Position[]; name
     REYONGB: { positions: ['REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
     POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
     MELODIC: {
-        positions: [
-            'PEMADE_POLOS',
-            'PEMADE_SANGSIH',
-            'KANTILAN_POLOS',
-            'KANTILAN_SANGSIH',
-            'UGAL',
-            'GENDER_RAMBAT',
-            'REYONG_1',
-            'REYONG_3',
-            'REYONG_2',
-            'REYONG_4',
-            'REYONGB_1',
-            'REYONGB_2',
-            'CALUNG',
-            'JEGOGAN',
-            'PENYACAH',
-            'PONGGANG'
-        ],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
         name: 'Melodic'
     },
     DAUN: {
-        positions: [
-            'PEMADE_POLOS',
-            'PEMADE_SANGSIH',
-            'KANTILAN_POLOS',
-            'KANTILAN_SANGSIH',
-            'UGAL',
-            'GENDER_RAMBAT',
-            'CALUNG',
-            'JEGOGAN',
-            'PENYACAH'
-        ],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'CALUNG', 'JEGOGAN', 'PENYACAH'],
         name: 'Daun'
     },
     PERCUSSION: {
-        positions: [
-            'KEMPLI',
-            'KENDANG',
-            'KENDANG_LANANG',
-            'KENDANG_WADON',
-            'REYONG_1',
-            'REYONG_2',
-            'REYONG_3',
-            'REYONG_4',
-            'CENGCENG',
-            'CENGCENG_P',
-            'CENGCENG_S',
-            'REYONGB_1',
-            'REYONGB_2',
-            'TAWATAWA'
-        ],
+        positions: [ 'KEMPLI', 'KENDANG', 'KENDANG_LANANG', 'KENDANG_WADON', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'CENGCENG', 'CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'TAWATAWA'],
         name: 'Percussion'
     },
     CENGCENG_KOPYAK: { positions: ['CENGCENG_P', 'CENGCENG_S'], name: 'Cengceng' }
