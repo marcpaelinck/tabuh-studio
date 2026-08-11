@@ -9,6 +9,7 @@ import path from 'path'
 
 import pkg from '../package.json'
 import authRouter from './routes/auth'
+import groupsRouter from './routes/groups'
 import scoresRouter from './routes/scores'
 
 dotenv.config()
@@ -91,10 +92,15 @@ app.use('/api/scores', (req, res, next) => {
     if (req.method === 'GET') return readLimit(req, res, next)
     return writeLimit(req, res, next)
 })
+app.use('/api/groups', (req, res, next) => {
+    if (req.method === 'GET') return readLimit(req, res, next)
+    return writeLimit(req, res, next)
+})
 
 // ── API routes ────────────────────────────────────────────────
 app.use('/api/auth', authRouter)
 app.use('/api/scores', scoresRouter)
+app.use('/api/groups', groupsRouter)
 
 app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok' })

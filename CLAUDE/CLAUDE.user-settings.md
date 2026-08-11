@@ -159,6 +159,40 @@ Preference blob shape (all keys optional; values are plain identifiers, not UI o
 
 **Manual steps:** apply the group-tables migration; rebuild + restart.
 
+### Phase 2 — as built
+- **DB:** `music_groups`, `group_scores`, `group_managers`, `user_group_subscriptions` (seed
+  schema + migration `005_music_groups.sql`), all joins `ON DELETE CASCADE`.
+- **Backend:** new `routes/groups.ts` mounted at `/api/groups`:
+  - `GET /` (any auth) — groups with `managerIds` + `scoreCount`.
+  - `POST/PATCH/DELETE /:id` (admin).
+  - `PUT /:id/managers` (admin) — replaces a group's editor-managers (deviation from the plan's
+    per-user `PUT /users/:id/managed-groups`: managers are edited **per group** to match the UI).
+  - `GET /:id/scores`, `POST /:id/scores`, `DELETE /:id/scores/:scoreId` — repertoire; add/remove
+    guarded by `canManageGroup` (admin or a listed manager); any score may be added.
+  - `GET /for-score/:uuid` — the groups whose repertoire includes a score (for Score details).
+  - `auth.ts`: `GET/PUT /auth/subscriptions` (the user's subscribed group ids). `scores` list
+    now includes `groups: number[]` (JSON_ARRAYAGG). Preferences `defaultScoreFilter` accepts an
+    orchestra **or** `{type:'group', value:<id>}`.
+- **Frontend:**
+  - `useGroupsStore` holds all groups + the user's subscriptions; loaded on login/restore in
+    `AuthContext`, cleared on logout.
+  - `apiService`: group CRUD, managers, repertoire, `for-score`, subscriptions (+ `MusicGroup`,
+    `GroupInput`, `GroupScore` types). `ScoreListItem`/`ScoreInfo` gained `groups: number[]`.
+  - `ScoreBrowser`: single-dimension filter with an "orchestra" section and a "my groups" section
+    (subscribed only; hidden when logged out). Takes a `defaultFilter` (current score's orchestra,
+    else the pref); group filtering matches `score.groups`.
+  - `PreferencesDrawer`: a **Subscribed groups** `CheckPicker` and a combined **Default score
+    filter** `SelectPicker` (orchestras + subscribed groups, grouped). Saving writes subscriptions
+    and preferences.
+  - `ManageGroupsDrawer` (Settings → **Manage groups…**, visible to admins and editors):
+    role-aware. Admins get group create/edit/delete + an editor-managers `CheckPicker` + inline
+    repertoire. Editors see only the groups they manage (`GET /groups` returns a `managedByMe`
+    flag) and may edit **only** the repertoire — no group CRUD, no managers, and `apiListUsers`
+    is skipped for them.
+  - `ScoreDetailsDialog` (edit mode, logged-in): read-only tag list of the groups whose repertoire
+    includes the score, via `GET /groups/for-score/:uuid`.
+- **Not run in-sandbox:** the full frontend typecheck (time limit) — confirm with a local build.
+
 ## Phase 3 — Local session persistence (auth-independent)
 
 Persist the current UI selections next to the recovery score so a reload restores what the user

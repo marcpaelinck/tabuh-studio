@@ -5,8 +5,8 @@ import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from './animation'
 
-// Phase 1: orchestra only. Phase 2 will add `{ type: 'group'; value: number }`.
-export type ScoreFilterPref = { type: 'orchestra'; value: string }
+// An orchestra (by name) or a music group (by id) — never both.
+export type ScoreFilterPref = { type: 'orchestra'; value: string } | { type: 'group'; value: number }
 
 export interface UserPreferences {
     /** Pre-selected filter in the "Open" drawer (a New score always starts deselected). */

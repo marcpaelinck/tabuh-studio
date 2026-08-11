@@ -29,11 +29,17 @@ router.get('/', async (_req, res: Response) => {
          s.created_at,
          u.email AS owner_email,
          s.uuid,
-         JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.notationversion')) AS notationversion
+         JSON_UNQUOTE(JSON_EXTRACT(s.content, '$.notationversion')) AS notationversion,
+         (SELECT JSON_ARRAYAGG(gs.group_id) FROM group_scores gs WHERE gs.score_id = s.id) AS \`groups\`
        FROM scores s
        JOIN users u ON u.id = s.owner_id
        ORDER BY s.created_at DESC`
         )
+        // JSON_ARRAYAGG yields null when a score is in no group (and may arrive as a JSON string);
+        // normalise to a number[].
+        for (const r of rows) {
+            r.groups = Array.isArray(r.groups) ? r.groups : typeof r.groups === 'string' ? JSON.parse(r.groups) : []
+        }
         console.log('content of score list:', rows ? rows : rows)
         res.json(rows)
     } catch (err) {

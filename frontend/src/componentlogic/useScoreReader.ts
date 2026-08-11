@@ -64,7 +64,8 @@ function toScoreInfo(item: ScoreListItem): ScoreInfo {
         title: item.title,
         uuid: item.uuid,
         instrumentgroup: item.instrument_set,
-        notationversion: (item as any).notationversion ?? ''
+        notationversion: (item as any).notationversion ?? '',
+        groups: item.groups ?? []
     }
 }
 

@@ -10,8 +10,10 @@ import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
+import type { ScoreFilterPref } from '../typing/preferences'
 import type { Score, ScoreFormat } from '../typing/score'
 import { KeyMapEditor } from './editor/KeyMapEditor'
+import { ManageGroupsDrawer } from './ManageGroupsDrawer'
 import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { PreferencesDrawer } from './PreferencesDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
@@ -36,6 +38,7 @@ type Action =
     | 'instruments-select'
     | 'settings-preferences'
     | 'settings-manage-users'
+    | 'settings-manage-groups'
     | 'settings-instruments'
     | 'settings-keyboard'
 
@@ -80,16 +83,16 @@ export function MainMenu({
     // Settings drawers.
     const [preferencesOpen, setPreferencesOpen] = useState<boolean>(false)
     const [manageUsersOpen, setManageUsersOpen] = useState<boolean>(false)
+    const [manageGroupsOpen, setManageGroupsOpen] = useState<boolean>(false)
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
 
-    // Preferred orchestra when opening the score browser with no score loaded: the user's
-    // preference (phase 1 supports only an orchestra filter) falls back to a fixed default.
-    const DEFAULT_ORCHESTRA = 'GONG_KEBYAR'
-    const preferredOrchestra =
-        user?.preferences?.defaultScoreFilter?.type === 'orchestra'
-            ? user.preferences.defaultScoreFilter.value
-            : undefined
+    // Pre-selected filter when opening the score browser: the loaded score's orchestra, else the
+    // user's preferred default filter (orchestra or a subscribed group). ScoreBrowser falls back
+    // to the first available orchestra when neither is applicable.
+    const defaultFilter: ScoreFilterPref | undefined = score
+        ? { type: 'orchestra', value: score.instrumenttype }
+        : user?.preferences?.defaultScoreFilter
 
     async function performAction() {
         switch (activeKey) {
@@ -104,6 +107,9 @@ export function MainMenu({
                 break
             case 'settings-manage-users':
                 setManageUsersOpen(true)
+                break
+            case 'settings-manage-groups':
+                setManageGroupsOpen(true)
                 break
             case 'settings-keyboard':
                 setKeyMapEditorOpen(true)
@@ -191,7 +197,7 @@ export function MainMenu({
                 <ScoreBrowser
                     key={scoreSelector ? 'open' : 'closed'}
                     scoreMenuOptions={scoreMenuOptions}
-                    defaultInstrumentGroup={score?.instrumenttype ?? preferredOrchestra ?? DEFAULT_ORCHESTRA}
+                    defaultFilter={defaultFilter}
                     selectedValue={selectedScoreOption?.value}
                     onSelect={(o) => {
                         setScoreSelector(false)
@@ -206,6 +212,7 @@ export function MainMenu({
         <ScoreDetailsDialog
             open={scoreDialogMode !== null}
             mode={scoreDialogMode ?? 'new'}
+            scoreUuid={score?.uuid}
             initial={
                 scoreDialogMode === 'edit' && score
                     ? { title: score.title, composer: score.composer, instrumenttype: score.instrumenttype }
@@ -284,6 +291,11 @@ export function MainMenu({
                 <Nav.Item className="text-xs" disabled={!user} eventKey="settings-preferences">
                     Preferences...
                 </Nav.Item>
+                {(user?.role === 'admin' || user?.role === 'editor') && (
+                    <Nav.Item className="text-xs" eventKey="settings-manage-groups">
+                        Manage groups...
+                    </Nav.Item>
+                )}
                 {user?.role === 'admin' && (
                     <>
                         <Nav.Item className="text-xs" eventKey="settings-manage-users">
@@ -303,6 +315,7 @@ export function MainMenu({
             <KeyMapEditor open={keyMapEditorOpen} setOpen={setKeyMapEditorOpen} />
             <PreferencesDrawer open={preferencesOpen} onClose={() => setPreferencesOpen(false)} />
             <ManageUsersDrawer open={manageUsersOpen} onClose={() => setManageUsersOpen(false)} />
+            <ManageGroupsDrawer open={manageGroupsOpen} onClose={() => setManageGroupsOpen(false)} />
         </Nav>
     )
 }

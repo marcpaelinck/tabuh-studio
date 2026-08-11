@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
     apiDeleteAccount,
+    apiGetSubscriptions,
+    apiListGroups,
     apiLogin,
     apiLogout,
     apiMe,
@@ -9,6 +11,7 @@ import {
     apiUpdateProfile,
     setAuthExpiredHandler
 } from '../services/apiService'
+import { useGroupsStore } from '../stores/useGroupsStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { UserPreferences } from '../typing/preferences'
 
@@ -45,6 +48,17 @@ function seedSelectionsFromPreferences(prefs: UserPreferences | undefined) {
     if (typeof prefs.notationVisibleByDefault === 'boolean') s.setNotationVisible(prefs.notationVisibleByDefault)
 }
 
+// Loads the music groups and the user's subscriptions into the groups store (best-effort).
+async function loadGroupsAndSubscriptions() {
+    try {
+        const [{ groups }, { groupIds }] = await Promise.all([apiListGroups(), apiGetSubscriptions()])
+        useGroupsStore.getState().setGroups(groups)
+        useGroupsStore.getState().setSubscriptions(groupIds)
+    } catch {
+        // Not logged in or transient error — leave the store empty.
+    }
+}
+
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -61,6 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // Phase 1: seed on restore too (no local session persistence yet). Phase 3 will
                 // make a silent restore defer to the locally persisted session instead.
                 seedSelectionsFromPreferences(user.preferences)
+                loadGroupsAndSubscriptions()
             })
             .catch(() => {
                 // No valid session — the user needs to log in.
@@ -79,11 +94,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { user } = await apiLogin(email, password)
         setUser(user)
         seedSelectionsFromPreferences(user.preferences)
+        loadGroupsAndSubscriptions()
     }, [])
 
     const logout = useCallback(async () => {
         await apiLogout()
         setUser(null)
+        useGroupsStore.getState().clear()
     }, [])
 
     const updateProfile = useCallback(async (firstName: string, lastName: string) => {

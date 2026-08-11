@@ -11,7 +11,9 @@ import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import _ from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Drawer, Input, InputGroup, SelectPicker } from 'rsuite'
+import { Button, Drawer, Input, InputGroup, SelectPicker, Tag, TagGroup } from 'rsuite'
+import { useAuth } from '../context/AuthContext'
+import { apiGetGroupsForScore } from '../services/apiService'
 
 // Human-readable labels for the selectable instrument types (UNDEFINED is excluded).
 const instrumentLabels: Partial<Record<Orchestra, string>> = Object.fromEntries(
@@ -33,15 +35,19 @@ interface ScoreDetailsDialogProps {
     mode: 'new' | 'edit'
     /** Pre-fill values (used in 'edit' mode; ignored fields default to empty in 'new' mode). */
     initial?: ScoreDetailsValues
+    /** The score's uuid (edit mode) — used to show which groups have it on their repertoire. */
+    scoreUuid?: string
     onClose: () => void
     /** Called with the collected values on Create/Save. In 'edit' mode instrumenttype is unchanged. */
     onSubmit: (values: ScoreDetailsValues) => void
 }
 
-export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: ScoreDetailsDialogProps) {
+export function ScoreDetailsDialog({ open, mode, initial, scoreUuid, onClose, onSubmit }: ScoreDetailsDialogProps) {
+    const { user } = useAuth()
     const [title, setTitle] = useState('')
     const [composer, setComposer] = useState('')
     const [instrumenttype, setInstrumenttype] = useState<Orchestra | null>(null)
+    const [groupNames, setGroupNames] = useState<string[]>([])
 
     // (Re)seed the fields whenever the dialog opens.
     useEffect(() => {
@@ -49,6 +55,14 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
         setTitle(initial?.title ?? '')
         setComposer(initial?.composer ?? '')
         setInstrumenttype(initial?.instrumenttype ?? null)
+        // Read-only: the groups whose repertoire includes this score (logged-in users only).
+        setGroupNames([])
+        if (mode === 'edit' && user && scoreUuid) {
+            apiGetGroupsForScore(scoreUuid)
+                .then(({ groups }) => setGroupNames(groups.map((g) => g.name)))
+                .catch(() => setGroupNames([]))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
     // Title is always required; a score also requires an instrument type.
@@ -106,6 +120,20 @@ export function ScoreDetailsDialog({ open, mode, initial, onClose, onSubmit }: S
                         <div className="text-xs mb-1">Composer</div>
                         <Input value={composer} onChange={setComposer} placeholder="Composer (optional)" />
                     </div>
+                    {mode === 'edit' && user && (
+                        <div>
+                            <div className="text-xs mb-1">On the repertoire of</div>
+                            {groupNames.length ? (
+                                <TagGroup>
+                                    {groupNames.map((n) => (
+                                        <Tag key={n}>{n}</Tag>
+                                    ))}
+                                </TagGroup>
+                            ) : (
+                                <div className="text-xs text-gray-500">No groups.</div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </Drawer.Body>
         </Drawer>

@@ -255,7 +255,13 @@ router.patch('/profile', requireAuth, validate(profileSchema), async (req: Reque
 // Per-user preferences (all keys optional; unknown keys are stripped). Phase 2 will extend
 // `defaultScoreFilter` to also accept a music-group target.
 const preferencesSchema = z.object({
-    defaultScoreFilter: z.object({ type: z.literal('orchestra'), value: z.string() }).optional(),
+    // An orchestra (string) or a music group (numeric id) — never both.
+    defaultScoreFilter: z
+        .union([
+            z.object({ type: z.literal('orchestra'), value: z.string() }),
+            z.object({ type: z.literal('group'), value: z.number().int() })
+        ])
+        .optional(),
     // Map of orchestra -> focus option value.
     defaultFocusByOrchestra: z.record(z.string(), z.string()).optional(),
     notationVisibleByDefault: z.boolean().optional(),
@@ -272,6 +278,46 @@ router.put('/preferences', requireAuth, validate(preferencesSchema), async (req:
     } catch (err) {
         console.error(err)
         res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ── Music-group subscriptions (the current user's) ────────────────────
+
+router.get('/subscriptions', requireAuth, async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    try {
+        const [rows] = await pool.query<RowDataPacket[]>(
+            'SELECT group_id FROM user_group_subscriptions WHERE user_id = ?',
+            [id]
+        )
+        res.json({ groupIds: rows.map((r) => r.group_id) })
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+const subscriptionsSchema = z.object({ groupIds: z.array(z.number().int()) })
+router.put('/subscriptions', requireAuth, validate(subscriptionsSchema), async (req: Request, res: Response) => {
+    const { id } = (req as AuthenticatedRequest).user!
+    const { groupIds } = req.body as { groupIds: number[] }
+    const conn = await pool.getConnection()
+    try {
+        await conn.beginTransaction()
+        await conn.query('DELETE FROM user_group_subscriptions WHERE user_id = ?', [id])
+        if (groupIds.length) {
+            await conn.query('INSERT INTO user_group_subscriptions (user_id, group_id) VALUES ?', [
+                groupIds.map((g) => [id, g])
+            ])
+        }
+        await conn.commit()
+        res.json({ groupIds })
+    } catch (err) {
+        await conn.rollback()
+        console.error(err)
+        res.status(500).json({ error: 'Server error' })
+    } finally {
+        conn.release()
     }
 })
 

@@ -6,18 +6,19 @@ const NAME = 'Tabuh Studio'
 const FRONTEND_VERSION = pkg.version
 const BACKEND_VERSION = (await apiVersion()).version || ''
 const COPYRIGHT = '\u00a9 Marc Paelinck 2026'
+const EMAIL = 'info@tabuh.studio'
 
 export interface AppInfoStore {
     name: string
     frontend_version: string
     backend_version: string
     copyright: string
+    email: string
 }
-export const useAppInfo = create(
-    (): AppInfoStore => ({
-        name: NAME,
-        frontend_version: FRONTEND_VERSION,
-        backend_version: BACKEND_VERSION,
-        copyright: COPYRIGHT
-    })
-)
+export const useAppInfo = create((): AppInfoStore => ({
+    name: NAME,
+    frontend_version: FRONTEND_VERSION,
+    backend_version: BACKEND_VERSION,
+    copyright: COPYRIGHT,
+    email: EMAIL
+}))

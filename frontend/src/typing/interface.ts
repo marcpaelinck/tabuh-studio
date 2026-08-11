@@ -17,6 +17,8 @@ export type ScoreInfo = {
     file?: string
     notationversion: string
     pdf?: string
+    /** Ids of the music groups whose repertoire includes this score (empty from file source). */
+    groups: number[]
 }
 
 export interface ScoreMenuOption {

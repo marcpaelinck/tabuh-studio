@@ -195,6 +195,8 @@ export interface ScoreListItem {
     instrument_set: string
     owner_email: string
     created_at: string
+    /** Ids of the music groups whose repertoire includes this score. */
+    groups: number[]
 }
 
 export async function apiGetEnvironment(): Promise<{ environment: string } | undefined> {
@@ -226,4 +228,83 @@ export async function apiUpdateScore(
 
 export async function apiDeleteScore(uuid: string): Promise<void> {
     return request<void>(`/scores/${uuid}`, { method: 'DELETE' })
+}
+
+// ── Music groups ──────────────────────────────────────────────────────
+
+export interface MusicGroup {
+    id: number
+    name: string
+    city: string | null
+    country: string | null
+    contactName: string | null
+    contactEmail: string | null
+    website: string | null
+    managerIds: number[]
+    scoreCount: number
+    /** True when the current user may manage this group (admin, or a listed manager). */
+    managedByMe?: boolean
+}
+
+export interface GroupInput {
+    name: string
+    city?: string | null
+    country?: string | null
+    contactName?: string | null
+    contactEmail?: string | null
+    website?: string | null
+}
+
+export interface GroupScore {
+    id: number
+    uuid: string
+    title: string
+    instrument_set: string
+}
+
+export async function apiListGroups() {
+    return request<{ groups: MusicGroup[] }>('/groups')
+}
+
+export async function apiCreateGroup(input: GroupInput) {
+    return request<{ group: MusicGroup }>('/groups', { method: 'POST', body: JSON.stringify(input) })
+}
+
+export async function apiUpdateGroup(id: number, input: Partial<GroupInput>) {
+    return request<{ group: MusicGroup }>(`/groups/${id}`, { method: 'PATCH', body: JSON.stringify(input) })
+}
+
+export async function apiDeleteGroup(id: number) {
+    return request<void>(`/groups/${id}`, { method: 'DELETE' })
+}
+
+export async function apiSetGroupManagers(id: number, userIds: number[]) {
+    return request<{ ok: true }>(`/groups/${id}/managers`, { method: 'PUT', body: JSON.stringify({ userIds }) })
+}
+
+export async function apiGetGroupScores(id: number) {
+    return request<{ scores: GroupScore[] }>(`/groups/${id}/scores`)
+}
+
+export async function apiAddGroupScore(id: number, scoreId: number) {
+    return request<{ ok: true }>(`/groups/${id}/scores`, { method: 'POST', body: JSON.stringify({ scoreId }) })
+}
+
+export async function apiRemoveGroupScore(id: number, scoreId: number) {
+    return request<void>(`/groups/${id}/scores/${scoreId}`, { method: 'DELETE' })
+}
+
+export async function apiGetGroupsForScore(uuid: string) {
+    return request<{ groups: { id: number; name: string }[] }>(`/groups/for-score/${uuid}`)
+}
+
+export async function apiGetSubscriptions() {
+    return request<{ groupIds: number[] }>('/auth/subscriptions')
+}
+
+export async function apiSetSubscriptions(groupIds: number[]) {
+    return request<{ groupIds: number[] }>('/auth/subscriptions', {
+        method: 'PUT',
+        body: JSON.stringify({ groupIds })
+    })
 }

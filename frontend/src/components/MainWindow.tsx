@@ -318,6 +318,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         dialog.alert(
             <p>
                 <b>{appInfo.name}</b>
+                <br /> {appInfo.email}
                 <br />
                 <br /> version {appInfo.frontend_version}
                 <br /> API version {appInfo.backend_version}
@@ -636,7 +637,9 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                 {mobileTab == 'scores' && (
                                     <ScoreBrowser
                                         scoreMenuOptions={scoreMenuOptions}
-                                        defaultInstrumentGroup={score?.instrumenttype ?? 'GONG_KEBYAR'}
+                                        defaultFilter={
+                                            score ? { type: 'orchestra', value: score.instrumenttype } : undefined
+                                        }
                                         selectedValue={selectedScoreOption?.value}
                                         onSelect={(o) => {
                                             setSelectedScoreOption(o)

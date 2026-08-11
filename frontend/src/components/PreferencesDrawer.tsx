@@ -5,8 +5,10 @@
 import { instrumentGroups } from '@tabuhstudio/shared'
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import { useEffect, useState } from 'react'
-import { Button, Drawer, Message, SelectPicker, Toggle } from 'rsuite'
+import { Button, CheckPicker, Drawer, Message, SelectPicker, Toggle } from 'rsuite'
 import { useAuth } from '../context/AuthContext'
+import { apiSetSubscriptions } from '../services/apiService'
+import { useGroupsStore } from '../stores/useGroupsStore'
 import type { UserPreferences } from '../typing/preferences'
 import { createFocusMenuItems } from '../utils/selectorsUtils'
 
@@ -40,8 +42,12 @@ interface PreferencesDrawerProps {
 
 export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
     const { user, updatePreferences } = useAuth()
+    const groups = useGroupsStore((s) => s.groups)
+    const storeSubscriptions = useGroupsStore((s) => s.subscriptions)
 
-    const [orchestra, setOrchestra] = useState<string | null>(null)
+    // Default score filter is encoded as 'orchestra:<name>' or 'group:<id>' for the combined picker.
+    const [scoreFilter, setScoreFilter] = useState<string | null>(null)
+    const [subscriptions, setSubscriptions] = useState<number[]>([])
     const [focusByOrchestra, setFocusByOrchestra] = useState<Record<string, string | null>>({})
     const [notationVisible, setNotationVisible] = useState(false)
     const [cursorStyle, setCursorStyle] = useState<string | null>(null)
@@ -50,10 +56,13 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
     const [saved, setSaved] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
+    // Initialise from the current user/store when the drawer opens (not on later user changes,
+    // so the success message and edits survive the save that updates the user object).
     useEffect(() => {
         if (!open) return
         const p = user?.preferences ?? {}
-        setOrchestra(p.defaultScoreFilter?.type === 'orchestra' ? p.defaultScoreFilter.value : null)
+        setScoreFilter(p.defaultScoreFilter ? `${p.defaultScoreFilter.type}:${p.defaultScoreFilter.value}` : null)
+        setSubscriptions(storeSubscriptions)
         setFocusByOrchestra(Object.fromEntries(orchestras.map((o) => [o, p.defaultFocusByOrchestra?.[o] ?? null])))
         setNotationVisible(!!p.notationVisibleByDefault)
         setCursorStyle(p.defaultCursorStyle ?? null)
@@ -61,13 +70,25 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         setSaved(false)
         setError(null)
         setSaving(false)
-    }, [open, user])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open])
+
+    const subscribedGroups = groups.filter((g) => subscriptions.includes(g.id))
+    const filterOptions = [
+        ...orchestraOptions.map((o) => ({ label: o.label, value: `orchestra:${o.value}`, kind: 'Orchestra' })),
+        ...subscribedGroups.map((g) => ({ label: g.name, value: `group:${g.id}`, kind: 'Group' }))
+    ]
+    const groupOptions = groups.map((g) => ({ label: g.name, value: g.id }))
 
     const save = async () => {
         setError(null)
         setSaving(true)
         const prefs: UserPreferences = { notationVisibleByDefault: notationVisible }
-        if (orchestra) prefs.defaultScoreFilter = { type: 'orchestra', value: orchestra }
+        if (scoreFilter) {
+            const [kind, val] = scoreFilter.split(':')
+            if (kind === 'orchestra') prefs.defaultScoreFilter = { type: 'orchestra', value: val }
+            else if (kind === 'group') prefs.defaultScoreFilter = { type: 'group', value: Number(val) }
+        }
         const focusMap: Partial<Record<Orchestra, string>> = {}
         for (const o of orchestras) {
             const v = focusByOrchestra[o]
@@ -77,6 +98,8 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         if (cursorStyle) prefs.defaultCursorStyle = cursorStyle as UserPreferences['defaultCursorStyle']
         if (keyboard) prefs.defaultKeyboard = keyboard as UserPreferences['defaultKeyboard']
         try {
+            await apiSetSubscriptions(subscriptions)
+            useGroupsStore.getState().setSubscriptions(subscriptions)
             await updatePreferences(prefs)
             setSaved(true)
         } catch (e) {
@@ -112,11 +135,24 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                 )}
                 <div className="flex flex-col gap-4">
                     <div>
-                        <div className="text-sm mb-1">Default score filter (orchestra)</div>
+                        <div className="text-sm mb-1">Subscribed groups</div>
+                        <CheckPicker
+                            data={groupOptions}
+                            value={subscriptions}
+                            onChange={setSubscriptions}
+                            block
+                            searchable={false}
+                            placeholder={groupOptions.length ? 'None' : 'No groups exist yet'}
+                            disabled={groupOptions.length === 0}
+                        />
+                    </div>
+                    <div>
+                        <div className="text-sm mb-1">Default score filter</div>
                         <SelectPicker
-                            data={orchestraOptions}
-                            value={orchestra}
-                            onChange={setOrchestra}
+                            data={filterOptions}
+                            groupBy="kind"
+                            value={scoreFilter}
+                            onChange={setScoreFilter}
                             block
                             searchable={false}
                             placeholder="No default"
