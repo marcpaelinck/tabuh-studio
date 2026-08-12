@@ -17,9 +17,17 @@ Initial release
 
 - `Changed` Redesigned mobile version
 
-## 1.1.1 2026-08-04
+## 1.1.1 2026-08-06
 
 - `Added` NodeMailer mailing package
 - `Added` Facility to create/update user profile
 - `Added` DB Table auth_tokens
-- `Changed` DB Table user: added firstname, lastname
+- `Changed` DB Table `user`: added columns `firstname`, `lastname`, `created_at` and `updated_at`
+
+## 1.1.2 2026-08-12
+
+- `Changed` DB table `user` added column `preferences`
+- `Changed` in auth.ts: `defaultFocus` -> `defaultFocusByOrchestra`
+- `Added` DB tables `music_groups`, `group_scores`, `group_managers`, `user_group_subscriptions`
+- `Added` groups endpoints
+- `Changed` score list endpoint: filter on group
