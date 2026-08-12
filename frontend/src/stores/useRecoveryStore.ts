@@ -22,6 +22,12 @@ export interface RecoverySnapshot {
 
 interface RecoveryState {
     snapshot: RecoverySnapshot | null
+    /**
+     * The snapshot exactly as loaded from storage at startup. Unlike `snapshot`, this is NEVER
+     * updated by the live captures during a session, so the resume prompt reflects the *previous*
+     * session's unsaved work and does not pop up mid-editing. Not persisted.
+     */
+    bootSnapshot: RecoverySnapshot | null
     /** Async IDB hydration has completed (snapshot reflects what was persisted). */
     hydrated: boolean
     capture: (snapshot: RecoverySnapshot) => void
@@ -30,8 +36,9 @@ interface RecoveryState {
 
 export const useRecoveryStore = create<RecoveryState>()(
     persist(
-        (set) => ({
+        (set): RecoveryState => ({
             snapshot: null,
+            bootSnapshot: null,
             hydrated: false,
             capture: (snapshot) => set({ snapshot }),
             clear: () => set({ snapshot: null })
@@ -40,8 +47,10 @@ export const useRecoveryStore = create<RecoveryState>()(
             name: 'currentScore', // key inside the IDB store
             storage: createJSONStorage(() => idbStorage),
             partialize: (s) => ({ snapshot: s.snapshot }),
-            // Runs after the async IDB read resolves; flip `hydrated` so the boot check waits.
-            onRehydrateStorage: () => () => useRecoveryStore.setState({ hydrated: true })
+            // Runs after the async IDB read resolves. Freeze the loaded snapshot into `bootSnapshot`
+            // (what the resume prompt uses) and flip `hydrated` so the boot check waits for it.
+            onRehydrateStorage: () => (state) =>
+                useRecoveryStore.setState({ hydrated: true, bootSnapshot: state?.snapshot ?? null })
         }
     )
 )

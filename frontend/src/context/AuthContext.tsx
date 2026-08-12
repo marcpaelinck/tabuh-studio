@@ -72,9 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .then(() => apiMe())
             .then(({ user }) => {
                 setUser(user)
-                // Phase 1: seed on restore too (no local session persistence yet). Phase 3 will
-                // make a silent restore defer to the locally persisted session instead.
-                seedSelectionsFromPreferences(user.preferences)
+                // Silent restore (refresh while already logged in) does NOT re-apply preferences:
+                // the locally persisted session (useUserSelectionStore) wins. Preferences are only
+                // (re)applied on an explicit login below.
                 loadGroupsAndSubscriptions()
             })
             .catch(() => {

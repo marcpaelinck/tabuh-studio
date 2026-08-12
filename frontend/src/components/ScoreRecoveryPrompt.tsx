@@ -11,16 +11,20 @@ interface ScoreRecoveryPromptProps {
 }
 
 export function ScoreRecoveryPrompt({ recoverScore }: ScoreRecoveryPromptProps) {
-    const { snapshot, hydrated, clear } = useRecoveryStore()
+    // Use `bootSnapshot` (frozen at startup), NOT `snapshot` (which the live session keeps
+    // updating) — otherwise the first edit of a freshly selected score would pop this up.
+    const hydrated = useRecoveryStore((s) => s.hydrated)
+    const bootSnapshot = useRecoveryStore((s) => s.bootSnapshot)
+    const clear = useRecoveryStore((s) => s.clear)
     const [dismissed, setDismissed] = useState(false)
 
-    // Wait for the async IDB hydration; only prompt when there is genuinely unsaved work.
-    if (!hydrated || dismissed || !snapshot?.dirty) return null
+    // Wait for the async IDB hydration; only prompt when the previous session left unsaved work.
+    if (!hydrated || dismissed || !bootSnapshot?.dirty) return null
 
-    const when = new Date(snapshot.savedAt).toLocaleString()
+    const when = new Date(bootSnapshot.savedAt).toLocaleString()
 
     const resume = () => {
-        recoverScore(snapshot.score)
+        recoverScore(bootSnapshot.score)
         setDismissed(true)
     }
     const discard = () => {
@@ -34,8 +38,8 @@ export function ScoreRecoveryPrompt({ recoverScore }: ScoreRecoveryPromptProps) 
                 <Modal.Title>Resume unsaved work?</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                Unsaved changes to <b>{snapshot.title || 'an untitled score'}</b> from {when} were found. Resume editing
-                them, or discard and start fresh?
+                Unsaved changes to <b>{bootSnapshot.title || 'an untitled score'}</b> from {when} were found. Resume
+                editing them, or discard and start fresh?
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={discard} appearance="subtle">

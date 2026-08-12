@@ -69,12 +69,14 @@ export function ScoreDetailsDialog({ open, mode, initial, scoreUuid, onClose, on
     const valid = title.trim().length > 0 && instrumenttype !== null
 
     const handleSubmit = () => {
-        if (!valid || !initial?.instrumenttype) return
+        console.log(`Creating new score ${title.trim()} for ${instrumenttype}`)
+
+        if (!valid || (mode === 'edit' && !initial)) return
         onSubmit({
             title: title.trim(),
             composer: composer.trim(),
             // 'edit' keeps the existing instrument type; 'new' guarantees a value via `valid`.
-            instrumenttype: mode === 'edit' ? initial?.instrumenttype : instrumenttype
+            instrumenttype: mode === 'edit' ? initial!.instrumenttype : instrumenttype
         })
         onClose()
     }

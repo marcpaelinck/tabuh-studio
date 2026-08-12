@@ -209,8 +209,23 @@ was doing, regardless of login state.
     "activated on login" requirement), overriding the restored session.
   - A **silent** session-restore (refresh while already logged in) does **not** re-apply
     preferences — the persisted local session wins.
-
+    
 **Manual steps:** none beyond a rebuild (uses the already-added `idb-keyval`).
+
+### Phase 3 — as built
+- `useUserSelectionStore` is wrapped in zustand `persist` with `storage: createJSONStorage(() =>
+  idbStorage)` and `name: 'userSelections'` (same IDB store as the recovery snapshot, different key).
+- `partialize` persists only the UI selections — `selectedFocusOption`, `selectedSpeedOption`,
+  `selectedPanggulOption`, `selectedCursorStyle`, `mainView`, `editorView`, `mobileTab`,
+  `selectedKeyMapId`, `keyboard`, `notationVisible`. `selectedScoreOption` and the setters are
+  excluded. Hydration is async (IDB), so selections restore shortly after boot.
+- Precedence implemented in `AuthContext`: the silent mount restore no longer calls
+  `seedSelectionsFromPreferences` (the persisted session wins); explicit **login** and
+  **Save preferences** still apply preferences, overriding the persisted values they cover
+  (cursor style / keyboard / notation visibility). Fields preferences don't cover (focus, speed,
+  views, mobile tab, keymap) always keep the persisted session.
+- Note: focus/panggul are re-derived when a score opens, so their persisted values mainly matter
+  before any score loads.
 
 ---
 
