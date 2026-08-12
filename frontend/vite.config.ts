@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ mode }) => {
     const config = {
         plugins: [
-            react({ babel: { plugins: ['babel-plugin-react-compiler'] } }),
+            react({ babel: { plugins: ['babel-plugin-react-compiler'] } } as any),
             tailwindcss({
                 // Disable Lightning CSS optimization
                 optimize: false
