@@ -14,7 +14,7 @@ export function GuidedTour() {
         continuous: true,
         steps: initialViewSteps,
         // zIndex sits above rsuite drawers/popovers; skipBeacon starts straight on the tooltip.
-        options: { zIndex: 10000, skipBeacon: true }
+        options: { zIndex: 10000, skipBeacon: true, buttons: ['back', 'close', 'primary', 'skip'] }
     })
 
     return (
