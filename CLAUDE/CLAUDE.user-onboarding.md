@@ -63,6 +63,29 @@ Tooltips are missing for the following items:
 - Create the boilerplate that is necessary to develop a 'guided tour'.
 - Create a simple guided tour for the initial view of the application (no score loaded) which explains the main menu, the `Dashboard` on the top left, the playback menu and the player.
 
+### Phase 2 — as built
+- **Dependency:** `react-joyride@^3.0.2` added to `frontend/package.json` (**run `npm install`**).
+- **Boilerplate** (`frontend/src/tour/`):
+  - `tourSteps.ts` — `Step[]` definitions targeting the Phase-1 `data-tour` anchors
+    (`main-menu` → `dashboard` → `playback-menu` → `player`), each with a title, content and
+    placement. All four targets exist in the no-score desktop view.
+  - `GuidedTour.tsx` — uses the v3 `useJoyride` hook in **uncontrolled** mode
+    (`{ continuous: true, steps, options: { zIndex: 10000, skipBeacon: true } }`); renders a "?"
+    launch button (`controls.start()`) + the returned `Tour` element. Uncontrolled mode lets
+    Joyride own the step index and Next/Back/Skip; Phase 3 can add per-step `before` hooks for
+    situational/action-driven steps (the v3-recommended approach — do **not** drive `stepIndex`
+    from a `useEffect`).
+- **Trigger/placement:** the "?" button sits in the desktop toolbar next to the player/editor
+  toggle; `GuidedTour` is rendered only inside the desktop (`full`) layout, so the tour never
+  runs on mobile. No auto-start on first visit yet (easy to add later via a persisted "seen" flag).
+- **v3 API notes** (differs from v2, verified against react-joyride.com): named exports
+  (`{ useJoyride }`, `{ Joyride }`, `type Step`), appearance/behaviour via the `options` prop,
+  `disableBeacon` → `skipBeacon`, callback → `onEvent(data, controls)` (not used here since
+  uncontrolled).
+- **Not run in-sandbox:** react-joyride isn't installed in the sandbox (and installing there
+  risks the workspace symlink again), so no typecheck here — confirm with a local
+  `npm install` + `npm run build`.
+
 ## Phase 3: Add user instructions
 This phase is meant to try out one or more steps of the tour where the tour guide should have situational awareness (know the state of the app). The tour guide should invite the user to perform actions and should be able to disable options that the user should not select. I will add specifications when we get here.
 

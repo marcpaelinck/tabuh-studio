@@ -49,6 +49,7 @@ import {
     useUserSelectionStore,
     type MainView
 } from '../stores/useUserSettingsStore.ts'
+import { GuidedTour } from '../tour/GuidedTour'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -534,10 +535,10 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 <Header id="header" className="flex bg-[#f7f7fa]">
                     <Grid className="ml-4 mt-2 w-full content-center" align="middle">
                         <Row align="middle">
-                            <Col span={19} id="Dashboard" align="left" data-tour="dashboard">
+                            <Col span={10} id="Dashboard" align="left" data-tour="dashboard">
                                 <Dashboard values={dashboardValues} />
                             </Col>
-                            <Col span={5} id="Toolbar" className="flex justify-end">
+                            <Col span={14} id="Toolbar" className="flex justify-end">
                                 <HStack>
                                     {playbackMenu}
                                     <Tip tip="Switch between the player and the notation editor">
@@ -552,6 +553,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                                             className="bg-[#2196f3]"
                                         />
                                     </Tip>
+                                    <GuidedTour />
                                 </HStack>
                             </Col>
                         </Row>
