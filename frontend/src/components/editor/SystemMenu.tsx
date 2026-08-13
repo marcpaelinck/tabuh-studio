@@ -12,9 +12,21 @@
 
 import type { Position } from '@tabuhstudio/shared'
 import type { UUID } from '@tabuhstudio/shared/types/basetypes'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FaBars } from 'react-icons/fa6'
-import { Button, Dropdown, IconButton, Modal, Radio, RadioGroup, SelectPicker, Toggle } from 'rsuite'
+import {
+    Button,
+    Dropdown,
+    IconButton,
+    Modal,
+    Popover,
+    Radio,
+    RadioGroup,
+    SelectPicker,
+    Toggle,
+    Whisper,
+    type WhisperInstance
+} from 'rsuite'
 import type { InputOption } from 'rsuite/esm/InputPicker/hooks/useData'
 import type { ItemPosition, System, SystemActionValue } from '../../typing/score'
 
@@ -137,28 +149,41 @@ export function SystemMenu({
         delete: 'Delete system'
     }
 
+    // Whisper + Popover overlay menu (rather than Dropdown + renderToggle): the latter's overlay
+    // outside-click close races with the custom toggle's own click, so clicking an open toggle
+    // closed then immediately reopened it. `runAndClose` shuts the popover before the action.
+    const menuRef = useRef<WhisperInstance>(null)
+    const runAndClose = (fn: () => void) => () => {
+        menuRef.current?.close()
+        fn()
+    }
+
     return (
         <>
-            <Dropdown
+            <Whisper
+                ref={menuRef}
                 placement="bottomStart"
-                disabled={disabled}
-                renderToggle={(props, ref) => (
-                    <IconButton
-                        {...props}
-                        ref={ref}
-                        size="sm"
-                        as="span"
-                        appearance="subtle"
-                        disabled={disabled}
-                        icon={<FaBars />}
-                        aria-label="system menu"
-                    />
-                )}>
-                <Dropdown.Item onSelect={() => setDialog('new')}>New…</Dropdown.Item>
-                <Dropdown.Item onSelect={() => setDialog('copy')}>Copy from…</Dropdown.Item>
-                <Dropdown.Item onSelect={() => setDialog('move')}>Move…</Dropdown.Item>
-                <Dropdown.Item onSelect={() => setDialog('delete')}>Delete…</Dropdown.Item>
-            </Dropdown>
+                trigger={disabled ? 'none' : 'click'}
+                speaker={
+                    <Popover full>
+                        <Dropdown.Menu>
+                            <Dropdown.Item onSelect={runAndClose(() => setDialog('new'))}>New…</Dropdown.Item>
+                            <Dropdown.Item onSelect={runAndClose(() => setDialog('copy'))}>Copy from…</Dropdown.Item>
+                            <Dropdown.Item onSelect={runAndClose(() => setDialog('move'))}>Move…</Dropdown.Item>
+                            <Dropdown.Item onSelect={runAndClose(() => setDialog('delete'))}>Delete…</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Popover>
+                }>
+                <IconButton
+                    size="sm"
+                    appearance="subtle"
+                    disabled={disabled}
+                    icon={<FaBars />}
+                    aria-label="system menu"
+                    title="System actions: add, copy, move or delete this system"
+                    data-tour="system-menu"
+                />
+            </Whisper>
 
             <Modal
                 size="xs"

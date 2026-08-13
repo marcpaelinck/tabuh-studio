@@ -35,6 +35,28 @@ Tooltips are missing for the following items:
 - The selectors at the top of the editor window (Compact/Expanded, Expand, Typing)
 - The hamburger menu at the top of each system
 
+### Phase 1 — as built
+- **Library choice (revised):** use **react-joyride v3** (`^3`) for the tour — it now officially
+  supports React 19 (V3 rewrite, Mar 2026) and has the primitives the state-aware tour needs
+  (controlled `stepIndex`/`run`, `spotlightClicks`, `callback`). @reactour/tour has an open
+  React 19 issue, so it's out. Mobile is out of scope for the tour entirely.
+- **Reusable tooltip components** (`components/Tooltipped.tsx`):
+  - `Tip` — wraps any single ref-forwarding control in a Whisper + Tooltip.
+  - `NavItemTip` — a `Nav.Item` with a hover tooltip. Keeps `Nav.Item` as the direct child of
+    `Nav`/`Nav.Menu` (rsuite inspects children by type) and puts the Whisper on the item's inner
+    content.
+- **Tooltips added:** Player rewind/play/seek; PlaybackMenu focus/speed/cursor; the player↔editor
+  `SegmentedControl`; the profile icon (native `title`, since it's already a Whisper trigger); all
+  MainMenu leaf items (via `NavItemTip`); the editor Compact/Expanded control (Expand/Typing
+  already had `title`s); the per-system hamburger (native `title`, since it's a Dropdown toggle).
+- **`data-tour` anchors added** (for Phase 2), so tour targets are decoupled from CSS:
+  `main-menu`, `dashboard`, `playback-menu` (`pb-focus`/`pb-speed`/`pb-cursor`), `player`
+  (`player-rewind`/`player-play`/`player-seek`), `view-toggle`, `profile-menu`, `editor-view`,
+  `system-menu`.
+- **Not run in-sandbox:** full frontend typecheck (time limit) — confirm with a local build. One
+  thing to eyeball there: `data-tour` on a couple of rsuite components (e.g. `SegmentedControl`,
+  `Col`) relies on them passing `data-*` through; the partial typecheck was clean.
+
 ## Phase 2: Vanilla 'Guided Tour'
 
 ### requirements

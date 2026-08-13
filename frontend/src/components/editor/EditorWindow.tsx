@@ -11,7 +11,7 @@ import type { PlaybackCursorStyle } from '../../typing/animation'
 import type { EditorCursorParameters, PlaybackAction, PlaybackState } from '../../typing/playback'
 import type { Score, System, SystemActionValue } from '../../typing/score'
 import { debug } from '../../utils/debugger'
-import { FeatureUnderDevelopment } from '../Feature'
+import { Tip } from '../Tooltipped'
 import { ExecutionFormContext } from './executionFormContext'
 import { SystemNode } from './SystemNode'
 
@@ -189,9 +189,10 @@ export default function EditorWindow({
                         `relative z-10`), so clicks on the toggle win over overlapping position labels. */}
                     <div className="sticky top-0 z-30 w-full bg-white pb-1">
                         <HStack>
-                            <FeatureUnderDevelopment>
+                            <Tip tip="Compact = editable grouped view; Expanded = read-only per-position view">
                                 <SegmentedControl
                                     size="sm"
+                                    data-tour="editor-view"
                                     value={editorView}
                                     onChange={(value) => setEditorView(value as EditorView)}
                                     data={[
@@ -199,35 +200,35 @@ export default function EditorWindow({
                                         { label: 'Expanded (view)', value: 'expanded' }
                                     ]}
                                 />
-                            </FeatureUnderDevelopment>
+                            </Tip>
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
                             {editorView === 'compact' && (
-                                <div
-                                    className="flex items-center gap-2"
-                                    title="Show/hide the expanded-notation preview under the cursor line">
-                                    <Text size="sm">Expand:</Text>
-                                    <Toggle
-                                        size="sm"
-                                        checked={showExpansion}
-                                        onChange={(checked) => setShowExpansion(checked)}
-                                        checkedChildren="ON"
-                                        unCheckedChildren="OFF"
-                                    />
-                                </div>
+                                <Tip tip="Show/hide the expanded-notation preview under the cursor line">
+                                    <div className="flex items-center gap-2">
+                                        <Text size="sm">Expand:</Text>
+                                        <Toggle
+                                            size="sm"
+                                            checked={showExpansion}
+                                            onChange={(checked) => setShowExpansion(checked)}
+                                            checkedChildren="ON"
+                                            unCheckedChildren="OFF"
+                                        />
+                                    </div>
+                                </Tip>
                             )}
                             {editorView === 'compact' && (
-                                <div
-                                    className="flex items-center gap-2"
-                                    title="Toggle insert / overwrite typing  (Insert, or Ctrl/⌘ + Shift + O)">
-                                    <Text size="sm">Typing:</Text>
-                                    <Toggle
-                                        size="sm"
-                                        checked={overwriteMode}
-                                        onChange={(checked) => setOverwriteMode(checked)}
-                                        checkedChildren="OVR"
-                                        unCheckedChildren="INS"
-                                    />
-                                </div>
+                                <Tip tip="Toggle insert / overwrite typing  (Insert, or Ctrl/⌘ + Shift + O)">
+                                    <div className="flex items-center gap-2">
+                                        <Text size="sm">Typing:</Text>
+                                        <Toggle
+                                            size="sm"
+                                            checked={overwriteMode}
+                                            onChange={(checked) => setOverwriteMode(checked)}
+                                            checkedChildren="OVR"
+                                            unCheckedChildren="INS"
+                                        />
+                                    </div>
+                                </Tip>
                             )}
                         </HStack>
                     </div>

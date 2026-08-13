@@ -18,6 +18,7 @@ import { ManageUsersDrawer } from './ManageUsersDrawer'
 import { PreferencesDrawer } from './PreferencesDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
+import { NavItemTip } from './Tooltipped'
 
 type Action =
     | '1'
@@ -227,41 +228,57 @@ export function MainMenu({
     )
 
     return (
-        <Nav vertical activeKey={activeKey} onSelect={setActiveKey}>
+        <Nav vertical activeKey={activeKey} onSelect={setActiveKey} data-tour="main-menu">
             <Nav.Menu eventKey="0" title="Notation" icon={<IoFolderOpenOutline />} {...menuProps('0')}>
-                <Nav.Item className="text-xs" eventKey="score-new">
+                <NavItemTip tip="Create a new, empty score" className="text-xs" eventKey="score-new">
                     New...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-open">
+                </NavItemTip>
+                <NavItemTip tip="Open a score from the library" className="text-xs" eventKey="file-open">
                     Open...
-                </Nav.Item>
-                <Nav.Item className="text-xs" disabled={!score} eventKey="score-details">
+                </NavItemTip>
+                <NavItemTip
+                    tip="Edit title / composer and see which groups have this score"
+                    className="text-xs"
+                    disabled={!score}
+                    eventKey="score-details">
                     Score details...
-                </Nav.Item>
-                <Nav.Item disabled={!user} eventKey="file-save" className="text-xs block width-xl">
-                    <div className="block width-xl">Save</div>
-                    {!user && <div className="text-xs block width-xl text-gray-400">Requires login</div>}
-                </Nav.Item>
+                </NavItemTip>
+                <NavItemTip
+                    tip={`Save the score to the library ${!user ? '(requires Editor account)' : ''}`}
+                    disabled={!user}
+                    eventKey="file-save"
+                    className="text-xs block width-xl">
+                    Save
+                </NavItemTip>
             </Nav.Menu>
             <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />} {...menuProps('1')}>
-                <Nav.Item className="text-xs" eventKey="file-open-json">
+                <NavItemTip
+                    tip="Open a Tabuh Studio .json file from your computer"
+                    className="text-xs"
+                    eventKey="file-open-json">
                     Open Tabuh Studio...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-import-notation">
+                </NavItemTip>
+                <NavItemTip tip="Import a Tabuh notation script" className="text-xs" eventKey="file-import-notation">
                     Open TS Script...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-import-laras">
+                </NavItemTip>
+                <NavItemTip tip="Import a Laras file" className="text-xs" eventKey="file-import-laras">
                     Open Laras...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-export">
+                </NavItemTip>
+                <NavItemTip
+                    tip="Export the score as a Tabuh Studio .json file"
+                    className="text-xs"
+                    eventKey="file-export">
                     Export Tabuh Studio...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-export-midi">
+                </NavItemTip>
+                <NavItemTip tip="Export the score as a MIDI file" className="text-xs" eventKey="file-export-midi">
                     Export MIDI...
-                </Nav.Item>
-                <Nav.Item className="text-xs" eventKey="file-export-pdf">
+                </NavItemTip>
+                <NavItemTip
+                    tip="Export a PDF version of the score's notation"
+                    className="text-xs"
+                    eventKey="file-export-pdf">
                     Export PDF...
-                </Nav.Item>
+                </NavItemTip>
             </Nav.Menu>
             <Nav.Menu
                 disabled
@@ -272,41 +289,57 @@ export function MainMenu({
                 <Nav.Item eventKey="instruments-select">Select</Nav.Item>
             </Nav.Menu>
             <Nav.Menu eventKey="3" title="Keyboard" icon={<FaRegKeyboard />} {...menuProps('3')}>
-                <Nav.Item
+                <NavItemTip
+                    tip="Use the regular note-entry keyboard layout"
                     className="text-xs"
                     active={keyboard == 'regular'}
                     onSelect={() => setKeyboard('regular')}
                     eventKey="keyboard-regular">
                     Regular
-                </Nav.Item>
-                <Nav.Item
+                </NavItemTip>
+                <NavItemTip
+                    tip="Use the Laras note-entry keyboard layout"
                     className="text-xs"
                     active={keyboard == 'laras'}
                     onSelect={() => setKeyboard('laras')}
                     eventKey="keyboard-laras">
                     Laras
-                </Nav.Item>
+                </NavItemTip>
             </Nav.Menu>
             <Nav.Menu disabled={!user} eventKey="4" title="Settings" icon={<IoSettingsOutline />} {...menuProps('4')}>
-                <Nav.Item className="text-xs" disabled={!user} eventKey="settings-preferences">
+                <NavItemTip
+                    tip="Your personal app preferences"
+                    className="text-xs"
+                    disabled={!user}
+                    eventKey="settings-preferences">
                     Preferences...
-                </Nav.Item>
+                </NavItemTip>
                 {(user?.role === 'admin' || user?.role === 'editor') && (
-                    <Nav.Item className="text-xs" eventKey="settings-manage-groups">
+                    <NavItemTip
+                        tip="Manage music groups and their repertoire"
+                        className="text-xs"
+                        eventKey="settings-manage-groups">
                         Manage groups...
-                    </Nav.Item>
+                    </NavItemTip>
                 )}
                 {user?.role === 'admin' && (
                     <>
-                        <Nav.Item className="text-xs" eventKey="settings-manage-users">
+                        <NavItemTip
+                            tip="Manage user accounts and roles"
+                            className="text-xs"
+                            eventKey="settings-manage-users">
                             Manage users...
-                        </Nav.Item>
-                        <Nav.Item className="text-xs" eventKey="settings-keyboard">
+                        </NavItemTip>
+                        <NavItemTip tip="Edit keyboard mappings" className="text-xs" eventKey="settings-keyboard">
                             Keyboard settings...
-                        </Nav.Item>
-                        <Nav.Item className="text-xs" disabled eventKey="settings-instruments">
+                        </NavItemTip>
+                        <NavItemTip
+                            tip="Define instruments (coming soon)"
+                            className="text-xs"
+                            disabled
+                            eventKey="settings-instruments">
                             Instrument definitions...
-                        </Nav.Item>
+                        </NavItemTip>
                     </>
                 )}
             </Nav.Menu>

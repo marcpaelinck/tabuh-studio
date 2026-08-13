@@ -72,6 +72,7 @@ import PlayerWindow from './player/PlayerWindow'
 import { RegisterDrawer } from './RegisterDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreRecoveryPrompt } from './ScoreRecoveryPrompt'
+import { Tip } from './Tooltipped'
 
 interface LoginDialogProps {
     open: boolean
@@ -271,7 +272,12 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
                     </Dropdown.Menu>
                 </Popover>
             }>
-            <IconButton aria-label="Profile menu" icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />} />
+            <IconButton
+                aria-label="Profile menu"
+                title={user ? 'Account, profile and settings' : 'Log in or create an account'}
+                data-tour="profile-menu"
+                icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />}
+            />
         </Whisper>
     )
 
@@ -528,21 +534,24 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 <Header id="header" className="flex bg-[#f7f7fa]">
                     <Grid className="ml-4 mt-2 w-full content-center" align="middle">
                         <Row align="middle">
-                            <Col span={19} id="Dashboard" align="left">
+                            <Col span={19} id="Dashboard" align="left" data-tour="dashboard">
                                 <Dashboard values={dashboardValues} />
                             </Col>
                             <Col span={5} id="Toolbar" className="flex justify-end">
                                 <HStack>
                                     {playbackMenu}
-                                    <SegmentedControl
-                                        value={mainView}
-                                        data={[
-                                            { label: 'player', value: 'player' },
-                                            { label: 'editor', value: 'editor' }
-                                        ]}
-                                        onChange={(value) => setMainView(value as MainView)}
-                                        className="bg-[#2196f3]"
-                                    />
+                                    <Tip tip="Switch between the player and the notation editor">
+                                        <SegmentedControl
+                                            data-tour="view-toggle"
+                                            value={mainView}
+                                            data={[
+                                                { label: 'player', value: 'player' },
+                                                { label: 'editor', value: 'editor' }
+                                            ]}
+                                            onChange={(value) => setMainView(value as MainView)}
+                                            className="bg-[#2196f3]"
+                                        />
+                                    </Tip>
                                 </HStack>
                             </Col>
                         </Row>
