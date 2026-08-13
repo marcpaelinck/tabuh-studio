@@ -8,6 +8,8 @@ interface OptionListProps<T> {
     selectedValue?: string
     onSelect: (option: ExtendedOption<T>) => void
     className?: string
+    /** Adds `data-tour="<name>"` to the row whose value/label matches (used to anchor a tour step). */
+    dataTour?: { value: string; name: string } | { label: string; name: string }
 }
 
 /**
@@ -15,14 +17,28 @@ interface OptionListProps<T> {
  * box (rsuite `List`). Clicking a row calls `onSelect`; the selected row is highlighted.
  * Shared by the score, focus and speed selectors.
  */
-export function OptionList<T>({ data, selectedValue, onSelect, className }: OptionListProps<T>): JSX.Element {
+export function OptionList<T>({ data, selectedValue, onSelect, className, dataTour }: OptionListProps<T>): JSX.Element {
     return (
         <List bordered hover divider={false} className={className} style={{ overflowY: 'auto' }}>
             {data.map((o) => (
                 <List.Item
                     key={o.value}
+                    data-option-label={String(o.label)}
                     className={`cursor-pointer text-sm ${o.value === selectedValue ? 'bg-blue-100' : ''}`}
-                    onClick={() => onSelect(o)}>
+                    onClick={() => onSelect(o)}
+                    data-tour={
+                        dataTour
+                            ? 'value' in dataTour
+                                ? o.value == dataTour.value
+                                    ? dataTour.name
+                                    : ''
+                                : 'label' in dataTour
+                                  ? o.label == dataTour.label
+                                      ? dataTour.name
+                                      : ''
+                                  : ''
+                            : ''
+                    }>
                     {o.label}
                 </List.Item>
             ))}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import { Button, ButtonGroup } from 'rsuite'
 import { useGroupsStore } from '../stores/useGroupsStore'
+import { useTourStore } from '../tour/useTourStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { ScoreFilterPref } from '../typing/preferences'
 import { OptionList } from './OptionList'
@@ -55,6 +56,11 @@ export function ScoreBrowser({
         else if (orchestras.length) setFilter({ type: 'orchestra', value: orchestras[0] })
     }, [orchestraOptions, subscribedGroups, defaultFilter, filter])
 
+    // Publish the selected orchestra so the guided tour can react to it.
+    useEffect(() => {
+        useTourStore.getState().setBrowserOrchestra(filter?.type === 'orchestra' ? filter.value : null)
+    }, [filter])
+
     const filtered = !filter
         ? scoreMenuOptions
         : filter.type === 'orchestra'
@@ -65,37 +71,44 @@ export function ScoreBrowser({
 
     return (
         <div className="flex flex-col gap-3 h-full">
-            <div>
-                <div className="text-xs mb-1">orchestra:</div>
-                <ButtonGroup vertical className="w-full">
-                    {orchestraOptions.map((o) => (
-                        <Button
-                            key={o.value}
-                            appearance={isActive({ type: 'orchestra', value: o.value }) ? 'primary' : 'default'}
-                            onClick={() => setFilter({ type: 'orchestra', value: o.value })}>
-                            {o.label}
-                        </Button>
-                    ))}
-                </ButtonGroup>
-                {subscribedGroups.length > 0 && (
-                    <>
-                        <div className="text-xs mb-1 mt-2">my groups:</div>
-                        <ButtonGroup vertical className="w-full">
-                            {subscribedGroups.map((g) => (
-                                <Button
-                                    key={g.id}
-                                    appearance={isActive({ type: 'group', value: g.id }) ? 'primary' : 'default'}
-                                    onClick={() => setFilter({ type: 'group', value: g.id })}>
-                                    {g.name}
-                                </Button>
-                            ))}
-                        </ButtonGroup>
-                    </>
-                )}
-            </div>
+            {/* <div data-tour="open-orchestra"> */}
+            <div className="text-xs mb-1">orchestra:</div>
+            <ButtonGroup vertical className="w-full">
+                {orchestraOptions.map((o) => (
+                    <Button
+                        key={o.value}
+                        appearance={isActive({ type: 'orchestra', value: o.value }) ? 'primary' : 'default'}
+                        onClick={() => setFilter({ type: 'orchestra', value: o.value })}
+                        data-tour={o.value == 'GONG_KEBYAR' ? 'open-orchestra' : undefined}>
+                        {o.label}
+                    </Button>
+                ))}
+            </ButtonGroup>
+            {subscribedGroups.length > 0 && (
+                <>
+                    <div className="text-xs mb-1 mt-2">my groups:</div>
+                    <ButtonGroup vertical className="w-full">
+                        {subscribedGroups.map((g) => (
+                            <Button
+                                key={g.id}
+                                appearance={isActive({ type: 'group', value: g.id }) ? 'primary' : 'default'}
+                                onClick={() => setFilter({ type: 'group', value: g.id })}>
+                                {g.name}
+                            </Button>
+                        ))}
+                    </ButtonGroup>
+                </>
+            )}
+            {/* </div> */}
             <div className="flex flex-1 min-h-0 flex-col">
                 <div className="text-xs mb-1">score:</div>
-                <OptionList data={filtered} selectedValue={selectedValue} onSelect={onSelect} className="flex-1 min-h-0" />
+                <OptionList
+                    data={filtered}
+                    selectedValue={selectedValue}
+                    onSelect={onSelect}
+                    dataTour={{ label: 'Cendrawasih', name: 'selectScore' }}
+                    className="flex-1 min-h-0"
+                />
             </div>
         </div>
     )

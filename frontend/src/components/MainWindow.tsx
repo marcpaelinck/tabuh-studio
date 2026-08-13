@@ -50,6 +50,7 @@ import {
     type MainView
 } from '../stores/useUserSettingsStore.ts'
 import { GuidedTour } from '../tour/GuidedTour'
+import { useTourStore } from '../tour/useTourStore'
 import { type Appearance, type ExtendedOption, type ScoreInfo } from '../typing/interface'
 import type { DashboardParameters } from '../typing/playback'
 import { debug } from '../utils/debugger'
@@ -439,6 +440,11 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         })
         // debug(`PLAYBACKSTATE=${playbackState.audioState}`)
     }, [playbackState, validation, score, localCacheState])
+
+    // Publish playback state for the guided tour (so the "start playback" step can advance).
+    useEffect(() => {
+        useTourStore.getState().setPlaybackPlaying(playbackState.audioState === 'playing')
+    }, [playbackState.audioState])
 
     function setDashboardElement(name: ComponentName, value: DashboardComponentValues) {
         setDashboardValues((currDashboardValues) => {

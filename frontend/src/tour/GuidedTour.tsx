@@ -1,34 +1,48 @@
-// Guided-tour boilerplate (react-joyride v3, uncontrolled). Renders a "?" launch button plus the
-// tour element. Uncontrolled mode lets Joyride own the step index and the Next/Back/Skip buttons;
-// later phases can add per-step `before` hooks for situational, action-driven steps without
-// switching to controlled mode. Rendered inside the desktop layout only.
+// Tour launcher: a "?" button that opens a small menu (Whisper + Popover, the pattern that
+// avoids rsuite's Dropdown toggle race) offering the two tours. Renders both tour components,
+// which start themselves when their id becomes the active tour. Desktop only.
 
+import { useRef } from 'react'
 import { BsQuestionCircle } from 'react-icons/bs'
-import { useJoyride } from 'react-joyride'
-import { IconButton } from 'rsuite'
-import { Tip } from '../components/Tooltipped'
-import { initialViewSteps } from './tourSteps'
+import { Dropdown, IconButton, Popover, Whisper, type WhisperInstance } from 'rsuite'
+import { BriefTour } from './BriefTour'
+import { HandsOnTour } from './HandsOnTour'
+import { useTourStore } from './useTourStore'
 
 export function GuidedTour() {
-    const { controls, Tour } = useJoyride({
-        continuous: true,
-        steps: initialViewSteps,
-        // zIndex sits above rsuite drawers/popovers; skipBeacon starts straight on the tooltip.
-        options: { zIndex: 10000, skipBeacon: true, buttons: ['back', 'close', 'primary', 'skip'] }
-    })
+    const setActive = useTourStore((s) => s.setActive)
+    const menuRef = useRef<WhisperInstance>(null)
+    const runAndClose = (fn: () => void) => () => {
+        menuRef.current?.close()
+        fn()
+    }
 
     return (
         <>
-            <Tip tip="Take a guided tour">
+            <Whisper
+                ref={menuRef}
+                placement="bottomEnd"
+                trigger="click"
+                speaker={
+                    <Popover full>
+                        <Dropdown.Menu>
+                            <Dropdown.Item onSelect={runAndClose(() => setActive('brief'))}>
+                                Basic functionality
+                            </Dropdown.Item>
+                            <Dropdown.Item onSelect={runAndClose(() => setActive('handsOn'))}>The Player</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Popover>
+                }>
                 <IconButton
-                    aria-label="Guided tour"
+                    aria-label="Guided tours"
+                    title="Guided tours"
                     appearance="subtle"
                     size="sm"
                     icon={<BsQuestionCircle />}
-                    onClick={() => controls.start()}
                 />
-            </Tip>
-            {Tour}
+            </Whisper>
+            <BriefTour />
+            <HandsOnTour />
         </>
     )
 }

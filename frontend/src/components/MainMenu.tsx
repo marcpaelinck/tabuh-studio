@@ -19,6 +19,7 @@ import { PreferencesDrawer } from './PreferencesDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 import { NavItemTip } from './Tooltipped'
+import { useTourStore } from '../tour/useTourStore'
 
 type Action =
     | '1'
@@ -87,6 +88,17 @@ export function MainMenu({
     const [manageGroupsOpen, setManageGroupsOpen] = useState<boolean>(false)
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
+
+    // ── Guided-tour hooks ──────────────────────────────────────────────
+    // Let the hands-on tour open a submenu (so a target becomes visible)…
+    const requestedMenuKey = useTourStore((s) => s.requestedMenuKey)
+    useEffect(() => {
+        if (requestedMenuKey !== null) setOpenMenu(requestedMenuKey)
+    }, [requestedMenuKey])
+    // …and publish whether the "Open" score drawer is open, so the tour can advance.
+    useEffect(() => {
+        useTourStore.getState().setScoreBrowserOpen(scoreSelector)
+    }, [scoreSelector])
 
     // Pre-selected filter when opening the score browser: the loaded score's orchestra, else the
     // user's preferred default filter (orchestra or a subscribed group). ScoreBrowser falls back
@@ -233,7 +245,7 @@ export function MainMenu({
                 <NavItemTip tip="Create a new, empty score" className="text-xs" eventKey="score-new">
                     New...
                 </NavItemTip>
-                <NavItemTip tip="Open a score from the library" className="text-xs" eventKey="file-open">
+                <NavItemTip tip="Open a score from the library" className="text-xs" eventKey="file-open" data-tour="menu-open">
                     Open...
                 </NavItemTip>
                 <NavItemTip

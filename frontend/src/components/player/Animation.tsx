@@ -176,32 +176,36 @@ export function Animation({ notationElement, appAppearance, setSVGInfo }: Animat
                 className={`min-w-0 ${mobile ? 'flex flex-col flex-1 min-h-0' : ''}`}>
                 <Row id="animation-toggles-row" gutter={10} className="p-1 min-w-0">
                     <HStack className="w-full" justifyContent="center">
-                        <Toggle
-                            id="notation toggle"
-                            label="notation"
-                            labelPlacement="start"
-                            disabled={notationElement == null}
-                            color={theme.animation}
-                            checked={notationVisible}
-                            onChange={(checked) => setNotationVisibility(checked)}></Toggle>
+                        <span data-tour="notation-toggle">
+                            <Toggle
+                                id="notation toggle"
+                                label="notation"
+                                labelPlacement="start"
+                                disabled={notationElement == null}
+                                color={theme.animation}
+                                checked={notationVisible}
+                                onChange={(checked) => setNotationVisibility(checked)}></Toggle>
+                        </span>
                         {
                             // The panggul checkbox is only visible if the embedded SVG code has a panggul element
                             hasPanggul && (
-                                <SelectPicker
-                                    id="panggul selector"
-                                    searchable={false}
-                                    cleanable={false}
-                                    label="animation:"
-                                    data={panggulMenuItems}
-                                    value={selectedPanggulOption.value}
-                                    onSelect={(value, item) => {
-                                        setSelectedPanggulOption(item as ExtendedOption<Position[]>)
-                                    }}
-                                    // Next lines only needed if cleanable==true
-                                    // onChange={(value, e) => {
-                                    //     if (value === null) setSelectedPanggulOption(null)
-                                    // }}
-                                />
+                                <span data-tour="panggul-selector">
+                                    <SelectPicker
+                                        id="panggul selector"
+                                        searchable={false}
+                                        cleanable={false}
+                                        label="animation:"
+                                        data={panggulMenuItems}
+                                        value={selectedPanggulOption.value}
+                                        onSelect={(value, item) => {
+                                            setSelectedPanggulOption(item as ExtendedOption<Position[]>)
+                                        }}
+                                        // Next lines only needed if cleanable==true
+                                        // onChange={(value, e) => {
+                                        //     if (value === null) setSelectedPanggulOption(null)
+                                        // }}
+                                    />
+                                </span>
                             )
                         }
                     </HStack>

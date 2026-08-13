@@ -87,7 +87,63 @@ Tooltips are missing for the following items:
   `npm install` + `npm run build`.
 
 ## Phase 3: Add user instructions
-This phase is meant to try out one or more steps of the tour where the tour guide should have situational awareness (know the state of the app). The tour guide should invite the user to perform actions and should be able to disable options that the user should not select. I will add specifications when we get here.
+This phase is meant to try out one or more steps of the tour where the tour guide should have situational awareness (know the state of the app). The tour guide should invite the user to perform actions and should be able to disable options that the user should not select.
+
+The question mark icon that was added in phase 2 should now open a menu with two options: 'Brief tour' (which should link to the tour from phase 2) and 'Hands on tour of the Player' (our new tour).
+
+Here is a description of the tour. The tour starts with no score loaded. I realize that the app doesn't have a 'close' option to close any opened score. I will add this to the backlog.
+- Open the 'Notation' menu item and highlight the 'Open' sub-item. Request the user to click it.
+- Ask the user to select the 'GONG KEBYAR' orchestra if it is not selected, otherwise another orchestra. If another orchestra than 'GONG KEBYAR' is now selected, ask the user to select 'GONG KEBYAR'.
+- Request the user to select the 'Cendrawasih' score from the score list. If possible, disable any other score selection.
+- Request the user to select the 'PEMADE' focus value.
+- Invite the user to switch the 'notation' toggle off and on again.
+- Invite the user to start playback by clicking the playback start button.
+- Ask the user to change the cursor in the animation window with the 'cursor' option selector.
+- Ask the user to try out the different values of the 'animation' selector and dynamically give an explanation of the selected option.
+- Ask the user to change the speed value and to then switch it back to 100%.
+- Ask the user to move the slider cursor.
+
+### Phase 3 — as built
+- **"?" menu:** the icon is now a Whisper+Popover menu (`tour/GuidedTour.tsx`) with **Brief tour**
+  (Phase 2) and **Hands-on tour of the Player**. A `tour/useTourStore.ts` holds the active tour +
+  the signals below; each tour is a component (`BriefTour`, `HandsOnTour`) that starts itself when
+  it becomes active and clears the store on `tour:end`.
+- **Mechanism (react-joyride v3, uncontrolled + programmatic advance):** action steps
+  (`handsOnSteps.tsx`) block everything but the spotlighted control (`overlayClickAction: false`,
+  no Next button — `buttons: ['skip']`) and **auto-advance** via `controls.next()` when the app
+  state shows the action was done. A watcher effect in `HandsOnTour` reads the relevant stores +
+  the tour signals and evaluates each step's `advanceWhen(snapshot)`. Note: v3 has no
+  `spotlightClicks`; gating is the overlay + `overlayClickAction:false` (target stays clickable via
+  `blockTargetInteraction:false`, the default).
+- **Situational awareness wiring:** the tour drives the UI by asking MainMenu to open the Notation
+  submenu (`requestMenu`), and observes user actions through published signals: `scoreBrowserOpen`
+  (MainMenu), `browserOrchestra` (ScoreBrowser), `playbackPlaying` (MainWindow); the rest come
+  straight from `useScoreStore` / `useUserSelectionStore` (selected score, focus, notation toggle,
+  cursor, speed). Stale signals are reset on tour start.
+- **In-drawer targeting (resolved):** for controls inside the rsuite Open drawer the `data-tour`
+  anchor is placed on the **specific** control that must be clicked — the GONG KEBYAR button and the
+  Cendrawasih row (via `OptionList`'s `dataTour` prop) — so the overlay still gates everything else,
+  the target stays clickable, and gating is preserved (no `hideOverlay` workaround). Those steps
+  set a per-step `zIndex: 100000` (the global `options.zIndex` default was removed) so the tooltip
+  renders above the drawer, plus a `before: wait(300)` hook so the step waits for the drawer's open
+  animation / list population before highlighting.
+- **Steps:** open the score drawer → pick GONG KEBYAR → select *Cendrawasih* → focus PEMADE →
+  notation OFF → notation ON → play → change cursor → explore the animation selector (live
+  explanation) → change speed → back to 100% → move the slider.
+- **Transition-based advance:** steps that could otherwise be "already satisfied" on entry capture
+  a baseline in `step:before` (`HandsOnTour`) and advance only on an actual change — the two
+  notation toggles (advance on any toggle from the entry value), the speed change, the cursor
+  change and the score pick. The `open` step still waits for a real drawer, `orchestra`/`focus`
+  advance on reaching the target state (they only auto-skip if a preference already matches).
+- **Simplifications this iteration** (flagged for your review): the orchestra step is a single
+  "select GONG KEBYAR" (not the switch-then-switch-back demo); "notation" and "speed" are two
+  sub-steps each; the animation and slider steps advance with the Next/Done button (the animation
+  step shows a live explanation of the selected option).
+- **Assumptions (data-dependent):** a score titled **Cendrawasih** exists in the GONG KEBYAR
+  repertoire, has a **PEMADE** part (focus value `Pemade`) and a panggul in its SVG (so the
+  animation selector shows).
+- **Not run in-sandbox:** react-joyride isn't installed here, so no typecheck — confirm with a
+  local `npm install` + `npm run build`.
 
 ## Phase 4: Expand the tour to multiple aspects.
 I expect to have a clear concept of the final product once we land here. This phase will expand the concept to the entire app.
