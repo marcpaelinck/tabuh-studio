@@ -26,6 +26,8 @@ export interface CurrentScore {
     setLabelDict: Dispatch<Record<string, System>>
     /** Marks the current score as saved (clears the dirty flag). */
     markSaved: () => void
+    /** Closes the current score: back to the no-score state. */
+    clearCurrentScore: () => void
 }
 
 export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set) => ({
@@ -62,7 +64,15 @@ export const useScoreStore: UseBoundStore<StoreApi<CurrentScore>> = create((set)
     setBeatPosition: (position: Position) => set(() => ({ beatPosition: position })),
     setAllowedPositionGroups: (groups: Position[][]) => set(() => ({ allowedPositionGroups: groups })),
     setLabelDict: (dict: Record<string, System>) => set(() => ({ labelDict: dict })),
-    markSaved: () => set(() => ({ dirty: false }))
+    markSaved: () => set(() => ({ dirty: false })),
+    clearCurrentScore: () =>
+        set(() => ({
+            currentScore: undefined,
+            orchestra: undefined,
+            orchestraPositions: [],
+            labelDict: {},
+            dirty: false
+        }))
 }))
 
 //         set((state) => ({state.currentScore: (state.currentScore ? { ...state.currentScore, ...entries } : undefined)})),

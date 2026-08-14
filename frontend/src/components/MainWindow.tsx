@@ -432,6 +432,7 @@ export function MainWindow({ dataSource }: MainWindowProps) {
                 text: score.title,
                 tooltip: `title: ${score.title}\ncomposer: ${score.composer}\nuuid: ${score.uuid}`
             })
+        else setDashboardElement('score', { ...dashboardValues.score, visible: false })
         if (!['playing', 'paused'].includes(playbackState.audioState)) {
             setDashboardElement('playback', { ...dashboardValues.playback, visible: false })
         }

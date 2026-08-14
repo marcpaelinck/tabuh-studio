@@ -8,10 +8,13 @@ import { useShowMessage } from '../componentlogic/useShowMessage'
 import type { KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
+import { useRecoveryStore } from '../stores/useRecoveryStore'
+import { useScoreStore } from '../stores/useScoreStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { ScoreFilterPref } from '../typing/preferences'
 import type { Score, ScoreFormat } from '../typing/score'
+import { CloseScoreDialog } from './CloseScoreDialog'
 import { KeyMapEditor } from './editor/KeyMapEditor'
 import { ManageGroupsDrawer } from './ManageGroupsDrawer'
 import { ManageUsersDrawer } from './ManageUsersDrawer'
@@ -29,6 +32,7 @@ type Action =
     | 'login'
     | 'score-new'
     | 'score-details'
+    | 'score-close'
     | 'file-open'
     | 'file-open-json'
     | 'file-import-notation'
@@ -86,6 +90,12 @@ export function MainMenu({
     const [preferencesOpen, setPreferencesOpen] = useState<boolean>(false)
     const [manageUsersOpen, setManageUsersOpen] = useState<boolean>(false)
     const [manageGroupsOpen, setManageGroupsOpen] = useState<boolean>(false)
+    // Close-score confirmation dialog.
+    const [closeDialogOpen, setCloseDialogOpen] = useState<boolean>(false)
+    const dirty = useScoreStore((s) => s.dirty)
+    const clearCurrentScore = useScoreStore((s) => s.clearCurrentScore)
+    // Only editors/admins can persist to the database (matches the backend guard).
+    const canSaveDb = user?.role === 'editor' || user?.role === 'admin'
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
 
@@ -107,6 +117,22 @@ export function MainMenu({
         ? { type: 'orchestra', value: score.instrumenttype }
         : user?.preferences?.defaultScoreFilter
 
+    // Closes the current score: back to the no-score state, and drop the recovery snapshot.
+    function doClose() {
+        clearCurrentScore()
+        useRecoveryStore.getState().clear()
+        setSelectedScoreOption(null)
+        setCloseDialogOpen(false)
+    }
+
+    // Persist the current score, then close it. Returns whether the save succeeded.
+    async function saveThenClose(destination: 'database' | 'jsonfile'): Promise<boolean> {
+        const persisted = persistCachedChanges(score)
+        const ok = await saveScore(persisted, destination)
+        if (ok) doClose()
+        return ok
+    }
+
     async function performAction() {
         switch (activeKey) {
             case 'score-new':
@@ -114,6 +140,12 @@ export function MainMenu({
                 break
             case 'score-details':
                 if (score) setScoreDialogMode('edit')
+                break
+            case 'score-close':
+                if (!score) break
+                // No unsaved changes → close straight away; otherwise ask about saving.
+                if (dirty) setCloseDialogOpen(true)
+                else doClose()
                 break
             case 'settings-preferences':
                 setPreferencesOpen(true)
@@ -262,6 +294,13 @@ export function MainMenu({
                     className="text-xs block width-xl">
                     Save
                 </NavItemTip>
+                <NavItemTip
+                    tip="Close the current score (prompts to save unsaved changes)"
+                    className="text-xs"
+                    disabled={!score}
+                    eventKey="score-close">
+                    Close
+                </NavItemTip>
             </Nav.Menu>
             <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />} {...menuProps('1')}>
                 <NavItemTip
@@ -361,6 +400,15 @@ export function MainMenu({
             <PreferencesDrawer open={preferencesOpen} onClose={() => setPreferencesOpen(false)} />
             <ManageUsersDrawer open={manageUsersOpen} onClose={() => setManageUsersOpen(false)} />
             <ManageGroupsDrawer open={manageGroupsOpen} onClose={() => setManageGroupsOpen(false)} />
+            <CloseScoreDialog
+                open={closeDialogOpen}
+                scoreTitle={score?.title ?? ''}
+                canSaveDb={canSaveDb}
+                onCancel={() => setCloseDialogOpen(false)}
+                onSaveDb={() => saveThenClose('database')}
+                onSaveFile={() => saveThenClose('jsonfile')}
+                onDiscard={doClose}
+            />
         </Nav>
     )
 }
