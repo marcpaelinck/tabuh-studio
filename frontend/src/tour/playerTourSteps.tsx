@@ -150,7 +150,7 @@ export const handsOnSteps: HandsOnStep[] = [
         step: actionStep({
             target: '[data-tour="player-play"]',
             title: 'Play',
-            content: 'Start playback with the play button.',
+            content: 'Start playback with the play button and wait a few seconds for the playback start up.',
             placement: 'top'
         }),
         advanceWhen: (s) => s.playbackPlaying
