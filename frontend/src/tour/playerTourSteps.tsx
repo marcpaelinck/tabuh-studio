@@ -157,13 +157,12 @@ export const handsOnSteps: HandsOnStep[] = [
     },
     {
         id: 'cursor',
-        step: actionStep({
+        step: {
             target: '[data-tour="pb-cursor"]',
             title: 'Cursor style',
             content: "Change the cursor style and watch how the notation's highlight changes.",
             placement: 'right'
-        }),
-        advanceWhen: (s) => s.cursorStyle !== s.cursorBaseline
+        }
     },
     {
         id: 'animation',

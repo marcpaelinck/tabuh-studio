@@ -5,8 +5,9 @@
 import { useRef } from 'react'
 import { BsQuestionCircle } from 'react-icons/bs'
 import { Dropdown, IconButton, Popover, Whisper, type WhisperInstance } from 'rsuite'
+import { Tip } from '../components/Tooltipped'
 import { BriefTour } from './BriefTour'
-import { HandsOnTour } from './HandsOnTour'
+import { HandsOnTour } from './PlayerTour'
 import { useTourStore } from './useTourStore'
 
 export function GuidedTour() {
@@ -19,28 +20,32 @@ export function GuidedTour() {
 
     return (
         <>
-            <Whisper
-                ref={menuRef}
-                placement="bottomEnd"
-                trigger="click"
-                speaker={
-                    <Popover full>
-                        <Dropdown.Menu>
-                            <Dropdown.Item onSelect={runAndClose(() => setActive('brief'))}>
-                                Basic functionality
-                            </Dropdown.Item>
-                            <Dropdown.Item onSelect={runAndClose(() => setActive('handsOn'))}>The Player</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Popover>
-                }>
-                <IconButton
-                    aria-label="Guided tours"
-                    title="Guided tours"
-                    appearance="subtle"
-                    size="sm"
-                    icon={<BsQuestionCircle />}
-                />
-            </Whisper>
+            <Tip tip="Guided tour">
+                <Whisper
+                    ref={menuRef}
+                    placement="bottomEnd"
+                    trigger="click"
+                    speaker={
+                        <Popover full>
+                            <Dropdown.Menu>
+                                <Dropdown.Item onSelect={runAndClose(() => setActive('brief'))}>
+                                    Basic functionality
+                                </Dropdown.Item>
+                                <Dropdown.Item onSelect={runAndClose(() => setActive('handsOn'))}>
+                                    The Player
+                                </Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Popover>
+                    }>
+                    <IconButton
+                        aria-label="Guided tours"
+                        // title="Guided tours"
+                        appearance="subtle"
+                        size="sm"
+                        icon={<BsQuestionCircle />}
+                    />
+                </Whisper>
+            </Tip>
             <BriefTour />
             <HandsOnTour />
         </>

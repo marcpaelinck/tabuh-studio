@@ -23,7 +23,7 @@ export default function PlaybackMenu({ focusMenuItems, speedMenuItems }: PlayerM
     return (
         <div className="selectors flex flex-wrap" data-tour="playback-menu">
             <Stack direction={{ xs: 'column', sm: 'row' }}>
-                <Tip tip="Which instrument the animation follows during playback">
+                <Tip tip="The instrument that is animated during playback">
                     <span data-tour="pb-focus" className="inline-block">
                         <SelectPicker
                             id="focusselector"

@@ -251,36 +251,38 @@ function NavHeader({ expanded, user, login, logout, infoDlg, environment, ...res
         fn()
     }
     const profileMenu = (
-        <Whisper
-            ref={menuRef}
-            placement="bottomStart"
-            trigger="click"
-            speaker={
-                <Popover full>
-                    <Dropdown.Menu>
-                        {user ? (
-                            <Dropdown.Item onSelect={runAndClose(() => logout())}>Logout</Dropdown.Item>
-                        ) : (
-                            <Dropdown.Item onSelect={runAndClose(() => setOpenLogin(true))}>Login...</Dropdown.Item>
-                        )}
-                        <Dropdown.Item onSelect={runAndClose(() => setOpenRegister(true))}>
-                            Create an account...
-                        </Dropdown.Item>
-                        {user && (
-                            <Dropdown.Item onSelect={runAndClose(() => setOpenProfile(true))}>
-                                Edit my profile...
+        <Tip tip="login menu">
+            <Whisper
+                ref={menuRef}
+                placement="bottomStart"
+                trigger="click"
+                speaker={
+                    <Popover full>
+                        <Dropdown.Menu>
+                            {user ? (
+                                <Dropdown.Item onSelect={runAndClose(() => logout())}>Logout</Dropdown.Item>
+                            ) : (
+                                <Dropdown.Item onSelect={runAndClose(() => setOpenLogin(true))}>Login...</Dropdown.Item>
+                            )}
+                            <Dropdown.Item onSelect={runAndClose(() => setOpenRegister(true))}>
+                                Create an account...
                             </Dropdown.Item>
-                        )}
-                    </Dropdown.Menu>
-                </Popover>
-            }>
-            <IconButton
-                aria-label="Profile menu"
-                title={user ? 'Account, profile and settings' : 'Log in or create an account'}
-                data-tour="profile-menu"
-                icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />}
-            />
-        </Whisper>
+                            {user && (
+                                <Dropdown.Item onSelect={runAndClose(() => setOpenProfile(true))}>
+                                    Edit my profile...
+                                </Dropdown.Item>
+                            )}
+                        </Dropdown.Menu>
+                    </Popover>
+                }>
+                <IconButton
+                    aria-label="Profile menu"
+                    // title={user ? 'Account, profile and settings' : 'Log in or create an account'}
+                    data-tour="profile-menu"
+                    icon={user ? <BsPersonFillCheck color="orange" /> : <BsPerson />}
+                />
+            </Whisper>
+        </Tip>
     )
 
     return (

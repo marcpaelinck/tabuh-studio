@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useJoyride } from 'react-joyride'
 import { useScoreStore } from '../stores/useScoreStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
-import { handsOnSteps, type TourSnapshot } from './handsOnSteps'
+import { handsOnSteps, type TourSnapshot } from './playerTourSteps'
 import { useTourStore } from './useTourStore'
 
 export function HandsOnTour() {

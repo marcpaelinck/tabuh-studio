@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react'
 import { useJoyride } from 'react-joyride'
-import { initialViewSteps } from './tourSteps'
+import { initialViewSteps } from './briefTourSteps'
 import { useTourStore } from './useTourStore'
 
 export function BriefTour() {
@@ -11,7 +11,7 @@ export function BriefTour() {
     const { controls, on, Tour } = useJoyride({
         continuous: true,
         steps: initialViewSteps,
-        options: { zIndex: 10000, skipBeacon: true, buttons: ['back', 'close', 'primary', 'skip'] }
+        options: { skipBeacon: true, buttons: ['back', 'close', 'primary', 'skip'] }
     })
 
     useEffect(() => {
