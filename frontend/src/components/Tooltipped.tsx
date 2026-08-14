@@ -20,7 +20,9 @@ interface TipProps {
 export function Tip({ tip, placement = 'auto', children }: TipProps) {
     return (
         <Whisper placement={placement} trigger="hover" speaker={<Tooltip>{tip}</Tooltip>}>
-            {children}
+            {/* The span element enables to nest another Whisper:
+            a Whisper needs an HTML element as a direct child. */}
+            <span style={{ display: 'inline-block' }}> {children}</span>
         </Whisper>
     )
 }
