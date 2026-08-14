@@ -298,7 +298,8 @@ export function MainMenu({
                     tip="Close the current score (prompts to save unsaved changes)"
                     className="text-xs"
                     disabled={!score}
-                    eventKey="score-close">
+                    eventKey="score-close"
+                    data-tour="menu-close">
                     Close
                 </NavItemTip>
             </Nav.Menu>

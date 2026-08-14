@@ -86,7 +86,7 @@ Tooltips are missing for the following items:
   risks the workspace symlink again), so no typecheck here — confirm with a local
   `npm install` + `npm run build`.
 
-## Phase 3: Add user instructions
+## Phase 3: Add user instructions: Player tour
 This phase is meant to try out one or more steps of the tour where the tour guide should have situational awareness (know the state of the app). The tour guide should invite the user to perform actions and should be able to disable options that the user should not select.
 
 The question mark icon that was added in phase 2 should now open a menu with two options: 'Brief tour' (which should link to the tour from phase 2) and 'Hands on tour of the Player' (our new tour).
@@ -127,9 +127,11 @@ Here is a description of the tour. The tour starts with no score loaded. I reali
   set a per-step `zIndex: 100000` (the global `options.zIndex` default was removed) so the tooltip
   renders above the drawer, plus a `before: wait(300)` hook so the step waits for the drawer's open
   animation / list population before highlighting.
-- **Steps:** open the score drawer → pick GONG KEBYAR → select *Cendrawasih* → focus PEMADE →
-  notation OFF → notation ON → play → change cursor → explore the animation selector (live
-  explanation) → change speed → back to 100% → move the slider.
+- **Steps:** *(conditional)* close the open score → open the score drawer → pick GONG KEBYAR →
+  select *Cendrawasih* → focus PEMADE → notation OFF → notation ON → play → change cursor → explore
+  the animation selector (live explanation) → change speed → back to 100% → move the slider. The
+  first "close" step is only shown when a score is already open (`PlayerTour` starts at index 1
+  otherwise via `controls.start(scoreOpen ? 0 : 1)`) and won't advance until the score is closed.
 - **Transition-based advance:** steps that could otherwise be "already satisfied" on entry capture
   a baseline in `step:before` (`HandsOnTour`) and advance only on an actual change — the two
   notation toggles (advance on any toggle from the entry value), the speed change, the cursor
@@ -145,5 +147,5 @@ Here is a description of the tour. The tour starts with no score loaded. I reali
 - **Not run in-sandbox:** react-joyride isn't installed here, so no typecheck — confirm with a
   local `npm install` + `npm run build`.
 
-## Phase 4: Expand the tour to multiple aspects.
+## Phase 4: Add a tour for the Editor.
 I expect to have a clear concept of the final product once we land here. This phase will expand the concept to the entire app.

@@ -73,6 +73,18 @@ function PanggulExplanation() {
 
 export const handsOnSteps: HandsOnStep[] = [
     {
+        // Conditional first step: only reached when a score is already open (PlayerTour starts at
+        // index 1 otherwise). The tour won't proceed until the score is closed.
+        id: 'close',
+        step: actionStep({
+            target: '[data-tour="menu-close"]',
+            title: 'Close the open score',
+            content: 'A score is open. Close it first via Notation → Close (you can save it if you want).',
+            placement: 'left'
+        }),
+        advanceWhen: (s) => !s.currentScoreTitle
+    },
+    {
         id: 'open',
         step: actionStep({
             target: '[data-tour="menu-open"]',

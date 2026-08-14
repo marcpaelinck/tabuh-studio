@@ -35,8 +35,10 @@ export function HandsOnTour() {
     const speedBaselineRef = useRef<number>(1)
     const advancedRef = useRef<number>(-1)
 
-    // Start when this tour becomes active; open the Notation submenu first so "Open…" is visible.
-    // Reset the tour signals so stale values from a previous run don't auto-advance early steps.
+    // Start when this tour becomes active; open the Notation submenu first so "Close…"/"Open…" are
+    // visible. Reset the tour signals so stale values from a previous run don't auto-advance early
+    // steps. The step 0 ("close") is conditional: start there only if a score is already open,
+    // otherwise skip straight to "open" (step 1).
     useEffect(() => {
         if (active === 'handsOn') {
             advancedRef.current = -1
@@ -45,7 +47,8 @@ export function HandsOnTour() {
             t.setBrowserOrchestra(null)
             t.setPlaybackPlaying(false)
             t.requestMenu('0')
-            controls.start()
+            const scoreOpen = !!useScoreStore.getState().currentScore
+            controls.start(scoreOpen ? 0 : 1)
         }
     }, [active, controls])
 
