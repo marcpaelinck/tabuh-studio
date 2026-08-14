@@ -65,6 +65,7 @@ const createSampler = ({
 }
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
+    Tone.getDestination().volume.value = 5
     const entries = Object.entries(positionConfigs).map(([position, config]) => {
         return [
             position,
