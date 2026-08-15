@@ -8,13 +8,14 @@
 // demo); the animation and slider steps advance with the Next/Done button.
 
 import type { Step } from 'react-joyride'
-import { useUserSelectionStore } from '../stores/useUserSettingsStore'
+import { useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore'
 
 /** Live snapshot passed to the per-step advance predicates. */
 export interface TourSnapshot {
     currentScoreTitle?: string
     /** Title of the score option just selected (set synchronously on click, before the drawer closes). */
     selectedScoreTitle?: string
+    currentView: MainView
     focusValue: string
     notationVisible: boolean
     cursorStyle: string
@@ -83,6 +84,17 @@ export const handsOnSteps: HandsOnStep[] = [
             placement: 'left'
         }),
         advanceWhen: (s) => !s.currentScoreTitle
+    },
+    {
+        // Conditional step: Request the user to switch to the Player mode if the Editor mode is selected.
+        id: 'playerView',
+        step: actionStep({
+            target: '[data-tour="view-toggle"]',
+            title: 'Select the Player view',
+            content: 'The view selector is currently set to the Editor view. Switch it to the Player view.',
+            placement: 'left'
+        }),
+        advanceWhen: (s) => s.currentView.toLowerCase() === 'player'
     },
     {
         id: 'open',

@@ -11,6 +11,7 @@ import TsGongIcon from '../reacticons/TsGongIcon'
 import { useRecoveryStore } from '../stores/useRecoveryStore'
 import { useScoreStore } from '../stores/useScoreStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
+import { useTourStore } from '../tour/useTourStore'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import type { ScoreFilterPref } from '../typing/preferences'
 import type { Score, ScoreFormat } from '../typing/score'
@@ -22,7 +23,6 @@ import { PreferencesDrawer } from './PreferencesDrawer'
 import { ScoreBrowser } from './ScoreBrowser'
 import { ScoreDetailsDialog, type ScoreDetailsValues } from './ScoreDetailsDialog'
 import { NavItemTip } from './Tooltipped'
-import { useTourStore } from '../tour/useTourStore'
 
 type Action =
     | '1'
@@ -100,11 +100,14 @@ export function MainMenu({
     const { showMessage } = useShowMessage()
 
     // ── Guided-tour hooks ──────────────────────────────────────────────
-    // Let the hands-on tour open a submenu (so a target becomes visible)…
+    // Let the hands-on tour open a submenu (so a target becomes visible) — or collapse it again
+    // (requestMenu(null)) so the item it made the user click isn't left highlighted afterwards.
     const requestedMenuKey = useTourStore((s) => s.requestedMenuKey)
+    const tourActive = useTourStore((s) => s.active)
     useEffect(() => {
-        if (requestedMenuKey !== null) setOpenMenu(requestedMenuKey)
-    }, [requestedMenuKey])
+        // Only drive the submenu while a tour is active, so normal usage isn't affected.
+        if (tourActive) setOpenMenu(requestedMenuKey)
+    }, [requestedMenuKey, tourActive])
     // …and publish whether the "Open" score drawer is open, so the tour can advance.
     useEffect(() => {
         useTourStore.getState().setScoreBrowserOpen(scoreSelector)
@@ -277,7 +280,11 @@ export function MainMenu({
                 <NavItemTip tip="Create a new, empty score" className="text-xs" eventKey="score-new">
                     New...
                 </NavItemTip>
-                <NavItemTip tip="Open a score from the library" className="text-xs" eventKey="file-open" data-tour="menu-open">
+                <NavItemTip
+                    tip="Open a score from the library"
+                    className="text-xs"
+                    eventKey="file-open"
+                    data-tour="menu-open">
                     Open...
                 </NavItemTip>
                 <NavItemTip

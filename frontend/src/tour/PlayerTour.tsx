@@ -10,23 +10,23 @@ import { handsOnSteps, type TourSnapshot } from './playerTourSteps'
 import { useTourStore } from './useTourStore'
 
 export function HandsOnTour() {
-    const active = useTourStore((s) => s.active)
-    const scoreBrowserOpen = useTourStore((s) => s.scoreBrowserOpen)
-    const browserOrchestra = useTourStore((s) => s.browserOrchestra)
-    const playbackPlaying = useTourStore((s) => s.playbackPlaying)
+    const { active, scoreBrowserOpen, browserOrchestra, playbackPlaying } = useTourStore()
 
     const currentScore = useScoreStore((s) => s.currentScore)
-    const selectedScoreOption = useUserSelectionStore((s) => s.selectedScoreOption)
-    const selectedFocusOption = useUserSelectionStore((s) => s.selectedFocusOption)
-    const notationVisible = useUserSelectionStore((s) => s.notationVisible)
-    const selectedCursorStyle = useUserSelectionStore((s) => s.selectedCursorStyle)
-    const selectedSpeedOption = useUserSelectionStore((s) => s.selectedSpeedOption)
+    const {
+        selectedScoreOption,
+        selectedFocusOption,
+        notationVisible,
+        selectedCursorStyle,
+        selectedSpeedOption,
+        mainView
+    } = useUserSelectionStore()
 
     const joyrideSteps = useMemo(() => handsOnSteps.map((h) => h.step), [])
     const { controls, state, on, Tour } = useJoyride({
         continuous: true,
         steps: joyrideSteps,
-        options: { /*zIndex: 10000,*/ skipBeacon: true }
+        options: { skipBeacon: true }
     })
 
     const cursorBaselineRef = useRef<string>('')
@@ -81,6 +81,17 @@ export function HandsOnTour() {
         [on]
     )
 
+    // Cosmetic: rsuite keeps the clicked "Open" item highlighted as the submenu's active descendant
+    // (browser blur doesn't clear it). Once the tour is past the Notation-menu steps, collapse the
+    // Notation submenu so that highlighted item is hidden for the rest of the tour.
+    // useEffect(() => {
+    //     if (state.status !== 'running') return
+    //     const id = handsOnSteps[state.index]?.id
+    //     if (id && id !== 'close' && id !== 'open') {
+    //         useTourStore.getState().requestMenu(null)
+    //     }
+    // }, [state.index, state.status])
+
     // Auto-advance the current action step when its condition is satisfied.
     useEffect(() => {
         if (state.status !== 'running' || state.lifecycle !== 'tooltip') return
@@ -89,6 +100,7 @@ export function HandsOnTour() {
 
         const snapshot: TourSnapshot = {
             currentScoreTitle: currentScore?.title,
+            currentView: mainView,
             selectedScoreTitle: selectedScoreOption?.objValue?.title,
             focusValue: selectedFocusOption.value,
             notationVisible,
@@ -111,6 +123,7 @@ export function HandsOnTour() {
         state.status,
         state.lifecycle,
         currentScore,
+        mainView,
         selectedScoreOption,
         selectedFocusOption,
         notationVisible,
