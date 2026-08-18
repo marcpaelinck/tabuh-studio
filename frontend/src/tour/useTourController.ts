@@ -52,6 +52,8 @@ export function useTourController<S>({
     const { controls, state, on, Tour } = useJoyride({
         continuous: true,
         steps: joyrideSteps,
+        // Rename the "Skip" button to the clearer "Quit" for every tour (locale is deep-merged).
+        locale: { skip: 'Quit' },
         options: { skipBeacon: true, ...options }
     })
     const advancedRef = useRef<number>(-1)

@@ -11,6 +11,7 @@ export function BriefTour() {
     const { controls, on, Tour } = useJoyride({
         continuous: true,
         steps: initialViewSteps,
+        locale: { skip: 'Quit' },
         options: { skipBeacon: true, buttons: ['back', 'close', 'primary', 'skip'] }
     })
 
