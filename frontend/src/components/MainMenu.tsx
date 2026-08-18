@@ -98,6 +98,7 @@ export function MainMenu({
     const canSaveDb = user?.role === 'editor' || user?.role === 'admin'
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
+    const { mainMenuActiveItem } = useTourStore()
 
     // ── Guided-tour hooks ──────────────────────────────────────────────
     // Let the hands-on tour open a submenu (so a target becomes visible) — or collapse it again
@@ -280,13 +281,16 @@ export function MainMenu({
                 <NavItemTip tip="Create a new, empty score" className="text-xs" eventKey="score-new">
                     New...
                 </NavItemTip>
-                <NavItemTip
-                    tip="Open a score from the library"
-                    className="text-xs"
-                    eventKey="file-open"
-                    data-tour="menu-open">
-                    Open...
-                </NavItemTip>
+                <div data-tour="menu-open">
+                    <NavItemTip
+                        id="menu-open"
+                        tip="Open a score from the library"
+                        className="text-xs"
+                        active={mainMenuActiveItem == 'menu-open'}
+                        eventKey="file-open">
+                        Open...
+                    </NavItemTip>
+                </div>
                 <NavItemTip
                     tip="Edit title / composer and see which groups have this score"
                     className="text-xs"
@@ -301,14 +305,16 @@ export function MainMenu({
                     className="text-xs block width-xl">
                     Save
                 </NavItemTip>
-                <NavItemTip
-                    tip="Close the current score (prompts to save unsaved changes)"
-                    className="text-xs"
-                    disabled={!score}
-                    eventKey="score-close"
-                    data-tour="menu-close">
-                    Close
-                </NavItemTip>
+                <div data-tour="menu-close">
+                    <NavItemTip
+                        tip="Close the current score (prompts to save unsaved changes)"
+                        className="text-xs"
+                        disabled={!score}
+                        active={mainMenuActiveItem == 'menu-close'}
+                        eventKey="score-close">
+                        Close
+                    </NavItemTip>
+                </div>
             </Nav.Menu>
             <Nav.Menu eventKey="1" title="File" icon={<TbFileImport />} {...menuProps('1')}>
                 <NavItemTip

@@ -587,7 +587,7 @@ export function CompactSystemEditor({
                 onPaste={onPaste}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                data-tour={`${tourSystemPrefix}-notation`}
+                tourSystemPrefix={tourSystemPrefix}
                 className={className}
                 style={style}
             />

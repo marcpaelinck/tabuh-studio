@@ -55,7 +55,8 @@ export interface StaffGridProps {
     className?: string
     style?: CSSProperties
     /** Editor tour: data-tour anchor for the notation container itself (forwarded to the root div). */
-    'data-tour'?: string
+    // 'data-tour'?: string
+    tourSystemPrefix?: string
 }
 
 export function StaffGrid({
@@ -70,7 +71,8 @@ export function StaffGrid({
     onBlur,
     className,
     style,
-    'data-tour': dataTour
+    // 'data-tour': dataTour
+    tourSystemPrefix
 }: StaffGridProps) {
     const positionFontStyle = { fontFamily: 'Courier', fontSize: '12px' }
 
@@ -78,7 +80,7 @@ export function StaffGrid({
     return (
         <div
             ref={containerRef}
-            data-tour={dataTour}
+            // data-tour={dataTour}
             tabIndex={readOnly ? -1 : 0}
             role="textbox"
             aria-multiline="true"
@@ -103,12 +105,22 @@ export function StaffGrid({
             }}>
             <div className="relative">
                 {grid && (
-                    <div
-                        ref={grid.ref}
-                        aria-hidden="true"
-                        className={`absolute top-0 bottom-0 z-0 ${notationFont}`}
-                        style={{ left: grid.left, width: `${grid.widthCh}ch`, ...grid.style }}
-                    />
+                    <>
+                        {/* Label area (used for guided tour) */}
+                        <div
+                            style={{ left: 0, width: grid.left }}
+                            className={`absolute top-0 bottom-0 z-0`}
+                            data-tour={`${tourSystemPrefix}-label-area`}
+                        />
+                        {/* Grid container */}
+                        <div
+                            ref={grid.ref}
+                            aria-hidden="true"
+                            className={`absolute top-0 bottom-0 z-0 ${notationFont}`}
+                            data-tour={`${tourSystemPrefix}-notation`}
+                            style={{ left: grid.left, width: `${grid.widthCh}ch`, ...grid.style }}
+                        />
+                    </>
                 )}
                 <div className="relative z-10">
                     {rows.map((row) => {

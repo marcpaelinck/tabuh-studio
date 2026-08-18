@@ -5,6 +5,7 @@
 // these into react-joyride and auto-advances them.
 
 import type { Step } from 'react-joyride'
+import { useTourStore } from './useTourStore'
 
 /** A tour step plus optional predicates controlling how it advances. */
 export interface TourStepDef<S> {
@@ -48,6 +49,17 @@ export function wait(ms: number) {
     }
 }
 
+// Before-hook that marks a MainMenu item as `active` before the step spotlights it. rsuite's
+// Nav.Item honours an explicit `active` prop over its `activeKey`, so this makes the highlighted
+// item the ONLY active one — otherwise a stale active item lights up too under the tour overlay.
+// Pass '' to clear. A short wait lets MainMenu re-render before joyride paints the spotlight.
+function activateMenuItem(item: string, ms = 50) {
+    return async () => {
+        useTourStore.getState().setMainMenuActiveItem(item)
+        await new Promise((resolve) => setTimeout(resolve, ms))
+    }
+}
+
 // The reusable "load a known score" prologue. Index 0 ("close") is conditional: a tour starts there
 // only when a score is already open, otherwise it starts at index 1 ("open"). Both tours share the
 // same 0/1 layout, so the start logic is identical (see useTourController).
@@ -58,7 +70,8 @@ export const setupSteps: TourStepDef<SetupSnapshot>[] = [
             target: '[data-tour="menu-close"]',
             title: 'Close the open score',
             content: 'A score is open. Close it first via Notation → Close (you can save it if you want).',
-            placement: 'left'
+            placement: 'left',
+            before: activateMenuItem('menu-close')
         }),
         advanceWhen: (s) => !s.currentScoreTitle
     },
@@ -68,7 +81,8 @@ export const setupSteps: TourStepDef<SetupSnapshot>[] = [
             target: '[data-tour="menu-open"]',
             title: 'Open a score',
             content: 'The Notation menu is open — click “Open…” to browse the score library.',
-            placement: 'left'
+            placement: 'left',
+            before: activateMenuItem('menu-open')
         }),
         // Wait until the drawer is actually rendered (its orchestra selector is in the DOM), so the
         // next steps' targets exist before we advance — otherwise they'd be skipped as "not found".
@@ -81,7 +95,8 @@ export const setupSteps: TourStepDef<SetupSnapshot>[] = [
             title: 'Choose an orchestra',
             content: 'Select the GONG KEBYAR orchestra to filter the list.',
             placement: 'right',
-            before: wait(300),
+            // Clear the menu highlight (we've moved on to the drawer) and wait for the drawer to render.
+            before: activateMenuItem('', 300),
             // High zIndex puts the dialog on top of the drawer.
             zIndex: 100000
         }),

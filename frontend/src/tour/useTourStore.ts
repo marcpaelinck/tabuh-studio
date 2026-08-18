@@ -21,6 +21,10 @@ interface TourState {
     playbackPlaying: boolean
     /** Monotonic counter bumped each time the user clicks in the FIRST system's notation (editor tour). */
     editorNotationClicks: number
+    /** Sets the highlighted Nav.item of the main menu. Should be set before a menu item has the tour focus.
+     * This avoids another item to be highlighted together with the target item.
+     */
+    mainMenuActiveItem: string
 
     setActive: (t: TourId | null) => void
     requestMenu: (key: string | null) => void
@@ -28,6 +32,7 @@ interface TourState {
     setBrowserOrchestra: (v: string | null) => void
     setPlaybackPlaying: (v: boolean) => void
     bumpEditorNotationClick: () => void
+    setMainMenuActiveItem: (v: string) => void
 }
 
 export const useTourStore = create<TourState>((set) => ({
@@ -37,10 +42,12 @@ export const useTourStore = create<TourState>((set) => ({
     browserOrchestra: null,
     playbackPlaying: false,
     editorNotationClicks: 0,
+    mainMenuActiveItem: '',
     setActive: (active) => set({ active }),
     requestMenu: (requestedMenuKey) => set({ requestedMenuKey }),
     setScoreBrowserOpen: (scoreBrowserOpen) => set({ scoreBrowserOpen }),
     setBrowserOrchestra: (browserOrchestra) => set({ browserOrchestra }),
     setPlaybackPlaying: (playbackPlaying) => set({ playbackPlaying }),
-    bumpEditorNotationClick: () => set((s) => ({ editorNotationClicks: s.editorNotationClicks + 1 }))
+    bumpEditorNotationClick: () => set((s) => ({ editorNotationClicks: s.editorNotationClicks + 1 })),
+    setMainMenuActiveItem: (mainMenuActiveItem) => set({ mainMenuActiveItem })
 }))

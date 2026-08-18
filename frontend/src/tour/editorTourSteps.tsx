@@ -94,7 +94,7 @@ const editorSteps: TourStepDef<EditorSnapshot>[] = [
     {
         id: 'positionLabels',
         step: {
-            target: '[data-tour="editor-system-4-staff-label"]',
+            target: '[data-tour="editor-system-4-label-area"]',
             title: 'Position labels',
             content: 'On the left of each notation line is its label — the position(s) that line belongs to.',
             placement: 'right',
@@ -162,7 +162,7 @@ const editorSteps: TourStepDef<EditorSnapshot>[] = [
             title: 'Modify a staff',
             content:
                 'Click this position label and choose “Modify…”. You can add or remove positions from the line there. Have a look, then click Done to close it and continue. ' +
-                "Don't worry, any change you make won't be saved.",
+                "Don't worry, changes you make won't be saved.",
             placement: 'bottom',
             scrollOffset: 200
         }
@@ -241,8 +241,7 @@ const editorSteps: TourStepDef<EditorSnapshot>[] = [
         step: actionStep({
             target: '[data-tour="editor-expand"]',
             title: 'Turn Expand off',
-            content:
-                'Now switch the Expand toggle OFF and click in the notation again — the preview is gone. Expand only changes what you see, never the score.',
+            content: 'Now switch the Expand toggle OFF.',
             placement: 'bottom'
         }),
         advanceWhen: (s) => s.showExpansion === false
@@ -252,7 +251,7 @@ const editorSteps: TourStepDef<EditorSnapshot>[] = [
         step: {
             target: '[data-tour="editor-system-4-notation"]',
             title: 'Expand view locked',
-            content: 'Click again in the first system’s notation — the expand view is now locked.',
+            content: 'Click again in the first system’s notation — the expanded preview is now disabled.',
             placement: 'top'
         }
     },

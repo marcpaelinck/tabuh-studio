@@ -71,7 +71,9 @@ export function useTourController<S>({
         () =>
             on('tour:end', () => {
                 onEnd?.()
-                useTourStore.getState().setActive(null)
+                const t = useTourStore.getState()
+                t.setMainMenuActiveItem('')
+                t.setActive(null)
             }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [on]
