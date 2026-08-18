@@ -1,56 +1,29 @@
-// Hands-on "Player" tour: state-aware, action-driven steps. Each step gates the UI (only the
-// spotlighted control is usable) and auto-advances when the app state shows the action was done
-// (see HandsOnTour's watcher). Steps without an `advanceWhen` use the normal Next/Done button.
+// Hands-on "Player" tour: state-aware, action-driven steps. It runs the shared setup prologue
+// (close/open/orchestra/selectScore — see tourShared.ts) and then the Player-specific steps below.
+// Each action step gates the UI (only the spotlighted control is usable) and auto-advances when the
+// app state shows the action was done (see useTourController's watcher). Steps without an
+// `advanceWhen` use the normal Next/Done button.
 //
-// Assumptions (data-dependent): a score titled "Cendrawasih" exists in the GONG KEBYAR
-// repertoire, and it has a PEMADE part and a panggul in its SVG. Simplifications for this first
-// iteration: the orchestra step is a single "select GONG KEBYAR" (not the switch-and-back-again
-// demo); the animation and slider steps advance with the Next/Done button.
+// Assumptions (data-dependent): a score titled "Cendrawasih" exists in the GONG KEBYAR repertoire,
+// and it has a PEMADE part and a panggul in its SVG. See CLAUDE.user-onboarding.md — the plan is to
+// ship dedicated read-only tour scores so these assumptions always hold.
 
-import type { Step } from 'react-joyride'
 import { useUserSelectionStore, type MainView } from '../stores/useUserSettingsStore'
+import { actionStep, setupSteps, type SetupSnapshot, type TourStepDef } from './tourShared'
 
-/** Live snapshot passed to the per-step advance predicates. */
-export interface TourSnapshot {
-    currentScoreTitle?: string
-    /** Title of the score option just selected (set synchronously on click, before the drawer closes). */
-    selectedScoreTitle?: string
+/** Live snapshot passed to the Player tour's per-step advance predicates. */
+export interface PlayerSnapshot extends SetupSnapshot {
     currentView: MainView
     focusValue: string
     notationVisible: boolean
     cursorStyle: string
     speedFactor: number // objValue of the speed option (1 = 100%)
-    browserOrchestra: string | null
-    scoreBrowserOpen: boolean
     playbackPlaying: boolean
     // Baselines captured when a step is entered, so a step advances on an actual user *transition*
     // rather than because its end state happened to be true already.
     cursorBaseline: string
-    /** Selected-score title captured when the "select score" step was entered (to detect a new pick). */
-    selectedScoreBaseline?: string
     notationBaseline: boolean
     speedBaseline: number
-}
-
-export interface HandsOnStep {
-    id: string
-    step: Step
-    /** When this returns true for the active step, the tour advances automatically. */
-    advanceWhen?: (s: TourSnapshot) => boolean
-}
-
-// Action steps: block everything except the spotlighted control, no forward button (the action
-// advances the tour), keep a Skip to bail out.
-function actionStep(step: Step): Step {
-    return { overlayClickAction: false, dismissKeyAction: false, buttons: ['skip'], ...step }
-}
-
-// Delay function for the step highlighting.
-// Should be used to wait until drawers are fully opened.
-function wait(ms: number) {
-    return async () => {
-        await new Promise((resolve) => setTimeout(resolve, ms))
-    }
 }
 
 // Live explanation of the currently selected animation (panggul) option.
@@ -72,21 +45,11 @@ function PanggulExplanation() {
     )
 }
 
-export const handsOnSteps: HandsOnStep[] = [
+// Player-specific steps, appended after the shared setup prologue.
+const playerSteps: TourStepDef<PlayerSnapshot>[] = [
     {
-        // Conditional first step: only reached when a score is already open (PlayerTour starts at
-        // index 1 otherwise). The tour won't proceed until the score is closed.
-        id: 'close',
-        step: actionStep({
-            target: '[data-tour="menu-close"]',
-            title: 'Close the open score',
-            content: 'A score is open. Close it first via Notation → Close (you can save it if you want).',
-            placement: 'left'
-        }),
-        advanceWhen: (s) => !s.currentScoreTitle
-    },
-    {
-        // Conditional step: Request the user to switch to the Player mode if the Editor mode is selected.
+        // Conditional step: request switching to the Player mode if the Editor mode is selected.
+        // Auto-skips (advanceWhen already true) when the Player view is active.
         id: 'playerView',
         step: actionStep({
             target: '[data-tour="view-toggle"]',
@@ -95,47 +58,6 @@ export const handsOnSteps: HandsOnStep[] = [
             placement: 'left'
         }),
         advanceWhen: (s) => s.currentView.toLowerCase() === 'player'
-    },
-    {
-        id: 'open',
-        step: actionStep({
-            target: '[data-tour="menu-open"]',
-            title: 'Open a score',
-            content: 'The Notation menu is open — click “Open…” to browse the score library.',
-            placement: 'left'
-        }),
-        // Wait until the drawer is actually rendered (its orchestra selector is in the DOM), so the
-        // next steps' targets exist before we advance — otherwise they'd be skipped as "not found".
-        advanceWhen: (s) => s.scoreBrowserOpen && !!document.querySelector('[data-tour="open-orchestra"]')
-    },
-    {
-        id: 'orchestra',
-        step: actionStep({
-            target: '[data-tour="open-orchestra"]',
-            title: 'Choose an orchestra',
-            content: 'Select the GONG KEBYAR orchestra to filter the list.',
-            placement: 'right',
-            before: wait(300),
-            // High zIndex puts the dialog on top of the drawer.
-            zIndex: 100000
-        }),
-        advanceWhen: (s) => s.browserOrchestra === 'GONG_KEBYAR'
-    },
-    {
-        id: 'selectScore',
-        step: actionStep({
-            target: '[data-option-label="Cendrawasih"]',
-            title: 'Pick a score',
-            content: 'Select “Cendrawasih” from the list to load it.',
-            placement: 'right',
-            before: wait(300),
-            // High zIndex puts the dialog on top of the drawer.
-            zIndex: 100000
-        }),
-        // Advance on a NEW selection of Cendrawasih (compared to when the step started), so a
-        // pre-existing selection doesn't skip the step. Uses the selection (immediate) rather than
-        // the loaded score, to move on before the drawer closes and the list target disappears.
-        advanceWhen: (s) => s.selectedScoreTitle === 'Cendrawasih' && s.selectedScoreTitle !== s.selectedScoreBaseline
     },
     {
         id: 'focus',
@@ -228,3 +150,5 @@ export const handsOnSteps: HandsOnStep[] = [
         }
     }
 ]
+
+export const handsOnSteps: TourStepDef<PlayerSnapshot>[] = [...setupSteps, ...playerSteps]

@@ -92,6 +92,7 @@ This phase is meant to try out one or more steps of the tour where the tour guid
 The question mark icon that was added in phase 2 should now open a menu with two options: 'Brief tour' (which should link to the tour from phase 2) and 'Hands on tour of the Player' (our new tour).
 
 Here is a description of the tour. The tour starts with no score loaded. I realize that the app doesn't have a 'close' option to close any opened score. I will add this to the backlog.
+- If a score is currently loaded, request the user to close it.
 - Open the 'Notation' menu item and highlight the 'Open' sub-item. Request the user to click it.
 - Ask the user to select the 'GONG KEBYAR' orchestra if it is not selected, otherwise another orchestra. If another orchestra than 'GONG KEBYAR' is now selected, ask the user to select 'GONG KEBYAR'.
 - Request the user to select the 'Cendrawasih' score from the score list. If possible, disable any other score selection.
@@ -147,5 +148,72 @@ Here is a description of the tour. The tour starts with no score loaded. I reali
 - **Not run in-sandbox:** react-joyride isn't installed here, so no typecheck — confirm with a
   local `npm install` + `npm run build`.
 
-## Phase 4: Add a tour for the Editor.
-I expect to have a clear concept of the final product once we land here. This phase will expand the concept to the entire app.
+## Phase 4: Add an introductory tour for the Editor.
+Here is the flow description.
+- Reuse the first five steps of the PlayerTour to close any existing score, open the 'Cendrawasih' GONG KEBYAR score and switch to the Editor mode.
+- Explain what the user sees by highlighting each part of the editor screen in sequence:
+	- The selectors at the top (Compact/Expanded, Expand and Typing).
+	- The systems (highlight system # 2 as an example)
+	- The component of a system (the positions labels, the notation area and the system controls).
+- Highlight the Compact/Expanded button group and explain that the current (Compact) view is the editor view. It's called compact because it enables to combine the notation of multiple positions and even instruments into one line. I would like the word position to be clickable so that when clicked the definition of 'position' appears. Or perhaps it should appear on hover.
+- Ask the user to hover over the label of the staff in the first system and explain that this single notation line applies to 5 positions.
+- Ask the user to click in the notation of the first system and explain that what they see now is the expanded view of this line: each position has its own staff. Remark that the sangsih instruments have different notes than the other instruments: their notation has been automatically converted to the kempyung (ngempat) notation."
+- Let the user click on the position label of this staff and select 'Modify...'. Explain what they see. Then let them click on Done.
+- Give an explanation of each control in the SummaryItem bar: 
+	- hamburger menu
+	- playback buttons. Explain the difference between both (playback the current system / from the current system to the end)
+	- system number
+	- system label
+	- execution items. Let the user click on the button and give a short explanation of what execution items consist of. 
+	- kempli state.
+- Explain the function of the 'Expand' toggle and ask the user to click in the notation area of the first system. Now ask the user to switch off the Expand toggle and to click again in the samd notation area.
+- Explain the function of the Typing toggle.
+- Let the user know that there is a more in-depth editor tour where all the features will be discussed in more detail.
+
+### Phase 4 — as built
+- **Refactor for reuse.** The react-joyride wiring (start / end / `step:before` baseline capture /
+  auto-advance watcher) was extracted into `tour/useTourController.ts`, a generic hook parameterised
+  by a snapshot type `S`. The score-loading prologue (close → open → orchestra → select Cendrawasih)
+  moved into `tour/tourShared.tsx` as `setupSteps` + `SetupSnapshot`, plus the `actionStep`/`wait`
+  helpers and the `TourStepDef<S>` shape. Both tours now compose `[...setupSteps, ...ownSteps]`:
+  - `PlayerTour` (`playerTourSteps.tsx` → `PlayerSnapshot extends SetupSnapshot`). The old
+    `playerView` step moved from just-after-`close` to just-after-`selectScore` so `setupSteps` stays
+    a clean shared prefix; behaviour is unchanged (it auto-skips when already in the Player view).
+  - `EditorTour` (`editorTourSteps.tsx` → `EditorSnapshot extends SetupSnapshot`, `EditorTour.tsx`).
+  Both components are now thin: they rebuild their snapshot each render and pass it to the controller.
+- **Launcher.** `GuidedTour` gained a third menu item, **“The Editor”** (`setActive('editor')`), and
+  renders `<EditorTour/>`. `TourId` gained `'editor'`.
+- **Interaction model.** Auto-advancing (observable) steps: switch-to-Editor (`mainView`) and
+  Expand-off (`showExpansion`). The **click-in-notation** step uses a third mode — `gateNextWhen`
+  (see `useTourController`): it does NOT auto-advance; its Next (`primary`) button stays hidden until
+  the user clicks in the notation (tracked by the `editorNotationClicks` counter in `useTourStore`,
+  bumped from the compact editor), so the user can experiment at their own pace and then click Next.
+  Next-button steps: all the pure “here’s what you see” explanations, plus the three that aren’t
+  globally observable — **hover the staff label**, the **Modify… dialog**, and **click the execution
+  button** (its Drawer would cover the tour overlay, so the user opens/closes it and clicks Next).
+  (`gateNextWhen` is generic — any step can adopt the same "act, then Next" pattern.)
+- **Anchors added** (`data-tour`): `editor-toolbar`, `editor-expand`, `editor-typing` (EditorWindow);
+  and per-system, indexed anchors so a step can target any system and any of its parts. Every system
+  carries `editor-system-N` on its wrapper (N = 1-based index, threaded EditorWindow → SystemNode →
+  CompactSystemEditor as `tourIndex` / `tourSystemPrefix`), plus `editor-system-N-controls`,
+  `-menu`, `-playback`, `-id`, `-label`, `-execution`, `-kempli`, `-notation`, and (on the first line)
+  `-staff-label`. Steps point directly at the wanted system (e.g. the "explain the parts" trio uses
+  `editor-system-2-*`; the interactive steps use `editor-system-1-*`); moving a step to another system
+  is now a one-line change of its `data-tour` string. `editor-view` already existed. This generates
+  some unused anchors, but the overhead is negligible.
+- **Compact view forced at start.** `EditorTour` calls `setEditorView('compact')` in `onStart` so the
+  compact-only anchors (labels, notation, Expand/Typing toggles) exist when the tour reaches them.
+- The **“position” glossary** is a hover/click `Whisper` chip embedded in the compact-view step’s
+  content (`PositionTerm` in `editorTourSteps.tsx`).
+- **Not run in-sandbox:** react-joyride isn’t installed here, so no typecheck — confirm with a local
+  `npm run build`.
+
+### TODO — dedicated read-only tour scores
+The tours currently depend on the live **Cendrawasih / GONG KEBYAR** score matching several
+assumptions (exists, ≥2 systems, a 5-position first line, sangsih/kempyung, a PEMADE part, a panggul
+in its SVG). Before release we should ship **separate, read-only scores dedicated to the guided
+tours**, so users can’t tamper with them and the tour steps always line up. This affects the setup
+prologue’s hard-coded orchestra/title targets and the editor steps’ per-line assumptions.
+
+## Phase 5: Add an in-depth tour for the Editor.
+This tour will let the user  create a new score from scratch. TBD.

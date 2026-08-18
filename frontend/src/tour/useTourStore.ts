@@ -5,7 +5,7 @@
 
 import { create } from 'zustand'
 
-export type TourId = 'brief' | 'handsOn'
+export type TourId = 'brief' | 'handsOn' | 'editor'
 
 interface TourState {
     /** The currently running tour (null = none). */
@@ -19,12 +19,15 @@ interface TourState {
     browserOrchestra: string | null
     /** Whether playback is currently playing. */
     playbackPlaying: boolean
+    /** Monotonic counter bumped each time the user clicks in the FIRST system's notation (editor tour). */
+    editorNotationClicks: number
 
     setActive: (t: TourId | null) => void
     requestMenu: (key: string | null) => void
     setScoreBrowserOpen: (v: boolean) => void
     setBrowserOrchestra: (v: string | null) => void
     setPlaybackPlaying: (v: boolean) => void
+    bumpEditorNotationClick: () => void
 }
 
 export const useTourStore = create<TourState>((set) => ({
@@ -33,9 +36,11 @@ export const useTourStore = create<TourState>((set) => ({
     scoreBrowserOpen: false,
     browserOrchestra: null,
     playbackPlaying: false,
+    editorNotationClicks: 0,
     setActive: (active) => set({ active }),
     requestMenu: (requestedMenuKey) => set({ requestedMenuKey }),
     setScoreBrowserOpen: (scoreBrowserOpen) => set({ scoreBrowserOpen }),
     setBrowserOrchestra: (browserOrchestra) => set({ browserOrchestra }),
-    setPlaybackPlaying: (playbackPlaying) => set({ playbackPlaying })
+    setPlaybackPlaying: (playbackPlaying) => set({ playbackPlaying }),
+    bumpEditorNotationClick: () => set((s) => ({ editorNotationClicks: s.editorNotationClicks + 1 }))
 }))

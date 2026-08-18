@@ -61,6 +61,10 @@ export interface CompactSystemEditorProps {
     keyMap?: KeyMap
     className?: string
     style?: CSSProperties
+    /** Editor tour: this system's data-tour prefix (e.g. "editor-system-2"); tags the first line's label. */
+    tourSystemPrefix?: string
+    /** Editor tour: called when the user clicks in this system's notation (advances the tour step). */
+    onTourNotationClick?: () => void
 }
 
 const positionName = (p: Position) => positionConfigs[p]?.name ?? p
@@ -119,7 +123,9 @@ export function CompactSystemEditor({
     onChange,
     keyMap,
     className,
-    style
+    style,
+    tourSystemPrefix,
+    onTourNotationClick
 }: CompactSystemEditorProps) {
     // The focusable editor surface, so undo/redo can route focus back to this system.
     const containerRef = useRef<HTMLDivElement>(null)
@@ -294,6 +300,7 @@ export function CompactSystemEditor({
                     container (tabIndex=0), which would otherwise move the cursor / shift layout. */}
                 <div
                     className="shrink-0 w-36 pr-2 truncate text-gray-600 cursor-pointer hover:text-blue-600"
+                    data-tour={tourSystemPrefix && li === 0 ? `${tourSystemPrefix}-staff-label` : undefined}
                     onMouseDown={(e) => e.preventDefault()}>
                     <Whisper trigger="hover" placement="bottomStart" speaker={<Tooltip>{tooltip}</Tooltip>}>
                         <span>{label}</span>
@@ -557,8 +564,14 @@ export function CompactSystemEditor({
             cursorIndex: flatCursor,
             selection,
             overwrite: isActive && overwriteMode,
-            onSymbolClick: (index: number, extend?: boolean) => setCursor(li, index, extend),
-            onTrailingClick: (extend?: boolean) => setCursor(li, line.notation.length, extend),
+            onSymbolClick: (index: number, extend?: boolean) => {
+                onTourNotationClick?.()
+                setCursor(li, index, extend)
+            },
+            onTrailingClick: (extend?: boolean) => {
+                onTourNotationClick?.()
+                setCursor(li, line.notation.length, extend)
+            },
             below
         }
     })
@@ -574,6 +587,7 @@ export function CompactSystemEditor({
                 onPaste={onPaste}
                 onFocus={onFocus}
                 onBlur={onBlur}
+                data-tour={`${tourSystemPrefix}-notation`}
                 className={className}
                 style={style}
             />

@@ -141,17 +141,25 @@ export default function EditorWindow({
 
     const systems = useMemo(() => {
         if (!score) return
-        return score.systems.map((systemData) => {
+        return score.systems.map((systemData, sysIndex) => {
             // Structure:
             // - Panel Header: contains context menu and System summary information
             // - Panel content (visible when panel is expanded): System grid (SystemNode)
+            // Editor tour: every system carries a 1-based index so a step can spotlight any system
+            // (e.g. `editor-system-2`) and any of its parts (e.g. `editor-system-2-controls`).
+            const tourIndex = sysIndex + 1
             return (
                 // <Profiler key={`profiler-${systemData.uuid}`} id={`sys ${systemData.id}`} onRender={onRender}>
-                <Grid key={`grid-${systemData.uuid}`} id="grid-1" className="m-0 flex">
+                <Grid
+                    key={`grid-${systemData.uuid}`}
+                    id="grid-1"
+                    className="m-0 flex"
+                    data-tour={`editor-system-${tourIndex}`}>
                     <Row>
                         <Col span={23} className="flex">
                             <SystemNode
                                 className="flex"
+                                tourIndex={tourIndex}
                                 id={systemId(systemData.uuid)}
                                 systemData={systemData}
                                 positions={score.positions}
@@ -187,7 +195,7 @@ export default function EditorWindow({
                         Sticky so it stays pinned at the top while the systems scroll beneath it.
                         z-30 keeps this bar above the compact editor's content layer (StaffGrid's
                         `relative z-10`), so clicks on the toggle win over overlapping position labels. */}
-                    <div className="sticky top-0 z-30 w-full bg-white pb-1">
+                    <div className="sticky top-0 z-30 w-full bg-white pb-1" data-tour="editor-toolbar">
                         <HStack>
                             <Tip tip="Compact = editable grouped view; Expanded = read-only per-position view">
                                 <SegmentedControl
@@ -204,7 +212,7 @@ export default function EditorWindow({
                             <Text size="md" color="blue">{`${editorView == 'expanded' ? '(read only)' : ''}`}</Text>
                             {editorView === 'compact' && (
                                 <Tip tip="Show/hide the expanded-notation preview under the cursor line">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2" data-tour="editor-expand">
                                         <Text size="sm">Expand:</Text>
                                         <Toggle
                                             size="sm"
@@ -218,7 +226,7 @@ export default function EditorWindow({
                             )}
                             {editorView === 'compact' && (
                                 <Tip tip="Toggle insert / overwrite typing  (Insert, or Ctrl/⌘ + Shift + O)">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2" data-tour="editor-typing">
                                         <Text size="sm">Typing:</Text>
                                         <Toggle
                                             size="sm"

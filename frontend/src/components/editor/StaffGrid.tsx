@@ -54,6 +54,8 @@ export interface StaffGridProps {
     onBlur?: () => void
     className?: string
     style?: CSSProperties
+    /** Editor tour: data-tour anchor for the notation container itself (forwarded to the root div). */
+    'data-tour'?: string
 }
 
 export function StaffGrid({
@@ -67,7 +69,8 @@ export function StaffGrid({
     onFocus,
     onBlur,
     className,
-    style
+    style,
+    'data-tour': dataTour
 }: StaffGridProps) {
     const positionFontStyle = { fontFamily: 'Courier', fontSize: '12px' }
 
@@ -75,6 +78,7 @@ export function StaffGrid({
     return (
         <div
             ref={containerRef}
+            data-tour={dataTour}
             tabIndex={readOnly ? -1 : 0}
             role="textbox"
             aria-multiline="true"

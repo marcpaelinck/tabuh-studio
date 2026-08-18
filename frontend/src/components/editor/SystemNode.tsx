@@ -3,6 +3,7 @@ import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import {
     memo,
+    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -23,6 +24,7 @@ import { getPositionGroups } from '../../config/position-functions'
 import { useKeyMapStore } from '../../stores/useKeyMapStore'
 import { useScoreStore } from '../../stores/useScoreStore'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
+import { useTourStore } from '../../tour/useTourStore'
 import type { PlaybackCursorStyle } from '../../typing/animation'
 import type {
     AudioState,
@@ -44,6 +46,8 @@ import { SystemNotationViewer, type EditorStaff } from './SystemNotationViewer'
 
 interface EditorSystemProps extends TextareaProps {
     systemData: System
+    /** Editor tour: 1-based index of this system; drives its `editor-system-N…` data-tour anchors. */
+    tourIndex: number
     positions: Position[]
     audioState: AudioState
     playbackType: PlaybackType
@@ -63,6 +67,7 @@ interface EditorSystemProps extends TextareaProps {
 // (see updateSystem / executeItemAction / updateCursorFunction / gotoTargets).
 export const SystemNode = memo(function SystemNode({
     systemData,
+    tourIndex,
     positions,
     audioState,
     playbackType,
@@ -77,6 +82,13 @@ export const SystemNode = memo(function SystemNode({
     ...props
 }: EditorSystemProps): ReactNode {
     const systemUuid = systemData.uuid
+
+    // Editor tour: per-system data-tour prefix (e.g. "editor-system-2"), and a notation-click signal
+    // published only while the editor tour is running (stable identity; no cost during normal editing).
+    const tourPrefix = `editor-system-${tourIndex}`
+    const onTourNotationClick = useCallback(() => {
+        if (useTourStore.getState().active === 'editor') useTourStore.getState().bumpEditorNotationClick()
+    }, [])
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
     const { orchestraPositions, beatPosition, orchestra } = useScoreStore()
@@ -159,7 +171,11 @@ export const SystemNode = memo(function SystemNode({
 
     const systemHeaderButtons: ReactElement | undefined = useMemo(() => {
         return (
-            <SCol key={`systemButtons-${systemData.uuid}`} span={3} className="flex items-center">
+            <SCol
+                key={`systemButtons-${systemData.uuid}`}
+                span={3}
+                className="flex items-center"
+                data-tour={`${tourPrefix}-playback`}>
                 <PlaybackButtons
                     scoreRef={scoreRef}
                     sysUuid={systemUuid}
@@ -215,7 +231,7 @@ export const SystemNode = memo(function SystemNode({
     // Hamburger menu (new / copy / move / delete). Placed at the far left of the header.
     const systemMenu: ReactElement = useMemo(
         () => (
-            <SCol span={2} className="flex items-center">
+            <SCol span={2} className="flex items-center" data-tour={`${tourPrefix}-menu`}>
                 <SystemMenu
                     systemData={systemData}
                     isGotoTarget={gotoTargets.has(systemData.uuid)}
@@ -236,10 +252,10 @@ export const SystemNode = memo(function SystemNode({
         const execute = (fieldname: string, value?: string) => executeItemAction(fieldname, systemData, value)
         return (
             <>
-                <SCol span={2}>
+                <SCol span={2} data-tour={`${tourPrefix}-id`}>
                     <SummaryItem item="id" sysData={systemData} disabled={headerDisabled} />
                 </SCol>
-                <SCol span={4}>
+                <SCol span={4} data-tour={`${tourPrefix}-label`}>
                     <SummaryItem
                         item="label"
                         labels={labelDict}
@@ -248,7 +264,7 @@ export const SystemNode = memo(function SystemNode({
                         disabled={headerDisabled}
                     />
                 </SCol>
-                <SCol span={6}>
+                <SCol span={6} data-tour={`${tourPrefix}-execution`}>
                     <SummaryItem
                         item="execution"
                         sysData={systemData}
@@ -257,7 +273,7 @@ export const SystemNode = memo(function SystemNode({
                         disabled={headerDisabled}
                     />
                 </SCol>
-                <SCol span={2}>
+                <SCol span={2} data-tour={`${tourPrefix}-kempli`}>
                     <SummaryItem
                         item="kempli"
                         sysData={systemData}
@@ -323,7 +339,7 @@ export const SystemNode = memo(function SystemNode({
         debug(`re-rendering notation area of system ${systemData.id}`)
         return (
             <Grid ref={systemGridRef} id={`system ${systemData.uuid}`}>
-                <Row id="SystemHeader">
+                <Row id="SystemHeader" data-tour={`${tourPrefix}-controls`}>
                     {systemMenu}
                     {systemHeaderButtons}
                     {systemHeaderFields}
@@ -336,6 +352,8 @@ export const SystemNode = memo(function SystemNode({
                             <CompactSystemEditor
                                 ref={compactNotationRef}
                                 key={`compact-${systemData.uuid}`}
+                                tourSystemPrefix={tourPrefix}
+                                onTourNotationClick={onTourNotationClick}
                                 systemUuid={systemData.uuid}
                                 initialLines={compactLines}
                                 beatStops={beatStops}

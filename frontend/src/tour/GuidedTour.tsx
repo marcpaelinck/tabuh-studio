@@ -7,6 +7,7 @@ import { BsQuestionCircle } from 'react-icons/bs'
 import { Dropdown, IconButton, Popover, Whisper, type WhisperInstance } from 'rsuite'
 import { Tip } from '../components/Tooltipped'
 import { BriefTour } from './BriefTour'
+import { EditorTour } from './EditorTour'
 import { HandsOnTour } from './PlayerTour'
 import { useTourStore } from './useTourStore'
 
@@ -34,6 +35,9 @@ export function GuidedTour() {
                                 <Dropdown.Item onSelect={runAndClose(() => setActive('handsOn'))}>
                                     The Player
                                 </Dropdown.Item>
+                                <Dropdown.Item onSelect={runAndClose(() => setActive('editor'))}>
+                                    The Editor
+                                </Dropdown.Item>
                             </Dropdown.Menu>
                         </Popover>
                     }>
@@ -48,6 +52,7 @@ export function GuidedTour() {
             </Tip>
             <BriefTour />
             <HandsOnTour />
+            <EditorTour />
         </>
     )
 }
