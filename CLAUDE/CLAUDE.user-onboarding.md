@@ -216,4 +216,6 @@ tours**, so users can’t tamper with them and the tour steps always line up. Th
 prologue’s hard-coded orchestra/title targets and the editor steps’ per-line assumptions.
 
 ## Phase 5: Add an in-depth tour for the Editor.
-This tour will let the user  create a new score from scratch. TBD.
+Here is the flow description.
+- Use the first step ('close') of `tourShared`.
+- 

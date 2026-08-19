@@ -104,6 +104,9 @@ export interface CompactEditorController {
     addPosition: (lineIndex: number, position: Position) => void
     /** Remove `position` from a multi-position group, splitting it into its own solo staff. */
     removePosition: (lineIndex: number, position: Position) => void
+    /** Replace the whole position set of the group at `lineIndex` (the shared notation is kept and
+     *  re-expanded for the new set). Used by the Modify dialog to commit an edited position set. */
+    setPositions: (lineIndex: number, positions: Position[]) => void
     /** Replace the whole notation of the line at `lineIndex` (e.g. copy-from-system). Undoable. */
     replaceLineNotation: (lineIndex: number, notation: NoteObject[]) => void
 }
@@ -524,6 +527,23 @@ export function useCompactSystemEditor({
         [onChange]
     )
 
+    // Replace a group's whole position set (Modify dialog "Done"). The shared flat notation is kept;
+    // onChange re-expands it for the new set. A no-op for an empty set (the UI disables that).
+    const setPositions = useCallback(
+        (lineIndex: number, positions: Position[]) => {
+            if (positions.length === 0) return
+            useEditorStateStore.getState().clearHistory()
+            setState((st) => {
+                const line = st.lines[lineIndex]
+                if (!line) return st
+                const lines = st.lines.with(lineIndex, { ...line, positions: [...positions] })
+                onChange?.(lines)
+                return { ...st, lines }
+            })
+        },
+        [onChange]
+    )
+
     // Removing a position from a multi-position group splits it into its own solo staff
     // carrying the cast notation it had (see castGroupToSolo). A group's last position
     // cannot be removed (remove the whole line instead) — the UI disables that case.
@@ -586,6 +606,7 @@ export function useCompactSystemEditor({
         removeLine,
         addPosition,
         removePosition,
+        setPositions,
         replaceLineNotation
     }
 }

@@ -26,7 +26,7 @@ import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Modal, Popover, Radio, RadioGroup, SelectPicker, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
-import { candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
+import { canAddPositions, candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
 import { useCompactSystemEditor, type CompactLine } from '../../componentlogic/editor/useCompactSystemEditor'
 import { editorFontSize } from '../../config/config'
@@ -142,8 +142,7 @@ export function CompactSystemEditor({
         setCursor,
         addLine,
         removeLine,
-        addPosition,
-        removePosition,
+        setPositions,
         replaceLineNotation
     } = useCompactSystemEditor({
         systemUuid,
@@ -165,6 +164,9 @@ export function CompactSystemEditor({
     // Open staff dialog: the New / Modify popup for the label menu of line `li`.
     const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
     const [newPlacement, setNewPlacement] = useState<'above' | 'below'>('below')
+    // Modify dialog: local draft of the staff's position set. Edited freely (positions can all be
+    // removed); applied to the line on "Done" (disabled while empty). Discarded on Cancel/close.
+    const [modifyPositions, setModifyPositions] = useState<Position[]>([])
     // Open "Copy from…" dialog: the current line, its label, and the systems that have a
     // matching staff (same position set) with the notation to copy. `source` is the picked one.
     const [copyDialog, setCopyDialog] = useState<{
@@ -202,6 +204,13 @@ export function CompactSystemEditor({
         setStaffDialog(null)
         setNewStaffs([])
         setNewPlacement('below')
+        setModifyPositions([])
+    }
+
+    // Open the Modify dialog for line `li`, seeding the draft from its current positions.
+    const openModifyDialog = (li: number) => {
+        setModifyPositions([...(lines[li]?.positions ?? [])])
+        setStaffDialog({ kind: 'modify', li })
     }
 
     // "Copy from…": open a dialog listing the OTHER systems that contain a staff with the
@@ -262,18 +271,18 @@ export function CompactSystemEditor({
                         className={menuItemClass}
                         onClick={() => {
                             closeMenu()
-                            setStaffDialog({ kind: 'modify', li })
+                            openCopyDialog(li)
                         }}>
-                        Modify…
+                        Copy from…
                     </button>
                     <button
                         type="button"
                         className={menuItemClass}
                         onClick={() => {
                             closeMenu()
-                            openCopyDialog(li)
+                            openModifyDialog(li)
                         }}>
-                        Copy from…
+                        Modify {label}…
                     </button>
                     <button
                         type="button"
@@ -336,8 +345,22 @@ export function CompactSystemEditor({
         }
         const newStaffLabel = (item: NewStaffItem) =>
             item.kind === 'position' ? positionName(item.position) : groupLabel(item.group)
-        // Modify dialog: positions that can be added to the existing group.
-        const addCandidates = line ? candidatesFor(line.positions, free, orchestra) : []
+
+        // Modify dialog works on the `modifyPositions` draft. Pool of positions still free to add:
+        // everything not used by the OTHER lines and not already in the draft (so removed positions
+        // can be re-added). Recomputed each render, so the sections track the draft live.
+        const otherUsed = new Set(lines.flatMap((l, i) => (i === li ? [] : l.positions)))
+        const draftAvailable = orchestraPositions.filter((p) => !otherUsed.has(p) && !modifyPositions.includes(p))
+        const draftAvailableSet = new Set(draftAvailable)
+        // Single positions that can join the draft, and whole groups that can (all positions free +
+        // the combined set valid for the orchestra).
+        const addCandidates = candidatesFor(modifyPositions, draftAvailable, orchestra)
+        const addGroups = (Object.keys(orchestraGroups) as PositionGroup[]).filter(
+            (g) =>
+                groupPositions(g).length >= 2 &&
+                groupPositions(g).every((p) => draftAvailableSet.has(p)) &&
+                canAddPositions(modifyPositions, groupPositions(g), orchestra)
+        )
 
         // Reorder the basket when a chip is dragged onto another.
         const handleDragEnd = (event: DragEndEvent) => {
@@ -443,27 +466,51 @@ export function CompactSystemEditor({
                             <div>
                                 <div className="text-xs mb-1">Staff positions</div>
                                 <div className="flex flex-wrap gap-1 max-w-72">
-                                    {line!.positions.map((p) => (
+                                    {modifyPositions.map((p) => (
                                         <Tag
                                             key={p}
-                                            closable={line!.positions.length > 1}
-                                            onClose={() => removePosition(li, p)}>
+                                            closable
+                                            onClose={() => setModifyPositions((s) => s.filter((x) => x !== p))}>
                                             {positionName(p)}
                                         </Tag>
                                     ))}
+                                    {modifyPositions.length === 0 && (
+                                        <span className="text-xs text-gray-400">
+                                            add at least one position/group below
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                             <div>
                                 <div className="text-xs mb-1">Add position</div>
                                 <div className="flex flex-wrap gap-1 max-w-72">
                                     {addCandidates.map((p) => (
-                                        <Button key={p} size="xs" appearance="ghost" onClick={() => addPosition(li, p)}>
+                                        <Button
+                                            key={p}
+                                            size="xs"
+                                            appearance="ghost"
+                                            onClick={() => setModifyPositions((s) => [...s, p])}>
                                             {positionName(p)}
                                         </Button>
                                     ))}
                                     {addCandidates.length === 0 && (
                                         <span className="text-xs text-gray-400">no positions available</span>
                                     )}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-xs mb-1">Position groups</div>
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {addGroups.map((g) => (
+                                        <button
+                                            key={g}
+                                            type="button"
+                                            className={groupLabelClass}
+                                            onClick={() => setModifyPositions((s) => [...s, ...groupPositions(g)])}>
+                                            {groupLabel(g)}
+                                        </button>
+                                    ))}
+                                    {addGroups.length === 0 && <span className="text-xs text-gray-400">none</span>}
                                 </div>
                             </div>
                         </div>
@@ -488,9 +535,20 @@ export function CompactSystemEditor({
                             </Button>
                         </>
                     ) : (
-                        <Button onClick={closeStaffDialog} appearance="primary">
-                            Done
-                        </Button>
+                        <>
+                            <Button onClick={closeStaffDialog} appearance="subtle">
+                                Cancel
+                            </Button>
+                            <Button
+                                appearance="primary"
+                                disabled={modifyPositions.length === 0}
+                                onClick={() => {
+                                    setPositions(li, modifyPositions)
+                                    closeStaffDialog()
+                                }}>
+                                Done
+                            </Button>
+                        </>
                     )}
                 </Modal.Footer>
             </Modal>

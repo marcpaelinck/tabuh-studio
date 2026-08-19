@@ -211,6 +211,15 @@ export function candidatesFor(groupPositions: Position[], available: Position[],
     )
 }
 
+// True if EVERY position in `additions` can be added to `current` at once — i.e. the combined set is
+// a subset of some allowed position group for the orchestra. The whole-group counterpart of
+// candidatesFor (used by the Modify dialog's "Position groups" section).
+export function canAddPositions(current: Position[], additions: Position[], orchestra?: Orchestra): boolean {
+    if (additions.length === 0 || !orchestra) return false
+    const combined = [...current, ...additions]
+    return allowedPositionGroups[orchestra].some((grp) => combined.every((x) => grp.includes(x)))
+}
+
 // Splits a position `p` out of a multi-position group into its own solo staff,
 // carrying the notation `p` currently has (the cast result), so it keeps playing.
 export function castGroupToSolo(
