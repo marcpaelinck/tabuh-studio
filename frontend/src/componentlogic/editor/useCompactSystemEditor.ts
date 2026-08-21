@@ -26,6 +26,7 @@
  */
 
 import type { Keystroke, NoteObject, Position } from '@tabuhstudio/shared'
+import { sortByPositionOrder } from '@tabuhstudio/shared/utils/position'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
@@ -82,6 +83,9 @@ export interface UseCompactSystemEditorOptions {
     /** Column indices where each beat STARTS (for Ctrl+Arrow beat jumps). Empty when there
      *  is no kempli beat, in which case Ctrl+Arrow moves by four notes instead. */
     beatStops?: number[]
+    /** The score-wide staff order. New/modified staves are kept sorted by it (a group follows its
+     *  earliest position), so staff order always follows the one canonical order. */
+    positionOrder?: Position[]
 }
 
 export interface CompactEditorController {
@@ -178,8 +182,17 @@ export function useCompactSystemEditor({
     castingInstructions,
     onChange,
     focusEditor,
-    beatStops = []
+    beatStops = [],
+    positionOrder
 }: UseCompactSystemEditorOptions): CompactEditorController {
+    // Keep the staves sorted by the score-wide order (a group follows its earliest position), so
+    // staff order always follows the one canonical order. Read via a ref so the structure-editing
+    // callbacks don't need it in their dependency arrays.
+    const positionOrderRef = useRef(positionOrder)
+    positionOrderRef.current = positionOrder
+    const sortLines = (lines: CompactLine[]): CompactLine[] =>
+        positionOrderRef.current ? sortByPositionOrder(lines, positionOrderRef.current) : lines
+
     const [state, setState] = useState<CompactEditorState>(() => ({
         lines: initialLines,
         cursor: { line: 0, index: initialLines[0]?.notation.length ?? 0 },
@@ -480,15 +493,16 @@ export function useCompactSystemEditor({
     // and restructuring makes past snapshots ambiguous. Cleared outside the updater so it
     // runs once (StrictMode double-invokes the updater).
     const addLine = useCallback(
-        (atIndex: number, positions: Position[]) => {
+        (_atIndex: number, positions: Position[]) => {
             useEditorStateStore.getState().clearHistory()
             setState((st) => {
                 if (positions.length === 0) return st
                 const newLine: CompactLine = { id: uuidv4(), positions: [...positions], notation: [] }
-                const idx = Math.max(0, Math.min(st.lines.length, atIndex))
-                const lines = [...st.lines.slice(0, idx), newLine, ...st.lines.slice(idx)]
+                // Insertion index no longer matters: the new staff is placed by the score-wide order.
+                const lines = sortLines([...st.lines, newLine])
+                const newIdx = Math.max(0, lines.findIndex((l) => l.id === newLine.id))
                 onChange?.(lines)
-                return { lines, cursor: { line: idx, index: 0 }, anchor: null }
+                return { lines, cursor: { line: newIdx, index: 0 }, anchor: null }
             })
         },
         [onChange]
@@ -536,9 +550,18 @@ export function useCompactSystemEditor({
             setState((st) => {
                 const line = st.lines[lineIndex]
                 if (!line) return st
-                const lines = st.lines.with(lineIndex, { ...line, positions: [...positions] })
+                // Changing a group's positions can change its rank, so re-sort. Keep the cursor on
+                // its logical line (by id) across the reorder.
+                const cursorLineId = st.lines[st.cursor.line]?.id
+                const lines = sortLines(st.lines.with(lineIndex, { ...line, positions: [...positions] }))
+                const cursorLine = cursorLineId ? Math.max(0, lines.findIndex((l) => l.id === cursorLineId)) : 0
                 onChange?.(lines)
-                return { ...st, lines }
+                return {
+                    ...st,
+                    lines,
+                    cursor: { line: cursorLine, index: clampCursor(lines[cursorLine]?.notation ?? [], st.cursor.index) },
+                    anchor: null
+                }
             })
         },
         [onChange]

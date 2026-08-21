@@ -3,14 +3,21 @@
 // orchestra's instruments, so no score needs to be open). See CLAUDE.user-settings.md.
 
 import { instrumentGroups } from '@tabuhstudio/shared'
-import type { Orchestra } from '@tabuhstudio/shared/types/position'
+import type { Orchestra, Position } from '@tabuhstudio/shared/types/position'
+import { orchestraPositions, orderedPositions } from '@tabuhstudio/shared/utils/position'
 import { useEffect, useState } from 'react'
 import { Button, CheckPicker, Drawer, Message, SelectPicker, Toggle } from 'rsuite'
 import { useAuth } from '../context/AuthContext'
 import { apiSetSubscriptions } from '../services/apiService'
 import { useGroupsStore } from '../stores/useGroupsStore'
+import { useScoreStore } from '../stores/useScoreStore'
 import type { UserPreferences } from '../typing/preferences'
 import { createFocusMenuItems } from '../utils/selectorsUtils'
+import { PositionOrderEditor } from './PositionOrderEditor'
+import { QTip } from './Tooltipped'
+
+// True when two position orders are identical (same length + element order).
+const sameOrder = (a: Position[], b: Position[]) => a.length === b.length && a.every((p, i) => p === b[i])
 
 const orchestras = Object.keys(instrumentGroups) as Orchestra[]
 const orchestraLabel = (o: string) => o.replace(/_/g, ' ')
@@ -44,6 +51,8 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
     const { user, updatePreferences } = useAuth()
     const groups = useGroupsStore((s) => s.groups)
     const storeSubscriptions = useGroupsStore((s) => s.subscriptions)
+    // The open score (if any) — used to offer "apply this order to the current score".
+    const currentScore = useScoreStore((s) => s.currentScore)
 
     // Default score filter is encoded as 'orchestra:<name>' or 'group:<id>' for the combined picker.
     const [scoreFilter, setScoreFilter] = useState<string | null>(null)
@@ -52,6 +61,9 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
     const [notationVisible, setNotationVisible] = useState(false)
     const [cursorStyle, setCursorStyle] = useState<string | null>(null)
     const [keyboard, setKeyboard] = useState<string | null>(null)
+    // Default staff (position) order per orchestra + which orchestra's order is being edited.
+    const [orderByOrchestra, setOrderByOrchestra] = useState<Record<string, Position[]>>({})
+    const [orderOrchestra, setOrderOrchestra] = useState<Orchestra>(orchestras[0])
     const [saving, setSaving] = useState(false)
     const [saved, setSaved] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -67,6 +79,10 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         setNotationVisible(!!p.notationVisibleByDefault)
         setCursorStyle(p.defaultCursorStyle ?? null)
         setKeyboard(p.defaultKeyboard ?? null)
+        setOrderByOrchestra(
+            Object.fromEntries(orchestras.map((o) => [o, orderedPositions(o, p.defaultPositionOrderByOrchestra?.[o])]))
+        )
+        setOrderOrchestra(orchestras[0])
         setSaved(false)
         setError(null)
         setSaving(false)
@@ -97,6 +113,13 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
         if (Object.keys(focusMap).length) prefs.defaultFocusByOrchestra = focusMap
         if (cursorStyle) prefs.defaultCursorStyle = cursorStyle as UserPreferences['defaultCursorStyle']
         if (keyboard) prefs.defaultKeyboard = keyboard as UserPreferences['defaultKeyboard']
+        // Persist only the orders that differ from the system default (keeps the blob small).
+        const orderMap: Partial<Record<Orchestra, Position[]>> = {}
+        for (const o of orchestras) {
+            const ord = orderByOrchestra[o]
+            if (ord && !sameOrder(ord, orchestraPositions(o))) orderMap[o] = ord
+        }
+        if (Object.keys(orderMap).length) prefs.defaultPositionOrderByOrchestra = orderMap
         try {
             await apiSetSubscriptions(subscriptions)
             useGroupsStore.getState().setSubscriptions(subscriptions)
@@ -108,6 +131,8 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
             setSaving(false)
         }
     }
+
+    const titleStyle = 'text-sm mb-1 font-bold'
 
     return (
         <Drawer open={open} size="sm" onClose={onClose}>
@@ -135,7 +160,10 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                 )}
                 <div className="flex flex-col gap-4">
                     <div>
-                        <div className="text-sm mb-1">Subscribed groups</div>
+                        <div className={titleStyle}>
+                            Subscribed groups
+                            <QTip tip="(Music) groups that you select here can be used to filter scores." />
+                        </div>
                         <CheckPicker
                             data={groupOptions}
                             value={subscriptions}
@@ -147,7 +175,18 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                         />
                     </div>
                     <div>
-                        <div className="text-sm mb-1">Default score filter</div>
+                        <div className={titleStyle}>
+                            Default score filter
+                            <QTip
+                                tip={
+                                    <span>
+                                        The filter is applied on the list of compositions
+                                        <br />
+                                        when you open a score from the library.
+                                    </span>
+                                }
+                            />
+                        </div>
                         <SelectPicker
                             data={filterOptions}
                             groupBy="kind"
@@ -159,7 +198,10 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                         />
                     </div>
                     <div>
-                        <div className="text-sm mb-1">Default focus per orchestra</div>
+                        <div className={titleStyle}>
+                            Default focus per orchestra
+                            <QTip tip="Will be automatically selected for the playback animation." />
+                        </div>
                         <div className="flex flex-col gap-2">
                             {orchestras.map((o) => (
                                 <div key={o} className="flex items-center gap-2">
@@ -177,12 +219,70 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                             ))}
                         </div>
                     </div>
+                    <div>
+                        <div className={titleStyle}>
+                            Staff order per orchestra
+                            <QTip tip="Order of the staffs in the editor and the PDF output." />
+                        </div>
+                        <SelectPicker
+                            data={orchestraOptions}
+                            value={orderOrchestra}
+                            onChange={(v) => v && setOrderOrchestra(v as Orchestra)}
+                            block
+                            searchable={false}
+                            cleanable={false}
+                            className="mb-2"
+                        />
+                        <PositionOrderEditor
+                            positions={orderByOrchestra[orderOrchestra] ?? []}
+                            onChange={(next) => setOrderByOrchestra((prev) => ({ ...prev, [orderOrchestra]: next }))}
+                        />
+                        <div className="flex items-center gap-3">
+                            <Button
+                                size="xs"
+                                appearance="link"
+                                className="mt-1 pl-0"
+                                onClick={() =>
+                                    setOrderByOrchestra((prev) => ({
+                                        ...prev,
+                                        [orderOrchestra]: orchestraPositions(orderOrchestra)
+                                    }))
+                                }>
+                                Reset to system default
+                            </Button>
+                            <Button
+                                size="xs"
+                                appearance="link"
+                                className="mt-1"
+                                // Only meaningful when the open score uses the orchestra being edited.
+                                disabled={!currentScore || currentScore.instrumenttype !== orderOrchestra}
+                                onClick={() =>
+                                    useScoreStore.getState().applyPositionOrder(orderByOrchestra[orderOrchestra] ?? [])
+                                }>
+                                Apply to current score
+                            </Button>
+                        </div>
+                    </div>
                     <div className="flex items-center justify-between">
-                        <div className="text-sm">Show notation by default</div>
+                        <div className={titleStyle}>
+                            Show notation in animation
+                            <QTip tip="Default setting for the playback animation (Player view)." />
+                        </div>
                         <Toggle checked={notationVisible} onChange={setNotationVisible} />
                     </div>
                     <div>
-                        <div className="text-sm mb-1">Default cursor style</div>
+                        <div className={titleStyle}>
+                            Default cursor style
+                            <QTip
+                                tip={
+                                    <span>
+                                        Style of the notation highlighting during playback.
+                                        <br />
+                                        Applies both to the Player view and the Editor view.
+                                    </span>
+                                }
+                            />
+                        </div>
                         <SelectPicker
                             data={cursorOptions}
                             value={cursorStyle}
@@ -194,7 +294,10 @@ export function PreferencesDrawer({ open, onClose }: PreferencesDrawerProps) {
                         />
                     </div>
                     <div>
-                        <div className="text-sm mb-1">Default keyboard</div>
+                        <div className={titleStyle}>
+                            Default keyboard setting
+                            <QTip tip="A keyboard setting assigns note symbols to keystrokes." />
+                        </div>
                         <SelectPicker
                             data={keyboardOptions}
                             value={keyboard}

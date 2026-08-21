@@ -12,11 +12,12 @@ import type {
 // prettier-ignore
 export const orchestraConfigs: Record<Orchestra, { instruments: Instrument[]; beatPosition: Position | null }> = {
     GONG_KEBYAR: {
-        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 'CENGCENG', 'KENDANG', 'KEMPLI'],
+        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 
+            'CENGCENG', 'CENGCENG_KOPYAK', 'KENDANG', 'KEMPLI'],
         beatPosition: 'KEMPLI'
     },
     BALEGANJUR: {
-        instruments: ['CENGCENG', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
+        instruments: ['CENGCENG_KOPYAK', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
         beatPosition: 'TAWATAWA'
     }
 }

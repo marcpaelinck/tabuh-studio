@@ -91,7 +91,7 @@ export const SystemNode = memo(function SystemNode({
     }, [])
 
     const [playbackCursor, setPlaybackCursor] = useState<EditorCursor | null>(null)
-    const { orchestraPositions, beatPosition, orchestra } = useScoreStore()
+    const { orchestraPositions, beatPosition, orchestra, structureVersion } = useScoreStore()
 
     const compactNotationRef = useRef<HTMLDivElement>(null)
     const expandedNotationRef = useRef<HTMLDivElement>(null)
@@ -351,9 +351,10 @@ export const SystemNode = memo(function SystemNode({
                             {/* The compact (grouped/shorthand) view — the EDITABLE surface. */}
                             <CompactSystemEditor
                                 ref={compactNotationRef}
-                                key={`compact-${systemData.uuid}`}
+                                key={`compact-${systemData.uuid}-${structureVersion}`}
                                 tourSystemPrefix={tourPrefix}
                                 onTourNotationClick={onTourNotationClick}
+                                positionOrder={orchestraPositions}
                                 systemUuid={systemData.uuid}
                                 initialLines={compactLines}
                                 beatStops={beatStops}
@@ -385,7 +386,7 @@ export const SystemNode = memo(function SystemNode({
                 )}
             </Grid>
         )
-    }, [systemData, playbackCursor, audioState, playbackType, editorView, notationWidth, playing, keyMap])
+    }, [systemData, playbackCursor, audioState, playbackType, editorView, notationWidth, playing, keyMap, orchestraPositions, structureVersion])
 
     return notationArea
 })

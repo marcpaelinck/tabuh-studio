@@ -1,10 +1,12 @@
 import { DEFAULT_KEMPLI } from '@tabuhstudio/shared/config/defaults'
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
+import { orderedPositions } from '@tabuhstudio/shared/utils/position'
 import _ from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import type { DashboardLevel } from '../components/Dashboard'
 import { defaultBeatFrequency } from '../config/config'
+import { useAuth } from '../context/AuthContext'
 import { useEditorStateStore } from '../stores/useEditorStateStore'
 import { captureRecoverySnapshot } from '../stores/useRecoveryStore'
 import { useScoreStore } from '../stores/useScoreStore'
@@ -51,6 +53,7 @@ function gotoItemTargetName(destination: System) {
 }
 
 export function useScoreManager() {
+    const { user } = useAuth()
     const { beatPosition } = useScoreStore()
     const { currentScore: score, orchestra, setCurrentScore: setScore, updateCurrentScore } = useScoreStore()
     const { labelDict, setLabelDict } = useScoreStore()
@@ -67,7 +70,8 @@ export function useScoreManager() {
     )
     function updateScore(score: Score) {
         debug(`updating score with title ${score.title}`)
-        setScore(score)
+        // Staff order always follows the current user's default for this orchestra (else system default).
+        setScore(score, user?.preferences?.defaultPositionOrderByOrchestra?.[score.instrumenttype])
         const labeldict = Object.fromEntries(
             score.systems.filter((sys) => sys.label != undefined).map((sys) => [sys.label, sys])
         )
@@ -339,7 +343,9 @@ export function useScoreManager() {
             title: fields.title,
             composer: fields.composer,
             instrumenttype: fields.instrumenttype,
-            positions: [],
+            // The position set for the orchestra. Its ORDER is not used — staff order always follows
+            // the user/system default, resolved on load (see useScoreStore.setCurrentScore).
+            positions: orderedPositions(fields.instrumenttype),
             systems: [{ ...createEmptySystem({ ...DEFAULT_KEMPLI }), id: 1, index: 0 }]
         }
         updateScore(score)

@@ -1,7 +1,7 @@
 // Per-user app preferences (stored server-side as JSON on the user, applied on login).
 // See CLAUDE.user-settings.md. All keys are optional — an unset key means "use the app default".
 
-import type { Orchestra } from '@tabuhstudio/shared/types/position'
+import type { Orchestra, Position } from '@tabuhstudio/shared/types/position'
 import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from './animation'
 
@@ -17,4 +17,6 @@ export interface UserPreferences {
     notationVisibleByDefault?: boolean
     defaultCursorStyle?: PlaybackCursorStyle
     defaultKeyboard?: KeyboardType
+    /** Default staff (position) order for new scores, per orchestra. Applied only to NEW scores. */
+    defaultPositionOrderByOrchestra?: Partial<Record<Orchestra, Position[]>>
 }

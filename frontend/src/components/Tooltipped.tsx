@@ -4,6 +4,7 @@
 //     (rsuite Nav.Item has no built-in tooltip). Reads the Nav/Sidenav context normally.
 
 import type { ComponentProps, ReactElement, ReactNode } from 'react'
+import { PiQuestion } from 'react-icons/pi'
 import { Nav, Tooltip, Whisper } from 'rsuite'
 
 type Placement = 'top' | 'bottom' | 'left' | 'right' | 'auto' | 'autoVertical' | 'autoHorizontal'
@@ -39,4 +40,10 @@ export function NavItemTip({ tip, placement = 'left', children, ...navItemProps 
             </Whisper>
         </Nav.Item>
     )
+}
+
+// QTip displays a question mark icon that shows a tooltip on hover.
+// Usage: <div>... <QTip tip="..."></div>
+export function QTip({ tip, placement = 'auto' }: { tip: ReactNode; placement?: Placement }) {
+    return <Tip tip={tip} placement={placement} children={<PiQuestion className="ml-1" />}></Tip>
 }

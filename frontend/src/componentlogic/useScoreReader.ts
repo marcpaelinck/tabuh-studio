@@ -2,10 +2,11 @@ import { NoteObject, type Position } from '@tabuhstudio/shared'
 import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
-import { orchestraPositions } from '@tabuhstudio/shared/utils/position'
+import { orderedPositions } from '@tabuhstudio/shared/utils/position'
 import _ from 'lodash'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { useAuth } from '../context/AuthContext'
 import { parseLaras } from '../scoreparsers/larasParser'
 import { parseNotation } from '../scoreparsers/tabuhParser'
 import type { ScoreListItem, ScoreRecord } from '../services/apiService'
@@ -83,10 +84,16 @@ export function useScoreReader(source: 'database' | 'file'): {
         useScoreStore()
     const { beatPosition } = useScoreStore()
     const [isLoading, setIsLoading] = useState<boolean>(false)
+    // Read via a ref so the (deps:[]) load callbacks always see the current user's preferences.
+    const { user } = useAuth()
+    const userRef = useRef(user)
+    userRef.current = user
 
     function setScoreStates(score: Score): void {
-        setCurrentScore(score)
-        setOrchestraPositions(orchestraPositions(score.instrumenttype))
+        // Staff order always follows the current user's default for the orchestra (else system default).
+        const staffOrder = userRef.current?.preferences?.defaultPositionOrderByOrchestra?.[score.instrumenttype]
+        setCurrentScore(score, staffOrder)
+        setOrchestraPositions(orderedPositions(score.instrumenttype, staffOrder))
         setAllowedPositionGroups(allowedPositionGroups[score.instrumenttype as Orchestra])
         setOrchestra(score.instrumenttype)
     }

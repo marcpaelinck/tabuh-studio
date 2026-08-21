@@ -17,14 +17,11 @@
  * unused positions). Delete removes the staff immediately.
  */
 
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
 import { NoteObject, type Position, type PositionGroup } from '@tabuhstudio/shared'
 import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react'
-import { Button, Modal, Popover, Radio, RadioGroup, SelectPicker, Tag, Tooltip, Whisper } from 'rsuite'
+import { Button, Modal, Popover, SelectPicker, Tag, Tooltip, Whisper } from 'rsuite'
 import type { OverlayTriggerHandle } from 'rsuite/esm/internals/Overlay'
 import { canAddPositions, candidatesFor, type CastingInstruction } from '../../componentlogic/castingRulesManager'
 import type { KeyMap } from '../../componentlogic/editor/keyMap'
@@ -65,6 +62,8 @@ export interface CompactSystemEditorProps {
     tourSystemPrefix?: string
     /** Editor tour: called when the user clicks in this system's notation (advances the tour step). */
     onTourNotationClick?: () => void
+    /** Score-wide staff order; new/modified staves are kept sorted by it. */
+    positionOrder?: Position[]
 }
 
 const positionName = (p: Position) => positionConfigs[p]?.name ?? p
@@ -80,34 +79,6 @@ const groupLabelClass = `${labelBase} bg-blue-600 text-white hover:bg-blue-700`
 
 // Stable id for a queued staff (positions/groups are unique in the basket, so this is unique).
 const staffId = (item: NewStaffItem) => (item.kind === 'position' ? `pos:${item.position}` : `grp:${item.group}`)
-
-// A draggable/sortable chip in the "New staffs" basket. Clicking (no drag) removes it; the
-// trailing ✕ signals that. A pointer-move threshold distinguishes a click from a drag.
-function SortableStaffLabel({
-    id,
-    className,
-    label,
-    onRemove
-}: {
-    id: string
-    className: string
-    label: string
-    onRemove: () => void
-}) {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
-    return (
-        <button
-            ref={setNodeRef}
-            type="button"
-            className={className}
-            style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 }}
-            onClick={onRemove}
-            {...attributes}
-            {...listeners}>
-            {label} <span aria-hidden="true">✕</span>
-        </button>
-    )
-}
 
 export function CompactSystemEditor({
     ref,
@@ -125,7 +96,8 @@ export function CompactSystemEditor({
     className,
     style,
     tourSystemPrefix,
-    onTourNotationClick
+    onTourNotationClick,
+    positionOrder
 }: CompactSystemEditorProps) {
     // The focusable editor surface, so undo/redo can route focus back to this system.
     const containerRef = useRef<HTMLDivElement>(null)
@@ -151,19 +123,18 @@ export function CompactSystemEditor({
         castingInstructions,
         onChange,
         focusEditor,
-        beatStops
+        beatStops,
+        positionOrder
     })
     const overwriteMode = useEditorStateStore((s) => s.overwriteMode)
     const showExpansion = useEditorStateStore((s) => s.showExpansion)
     // Positions chosen for a NEW staff, before it is created (add above/below).
     const { orchestra, orchestraPositions } = useScoreStore()
-    // Staffs queued in the New-staff dialog's "New staffs" basket, before they are created.
+    // Staffs queued in the New-staff dialog's "New staffs" basket, before they are created. Their
+    // order is irrelevant — created staves are placed by the score-wide order.
     const [newStaffs, setNewStaffs] = useState<NewStaffItem[]>([])
-    // 5px pointer-move threshold: a click removes a basket chip, a drag reorders it.
-    const dragSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
     // Open staff dialog: the New / Modify popup for the label menu of line `li`.
     const [staffDialog, setStaffDialog] = useState<{ kind: 'new' | 'modify'; li: number } | null>(null)
-    const [newPlacement, setNewPlacement] = useState<'above' | 'below'>('below')
     // Modify dialog: local draft of the staff's position set. Edited freely (positions can all be
     // removed); applied to the line on "Done" (disabled while empty). Discarded on Cancel/close.
     const [modifyPositions, setModifyPositions] = useState<Position[]>([])
@@ -203,7 +174,6 @@ export function CompactSystemEditor({
     const closeStaffDialog = () => {
         setStaffDialog(null)
         setNewStaffs([])
-        setNewPlacement('below')
         setModifyPositions([])
     }
 
@@ -345,6 +315,8 @@ export function CompactSystemEditor({
         }
         const newStaffLabel = (item: NewStaffItem) =>
             item.kind === 'position' ? positionName(item.position) : groupLabel(item.group)
+        const removeNewStaff = (item: NewStaffItem) =>
+            setNewStaffs((s) => s.filter((it) => staffId(it) !== staffId(item)))
 
         // Modify dialog works on the `modifyPositions` draft. Pool of positions still free to add:
         // everything not used by the OTHER lines and not already in the draft (so removed positions
@@ -361,17 +333,6 @@ export function CompactSystemEditor({
                 groupPositions(g).every((p) => draftAvailableSet.has(p)) &&
                 canAddPositions(modifyPositions, groupPositions(g), orchestra)
         )
-
-        // Reorder the basket when a chip is dragged onto another.
-        const handleDragEnd = (event: DragEndEvent) => {
-            const { active, over } = event
-            if (!over || active.id === over.id) return
-            setNewStaffs((s) => {
-                const from = s.findIndex((it) => staffId(it) === active.id)
-                const to = s.findIndex((it) => staffId(it) === over.id)
-                return from < 0 || to < 0 ? s : arrayMove(s, from, to)
-            })
-        }
 
         return (
             // Nudge the dialog toward the left (near the position labels) instead of centre.
@@ -416,50 +377,25 @@ export function CompactSystemEditor({
                             </div>
                             <div>
                                 <div className="text-xs mb-1">New staffs</div>
-                                <DndContext
-                                    sensors={dragSensors}
-                                    collisionDetection={closestCenter}
-                                    onDragEnd={handleDragEnd}>
-                                    <SortableContext
-                                        items={newStaffs.map(staffId)}
-                                        strategy={horizontalListSortingStrategy}>
-                                        <div className="flex flex-wrap gap-1 max-w-72">
-                                            {newStaffs.map((item) => (
-                                                <SortableStaffLabel
-                                                    key={staffId(item)}
-                                                    id={staffId(item)}
-                                                    className={
-                                                        item.kind === 'position' ? positionLabelClass : groupLabelClass
-                                                    }
-                                                    label={newStaffLabel(item)}
-                                                    onRemove={() =>
-                                                        setNewStaffs((s) =>
-                                                            s.filter((it) => staffId(it) !== staffId(item))
-                                                        )
-                                                    }
-                                                />
-                                            ))}
-                                            {newStaffs.length === 0 && (
-                                                <span className="text-xs text-gray-400">
-                                                    click one or more position(s)/group(s) to add staffs
-                                                </span>
-                                            )}
-                                        </div>
-                                    </SortableContext>
-                                </DndContext>
-                            </div>
-                            {lines.length > 0 && (
-                                <div>
-                                    <div className="text-xs mb-1">Position</div>
-                                    <RadioGroup
-                                        inline
-                                        value={newPlacement}
-                                        onChange={(v) => setNewPlacement(v as 'above' | 'below')}>
-                                        <Radio value="above">above</Radio>
-                                        <Radio value="below">below</Radio>
-                                    </RadioGroup>
+                                {/* Click a chip to remove it. Order is irrelevant — new staves are
+                                    placed by the score-wide staff order. */}
+                                <div className="flex flex-wrap gap-1 max-w-72">
+                                    {newStaffs.map((item) => (
+                                        <button
+                                            key={staffId(item)}
+                                            type="button"
+                                            className={item.kind === 'position' ? positionLabelClass : groupLabelClass}
+                                            onClick={() => removeNewStaff(item)}>
+                                            {newStaffLabel(item)} <span aria-hidden="true">✕</span>
+                                        </button>
+                                    ))}
+                                    {newStaffs.length === 0 && (
+                                        <span className="text-xs text-gray-400">
+                                            click one or more position(s)/group(s) to add staffs
+                                        </span>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-3">
@@ -526,9 +462,8 @@ export function CompactSystemEditor({
                                 appearance="primary"
                                 disabled={newStaffs.length === 0}
                                 onClick={() => {
-                                    // Insert every queued staff consecutively at the chosen spot.
-                                    const at = lines.length === 0 ? 0 : newPlacement === 'above' ? li : li + 1
-                                    newStaffs.forEach((item, i) => addLine(at + i, itemPositions(item)))
+                                    // Add each queued staff; addLine places it by the score-wide order.
+                                    newStaffs.forEach((item) => addLine(0, itemPositions(item)))
                                     closeStaffDialog()
                                 }}>
                                 Create
