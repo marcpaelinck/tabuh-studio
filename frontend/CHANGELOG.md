@@ -117,7 +117,9 @@ Initial release
 - `Added` Persist/recover user settings focus, speed, panggul, cursor style, main/editor view, mobile tab, and keyboard
   selection.
 
-## 1.1.13 ??????
+## 1.1.13 2026-08-21
 
 - `Added` Tooltips where missing.
-- `Added` 'Guided tour' for first-time users.
+- `Added` 'Guided tour' for first-time users
+- `Added` 'Guided tour' for Player
+- `Added` 'Guided tour' for Editor (basics)
