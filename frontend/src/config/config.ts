@@ -34,13 +34,15 @@ type ThemeColor = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'vio
 
 export const theme: Record<string, ThemeColor> = { main: 'blue', animation: 'green', player: 'orange' }
 
-// DYNAMICS
-export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
-
 // EDITOR
 
 export const editorFontSize = 12
 export type KeyboardType = 'regular' | 'laras'
+
+/** The built-in keymap definition id (see shared `keyMaps`) that each keyboard layout selects.
+ *  The MainMenu "Keyboard" switch and the `defaultKeyboard` preference use this to set the editor's
+ *  active keymap (`selectedKeyMapId`), which is what note entry actually reads. */
+export const keyMapIdForKeyboard: Record<KeyboardType, string> = { regular: '1', laras: '2' }
 
 export const partColorPalette: CSSColors[] = [
     'darkseagreen',
@@ -57,7 +59,7 @@ export const noCursor: EditorCursor = { sysUuid: '', beatSlice: { start: 0, end:
 // PLAYER
 
 export const defaultTempo: BPM = 60
-export const defaultDynamics: number = 0.67 // mf
+export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 export const dynamicsToNumber: Record<DynamicsValue, number> = {
     pp: 0.24,
     p: 0.35,
@@ -66,6 +68,7 @@ export const dynamicsToNumber: Record<DynamicsValue, number> = {
     f: 0.83,
     ff: 1.0
 }
+export const defaultDynamics: number = 0.67 // mf
 export const defaultBeatFrequency = 4 // Default beat (kempli) frequency used for systems where kempli.state === 'off'
 
 // List of playback speeds for selector

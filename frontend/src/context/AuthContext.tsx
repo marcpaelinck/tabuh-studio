@@ -11,6 +11,7 @@ import {
     apiUpdateProfile,
     setAuthExpiredHandler
 } from '../services/apiService'
+import { keyMapIdForKeyboard } from '../config/config'
 import { useGroupsStore } from '../stores/useGroupsStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { UserPreferences } from '../typing/preferences'
@@ -44,7 +45,11 @@ function seedSelectionsFromPreferences(prefs: UserPreferences | undefined) {
     if (!prefs) return
     const s = useUserSelectionStore.getState()
     if (prefs.defaultCursorStyle) s.setSelectedCursorStyle(prefs.defaultCursorStyle)
-    if (prefs.defaultKeyboard) s.setKeyboard(prefs.defaultKeyboard)
+    if (prefs.defaultKeyboard) {
+        s.setKeyboard(prefs.defaultKeyboard)
+        // Drive the editor's active keymap too, otherwise the preference has no effect on note entry.
+        s.setSelectedKeyMapId(keyMapIdForKeyboard[prefs.defaultKeyboard])
+    }
     if (typeof prefs.notationVisibleByDefault === 'boolean') s.setNotationVisible(prefs.notationVisibleByDefault)
 }
 

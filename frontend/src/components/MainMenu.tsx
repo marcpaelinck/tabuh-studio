@@ -5,7 +5,7 @@ import { TbFileImport } from 'react-icons/tb'
 import { Drawer, Nav } from 'rsuite'
 import { persistCachedChanges } from '../componentlogic/useScoreReader'
 import { useShowMessage } from '../componentlogic/useShowMessage'
-import type { KeyboardType } from '../config/config'
+import { keyMapIdForKeyboard, type KeyboardType } from '../config/config'
 import type { AuthUser } from '../context/AuthContext'
 import TsGongIcon from '../reacticons/TsGongIcon'
 import { useRecoveryStore } from '../stores/useRecoveryStore'
@@ -97,6 +97,8 @@ export function MainMenu({
     // Only editors/admins can persist to the database (matches the backend guard).
     const canSaveDb = user?.role === 'editor' || user?.role === 'admin'
     const { selectedScoreOption, setSelectedScoreOption } = useUserSelectionStore()
+    // The editor's active keymap is chosen by `selectedKeyMapId`; the Keyboard switch drives it.
+    const { selectedKeyMapId, setSelectedKeyMapId } = useUserSelectionStore()
     const { showMessage } = useShowMessage()
     const { mainMenuActiveItem } = useTourStore()
 
@@ -357,16 +359,22 @@ export function MainMenu({
                 <NavItemTip
                     tip="Use the regular note-entry keyboard layout"
                     className="text-xs"
-                    active={keyboard == 'regular'}
-                    onSelect={() => setKeyboard('regular')}
+                    active={selectedKeyMapId === keyMapIdForKeyboard.regular}
+                    onSelect={() => {
+                        setKeyboard('regular')
+                        setSelectedKeyMapId(keyMapIdForKeyboard.regular)
+                    }}
                     eventKey="keyboard-regular">
                     Regular
                 </NavItemTip>
                 <NavItemTip
                     tip="Use the Laras note-entry keyboard layout"
                     className="text-xs"
-                    active={keyboard == 'laras'}
-                    onSelect={() => setKeyboard('laras')}
+                    active={selectedKeyMapId === keyMapIdForKeyboard.laras}
+                    onSelect={() => {
+                        setKeyboard('laras')
+                        setSelectedKeyMapId(keyMapIdForKeyboard.laras)
+                    }}
                     eventKey="keyboard-laras">
                     Laras
                 </NavItemTip>
