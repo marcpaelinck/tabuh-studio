@@ -1,3 +1,4 @@
+import { keyMapIdForKeyboard } from '@tabuhstudio/shared/config/keymap'
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import {
     apiDeleteAccount,
@@ -11,7 +12,6 @@ import {
     apiUpdateProfile,
     setAuthExpiredHandler
 } from '../services/apiService'
-import { keyMapIdForKeyboard } from '../config/config'
 import { useGroupsStore } from '../stores/useGroupsStore'
 import { useUserSelectionStore } from '../stores/useUserSettingsStore'
 import type { UserPreferences } from '../typing/preferences'

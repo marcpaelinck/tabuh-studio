@@ -26,7 +26,7 @@ export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
     GONGS: { name: 'Gongs', positions: ['GONGS'] },
     KEMPLI: { name: 'Kempli', positions: ['KEMPLI'] },
     CENGCENG: { name: 'Cengceng', positions: ['CENGCENG'] },
-    KENDANG: { name: 'Kendang', positions: ['KENDANG'] },
+    KENDANG: { name: 'Kendang', positions: ['KENDANG', 'KENDANG_LANANG', 'KENDANG_WADON'] },
     JEGOGAN: { name: 'Jegogan', positions: ['JEGOGAN'] },
     CALUNG: { name: 'Calung', positions: ['CALUNG'] },
     PENYACAH: { name: 'Penyacah', positions: ['PENYACAH'] },
@@ -46,7 +46,7 @@ export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
  * Possible grouping of instruments in the compact editor view.
  */
 // prettier-ignore
-export const positionGroups: Record<PositionGroup, { positions: Position[]; name: string }> = {
+export const positionGroups: Record<PositionGroup, InstrumentConfig> = {
     PEMADE: { positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], name: 'Pemade' },
     KANTILAN: { positions: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], name: 'Kantilan' },
     GANGSA_POLOS: { positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'], name: 'Gangsa p' },

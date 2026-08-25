@@ -1,8 +1,8 @@
 import type { Position } from '@tabuhstudio/shared'
+import type { KeyboardType } from '@tabuhstudio/shared/types/keymap'
 import type { Dispatch } from 'react'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { ExtendedOption, ScoreInfo } from '../typing/interface'
 import { idbStorage } from './idbStorage'
@@ -65,7 +65,8 @@ export const useUserSelectionStore = create<UserSelections>()(
             notationVisible: false,
             setSelectedScoreOption: (option: ExtendedOption<ScoreInfo> | null) =>
                 set(() => ({ selectedScoreOption: option })),
-            setSelectedFocusOption: (option: ExtendedOption<Position[]>) => set(() => ({ selectedFocusOption: option })),
+            setSelectedFocusOption: (option: ExtendedOption<Position[]>) =>
+                set(() => ({ selectedFocusOption: option })),
             setSelectedSpeedOption: (option: ExtendedOption<number>) => set(() => ({ selectedSpeedOption: option })),
             setSelectedPanggulOption: (option: ExtendedOption<Position[]>) =>
                 set(() => ({ selectedPanggulOption: option })),

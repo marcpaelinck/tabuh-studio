@@ -45,3 +45,5 @@ export interface KeyMapDefinition {
     name: string
     mappings: EditableKeyMapping[]
 }
+
+export type KeyboardType = 'regular' | 'laras'

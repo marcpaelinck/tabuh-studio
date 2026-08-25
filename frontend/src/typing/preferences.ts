@@ -1,8 +1,8 @@
 // Per-user app preferences (stored server-side as JSON on the user, applied on login).
 // See CLAUDE.user-settings.md. All keys are optional — an unset key means "use the app default".
 
+import type { KeyboardType } from '@tabuhstudio/shared/types/keymap'
 import type { Orchestra, Position } from '@tabuhstudio/shared/types/position'
-import type { KeyboardType } from '../config/config'
 import type { PlaybackCursorStyle } from './animation'
 
 // An orchestra (by name) or a music group (by id) — never both.

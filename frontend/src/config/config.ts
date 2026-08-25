@@ -4,14 +4,9 @@ import type { DynamicsValue } from '../typing/execution'
 import type { EditorCursor } from '../typing/playback'
 import type { Note } from '../typing/score'
 
-export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
-
-// TAILWIND STYLES
+// STYLE
 
 export const FRAMESTYLE = ' border border-gray-300 '
-
-// COLORS
-
 export const tsBlue = '#1C78E0'
 
 //prettier-ignore
@@ -37,26 +32,8 @@ export const theme: Record<string, ThemeColor> = { main: 'blue', animation: 'gre
 // EDITOR
 
 export const editorFontSize = 12
-export type KeyboardType = 'regular' | 'laras'
 
-/** The built-in keymap definition id (see shared `keyMaps`) that each keyboard layout selects.
- *  The MainMenu "Keyboard" switch and the `defaultKeyboard` preference use this to set the editor's
- *  active keymap (`selectedKeyMapId`), which is what note entry actually reads. */
-export const keyMapIdForKeyboard: Record<KeyboardType, string> = { regular: '1', laras: '2' }
-
-export const partColorPalette: CSSColors[] = [
-    'darkseagreen',
-    'aquamarine',
-    'paleturquoise',
-    'lightsteelblue',
-    'thistle',
-    'lavender',
-    'cornsilk',
-    'khaki'
-]
-export const noCursor: EditorCursor = { sysUuid: '', beatSlice: { start: 0, end: 0 }, lastColumn: 0 } // 'null' value for the playback cursor of the editor
-
-// PLAYER
+// PLAYBACK -> MOVE TO SHARED
 
 export const defaultTempo: BPM = 60
 export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
@@ -70,6 +47,8 @@ export const dynamicsToNumber: Record<DynamicsValue, number> = {
 }
 export const defaultDynamics: number = 0.67 // mf
 export const defaultBeatFrequency = 4 // Default beat (kempli) frequency used for systems where kempli.state === 'off'
+export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
+export const noCursor: EditorCursor = { sysUuid: '', beatSlice: { start: 0, end: 0 }, lastColumn: 0 } // 'null' value for the playback cursor of the editor
 
 // List of playback speeds for selector
 export const speedList = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]

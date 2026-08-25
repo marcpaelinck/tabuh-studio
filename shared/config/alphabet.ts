@@ -42,21 +42,21 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
     '0': {
         kind: 'tone',
         category: 'percussion',
-        name: 'Ka',
+        name: 'Krum',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     '8': {
         kind: 'tone',
         category: 'percussion',
-        name: 'Det',
+        name: 'Ka',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
     '9': {
         kind: 'tone',
         category: 'percussion',
-        name: 'Tong',
+        name: 'Det',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -87,7 +87,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
     ')': {
         kind: 'tone',
         category: 'percussion',
-        name: 'Teng',
+        name: 'Pung',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
