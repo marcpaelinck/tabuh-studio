@@ -4,7 +4,7 @@ import type { DynamicsValue } from '../typing/execution'
 import type { EditorCursor } from '../typing/playback'
 import type { Note } from '../typing/score'
 
-// STYLE
+// STYLE & THEME
 
 export const FRAMESTYLE = ' border border-gray-300 '
 export const tsBlue = '#1C78E0'
@@ -23,13 +23,9 @@ export type CSSColors = | 'aliceblue' | 'antiquewhite' | 'aqua' | 'aquamarine' |
        | 'salmon' | 'sandybrown' | 'seagreen' | 'seashell' | 'sienna' | 'silver' | 'skyblue' | 'slateblue' | 'slategray' | 'snow' | 'springgreen' | 'steelblue' | 'tan' | 'teal'
        | 'thistle' | 'tomato' | 'turquoise' | 'violet' | 'wheat' | 'white' | 'whitesmoke' | 'yellow' | 'yellowgreen'
 
-// THEME
-
 type ThemeColor = 'red' | 'orange' | 'yellow' | 'green' | 'cyan' | 'blue' | 'violet'
 
 export const theme: Record<string, ThemeColor> = { main: 'blue', animation: 'green', player: 'orange' }
-
-// EDITOR
 
 export const editorFontSize = 12
 
