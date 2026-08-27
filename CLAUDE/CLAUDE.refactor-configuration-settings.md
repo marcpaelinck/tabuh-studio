@@ -90,9 +90,10 @@ interface PositionConfig {
 - Add **`tone: ToneType`** to `AlphabetItem`, keyed by pitch char — genuinely 1-to-1 and
   orchestra-independent (`i`→DING, `o`→DONG, `G`→GIR, `0`→CUNG, …; new `r`/`s` get their tones).
 - **Muting is purely modifier-derived** for *all* positions: none→OPEN, `/`→ABBREVIATED, `?`→MUTED.
-  (This relies on the KEMPLI data correction below — after it, no position-specific muting override is
-  needed.) `NoteObject` therefore exposes derived accessors `tone` (via alphabet), `octaveNumber`
-  (already), and `muting` (from the modifier). No shorthand codes, no `noteConfigs`.
+  (This relies on the KEMPLI default-stroke decision below — its bare `x` is defined as OPEN, so it
+  follows the "no modifier → OPEN" rule and no position-specific muting override is needed.)
+  `NoteObject` therefore exposes derived accessors `tone` (via alphabet), `octaveNumber` (already),
+  and `muting` (from the modifier). No shorthand codes, no `noteConfigs`.
 - NB naming: `NoteObject.stroke` already exists and means *articulation* (damped/muted/tremolo/rake…,
   from the modifier). Do **not** reuse that name for the physical strike location (slice 4).
 
@@ -142,14 +143,21 @@ own; unchanged in structure.
 - Animation / MIDI: `symbol → alphabet.tone + NoteObject.octaveNumber + modifier-derived muting +
   strikeLocation[pos]`.
 
-## Required data correction (KEMPLI)
+## KEMPLI default stroke (resolved — no migration)
 
-Muting can only be *purely modifier-derived* once KEMPLI stops using a bare `x` to mean "muted".
-Change KEMPLI's mapping from `{'x': ['X_MUTED']}` to **`{'x': ['X_OPEN'], 'x?': ['X_MUTED']}`** — a
-bare `x` becomes an OPEN stroke, and a muted KEMPLI stroke is written `x?` (consistent with every
-other position). **Migration:** existing stored scores that wrote a bare `x` on KEMPLI (meaning
-"muted") must be rewritten to `x?`, or they will play OPEN. A one-off data migration over stored
-scores accompanies this change.
+For muting to be purely modifier-derived with no exception, the KEMPLI default stroke `x` is defined
+as an **OPEN** note: `symbolToNoteNames: { x: ['X'] }`, where note `X` has `muting: OPEN`. This keeps
+`x` — the natural, convenient beat notation — as the default stroke and simply follows the general
+rule "no modifier → OPEN".
+
+The muting value of the kempli stroke only affects the *animation*, and the kempli is not animated
+(no `svg_file`) and is not expected to be, so OPEN vs MUTED is immaterial here. Consequently **no
+`x?` split and no score migration are needed** — the earlier idea (bare `x` = muted, `x?` = OPEN,
+plus a data migration) was rejected precisely to avoid rewriting existing scores. The sample file was
+renamed to `GK_KEMPLI_X` accordingly.
+
+Open/muted kempli strokes for the legong style (where the kempli follows the kendang, usually in the
+pengawak) will be added later as dedicated kendang-like symbols with their own samples.
 
 ## The accessor seam (do this first)
 
@@ -187,8 +195,13 @@ unchanged accessors.
 ## Incremental plan (each step shippable + test-guarded)
 
 1. **Accessor seam** over the *current* config (no shape change); migrate all consumers.
-2. **KEMPLI correction** (`x` → `x?` for muted) + one-off score data migration; add alphabet symbols
-   `r`, `s` and the `tone` field on alphabet items.
+2. **KEMPLI default stroke** + add the `tone` field on alphabet items. *(Done: KEMPLI stays
+   `symbolToNoteNames: { x: ['X'] }` with note `X` = OPEN, so `x` remains the beat notation and no
+   `x?` split or score migration is needed — see "KEMPLI default stroke" above; sample renamed to
+   `GK_KEMPLI_X`. `tone` added to `AlphabetItem` and populated on the atomic tone symbols. The lazy
+   on-load migration that was briefly added is no longer needed and has been removed.)*
+   - **Deferred:** the new alphabet symbols `r`, `s` move to step 5 (they belong to Semar Pagulingan,
+     which introduces their positions, tones, and samples; adding them earlier would be orphaned).
 3. **Voicing** (`symbol → NoteObject[]`) + strike-location table; retire `noteConfigs`,
    `symbolToNoteNames`, `toneManager.combinedTones`, and the `Note` type behind the accessors.
 4. **SampleSet** as a first-class concept (start with one default `GONG_KEBYAR` set) + the

@@ -79,7 +79,6 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         TONG: { tone: 'TONG', octave: null, stroke: null, muting: 'OPEN' },
         // KEMPLI
         X_OPEN: { tone: 'X', octave: null, stroke: 'KNOB', muting: 'OPEN' },
-        X_MUTED: { tone: 'X', octave: null, stroke: 'KNOB', muting: 'MUTED' },
         // KENDANG
         KA: { tone: 'KA', octave: null, stroke: null, muting: 'OPEN' },
         PAK: { tone: 'PAK', octave: null, stroke: null, muting: 'OPEN' },

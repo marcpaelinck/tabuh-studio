@@ -1,4 +1,4 @@
-import type { NoteSymbol } from '../types/basetypes'
+import type { NoteSymbol, ToneType } from '../types/basetypes'
 import type { Position } from '../types/position'
 import { positionConfigs, positionGroups } from './position'
 
@@ -14,6 +14,12 @@ export interface AlphabetItem {
     name: string
     description: string
     positions: Position[]
+    /**
+     * The tone a pitch character produces (1-to-1, orchestra-independent). Set only on atomic tone
+     * symbols; absent on prefixes/octavation/modifiers/rests and on multi-note symbols (`b`, `t`)
+     * whose notes come from the voicing. Prep for deriving `NoteObject.tone` (retires `noteConfigs`).
+     */
+    tone?: ToneType
 }
 
 // prettier-ignore
@@ -43,6 +49,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Krum',
+        tone: 'CUNG',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -50,6 +57,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Ka',
+        tone: 'KA',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -57,17 +65,19 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Det',
+        tone: 'DE',
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
-    G: { kind: 'tone', category: 'colotomy', name: 'Gir', description: 'Gong stroke', positions: ['GONGS'] },
-    P: { kind: 'tone', category: 'colotomy', name: 'Pur', description: 'Kempur stroke', positions: ['GONGS'] },
-    T: { kind: 'tone', category: 'colotomy', name: 'Tong', description: 'Kemong stroke', positions: ['GONGS'] },
+    G: { kind: 'tone', category: 'colotomy', name: 'Gir', tone: 'GIR', description: 'Gong stroke', positions: ['GONGS'] },
+    P: { kind: 'tone', category: 'colotomy', name: 'Pur', tone: 'PUR', description: 'Kempur stroke', positions: ['GONGS'] },
+    T: { kind: 'tone', category: 'colotomy', name: 'Tong', tone: 'TONG', description: 'Kemong stroke', positions: ['GONGS'] },
     x: {
         kind: 'tone',
         category: 'percussion',
         name: 'Stroke',
-        description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
+        tone: 'X',
+        description: 'percussion stroke. Reyong: on chime rim. Kempli: open stroke. Ceng-ceng: open stroke.',
         positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CENGCENG', 'KEMPLI', 'CENGCENG_P', 'CENGCENG_S', 'TAWATAWA']
     },
     y: {
@@ -81,6 +91,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Tut',
+        tone: 'TUT',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -88,6 +99,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Pung',
+        tone: 'KUNG',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -95,6 +107,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'percussion',
         name: 'Pak',
+        tone: 'PAK',
         description: 'Wadon stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
@@ -102,6 +115,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'melodic',
         name: 'DING',
+        tone: 'DING',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
     },
@@ -109,6 +123,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'melodic',
         name: 'DONG',
+        tone: 'DONG',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
     },
@@ -116,6 +131,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'melodic',
         name: 'DENG',
+        tone: 'DENG',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
     },
@@ -123,6 +139,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'melodic',
         name: 'DUNG',
+        tone: 'DUNG',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
     },
@@ -130,6 +147,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         kind: 'tone',
         category: 'melodic',
         name: 'DANG',
+        tone: 'DANG',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
     },
