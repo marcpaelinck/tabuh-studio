@@ -12,7 +12,7 @@
 // `setTotalDurationMs` (the caller reads `timeline.totalDurationMs`).
 
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getAllPositions, getPositionType, getShorthandCodes, hasPosition } from '@tabuhstudio/shared/config/configAccess'
 import type { BPM } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { createElement } from 'react'
@@ -97,11 +97,11 @@ function setLastSamplerActionEndtime(action: PlaybackSamplerAction | null | unde
 }
 
 function samplerAction2AnimationNotes(position: Position, action: PlaybackSamplerAction): AnimationNote[] {
-    if (!(position in positionConfigs)) return []
-    const shorthandCodes = positionConfigs[position].symbolToNoteNames[action.params.note.canonicalSymbol] || []
+    if (!hasPosition(position)) return []
+    const shorthandCodes = getShorthandCodes(position, action.params.note.canonicalSymbol)
     const result: AnimationNote[] = []
     shorthandCodes.forEach((shCode) => {
-        const instrType: string = positionConfigs[position].type
+        const instrType: string = getPositionType(position)
         if (!shCode) return null
         const note: Note = noteConfigs[instrType][shCode]
         const keyname: string = note ? `${note.tone}${note.octave != null ? note.octave : ''}` : ''
@@ -198,7 +198,7 @@ export function buildTimeline(pbAction: PlaybackAction, opts: BuildTimelineOptio
 
     var prevSystem: System | undefined = undefined
     var currAction: Record<string, PlaybackSamplerAction | null> = Object.fromEntries(
-        Object.keys(positionConfigs).map((key) => [key, null])
+        getAllPositions().map((key) => [key, null])
     )
     var currentStep: FlowStep | undefined = nextInFlow()
     var introTempo: BPM = defaultTempo // Needed for initial animation action.
@@ -212,7 +212,7 @@ export function buildTimeline(pbAction: PlaybackAction, opts: BuildTimelineOptio
     // This dict will be used to create animation actions
     // @ts-ignore
     const samplerActionsByPos: Record<Position, PlaybackSamplerAction[]> = Object.fromEntries(
-        _.keys(positionConfigs).map((key) => [key, []] as [Position, PlaybackSamplerAction[]])
+        getAllPositions().map((key) => [key, []] as [Position, PlaybackSamplerAction[]])
     )
     var currentTempo = 0
 

@@ -1,5 +1,11 @@
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
+import {
+    getAllPositions,
+    getPositionVolume,
+    getSampleTemplate,
+    getSymbolToNoteNames
+} from '@tabuhstudio/shared/config/configAccess'
+import { positionGroups } from '@tabuhstudio/shared/config/position'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
 import {
@@ -66,13 +72,13 @@ const createSampler = ({
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
     Tone.getDestination().volume.value = 5
-    const entries = Object.entries(positionConfigs).map(([position, config]) => {
+    const entries = getAllPositions().map((position) => {
         return [
             position,
             createSampler({
-                isMelodic: positionGroups.MELODIC.positions.includes(position as Position),
+                isMelodic: positionGroups.MELODIC.positions.includes(position),
                 samples: lookup[position].idx2sample,
-                volume: config.volume
+                volume: getPositionVolume(position)
             })
         ]
     })
@@ -84,17 +90,15 @@ export function soundFile(note: string, fileTemplate: string): string {
 }
 
 const lookup = Object.fromEntries(
-    Object.entries(positionConfigs).map(([position, config]) => {
-        const noteList = [...new Set(Object.values(config.symbolToNoteNames).flat())]
+    getAllPositions().map((position) => {
+        const symbolToNoteNames = getSymbolToNoteNames(position)
+        const noteList = [...new Set(Object.values(symbolToNoteNames).flat())]
         const indexToSample = Object.fromEntries(
-            noteList.map((note, index) => [
-                NOTES[index],
-                soundFile(note, positionConfigs[position as Position].sampletemplate)
-            ])
+            noteList.map((note, index) => [NOTES[index], soundFile(note, getSampleTemplate(position))])
         )
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
         const symbolToIndices = Object.fromEntries(
-            Object.entries(config.symbolToNoteNames).map(([symbol, notes]) => [
+            Object.entries(symbolToNoteNames).map(([symbol, notes]) => [
                 symbol,
                 notes.map((repr) => noteToIndex[repr])
             ])
@@ -179,10 +183,7 @@ export const useInstruments = (outroTime: number = playerOutroTime) => {
 
     const instrumentSamplers: InstrumentSamplers = useMemo(() => {
         return Object.fromEntries(
-            Object.keys(positionConfigs).map((position) => [
-                position as Position,
-                createInstrument(position as Position, samplers, outroTime)
-            ])
+            getAllPositions().map((position) => [position, createInstrument(position, samplers, outroTime)])
         ) as Record<Position, InstrumentSampler>
     }, [])
 

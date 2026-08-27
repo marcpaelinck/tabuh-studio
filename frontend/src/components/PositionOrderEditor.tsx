@@ -5,10 +5,10 @@
 import { closestCenter, DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionName } from '@tabuhstudio/shared/config/configAccess'
 import type { Position } from '@tabuhstudio/shared/types/position'
 
-const positionName = (p: Position) => positionConfigs[p]?.name ?? p
+const positionName = (p: Position) => getPositionName(p)
 
 function SortableRow({ id, label }: { id: string; label: string }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })

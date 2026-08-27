@@ -10,7 +10,7 @@
  */
 
 import type { NoteObject, Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionName } from '@tabuhstudio/shared/config/configAccess'
 import type { CSSProperties, RefObject } from 'react'
 import { StaffGrid, type StaffGridRow } from './StaffGrid'
 
@@ -35,7 +35,7 @@ export interface SystemNotationViewerProps {
 export function SystemNotationViewer({ ref, staves, notationWidth, className, style }: SystemNotationViewerProps) {
     const rows: StaffGridRow[] = staves.map((staff) => ({
         key: staff.position,
-        label: <div className="shrink-0 w-36 pr-2 truncate text-blue-600">{positionConfigs[staff.position].name}</div>,
+        label: <div className="shrink-0 w-36 pr-2 truncate text-blue-600">{getPositionName(staff.position)}</div>,
         symbols: staff.symbols,
         cursorIndex: null,
         onSymbolClick: noop,

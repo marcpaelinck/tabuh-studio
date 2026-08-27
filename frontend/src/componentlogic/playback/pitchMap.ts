@@ -17,7 +17,12 @@
 // the exported MIDI numbers. Pitches here are nominal 12-TET, not true pelog/slendro tuning.
 
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import {
+    getAllPositions,
+    getPositionInstrument,
+    getShorthandCodes,
+    getSymbolToNoteNames
+} from '@tabuhstudio/shared/config/configAccess'
 import type { Instrument } from '@tabuhstudio/shared/types/position'
 
 const PITCH_CLASS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
@@ -69,8 +74,9 @@ const midiByNoteName:Record<Instrument, Record<string, number>> = {
 /** Positions grouped by their instrument, in `positionConfigs` declaration order. */
 const positionsByInstrument = ((): Record<Instrument, Position[]> => {
     const acc = {} as Record<Instrument, Position[]>
-    for (const [position, cfg] of Object.entries(positionConfigs)) {
-        ;(acc[cfg.instrument] ??= []).push(position as Position)
+    for (const position of getAllPositions()) {
+        const instrument = getPositionInstrument(position)
+        if (instrument) (acc[instrument] ??= []).push(position)
     }
     return acc
 })()
@@ -98,7 +104,7 @@ const positionsByInstrument = ((): Record<Instrument, Position[]> => {
 //     return acc
 // })()
 
-const instrumentOf = (position: Position): Instrument | undefined => positionConfigs[position]?.instrument
+const instrumentOf = (position: Position): Instrument | undefined => getPositionInstrument(position)
 
 /**
  * The MIDI note number(s) a symbol plays for a given position (0..n; n>1 for chord keys),
@@ -108,7 +114,7 @@ export function symbolMidis(position: Position, canonicalSymbol: string): number
     const instrument = instrumentOf(position)
     if (!instrument) return []
     const map = midiByNoteName[instrument]
-    return (positionConfigs[position].symbolToNoteNames[canonicalSymbol] ?? []).map((name) => map[name])
+    return getShorthandCodes(position, canonicalSymbol).map((name) => map[name])
 }
 
 export interface NoteMapRow {
@@ -134,7 +140,7 @@ export function instrumentNoteMapRows(instrument: Instrument): NoteMapRow[] {
 
     const symbolsByNote: Record<string, string[]> = {}
     for (const position of positionsByInstrument[instrument] ?? []) {
-        for (const [symbol, names] of Object.entries(positionConfigs[position].symbolToNoteNames)) {
+        for (const [symbol, names] of Object.entries(getSymbolToNoteNames(position))) {
             for (const name of names) (symbolsByNote[name] ??= []).push(symbol)
         }
     }

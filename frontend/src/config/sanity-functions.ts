@@ -1,5 +1,5 @@
 import { type Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getAllPositions, getSampleTemplate, getSymbolToNoteNames, hasPosition } from '@tabuhstudio/shared/config/configAccess'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck, SOUNDS_FOLDER } from './config'
 
@@ -8,16 +8,16 @@ import { doSanityCheck, SOUNDS_FOLDER } from './config'
 // e.g. GK_JEGOGAN_I1_O.mp3
 async function sanityCheck() {
     var logMessage = ''
-    const instrPitchStroke = Object.entries(positionConfigs)
-        .map(([instr, config]) =>
-            Object.values(config.symbolToNoteNames)
+    const instrPitchStroke = getAllPositions()
+        .map((position) =>
+            Object.values(getSymbolToNoteNames(position))
                 .flat()
-                .map((note) => [instr, note])
+                .map((note) => [position, note] as [Position, string])
         )
         .flat()
     for (const [position, note] of instrPitchStroke) {
-        const filename = positionConfigs[position as Position].sampletemplate.replace('{note}', note)
-        const found = position in positionConfigs && (await fileExists(SOUNDS_FOLDER + filename))
+        const filename = getSampleTemplate(position).replace('{note}', note)
+        const found = hasPosition(position) && (await fileExists(SOUNDS_FOLDER + filename))
         if (!found) logMessage += `X ${filename} not found in ${SOUNDS_FOLDER}\n`
     }
     if (logMessage) console.error(logMessage)

@@ -9,7 +9,7 @@
 // Pure builder (`buildMidiNoteMapModel`) + pdf-lib renderer (`generateMidiNoteMapPdf`).
 
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionInstrument } from '@tabuhstudio/shared/config/configAccess'
 import type { Instrument } from '@tabuhstudio/shared/types/position'
 import { PDFDocument, PDFString, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { gmProgram } from '../playback/midiGenerator'
@@ -94,7 +94,7 @@ export function buildMidiNoteMapModel(scoreTitle: string, positions: Position[])
     const instruments: MidiNoteMapInstrument[] = []
     const seen = new Set<Instrument>()
     for (const position of positions) {
-        const instrument = positionConfigs[position]?.instrument
+        const instrument = getPositionInstrument(position)
         if (!instrument || seen.has(instrument)) continue
         seen.add(instrument)
         const program = gmProgram(position)

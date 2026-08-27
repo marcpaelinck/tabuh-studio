@@ -4,7 +4,7 @@
 
 import { symbolName } from '../../frontend/src/config/alphabet-functions.ts'
 import { alphabet, type Category } from '../config/alphabet.ts'
-import { positionConfigs } from '../config/position.ts'
+import { positionHasSymbol } from '../config/configAccess.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
 
 import type {
@@ -378,7 +378,7 @@ export class NoteObject {
     }
 
     hasSample() {
-        return this.position ? this.canonicalSymbol in positionConfigs[this.position].symbolToNoteNames : undefined
+        return this.position ? positionHasSymbol(this.position, this.canonicalSymbol) : undefined
     }
 
     // Returns a new NoteObject where the grace note is resolved to the correct octave

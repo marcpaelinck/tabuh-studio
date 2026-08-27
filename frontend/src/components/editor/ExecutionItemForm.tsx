@@ -1,5 +1,5 @@
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionName } from '@tabuhstudio/shared/config/configAccess'
 import _ from 'lodash'
 import { createContext, useContext, useMemo, type Dispatch, type ReactNode, type Ref, type SyntheticEvent } from 'react'
 import {
@@ -752,7 +752,7 @@ export function positionOptionsForSystem(
 ): InputOption<string>[] {
     return orchestraPosititions
         .filter((p) => p in staffs && p !== beatPosition)
-        .map((p) => ({ label: positionConfigs[p as Position].name, value: p }))
+        .map((p) => ({ label: getPositionName(p as Position), value: p }))
 }
 
 // ---------------------------------------------------------------------------

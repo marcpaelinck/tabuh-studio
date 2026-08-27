@@ -18,7 +18,7 @@
 // accompanying note-map PDF documents the pitch → Tabuh-note mapping.
 
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionInstrument, getPositionName } from '@tabuhstudio/shared/config/configAccess'
 import type { Instrument } from '@tabuhstudio/shared/types/position'
 import { Midi } from '@tonejs/midi'
 import { baseNoteValue } from '../../config/config'
@@ -57,7 +57,7 @@ const GM_PROGRAM_BY_INSTRUMENT: Record<Instrument, number> = {
 
 /** The 0-based General-MIDI program used for a position's track (via its instrument). */
 export function gmProgram(position: Position): number {
-    const instrument = positionConfigs[position]?.instrument
+    const instrument = getPositionInstrument(position)
     return (instrument !== undefined ? GM_PROGRAM_BY_INSTRUMENT[instrument] : undefined) ?? 0
 }
 
@@ -111,7 +111,7 @@ export function generateMidiFile(timeline: TimeLine): Uint8Array {
     let channel = 0
     for (const [position, actions] of actionsByPosition(timeline)) {
         const track = midi.addTrack()
-        track.name = positionConfigs[position]?.name ?? position
+        track.name = getPositionName(position)
         track.instrument.number = gmProgram(position)
         // Give each track its own channel, skipping 9 (the GM percussion channel), wrapping
         // if there are more than 15 melodic tracks.

@@ -18,7 +18,8 @@
  */
 
 import { NoteObject, type Position, type PositionGroup } from '@tabuhstudio/shared'
-import { positionConfigs, positionGroups } from '@tabuhstudio/shared/config/position'
+import { getPositionName, hasPosition } from '@tabuhstudio/shared/config/configAccess'
+import { positionGroups } from '@tabuhstudio/shared/config/position'
 import type { NoteSymbol } from '@tabuhstudio/shared/types/basetypes'
 import { useCallback, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { Button, Modal, Popover, SelectPicker, Tag, Tooltip, Whisper } from 'rsuite'
@@ -66,7 +67,7 @@ export interface CompactSystemEditorProps {
     positionOrder?: Position[]
 }
 
-const positionName = (p: Position) => positionConfigs[p]?.name ?? p
+const positionName = (p: Position) => getPositionName(p)
 
 // A staff queued in the "New staffs" basket: either a single position or a whole group.
 type NewStaffItem = { kind: 'position'; position: Position } | { kind: 'group'; group: PositionGroup }
@@ -309,8 +310,8 @@ export function CompactSystemEditor({
         )
         const groupLabel = (g: PositionGroup) => {
             const positions = groupPositions(g)
-            return positions.length == 1 && positions[0] in positionConfigs
-                ? positionConfigs[positions[0]].name
+            return positions.length == 1 && hasPosition(positions[0])
+                ? getPositionName(positions[0])
                 : (positionGroups[g]?.name ?? g)
         }
         const newStaffLabel = (item: NewStaffItem) =>

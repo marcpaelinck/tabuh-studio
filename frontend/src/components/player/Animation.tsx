@@ -10,7 +10,7 @@ import NotationArea from './NotationArea'
 // import 'rsuite/Loader/styles/index.css';
 // import 'rsuite/DropDown/styles/index.css';
 import type { Position } from '@tabuhstudio/shared'
-import { positionConfigs } from '@tabuhstudio/shared/config/position'
+import { getPositionName, getPositionSvgFile } from '@tabuhstudio/shared/config/configAccess'
 import { ReactSVG } from 'react-svg'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import { type XCoordRecord, type YCoordRecord } from '../../typing/animation'
@@ -22,7 +22,7 @@ import { ResizableSVG } from '../ResizableSVG'
 // (Animation can currently animate only one instrument at the same time)
 function positionToSvg(positions: string[]): string {
     const svgList: string[] = []
-    positions.forEach((pos: string) => svgList.push(positionConfigs[pos as Position]?.svg_file))
+    positions.forEach((pos: string) => svgList.push(getPositionSvgFile(pos as Position)))
     const uniqueList: string[] = [...new Set(svgList)]
     return uniqueList.length == 1 ? uniqueList[0] : ''
 }
@@ -86,7 +86,7 @@ export function Animation({ notationElement, appAppearance, setSVGInfo }: Animat
         if (selectedFocusOption.objValue.length > 1) {
             selectedFocusOption.objValue.forEach((position) => {
                 menuItems.push({
-                    label: positionConfigs[position as Position].name,
+                    label: getPositionName(position as Position),
                     value: position,
                     objValue: [position]
                 })
