@@ -7,7 +7,7 @@ export type XCoordRecord = { [note: string]: number } | null
 
 export type YCoordRecord = { y: number } | null
 
-export type NoteProps = {
+export type AnimationNoteProps = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
     octave: number | null // 0, 1 or 2: relative to the instrument. Scale always start with DING.
     stroke: StrokeLocation | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.

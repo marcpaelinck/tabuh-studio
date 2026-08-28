@@ -32,7 +32,7 @@ import { getSystemDuration } from '../../utils/objectUtils'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOplusNumber } from '../../utils/timeunits'
 import { cycleValidation } from '../validationManager'
 import { executionManager } from './executionManager'
-import { deriveNote, voicing } from './notePlayback'
+import { voicing } from './notePlayback'
 import { createNoteActions, noteDuration } from './strokeManager'
 
 export interface BuildTimelineOptions {
@@ -99,18 +99,10 @@ function setLastSamplerActionEndtime(action: PlaybackSamplerAction | null | unde
 
 function samplerAction2AnimationNotes(position: Position, action: PlaybackSamplerAction): AnimationNote[] {
     if (!hasPosition(position)) return []
-    // Expand the played symbol to its atomic notes (BYONG → several) and derive each note's
-    // tone / octave / muting / strike straight from the symbol (see notePlayback).
+    // Expand the played symbol to its atomic notes (BYONG → several)
     const noteObj = new NoteObject(action.params.note.canonicalSymbol, position)
     return voicing(noteObj).map((n) => {
-        const note = deriveNote(n)
-        return {
-            time: action.time,
-            keyname: `${note.tone}${note.octave != null ? note.octave : ''}`,
-            noteProps: note,
-            duration: action.params.duration,
-            isLast: action.params.isLast
-        }
+        return { time: action.time, noteObject: n, duration: action.params.duration, isLast: action.params.isLast }
     })
 }
 

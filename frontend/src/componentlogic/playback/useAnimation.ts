@@ -2,23 +2,29 @@ import type { Position } from '@tabuhstudio/shared'
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import * as Tone from 'tone'
 import { animationConfig, type CSSColors } from '../../config/config'
-import type { SVGInfo } from '../../typing/animation'
-import type { AnimationNote, AnimmationFunctionParameters } from '../../typing/playback'
+import type { AnimationNoteProps, SVGInfo } from '../../typing/animation'
+import type { AnimmationFunctionParameters as AnimationFunctionParameters, AnimationNote } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
+import { deriveAnimationNoteProps } from './notePlayback'
 
 const moveToDuration = 500 // duration of the movement to the next key
 const strikeDuration = 600 // duration of the stroke
 const bezier = 'cubic-bezier(0,.25,1,.71)' // default timing curve
 const bezierStroke = 'cubic-bezier(.99,-0.01,1,.51)' // timing curve for stroke (accelerates toward stroke)
 
+// Contains animation-specific properties
+interface EnrichedAnimationNote extends AnimationNote, AnimationNoteProps {
+    keyname: string
+}
+
 // Retrieves the highlight color for the given note (instrument key).
 // PositionSeq can be used in case multiple positions are animated on the same instrument. The corresponding color
 // will then be selected from the list of colors, reusing the colors if positionSeq is larger than the number of
 // available colors.
-const getHighlightColor = (note: AnimationNote, positionSeq: number = 0): CSSColors => {
+const getHighlightColor = (note: EnrichedAnimationNote, positionSeq: number = 0): CSSColors => {
     const colors: CSSColors[] =
-        animationConfig.highlight[note.noteProps.tone] ||
-        animationConfig.highlight[note.noteProps.muting] ||
+        animationConfig.highlight[note.tone] ||
+        animationConfig.highlight[note.muting] ||
         Object.values(animationConfig.highlight)[0]
     if (!colors) return 'cyan'
     var color_id = positionSeq % colors.length
@@ -31,7 +37,7 @@ const getHighlightColor = (note: AnimationNote, positionSeq: number = 0): CSSCol
  * @param note
  * @param positionIndex
  */
-async function highlightNote(keyElement: Element, note: AnimationNote, positionIndex: number) {
+async function highlightNote(keyElement: Element, note: EnrichedAnimationNote, positionIndex: number) {
     const durationMillis = Math.min(Tone.Time(note.duration).toMilliseconds(), 3000)
     const color: string = getHighlightColor(note, positionIndex)
     var highlightKeyframes = new KeyframeEffect(
@@ -46,16 +52,21 @@ async function highlightNote(keyElement: Element, note: AnimationNote, positionI
     animation.play()
 }
 
-function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, pbSpeed: number) {
+function animatePanggul(
+    currNotes: EnrichedAnimationNote[],
+    nextNotes: EnrichedAnimationNote[],
+    timeuntilMs: number,
+    svgInfo: SVGInfo,
+    pbSpeed: number
+) {
     var keyframes: Keyframe[], options: KeyframeAnimationOptions
-    if (!params || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null || !params.currnotes)
-        return
+    if (!currNotes || !nextNotes || !svgInfo.animation || !svgInfo.panggul || !svgInfo.x || svgInfo.y == null) return
 
     // Currently only one panggul can be animated
-    var currKey = params.currnotes.length ? params.currnotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
-    var nextKey = params.nextnotes.length ? params.nextnotes[0].keyname : currKey
+    var currKey = currNotes.length ? currNotes[0].keyname : Object.keys(svgInfo.x)[0] // E.g. 'DONG1'. This uniquely identifies a key
+    var nextKey = nextNotes.length ? nextNotes[0].keyname : currKey
 
-    if (params.currnotes.length > 0 && params.currnotes[0].isLast /*&& !this.dom.loopCheckbox.checked*/) {
+    if (currNotes.length > 0 && currNotes[0].isLast /*&& !this.dom.loopCheckbox.checked*/) {
         // Final animation: lift the hammer.
         debug('last note')
         keyframes = [
@@ -71,14 +82,14 @@ function animatePanggul(params: AnimmationFunctionParameters, svgInfo: SVGInfo, 
         ]
         options = { duration: strikeDuration, fill: 'forwards', easing: bezier, composite: 'replace' }
     } else {
-        if (!params.nextnotes) {
+        if (!nextNotes) {
             console.error('ERROR in panggul animation: next note not defined but current note is not last.')
             return
         }
         // var millisToNextNote = Math.round(Tone.Time(action.timeuntil).toMilliseconds() / selectedSpeed)
-        if (!params.timeuntilMs) console.error(`params.timeuntilMs is ${params.timeuntilMs}`)
+        if (!timeuntilMs) console.error(`params.timeuntilMs is ${timeuntilMs}`)
         if (!pbSpeed) console.error(`pbSpeed is ${pbSpeed}`)
-        var millisToNextNote = Math.round(params.timeuntilMs / pbSpeed)
+        var millisToNextNote = Math.round(timeuntilMs / pbSpeed)
         // Convert time durations to fractions (keyframe time indicators run from 0 to 1)
         var move_to_fraction = moveToDuration / millisToNextNote
         var stroke_fraction = strikeDuration / millisToNextNote
@@ -163,20 +174,34 @@ export const useAnimationEngine = (
         )
     }
 
+    // Adds NoteProps and keyname (SVG element query key) to an AnimationNote
+    function enrichAnimationNote(aNote: AnimationNote): EnrichedAnimationNote {
+        const noteProps = deriveAnimationNoteProps(aNote.noteObject)
+        return {
+            ...aNote,
+            ...noteProps,
+            keyname: `${noteProps.tone}${noteProps.octave != null ? noteProps.octave : ''}`
+        }
+    }
+
     // For the use of Draw.schedule, see
-    const animateInstrument = useCallback((time: number, params: AnimmationFunctionParameters): void => {
+    const animateInstrument = useCallback((time: number, params: AnimationFunctionParameters): void => {
         if (!pbWindowVisibleRef.current) return
         const pbSpeed = pbSpeedRef.current
         const mySvgInfo = svgInfoRef.current
+
+        const currNotes = params.currnotes.map((n) => enrichAnimationNote(n))
+        const nextNotes = params.nextnotes.map((n) => enrichAnimationNote(n))
+        //     keyname: `${note.tone}${note.octave != null ? note.octave : ''}`,
 
         if (focusRef.current.includes(params.position)) {
             if (mySvgInfo.svg && params.currnotes) {
                 // Hightighting animation
                 debug(`ANIMATION: ${JSON.stringify(params)}`)
                 if (shouldHighlight(params.position)) {
-                    params.currnotes.forEach((note) => {
+                    currNotes.forEach((note) => {
                         var keyElement = mySvgInfo.svg?.querySelector(
-                            `#${note.keyname}${note.noteProps.stroke ? ' .' + note.noteProps.stroke : ''}`
+                            `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
                         )
                         // positionIndex will be used to select the highlight color combinations.
                         const positionIndex = focusRef.current.indexOf(params.position)
@@ -195,7 +220,10 @@ export const useAnimationEngine = (
                     mySvgInfo.y != null &&
                     mySvgInfo.animation
                 ) {
-                    Tone.getDraw().schedule(() => animatePanggul(params, mySvgInfo, pbSpeed), time)
+                    Tone.getDraw().schedule(
+                        () => animatePanggul(currNotes, nextNotes, params.timeuntilMs, mySvgInfo, pbSpeed),
+                        time
+                    )
                 }
             }
         }

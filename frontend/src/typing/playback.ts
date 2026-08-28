@@ -3,7 +3,6 @@ import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
-import type { NoteProps } from './animation'
 import type { BeatSliceInfo } from './execution'
 import type { Score } from './score'
 
@@ -48,8 +47,7 @@ export interface PlaybackSamplerAction {
 
 export interface AnimationNote {
     time: TimeObject
-    keyname: string
-    noteProps: NoteProps
+    noteObject: NoteObject
     duration: TimeObject
     isLast: boolean
 }
