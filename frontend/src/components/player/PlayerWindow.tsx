@@ -43,12 +43,10 @@ export default function PlayerWindow({
     }, [visible])
 
     useEffect(() => {
-        console.log(`Changing playback speed to ${playbackSpeed}`)
         playbackSpeedRef.current = playbackSpeed
     }, [playbackSpeed])
 
     useEffect(() => {
-        console.log(`Changing panggul option to ${selectedPanggulOption.objValue}`)
         currentPanggulRef.current = selectedPanggulOption.objValue
     }, [selectedPanggulOption])
     useEffect(() => {
@@ -56,7 +54,6 @@ export default function PlayerWindow({
     }, [selectedCursorStyle])
 
     useEffect(() => {
-        console.log(`Changing focus to  ${selectedFocusOption.objValue}`)
         currentFocusRef.current = selectedFocusOption.objValue
     }, [selectedFocusOption])
 

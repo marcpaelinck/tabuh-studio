@@ -72,10 +72,6 @@ export default function NotationArea({ notation, visible }: NotationAreaProps) {
         visibleRef.current = visible
     }, [visible])
 
-    useEffect(() => {
-        console.log(`NotationArea visible=${visible}`)
-    }, [visible])
-
     // Highlighting function: highlights the given range (line and character range)
     const highlightCursor: HilightRangeFunction = (hlRange: HighlightRange) => {
         const para: HTMLParagraphElement = textAreaRef.current?.children[hlRange.line] as HTMLParagraphElement
@@ -86,7 +82,6 @@ export default function NotationArea({ notation, visible }: NotationAreaProps) {
 
         const range1 = new Range()
         if (para1) {
-            console.log(selectedCursorStyle)
             var start = hlRange.range[0]
             var end = hlRange.range[1]
             // If user cursor setting is system, highlight the entire system.

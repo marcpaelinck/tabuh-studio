@@ -492,7 +492,6 @@ export function MainWindow({ dataSource }: MainWindowProps) {
         // `score` status is updated after each edit to the current score
         if (score && currentScoreId != score.uuid) {
             setCurrentScoreId(score.uuid)
-            console.log('Initial PB load')
             playback({ actionType: 'load', playbackType: 'multiple', score: score, systemIndex: 0 })
         }
         setPlaybackProgress(0)
