@@ -163,7 +163,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: positionGroups.REYONG.positions
+        positions: positionGroups.REYONG.positions.concat(positionGroups.REYONGB.positions)
     },
     I: {
         kind: 'prefix',

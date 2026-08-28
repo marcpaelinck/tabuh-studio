@@ -62,7 +62,7 @@ export const positionGroups: Record<PositionGroup, InstrumentConfig> = {
     REYONGB: { positions: ['REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
     POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
     MELODIC: {
-        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'TROMPONG', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
         name: 'Melodic'
     },
     DAUN: {

@@ -1,3 +1,4 @@
+import { alphabet, invalidSymbol } from '../config/alphabet'
 import { positionConfigs } from '../config/position'
 import type { NoteSymbol } from '../types/basetypes'
 import type { Position } from '../types/position'
@@ -30,4 +31,12 @@ export function noteRange(position: Position, invert: boolean = false): NoteSymb
         /^[aeiou][,<]{0,1}$/.test(sym)
     )
     return sortNotes(range)
+}
+
+export function symbolName(symbol: NoteSymbol) {
+    return Array.from(symbol)
+        .map((char) =>
+            char in alphabet ? alphabet[char].name.toLowerCase() : alphabet[invalidSymbol].name.toLowerCase()
+        )
+        .join(' ')
 }

@@ -202,8 +202,15 @@ unchanged accessors.
    on-load migration that was briefly added is no longer needed and has been removed.)*
    - **Deferred:** the new alphabet symbols `r`, `s` move to step 5 (they belong to Semar Pagulingan,
      which introduces their positions, tones, and samples; adding them earlier would be orphaned).
-3. **Voicing** (`symbol → NoteObject[]`) + strike-location table; retire `noteConfigs`,
-   `symbolToNoteNames`, `toneManager.combinedTones`, and the `Note` type behind the accessors.
+3. **Voicing** (`symbol → NoteObject[]`) + strike-location; retire `noteConfigs` (and later
+   `symbolToNoteNames` / the `Note` type) behind the accessors. *(In progress: `playback/notePlayback.ts`
+   derives `Note` (tone/octave/muting/strike) from a symbol's `NoteObject` and expands BYONG via the
+   inline `combinedVoicings`. Correctness is checked by `frontend/scripts/verifyDeriveNote.ts`, which
+   compares the derived values against `noteConfigs` for every coded symbol — **run it locally** with
+   the project's TS loader; the sandbox can't (broken `@tabuhstudio/shared` symlink). Only after it is
+   clean: rewire `timelineBuilder.samplerAction2AnimationNotes` to use `deriveNote`, then delete
+   `noteConfigs`. `symbolToNoteNames` stays as the sample/MIDI code source until step 4; the `Note`
+   type is kept as the animation payload for now.)*
 4. **SampleSet** as a first-class concept (start with one default `GONG_KEBYAR` set) + the
    group<user<session resolution + a playback selection point; move `files` / `volume` off the
    position and drop `sampletemplate`.

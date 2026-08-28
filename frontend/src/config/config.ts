@@ -78,7 +78,10 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         PUR: { tone: 'PUR', octave: null, stroke: null, muting: 'OPEN' },
         TONG: { tone: 'TONG', octave: null, stroke: null, muting: 'OPEN' },
         // KEMPLI
-        X_OPEN: { tone: 'X', octave: null, stroke: 'KNOB', muting: 'OPEN' },
+        X: { tone: 'X', octave: null, stroke: null, muting: 'OPEN' },
+        // CENGCENG
+        X_OPEN: { tone: 'X', octave: null, stroke: null, muting: 'OPEN' },
+        X_MUTED: { tone: 'X', octave: null, stroke: null, muting: 'MUTED' },
         // KENDANG
         KA: { tone: 'KA', octave: null, stroke: null, muting: 'OPEN' },
         PAK: { tone: 'PAK', octave: null, stroke: null, muting: 'OPEN' },
@@ -88,6 +91,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         KUNG: { tone: 'KUNG', octave: null, stroke: null, muting: 'OPEN' }
     },
     daun: {
+        DING0: { tone: 'DING', octave: 0, stroke: null, muting: 'OPEN' },
         DONG0: { tone: 'DONG', octave: 0, stroke: null, muting: 'OPEN' },
         DENG0: { tone: 'DENG', octave: 0, stroke: null, muting: 'OPEN' },
         DUNG0: { tone: 'DUNG', octave: 0, stroke: null, muting: 'OPEN' },
@@ -98,6 +102,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         DUNG1: { tone: 'DUNG', octave: 1, stroke: null, muting: 'OPEN' },
         DANG1: { tone: 'DANG', octave: 1, stroke: null, muting: 'OPEN' },
         DING2: { tone: 'DING', octave: 2, stroke: null, muting: 'OPEN' },
+        DING0_ABBR: { tone: 'DING', octave: 0, stroke: null, muting: 'ABBREVIATED' },
         DONG0_ABBR: { tone: 'DONG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
         DENG0_ABBR: { tone: 'DENG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
         DUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
@@ -108,6 +113,7 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         DUNG1_ABBR: { tone: 'DUNG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
         DANG1_ABBR: { tone: 'DANG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
         DING2_ABBR: { tone: 'DING', octave: 2, stroke: null, muting: 'ABBREVIATED' },
+        DING0_MUTED: { tone: 'DING', octave: 0, stroke: null, muting: 'MUTED' },
         DONG0_MUTED: { tone: 'DONG', octave: 0, stroke: null, muting: 'MUTED' },
         DENG0_MUTED: { tone: 'DENG', octave: 0, stroke: null, muting: 'MUTED' },
         DUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: null, muting: 'MUTED' },
@@ -159,12 +165,12 @@ export const noteConfigs: Record<string, Record<string, Note>> = {
         DUNG2_MUTED: { tone: 'DUNG', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
         XDUNG0: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' },
         XDONG1: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
-        XDUNG1: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' }, // Baleganjur
+        XDUNG1: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'OPEN' }, // Baleganjur
         XDANG1: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
         XDENG2: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'OPEN' },
         XDUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDUNG1_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' }, // Baleganjur
+        XDUNG1_ABBR: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' }, // Baleganjur
         XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'ABBREVIATED' },
         XDUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'MUTED' },

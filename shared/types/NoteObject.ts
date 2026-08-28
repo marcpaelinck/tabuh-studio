@@ -2,7 +2,6 @@
  * NoteObject — immutable, normalised representation of a BaliMusic font symbol.
  */
 
-import { symbolName } from '../../frontend/src/config/alphabet-functions.ts'
 import { alphabet, type Category } from '../config/alphabet.ts'
 import { positionHasSymbol } from '../config/configAccess.ts'
 import { ERROR_PITCH_CHAR, SILENCE_EXTENDING_CHARS, SILENCE_MUTING_CHARS } from '../constants/noteChars.ts'
@@ -27,7 +26,7 @@ import {
     STROKE_MODIFIERS
 } from '../constants/noteChars.ts'
 import type { Position } from '../types/position.ts'
-import { noteRange } from '../utils/alphabet.ts'
+import { noteRange, symbolName } from '../utils/alphabet.ts'
 
 // Re-export so that consumers can import everything from a single file if needed.
 export {
@@ -261,8 +260,9 @@ export class NoteObject {
                     this.pattern.norot = PATTERN_MODIFIER_MAP.get(ch) == 'NOROT'
                 }
             }
-        } catch {
+        } catch (error) {
             structurallyValid = false
+            console.error((error as NoteObjectError).message)
         }
 
         if (!structurallyValid) {
