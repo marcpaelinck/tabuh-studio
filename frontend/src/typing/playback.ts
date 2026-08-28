@@ -1,8 +1,9 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
-import type { MutingType, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
+import type { UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { HTMLAttributes, ReactElement } from 'react'
 import * as Tone from 'tone'
 import type { TimeObject } from 'tone/build/esm/core/type/Units'
+import type { NoteProps } from './animation'
 import type { BeatSliceInfo } from './execution'
 import type { Score } from './score'
 
@@ -48,9 +49,7 @@ export interface PlaybackSamplerAction {
 export interface AnimationNote {
     time: TimeObject
     keyname: string
-    tone: ToneType
-    stroke: StrokeLocation | null
-    muting: MutingType
+    noteProps: NoteProps
     duration: TimeObject
     isLast: boolean
 }

@@ -2,7 +2,6 @@ import type { MutingType, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import type { BPM, Subdivision } from 'tone/build/esm/core/type/Units'
 import type { DynamicsValue } from '../typing/execution'
 import type { EditorCursor } from '../typing/playback'
-import type { Note } from '../typing/score'
 
 // STYLE & THEME
 
@@ -66,120 +65,6 @@ export const doSanityCheck = false
 // prettier-ignore
 export const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2',
                       'F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
-
-// INSTRUMENT, INSTRUMENT POSITION AND GROUPING INFO
-
-// Translates shorthand codes used in instrumentConfigs to Note records.
-// The stroke is used for the animation.
-export const noteConfigs: Record<string, Record<string, Note>> = {
-    percussion: {
-        // GONGS
-        GIR: { tone: 'GIR', octave: null, stroke: null, muting: 'OPEN' },
-        PUR: { tone: 'PUR', octave: null, stroke: null, muting: 'OPEN' },
-        TONG: { tone: 'TONG', octave: null, stroke: null, muting: 'OPEN' },
-        // KEMPLI
-        X: { tone: 'X', octave: null, stroke: null, muting: 'OPEN' },
-        // CENGCENG
-        X_OPEN: { tone: 'X', octave: null, stroke: null, muting: 'OPEN' },
-        X_MUTED: { tone: 'X', octave: null, stroke: null, muting: 'MUTED' },
-        // KENDANG
-        KA: { tone: 'KA', octave: null, stroke: null, muting: 'OPEN' },
-        PAK: { tone: 'PAK', octave: null, stroke: null, muting: 'OPEN' },
-        DE: { tone: 'DE', octave: null, stroke: null, muting: 'OPEN' },
-        TUT: { tone: 'TUT', octave: null, stroke: null, muting: 'OPEN' },
-        CUNG: { tone: 'CUNG', octave: null, stroke: null, muting: 'OPEN' },
-        KUNG: { tone: 'KUNG', octave: null, stroke: null, muting: 'OPEN' }
-    },
-    daun: {
-        DING0: { tone: 'DING', octave: 0, stroke: null, muting: 'OPEN' },
-        DONG0: { tone: 'DONG', octave: 0, stroke: null, muting: 'OPEN' },
-        DENG0: { tone: 'DENG', octave: 0, stroke: null, muting: 'OPEN' },
-        DUNG0: { tone: 'DUNG', octave: 0, stroke: null, muting: 'OPEN' },
-        DANG0: { tone: 'DANG', octave: 0, stroke: null, muting: 'OPEN' },
-        DING1: { tone: 'DING', octave: 1, stroke: null, muting: 'OPEN' },
-        DONG1: { tone: 'DONG', octave: 1, stroke: null, muting: 'OPEN' },
-        DENG1: { tone: 'DENG', octave: 1, stroke: null, muting: 'OPEN' },
-        DUNG1: { tone: 'DUNG', octave: 1, stroke: null, muting: 'OPEN' },
-        DANG1: { tone: 'DANG', octave: 1, stroke: null, muting: 'OPEN' },
-        DING2: { tone: 'DING', octave: 2, stroke: null, muting: 'OPEN' },
-        DING0_ABBR: { tone: 'DING', octave: 0, stroke: null, muting: 'ABBREVIATED' },
-        DONG0_ABBR: { tone: 'DONG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
-        DENG0_ABBR: { tone: 'DENG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
-        DUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
-        DANG0_ABBR: { tone: 'DANG', octave: 0, stroke: null, muting: 'ABBREVIATED' },
-        DING1_ABBR: { tone: 'DING', octave: 1, stroke: null, muting: 'ABBREVIATED' },
-        DONG1_ABBR: { tone: 'DONG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
-        DENG1_ABBR: { tone: 'DENG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
-        DUNG1_ABBR: { tone: 'DUNG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
-        DANG1_ABBR: { tone: 'DANG', octave: 1, stroke: null, muting: 'ABBREVIATED' },
-        DING2_ABBR: { tone: 'DING', octave: 2, stroke: null, muting: 'ABBREVIATED' },
-        DING0_MUTED: { tone: 'DING', octave: 0, stroke: null, muting: 'MUTED' },
-        DONG0_MUTED: { tone: 'DONG', octave: 0, stroke: null, muting: 'MUTED' },
-        DENG0_MUTED: { tone: 'DENG', octave: 0, stroke: null, muting: 'MUTED' },
-        DUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: null, muting: 'MUTED' },
-        DANG0_MUTED: { tone: 'DANG', octave: 0, stroke: null, muting: 'MUTED' },
-        DING1_MUTED: { tone: 'DING', octave: 1, stroke: null, muting: 'MUTED' },
-        DONG1_MUTED: { tone: 'DONG', octave: 1, stroke: null, muting: 'MUTED' },
-        DENG1_MUTED: { tone: 'DENG', octave: 1, stroke: null, muting: 'MUTED' },
-        DUNG1_MUTED: { tone: 'DUNG', octave: 1, stroke: null, muting: 'MUTED' },
-        DANG1_MUTED: { tone: 'DANG', octave: 1, stroke: null, muting: 'MUTED' },
-        DING2_MUTED: { tone: 'DING', octave: 2, stroke: null, muting: 'MUTED' }
-    },
-    chimes: {
-        // REYONG SPECIFIC
-        DENG0: { tone: 'DENG', octave: 0, stroke: 'KNOB', muting: 'OPEN' },
-        DUNG0: { tone: 'DUNG', octave: 0, stroke: 'KNOB', muting: 'OPEN' },
-        DANG0: { tone: 'DANG', octave: 0, stroke: 'KNOB', muting: 'OPEN' },
-        DING1: { tone: 'DING', octave: 1, stroke: 'KNOB', muting: 'OPEN' },
-        DONG1: { tone: 'DONG', octave: 1, stroke: 'KNOB', muting: 'OPEN' },
-        DENG1: { tone: 'DENG', octave: 1, stroke: 'KNOB', muting: 'OPEN' },
-        DUNG1: { tone: 'DUNG', octave: 1, stroke: 'KNOB', muting: 'OPEN' },
-        DANG1: { tone: 'DANG', octave: 1, stroke: 'KNOB', muting: 'OPEN' },
-        DING2: { tone: 'DING', octave: 2, stroke: 'KNOB', muting: 'OPEN' },
-        DONG2: { tone: 'DONG', octave: 2, stroke: 'KNOB', muting: 'OPEN' },
-        DENG2: { tone: 'DENG', octave: 2, stroke: 'KNOB', muting: 'OPEN' },
-        DUNG2: { tone: 'DUNG', octave: 2, stroke: 'KNOB', muting: 'OPEN' },
-        DENG0_ABBR: { tone: 'DENG', octave: 0, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DANG0_ABBR: { tone: 'DANG', octave: 0, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DING1_ABBR: { tone: 'DING', octave: 1, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DENG1_ABBR: { tone: 'DENG', octave: 1, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DUNG1_ABBR: { tone: 'DUNG', octave: 1, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DING2_ABBR: { tone: 'DING', octave: 2, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DONG2_ABBR: { tone: 'DONG', octave: 2, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DUNG2_ABBR: { tone: 'DUNG', octave: 2, stroke: 'KNOB', muting: 'ABBREVIATED' },
-        DENG0_MUTED: { tone: 'DENG', octave: 0, stroke: 'KNOB', muting: 'MUTED' },
-        DUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'KNOB', muting: 'MUTED' },
-        DANG0_MUTED: { tone: 'DANG', octave: 0, stroke: 'KNOB', muting: 'MUTED' },
-        DING1_MUTED: { tone: 'DING', octave: 1, stroke: 'KNOB', muting: 'MUTED' },
-        DONG1_MUTED: { tone: 'DONG', octave: 1, stroke: 'KNOB', muting: 'MUTED' },
-        DENG1_MUTED: { tone: 'DENG', octave: 1, stroke: 'KNOB', muting: 'MUTED' },
-        DUNG1_MUTED: { tone: 'DUNG', octave: 1, stroke: 'KNOB', muting: 'MUTED' },
-        DANG1_MUTED: { tone: 'DANG', octave: 1, stroke: 'KNOB', muting: 'MUTED' },
-        DING2_MUTED: { tone: 'DING', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
-        DONG2_MUTED: { tone: 'DONG', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
-        DENG2_MUTED: { tone: 'DENG', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
-        DUNG2_MUTED: { tone: 'DUNG', octave: 2, stroke: 'KNOB', muting: 'MUTED' },
-        XDUNG0: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'OPEN' },
-        XDONG1: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
-        XDUNG1: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'OPEN' }, // Baleganjur
-        XDANG1: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'OPEN' },
-        XDENG2: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'OPEN' },
-        XDUNG0_ABBR: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDONG1_ABBR: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDUNG1_ABBR: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' }, // Baleganjur
-        XDANG1_ABBR: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDENG2_ABBR: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'ABBREVIATED' },
-        XDUNG0_MUTED: { tone: 'DUNG', octave: 0, stroke: 'RIM', muting: 'MUTED' },
-        XDONG1_MUTED: { tone: 'DONG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
-        XDUNG1_MUTED: { tone: 'DUNG', octave: 1, stroke: 'RIM', muting: 'MUTED' }, // Baleganjur
-        XDANG1_MUTED: { tone: 'DANG', octave: 1, stroke: 'RIM', muting: 'MUTED' },
-        XDENG2_MUTED: { tone: 'DENG', octave: 2, stroke: 'RIM', muting: 'MUTED' }
-    }
-}
 
 // ANIMATION
 

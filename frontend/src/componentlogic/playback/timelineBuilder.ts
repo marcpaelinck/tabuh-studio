@@ -12,12 +12,12 @@
 // `setTotalDurationMs` (the caller reads `timeline.totalDurationMs`).
 
 import { KEMPLI_BEAT_CHAR, NoteObject, SPACE_CHAR, type Position } from '@tabuhstudio/shared'
-import { getAllPositions, getPositionType, getShorthandCodes, hasPosition } from '@tabuhstudio/shared/config/configAccess'
+import { getAllPositions, hasPosition } from '@tabuhstudio/shared/config/configAccess'
 import type { BPM } from '@tabuhstudio/shared/types/basetypes'
 import _ from 'lodash'
 import { createElement } from 'react'
 import type { ReactElement } from 'rsuite/esm/internals/types'
-import { defaultBeatFrequency, defaultTempo, dynamicsToNumber, noteConfigs } from '../../config/config'
+import { defaultBeatFrequency, defaultTempo, dynamicsToNumber } from '../../config/config'
 import type { FlowStep } from '../../typing/execution'
 import type {
     AnimationNote,
@@ -26,12 +26,13 @@ import type {
     SamplerFunction,
     TimeLine
 } from '../../typing/playback'
-import type { Note, Score, System } from '../../typing/score'
+import type { Score, System } from '../../typing/score'
 import { debug } from '../../utils/debugger'
 import { getSystemDuration } from '../../utils/objectUtils'
 import { BaseNoteEquiv2Millis, millis2BaseNoteEquiv, n2TO, To2Millis, TO2n, TOplusNumber } from '../../utils/timeunits'
 import { cycleValidation } from '../validationManager'
 import { executionManager } from './executionManager'
+import { deriveNote, voicing } from './notePlayback'
 import { createNoteActions, noteDuration } from './strokeManager'
 
 export interface BuildTimelineOptions {
@@ -98,26 +99,19 @@ function setLastSamplerActionEndtime(action: PlaybackSamplerAction | null | unde
 
 function samplerAction2AnimationNotes(position: Position, action: PlaybackSamplerAction): AnimationNote[] {
     if (!hasPosition(position)) return []
-    const shorthandCodes = getShorthandCodes(position, action.params.note.canonicalSymbol)
-    const result: AnimationNote[] = []
-    shorthandCodes.forEach((shCode) => {
-        const instrType: string = getPositionType(position)
-        if (!shCode) return null
-        const note: Note = noteConfigs[instrType][shCode]
-        const keyname: string = note ? `${note.tone}${note.octave != null ? note.octave : ''}` : ''
-        if (note)
-            result.push({
-                time: action.time,
-                keyname: keyname,
-                tone: note.tone,
-                stroke: note.stroke,
-                muting: note.muting,
-                duration: action.params.duration,
-                isLast: action.params.isLast
-            })
-        else console.error(`Note ${shCode} not found in noteConfigs[${instrType}]`)
+    // Expand the played symbol to its atomic notes (BYONG → several) and derive each note's
+    // tone / octave / muting / strike straight from the symbol (see notePlayback).
+    const noteObj = new NoteObject(action.params.note.canonicalSymbol, position)
+    return voicing(noteObj).map((n) => {
+        const note = deriveNote(n)
+        return {
+            time: action.time,
+            keyname: `${note.tone}${note.octave != null ? note.octave : ''}`,
+            noteProps: note,
+            duration: action.params.duration,
+            isLast: action.params.isLast
+        }
     })
-    return result
 }
 
 /**

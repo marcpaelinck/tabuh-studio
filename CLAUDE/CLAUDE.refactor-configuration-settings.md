@@ -202,15 +202,17 @@ unchanged accessors.
    on-load migration that was briefly added is no longer needed and has been removed.)*
    - **Deferred:** the new alphabet symbols `r`, `s` move to step 5 (they belong to Semar Pagulingan,
      which introduces their positions, tones, and samples; adding them earlier would be orphaned).
-3. **Voicing** (`symbol → NoteObject[]`) + strike-location; retire `noteConfigs` (and later
-   `symbolToNoteNames` / the `Note` type) behind the accessors. *(In progress: `playback/notePlayback.ts`
-   derives `Note` (tone/octave/muting/strike) from a symbol's `NoteObject` and expands BYONG via the
-   inline `combinedVoicings`. Correctness is checked by `frontend/scripts/verifyDeriveNote.ts`, which
-   compares the derived values against `noteConfigs` for every coded symbol — **run it locally** with
-   the project's TS loader; the sandbox can't (broken `@tabuhstudio/shared` symlink). Only after it is
-   clean: rewire `timelineBuilder.samplerAction2AnimationNotes` to use `deriveNote`, then delete
-   `noteConfigs`. `symbolToNoteNames` stays as the sample/MIDI code source until step 4; the `Note`
-   type is kept as the animation payload for now.)*
+3. **Voicing** (`symbol → NoteObject[]`) + strike-location; retire `noteConfigs`. *(Done:
+   `playback/notePlayback.ts` derives `Note` (tone/octave/muting/strike) from a symbol's `NoteObject`
+   — tone/octave/strike via mappings + `alphabet`, muting from the modifier — and expands BYONG / the
+   reyong `t` stroke via `combinedVoicings`, with `irregularNotes` for the reyong rim `x`.
+   `timelineBuilder.samplerAction2AnimationNotes` now uses `voicing`/`deriveNote`, and **`noteConfigs`
+   is deleted**. A one-off harness (`verifyDeriveNote.ts`) compared the derivation against `noteConfigs`
+   for every coded symbol and confirmed equivalence — the only diffs were **pre-existing bugs in the
+   old `noteConfigs` path** (KENDANG/JEGOGAN/CALUNG `/` and `?` variants had lost their
+   ABBREVIATED/MUTED muting); the derived values fix those, so playback muting is now correct there.
+   Harness has been removed.)* `symbolToNoteNames` stays as the sample/MIDI code source until step 4;
+   the `Note` type is kept as the derived animation payload for now.
 4. **SampleSet** as a first-class concept (start with one default `GONG_KEBYAR` set) + the
    group<user<session resolution + a playback selection point; move `files` / `volume` off the
    position and drop `sampletemplate`.

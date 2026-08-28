@@ -1,15 +1,8 @@
 import type { NoteObject, Position } from '@tabuhstudio/shared'
-import type { MutingType, NoteSymbol, StrokeLocation, ToneType, UUID } from '@tabuhstudio/shared/types/basetypes'
+import type { NoteSymbol, UUID } from '@tabuhstudio/shared/types/basetypes'
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { CastingInstruction } from '../componentlogic/castingRulesManager'
 import type { BeatSliceInfo, ExecutionItem } from './execution'
-
-export type Note = {
-    tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
-    octave: number | null // 0, 1 or 2: relative to the instrument. Scale always start with DING.
-    stroke: StrokeLocation | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
-    muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
-}
 
 // 'JSON': standard score format (loaded from server/database)
 // 'JSON-file': standard score format loaded from a local file chosen by the user

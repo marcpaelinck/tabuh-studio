@@ -17,8 +17,8 @@ const bezierStroke = 'cubic-bezier(.99,-0.01,1,.51)' // timing curve for stroke 
 // available colors.
 const getHighlightColor = (note: AnimationNote, positionSeq: number = 0): CSSColors => {
     const colors: CSSColors[] =
-        animationConfig.highlight[note.tone] ||
-        animationConfig.highlight[note.muting] ||
+        animationConfig.highlight[note.noteProps.tone] ||
+        animationConfig.highlight[note.noteProps.muting] ||
         Object.values(animationConfig.highlight)[0]
     if (!colors) return 'cyan'
     var color_id = positionSeq % colors.length
@@ -176,7 +176,7 @@ export const useAnimationEngine = (
                 if (shouldHighlight(params.position)) {
                     params.currnotes.forEach((note) => {
                         var keyElement = mySvgInfo.svg?.querySelector(
-                            `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
+                            `#${note.keyname}${note.noteProps.stroke ? ' .' + note.noteProps.stroke : ''}`
                         )
                         // positionIndex will be used to select the highlight color combinations.
                         const positionIndex = focusRef.current.indexOf(params.position)

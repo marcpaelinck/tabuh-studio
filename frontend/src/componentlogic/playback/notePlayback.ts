@@ -14,7 +14,7 @@ import { MELODIC_PITCH_CHARS } from '@tabuhstudio/shared/constants/noteChars'
 import type { MutingType, NoteSymbol, StrokeLocation, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import { NoteObject } from '@tabuhstudio/shared/types/NoteObject'
 import type { Position } from '@tabuhstudio/shared/types/position'
-import type { Note } from '../../typing/score'
+import type { NoteProps } from '../../typing/animation'
 
 // Symbols that strike more than one note at once, by pitch char then position. The listed strings are
 // the constituent symbols (a prefix/modifier on the parent symbol is carried onto each). Everything
@@ -87,7 +87,7 @@ export function noteStrike(note: NoteObject): StrokeLocation | null {
 }
 
 /** The full derived note for a single (atomic) symbol. */
-export function deriveNote(note: NoteObject): Note {
+export function deriveNote(note: NoteObject): NoteProps {
     return {
         tone: noteTone(note) as ToneType,
         octave: noteOctave(note),
