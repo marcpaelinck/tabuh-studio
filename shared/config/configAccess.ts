@@ -24,10 +24,6 @@ export const getPositionType = (p: Position): string => positionConfigs[p]?.type
 // ── Rendering ────────────────────────────────────────────────────────────────
 export const getPositionSvgFile = (p: Position): string => positionConfigs[p]?.svg_file ?? ''
 
-// ── Audio / samples (retired to the SampleSet in a later step) ───────────────
-export const getPositionVolume = (p: Position): number => positionConfigs[p].volume
-export const getSampleTemplate = (p: Position): string => positionConfigs[p].sampletemplate
-
 // ── Symbols / voicing (currently `symbolToNoteNames`) ────────────────────────
 /** The whole symbol → shorthand-note-codes map for a position (used to build sampler lookups). */
 export const getSymbolToNoteNames = (p: Position): { [symbol: string]: string[] } =>

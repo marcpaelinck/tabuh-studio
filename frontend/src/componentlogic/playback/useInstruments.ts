@@ -1,10 +1,5 @@
 import type { Position } from '@tabuhstudio/shared'
-import {
-    getAllPositions,
-    getPositionVolume,
-    getSampleTemplate,
-    getSymbolToNoteNames
-} from '@tabuhstudio/shared/config/configAccess'
+import { getAllPositions, getSymbolToNoteNames } from '@tabuhstudio/shared/config/configAccess'
 import { positionGroups } from '@tabuhstudio/shared/config/position'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
@@ -14,9 +9,9 @@ import {
     baseNoteSubdivision,
     dimRateNonFocusedInstruments,
     NOTES,
-    playerOutroTime,
-    SOUNDS_FOLDER
+    playerOutroTime
 } from '../../config/config'
+import { resolveSampleSet } from '../../config/sampleSets'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
@@ -40,6 +35,10 @@ export type InstrumentSamplers = Record<Position, InstrumentSampler>
 //     delayTime: 0,
 //     feedback: 0
 // })
+
+// The active sample set (files + volumes + folder). Static today; when set selection is dynamic the
+// samplers/lookup below should rebuild when it changes.
+const sampleSet = resolveSampleSet()
 
 const lowpassFilter = new Tone.Filter({
     frequency: 5000, // Cutoff frequency in Hz
@@ -66,8 +65,8 @@ const createSampler = ({
         // filter needs to be checked first. Doesn't seem to work.
         //     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
         // else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
-        return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
-    else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).toDestination()
+        return new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume }).toDestination()
+    else return new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume }).toDestination()
 }
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
@@ -78,7 +77,7 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
             createSampler({
                 isMelodic: positionGroups.MELODIC.positions.includes(position),
                 samples: lookup[position].idx2sample,
-                volume: getPositionVolume(position)
+                volume: sampleSet.entries[position]!.volume
             })
         ]
     })
@@ -94,7 +93,7 @@ const lookup = Object.fromEntries(
         const symbolToNoteNames = getSymbolToNoteNames(position)
         const noteList = [...new Set(Object.values(symbolToNoteNames).flat())]
         const indexToSample = Object.fromEntries(
-            noteList.map((note, index) => [NOTES[index], soundFile(note, getSampleTemplate(position))])
+            noteList.map((note, index) => [NOTES[index], soundFile(note, sampleSet.entries[position]!.sampletemplate)])
         )
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
         const symbolToIndices = Object.fromEntries(

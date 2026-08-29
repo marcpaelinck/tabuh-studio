@@ -213,9 +213,17 @@ unchanged accessors.
    ABBREVIATED/MUTED muting); the derived values fix those, so playback muting is now correct there.
    Harness has been removed.)* `symbolToNoteNames` stays as the sample/MIDI code source until step 4;
    the `Note` type is kept as the derived animation payload for now.
-4. **SampleSet** as a first-class concept (start with one default `GONG_KEBYAR` set) + the
-   group<user<session resolution + a playback selection point; move `files` / `volume` off the
-   position and drop `sampletemplate`.
+4. **SampleSet** as a first-class concept (start with one default set) + the group<user<session
+   resolution + a playback selection point; move `files` / `volume` off the position and drop
+   `sampletemplate`. *(Foundation done: `config/sampleSets.ts` defines the `SampleSet` type and a
+   default set (generated from `positionConfigs`, so behaviour is unchanged) behind `resolveSampleSet()`;
+   `useInstruments` and `sanity-functions` now source folder/volume/template from the resolved set,
+   and the `getSampleTemplate`/`getPositionVolume` accessors are removed. **Remaining:** author explicit
+   per-symbol files and physically remove `sampletemplate`/`volume` from `positionConfigs`; add real
+   alternative sets; implement the session store + user-pref + group config that `resolveSampleSet`
+   will consult (session ?? user ?? group ?? default); add the selection UI; rebuild samplers when the
+   selection changes. Also note `symbolToNoteNames` still serves the sample codes + MIDI (`pitchMap`) +
+   valid-symbols, so it is not yet fully retired.)*
 5. Add **`SEMAR_PAGULINGAN`** as the proof case: orchestra-specific positions (with the id prefix),
    its voicing (7 keys incl. `r`/`s`), and a sample set.
 6. Back each slice with the DB behind the unchanged accessors; add editing UI for authorized users.
