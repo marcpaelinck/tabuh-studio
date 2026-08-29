@@ -6,7 +6,7 @@ import { defaultBeatPosition, orchestraConfigs, positionConfigs } from '@tabuhst
 import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { UUID } from 'crypto'
 import _ from 'lodash'
-import { defaultDynamics, defaultTempo } from '../../config/config'
+import { defaultDynamics, defaultTempo, dynamicsToNumber } from '../../config/config'
 import type {
     BeatSliceInfo,
     DynamicsItem,
@@ -261,7 +261,7 @@ export function executionManager(
     ): PositionDynamics {
         var newDynamics = _.fromPairs(
             _.keys(positionConfigs).map((pos) => {
-                const value = currentValues ? currentValues[pos as Position][1] : defaultDynamics
+                const value = currentValues ? currentValues[pos as Position][1] : dynamicsToNumber[defaultDynamics]
                 return [pos, [value, value]]
             })
         ) as PositionDynamics
@@ -271,6 +271,9 @@ export function executionManager(
         const beatNbr = beatIdx + 1 // Beats are numbered from 1
         for (const item of matches) {
             const dynamicsItem = item as DynamicsItem
+            // Do not use the stored number values: instead, always look them up in the dynamicsToNumber config setting.
+            dynamicsItem.value = dynamicsToNumber[dynamicsItem.dynamics]
+            dynamicsItem.fromValue = dynamicsItem.fromDynamics ? dynamicsToNumber[dynamicsItem.fromDynamics] : undefined
             // If positions is not given, assume dynamics apply to all positions
             const positions = dynamicsItem.positions.length > 0 ? dynamicsItem.positions : _.keys(positionConfigs)
             const fromValue = newDynamics[positions[0] as Position][1]
