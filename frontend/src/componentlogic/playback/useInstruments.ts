@@ -47,8 +47,8 @@ const lowpassFilter = new Tone.Filter({
 })
 
 function lowpassFrequency(velocity: number): number {
-    const minFreq = 500
-    const maxFreq = 8000
+    const minFreq = 1000
+    const maxFreq = 5000
     return minFreq + (maxFreq - minFreq) * velocity
 }
 
@@ -61,12 +61,13 @@ const createSampler = ({
     samples: { [key: string]: string }
     volume: Tone.Unit.Decibels
 }) => {
-    if (isMelodic)
-        // filter needs to be checked first. Doesn't seem to work.
-        //     return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
-        // else return new Tone.Sampler({ urls: samples, baseUrl: SOUNDS_FOLDER, volume }).chain(lowpassFilter).toDestination()
-        return new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume }).toDestination()
-    else return new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume }).toDestination()
+    const sampler = new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume })
+    // To connect a filter, use the following code:
+    //       sampler.connect(filter)
+    //       filter.toDestination()
+    // Filters tend to distort the sound, so not using filters currently
+    sampler.toDestination()
+    return sampler
 }
 
 const createSamplers = (): Record<string, Tone.Sampler> => {
@@ -97,10 +98,7 @@ const lookup = Object.fromEntries(
         )
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
         const symbolToIndices = Object.fromEntries(
-            Object.entries(symbolToNoteNames).map(([symbol, notes]) => [
-                symbol,
-                notes.map((repr) => noteToIndex[repr])
-            ])
+            Object.entries(symbolToNoteNames).map(([symbol, notes]) => [symbol, notes.map((repr) => noteToIndex[repr])])
         )
         return [position, { idx2sample: indexToSample, symbol2idxs: symbolToIndices }]
     })
