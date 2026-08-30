@@ -11,7 +11,7 @@
 import { alphabet } from '@tabuhstudio/shared/config/alphabet'
 import { getPositionType } from '@tabuhstudio/shared/config/configAccess'
 import { MELODIC_PITCH_CHARS } from '@tabuhstudio/shared/constants/noteChars'
-import type { MutingType, NoteSymbol, StrokeLocation, ToneType } from '@tabuhstudio/shared/types/basetypes'
+import type { MutingType, NoteSymbol, StrikeZone, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import { NoteObject } from '@tabuhstudio/shared/types/NoteObject'
 import type { Position } from '@tabuhstudio/shared/types/position'
 import type { AnimationNoteProps } from '../../typing/animation'
@@ -32,15 +32,15 @@ const combinedVoicings: Partial<Record<NoteSymbol, Partial<Record<Position, Note
 }
 
 const irregularNotes: Partial<
-    Record<NoteSymbol | '', Partial<Record<Position, { tone: ToneType; octave: number; stroke: StrokeLocation }>>>
+    Record<NoteSymbol | '', Partial<Record<Position, { tone: ToneType; octave: number; zone: StrikeZone }>>>
 > = {
     x: {
-        REYONG_1: { tone: 'DUNG', octave: 0, stroke: 'RIM' },
-        REYONG_2: { tone: 'DONG', octave: 1, stroke: 'RIM' },
-        REYONG_3: { tone: 'DANG', octave: 1, stroke: 'RIM' },
-        REYONG_4: { tone: 'DENG', octave: 2, stroke: 'RIM' },
-        REYONGB_1: { tone: 'DONG', octave: 1, stroke: 'RIM' },
-        REYONGB_2: { tone: 'DUNG', octave: 1, stroke: 'RIM' }
+        REYONG_1: { tone: 'DUNG', octave: 0, zone: 'RIM' },
+        REYONG_2: { tone: 'DONG', octave: 1, zone: 'RIM' },
+        REYONG_3: { tone: 'DANG', octave: 1, zone: 'RIM' },
+        REYONG_4: { tone: 'DENG', octave: 2, zone: 'RIM' },
+        REYONGB_1: { tone: 'DONG', octave: 1, zone: 'RIM' },
+        REYONGB_2: { tone: 'DUNG', octave: 1, zone: 'RIM' }
     }
 }
 
@@ -78,11 +78,11 @@ export function noteOctave(note: NoteObject): number | null {
  * for the `X`-prefixed stroke; the kempli boss is a knob; everything else (gangsa/gongs/kendang…) has
  * no distinct location (mallet/hand). Distinct from `NoteObject.stroke` (the articulation modifier).
  */
-export function noteStrike(note: NoteObject): StrokeLocation | null {
+export function noteStrikeZone(note: NoteObject): StrikeZone | null {
     if (irregularNotes[note.symbol.pitch] && note.position && irregularNotes[note.symbol.pitch]![note.position])
-        return irregularNotes[note.symbol.pitch]![note.position]!.stroke
+        return irregularNotes[note.symbol.pitch]![note.position]!.zone
     const type = note.position ? getPositionType(note.position) : ''
-    if (type === 'chimes') return note.symbol.pitch.toLowerCase() === 'x' ? 'RIM' : 'KNOB' // reyong: rim on `X`, else knob
+    if (type === 'chimes') return 'KNOB' // reyong: rim on `X`, else knob
     return null
 }
 
@@ -91,7 +91,7 @@ export function deriveAnimationNoteProps(note: NoteObject): AnimationNoteProps {
     return {
         tone: noteTone(note) as ToneType,
         octave: noteOctave(note),
-        stroke: noteStrike(note),
+        zone: noteStrikeZone(note),
         muting: noteMuting(note)
     }
 }

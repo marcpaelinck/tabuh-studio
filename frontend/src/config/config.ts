@@ -33,14 +33,14 @@ export const editorFontSize = 12
 export const defaultTempo: BPM = 60
 export const dynamicValues = ['pp', 'p', 'mp', 'mf', 'f', 'ff']
 export const dynamicsToNumber: Record<DynamicsValue, number> = {
-    pp: 0.24,
-    p: 0.35,
-    mp: 0.51,
-    mf: 0.67,
-    f: 0.83,
+    pp: 0.12,
+    p: 0.15,
+    mp: 0.22,
+    mf: 0.35,
+    f: 0.5,
     ff: 1.0
 }
-export const defaultDynamics: number = 0.67 // mf
+export const defaultDynamics: DynamicsValue = 'mf'
 export const defaultBeatFrequency = 4 // Default beat (kempli) frequency used for systems where kempli.state === 'off'
 export const AVERAGE_ATTACK_DELAY = 0.01 // (seconds) Average deviation of the note attack time for a more 'natural' effect
 export const noCursor: EditorCursor = { sysUuid: '', beatSlice: { start: 0, end: 0 }, lastColumn: 0 } // 'null' value for the playback cursor of the editor

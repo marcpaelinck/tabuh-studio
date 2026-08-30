@@ -201,7 +201,7 @@ export const useAnimationEngine = (
                 if (shouldHighlight(params.position)) {
                     currNotes.forEach((note) => {
                         var keyElement = mySvgInfo.svg?.querySelector(
-                            `#${note.keyname}${note.stroke ? ' .' + note.stroke : ''}`
+                            `#${note.keyname}${note.zone ? ' .' + note.zone : ''}`
                         )
                         // positionIndex will be used to select the highlight color combinations.
                         const positionIndex = focusRef.current.indexOf(params.position)

@@ -1,4 +1,4 @@
-import type { MutingType, StrokeLocation, ToneType } from '@tabuhstudio/shared/types/basetypes'
+import type { MutingType, StrikeZone, ToneType } from '@tabuhstudio/shared/types/basetypes'
 import type { HTMLAttributes, ReactElement } from 'react'
 
 // ANIMATION
@@ -10,7 +10,7 @@ export type YCoordRecord = { y: number } | null
 export type AnimationNoteProps = {
     tone: ToneType // corresponds with a specific key, chime, gong or (in case of a kendang) stroke type.
     octave: number | null // 0, 1 or 2: relative to the instrument. Scale always start with DING.
-    stroke: StrokeLocation | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
+    zone: StrikeZone | null // Striking location or method in case multiple ways exist to strike a key, chime or gong.
     muting: MutingType // whether and how the key, chime or gong is muted (OPEN, ABBREVIATED or MUTED)
 }
 

@@ -16,8 +16,8 @@ export type UUID = string
 const _tones_ = ['DING','DONG','DENG','DUNG','DANG','GIR','PUR','TONG','X','X','KA','PAK','DE','TUT','CUNG','KUNG'] as const
 export type ToneType = (typeof _tones_)[number] // 'DING' | 'DONG' | 'DENG' | ...
 
-const _strokes_ = ['KNOB', 'RIM'] as const
-export type StrokeLocation = (typeof _strokes_)[number]
+const _zones_ = ['KNOB', 'RIM'] as const
+export type StrikeZone = (typeof _zones_)[number]
 
 const _mutings_ = ['OPEN', 'ABBREVIATED', 'MUTED'] as const
 export type MutingType = (typeof _mutings_)[number]
