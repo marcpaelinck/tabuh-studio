@@ -228,5 +228,67 @@ unchanged accessors.
    its voicing (7 keys incl. `r`/`s`), and a sample set.
 6. Back each slice with the DB behind the unchanged accessors; add editing UI for authorized users.
 
+## Normalized sound/alphabet model (agreed — step 5/6 target)
+
+This refines the "Target architecture" above into a normalized set of relations whose **defining
+goal is to separate the acoustic/physical definition of a sound from the alphabet** (needed to support
+alternative alphabets later). It supersedes the ad-hoc split of slices 3–5 once we move config toward
+the DB shape.
+
+**Terminology:** "strike"/"stroke" as the *striking location* is renamed **`zone`** (`KNOB` / `RIM`),
+the common percussion term ("striking zone"). This is distinct from `NoteObject.stroke` (articulation
+modifier), which keeps its name.
+
+### Core concepts
+- A **sound** is the acoustic unit `(tone, octave?, muting, zone?)` — alphabet-independent. Its
+  human-readable id is the **`shorthandCode`** (the current note-name codes like `I1`, `O` are these).
+  `octave` and `zone` are both nullable: percussion has no octave; most instruments have a single zone.
+- `Position → Instrument` is a function, so most physical facts are properties of the **instrument**,
+  not the position. The exception is the **reyong**: its four players (= positions) each reach a
+  different subset of the 12 chimes, so *range* is per-position there. We keep the instrument keying
+  and add a **nullable `position`** qualifier that is set only where a fact differs per position
+  (reyong today; possibly others later). `position = null` ⇒ the row applies to all positions of the
+  instrument. (Chosen over modelling each reyong player as a separate "instrument", which is
+  counter-intuitive.)
+- The **only** alphabet-dependent relation is the symbol table. Everything else is acoustic. That one
+  wall is what the whole split protects.
+
+### Relations
+```
+Sound            shorthandCode → (tone, octave?, muting, zone?)          -- acoustic registry; single
+                                                                            source of truth for the tuple
+InstrumentSound  (instrument, position?, shorthandCode) → midicode?      -- physical RANGE + MIDI merged;
+                                                                            position set only for reyong;
+                                                                            midicode null for unpitched
+Sample           (sampleSet, instrument, shorthandCode) → file          -- per sample set
+InstrumentVolume (sampleSet, instrument) → volume                        -- ONE volume per instrument
+Symbol           (position, symbol) → shorthandCode                      -- THE alphabet layer (isolated)
+```
+Plus the existing membership config: `orchestra → positions` (ordered) and `position → instrument`.
+
+### Why this shape (design rules used)
+- **Merge relations that share a key**, keep them apart when a new key dimension appears. The old MIDI
+  table and the range table shared the key `(instrument, shorthandCode)` → merged into **InstrumentSound**
+  (range = "a row exists"; `midicode` is just a column, nullable for unpitched percussion).
+- **Key physical tables by instrument, not position** — samples/range/MIDI are instrument properties;
+  `position → instrument` resolves at lookup. Reyong is handled by the nullable `position` qualifier,
+  not by duplicating rows per position.
+- **`sampleSet` is a genuine extra dimension** → `Sample` and `InstrumentVolume` stay separate from the
+  set-independent physical facts and cannot be folded in.
+- **Volume is one setting per instrument** (per sample set); balancing individual samples within an
+  instrument is the sample provider's responsibility, not a config concern. No per-sample volume.
+- **`shorthandCode` is a surrogate for the `(tone, octave?, muting, zone?)` tuple**; `Sound` is its
+  single source of truth so the code and the tuple cannot silently disagree. This makes
+  `sampletemplate` redundant — filenames come from the explicit `Sample.file`.
+
+### Lookups reproduced
+- Audio: `(position, symbol) →[Symbol]→ shorthandCode`; `position →[membership]→ instrument`;
+  `(sampleSet, instrument, shorthandCode) →[Sample]→ file`.
+- MIDI: `(instrument, position?, shorthandCode) →[InstrumentSound]→ midicode`.
+- Range of a position: rows of `InstrumentSound` for its instrument where `position` is null or equals it.
+
+This is representation-agnostic: whichever of these become DB tables vs TS constants, the `configAccess`
+seam keeps authoring ergonomic and exposes normalized views.
+
 ## Out of scope
 The `STYLE & THEME` section of `frontend/src/config/config.ts`.
