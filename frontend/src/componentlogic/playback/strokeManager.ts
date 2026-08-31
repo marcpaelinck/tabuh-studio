@@ -184,7 +184,7 @@ function openNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample() || args.forceEmulation) {
+    if (args.note.hasSample() && !args.forceEmulation) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {
@@ -206,7 +206,7 @@ function dampedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
 
 function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
     const symbol = args.note.symbol
-    if (args.note.hasSample() || args.forceEmulation) {
+    if (args.note.hasSample() && !args.forceEmulation) {
         const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
         return [newAction({ args: args, note })]
     } else {
