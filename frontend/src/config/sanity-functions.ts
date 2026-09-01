@@ -1,5 +1,4 @@
-import { type Position } from '@tabuhstudio/shared'
-import { getAllPositions, getSymbolToNoteNames } from '@tabuhstudio/shared/config/configAccess'
+import { getAllPositions } from '@tabuhstudio/shared/config/configAccess'
 import { fileExists } from '../utils/filesystem'
 import { doSanityCheck } from './config'
 import { resolveSampleSet } from './sampleSets'
@@ -10,19 +9,13 @@ import { resolveSampleSet } from './sampleSets'
 async function sanityCheck() {
     var logMessage = ''
     const set = resolveSampleSet()
-    const instrPitchStroke = getAllPositions()
-        .map((position) =>
-            Object.values(getSymbolToNoteNames(position))
-                .flat()
-                .map((note) => [position, note] as [Position, string])
-        )
-        .flat()
-    for (const [position, note] of instrPitchStroke) {
-        const entry = set.entries[position]
-        if (!entry) continue
-        const filename = entry.sampletemplate.replace('{note}', note)
-        const found = await fileExists(set.folder + filename)
-        if (!found) logMessage += `X ${filename} not found in ${set.folder}\n`
+    for (const position of getAllPositions()) {
+        const files = set.files[position]
+        if (!files) continue
+        for (const filename of Object.values(files)) {
+            const found = await fileExists(set.folder + filename)
+            if (!found) logMessage += `X ${filename} not found in ${set.folder}\n`
+        }
     }
     if (logMessage) console.error(logMessage)
 }

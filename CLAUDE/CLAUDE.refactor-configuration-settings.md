@@ -215,15 +215,18 @@ unchanged accessors.
    the `Note` type is kept as the derived animation payload for now.
 4. **SampleSet** as a first-class concept (start with one default set) + the group<user<session
    resolution + a playback selection point; move `files` / `volume` off the position and drop
-   `sampletemplate`. *(Foundation done: `config/sampleSets.ts` defines the `SampleSet` type and a
-   default set (generated from `positionConfigs`, so behaviour is unchanged) behind `resolveSampleSet()`;
-   `useInstruments` and `sanity-functions` now source folder/volume/template from the resolved set,
-   and the `getSampleTemplate`/`getPositionVolume` accessors are removed. **Remaining:** author explicit
-   per-symbol files and physically remove `sampletemplate`/`volume` from `positionConfigs`; add real
-   alternative sets; implement the session store + user-pref + group config that `resolveSampleSet`
-   will consult (session ?? user ?? group ?? default); add the selection UI; rebuild samplers when the
-   selection changes. Also note `symbolToNoteNames` still serves the sample codes + MIDI (`pitchMap`) +
-   valid-symbols, so it is not yet fully retired.)*
+   `sampletemplate`. *(**Data cleanup done:** `config/sampleSets.ts` now holds the audio layer entirely —
+   `SampleSet = { id, name, folder, volume: per-instrument, files: per-position code→filename }`. The
+   single default set is generated from a compact per-position `{volume, template}` spec (behaviour
+   unchanged); `files` are keyed by **position** because CENGCENG_P/S share an instrument but have
+   distinct samples for the same code (see the CENGCENG_KOPYAK note under the normalized model), while
+   `volume` is one per instrument. `sampletemplate` and `volume` are **removed from `positionConfigs`
+   and from the `PositionConfig` type**; `soundFile` is gone; `useInstruments` and `sanity-functions`
+   read the resolved set. Typecheck clean.* ***Deferred to a later step (was the "selection machinery"
+   half of step 4):*** *add real alternative sets; implement the session store + user-pref + group config
+   that `resolveSampleSet` consults (session ?? user ?? group ?? default); add the selection UI; rebuild
+   samplers on selection change. Also `symbolToNoteNames` still serves the sample codes + MIDI
+   (`pitchMap`) + valid-symbols, so it is not yet fully retired.)*
 5. Add **`SEMAR_PAGULINGAN`** as the proof case: orchestra-specific positions (with the id prefix),
    its voicing (7 keys incl. `r`/`s`), and a sample set.
 6. Back each slice with the DB behind the unchanged accessors; add editing UI for authorized users.
@@ -260,7 +263,9 @@ Sound            shorthandCode → (tone, octave?, muting, zone?)          -- ac
 InstrumentSound  (instrument, position?, shorthandCode) → midicode?      -- physical RANGE + MIDI merged;
                                                                             position set only for reyong;
                                                                             midicode null for unpitched
-Sample           (sampleSet, instrument, shorthandCode) → file          -- per sample set
+Sample           (sampleSet, instrument, position?, shorthandCode) → file -- per sample set; position set
+                                                                             where samples differ per position
+                                                                             (see CENGCENG_KOPYAK note)
 InstrumentVolume (sampleSet, instrument) → volume                        -- ONE volume per instrument
 Symbol           (position, symbol) → shorthandCode                      -- THE alphabet layer (isolated)
 ```
@@ -275,6 +280,11 @@ Plus the existing membership config: `orchestra → positions` (ordered) and `po
   not by duplicating rows per position.
 - **`sampleSet` is a genuine extra dimension** → `Sample` and `InstrumentVolume` stay separate from the
   set-independent physical facts and cannot be folded in.
+- **Samples need the same nullable `position` qualifier as the range** — not just the reyong. Found while
+  finishing step 4: `CENGCENG_P` and `CENGCENG_S` are the same instrument (`CENGCENG_KOPYAK`) yet their
+  `X_OPEN`/`X_MUTED` codes map to *different* files, so `(instrument, shorthandCode)` is not unique for
+  samples. `position` is part of the `Sample` key (null ⇒ all positions of the instrument). Volume stays
+  per instrument (cengceng P/S share a volume).
 - **Volume is one setting per instrument** (per sample set); balancing individual samples within an
   instrument is the sample provider's responsibility, not a config concern. No per-sample volume.
 - **`shorthandCode` is a surrogate for the `(tone, octave?, muting, zone?)` tuple**; `Sound` is its

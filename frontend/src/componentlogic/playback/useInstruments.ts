@@ -1,5 +1,5 @@
 import type { Position } from '@tabuhstudio/shared'
-import { getAllPositions, getSymbolToNoteNames } from '@tabuhstudio/shared/config/configAccess'
+import { getAllPositions, getPositionInstrument, getSymbolToNoteNames } from '@tabuhstudio/shared/config/configAccess'
 import { positionGroups } from '@tabuhstudio/shared/config/position'
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
 import * as Tone from 'tone'
@@ -87,24 +87,19 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
             createSampler({
                 isMelodic: positionGroups.MELODIC.positions.includes(position),
                 samples: lookup[position].idx2sample,
-                volume: sampleSet.entries[position]!.volume
+                volume: sampleSet.volume[getPositionInstrument(position)!]!
             })
         ]
     })
     return Object.fromEntries(entries)
 }
 
-export function soundFile(note: string, fileTemplate: string): string {
-    return fileTemplate.replace('{note}', note)
-}
-
 const lookup = Object.fromEntries(
     getAllPositions().map((position) => {
         const symbolToNoteNames = getSymbolToNoteNames(position)
+        const files = sampleSet.files[position]!
         const noteList = [...new Set(Object.values(symbolToNoteNames).flat())]
-        const indexToSample = Object.fromEntries(
-            noteList.map((note, index) => [NOTES[index], soundFile(note, sampleSet.entries[position]!.sampletemplate)])
-        )
+        const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], files[note]]))
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))
         const symbolToIndices = Object.fromEntries(
             Object.entries(symbolToNoteNames).map(([symbol, notes]) => [symbol, notes.map((repr) => noteToIndex[repr])])

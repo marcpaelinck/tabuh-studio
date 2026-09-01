@@ -69,15 +69,12 @@ export type PositionGroup =
 export type InstrumentConfig = { name: string; positions: Position[] }
 
 export type PositionConfig = {
-    //`notes` contains a list of single notes or multiple notes that are played simultaneously.
-    // The string values are 'shorthand' codes that uniquely define a sample (see const noteConfigs).
-    // sampletemplate should contain the string '{note}' where the note name should appear in the
-    // sample file name.
+    // `symbolToNoteNames` maps each valid symbol to a list of 'shorthand' codes; each code uniquely
+    // defines a sample. Sample files and per-instrument volumes live in the SampleSet (see
+    // frontend/src/config/sampleSets.ts), not here.
     name: string
     instrument: Instrument
     type: string
     svg_file: string
-    sampletemplate: string
-    volume: number
     symbolToNoteNames: { [symbol: string]: string[] }
 }
