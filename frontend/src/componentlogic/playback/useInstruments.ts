@@ -8,13 +8,11 @@ import {
     AVERAGE_ATTACK_DELAY,
     baseNoteSubdivision,
     dimRateNonFocusedInstruments,
-    NOTES,
     playerOutroTime
 } from '../../config/config'
 import { resolveSampleSet } from '../../config/sampleSets'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { SamplerFunctionParameters } from '../../typing/playback'
-import { debug } from '../../utils/debugger'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'
 
 export type InstrumentSampler = {
@@ -29,16 +27,20 @@ export type InstrumentSampler = {
 
 export type InstrumentSamplers = Record<Position, InstrumentSampler>
 
-// const pitchShift: Tone.PitchShift = new Tone.PitchShift({
-//     pitch: 5.0, // 1 unit equals 100 cents
-//     windowSize: 0.07,
-//     delayTime: 0,
-//     feedback: 0
-// })
+// MIDI base pitches.
+// Needed when using Tone.Sampler to prevent Tone.js from automatically modifying the samples' pitch.
+// prettier-ignore
+const NOTES = ['C1','C#1','D1','D#1','E1','F1','F#1','G1','G#1','A1','A#1','B1','C2','C#2','D2','D#2','E2','F2',
+                      'F#2','G2','G#2','A2','A#2','B2','C3','C#3','D3','D#3','E3','F3','F#3','G3','G#3','A3','A#3','B3']
 
-// The active sample set (files + volumes + folder). Static today; when set selection is dynamic the
-// samplers/lookup below should rebuild when it changes.
-const sampleSet = resolveSampleSet()
+/* EXAMPLES OF FILTERS. NOT USED BECAUSE THE OUTPUT SOUNDS DISTORTED WHEN APPLIED ON SAMPLES.
+
+ const pitchShift: Tone.PitchShift = new Tone.PitchShift({
+    pitch: 5.0, // 1 unit equals 100 cents
+    windowSize: 0.07,
+    delayTime: 0,
+    feedback: 0
+})
 
 const lowpassFilter = new Tone.Filter({
     frequency: 5000, // Cutoff frequency in Hz
@@ -46,11 +48,17 @@ const lowpassFilter = new Tone.Filter({
     rolloff: -48 // Steepness (-12, -24, or -48 dB/octave)
 })
 
+// Change lowpass cutoff frequency according to velocity
 function lowpassFrequency(velocity: number): number {
     const minFreq = 1000
     const maxFreq = 5000
     return minFreq + (maxFreq - minFreq) * velocity
 }
+*/
+
+// The active sample set (files + volumes + folder). Static today; when set selection is dynamic the
+// samplers/lookup below should rebuild when it changes.
+const sampleSet = resolveSampleSet()
 
 const createSampler = ({
     isMelodic,
@@ -135,22 +143,20 @@ const createInstrument = (
                 alwaysFocusPositions.includes(position)
                     ? 1
                     : dimRateNonFocusedInstruments
-            if (position == 'PEMADE_POLOS')
-                debug(`focus=${JSON.stringify(focusRef.current)} pos=${params.position}, dimvalue=${dimValue}`)
             const indices = lookup[position].symbol2idxs[params.note.canonicalSymbol]
             if (indices && samplers[position]) {
                 var duration: Tone.Unit.TimeObject = params.duration
                 // Extend the last note to allow the sound to attenuate
                 //TODO Do not extend the last note when looping from the last note.
                 if (params.isLast) {
-                    //@ts-ignore
+                    // @ts-ignore
                     duration[baseNoteSubdivision] += millis2BaseNoteEquiv(outroTime, params.bpm)
                 }
                 try {
-                    lowpassFilter.frequency.setValueAtTime(lowpassFrequency(params.velocity * dimValue), time)
+                    // lowpassFilter.frequency.setValueAtTime(lowpassFrequency(params.velocity * dimValue), time)
                     sampler?.triggerAttackRelease(indices, duration, time, params.velocity * dimValue)
                 } catch {
-                    console.error(`ERROR: could not play sound ${params.position} ${JSON.stringify(params)} `)
+                    console.error(`ERROR: could not play sound ${params.position} ${params.note.canonicalSymbol}`)
                 }
             }
         },
