@@ -424,7 +424,7 @@ export function useScoreReader(source: 'database' | 'file'): {
         const scoreInfoList: ScoreInfo[] = JSON.parse(files)
         setScoreInfoList(
             scoreInfoList
-                .filter((info) => info.instrumentgroup == 'GONG_KEBYAR')
+                .filter((info) => _.keys(orchestraConfigs).includes(info.instrumentgroup))
                 .toSorted((i1, i2) => i1.title.localeCompare(i2.title))
         )
         setIsLoading(false)
