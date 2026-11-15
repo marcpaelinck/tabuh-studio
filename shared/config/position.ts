@@ -62,7 +62,7 @@ export const positionGroups: Record<PositionGroup, InstrumentConfig> = {
     REYONGB: { positions: ['REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
     POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
     MELODIC: {
-        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
         name: 'Melodic'
     },
     DAUN: {
@@ -232,11 +232,13 @@ export const positionConfigs: Record<Position, PositionConfig> = {
     TROMPONG: {
         name: 'Trompong',
         instrument: 'TROMPONG',
-        type: 'daun',
+        type: 'chimes',
         volume: -15,
-        svg_file: 'svg/GK_UGAL.svg',
-        sampletemplate: 'GK_UGAL_{note}.mp3',
-        symbolToNoteNames: { 'a,': ['DANG0'], 'i,': ['DING0'], 'o,': ['DONG0'], 'e,': ['DENG0'], 'u,': ['DUNG0'], a: ['DANG1'], i: ['DING1'], o: ['DONG1'], e: ['DENG1'], u: ['DUNG1'], 'a,/': ['DANG0_ABBR'], 'i,/': ['DING0_ABBR'], 'o,/': ['DONG0_ABBR'], 'e,/': ['DENG0_ABBR'], 'u,/': ['DUNG0_ABBR'], 'a/': ['DANG1_ABBR'], 'i/': ['DING1_ABBR'], 'o/': ['DONG1_ABBR'], 'e/': ['DENG1_ABBR'], 'u/': ['DUNG1_ABBR'], 'a,?': ['DANG0_MUTED'], 'i,?': ['DING0_MUTED'], 'o,?': ['DONG0_MUTED'], 'e,?': ['DENG0_MUTED'], 'u,?': ['DUNG0_MUTED'], 'a?': ['DANG1_MUTED'], 'i?': ['DING1_MUTED'], 'o?': ['DONG1_MUTED'], 'e?': ['DENG1_MUTED'], 'u?': ['DUNG1_MUTED']
+        svg_file: '',
+        sampletemplate: 'GK_TROMPONG_{note}.mp3',
+        symbolToNoteNames: { 'a,': ['DANG0'], 'i': ['DING1'], 'o': ['DONG1'], 'e': ['DENG1'], 'u': ['DUNG1'], a: ['DANG1'], 'i<': ['DING2'], 'o<': ['DONG2'], 'e<': ['DENG2'], 'u<': ['DUNG2'],
+            // 'a,/': ['DANG0'], 'i/': ['DING1'], 'o/': ['DONG1'], 'e/': ['DENG1'], 'u/': ['DUNG1'], 'a/': ['DANG1'], 'i</': ['DING2'], 'o</': ['DONG2'], 'e</': ['DENG2'], 'u</': ['DUNG2'],
+            // 'a,?': ['DANG0'], 'i?': ['DING1'], 'o?': ['DONG1'], 'e?': ['DENG1'], 'u?': ['DUNG1'], 'a?': ['DANG1'], 'i<?': ['DING2'], 'o<?': ['DONG2'], 'e<?': ['DENG2'], 'u<?': ['DUNG2'],
         }
     },
     GENDER_RAMBAT: {

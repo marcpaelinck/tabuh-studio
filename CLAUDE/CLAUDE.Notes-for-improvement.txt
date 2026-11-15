@@ -1,0 +1,17 @@
+# Notes for improvement
+This document contains various remarks that can help improve the code.
+
+## Symbol validation occurs in several places
+The validation of a symbol when creating a Note object uses several constants that link valid symbols or characters to positions.
+1. shared/config/alphabet.ts: the `alphabet` constant links a list of valid positions for each character.
+2. shared/config/positions.ts: constant `positionConfigs` links symbols to positions
+3. frontend/src/componentlogic/castingRulesManager.ts: castingRules should contain all instruments that can be grouped. This constant contains a list of valid (pitch) symbols for each position
+
+The information in these constants is redundant, making updates error prone. When adding new instruments or positions one can easily forget to update the values in one of these constants. The redundancy enables to enter contradictory information.
+
+## Instrument grouping occurs in several places.
+1. frontend/src/componentlogic/castingRulesManager.ts > allowedPositionGroups and shared/config/positions.ts > positionGroups both contains all possible position groupings.
+
+## Adding new instruments is error prone.
+This follows from the two previous sections. All the settings mentioned need to be updated in a consistent manner. This process is very error-prone.
+ 

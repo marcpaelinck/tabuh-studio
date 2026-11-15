@@ -39,6 +39,8 @@ const castingRules: CastingRuleSet = {
                                 'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A',  '-': '-', '.': '.', ' ': ' ' }},
     UGAL: {default: { 'o,': 'o,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<', 
                     'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', '-': '-', '.': '.', ' ': ' ' }},
+    TROMPONG: {default: { 'o,': 'o', 'e,': 'e', 'u,': 'u', 'a,': 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<', 'o<': 'o<', 'e<': 'e<', 'u<': 'u<', 
+                    'I':'I', 'O': 'O', 'E':'E', 'U': 'U', 'A': 'A', '-': '-', '.': '.', ' ': ' ' }},
     REYONG_1: {default: { 'o,':'a,', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'u,', o: 'a,', e: 'e,', u: 'u,', a: 'a,', 'i<':'u,',
                         'I':'A', 'O': 'I', 'E':'E', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 't':'t', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' },
             nokempyung: {'o,':'o', 'e,': 'e,', 'u,': 'u,', 'a,': 'a,', i: 'i', o: 'o', 'e': 'e,', 'u': 'u,', 'a': 'a,', 'i<': 'i', 'o<': 'o',
@@ -94,6 +96,7 @@ export const allowedPositionGroups: Record<Orchestra, Position[][]> = {
             'REYONG_3',
             'REYONG_4',
             'UGAL',
+            'TROMPONG',
             'PENYACAH',
             'CALUNG',
             'JEGOGAN'
@@ -247,6 +250,20 @@ const aggregationRules: { group: Position[]; rules: RuleName[] }[] = [
             'PEMADE_SANGSIH',
             'KANTILAN_SANGSIH',
             'UGAL',
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4'
+        ],
+        rules: ['default', 'default', 'default', 'default', 'default', 'default', 'default', 'default', 'default']
+    },
+    {
+        group: [
+            'PEMADE_POLOS',
+            'KANTILAN_POLOS',
+            'PEMADE_SANGSIH',
+            'KANTILAN_SANGSIH',
+            'TROMPONG',
             'REYONG_1',
             'REYONG_2',
             'REYONG_3',

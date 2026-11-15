@@ -123,3 +123,10 @@ Initial release
 - `Added` 'Guided tour' for first-time users
 - `Added` 'Guided tour' for Player
 - `Added` 'Guided tour' for Editor (basics)
+
+## 1.1.14 2026-11-15
+
+- `Fixed` Player progress bar not advancing
+- `Fixed` Player progress bar tooltip too narrow
+- `Fixed` Illegal character 'b' for balegangjur reyong position
+- `Added` Gong kebyar trompong samples
