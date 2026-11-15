@@ -10,7 +10,7 @@ import {
     dimRateNonFocusedInstruments,
     playerOutroTime
 } from '../../config/config'
-import { resolveSampleSet } from '../../config/sampleSets'
+import { sampleSetForPosition } from '../../config/sampleSets'
 import { useUserSelectionStore } from '../../stores/useUserSettingsStore'
 import type { SamplerFunctionParameters } from '../../typing/playback'
 import { millis2BaseNoteEquiv } from '../../utils/timeunits'
@@ -57,20 +57,22 @@ function lowpassFrequency(velocity: number): number {
 }
 */
 
-// The active sample set (files + volumes + folder). Static today; when set selection is dynamic the
-// samplers/lookup below should rebuild when it changes.
-const sampleSet = resolveSampleSet()
+// The sample set is resolved per position from the position's orchestra (positions are now
+// orchestra-unique, each orchestra has its own folder under `sounds/<ORCHESTRA>/<set>/`). Static today;
+// when set selection is dynamic the samplers/lookup below should rebuild when it changes.
 
 const createSampler = ({
+    baseUrl,
     isMelodic,
     samples,
     volume
 }: {
+    baseUrl: string
     isMelodic: boolean
     samples: { [key: string]: string }
     volume: Tone.Unit.Decibels
 }) => {
-    const sampler = new Tone.Sampler({ urls: samples, baseUrl: sampleSet.folder, volume })
+    const sampler = new Tone.Sampler({ urls: samples, baseUrl, volume })
     // To connect a filter, use the following code:
     //       sampler.connect(filter)
     //       filter.toDestination()
@@ -82,12 +84,15 @@ const createSampler = ({
 const createSamplers = (): Record<string, Tone.Sampler> => {
     Tone.getDestination().volume.value = 5
     const entries = getAllPositions().map((position) => {
+        const set = sampleSetForPosition(position)!
+        console.log(`${position} (${set.folder}): ${JSON.stringify(lookup[position].idx2sample)}`)
         return [
             position,
             createSampler({
+                baseUrl: set.folder,
                 isMelodic: positionGroups.MELODIC.positions.includes(position),
                 samples: lookup[position].idx2sample,
-                volume: sampleSet.volume[getPositionInstrument(position)!]!
+                volume: set.volume[getPositionInstrument(position)!]!
             })
         ]
     })
@@ -97,7 +102,7 @@ const createSamplers = (): Record<string, Tone.Sampler> => {
 const lookup = Object.fromEntries(
     getAllPositions().map((position) => {
         const symbolToNoteNames = getSymbolToNoteNames(position)
-        const files = sampleSet.files[position]!
+        const files = sampleSetForPosition(position)!.files[position]!
         const noteList = [...new Set(Object.values(symbolToNoteNames).flat())]
         const indexToSample = Object.fromEntries(noteList.map((note, index) => [NOTES[index], files[note]]))
         const noteToIndex = Object.fromEntries(noteList.map((notestr, index) => [notestr, NOTES[index]]))

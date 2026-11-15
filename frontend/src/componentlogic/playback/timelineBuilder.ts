@@ -428,7 +428,7 @@ export function buildTimeline(pbAction: PlaybackAction, opts: BuildTimelineOptio
                 pass: currentStep.pass,
                 iteration: currentStep.iteration,
                 tempo: currentStep.tempo[0],
-                dynamics: currentStep.dynamics['PEMADE_POLOS'][0]
+                dynamics: (currentStep.dynamics['PEMADE_POLOS'] ?? Object.values(currentStep.dynamics)[0])?.[0]
             }
         })
 

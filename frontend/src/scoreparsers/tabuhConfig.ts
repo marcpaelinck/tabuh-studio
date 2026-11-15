@@ -6,14 +6,14 @@
 //    pos_tag: alternatives for the positions of the instrument
 //    positions: corresponding list of Position values
 // prettier-ignore
-export const instrumentTags: Record<string, string | string[]>[] = [
+export const instrumentTags_GK: Record<string, string | string[]>[] = [
     { instr_tag: ['calung', 'cal', 'ca'], pos_tag: [''], positions: ['CALUNG'] },
     { instr_tag: ['cengceng', 'ceng', 'ce'], pos_tag: [''], positions: ['CENGCENG'] },
     { instr_tag: ['gangsa', 'ga'], pos_tag: [''], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
     { instr_tag: ['gangsa', 'ga'], pos_tag: ['polos', 'po', 'p'], positions: ['PEMADE_POLOS', 'KANTILAN_POLOS'] },
     { instr_tag: ['gangsa', 'ga'], pos_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH', 'KANTILAN_SANGSIH'] },
-    { instr_tag: ['genderrambat', 'gender', 'gen', 'ge'], pos_tag: [], positions: ['GENDERRAMBAT'] },
-    { instr_tag: ['gongs', 'gong', 'go'], pos_tag: [''], positions: ['GONGS'] },
+    { instr_tag: ['genderrambat', 'gender', 'gen', 'ge'], pos_tag: [''], positions: ['GENDER_RAMBAT'] },
+    { instr_tag: ['gongs', 'gong', 'go'], pos_tag: [''], positions: ['GK_GONGS'] },
     { instr_tag: ['gying', 'gy'], pos_tag: [''], positions: ['UGAL'] },
     { instr_tag: ['jegogan', 'jegog', 'jeg', 'je'], pos_tag: [''], positions: ['JEGOGAN'] },
     { instr_tag: ['jublag', 'jub', 'ju', 'calung', 'cal', 'ca'], pos_tag: [''], positions: ['CALUNG'] },
@@ -21,7 +21,7 @@ export const instrumentTags: Record<string, string | string[]>[] = [
     { instr_tag: ['kantilan', 'kan', 'ka'], pos_tag: ['polos', 'pol', 'po', 'p'], positions: ['KANTILAN_POLOS'] },
     { instr_tag: ['kantilan', 'kan', 'ka'], pos_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['KANTILAN_SANGSIH'] },
     { instr_tag: ['kempli', 'kem', 'ke'], pos_tag: [''], positions: ['KEMPLI'] },
-    { instr_tag: ['kendang', 'kend', 'kd'], pos_tag: [''], positions: ['KENDANG'] },
+    { instr_tag: ['kendang', 'kend', 'kd'], pos_tag: [''], positions: ['GK_KENDANG'] },
     { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: [''], positions: ['PEMADE_POLOS', 'PEMADE_SANGSIH'] },
     { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: ['polos', 'pol', 'po', 'p'], positions: ['PEMADE_POLOS'] },
     { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['PEMADE_SANGSIH'] },
@@ -35,9 +35,57 @@ export const instrumentTags: Record<string, string | string[]>[] = [
     { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['13', '1+3'], positions: ['REYONG_1', 'REYONG_3'] },
     { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['24', '2+4'], positions: ['REYONG_2', 'REYONG_4'] },
     { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['34', '3+4'], positions: ['REYONG_3', 'REYONG_4'] },
-    { instr_tag: ['suling', 'sul', 'su'], pos_tag: [''], positions: ['SULING'] },
+    { instr_tag: ['suling', 'sul', 'su'], pos_tag: [''], positions: ['SP_SULING'] },
     { instr_tag: ['trompong', 'tromp', 'tromp', 'tro', 'tr'], pos_tag: [''], positions: ['TROMPONG'] },
     { instr_tag: ['ugal', 'ug'], pos_tag: [''], positions: ['UGAL'] }
+]
+export const instrumentTags_SP: Record<string, string | string[]>[] = [
+    { instr_tag: ['calung', 'cal', 'ca'], pos_tag: [''], positions: ['SP_CALUNG'] },
+    { instr_tag: ['cengceng', 'ceng', 'ce'], pos_tag: [''], positions: ['SP_CENGCENG'] },
+    {
+        instr_tag: ['gangsa', 'ga'],
+        pos_tag: [''],
+        positions: ['SP_PEMADE_POLOS', 'SP_KANTILAN_POLOS', 'SP_PEMADE_SANGSIH', 'SP_KANTILAN_SANGSIH']
+    },
+    { instr_tag: ['gangsa', 'ga'], pos_tag: ['polos', 'po', 'p'], positions: ['SP_PEMADE_POLOS', 'SP_KANTILAN_POLOS'] },
+    {
+        instr_tag: ['gangsa', 'ga'],
+        pos_tag: ['sangsih', 'sang', 'sa', 's'],
+        positions: ['SP_PEMADE_SANGSIH', 'SP_KANTILAN_SANGSIH']
+    },
+    { instr_tag: ['genderrambat', 'gender', 'gen', 'ge'], pos_tag: [''], positions: ['SP_GENDER'] },
+    { instr_tag: ['gongs', 'gong', 'go'], pos_tag: [''], positions: ['SP_GONGS'] },
+    { instr_tag: ['gying', 'gy'], pos_tag: [''], positions: ['SP_UGAL'] },
+    { instr_tag: ['jegogan', 'jegog', 'jeg', 'je'], pos_tag: [''], positions: ['SP_JEGOGAN'] },
+    { instr_tag: ['jublag', 'jub', 'ju', 'calung', 'cal', 'ca'], pos_tag: [''], positions: ['SP_CALUNG'] },
+    { instr_tag: ['kantilan', 'kan', 'ka'], pos_tag: [''], positions: ['SP_KANTILAN_POLOS', 'SP_KANTILAN_SANGSIH'] },
+    { instr_tag: ['kantilan', 'kan', 'ka'], pos_tag: ['polos', 'pol', 'po', 'p'], positions: ['SP_KANTILAN_POLOS'] },
+    {
+        instr_tag: ['kantilan', 'kan', 'ka'],
+        pos_tag: ['sangsih', 'sang', 'sa', 's'],
+        positions: ['SP_KANTILAN_SANGSIH']
+    },
+    { instr_tag: ['kempli', 'kem', 'ke'], pos_tag: [''], positions: ['SP_KEMPLI'] },
+    { instr_tag: ['kendang', 'kend', 'kd'], pos_tag: [''], positions: ['SP_KENDANG'] },
+    { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: [''], positions: ['SP_PEMADE_POLOS', 'SP_PEMADE_SANGSIH'] },
+    { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: ['polos', 'pol', 'po', 'p'], positions: ['SP_PEMADE_POLOS'] },
+    { instr_tag: ['pemade', 'pem', 'pe'], pos_tag: ['sangsih', 'sang', 'sa', 's'], positions: ['SP_PEMADE_SANGSIH'] },
+    {
+        instr_tag: ['reyong', 'rey', 're'],
+        pos_tag: [''],
+        positions: ['SP_REYONG_1', 'SP_REYONG_2', 'SP_REYONG_3', 'SP_REYONG_4']
+    },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['1'], positions: ['SP_REYONG_1'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['2'], positions: ['SP_REYONG_2'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['3'], positions: ['SP_REYONG_3'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['4'], positions: ['SP_REYONG_4'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['12', '1+2'], positions: ['SP_REYONG_1', 'SP_REYONG_2'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['13', '1+3'], positions: ['SP_REYONG_1', 'SP_REYONG_3'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['24', '2+4'], positions: ['SP_REYONG_2', 'SP_REYONG_4'] },
+    { instr_tag: ['reyong', 'rey', 're'], pos_tag: ['34', '3+4'], positions: ['SP_REYONG_3', 'SP_REYONG_4'] },
+    { instr_tag: ['suling', 'sul', 'su'], pos_tag: [''], positions: ['SP_SP_SULING'] },
+    { instr_tag: ['trompong', 'tromp', 'tromp', 'tro', 'tr'], pos_tag: [''], positions: ['SP_TROMPONG'] },
+    { instr_tag: ['ugal', 'ug'], pos_tag: [''], positions: ['SP_UGAL'] }
 ]
 
 // possible separators between the instrument tag and position tag. E.g. reyong1 / reyong 1 / reyong_1 / reyong-1.

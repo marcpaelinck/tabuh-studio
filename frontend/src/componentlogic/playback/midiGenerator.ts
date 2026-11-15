@@ -32,7 +32,7 @@ const clamp01 = (v: number): number => Math.max(0, Math.min(1, v))
 // instrument (`positionConfigs[position].instrument`), and each instrument gets its own
 // program so a DAW plays every instrument on a distinct voice. GM has no gamelan sounds, so
 // these are best-effort idiophone/mallet approximations grouped by register; edit freely.
-const GM_PROGRAM_BY_INSTRUMENT: Record<Instrument, number> = {
+const GM_PROGRAM_BY_INSTRUMENT: Partial<Record<Instrument, number>> = {
     // Keyed bronze metallophones (bright → dark by register).
     KANTILAN: 8, // Celesta
     PEMADE: 9, // Glockenspiel
@@ -48,11 +48,25 @@ const GM_PROGRAM_BY_INSTRUMENT: Record<Instrument, number> = {
     PONGGANG: 114, // Steel Drums
     // Hanging gongs, timekeepers, drums and cymbals.
     KEMPLI: 115, // Woodblock
-    GONGS: 116, // Taiko Drum
-    KENDANG: 117, // Melodic Tom (low drum)
+    GK_GONGS: 116, // Taiko Drum
+    BAL_GONGS: 116,
+    GK_KENDANG: 117, // Melodic Tom (low drum)
+    BAL_KENDANG: 117,
     CENGCENG: 119, // Reverse Cymbal
     TAWATAWA: 47, // Timpani
-    CENGCENG_KOPYAK: 126 // Applause (cymbal wash)
+    BAL_CENGCENG_KOPYAK: 126, // Applause (cymbal wash)
+    // Semar Pagulingan
+    SP_PEMADE: 9,
+    SP_KANTILAN: 8,
+    SP_GENDER: 10,
+    SP_CALUNG: 12,
+    SP_JEGOGAN: 15,
+    SP_TROMPONG: 112,
+    SP_SULING: 73, // Flute
+    SP_GONGS: 116,
+    SP_KEMPLI: 115,
+    SP_KENDANG: 117,
+    SP_CENGCENG: 119
 }
 
 /** The 0-based General-MIDI program used for a position's track (via its instrument). */

@@ -16,7 +16,7 @@ import { gmProgram } from '../playback/midiGenerator'
 import { instrumentNoteMapRows } from '../playback/pitchMap'
 
 // Display names for the instruments (the `Instrument` enum values are upper-cased ids).
-const INSTRUMENT_NAMES: Record<Instrument, string> = {
+const INSTRUMENT_NAMES: Partial<Record<Instrument, string>> = {
     UGAL: 'Ugal',
     GENDER_RAMBAT: 'Gender rambat',
     TROMPONG: 'Trompong',
@@ -26,14 +26,28 @@ const INSTRUMENT_NAMES: Record<Instrument, string> = {
     PENYACAH: 'Penyacah',
     CALUNG: 'Calung',
     JEGOGAN: 'Jegogan',
-    GONGS: 'Gongs',
+    GK_GONGS: 'Gongs',
     CENGCENG: 'Cengceng',
-    CENGCENG_KOPYAK: 'Cengceng kopyak',
-    KENDANG: 'Kendang',
+    BAL_CENGCENG_KOPYAK: 'Cengceng kopyak',
+    GK_KENDANG: 'Kendang',
     KEMPLI: 'Kempli',
     REYONGB: 'Reyong (baleganjur)',
     PONGGANG: 'Ponggang',
-    TAWATAWA: 'Tawa tawa'
+    TAWATAWA: 'Tawa tawa',
+    BAL_GONGS: 'Gongs',
+    BAL_KENDANG: 'Kendang',
+    // Semar Pagulingan
+    SP_PEMADE: 'Pemade',
+    SP_KANTILAN: 'Kantilan',
+    SP_GENDER: 'Gender',
+    SP_CALUNG: 'Jublag',
+    SP_JEGOGAN: 'Jegogan',
+    SP_TROMPONG: 'Trompong',
+    SP_SULING: 'Suling',
+    SP_GONGS: 'Gongs',
+    SP_KEMPLI: 'Kempli',
+    SP_KENDANG: 'Kendang',
+    SP_CENGCENG: 'Cengceng'
 }
 
 // GM program names (0-based) for the programs the exporter uses; falls back to "Program N".

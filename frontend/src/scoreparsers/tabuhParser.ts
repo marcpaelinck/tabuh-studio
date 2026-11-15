@@ -93,7 +93,11 @@ export function parseNotation(content: string): ParserReturnValue {
                 gonganCounter++
                 const systemuuid = uuidv4()
                 const metaData = getMetadata(node, gonganCounter, systemuuid, scoreByMeasure.instrumenttype, content)
-                const notationByMeasure: GroupedNotationByMeasure[] = getNotationByMeasure(node, content)
+                const notationByMeasure: GroupedNotationByMeasure[] = getNotationByMeasure(
+                    node,
+                    content,
+                    scoreByMeasure.instrumenttype
+                )
                 const systemByMeasure: SystemByMeasure = {
                     uuid: systemuuid,
                     id: gonganCounter,
@@ -384,8 +388,8 @@ function getValueList<T>(node: SyntaxNode | null, valueType: ValueType | ListTyp
 
 // Converts a list of position tags to a list of Position values.
 // Position tags are used at the start of each stave and in the `positions=` parameter of metadata items.
-function tagsToPositions(tags: string[]): Position[] {
-    return tags.reduce((aggr, tag) => aggr.concat(tagLookup[tag] || []), [] as Position[])
+function tagsToPositions(tags: string[], orchestra: Orchestra): Position[] {
+    return tags.reduce((aggr, tag) => aggr.concat(tagLookup[orchestra][tag] || []), [] as Position[])
 }
 
 /***********
@@ -397,7 +401,11 @@ function tagsToPositions(tags: string[]): Position[] {
 // Grammar: Gongan { EmptyLine+ (MetadataLine | StaffLine)+ }
 //          StaffLine { PositionLabel Measure+ Eol }
 //          Measure { tab Note* }
-function getNotationByMeasure(gonganNode: SyntaxNode | null, content: string): GroupedNotationByMeasure[] {
+function getNotationByMeasure(
+    gonganNode: SyntaxNode | null,
+    content: string,
+    orchestra: Orchestra
+): GroupedNotationByMeasure[] {
     if (gonganNode == undefined) return []
     const groupedNotationByMeasures: GroupedNotationByMeasure[] = []
     const staffNodes = gonganNode.getChildren('StaffLine')
@@ -405,7 +413,7 @@ function getNotationByMeasure(gonganNode: SyntaxNode | null, content: string): G
     for (const child of staffNodes) {
         var notationByMeasure: NoteSymbol[][] = []
         const positionTag = getText(child.getChild('PositionLabel'), content)
-        const positions = tagsToPositions(positionTag.split('/'))
+        const positions = tagsToPositions(positionTag.split('/'), orchestra)
         var notationMeasures: GroupedNotationByMeasure
         const measureNodes = child.getChildren('Measure')
         for (const measureNode of measureNodes) {
@@ -517,7 +525,10 @@ function parseMetadata(
             // Default value for autokempyung is 'on'. Only generate casting instruction if metadata value is 'off'
             if (getValue<boolean>(node, 'OnOffValue', content) == false) {
                 const castingInstruction = { type: 'nokempyung' }
-                Object.assign(castingInstruction, getMetadataParameters(node, ['positions', 'scope'], content))
+                Object.assign(
+                    castingInstruction,
+                    getMetadataParameters(node, ['positions', 'scope'], content, orchestra)
+                )
                 return {
                     type: 'castinginstruction',
                     value: castingInstruction as CastingInstruction
@@ -531,7 +542,7 @@ function parseMetadata(
                 targetuuid: systemuuid,
                 label: getValue<string>(node, 'StringValue', content)
             }
-            Object.assign(parameters, getMetadataParameters(node, ['include'], content))
+            Object.assign(parameters, getMetadataParameters(node, ['include'], content, orchestra))
             return {
                 type: 'postprocessing',
                 value: { copy: parameters, targetuuid: systemuuid } as PostProcessing
@@ -553,7 +564,7 @@ function parseMetadata(
             }
             const parameters = Object.assign(
                 getGradualBeatsParameters(node, content, value.isGradual),
-                getMetadataParameters(node, ['passes', 'iterations', 'nthpass', 'positions'], content)
+                getMetadataParameters(node, ['passes', 'iterations', 'nthpass', 'positions'], content, orchestra)
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, dynamicsvalues, parameters, gradualoverride) as DynamicsItem
@@ -565,7 +576,12 @@ function parseMetadata(
             if (!['gineman', 'genderan', 'kebyar'].includes(gongantype.toLowerCase())) break
             const baseAttr = { type: 'kempli' }
             const value = { value: 'off' as KempliValue }
-            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
+            const parameters = getMetadataParameters(
+                node,
+                ['beats', 'passes', 'nthpass', 'iterations'],
+                content,
+                orchestra
+            )
             const item = Object.assign(baseAttr, value, parameters) as KempliItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -573,7 +589,7 @@ function parseMetadata(
         case 'GotoMetadata': {
             const baseAttr = { type: 'goto' }
             const value = { targetname: getValue<string>(node, 'StringValue', content), targetuuid: '' }
-            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content, orchestra)
             const item = Object.assign(baseAttr, value, parameters) as GotoItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -581,7 +597,12 @@ function parseMetadata(
         case 'KempliMetadata': {
             const value = { value: getValue<string>(node, 'KempliValue', content) }
             const baseAttr = { type: 'kempli' }
-            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
+            const parameters = getMetadataParameters(
+                node,
+                ['beats', 'passes', 'nthpass', 'iterations'],
+                content,
+                orchestra
+            )
             const item = Object.assign(baseAttr, value, parameters) as KempliItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -593,7 +614,7 @@ function parseMetadata(
         case 'LoopMetadata': {
             const baseAttr = { type: 'loop' }
             const value = { count: getValue<number>(node, 'IntegerValue', content) }
-            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content, orchestra)
             const item = Object.assign(baseAttr, value, parameters) as LoopItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -607,8 +628,15 @@ function parseMetadata(
         }
         case 'SuppressMetadata': {
             const baseAttr = { type: 'suppress' }
-            const value = { positions: tagsToPositions(getValueList<string>(node, 'StringList', content) || []) }
-            const parameters = getMetadataParameters(node, ['beats', 'passes', 'nthpass', 'iterations'], content)
+            const value = {
+                positions: tagsToPositions(getValueList<string>(node, 'StringList', content) || [], orchestra)
+            }
+            const parameters = getMetadataParameters(
+                node,
+                ['beats', 'passes', 'nthpass', 'iterations'],
+                content,
+                orchestra
+            )
             const item = Object.assign(baseAttr, value, parameters) as SuppressItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -623,7 +651,7 @@ function parseMetadata(
             }
             const parameters = Object.assign(
                 getGradualBeatsParameters(node, content, value.isGradual),
-                getMetadataParameters(node, ['passes', 'nthpass', 'iterations'], content)
+                getMetadataParameters(node, ['passes', 'nthpass', 'iterations'], content, orchestra)
             )
             const gradualoverride = { isGradual: value.isGradual || parameters.isGradual }
             const item = Object.assign(baseAttr, value, parameters, gradualoverride) as TempoItem
@@ -633,7 +661,7 @@ function parseMetadata(
         case 'WaitMetadata': {
             const baseAttr = { type: 'wait' }
             const value = { seconds: getValue<number>(node, 'FloatValue', content) }
-            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content)
+            const parameters = getMetadataParameters(node, ['passes', 'nthpass'], content, orchestra)
             const item = Object.assign(baseAttr, value, parameters) as WaitItem
             updateSeqAndTooltips(item, orchestra)
             return { type: 'executionitem', value: item } as ProcessingInstruction
@@ -648,7 +676,12 @@ function parseMetadata(
 // Returns the requested parameters of a metadata item
 // metadatanode: root node of the metadata item
 // paramList: list of parameter names. Each parameter will be returned as a pair `paramName`: `paramvalue`
-function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], content: string): Record<string, any> {
+function getMetadataParameters(
+    metadatanode: SyntaxNode,
+    paramList: string[],
+    content: string,
+    orchestra: Orchestra
+): Record<string, any> {
     const parameters: Record<string, any> = {}
     for (const paramName of paramList) {
         var param: any
@@ -689,7 +722,7 @@ function getMetadataParameters(metadatanode: SyntaxNode, paramList: string[], co
                 break
             case 'positions':
                 const posTags = getValueList<string>(metadatanode.getChild('PositionsParameter'), 'StringList', content)
-                const positions = posTags ? tagsToPositions(posTags) : undefined
+                const positions = posTags ? tagsToPositions(posTags, orchestra) : undefined
                 param = { positions: positions }
                 break
             case 'scope':

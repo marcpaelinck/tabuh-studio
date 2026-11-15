@@ -22,18 +22,18 @@ export const labelToPosition: Record<string, Position[]> = {
     p: ['PENYACAH'],
     c: ['CALUNG'],
     j: ['JEGOGAN'],
-    g: ['GONGS'],
+    g: ['GK_GONGS'],
     km: ['KEMPLI'],
     cc: ['CENGCENG'],
-    kkr: ['KENDANG'],
-    krw: ['KENDANG_WADON'],
-    krl: ['KENDANG_LANANG'],
+    kkr: ['GK_KENDANG'],
+    krw: ['GK_KENDANG_WADON'],
+    krl: ['GK_KENDANG_LANANG'],
     tr: ['KEMPLI']
 }
 
 // Alphabet translation table (Laras -> Tabuh)
 // prettier-ignore
-export const symbolLookup: Record<Position, Record<string, string>> = {
+export const symbolLookup: Partial<Record<Position, Record<string, string>>> = {
     REYONG_1: { E: 'e,', U: 'u,', A: 'a,', I: 'i', O: 'o', e: 'e', '.': '.' },
     REYONG_2: { A: 'a,', I: 'i', O: 'o', e: 'e', u: 'u', a: 'a', '.': '.' },
     REYONG_3: { e: 'e', u: 'u', a: 'a', i: 'i<', o: 'o<', '.': '.' },
@@ -48,15 +48,15 @@ export const symbolLookup: Record<Position, Record<string, string>> = {
     PENYACAH: { U: 'u,', A: 'a,', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', '.': '.' },
     CALUNG: { I: 'i', O: 'o', E: 'e', U: 'u', A: 'a', '.': '.' },
     JEGOGAN: { I: 'i', O: 'o', E: 'e', U: 'u', A: 'a', '.': '.' },
-    GONGS: { G: 'G', L: 'G', P: 'P', T: 'T', '.': '.' },
+    GK_GONGS: { G: 'G', L: 'G', P: 'P', T: 'T', '.': '.' },
     KEMPLI: { x: KEMPLI_BEAT_CHAR, '.': '.' },
     CENGCENG: { x: 'x', c: 'x?', '.': '.' },
-    KENDANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
-    KENDANG_WADON: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
-    KENDANG_LANANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
+    GK_KENDANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
+    GK_KENDANG_WADON: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
+    GK_KENDANG_LANANG: { o: '8', e: '*', n: '0', u: ')', D: '9', T: '(', '.': '.' },
     // BALEGANJUR SPECIFIC, NOT USED IN LARAS
-    CENGCENG_P: { x: 'x', c: 'x?', '.': '.' },
-    CENGCENG_S: { x: 'x', c: 'x?', '.': '.' },
+    BAL_CENGCENG_P: { x: 'x', c: 'x?', '.': '.' },
+    BAL_CENGCENG_S: { x: 'x', c: 'x?', '.': '.' },
     REYONGB_1: {},
     REYONGB_2: {},
     TAWATAWA: {},

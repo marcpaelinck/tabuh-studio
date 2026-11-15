@@ -13,7 +13,7 @@ export type UUID = string
 // Typing of tone and muting
 // See https://stackoverflow.com/questions/54607961/how-to-define-a-type-based-on-values-of-an-array
 // prettier-ignore
-const _tones_ = ['DING','DONG','DENG','DUNG','DANG','GIR','PUR','TONG','X','X','KA','PAK','DE','TUT','CUNG','KUNG'] as const
+const _tones_ = ['DING','DONG','DENG','DEUNG','DUNG','DANG','DAING','GIR','PUR','TONG','X','X','KA','PAK','DE','TUT','CUNG','KUNG'] as const
 export type ToneType = (typeof _tones_)[number] // 'DING' | 'DONG' | 'DENG' | ...
 
 const _zones_ = ['KNOB', 'RIM'] as const

@@ -73,7 +73,7 @@ kendang	9-(-9---	(-9-(-((	-9-9-(-(	-9-((9(9	(8*8*8*8	**-00000	09((-9-9	-((9(9((
 	{TEMPO 90}
 	{TEMPO 95 passes=[3]}
 	{LABEL P1}
-	{SUPPRESS ["gangsa p", "gangsa s"] passes=[1] beats=[2,3,4,5,6,7,8]}
+	{SUPPRESS ["gangsa"] passes=[1] beats=[2,3,4,5,6,7,8]}
 	## GONGAN 10
 trompong	u---	--a-	u-e-	u-a-	--u-	--a-	u-e-	u-a-
 gangsa p	u---	----	----	----	----	----	----	----
@@ -89,14 +89,14 @@ gangsa p	.oe.	eo.e	.oe.	eo.e	.oe.	eo.e	.oe.	eo.e
 gangsa s	ua.u	.au.	ua.u	.au.	ua.u	.au.	ua.u	.au.
 
 
-	{SUPPRESS ["gangsa p", "gangsa s"] passes=[1]}
+	{SUPPRESS ["gangsa"] passes=[1]}
 trompong	--u-	--a-	u-e-	u-a-	u-e-	o---	i-o-	a,-i-
 gangsa p	.oe.	eo.e	.oe.	eo.e	.o.e	oo.o	.eoo	.o.e
 gangsa s	ua.u	.au.	ua.u	.au.	uau.	aa.a	u.aa	.au.
 calung	--u-	--a-	u-e-	u-a-	u-e-	o---	o---	----
 kendang	-9(9	(-9-	(--9	-(-(	-99(	98*8	*-00	-9--
 
-	{SUPPRESS ["gangsa p", "gangsa s"] passes=[1]}
+	{SUPPRESS ["gangsa"] passes=[1]}
 trompong	o--o	o-o-	o-e-	o-i-	o-i-	a,---	i-o-	e-u-
 gangsa p	o.oe	.o.e	o.oe	.o.e	o.oe	.o.e	.o.i	o.io
 gangsa s	aua.	uau.	aua.	uau.	aua.	uau.	a.eu	.eu.
@@ -105,7 +105,7 @@ jegog	o
 kendang	-8*8	**8*	8**8	*9(-	-8*9	(9((	9--9	-(-(
 gong	T
 
-	{SUPPRESS ["gangsa p", "gangsa s"] passes=[1]}
+	{SUPPRESS ["gangsa"] passes=[1]}
 trompong	e---	u-e-	u---	a---	u-e-	o---	i-o-	a,-i-
 gangsa p	.i.o	i.io	.e.o	e.oe	.o.e	oo.o	.eoo	.o.e
 gangsa s	eue.	ueu.	e.ua	.ua.	uau.	aa.a	u.aa	.au.

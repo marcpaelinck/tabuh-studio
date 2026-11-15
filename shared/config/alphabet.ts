@@ -6,6 +6,13 @@ export type Kind = 'tone' | 'prefix' | 'octavation' | 'modifier' | 'rest' | 'err
 export type Category = 'melodic' | 'percussion' | 'colotomy' | 'all' | 'other'
 export const invalidSymbol = '!'
 
+// Semar Pagulingan melodic positions — the only ones carrying the pelog `r` (DEUNG) and `s` (DAING)
+// tones (and their grace prefixes `R`/`S`). Gong Kebyar / Baleganjur instruments do not have these tones.
+const SP_MELODIC_POSITIONS: Position[] = [
+    'SP_PEMADE_POLOS', 'SP_PEMADE_SANGSIH', 'SP_KANTILAN_POLOS', 'SP_KANTILAN_SANGSIH',
+    'SP_TROMPONG', 'SP_GENDER', 'SP_SULING', 'SP_CALUNG', 'SP_JEGOGAN'
+]
+
 export interface AlphabetItem {
     kind: Kind
     category?: Category
@@ -51,7 +58,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Krum',
         tone: 'CUNG',
         description: 'Lanang stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
     '8': {
         kind: 'tone',
@@ -59,7 +66,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Ka',
         tone: 'KA',
         description: 'Lanang stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
     '9': {
         kind: 'tone',
@@ -67,18 +74,18 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Det',
         tone: 'DE',
         description: 'Lanang stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
-    G: { kind: 'tone', category: 'colotomy', name: 'Gir', tone: 'GIR', description: 'Gong stroke', positions: ['GONGS'] },
-    P: { kind: 'tone', category: 'colotomy', name: 'Pur', tone: 'PUR', description: 'Kempur stroke', positions: ['GONGS'] },
-    T: { kind: 'tone', category: 'colotomy', name: 'Tong', tone: 'TONG', description: 'Kemong stroke', positions: ['GONGS'] },
+    G: { kind: 'tone', category: 'colotomy', name: 'Gir', tone: 'GIR', description: 'Gong stroke', positions: ['GK_GONGS', 'BAL_GONGS', 'SP_GONGS'] },
+    P: { kind: 'tone', category: 'colotomy', name: 'Pur', tone: 'PUR', description: 'Kempur stroke', positions: ['GK_GONGS', 'BAL_GONGS', 'SP_GONGS'] },
+    T: { kind: 'tone', category: 'colotomy', name: 'Tong', tone: 'TONG', description: 'Kemong stroke', positions: ['GK_GONGS', 'BAL_GONGS', 'SP_GONGS'] },
     x: {
         kind: 'tone',
         category: 'percussion',
         name: 'Stroke',
         tone: 'X',
         description: 'percussion stroke. Reyong: on chime rim. Kempli: open stroke. Ceng-ceng: open stroke.',
-        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CENGCENG', 'KEMPLI', 'CENGCENG_P', 'CENGCENG_S', 'TAWATAWA']
+        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CENGCENG', 'KEMPLI', 'BAL_CENGCENG_P', 'BAL_CENGCENG_S', 'TAWATAWA', 'SP_KEMPLI', 'SP_CENGCENG']
     },
     y: {
         kind: 'tone',
@@ -93,7 +100,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Tut',
         tone: 'TUT',
         description: 'Wadon stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
     ')': {
         kind: 'tone',
@@ -101,7 +108,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Pung',
         tone: 'KUNG',
         description: 'Wadon stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
     '*': {
         kind: 'tone',
@@ -109,7 +116,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'Pak',
         tone: 'PAK',
         description: 'Wadon stroke',
-        positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
+        positions: ['GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'GK_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'BAL_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_KENDANG']
     },
     i: {
         kind: 'tone',
@@ -150,6 +157,22 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         tone: 'DANG',
         description: 'Generic tone (without octave)',
         positions: positionGroups.MELODIC.positions
+    },
+    r: {
+        kind: 'tone',
+        category: 'melodic',
+        name: 'DEUNG',
+        tone: 'DEUNG',
+        description: 'Generic tone (without octave). Semar Pagulingan pelog tone between DENG and DUNG.',
+        positions: SP_MELODIC_POSITIONS
+    },
+    s: {
+        kind: 'tone',
+        category: 'melodic',
+        name: 'DAING',
+        tone: 'DAING',
+        description: 'Generic tone (without octave). Semar Pagulingan pelog tone between DANG and DING.',
+        positions: SP_MELODIC_POSITIONS
     },
     t: {
         kind: 'tone',
@@ -199,6 +222,20 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         name: 'DANG grace note',
         description: 'Briefly struck note preceding another note',
         positions: positionGroups.MELODIC.positions
+    },
+    R: {
+        kind: 'prefix',
+        combinesWith: ['melodic'],
+        name: 'DEUNG grace note',
+        description: 'Briefly struck note preceding another note',
+        positions: SP_MELODIC_POSITIONS
+    },
+    S: {
+        kind: 'prefix',
+        combinesWith: ['melodic'],
+        name: 'DAING grace note',
+        description: 'Briefly struck note preceding another note',
+        positions: SP_MELODIC_POSITIONS
     },
     X: {
         kind: 'prefix',

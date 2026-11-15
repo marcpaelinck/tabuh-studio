@@ -57,7 +57,7 @@ export const dimRateNonFocusedInstruments = 0.2 // Fraction to which the volume 
 export const baseNoteValue: number = 16 // BaseNoteValue is the time unit in which all notes are expressed internally. 16 means 1/16th note, 8 means 1/8th note, etc.
 export const baseNoteSubdivision: Subdivision = '16n'
 export const SOUNDS_FOLDER = 'sounds/'
-export const alwaysFocusPositions = ['KEMPLI', 'GONGS']
+export const alwaysFocusPositions = ['KEMPLI', 'SP_KEMPLI', 'GK_GONGS', 'BAL_GONGS', 'SP_GONGS']
 
 // Check if the set of sample files is complete
 export const doSanityCheck = false

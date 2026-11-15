@@ -12,21 +12,27 @@ import type {
 // prettier-ignore
 export const orchestraConfigs: Record<Orchestra, { instruments: Instrument[]; beatPosition: Position | null }> = {
     GONG_KEBYAR: {
-        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GONGS', 
-            'CENGCENG', 'CENGCENG_KOPYAK', 'KENDANG', 'KEMPLI'],
+        instruments: [ 'UGAL', 'GENDER_RAMBAT', 'TROMPONG', 'PEMADE', 'KANTILAN', 'REYONG', 'PENYACAH', 'CALUNG', 'JEGOGAN', 'GK_GONGS',
+            'CENGCENG', 'GK_KENDANG', 'KEMPLI'],
         beatPosition: 'KEMPLI'
     },
     BALEGANJUR: {
-        instruments: ['CENGCENG_KOPYAK', 'REYONGB', 'PONGGANG', 'GONGS', 'KENDANG', 'TAWATAWA'],
+        instruments: ['BAL_CENGCENG_KOPYAK', 'REYONGB', 'PONGGANG', 'BAL_GONGS', 'BAL_KENDANG', 'TAWATAWA'],
         beatPosition: 'TAWATAWA'
+    },
+    SEMAR_PAGULINGAN: {
+        instruments: [ 'SP_TROMPONG', 'SP_GENDER', 'SP_PEMADE', 'SP_KANTILAN', 'SP_CALUNG', 'SP_JEGOGAN', 'SP_SULING',
+            'SP_GONGS', 'SP_CENGCENG', 'SP_KENDANG', 'SP_KEMPLI'],
+        beatPosition: 'SP_KEMPLI'
     }
 }
 
 export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
-    GONGS: { name: 'Gongs', positions: ['GONGS'] },
+    // Gong Kebyar
+    GK_GONGS: { name: 'Gongs', positions: ['GK_GONGS'] },
     KEMPLI: { name: 'Kempli', positions: ['KEMPLI'] },
     CENGCENG: { name: 'Cengceng', positions: ['CENGCENG'] },
-    KENDANG: { name: 'Kendang', positions: ['KENDANG', 'KENDANG_LANANG', 'KENDANG_WADON'] },
+    GK_KENDANG: { name: 'Kendang', positions: ['GK_KENDANG', 'GK_KENDANG_LANANG', 'GK_KENDANG_WADON'] },
     JEGOGAN: { name: 'Jegogan', positions: ['JEGOGAN'] },
     CALUNG: { name: 'Calung', positions: ['CALUNG'] },
     PENYACAH: { name: 'Penyacah', positions: ['PENYACAH'] },
@@ -36,10 +42,25 @@ export const instrumentConfigs: Record<Instrument, InstrumentConfig> = {
     GENDER_RAMBAT: { name: 'Gender rambat', positions: ['GENDER_RAMBAT'] },
     TROMPONG: { name: 'Trompong', positions: ['TROMPONG'] },
     REYONG: { name: 'Reyong', positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4'] },
-    CENGCENG_KOPYAK: { name: 'Cengceng kopyak', positions: ['CENGCENG_P', 'CENGCENG_S'] },
+    // Baleganjur
+    BAL_GONGS: { name: 'Gongs', positions: ['BAL_GONGS'] },
+    BAL_KENDANG: { name: 'Kendang', positions: ['BAL_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON'] },
+    BAL_CENGCENG_KOPYAK: { name: 'Cengceng kopyak', positions: ['BAL_CENGCENG_P', 'BAL_CENGCENG_S'] },
     REYONGB: { name: 'Reyong baleganjur', positions: ['REYONGB_1', 'REYONGB_2'] },
     TAWATAWA: { name: 'Tawa-tawa', positions: ['TAWATAWA'] },
-    PONGGANG: { name: 'Ponggang', positions: ['PONGGANG'] }
+    PONGGANG: { name: 'Ponggang', positions: ['PONGGANG'] },
+    // Semar Pagulingan
+    SP_PEMADE: { name: 'Pemade', positions: ['SP_PEMADE_POLOS', 'SP_PEMADE_SANGSIH'] },
+    SP_KANTILAN: { name: 'Kantilan', positions: ['SP_KANTILAN_POLOS', 'SP_KANTILAN_SANGSIH'] },
+    SP_CALUNG: { name: 'Jublag', positions: ['SP_CALUNG'] },
+    SP_JEGOGAN: { name: 'Jegogan', positions: ['SP_JEGOGAN'] },
+    SP_TROMPONG: { name: 'Trompong', positions: ['SP_TROMPONG'] },
+    SP_GENDER: { name: 'Gender', positions: ['SP_GENDER'] },
+    SP_SULING: { name: 'Suling', positions: ['SP_SULING'] },
+    SP_GONGS: { name: 'Gongs', positions: ['SP_GONGS'] },
+    SP_KEMPLI: { name: 'Kempli', positions: ['SP_KEMPLI'] },
+    SP_KENDANG: { name: 'Kendang', positions: ['SP_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON'] },
+    SP_CENGCENG: { name: 'Cengceng', positions: ['SP_CENGCENG'] }
 }
 
 /**
@@ -62,27 +83,30 @@ export const positionGroups: Record<PositionGroup, InstrumentConfig> = {
     REYONGB: { positions: ['REYONGB_1', 'REYONGB_2'], name: 'Reyong' },
     POKOK: { positions: ['CALUNG', 'JEGOGAN', 'PENYACAH'], name: 'Pokok' },
     MELODIC: {
-        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'TROMPONG', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG'],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'TROMPONG', 'GENDER_RAMBAT', 'REYONG_1', 'REYONG_3', 'REYONG_2', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CALUNG', 'JEGOGAN', 'PENYACAH', 'PONGGANG',
+            'SP_PEMADE_POLOS', 'SP_PEMADE_SANGSIH', 'SP_KANTILAN_POLOS', 'SP_KANTILAN_SANGSIH', 'SP_TROMPONG', 'SP_GENDER', 'SP_SULING', 'SP_CALUNG', 'SP_JEGOGAN'],
         name: 'Melodic'
     },
     DAUN: {
-        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'CALUNG', 'JEGOGAN', 'PENYACAH'],
+        positions: [ 'PEMADE_POLOS', 'PEMADE_SANGSIH', 'KANTILAN_POLOS', 'KANTILAN_SANGSIH', 'UGAL', 'GENDER_RAMBAT', 'CALUNG', 'JEGOGAN', 'PENYACAH',
+            'SP_PEMADE_POLOS', 'SP_PEMADE_SANGSIH', 'SP_KANTILAN_POLOS', 'SP_KANTILAN_SANGSIH', 'SP_GENDER', 'SP_CALUNG', 'SP_JEGOGAN'],
         name: 'Daun'
     },
     PERCUSSION: {
-        positions: [ 'KEMPLI', 'KENDANG', 'KENDANG_LANANG', 'KENDANG_WADON', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'CENGCENG', 'CENGCENG_P', 'CENGCENG_S', 'REYONGB_1', 'REYONGB_2', 'TAWATAWA'],
+        positions: [ 'KEMPLI', 'GK_KENDANG', 'GK_KENDANG_LANANG', 'GK_KENDANG_WADON', 'REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'CENGCENG', 'BAL_CENGCENG_P', 'BAL_CENGCENG_S', 'BAL_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON', 'REYONGB_1', 'REYONGB_2', 'TAWATAWA',
+            'SP_KEMPLI', 'SP_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON', 'SP_CENGCENG'],
         name: 'Percussion'
     },
-    CENGCENG_KOPYAK: { positions: ['CENGCENG_P', 'CENGCENG_S'], name: 'Cengceng' }
+    CENGCENG_KOPYAK: { positions: ['BAL_CENGCENG_P', 'BAL_CENGCENG_S'], name: 'Cengceng' }
 }
 
 export const defaultBeatPosition: Position = 'KEMPLI'
 
 //prettier-ignore
 export const positionConfigs: Record<Position, PositionConfig> = {
-    GONGS: {
+    GK_GONGS: {
         name: 'Gongs',
-        instrument: 'GONGS',
+        instrument: 'GK_GONGS',
         type: 'percussion', //TODO move type to instrument and grouping info
         svg_file: 'svg/GK_GONGS.svg',
         symbolToNoteNames: { G: ['GIR'], P: ['PUR'], T: ['TONG'] } //TODO move alphabet info to separate settings
@@ -107,9 +131,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         svg_file: '',
         symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] }
     },
-    KENDANG: {
+    GK_KENDANG: {
         name: 'Kendang',
-        instrument: 'KENDANG',
+        instrument: 'GK_KENDANG',
         type: 'percussion',
         svg_file: 'svg/GK_KENDANG.svg',
         symbolToNoteNames: {
@@ -133,9 +157,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             '*?': ['PAK']
         }
     },
-    KENDANG_WADON: {
+    GK_KENDANG_WADON: {
         name: 'Kendang',
-        instrument: 'KENDANG',
+        instrument: 'GK_KENDANG',
         type: 'percussion',
         svg_file: 'svg/GK_KENDANG.svg',
         symbolToNoteNames: {
@@ -159,9 +183,9 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             '*?': ['PAK']
         }
     },
-    KENDANG_LANANG: {
+    GK_KENDANG_LANANG: {
         name: 'Kendang',
-        instrument: 'KENDANG',
+        instrument: 'GK_KENDANG',
         type: 'percussion',
         svg_file: 'svg/GK_KENDANG.svg',
         symbolToNoteNames: {
@@ -636,16 +660,16 @@ export const positionConfigs: Record<Position, PositionConfig> = {
             'x?': ['XDENG2_MUTED']
         }
     },
-    CENGCENG_P: {
+    BAL_CENGCENG_P: {
         name: 'Cengceng polos',
-        instrument: 'CENGCENG_KOPYAK',
+        instrument: 'BAL_CENGCENG_KOPYAK',
         type: 'percussion',
         svg_file: '',
         symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] }
     },
-    CENGCENG_S: {
+    BAL_CENGCENG_S: {
         name: 'Cengceng sangsih',
-        instrument: 'CENGCENG_KOPYAK',
+        instrument: 'BAL_CENGCENG_KOPYAK',
         type: 'percussion',
         svg_file: '',
         symbolToNoteNames: { x: ['X_OPEN'], 'x?': ['X_MUTED'] }
@@ -703,5 +727,505 @@ export const positionConfigs: Record<Position, PositionConfig> = {
         type: 'chimes',
         svg_file: '',
         symbolToNoteNames: { u: ['DUNG1'], a: ['DANG1'] }
-    }
+    },
+    BAL_GONGS: {
+        name: 'Gongs',
+        instrument: 'BAL_GONGS',
+        type: 'percussion',
+        svg_file: 'svg/GK_GONGS.svg',
+        symbolToNoteNames: {
+            G: ['GIR'],
+            P: ['PUR'],
+            T: ['TONG']
+        }
+    },
+    BAL_KENDANG: {
+        name: 'Kendang',
+        instrument: 'BAL_KENDANG',
+        type: 'percussion',
+        svg_file: 'svg/GK_KENDANG.svg',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
+    BAL_KENDANG_LANANG: {
+        name: 'Kendang',
+        instrument: 'BAL_KENDANG',
+        type: 'percussion',
+        svg_file: 'svg/GK_KENDANG.svg',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
+    BAL_KENDANG_WADON: {
+        name: 'Kendang',
+        instrument: 'BAL_KENDANG',
+        type: 'percussion',
+        svg_file: 'svg/GK_KENDANG.svg',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
+    SP_PEMADE_POLOS: {
+        name: 'Pemade polos',
+        instrument: 'SP_PEMADE',
+        type: 'daun',
+        svg_file: 'svg/SP_GANGSA.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_PEMADE_SANGSIH: {
+        name: 'Pemade sangsih',
+        instrument: 'SP_PEMADE',
+        type: 'daun',
+        svg_file: 'svg/SP_GANGSA.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_KANTILAN_POLOS: {
+        name: 'Kantilan polos',
+        instrument: 'SP_KANTILAN',
+        type: 'daun',
+        svg_file: 'svg/SP_GANGSA.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_KANTILAN_SANGSIH: {
+        name: 'Kantilan sangsih',
+        instrument: 'SP_KANTILAN',
+        type: 'daun',
+        svg_file: 'svg/SP_GANGSA.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_CALUNG: {
+        name: 'Jublag',
+        instrument: 'SP_CALUNG',
+        type: 'daun',
+        svg_file: 'svg/SP_CALUNG.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_JEGOGAN: {
+        name: 'Jegogan',
+        instrument: 'SP_JEGOGAN',
+        type: 'daun',
+        svg_file: 'svg/SP_JEGOGAN.svg',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_SULING: {
+        name: 'Suling',
+        instrument: 'SP_SULING',
+        type: 'daun',
+        svg_file: '',
+        symbolToNoteNames: {
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_GENDER: {
+        name: 'Gender',
+        instrument: 'SP_GENDER',
+        type: 'daun',
+        svg_file: '',
+        symbolToNoteNames: {
+            'i,': ['DING0'],
+            'i,/': ['DING0'],
+            'i,?': ['DING0'],
+            'o,': ['DONG0'],
+            'o,/': ['DONG0'],
+            'o,?': ['DONG0'],
+            'e,': ['DENG0'],
+            'e,/': ['DENG0'],
+            'e,?': ['DENG0'],
+            'r,': ['DEUNG0'],
+            'r,/': ['DEUNG0'],
+            'r,?': ['DEUNG0'],
+            'u,': ['DUNG0'],
+            'u,/': ['DUNG0'],
+            'u,?': ['DUNG0'],
+            'a,': ['DANG0'],
+            'a,/': ['DANG0'],
+            'a,?': ['DANG0'],
+            's,': ['DAING0'],
+            's,/': ['DAING0'],
+            's,?': ['DAING0'],
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1']
+        }
+    },
+    SP_TROMPONG: {
+        name: 'Trompong',
+        instrument: 'SP_TROMPONG',
+        type: 'chimes',
+        svg_file: 'svg/SP_TROMPONG.svg',
+        symbolToNoteNames: {
+            'i,': ['DING0'],
+            'i,/': ['DING0'],
+            'i,?': ['DING0_MUTED'],
+            'o,': ['DONG0'],
+            'o,/': ['DONG0'],
+            'o,?': ['DONG0_MUTED'],
+            'e,': ['DENG0'],
+            'e,/': ['DENG0'],
+            'e,?': ['DENG0_MUTED'],
+            'r,': ['DEUNG0'],
+            'r,/': ['DEUNG0'],
+            'r,?': ['DEUNG0_MUTED'],
+            'u,': ['DUNG0'],
+            'u,/': ['DUNG0'],
+            'u,?': ['DUNG0_MUTED'],
+            'a,': ['DANG0'],
+            'a,/': ['DANG0'],
+            'a,?': ['DANG0_MUTED'],
+            's,': ['DAING0'],
+            's,/': ['DAING0'],
+            's,?': ['DAING0_MUTED'],
+            i: ['DING1'],
+            'i/': ['DING1'],
+            'i?': ['DING1_MUTED'],
+            o: ['DONG1'],
+            'o/': ['DONG1'],
+            'o?': ['DONG1_MUTED'],
+            e: ['DENG1'],
+            'e/': ['DENG1'],
+            'e?': ['DENG1_MUTED'],
+            r: ['DEUNG1'],
+            'r/': ['DEUNG1'],
+            'r?': ['DEUNG1_MUTED'],
+            u: ['DUNG1'],
+            'u/': ['DUNG1'],
+            'u?': ['DUNG1_MUTED'],
+            a: ['DANG1'],
+            'a/': ['DANG1'],
+            'a?': ['DANG1_MUTED'],
+            s: ['DAING1'],
+            's/': ['DAING1'],
+            's?': ['DAING1_MUTED']
+        }
+    },
+    SP_GONGS: {
+        name: 'Gongs',
+        instrument: 'SP_GONGS',
+        type: 'percussion',
+        svg_file: 'svg/SP_GONGS.svg',
+        symbolToNoteNames: {
+            G: ['GIR'],
+            P: ['PUR'],
+            T: ['TONG']
+        }
+    },
+    SP_KEMPLI: {
+        name: 'Kempli',
+        instrument: 'SP_KEMPLI',
+        type: 'percussion',
+        svg_file: '',
+        symbolToNoteNames: {
+            x: ['X']
+        }
+    },
+    SP_CENGCENG: {
+        name: 'Cengceng',
+        instrument: 'SP_CENGCENG',
+        type: 'percussion',
+        svg_file: '',
+        symbolToNoteNames: {
+            x: ['X_OPEN'],
+            'x?': ['X_MUTED']
+        }
+    },
+    SP_KENDANG: {
+        name: 'Kendang',
+        instrument: 'SP_KENDANG',
+        type: 'percussion',
+        svg_file: '',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
+    SP_KENDANG_LANANG: {
+        name: 'Kendang',
+        instrument: 'SP_KENDANG',
+        type: 'percussion',
+        svg_file: '',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
+    SP_KENDANG_WADON: {
+        name: 'Kendang',
+        instrument: 'SP_KENDANG',
+        type: 'percussion',
+        svg_file: '',
+        symbolToNoteNames: {
+            '0': ['CUNG'],
+            '0/': ['CUNG'],
+            '0?': ['CUNG'],
+            '8': ['KA'],
+            '8/': ['KA'],
+            '8?': ['KA'],
+            '9': ['DE'],
+            '9/': ['DE'],
+            '9?': ['DE'],
+            '(': ['TUT'],
+            '(/': ['TUT'],
+            '(?': ['TUT'],
+            ')': ['KUNG'],
+            ')/': ['KUNG'],
+            ')?': ['KUNG'],
+            '*': ['PAK'],
+            '*/': ['PAK'],
+            '*?': ['PAK']
+        }
+    },
 }

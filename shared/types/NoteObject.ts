@@ -272,7 +272,7 @@ export class NoteObject {
             this.canonicalSymbol = ERROR_PITCH_CHAR
             this.name = symbolName(this.canonicalSymbol)
 
-            console.error(`invalid symbol '${input}' for ${position}`)
+            console.error(`invalid symbol '${input}' for ${position}.`)
         } else {
             // Symbol is structurally valid; use the externally supplied fault (if any).
             this.error = fault

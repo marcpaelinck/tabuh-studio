@@ -11,7 +11,7 @@
 /** Uppercase characters that prefix a grace note. Always appear before the pitch character. */
 // prettier-ignore
 export const GRACE_NOTE_PREFIXES: ReadonlySet<string> = new Set([
-  "A",  "E",  "I",  "O",  "U",  "S",  "B",  "X",]);
+  "A",  "E",  "I",  "O",  "U", "R", "S",  "B",  "X",]);
 
 /**
  * Every character that can serve as the main pitch character of a symbol.

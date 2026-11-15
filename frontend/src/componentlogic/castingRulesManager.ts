@@ -61,9 +61,10 @@ const castingRules: CastingRuleSet = {
                 norot: { 'i,':'i', 'o,':'o', 'e,': 'e', 'u,': 'u', 'a,': 'a', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i', 'o<': 'o', 'e<': 'e', 'u<': 'u', 'a<': 'a'}},
     REYONGB_1: {default: { 'o,': 'o', 'e,': 'e', 'O': 'O', 'E': 'E', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' }},
     REYONGB_2: {default: { 'u,': 'u', 'a,': 'a', 'U': 'U', 'A': 'A', 'B': 'B', 'X': 'X', 'b':'b', 'x':'x', '-': '-', '.': '.', ' ': ' ' }},
-    CENGCENG_P: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
-    CENGCENG_S: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
-    DEFAULT: {default: { 'i,':' ', 'o,':' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', 'o<': ' ', 'e<': ' ', 'u<': ' ', 'a<': ' ', '-': '-', '.': '.', ' ': ' ' }
+    BAL_CENGCENG_P: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
+    BAL_CENGCENG_S: {default: {x: 'x', '-': '-', '.': '.', ' ': ' ' }},
+    // DEFAULT: {default: { 'i,': ' ', 'o,': ' ', 'e,': ' ', 'u,': ' ', 'a,': ' ', i: ' ', o: ' ', e: ' ', u: ' ', a: ' ', 'i<': ' ', 'o<': ' ', 'e<': ' ', 'u<': ' ', 'a<': ' ', '-': '-', '.': '.', ' ': ' ' }
+    DEFAULT: {default: { 'i,': 'i,', 'o,': 'o,', 'e,': 'e,', 'r': 'r', 'u,': 'u,', 'a,': 'a,', 's': 's', i: 'i', o: 'o', e: 'e', u: 'u', a: 'a', 'i<': 'i<', 'o<': 'o<', 'e<': 'e<', 'u<': 'u<', 'a<': 'a<', '-': '-', '.': '.', ' ': ' ' }
     }
 }
 
@@ -102,7 +103,21 @@ export const allowedPositionGroups: Record<Orchestra, Position[][]> = {
     ],
     BALEGANJUR: [
         ['REYONGB_1', 'REYONGB_2'],
-        ['CENGCENG_P', 'CENGCENG_S']
+        ['BAL_CENGCENG_P', 'BAL_CENGCENG_S']
+    ],
+    SEMAR_PAGULINGAN: [
+        [
+            'SP_PEMADE_POLOS',
+            'SP_PEMADE_SANGSIH',
+            'SP_KANTILAN_POLOS',
+            'SP_KANTILAN_SANGSIH',
+            'SP_TROMPONG',
+            'SP_GENDER',
+            'SP_SULING',
+            'SP_CALUNG',
+            'SP_JEGOGAN'
+        ],
+        ['SP_KEMPLI', 'SP_CENGCENG']
     ]
 }
 

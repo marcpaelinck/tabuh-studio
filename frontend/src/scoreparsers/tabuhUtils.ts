@@ -1,7 +1,8 @@
 import type { Position } from '@tabuhstudio/shared'
+import type { Orchestra } from '@tabuhstudio/shared/types/position'
 import type { ExecutionItem, KempliItem } from '../typing/execution.ts'
 import type { KempliSetting } from '../typing/score.ts'
-import { instrumentTags, separators } from './tabuhConfig.ts'
+import { instrumentTags_GK, instrumentTags_SP, separators } from './tabuhConfig.ts'
 
 function createTagLookup(tagTable: Array<Record<string, string | string[]>>): Record<string, Position[]> {
     const tagLookup: Record<string, Position[]> = {}
@@ -20,7 +21,11 @@ function createTagLookup(tagTable: Array<Record<string, string | string[]>>): Re
     return tagLookup
 }
 
-export const tagLookup: Record<string, Position[]> = createTagLookup(instrumentTags)
+export const tagLookup: Record<Orchestra, Record<string, Position[]>> = {
+    GONG_KEBYAR: createTagLookup(instrumentTags_GK),
+    SEMAR_PAGULINGAN: createTagLookup(instrumentTags_SP),
+    BALEGANJUR: {}
+}
 
 // Returns the number of lines contained in `str` up to `position`.
 export function lineNr(str: string, position: number): number {

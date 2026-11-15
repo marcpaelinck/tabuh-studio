@@ -15,7 +15,7 @@ import { parser } from './grammars/laras/laras'
 function parseNotation(position: Position, stave: string): NoteSymbol[] {
     var notation: string[] = []
     for (const char of stave) {
-        notation.push(symbolLookup[position][char] || SPACE_CHAR)
+        notation.push(symbolLookup[position]?.[char] || SPACE_CHAR)
     }
     return notation
 }

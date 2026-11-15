@@ -1,5 +1,12 @@
 import type { EditableKeyMapping, KeyboardType, KeyMapDefinition } from '../types/keymap.ts'
-import type { Instrument, PositionGroup } from '../types/position.ts'
+import type { Position, PositionGroup } from '../types/position.ts'
+
+// All kendang positions across orchestras (the kendang keystrokes apply to any of them).
+const KENDANG_POSITIONS: Position[] = [
+    'GK_KENDANG', 'GK_KENDANG_LANANG', 'GK_KENDANG_WADON',
+    'BAL_KENDANG', 'BAL_KENDANG_LANANG', 'BAL_KENDANG_WADON',
+    'SP_KENDANG', 'SP_KENDANG_LANANG', 'SP_KENDANG_WADON'
+]
 
 // Utility function to simplify keystroke assignment
 // Default values for all boolean attributes is false
@@ -23,12 +30,12 @@ const alt: boolean = true
 // const meta: boolean = true
 
 const defaultMappings: EditableKeyMapping[] = [
-    { id: '', keystroke: ks({ key: 'k' }), symbol: '8', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'p' }), symbol: '*', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'd' }), symbol: '9', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 't' }), symbol: '(', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'n' }), symbol: '0', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'u' }), symbol: ')', instruments: ['KENDANG' as Instrument] }
+    { id: '', keystroke: ks({ key: 'k' }), symbol: '8', instruments: KENDANG_POSITIONS },
+    { id: '', keystroke: ks({ key: 'p' }), symbol: '*', instruments: KENDANG_POSITIONS },
+    { id: '', keystroke: ks({ key: 'd' }), symbol: '9', instruments: KENDANG_POSITIONS },
+    { id: '', keystroke: ks({ key: 't' }), symbol: '(', instruments: KENDANG_POSITIONS },
+    { id: '', keystroke: ks({ key: 'n' }), symbol: '0', instruments: KENDANG_POSITIONS },
+    { id: '', keystroke: ks({ key: 'u' }), symbol: ')', instruments: KENDANG_POSITIONS }
 ].map((obj, idx) => ({ ...obj, id: `${idx}` }))
 
 const larasMappings: EditableKeyMapping[] = [

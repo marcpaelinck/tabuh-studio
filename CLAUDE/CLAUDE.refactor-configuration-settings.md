@@ -228,8 +228,51 @@ unchanged accessors.
    samplers on selection change. Also `symbolToNoteNames` still serves the sample codes + MIDI
    (`pitchMap`) + valid-symbols, so it is not yet fully retired.)*
 5. Add **`SEMAR_PAGULINGAN`** as the proof case: orchestra-specific positions (with the id prefix),
-   its voicing (7 keys incl. `r`/`s`), and a sample set.
+   its voicing (7 keys incl. `r`/`s`), and a sample set. *(Done — see "Step 5" below.)*
 6. Back each slice with the DB behind the unchanged accessors; add editing UI for authorized users.
+
+## Step 5 — Semar Pagulingan + orchestra-unique ids (done)
+
+**Scope chosen (lower-risk path):** add SP as a full, distinct orchestra, and for GK/BAL split only the
+genuinely *shared* instruments so no id is shared between orchestras — rather than prefixing every GK/BAL
+id (which would have forced orchestra-awareness through the import parser, timeline dynamics, keymaps and
+casting rules). The folder reorg (`sounds/<ORCHESTRA>/<set>/`) made per-orchestra sample resolution
+mandatory regardless.
+
+- **Sound scale.** `ToneType` gained `DEUNG`, `DAING`. Alphabet gained tones `r`(DEUNG) / `s`(DAING) and
+  grace prefixes `R` / `S`, all restricted to SP melodic positions (`SP_MELODIC_POSITIONS`); GK/BAL
+  instruments don't have these pelog tones. Octave convention is uniform with GK (`,`=octave 0, bare=1).
+- **Shared-instrument split.** `GONGS`→`GK_GONGS`/`BAL_GONGS`/`SP_GONGS`; `KENDANG`(+lanang/wadon)→
+  `GK_`/`BAL_`/`SP_`; `CENGCENG_KOPYAK`(`CENGCENG_P`/`_S`)→`BAL_` only (it is a Baleganjur instrument;
+  it was wrongly listed under GK and no GK score/sample used it, so it was dropped from GK). All other
+  GK/BAL ids are unchanged. Updated across `types/position.ts`, `config/position.ts` (orchestraConfigs,
+  instrumentConfigs, positionGroups, positionConfigs), `alphabet.ts`, `keymap.ts`, `config.ts`
+  (`alwaysFocusPositions`), `castingRulesManager` (+`allowedPositionGroups.SEMAR_PAGULINGAN`), the MIDI /
+  pitch tables (`pitchMap`, `midiGenerator`, `midiNoteMap` — made `Partial`), and the laras/tabuh parser
+  configs.
+- **SP orchestra.** Instruments PEMADE, KANTILAN, CALUNG (jublag), JEGOGAN, TROMPONG, GENDER, SULING,
+  GONGS, KEMPLI, KENDANG(+lanang/wadon), CENGCENG — all `SP_`-prefixed, all volume −15. Voicings derived
+  from the sample set: 7 tones × octave 1 for single-octave instruments (pemade/kantilan/calung/jegogan/
+  suling), octaves 0–1 for two-octave instruments (trompong with `_MUTED`, gender). Melodic mutings
+  (`/`,`?`) with no distinct sample fall back to the open sample (animation muting is still modifier-
+  derived). `GENDERRAMBAT` staff id migrated to `SP_GENDER`.
+- **Sample sets.** `sampleSets.ts` now builds one default set per orchestra under
+  `sounds/<ORCHESTRA>/default/`; `resolveSampleSet(orchestra)` and `sampleSetForPosition(position)` (via a
+  position→orchestra reverse map, positions now being orchestra-unique). `useInstruments` /
+  `sanity-functions` resolve the set per position. Verified: every referenced SP sample exists (0
+  missing); the only missing GK/BAL files are **pre-existing gaps** (GENDER_RAMBAT has no
+  `GK_GENDERRAMBAT_*` samples, trompong's `DING0` reuses ugal which lacks it, REYONGB lacks `_ABBR`) —
+  their voicings/templates are unchanged by this step.
+- **Score migration.** Orchestra-aware, applied to all 29 bundled scores + 24 oldscores (GK/BAL shared
+  ids → prefixed; SP → all `SP_`, `GENDERRAMBAT`→`SP_GENDER`), across `positions[]`, `staffs{}` keys and
+  `execution[].positions[]` (`parts{}` = section→system-uuid map, left untouched). All 30 orchestra
+  scores validate against the new position set. DB equivalent: `backend/src/seed/prefixPositions.ts`
+  (`npm run seed:prefix-positions`), idempotent per orchestra — **run it against the database** to migrate
+  user-created scores.
+
+**Remaining SP follow-ups (deferred):** kendang `TENG`/`TONG` strokes need alphabet tones + symbols
+before wiring; no SP compact-editor grouping groups (SP positions show individually); MIDI export of SP
+uses best-effort GM programs.
 
 ## Normalized sound/alphabet model (agreed — step 5/6 target)
 
