@@ -277,7 +277,8 @@ const aggregationRules: { group: Position[]; rules: RuleName[] }[] = [
     { group: ['PEMADE_POLOS', 'PEMADE_SANGSIH'], rules: ['default', 'default'] },
     { group: ['KANTILAN_POLOS', 'KANTILAN_SANGSIH'], rules: ['default', 'default'] },
     { group: ['REYONG_1', 'REYONG_3'], rules: ['nokempyung', 'nokempyung'] },
-    { group: ['REYONG_2', 'REYONG_4'], rules: ['nokempyung', 'nokempyung'] }
+    { group: ['REYONG_2', 'REYONG_4'], rules: ['nokempyung', 'nokempyung'] },
+    { group: ['REYONGB_1', 'REYONGB_2'], rules: ['default', 'default'] }
 ]
 
 type InverseCastingRule = Record<NoteSymbol, NoteSymbol[]>

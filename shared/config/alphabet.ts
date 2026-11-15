@@ -68,7 +68,19 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Stroke',
         description: 'percussion stroke. Reyong: on chime rim. Kempli: muted stroke. Ceng-ceng: open stroke.',
-        positions: ['REYONG_1', 'REYONG_2', 'REYONG_3', 'REYONG_4', 'REYONGB_1', 'REYONGB_2', 'CENGCENG', 'KEMPLI', 'CENGCENG_P', 'CENGCENG_S', 'TAWATAWA']
+        positions: [
+            'REYONG_1',
+            'REYONG_2',
+            'REYONG_3',
+            'REYONG_4',
+            'REYONGB_1',
+            'REYONGB_2',
+            'CENGCENG',
+            'KEMPLI',
+            'CENGCENG_P',
+            'CENGCENG_S',
+            'TAWATAWA'
+        ]
     },
     y: {
         kind: 'tone',
@@ -145,7 +157,7 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         category: 'percussion',
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: positionGroups.REYONG.positions
+        positions: positionGroups.REYONG.positions.concat(positionGroups.REYONGB.positions)
     },
     I: {
         kind: 'prefix',
@@ -187,14 +199,14 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         combinesWith: ['melodic'],
         name: 'Stroke',
         description: 'Stroke on chime rim.',
-        positions: positionGroups.REYONG.positions
+        positions: positionGroups.REYONG.positions.concat(positionGroups.REYONGB.positions)
     },
     B: {
         kind: 'prefix',
         combinesWith: ['percussion'],
         name: 'Byong',
         description: "Combined stroke on first and third chime of a reyong position's 3-note range",
-        positions: positionGroups.REYONG.positions
+        positions: positionGroups.REYONG.positions.concat(positionGroups.REYONGB.positions)
     },
     ',': {
         kind: 'octavation',
