@@ -13,17 +13,23 @@ interface TipProps {
     tip: ReactNode
     placement?: Placement
     children: ReactElement
+    /**
+     * Stretch the wrapper to the full width of its container. Needed around controls that must fill
+     * their parent (e.g. a Slider): the default inline-block wrapper shrinks to its content width,
+     * which collapses a width-less control such as rsuite's Slider to ~0px.
+     */
+    fill?: boolean
 }
 
 // NOTE: the child must forward a DOM node as its ref. rsuite *Pickers* (SelectPicker, etc.)
 // forward an imperative handle whose `overlay` getter throws when closed, which crashes here —
 // wrap those in a plain <span> and tip the span instead of the picker.
-export function Tip({ tip, placement = 'auto', children }: TipProps) {
+export function Tip({ tip, placement = 'auto', children, fill = false }: TipProps) {
     return (
         <Whisper placement={placement} trigger="hover" speaker={<Tooltip>{tip}</Tooltip>}>
             {/* The span element enables to nest another Whisper:
             a Whisper needs an HTML element as a direct child. */}
-            <span style={{ display: 'inline-block' }}> {children}</span>
+            <span style={fill ? { display: 'block', width: '100%' } : { display: 'inline-block' }}>{children}</span>
         </Whisper>
     )
 }

@@ -43,6 +43,14 @@ body,
     max-width: 100%;
 }
 
+/* The Slider's value tooltip renders inside the (tiny) handle, so the global `max-width: 100%`
+   above collapses it to the handle's width and wraps the time value one character per line.
+   Let it size to its content and stay on one line. */
+.rs-slider-tooltip {
+    max-width: none;
+    white-space: nowrap;
+}
+
 .rs-btn-start-icon {
     /* Correct React Suite button not centered */
     margin-right: 0px;

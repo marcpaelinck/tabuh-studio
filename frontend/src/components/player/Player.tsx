@@ -77,7 +77,7 @@ export function Player({
                 {toMmSs(playbackProgress)}
             </Text>
             <Stack.Item grow={1} data-tour="player-seek">
-                <Tip tip="Drag to seek">
+                <Tip tip="Drag to seek" fill>
                     <Slider
                         progress
                         // className="flex w-full ts-theme-player"
