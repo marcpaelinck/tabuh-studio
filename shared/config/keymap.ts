@@ -1,5 +1,5 @@
 import type { EditableKeyMapping, KeyboardType, KeyMapDefinition } from '../types/keymap.ts'
-import type { Instrument, PositionGroup } from '../types/position.ts'
+import type { PositionGroup } from '../types/position.ts'
 
 // Utility function to simplify keystroke assignment
 // Default values for all boolean attributes is false
@@ -22,14 +22,16 @@ const alt: boolean = true
 // const shift: boolean = true
 // const meta: boolean = true
 
-const defaultMappings: EditableKeyMapping[] = [
-    { id: '', keystroke: ks({ key: 'k' }), symbol: '8', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'p' }), symbol: '*', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'd' }), symbol: '9', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 't' }), symbol: '(', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'n' }), symbol: '0', instruments: ['KENDANG' as Instrument] },
-    { id: '', keystroke: ks({ key: 'u' }), symbol: ')', instruments: ['KENDANG' as Instrument] }
-].map((obj, idx) => ({ ...obj, id: `${idx}` }))
+/** Do not fill in yet, instrument is not yet being being taken into account. See comment above
+ * `compileKeyMap` in the frontend. */
+const defaultMappings: EditableKeyMapping[] = []
+// { id: '', keystroke: ks({ key: 'k' }), symbol: '8', instruments: ['KENDANG' as Instrument] },
+// { id: '', keystroke: ks({ key: 'p' }), symbol: '*', instruments: ['KENDANG' as Instrument] },
+// { id: '', keystroke: ks({ key: 'd' }), symbol: '9', instruments: ['KENDANG' as Instrument] },
+// { id: '', keystroke: ks({ key: 't' }), symbol: '(', instruments: ['KENDANG' as Instrument] },
+// { id: '', keystroke: ks({ key: 'n' }), symbol: '0', instruments: ['KENDANG' as Instrument] },
+// { id: '', keystroke: ks({ key: 'u' }), symbol: ')', instruments: ['KENDANG' as Instrument] }
+// ].map((obj, idx) => ({ ...obj, id: `${idx}` }))
 
 const larasMappings: EditableKeyMapping[] = [
     { id: '', keystroke: ks({ key: 'O' }), symbol: 'o,', instruments: ['MELODIC' as PositionGroup] },
