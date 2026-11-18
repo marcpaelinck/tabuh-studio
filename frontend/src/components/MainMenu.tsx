@@ -34,7 +34,7 @@ type Action =
     | 'score-new'
     | 'score-details'
     | 'score-close'
-    | 'file-open'
+    | 'score-open'
     | 'file-open-json'
     | 'file-import-notation'
     | 'file-import-laras'
@@ -166,7 +166,7 @@ export function MainMenu({
             case 'settings-keyboard':
                 setKeyMapEditorOpen(true)
                 break
-            case 'file-open':
+            case 'score-open':
                 // Reset the selection before opening (the Drawer has no onOpen hook); the
                 // ScoreBrowser handles the orchestra default.
                 setSelectedScoreOption(null)
@@ -290,7 +290,7 @@ export function MainMenu({
                         tip="Open a score from the library"
                         className="text-xs"
                         active={mainMenuActiveItem == 'menu-open'}
-                        eventKey="file-open">
+                        eventKey="score-open">
                         Open...
                     </NavItemTip>
                 </div>
