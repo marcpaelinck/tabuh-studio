@@ -130,3 +130,8 @@ Initial release
 - `Fixed` Player progress bar tooltip too narrow
 - `Fixed` Illegal character 'b' for balegangjur reyong position
 - `Added` Gong kebyar trompong samples
+
+## 1.1.15 2026-11-18
+
+- `Fixed` Keyboard definition does not take instrument into account
+- `Changed` Order of orchestra in score selector - gong kebyar is now selected by default
