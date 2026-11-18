@@ -1,3 +1,4 @@
+import { orchestraConfigs } from '@tabuhstudio/shared/config/position'
 import { useEffect, useMemo, useState, type JSX } from 'react'
 import { Button, ButtonGroup } from 'rsuite'
 import { useGroupsStore } from '../stores/useGroupsStore'
@@ -20,6 +21,7 @@ interface ScoreBrowserProps {
  * scrollable, filtered score list. Shared by the desktop "Open" drawer and the mobile "Scores"
  * view. Orchestras are the distinct types among the available scores; groups are the user's
  * subscriptions (empty when logged out, so only orchestras show).
+ * The sorting order for the orchestras is taken from the key order in `orchestraConfigs` (shared/config/position.ts)
  */
 export function ScoreBrowser({
     scoreMenuOptions,
@@ -33,13 +35,14 @@ export function ScoreBrowser({
         [groups, subscriptions]
     )
 
-    const orchestraOptions = useMemo(
-        () =>
-            [...new Set(scoreMenuOptions.map((o) => o.objValue.instrumentgroup))]
-                .sort()
-                .map((g) => ({ label: g.replace(/_/g, ' '), value: g })),
-        [scoreMenuOptions]
-    )
+    const orchestraOptions = useMemo(() => {
+        const tst = [...new Set(scoreMenuOptions.map((o) => o.objValue.instrumentgroup))]
+            // same sorting order as orchestraConfigs keys.
+            .sort((o1, o2) => Object.keys(orchestraConfigs).indexOf(o1) - Object.keys(orchestraConfigs).indexOf(o2))
+            .map((g) => ({ label: g.replace(/_/g, ' '), value: g }))
+        console.log(tst)
+        return tst
+    }, [scoreMenuOptions])
 
     const [filter, setFilter] = useState<ScoreFilterPref | null>(null)
 
