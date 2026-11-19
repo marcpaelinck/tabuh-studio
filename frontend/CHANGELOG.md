@@ -135,3 +135,8 @@ Initial release
 
 - `Fixed` Keyboard definition does not take instrument into account
 - `Changed` Order of orchestra in score selector - gong kebyar is now selected by default
+
+## 1.1.16 2026-11-19
+
+- `Fixed` Reyong animation only shows position 1
+- `Fixed` Casting assigns wrong octtave to reyong2 DUNG
