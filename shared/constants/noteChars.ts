@@ -76,7 +76,8 @@ export const STROKE_MODIFIER_MAP: ReadonlyMap<string, string> = new Map([
     [';', 'tremolo'],
     [':', 'acceleratingtremolo'],
     ['[', 'rakeleft'],
-    [']', 'rakeright']
+    [']', 'rakeright'],
+    ['2', 'note2']
 ])
 export const STROKE_MODIFIERS: ReadonlySet<string> = new Set(STROKE_MODIFIER_MAP.keys())
 export const STROKE_MODIFIER_TYPES: ReadonlySet<string> = new Set(STROKE_MODIFIER_MAP.values())

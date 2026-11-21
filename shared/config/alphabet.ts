@@ -46,6 +46,14 @@ export const alphabet: Record<NoteSymbol, AlphabetItem> = {
         description: 'Lanang stroke',
         positions: ['KENDANG_LANANG', 'KENDANG_WADON', 'KENDANG']
     },
+    '2': {
+        kind: 'modifier',
+        combinesWith: ['melodic'],
+        combinesWithPrefix: true,
+        name: 'Octave Stroke',
+        description: '2 simultaneous tones one octave apart.',
+        positions: ['TROMPONG']
+    },
     '8': {
         kind: 'tone',
         category: 'percussion',

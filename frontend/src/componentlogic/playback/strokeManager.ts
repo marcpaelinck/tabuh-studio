@@ -96,7 +96,10 @@ export function createNoteActions(args: CreateStrokeArgs): PlaybackSamplerAction
         returnValue.push(...mutedNoteAction(args))
         return returnValue
     }
-
+    if (args.note.stroke.note2) {
+        returnValue.push(...note2Action(args))
+        return returnValue
+    }
     // The following strokes are emulated with a sequence of notes.
     if (args.note.stroke.halfduration) return halfDurationAction(args)
     if (args.note.stroke.tremolo) return tremoloAction(args)
@@ -223,6 +226,18 @@ function mutedNoteAction(args: CreateStrokeArgs): PlaybackSamplerAction[] {
                 isLastOfMotif: true
             })
         ]
+    }
+}
+
+function note2Action(args: CreateStrokeArgs): PlaybackSamplerAction[] {
+    const symbol = args.note.symbol
+    if (args.note.hasSample() || args.forceEmulation) {
+        const note = new NoteObject(symbol.pitch + symbol.octave + symbol.modifier, args.note.position)
+        return [newAction({ args, note })]
+    } else {
+        // Play single note
+        const note = new NoteObject(symbol.pitch + symbol.octave, args.note.position)
+        return [newAction({ args, note })]
     }
 }
 

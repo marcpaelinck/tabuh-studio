@@ -232,6 +232,7 @@ export class NoteObject {
         this.stroke = {
             damped: false,
             muted: false,
+            note2: false,
             halfduration: false,
             tremolo: false,
             acceleratingtremolo: false,

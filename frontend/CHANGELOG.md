@@ -140,3 +140,8 @@ Initial release
 
 - `Fixed` Reyong animation only shows position 1
 - `Fixed` Casting assigns wrong octtave to reyong2 DUNG
+
+## 1.1.17 2026-11-21
+
+- `Added` 'Note2' modifier for trompong - plays two notes an octave apart.
+- `Fixed` Casting assigns wrong octtave to reyong2 DUNG
