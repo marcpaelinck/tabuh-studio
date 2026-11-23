@@ -145,14 +145,14 @@ export const SystemNode = memo(function SystemNode({
     useEffect(() => {
         const compactStyle = createGridStyle({
             beatColWidths,
-            kempliFrequency: systemData.kempli.frequency || null,
+            kempli: systemData.kempli,
             cursor: playbackCursor,
             cursorStyle: playbackCursor?.sysUuid == systemData.uuid ? cursorStyleRef.current : 'None',
             gridColors: gridColorsCompact
         })
         const expandedStyle = createGridStyle({
             beatColWidths,
-            kempliFrequency: systemData.kempli.frequency || null,
+            kempli: systemData.kempli,
             cursor: playbackCursor,
             cursorStyle: playbackCursor?.sysUuid == systemData.uuid ? cursorStyleRef.current : 'None',
             gridColors: gridColorsExpanded

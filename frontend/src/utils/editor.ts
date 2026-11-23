@@ -1,16 +1,21 @@
 import _ from 'lodash'
+import { defaultBeatFrequency } from '../config/config'
 import type { PlaybackCursorStyle } from '../typing/animation'
 import type { EditorCursor } from '../typing/playback'
+import type { KempliSetting } from '../typing/score'
 
 interface GridColors {
     cursor: string
     kempli: string
+    /** Beat-line color when the system's kempli is 'off' (gray — the beat is not sounded). */
+    kempliOff: string
     grid: string
     background: string
 }
 export const gridColorsCompact = {
     cursor: 'rgba(255, 255, 0, 0.5)',
     kempli: 'rgba(238, 0, 255, 0.52)',
+    kempliOff: 'rgba(0, 0, 0, 0.2)',
     grid: 'rgba(0, 0, 0, 0.2)',
     background: 'rgba(255, 255, 255, 0.9)'
 }
@@ -18,6 +23,7 @@ export const gridColorsCompact = {
 export const gridColorsExpanded = {
     cursor: 'rgba(255, 255, 0, 0.5)',
     kempli: 'rgba(0, 255, 0, 0.8)',
+    kempliOff: 'rgba(0, 0, 0, 0.2)',
     grid: 'rgba(0, 0, 0, 0.2)',
     background: 'rgba(255, 255, 255, 0.9)'
 }
@@ -25,33 +31,44 @@ export const gridColorsExpanded = {
 // Returns a style object that displays a grid behind the System's notation area.
 // This function is used both for the compact and the expanded notation.
 // The grid consists of:
-// - vertical colored lines at kempli beat positions;
+// - vertical colored lines at kempli beat positions (gray when kempli.state === 'off');
 // - vertical gray lines at non-beat positions;
 // - a highlighted area called (editor) cursor that moves in sync with the audio playback.
 interface CreateGridStyleAttributes {
     beatColWidths: number[]
-    kempliFrequency: number | null
+    kempli: KempliSetting
     cursor: EditorCursor | null
     cursorStyle: PlaybackCursorStyle
     gridColors: GridColors
 }
 export function createGridStyle({
     beatColWidths,
-    kempliFrequency,
+    kempli,
     cursor,
     cursorStyle,
     gridColors
 }: CreateGridStyleAttributes): Record<string, string> {
     // Generates a gradient function for the kempli lines
     function kempliGrid(): string {
-        if (!kempliFrequency) {
+        const isOff = kempli.state === 'off'
+        // Off: beat lines are drawn gray (the beat is not sounded); on/notation use the palette color.
+        const kempliColor = isOff ? gridColors.kempliOff : gridColors.kempli
+        // Off: still show (gray) beat lines at the current frequency, defaulting to 4 when unavailable.
+        // On/notation: a positive frequency gives regular lines; a negative value is irregular (notation).
+        const frequency = isOff
+            ? kempli.frequency && kempli.frequency > 0
+                ? kempli.frequency
+                : defaultBeatFrequency
+            : kempli.frequency || null
+
+        if (!frequency) {
             return ''
         }
-        if (kempliFrequency > 0) {
+        if (frequency > 0) {
             return `repeating-linear-gradient(
                         to right,
-                        ${gridColors.kempli} 0px 2px,
-                        transparent 2px ${kempliFrequency}ch
+                        ${kempliColor} 0px 2px,
+                        transparent 2px ${frequency}ch
                         ),`
         } else if (beatColWidths && beatColWidths.length > 0) {
             // Irregular kempli beats (from notation)
@@ -66,7 +83,7 @@ export function createGridStyle({
                 .map((index, idx, arr) => {
                     const transpEnd = idx < arr.length - 1 ? `calc(${arr[idx + 1]}ch)` : '100%'
                     const css =
-                        `${gridColors.kempli} ${index}ch calc(${index}ch + 2px),
+                        `${kempliColor} ${index}ch calc(${index}ch + 2px),
                                 transparent calc(${index}ch + 2px) ` + transpEnd
                     return css
                 })
