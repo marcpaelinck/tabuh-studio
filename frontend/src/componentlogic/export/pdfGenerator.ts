@@ -29,6 +29,7 @@ const BLUE = rgb(0, 0, 1)
 const BLACK = rgb(0, 0, 0)
 const DARK_RED = rgb(0x80 / 255, 0x34 / 255, 0x0d / 255)
 const GREEN = rgb(0, 0.8, 0)
+const PURPLE = rgb(238 / 255, 0, 1)
 const NOTATION_LEFT = LEFT + TAG_W
 
 interface Fonts {
@@ -340,7 +341,7 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
         // Metadata above.
         for (const line of aboveLines) drawLine(line)
 
-        // Green kempli lines behind the notation rows, centred on each beat's first symbol
+        // Purple kempli lines behind the notation rows, centred on each beat's first symbol
         // (like the editor's grid), not on the symbol's left edge.
         const notationTop = y
         const notationBottom = notationTop - sys.rows.length * NOTATION_ROW_H
@@ -351,7 +352,7 @@ export async function generatePdf(model: PdfDocumentModel): Promise<Uint8Array> 
                     start: { x, y: notationBottom },
                     end: { x, y: notationTop },
                     thickness: 1.5,
-                    color: GREEN,
+                    color: PURPLE,
                     opacity: 0.5
                 })
             }
