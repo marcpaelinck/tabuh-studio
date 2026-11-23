@@ -386,7 +386,19 @@ export const SystemNode = memo(function SystemNode({
                 )}
             </Grid>
         )
-    }, [systemData, playbackCursor, audioState, playbackType, editorView, notationWidth, playing, keyMap, orchestraPositions, structureVersion])
+    }, [
+        systemData,
+        playbackCursor,
+        audioState,
+        playbackType,
+        editorView,
+        notationWidth,
+        playing,
+        keyMap,
+        orchestraPositions,
+        structureVersion,
+        labelDict
+    ])
 
     return notationArea
 })
