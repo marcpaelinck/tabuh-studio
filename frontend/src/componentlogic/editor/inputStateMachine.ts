@@ -128,6 +128,20 @@ export function setModifier(state: EditorStaffState, char: string, position: Pos
 }
 
 /**
+ * Octave-shifts a single symbol by `delta` (`','` = -1, `''` = 0, `'<'` = +1). Returns the new
+ * NoteObject, or `null` when the symbol cannot be shifted: it is not a melodic note, the target octave
+ * is out of range (below -1 / above +1), or the resulting symbol is invalid for the position.
+ */
+function octavateSymbol(sym: NoteObject, delta: -1 | 1, position: Position | undefined): NoteObject | null {
+    if (sym.error || !NoteObject.isMelodic(sym.symbol.pitch)) return null
+    const next = sym.octaveNumber + delta
+    if (next < -1 || next > 1) return null
+    const octaveChar = next === -1 ? ',' : next === 1 ? '<' : ''
+    const raw = sym.symbol.prefix + sym.symbol.pitch + octaveChar + sym.symbol.modifier
+    return tryBuild(raw, position)
+}
+
+/**
  * Raises (+1) or lowers (-1) the octave of the MELODIC note LEFT of the cursor
  * by changing its octave modifier (`','` = -1, `''` = 0, `'<'` = +1). It is a
  * no-op for non-melodic notes and when the octave is already at its limit
@@ -136,15 +150,50 @@ export function setModifier(state: EditorStaffState, char: string, position: Pos
 export function changeOctave(state: EditorStaffState, delta: -1 | 1, position: Position | undefined): EditorStaffState {
     const { symbols, cursorIndex } = state
     if (cursorIndex === 0) return state
-    const prev = symbols[cursorIndex - 1]
-    if (prev.error || !NoteObject.isMelodic(prev.symbol.pitch)) return state
-    const next = prev.octaveNumber + delta
-    if (next < -1 || next > 1) return state
-    const octaveChar = next === -1 ? ',' : next === 1 ? '<' : ''
-    const raw = prev.symbol.prefix + prev.symbol.pitch + octaveChar + prev.symbol.modifier
-    const built = tryBuild(raw, position)
+    const built = octavateSymbol(symbols[cursorIndex - 1], delta, position)
     if (!built) return state
     return replaceSymbol(state, cursorIndex - 1, built)
+}
+
+/** Result of octavating a selection range: the new symbols on success, or a reason to show otherwise. */
+export type OctavateRangeResult = { ok: true; symbols: NoteObject[] } | { ok: false; reason: string }
+
+/**
+ * Octavates every MELODIC note in the range [from, to) by `delta`. Non-melodic symbols (rests,
+ * extensions, spaces) are skipped. All-or-nothing: it succeeds only when every melodic note in the
+ * range can be shifted; otherwise no symbol is changed and a reason is returned for the caller to
+ * surface. Also fails when the range contains no melodic notes at all. Does not mutate `symbols`.
+ */
+export function octavateRange(
+    symbols: NoteObject[],
+    from: number,
+    to: number,
+    delta: -1 | 1,
+    position: Position | undefined
+): OctavateRangeResult {
+    const lo = Math.max(0, Math.min(from, to))
+    const hi = Math.min(symbols.length, Math.max(from, to))
+    const out = symbols.slice()
+    let hasNote = false
+    for (let i = lo; i < hi; i++) {
+        const sym = symbols[i]
+        // Skip non-melodic symbols (rests / extensions / spaces) — they are not notes.
+        if (sym.error || !NoteObject.isMelodic(sym.symbol.pitch)) continue
+        hasNote = true
+        const built = octavateSymbol(sym, delta, position)
+        if (!built) {
+            return {
+                ok: false,
+                reason:
+                    delta > 0
+                        ? 'Cannot raise the octave: some selected notes are already at the highest octave.'
+                        : 'Cannot lower the octave: some selected notes are already at the lowest octave.'
+            }
+        }
+        out[i] = built
+    }
+    if (!hasNote) return { ok: false, reason: 'There are no notes to octavate in the selection.' }
+    return { ok: true, symbols: out }
 }
 
 /**

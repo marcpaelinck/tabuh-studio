@@ -31,6 +31,7 @@ import type { ClipboardEvent, KeyboardEvent } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { registerEditor, useEditorStateStore, type EditorRestorer } from '../../stores/useEditorStateStore'
+import { useShowMessage } from '../useShowMessage'
 import { castGroupToSolo, type CastingInstruction } from '../castingRulesManager'
 import {
     applyString,
@@ -40,6 +41,7 @@ import {
     deleteRange,
     deleteRight,
     insertSymbol,
+    octavateRange,
     overwriteChar,
     overwriteString,
     overwriteSymbol,
@@ -201,6 +203,13 @@ export function useCompactSystemEditor({
     const [focused, setFocused] = useState(false)
     const setSelection = useEditorStateStore((s) => s.setSelection)
 
+    // Toast used when an operation can't be applied (e.g. octavating a range whose notes would go out of
+    // range). Held in a ref so the stable `onKeyDown` callback need not depend on `showMessage`, which
+    // `useShowMessage` re-creates each render.
+    const { showMessage } = useShowMessage()
+    const showMessageRef = useRef(showMessage)
+    showMessageRef.current = showMessage
+
     // Latest state, read synchronously by the undo/redo restorer (see registerEditor).
     const stateRef = useRef(state)
     stateRef.current = state
@@ -253,7 +262,7 @@ export function useCompactSystemEditor({
     // When `collapse` is true (the default, for text edits) any selection is deleted first
     // so the op replaces it; octave/modifier tweaks pass `collapse = false`.
     const runEdit = useCallback(
-        (op: (s: EditorStaffState) => EditorStaffState, collapse = true) => {
+        (op: (s: EditorStaffState) => EditorStaffState, collapse = true, preserveSelection = false) => {
             const st = stateRef.current
             const line = st.lines[st.cursor.line]
             if (!line) return
@@ -278,7 +287,8 @@ export function useCompactSystemEditor({
             const next: CompactEditorState = {
                 lines,
                 cursor: { line: st.cursor.line, index: result.cursorIndex },
-                anchor: null
+                // Keep the selection for range ops (e.g. octavation) so it can be repeated/reverted.
+                anchor: preserveSelection ? st.anchor : null
             }
             setState(() => next)
         },
@@ -416,12 +426,23 @@ export function useCompactSystemEditor({
                     )
                     break
                 // Edits run through runEdit (side effects happen in the handler, not in render).
+                // Octave up/down. With a selection, octavate every melodic note in the range
+                // (all-or-nothing; non-melodic symbols are skipped) and keep the selection so the shift
+                // can be repeated/reverted; a toast explains any case where nothing is applied. Without a
+                // selection, shift the single note left of the cursor.
                 case 'octaveUp':
-                    runEdit((s) => changeOctave(s, 1, COMPACT_POSITION), false)
+                case 'octaveDown': {
+                    const delta: 1 | -1 = action.type === 'octaveUp' ? 1 : -1
+                    if (sel) {
+                        const line = st0.lines[st0.cursor.line]
+                        const res = line ? octavateRange(line.notation, sel[0], sel[1], delta, COMPACT_POSITION) : null
+                        if (res?.ok) runEdit((s) => ({ ...s, symbols: res.symbols }), false, true)
+                        else if (res) showMessageRef.current({ message: res.reason, type: 'info' })
+                    } else {
+                        runEdit((s) => changeOctave(s, delta, COMPACT_POSITION), false)
+                    }
                     break
-                case 'octaveDown':
-                    runEdit((s) => changeOctave(s, -1, COMPACT_POSITION), false)
-                    break
+                }
                 case 'deleteLeft':
                     // With a selection, runEdit deletes it (identity op); else delete left.
                     runEdit(sel ? (s) => s : deleteLeft)
