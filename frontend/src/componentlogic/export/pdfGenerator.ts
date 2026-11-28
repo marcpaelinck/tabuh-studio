@@ -28,6 +28,7 @@ const ID_SIZE = 7
 const BLUE = rgb(0, 0, 1)
 const BLACK = rgb(0, 0, 0)
 const DARK_RED = rgb(0x80 / 255, 0x34 / 255, 0x0d / 255)
+// @ts-expect-error GREEN is kept for future use
 const GREEN = rgb(0, 0.8, 0)
 const PURPLE = rgb(238 / 255, 0, 1)
 const NOTATION_LEFT = LEFT + TAG_W
