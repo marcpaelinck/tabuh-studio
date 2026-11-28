@@ -144,4 +144,11 @@ Initial release
 ## 1.1.17 2026-11-21
 
 - `Added` 'Note2' modifier for trompong - plays two notes an octave apart.
-- `Fixed` Casting assigns wrong octtave to reyong2 DUNG
+
+## 1.1.18 2026-11-28
+
+- `Added` Possibility to octavate a selected range of notes.
+- `Changed` Changed the colors of kempli lines in PDF export to match editors (compact/expanded)
+- `Fixed` New system label not immediately available in execution directives such as 'goto'.
+- `Fixed` Editor: when kempli is off, kempli lines are now gray instead of colored.
+- `Fixed` Corrected incorrect spacing of 'illegal' note symbol (question mark inside diamond shape).
