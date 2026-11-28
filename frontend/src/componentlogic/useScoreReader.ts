@@ -22,10 +22,9 @@ import { readFile } from '../utils/filesystem'
 import { scoreToFormattedJson } from '../utils/objectUtils'
 import { allowedPositionGroups } from './castingRulesManager'
 import { expandSystem } from './expandNotation'
-import { buildMidiNoteMapModel, generateMidiNoteMapPdf } from './export/midiNoteMap'
-import { generatePdf } from './export/pdfGenerator'
-import { buildPdfModel } from './export/pdfModel'
-import { generateMidiFile, midiTrackPositions } from './playback/midiGenerator'
+// NOTE: the PDF/MIDI export modules (and their heavy deps pdf-lib, @pdf-lib/fontkit, @tonejs/midi) are
+// loaded lazily via dynamic import() inside the save functions below, so they are code-split out of the
+// main bundle and only fetched when the user actually exports.
 import { buildTimeline } from './playback/timelineBuilder'
 
 export function persistCachedChanges(score: Score | undefined): Score | undefined {
@@ -377,6 +376,8 @@ export function useScoreReader(source: 'database' | 'file'): {
             { useCache: true, beatPosition, forceStrokeEmulation: true }
         )
         if (!timeline) return false
+        const [{ generateMidiFile, midiTrackPositions }, { buildMidiNoteMapModel, generateMidiNoteMapPdf }] =
+            await Promise.all([import('./playback/midiGenerator'), import('./export/midiNoteMap')])
         const stem = fileStem(score)
         const positions = midiTrackPositions(timeline)
         return saveFilesToFolder([
@@ -393,6 +394,10 @@ export function useScoreReader(source: 'database' | 'file'): {
     // Exports the score as a formatted notation PDF (compact grouped notation).
     async function saveScoreToPdfFile(score: Score | undefined): Promise<boolean> {
         if (!score) return false
+        const [{ buildPdfModel }, { generatePdf }] = await Promise.all([
+            import('./export/pdfModel'),
+            import('./export/pdfGenerator')
+        ])
         const model = buildPdfModel(score)
         const bytes = (await generatePdf(model)) as BlobPart
         return saveToLocalFile(bytes, `${fileStem(score)}.pdf`, 'application/pdf', '.pdf', 'PDF document')

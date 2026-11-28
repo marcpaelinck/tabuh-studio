@@ -21,9 +21,12 @@ export default defineConfig(({ mode }) => {
             chunkSizeWarningLimit: 1500,
             rollupOptions: {
                 output: {
-                    entryFileNames: `assets/[name].js`,
-                    chunkFileNames: `assets/[name].js`,
-                    assetFileNames: `assets/[name].[ext]`
+                    // Content hash in the filename so a new deploy busts browser/CDN caches (and so the
+                    // lazy-loaded export chunks cache independently). Vite rewrites index.html to the
+                    // hashed names automatically.
+                    entryFileNames: `assets/[name]-[hash].js`,
+                    chunkFileNames: `assets/[name]-[hash].js`,
+                    assetFileNames: `assets/[name]-[hash].[ext]`
                 }
             },
             sourcemap: true
