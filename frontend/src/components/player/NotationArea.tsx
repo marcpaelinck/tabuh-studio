@@ -16,6 +16,18 @@ import type {
 import type { PlayerCursorParameters } from '../../typing/playback'
 import { debug } from '../../utils/debugger'
 
+// Style for the playback highlight, which is drawn via the CSS Custom Highlight API (see
+// `CSS.highlights.set('notation-highlight', …)` below). It is injected at runtime rather than written
+// in index.css because index.css is compiled by Tailwind's lightningcss (1.32.0), which does not yet
+// recognise the `::highlight()` pseudo-element and emits a build warning. Injecting here bypasses that
+// CSS pipeline. Runs once (module is cached; the id guard also covers dev HMR re-imports).
+if (typeof document !== 'undefined' && !document.getElementById('notation-highlight-style')) {
+    const style = document.createElement('style')
+    style.id = 'notation-highlight-style'
+    style.textContent = '::highlight(notation-highlight){background-color:peachpuff}'
+    document.head.appendChild(style)
+}
+
 // function scrollIntoContainerView(element: HTMLElement | null, container: HTMLElement | null) {
 //     if (!element || !container) return
 //     const elementRect = element.getBoundingClientRect()

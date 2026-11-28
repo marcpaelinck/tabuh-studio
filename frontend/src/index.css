@@ -8,9 +8,8 @@ body,
     height: 100%;
 }
 
-::highlight(notation-highlight) {
-    background-color: peachpuff;
-}
+/* The playback highlight (CSS Custom Highlight API) is styled at runtime in NotationArea.tsx, not
+   here, so Tailwind's lightningcss doesn't warn about the ::highlight() pseudo-element. */
 
 :root {
     font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
