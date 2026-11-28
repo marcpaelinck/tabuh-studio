@@ -152,3 +152,4 @@ Initial release
 - `Fixed` New system label not immediately available in execution directives such as 'goto'.
 - `Fixed` Editor: when kempli is off, kempli lines are now gray instead of colored.
 - `Fixed` Corrected incorrect spacing of 'illegal' note symbol (question mark inside diamond shape).
+- `Fixed` Fixed FE compiler warnings (unused variables, unrecognized CSS pweude-element, large chunks)
